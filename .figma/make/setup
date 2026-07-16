@@ -1,0 +1,13 @@
+#!/bin/bash
+set -e
+
+echo "Checking system dependencies..."
+
+NODE_VERSION="$(node --version 2>/dev/null || echo "none")"
+if [[ "$NODE_VERSION" == "none" ]]; then
+  echo "Node.js is required but was not found."
+  exit 1
+fi
+echo "Node $NODE_VERSION OK"
+
+echo "System dependencies verified."

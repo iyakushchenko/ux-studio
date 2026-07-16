@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Frame219 from "@/imports/Frame1000007317/index";
 import locationsMapChosen from "@/assets/locations-map-chosen.png";
 import AvailabilityTool, {
@@ -10,6 +10,9 @@ import RecipientPickerPopup, {
   recipientModeLabel,
   type RecipientMode,
 } from "@/app/RecipientPickerPopup";
+import ProtoNavChrome from "@/app/ProtoNavChrome";
+import ProtoHubViewport from "@/app/ProtoHubViewport";
+import { PROTO_HUB_LABEL, PROTO_SCREENS } from "@/app/protoScreens";
 import type { VaccineItem } from "@/app/protoVaccineList";
 import {
   setupChosenPageMap,
@@ -34,19 +37,7 @@ import {
  *   SELECTED = swap child 7’s search block for child 5’s map + Change location
  *   Change location → Availability Tool location picker (child 5 is never a nav screen)
  */
-const SCREENS = [
-  { label: "Agentic. Site Pilot. Home", childIndex: 11 },
-  { label: "Agentic. Site Pilot. Chat", childIndex: 10 },
-  { label: "PLP. Vaccinations",         childIndex: 9  },
-  { label: "PDP. Vaccine Details Page", childIndex: 8  },
-  { label: "Book - Step 1 - Location",  childIndex: 7  },
-  // childIndex 6 = Locations lightbox — popup only
-  // childIndex 5 = selected-location UI template — not in nav
-  { label: "Book - Step 2 - Date and Time", childIndex: 4  },
-  { label: "Book - Step 3 - Confirmation", childIndex: 3  },
-  { label: "Appointment History",       childIndex: 2  },
-  { label: "Appointment Details",       childIndex: 1  },
-];
+const SCREENS = PROTO_SCREENS;
 
 type ChosenLocation = { name: string; address: string; storeId?: string };
 
@@ -566,11 +557,16 @@ export default function App() {
     DEFAULT_CHOSEN_RECIPIENT
   );
   const [recipientPickerOpen, setRecipientPickerOpen] = useState(false);
+  /** Logo hub — blank standalone page (content TBD). */
+  const [hubOpen, setHubOpen] = useState(false);
   /** True once the Agentic home query differs from the seeded default. */
   const [homeQueryDirty, setHomeQueryDirty] = useState(false);
   /** True once the Chat composer has any input. */
   const [chatComposerDirty, setChatComposerDirty] = useState(false);
-  const viewportRef = useRef<HTMLDivElement>(null);
+  const hubScrollElRef = useRef<HTMLDivElement>(null);
+  const prototypeScrollElRef = useRef<HTMLDivElement>(null);
+  const hubScrollPosRef = useRef(0);
+  const prototypeScrollPosRef = useRef(0);
   const tabsScrollRef = useRef<HTMLDivElement>(null);
   const tabBtnRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const chosenLocationRef = useRef(chosenLocation);
@@ -617,6 +613,37 @@ export default function App() {
     !homeQueryDirty &&
     !chatComposerDirty;
 
+  const saveHubScroll = useCallback(() => {
+    if (hubScrollElRef.current) {
+      hubScrollPosRef.current = hubScrollElRef.current.scrollTop;
+    }
+  }, []);
+
+  const savePrototypeScroll = useCallback(() => {
+    if (prototypeScrollElRef.current) {
+      prototypeScrollPosRef.current = prototypeScrollElRef.current.scrollTop;
+    }
+  }, []);
+
+  const resetPrototypeScroll = useCallback(() => {
+    prototypeScrollPosRef.current = 0;
+    if (prototypeScrollElRef.current) {
+      prototypeScrollElRef.current.scrollTop = 0;
+    }
+  }, []);
+
+  const restoreHubScroll = useCallback(() => {
+    const el = hubScrollElRef.current;
+    if (!el) return;
+    const apply = () => {
+      el.scrollTop = hubScrollPosRef.current;
+    };
+    apply();
+    requestAnimationFrame(apply);
+    window.setTimeout(apply, 0);
+    window.setTimeout(apply, 120);
+  }, []);
+
   const resetPrototype = () => {
     // Stay on the current nav screen; only wipe interaction / DOM state.
     try {
@@ -638,12 +665,20 @@ export default function App() {
   }, [current]);
 
   useEffect(() => {
-    if (viewportRef.current) viewportRef.current.scrollTop = 0;
-  }, [current]);
+    if (!hubOpen) return;
+    restoreHubScroll();
+    const el = hubScrollElRef.current;
+    const inner = el?.firstElementChild;
+    if (!el || !inner) return;
+
+    const ro = new ResizeObserver(() => restoreHubScroll());
+    ro.observe(inner);
+    return () => ro.disconnect();
+  }, [hubOpen, restoreHubScroll]);
 
   // Boots Pharmacy logo + breadcrumb “Home” → page 1 (Agentic Site Pilot Home)
   useEffect(() => {
-    const root = viewportRef.current;
+    const root = prototypeScrollElRef.current;
     if (!root) return;
 
     const goHome = (e: Event) => {
@@ -653,6 +688,8 @@ export default function App() {
         (e as Event).stopImmediatePropagation();
       }
       setAvailabilityOpen(false);
+      setHubOpen(false);
+      resetPrototypeScroll();
       setCurrent(0);
     };
 
@@ -2690,10 +2727,31 @@ export default function App() {
     return () => favBtn.removeEventListener("click", toggle);
   }, []);
 
-  const go = (i: number) => setCurrent(Math.max(0, Math.min(SCREENS.length - 1, i)));
+  const go = (i: number) => {
+    const wasHub = hubOpen;
+    if (wasHub) saveHubScroll();
+    const next = Math.max(0, Math.min(SCREENS.length - 1, i));
+    setHubOpen(false);
+    if (wasHub || next !== current) {
+      resetPrototypeScroll();
+    }
+    setCurrent(next);
+  };
+
+  const openHub = () => {
+    if (hubOpen) {
+      saveHubScroll();
+      setHubOpen(false);
+      return;
+    }
+
+    savePrototypeScroll();
+    setHubOpen(true);
+  };
 
   const { label, childIndex } = SCREENS[current];
-  const isScreen1 = childIndex === 11;
+  const isScreen1 = childIndex === 11 && !hubOpen;
+  const navLabel = hubOpen ? PROTO_HUB_LABEL : label;
 
   /**
    * Screen 1 uses a height:100% chain so the body fills exactly the available
@@ -2822,101 +2880,42 @@ export default function App() {
     >
       <style>{dynamicCSS}</style>
 
-      {/* Top prototype nav — graphite chrome (not product primary) */}
-      <div className="shrink-0 bg-[#2e2e2e] shadow-lg" style={{ zIndex: 100 }}>
-        {/* Screen tabs — horizontal scroll on hover/wheel; active tab stays in view */}
+      <ProtoNavChrome
+        current={current}
+        hubOpen={hubOpen}
+        navLabel={navLabel}
+        isProtoPristine={isProtoPristine}
+        tabsScrollRef={tabsScrollRef}
+        tabBtnRefs={tabBtnRefs}
+        onOpenHub={openHub}
+        onGo={go}
+        onReset={resetPrototype}
+      />
+
+      {/* Hub + prototype each keep their own scroll position (stay mounted). */}
+      <div className="flex flex-1 min-h-0 w-full flex-col overflow-hidden bg-white">
         <div
-          ref={tabsScrollRef}
-          className="proto-nav-tabs flex items-center overflow-x-auto overflow-y-hidden px-2 pt-2"
-          style={{
-            scrollbarWidth: "none",
-            overscrollBehaviorX: "contain",
-          }}
+          ref={hubScrollElRef}
+          className={`proto-scroll min-h-0 flex-1 overflow-y-auto overflow-x-hidden w-full${
+            hubOpen ? "" : " hidden"
+          }`}
+          onScroll={saveHubScroll}
         >
-          {SCREENS.map((s, i) => (
-            <button
-              key={i}
-              ref={(node) => {
-                tabBtnRefs.current[i] = node;
-              }}
-              onClick={() => go(i)}
-              className={`flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold whitespace-nowrap rounded-t transition-all select-none shrink-0 ${
-                i === current
-                  ? "bg-[#467672] text-white"
-                  : "text-white/55 hover:text-white hover:bg-white/10"
-              }`}
-            >
-              <span
-                className={`inline-flex items-center justify-center w-4 h-4 rounded-full text-[9px] font-bold shrink-0 ${
-                  i === current ? "bg-white/25 text-white" : "bg-white/15 text-white/80"
-                }`}
-              >
-                {i + 1}
-              </span>
-              {s.label}
-            </button>
-          ))}
+          <ProtoHubViewport onGoToTab={go} />
         </div>
-
-        {/* Prev / next bar */}
-        <div className="flex items-center justify-between px-4 py-2 bg-black/20 border-t border-white/10">
-          <button
-            onClick={() => go(current - 1)}
-            disabled={current === 0}
-            className="flex items-center gap-1 text-[11px] text-white/75 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed px-2 py-1 rounded hover:bg-white/10 transition-colors"
+        <div
+          ref={prototypeScrollElRef}
+          className={`proto-scroll min-h-0 flex-1 overflow-y-auto overflow-x-hidden w-full${
+            hubOpen ? " hidden" : ""
+          }`}
+          onScroll={savePrototypeScroll}
+        >
+          <div
+            className="proto-viewport w-full"
+            style={{ height: isScreen1 ? "100%" : "auto" }}
           >
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <path d="M7.5 2L3.5 6L7.5 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            Previous
-          </button>
-
-          <div className="flex items-center gap-3">
-            <span className="text-white/45 text-[10px]">{current + 1} / {SCREENS.length}</span>
-            {!isProtoPristine && (
-              <button
-                type="button"
-                onClick={resetPrototype}
-                title="Reset page states (stay on this screen)"
-                className="text-[10px] font-semibold uppercase tracking-wide text-white/70 hover:text-white border border-white/25 hover:border-white/50 px-2 py-0.5 rounded transition-colors"
-              >
-                Reset
-              </button>
-            )}
-            <span className="text-white text-[11px] font-semibold">{label}</span>
-            <div className="flex gap-1">
-              {SCREENS.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => go(i)}
-                  className={`rounded-full transition-all ${
-                    i === current ? "w-4 h-2 bg-[#467672]" : "w-2 h-2 bg-white/30 hover:bg-white/60"
-                  }`}
-                />
-              ))}
-            </div>
+            <Frame219 />
           </div>
-
-          <button
-            onClick={() => go(current + 1)}
-            disabled={current === SCREENS.length - 1}
-            className="flex items-center gap-1 text-[11px] text-white/75 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed px-2 py-1 rounded hover:bg-white/10 transition-colors"
-          >
-            Next
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <path d="M4.5 2L8.5 6L4.5 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      {/* Only this region scrolls — min-h-0 lets flex shrink so the chrome stays fixed */}
-      <div
-        ref={viewportRef}
-        className="proto-scroll flex-1 min-h-0 overflow-y-auto overflow-x-hidden w-full bg-white"
-      >
-        <div className="proto-viewport w-full" style={{ height: isScreen1 ? "100%" : "auto" }}>
-          <Frame219 />
         </div>
       </div>
 
