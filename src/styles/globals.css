@@ -2943,38 +2943,25 @@
   transition: opacity 0.15s !important;
 }
 
-/* ── Screen 1 – Body10 background images ───────────────────────────────────── */
+/* ── Screen 1 (Agentic home) – full-bleed background, no seam ───────────── */
 
-/* Remove the blurred dark blue overlay image */
-[data-name="image 52"] {
+.proto-viewport > div > div:nth-child(11) > [data-name="body"] {
+  background: linear-gradient(
+    165deg,
+    #c5dde8 0%,
+    #dbebf5 45%,
+    #e8f3f9 100%
+  ) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Decorative Figma layers — agentic home only (do not hide global image 52) */
+.proto-viewport > div > div:nth-child(11) > [data-name="body"] [data-name="image 52"],
+.proto-viewport > div > div:nth-child(11)
+  > [data-name="body"]
+  [data-name="light-neutral-olive-shiny-glowing-effects-abstract-background-design 1"] {
   display: none !important;
-}
-
-/* Stretch the smooth gradient to fill the full body area */
-[data-name="light-neutral-olive-shiny-glowing-effects-abstract-background-design 1"] {
-  position: absolute !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  transform: none !important;
-  translate: none !important;
-  user-select: none !important;
-  -webkit-user-select: none !important;
-  pointer-events: none !important;
-}
-[data-name="light-neutral-olive-shiny-glowing-effects-abstract-background-design 1"] img,
-[data-name="image 52"] img {
-  position: absolute !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  max-width: none !important;
-  object-fit: cover !important;
-  object-position: center !important;
-  user-select: none !important;
-  -webkit-user-select: none !important;
-  -webkit-user-drag: none !important;
-  pointer-events: none !important;
 }
 
 /* Agentic body decorative images — never selectable / draggable */
