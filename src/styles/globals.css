@@ -1,0 +1,363 @@
+/* Megamenu item chevrons were misaligned bottom due to items-end on the flex row */
+[data-name="component.mega.menu.item"] {
+  align-items: center !important;
+}
+
+/* ── Global CTA hover effects ───────────────────────────────────────────────────
+ * Primary  = navy pill (bg-[#012169])
+ * Secondary = white pill with teal border (border-[#afccca])
+ * Applied globally so every screen gets consistent button behaviour.
+ */
+
+/* ── Icon buttons (heart + share, h-[32px] pill) ─────────────────────────────── */
+
+.proto-viewport [data-name="component.input.button"][class*="h-[32px]"] {
+  cursor: pointer !important;
+  user-select: none !important;
+  position: relative !important;
+  background: transparent !important;
+}
+/* Perfect circle hover via pseudo-element — doesn't affect button layout */
+.proto-viewport [data-name="component.input.button"][class*="h-[32px]"]::before {
+  content: "" !important;
+  position: absolute !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  transition: background 0.18s ease !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+}
+.proto-viewport [data-name="component.input.button"][class*="h-[32px]"]:hover::before {
+  background: #eef8f7 !important;
+}
+.proto-viewport [data-name="component.input.button"][class*="h-[32px]"]:active::before {
+  background: #c6e5e1 !important;
+}
+.proto-viewport [data-name="component.input.button"][class*="h-[32px]"]:hover svg path {
+  fill: #01318f !important;
+  transition: fill 0.18s ease !important;
+}
+
+/* Heart hover when favourited — deepen fuchsia */
+.proto-viewport [data-name="component.input.button"][class*="h-[32px]"]:hover [data-name="icon=add to wishlist"][data-fav-active="true"] svg path {
+  fill: #c2186e !important;
+}
+
+/* CTAs and toggle tabs: text non-selectable */
+.proto-viewport [data-name="component.input.button"],
+.proto-viewport [data-name="component.input.button"] *,
+.proto-viewport [data-name="units"][data-toggle-index],
+.proto-viewport [data-name="units"][data-toggle-index] * {
+  user-select: none !important;
+}
+
+/* Primary CTA — darken slightly, lift with shadow */
+.proto-viewport [data-name="component.input.button"][class*="bg-[#012169]"] {
+  cursor: pointer !important;
+  transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.12s ease !important;
+}
+.proto-viewport [data-name="component.input.button"][class*="bg-[#012169]"]:hover {
+  background: #01318f !important;
+  box-shadow: 0 4px 12px rgba(1,33,105,0.35) !important;
+  transform: translateY(-1px) !important;
+}
+.proto-viewport [data-name="component.input.button"][class*="bg-[#012169]"]:active {
+  background: #011a5c !important;
+  transform: translateY(0) !important;
+  box-shadow: none !important;
+}
+
+/* Secondary CTA — the border-[#afccca] is on an inner aria-hidden child,
+   so use :has() to target the button by its child */
+.proto-viewport [data-name="component.input.button"]:has(> [aria-hidden][class*="border-[#afccca]"]) {
+  cursor: pointer !important;
+  transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.12s ease !important;
+}
+.proto-viewport [data-name="component.input.button"]:has(> [aria-hidden][class*="border-[#afccca]"]):hover {
+  background: #c6e5e1 !important;
+  box-shadow: 0 4px 12px rgba(175,204,202,0.4) !important;
+  transform: translateY(-1px) !important;
+}
+.proto-viewport [data-name="component.input.button"]:has(> [aria-hidden][class*="border-[#afccca]"]):hover svg path {
+  fill: #01318f !important;
+}
+.proto-viewport [data-name="component.input.button"]:has(> [aria-hidden][class*="border-[#afccca]"]):hover * {
+  color: #01318f !important;
+}
+.proto-viewport [data-name="component.input.button"]:has(> [aria-hidden][class*="border-[#afccca]"]):active {
+  background: #afccca !important;
+  transform: translateY(0) !important;
+  box-shadow: none !important;
+}
+
+/* ── Sticky headers ─────────────────────────────────────────────────────────
+ * Sticky works because the scroll container (.proto-viewport's parent) is
+ * overflow-y:auto and no intermediate ancestor has overflow:hidden/clip.
+ * The prototype nav bar lives outside that scroll container so top:0 here
+ * means "top of the scrollable area", not the top of the window.
+ */
+
+/* Main navy header — sticky on every screen.
+ * On screen 2 the JS sticky-group wrapper overrides this, but the rule is
+ * harmless there because the wrapper itself is sticky at top: 0. */
+[data-name="boots-pharmacy.module.header"] {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 50 !important;
+}
+
+/* Frame337 (Site Pilot bar, screen 2) — sticky wrapper injected by JS handles
+ * this; no individual sticky rule needed here. */
+
+/* Breadcrumb bar — sticky below the header (or header+microheader on screen 2).
+ * --sticky-top is measured in JS after every screen switch so it always matches
+ * the actual rendered sticky group height. White background covers scrolling content. */
+[data-name="module.breadcrumbs"] {
+  position: sticky !important;
+  top: var(--sticky-top, 64px) !important;
+  z-index: 45 !important;
+  background: white !important;
+  width: 100% !important;
+}
+
+/* The breadcrumb background spans full width, but the inner padding container
+ * must be capped at 1440px (the Figma frame width) and centred — matching
+ * the header's own content column (max-w-[1312px] + px-[64px] = 1440px total). */
+[data-name="module.breadcrumbs"] > div > div {
+  max-width: 1440px !important;
+  width: 100% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* ── Screen 3: Vaccination Listing ─────────────────────────────────────────── */
+
+/* Hero: full-width band, content constrained to the 1440px optical grid.
+ * padding-inline grows at (viewport - 1440) / 2 so the background bleeds
+ * edge-to-edge while Copy + Image stay inside the same column as the header. */
+.proto-viewport > div > div:nth-child(9) [data-name="module.plp.hero"] {
+  width: 100% !important;
+  min-width: unset !important;
+  padding-left: max(0px, calc((100% - 1440px) / 2)) !important;
+  padding-right: max(0px, calc((100% - 1440px) / 2)) !important;
+}
+
+/* Remove the white bg wash so the blurred photo is the dominant background */
+.proto-viewport > div > div:nth-child(9) [data-name="component.plp.hero.bg"] {
+  background: transparent !important;
+  opacity: 1 !important;
+}
+
+/* Lower sections: backgrounds are already w-full; constrain inner content
+ * to max-width: 1440px so it aligns with the header/breadcrumb column.
+ *
+ * ModuleLaptopSpecs  (has aria-hidden bg div + sibling content div)
+ * ModuleLaptopSpecs1 (bg-white > centering div > padding div)
+ */
+.proto-viewport > div > div:nth-child(9) [data-name="module.laptop.specs"] > div:not([aria-hidden]) {
+  max-width: 1440px !important;
+  width: 100% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+.proto-viewport > div > div:nth-child(9) [data-name="module.laptop.specs"] > div > div {
+  max-width: 1440px !important;
+  width: 100% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Service tile cards in the listing are hardcoded w-[928px]; make them
+ * fill the flex-[1_0_0] Body8 column so they resize with the viewport. */
+.proto-viewport > div > div:nth-child(9) [data-name="boots-pharmacy.service.tile"] {
+  width: 100% !important;
+  min-width: unset !important;
+}
+
+/* ── Screen 4: Myself / Someone else toggle ─────────────────────────────────── */
+/* All rules scoped to [data-toggle-index] so they never bleed onto other
+   [data-name="units"] elements (e.g. the checkbox container). */
+
+/* Inactive tabs only get white bg — active tab keeps (or gets) teal.
+   Before JS fires, Units5 (Myself) retains its Figma bg-[#c6e5e1],
+   so the correct default is visible with zero flash. */
+.proto-viewport > div > div:nth-child(8) [data-name="units"][data-toggle-index]:not([data-toggle-active]) {
+  background: white !important;
+}
+
+/* Hide Figma aria-hidden border overlay on toggle tabs — we drive via box-shadow */
+.proto-viewport > div > div:nth-child(8) [data-name="units"][data-toggle-index] > [aria-hidden] {
+  display: none !important;
+}
+
+/* ACTIVE tab: teal fill, no border */
+.proto-viewport > div > div:nth-child(8) [data-name="units"][data-toggle-index][data-toggle-active] {
+  background: #c6e5e1 !important;
+  box-shadow: none !important;
+}
+
+/* INACTIVE left tab (Myself, index 0): border top + bottom + left, open on right */
+.proto-viewport > div > div:nth-child(8) [data-name="units"][data-toggle-index="0"]:not([data-toggle-active]) {
+  box-shadow:
+    inset 0 1px 0 #d6d6d6,
+    inset 0 -1px 0 #d6d6d6,
+    inset 1px 0 0 #d6d6d6 !important;
+}
+
+/* INACTIVE right tab (Someone else, index 1): border top + bottom + right, open on left */
+.proto-viewport > div > div:nth-child(8) [data-name="units"][data-toggle-index="1"]:not([data-toggle-active]) {
+  box-shadow:
+    inset 0 1px 0 #d6d6d6,
+    inset 0 -1px 0 #d6d6d6,
+    inset -1px 0 0 #d6d6d6 !important;
+}
+
+/* Hover: lighten inactive toggle tab slightly */
+.proto-viewport > div > div:nth-child(8) [data-name="units"][data-toggle-index]:not([data-toggle-active]):hover {
+  background: #eef8f7 !important;
+}
+
+/* ── Screen 4: Deal Details layout ──────────────────────────────────────────── */
+
+/* Card: constrain to 1440px and centre */
+.proto-viewport > div > div:nth-child(8) [data-name="module.pdp.rtb"] {
+  max-width: 1440px !important;
+  width: 100% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Inner row: gap equals the outer 48px padding so spacing is uniform */
+.proto-viewport > div > div:nth-child(8) [data-name="module.pdp.rtb"] > div > div {
+  gap: 48px !important;
+}
+
+/* Image wrapper (Frame127): true 50/50, keep 1:1 aspect ratio */
+.proto-viewport > div > div:nth-child(8) [data-name="module.pdp.rtb"] > div > div > :first-child {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  aspect-ratio: 1 / 1 !important;
+}
+
+/* Product image: fill its 1:1 wrapper, cover crop */
+.proto-viewport > div > div:nth-child(8) [data-name="component.product.image.basic"] {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  aspect-ratio: unset !important;
+}
+.proto-viewport > div > div:nth-child(8) [data-name="component.product.image.basic"] img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center top !important;
+}
+
+/* Right-side RTB: equal 50% half, fluid, explicit white so nothing bleeds through */
+.proto-viewport > div > div:nth-child(8) [data-name="component.pdp.rtb"] {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  width: auto !important;
+  background: white !important;
+}
+
+/* Promo bar: same width/centering as the card */
+.proto-viewport > div > div:nth-child(8) [data-name="component.gse.system.message"] {
+  max-width: 1440px !important;
+  width: 100% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* ── Screen 4: Second dose checkbox ─────────────────────────────────────────── */
+
+/* Strip every background from the checkbox section and all its descendants —
+   no tint, no hover fill, no outline anywhere */
+.proto-viewport > div > div:nth-child(8) [data-name="units"]:not([data-toggle-index]),
+.proto-viewport > div > div:nth-child(8) [data-name="units"]:not([data-toggle-index]) *:not([data-name="box"]) {
+  background: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.proto-viewport > div > div:nth-child(8) [data-name="component.input.checkbox"] {
+  cursor: pointer !important;
+  border-radius: 8px !important;
+  transition: background 0.18s ease !important;
+}
+/* Description text below: default arrow, not pointer */
+.proto-viewport > div > div:nth-child(8) [data-name="units"]:not([data-toggle-index]) > :not([data-name="component.input.checkbox"]) {
+  cursor: default !important;
+}
+.proto-viewport > div > div:nth-child(8) [data-name="units"]:not([data-toggle-index]) > :not([data-name="component.input.checkbox"]) * {
+  cursor: default !important;
+}
+.proto-viewport > div > div:nth-child(8) [data-name="component.input.checkbox"]:hover {
+  background: #eef8f7 !important;
+}
+.proto-viewport > div > div:nth-child(8) [data-name="component.input.checkbox"]:hover [data-name="Label"] p,
+.proto-viewport > div > div:nth-child(8) [data-name="component.input.checkbox"]:hover [data-name="Label"] span {
+  color: #000000 !important;
+}
+
+.proto-viewport > div > div:nth-child(8) [data-name="component.input.checkbox"][data-checkbox-checked="true"] [data-name="Label"] p,
+.proto-viewport > div > div:nth-child(8) [data-name="component.input.checkbox"][data-checkbox-checked="true"] [data-name="Label"] span {
+  font-weight: 700 !important;
+}
+
+/* Box checked: teal fill */
+.proto-viewport > div > div:nth-child(8) [data-name="component.input.checkbox"][data-checkbox-checked="true"] [data-name="box"] {
+  background: #c6e5e1 !important;
+  border-color: #c6e5e1 !important;
+}
+
+/* Box unchecked: white with grey border */
+.proto-viewport > div > div:nth-child(8) [data-name="component.input.checkbox"][data-checkbox-checked="false"] [data-name="box"] {
+  background: white !important;
+  border-color: #9e9e9e !important;
+  transition: background 0.18s ease, border-color 0.18s ease !important;
+}
+
+/* Box hover: fill with same teal as active toggle tab */
+.proto-viewport > div > div:nth-child(8) [data-name="component.input.checkbox"]:hover [data-name="box"] {
+  background: #c6e5e1 !important;
+  border-color: #c6e5e1 !important;
+}
+
+/* Checkmark hidden when unchecked */
+.proto-viewport > div > div:nth-child(8) [data-name="component.input.checkbox"][data-checkbox-checked="false"] [data-name="element. gse. checkbox. check mark"] {
+  opacity: 0 !important;
+  transition: opacity 0.15s !important;
+}
+
+/* ── Screen 1 – Body10 background images ───────────────────────────────────── */
+
+/* Remove the blurred dark blue overlay image */
+[data-name="image 52"] {
+  display: none !important;
+}
+
+/* Stretch the smooth gradient to fill the full body area */
+[data-name="light-neutral-olive-shiny-glowing-effects-abstract-background-design 1"] {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  transform: none !important;
+  translate: none !important;
+}
+[data-name="light-neutral-olive-shiny-glowing-effects-abstract-background-design 1"] img {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  object-fit: cover !important;
+  object-position: center !important;
+}
+
