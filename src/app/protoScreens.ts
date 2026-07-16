@@ -16,7 +16,7 @@ export const PROTO_SCREENS = [
 
 export type ProtoScreen = (typeof PROTO_SCREENS)[number];
 
-export const PROTO_HUB_LABEL = "Prototype Hub";
+export const PROTO_HUB_LABEL = "Onboarding";
 
 /** Nav counter: hub = 0, first tab = 1, … */
 export function protoNavIndex(hubOpen: boolean, current: number): number {

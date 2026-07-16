@@ -4,6 +4,7 @@ import {
   PROTO_HUB_SCREEN_GUIDE,
   type HubSection,
 } from "@/app/protoHubContent";
+import { BootsPharmacyLogo } from "@/app/BootsPharmacyLogo";
 import ProtoHubChatDiagram from "@/app/ProtoHubChatDiagram";
 import ProtoHubExperienceDiagram from "@/app/ProtoHubExperienceDiagram";
 import ProtoHubImageLightbox, {
@@ -15,6 +16,38 @@ import { protoScreenAtTab, protoTabToIndex } from "@/app/protoScreens";
 type Props = {
   onGoToTab: (screenIndex: number) => void;
 };
+
+const HUB_SCROLL_OFFSET = 24;
+
+function easeInOutCubic(progress: number) {
+  return progress < 0.5
+    ? 4 * progress * progress * progress
+    : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+}
+
+function prefersReducedMotion() {
+  return (
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
+function getHubScrollRoot(from: HTMLElement | null) {
+  return from?.closest(".proto-scroll") as HTMLElement | null;
+}
+
+function getScrollTopForTarget(
+  scrollRoot: HTMLElement,
+  targetEl: HTMLElement,
+  offset = HUB_SCROLL_OFFSET
+) {
+  const rootRect = scrollRoot.getBoundingClientRect();
+  const targetRect = targetEl.getBoundingClientRect();
+  const maxScroll = scrollRoot.scrollHeight - scrollRoot.clientHeight;
+  const top =
+    scrollRoot.scrollTop + (targetRect.top - rootRect.top) - offset;
+  return Math.min(Math.max(0, top), maxScroll);
+}
 
 function HubHighlights({ items }: { items: string[] }) {
   return (
@@ -106,11 +139,10 @@ export default function ProtoHubPage({ onGoToTab }: Props) {
   const scrollSettleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
     null
   );
+  const scrollAnimationRef = useRef<number | null>(null);
 
   useEffect(() => {
-    const scrollRoot = bodyRef.current?.closest(
-      ".proto-scroll"
-    ) as HTMLElement | null;
+    const scrollRoot = getHubScrollRoot(bodyRef.current);
     if (!scrollRoot) return;
 
     const sectionEls = sections
@@ -147,6 +179,13 @@ export default function ProtoHubPage({ onGoToTab }: Props) {
     };
 
     const onScroll = () => {
+      if (scrollAnimationRef.current != null) {
+        if (navLockRef.current) {
+          setActiveSectionId(navLockRef.current);
+        }
+        return;
+      }
+
       if (navLockRef.current) {
         setActiveSectionId(navLockRef.current);
       } else {
@@ -173,6 +212,9 @@ export default function ProtoHubPage({ onGoToTab }: Props) {
       if (scrollSettleTimerRef.current) {
         clearTimeout(scrollSettleTimerRef.current);
       }
+      if (scrollAnimationRef.current != null) {
+        cancelAnimationFrame(scrollAnimationRef.current);
+      }
     };
   }, [sections]);
 
@@ -180,33 +222,58 @@ export default function ProtoHubPage({ onGoToTab }: Props) {
     targetId: string,
     sectionIdForNav = targetId
   ) => {
-    const scrollRoot = bodyRef.current?.closest(
-      ".proto-scroll"
-    ) as HTMLElement | null;
+    const scrollRoot = getHubScrollRoot(bodyRef.current);
     const targetEl = document.getElementById(targetId);
     if (!scrollRoot || !targetEl) return;
 
-    const rootRect = scrollRoot.getBoundingClientRect();
-    const targetRect = targetEl.getBoundingClientRect();
-    const maxScroll = scrollRoot.scrollHeight - scrollRoot.clientHeight;
     const lastSectionId = sections[sections.length - 1]?.id;
-    let top = scrollRoot.scrollTop + (targetRect.top - rootRect.top) - 24;
+    let top = getScrollTopForTarget(scrollRoot, targetEl);
 
     if (sectionIdForNav === lastSectionId) {
-      top = maxScroll;
+      top = scrollRoot.scrollHeight - scrollRoot.clientHeight;
     }
-
-    top = Math.min(Math.max(0, top), maxScroll);
 
     navLockRef.current = sectionIdForNav;
     setActiveSectionId(sectionIdForNav);
-    scrollRoot.scrollTo({ top, behavior: "smooth" });
 
-    window.setTimeout(() => {
+    if (scrollAnimationRef.current != null) {
+      cancelAnimationFrame(scrollAnimationRef.current);
+      scrollAnimationRef.current = null;
+    }
+
+    const startTop = scrollRoot.scrollTop;
+    const distance = top - startTop;
+
+    if (Math.abs(distance) < 2 || prefersReducedMotion()) {
+      scrollRoot.scrollTop = top;
+      window.setTimeout(() => {
+        if (navLockRef.current === sectionIdForNav) {
+          navLockRef.current = null;
+        }
+      }, 50);
+      return;
+    }
+
+    const duration = Math.min(900, Math.max(450, Math.abs(distance) * 0.55));
+    const startTime = performance.now();
+
+    const animate = (now: number) => {
+      const progress = Math.min(1, (now - startTime) / duration);
+      scrollRoot.scrollTop = startTop + distance * easeInOutCubic(progress);
+
+      if (progress < 1) {
+        scrollAnimationRef.current = requestAnimationFrame(animate);
+        return;
+      }
+
+      scrollAnimationRef.current = null;
+      scrollRoot.scrollTop = top;
       if (navLockRef.current === sectionIdForNav) {
         navLockRef.current = null;
       }
-    }, 700);
+    };
+
+    scrollAnimationRef.current = requestAnimationFrame(animate);
   };
 
   const openFigure = (figure: {
@@ -225,8 +292,17 @@ export default function ProtoHubPage({ onGoToTab }: Props) {
     <>
       <main className="proto-hub-page" id="proto-hub-main">
         <div className="proto-hub-page__inner">
-          <header className="proto-hub-page__header">
+          <header className="proto-hub-page__hero">
+            <div className="proto-hub-page__hero-brand">
+              <BootsPharmacyLogo className="proto-hub-page__hero-logo" />
+            </div>
+            <p className="proto-hub-page__hero-eyebrow">Stakeholder walkthrough</p>
             <h1 className="proto-hub-page__h1">{title}</h1>
+            <ul className="proto-hub-page__hero-meta" aria-label="Prototype highlights">
+              <li>9 live screens</li>
+              <li>Agentic + browse paths</li>
+              <li>Persona-led journey</li>
+            </ul>
             <div className="proto-hub-page__lead">
               {lead.map((paragraph, i) => (
                 <p key={i}>{paragraph}</p>
@@ -412,13 +488,21 @@ export default function ProtoHubPage({ onGoToTab }: Props) {
                   AD UX Department · R&D Department
                 </p>
                 <p className="proto-hub-page__powered-detail">
-                  Internal experience tools behind this concept, stakeholder
-                  walkthrough, and persona journey.
+                  Internal experience tools (UXDS and X-Suite) behind this
+                  concept, stakeholder walkthrough, and persona journey.
                 </p>
                 <p className="proto-hub-page__powered-note">
                   AI-assisted content is grounded in real research and
                   human-reviewed before it is shared.
                 </p>
+                <div className="proto-hub-page__powered-credit">
+                  <p className="proto-hub-page__powered-credit-label">
+                    UX Concept and Documentation is prepared by
+                  </p>
+                  <p className="proto-hub-page__powered-credit-name">
+                    Igor Yakushchenko / UX Director @ Astound Digital © 2026
+                  </p>
+                </div>
               </div>
 
               <button

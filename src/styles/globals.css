@@ -42,6 +42,15 @@
   filter: none;
 }
 
+.proto-scroll {
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  .proto-scroll {
+    scroll-behavior: auto;
+  }
+}
+
 .proto-hub-page {
   --hub-primary: #36565d;
   --hub-primary-hover: #2d484e;
@@ -61,29 +70,82 @@
 .proto-hub-page__inner {
   max-width: 1120px;
   margin: 0 auto;
-  padding: 48px 40px 80px;
+  padding: 40px 40px 80px;
 }
-.proto-hub-page__header {
-  margin-bottom: 32px;
-  text-align: center;
+.proto-hub-page__hero {
+  margin-bottom: 40px;
+  padding: 40px 44px 36px;
+  border: 1px solid var(--hub-primary-border);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(54, 86, 93, 0.08) 0%, transparent 42%),
+    linear-gradient(135deg, #e8f2f1 0%, #f6fbfb 48%, #fff 100%);
+  box-shadow: 0 14px 36px var(--hub-primary-shadow-soft);
+  text-align: left;
+}
+.proto-hub-page__hero-brand {
+  margin-bottom: 22px;
+}
+.proto-hub-page__hero-logo {
+  display: block;
+  width: auto;
+  height: 34px;
+}
+.proto-hub-page__hero-eyebrow {
+  display: inline-block;
+  margin: 0 0 16px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid var(--hub-primary-border);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--hub-primary);
 }
 .proto-hub-page__h1 {
-  margin: 0 0 16px;
-  font-size: 28px;
+  margin: 0 0 20px;
+  max-width: 22ch;
+  font-size: clamp(28px, 4vw, 38px);
   font-weight: 600;
-  line-height: 1.25;
+  line-height: 1.12;
   color: var(--hub-primary);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
+}
+.proto-hub-page__hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 26px;
+  padding: 0;
+  list-style: none;
+}
+.proto-hub-page__hero-meta li {
+  padding: 7px 13px;
+  border: 1px solid var(--hub-primary-border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--hub-primary);
 }
 .proto-hub-page__lead {
   margin: 0;
+  max-width: 680px;
+  padding: 22px 24px;
+  border-left: 3px solid var(--hub-primary);
+  border-radius: 0 12px 12px 0;
+  background: rgba(255, 255, 255, 0.82);
   font-size: 16px;
-  line-height: 1.65;
-  color: #5c5c5c;
-  text-align: center;
+  line-height: 1.7;
+  color: #4a4a4a;
+  text-align: left;
 }
 .proto-hub-page__lead p {
-  margin: 0 0 14px;
+  margin: 0 0 16px;
 }
 .proto-hub-page__lead p:last-child {
   margin-bottom: 0;
@@ -483,6 +545,24 @@
   line-height: 1.45;
   color: #9a9da6;
 }
+.proto-hub-page__powered-credit {
+  margin: 0;
+  padding-top: 8px;
+  border-top: 1px solid #ececec;
+}
+.proto-hub-page__powered-credit-label {
+  margin: 0 0 4px;
+  font-size: 10px;
+  line-height: 1.45;
+  color: #9a9da6;
+}
+.proto-hub-page__powered-credit-name {
+  margin: 0;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.45;
+  color: #8a8d95;
+}
 .proto-hub-page__open-cta {
   display: flex;
   align-items: center;
@@ -514,6 +594,7 @@
 }
 .proto-hub-page__section {
   margin-bottom: 48px;
+  scroll-margin-top: 88px;
   text-align: left;
 }
 .proto-hub-page__section:last-child {
@@ -1043,6 +1124,19 @@
   .proto-hub-page__body {
     grid-template-columns: 1fr;
     gap: 24px;
+  }
+  .proto-hub-page__hero {
+    padding: 28px 24px 24px;
+  }
+  .proto-hub-page__hero-logo {
+    height: 28px;
+  }
+  .proto-hub-page__h1 {
+    max-width: none;
+    font-size: 28px;
+  }
+  .proto-hub-page__lead {
+    padding: 18px 18px 18px 16px;
   }
   .proto-hub-page__sidebar {
     position: static;
@@ -2232,7 +2326,7 @@
 }
 
 /* Agentic home — multiline query input (replaces static prompt text).
- * Fixed 5-line height; scroll after that (no resize handle, no auto-grow).
+ * Hugs wrapped line count (1–5 lines); shrinks when text is deleted; scrolls at max.
  * Mic + send stay top-aligned with the field. */
 .proto-viewport > div > div:nth-child(11) [data-name="Subtotal"] {
   align-items: flex-start !important;
@@ -2240,7 +2334,6 @@
 .proto-viewport > div > div:nth-child(11) textarea.proto-agentic-query {
   flex: 1 1 0 !important;
   min-width: 0 !important;
-  /* Hug content: 1 line empty → grow to max 5 lines, then scroll */
   height: 24px !important;
   min-height: 24px !important;
   max-height: 120px !important; /* 5 × 24px */
@@ -2257,8 +2350,7 @@
   padding: 0 !important;
   margin: 0 !important;
   overflow-x: hidden !important;
-  overflow-y: auto !important;
-  field-sizing: fixed !important;
+  overflow-y: hidden !important;
   scrollbar-width: none !important; /* Firefox */
   -ms-overflow-style: none !important; /* legacy Edge */
 }
@@ -2448,6 +2540,129 @@
   color: #7a7d87 !important;
 }
 .proto-viewport > div > div:nth-child(10) textarea.proto-agentic-query:focus {
+  outline: none !important;
+}
+
+/* Book Step 3 — Advantage Card points block (matches Frame218 spacing) */
+.proto-viewport > div > div:nth-child(3) .proto-confirm-advantage {
+  height: auto !important;
+  min-height: 104px !important;
+  max-height: none !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+  overflow: hidden !important;
+}
+.proto-viewport > div > div:nth-child(3) .proto-confirm-advantage__inner {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+  width: 100% !important;
+  min-height: 104px !important;
+  padding: 4px 8px !important;
+  box-sizing: border-box !important;
+}
+.proto-viewport > div > div:nth-child(3) .proto-confirm-advantage__rows {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  display: grid !important;
+  grid-template-columns: max-content max-content !important;
+  column-gap: 24px !important;
+  row-gap: 0 !important;
+  align-content: center !important;
+  padding: 8px !important;
+  box-sizing: border-box !important;
+  font-family: "Open Sans", sans-serif !important;
+  font-size: 13px !important;
+  line-height: 24px !important;
+  color: #3a3a3a !important;
+}
+.proto-viewport > div > div:nth-child(3) .proto-confirm-advantage__label {
+  font-weight: 400 !important;
+  white-space: nowrap !important;
+}
+.proto-viewport > div > div:nth-child(3) .proto-confirm-advantage__value {
+  font-weight: 600 !important;
+  white-space: nowrap !important;
+}
+.proto-viewport > div > div:nth-child(3) .proto-confirm-advantage__link {
+  grid-column: 1 / -1 !important;
+  justify-self: start !important;
+  margin: 4px 0 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  font-family: "Open Sans", sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  line-height: 24px !important;
+  text-align: left !important;
+}
+.proto-viewport > div > div:nth-child(3) .proto-confirm-advantage__link:focus:not(:focus-visible) {
+  outline: none !important;
+}
+.proto-viewport > div > div:nth-child(3) .proto-confirm-advantage__link:focus-visible {
+  outline: 2px solid #012169 !important;
+  outline-offset: 2px !important;
+  border-radius: 4px !important;
+}
+.proto-viewport > div > div:nth-child(3) .proto-confirm-advantage__card {
+  flex: 0 0 auto !important;
+  width: 132px !important;
+  height: auto !important;
+  max-height: 84px !important;
+  align-self: center !important;
+  display: block !important;
+  object-fit: contain !important;
+  margin: 0 !important;
+}
+
+/* Book Step 3 — Open Appointment icon+link under primary CTAs */
+.proto-viewport > div > div:nth-child(3) .proto-confirm-open-appointment {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  height: auto !important;
+  margin-top: 40px !important;
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #012169 !important;
+  font-family: "Open Sans", sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  line-height: 24px !important;
+  cursor: pointer !important;
+  transition: color 0.18s ease !important;
+}
+.proto-viewport > div > div:nth-child(3) .proto-confirm-open-appointment__icon {
+  transform: scaleX(-1);
+}
+.proto-viewport > div > div:nth-child(3) .proto-confirm-open-appointment:hover {
+  background: transparent !important;
+  color: #01318f !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+.proto-viewport > div > div:nth-child(3) .proto-confirm-open-appointment:hover
+  .proto-confirm-open-appointment__icon {
+  filter: brightness(0) saturate(100%) invert(15%) sepia(55%) saturate(3000%)
+    hue-rotate(205deg) brightness(0.85);
+}
+.proto-viewport > div > div:nth-child(3) .proto-confirm-open-appointment:active {
+  background: transparent !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+.proto-viewport > div > div:nth-child(3) .proto-confirm-open-appointment:focus-visible {
+  outline: 2px solid #012169 !important;
+  outline-offset: 2px !important;
+}
+.proto-viewport > div > div:nth-child(3) .proto-confirm-open-appointment:focus:not(:focus-visible) {
   outline: none !important;
 }
 

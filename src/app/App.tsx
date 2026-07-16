@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import Frame219 from "@/imports/Frame1000007317/index";
 import locationsMapChosen from "@/assets/locations-map-chosen.png";
+import bootsAdvantageCard from "@/assets/boots-advantage-card.png";
 import AvailabilityTool, {
   PROTO_TODAY_TOOLTIP,
   type AvailOpenIntent,
@@ -12,7 +13,8 @@ import RecipientPickerPopup, {
 } from "@/app/RecipientPickerPopup";
 import ProtoNavChrome from "@/app/ProtoNavChrome";
 import ProtoHubViewport from "@/app/ProtoHubViewport";
-import { PROTO_HUB_LABEL, PROTO_SCREENS } from "@/app/protoScreens";
+import { PROTO_HUB_LABEL, PROTO_SCREENS, protoTabToIndex } from "@/app/protoScreens";
+import iconArrowsSecondary from "@/assets/avail/arrows-secondary.svg";
 import type { VaccineItem } from "@/app/protoVaccineList";
 import {
   setupChosenPageMap,
@@ -167,15 +169,22 @@ function resolveAvailIntent(
   return intent;
 }
 
-/** Hug 1 line when empty; grow to max 5 lines, then scroll. */
+/** Hug 1 line when empty; grow/shrink with wrapped lines; max 5 lines then scroll. */
 function syncAgenticQueryHeight(ta: HTMLTextAreaElement) {
   const max = AGENTIC_QUERY_LINE_PX * AGENTIC_QUERY_MAX_LINES;
+  // Collapse before measuring so height shrinks when lines are deleted.
   ta.style.setProperty("height", `${AGENTIC_QUERY_LINE_PX}px`, "important");
+  ta.style.setProperty("min-height", `${AGENTIC_QUERY_LINE_PX}px`, "important");
   const next = Math.min(
     Math.max(ta.scrollHeight, AGENTIC_QUERY_LINE_PX),
     max
   );
   ta.style.setProperty("height", `${next}px`, "important");
+  ta.style.setProperty(
+    "overflow-y",
+    next >= max ? "auto" : "hidden",
+    "important"
+  );
 }
 
 let protoStoreSeq = 0;
@@ -839,7 +848,7 @@ export default function App() {
       ta = document.createElement("textarea");
       ta.className = "proto-agentic-query";
       ta.value = AGENTIC_HOME_QUERY_DEFAULT;
-      ta.rows = 5;
+      ta.rows = 1;
       ta.spellcheck = true;
       ta.setAttribute("aria-label", "Ask Site Pilot");
       ta.placeholder = "Ask about health services…";
@@ -2117,6 +2126,67 @@ export default function App() {
     };
   }, [current]);
 
+  // Book Step 3 — Advantage Card points block: rows left, card image right.
+  useEffect(() => {
+    if (SCREENS[current]?.childIndex !== 3) return;
+    const screen = document.querySelector(
+      ".proto-viewport > div > div:nth-child(3)"
+    ) as HTMLElement | null;
+    const summary = screen?.querySelector<HTMLElement>(
+      '[data-name="component.appointment.summary"]'
+    );
+    if (!summary) return;
+
+    const pointsLabel = Array.from(summary.querySelectorAll("p")).find((p) =>
+      /^Points received$/i.test((p.textContent ?? "").trim())
+    );
+    if (!pointsLabel) return;
+
+    let block = pointsLabel.parentElement as HTMLElement | null;
+    while (block && block !== summary) {
+      if (
+        block.className.includes("c4dde3") &&
+        block.className.includes("rounded-[16px]")
+      ) {
+        break;
+      }
+      block = block.parentElement as HTMLElement | null;
+    }
+    if (!block) return;
+
+    const spendLabel = Array.from(summary.querySelectorAll("p")).find((p) =>
+      /^Points to spend in store$/i.test((p.textContent ?? "").trim())
+    );
+    const receivedValue =
+      pointsLabel.nextElementSibling?.textContent?.trim() ?? "450";
+    const spendValue = spendLabel?.nextElementSibling?.textContent?.trim() ?? "1890";
+
+    block.dataset.protoAdvantagePatched = "true";
+    block.classList.add("proto-confirm-advantage");
+
+    const inner = document.createElement("div");
+    inner.className = "proto-confirm-advantage__inner";
+
+    const rows = document.createElement("div");
+    rows.className = "proto-confirm-advantage__rows";
+    rows.innerHTML = `
+      <span class="proto-confirm-advantage__label">Points received</span>
+      <span class="proto-confirm-advantage__value">${receivedValue}</span>
+      <span class="proto-confirm-advantage__label">Points to spend in store</span>
+      <span class="proto-confirm-advantage__value">${spendValue}</span>
+      <button type="button" class="proto-confirm-advantage__link proto-link">Open My Advantage Card details</button>
+    `;
+
+    const card = document.createElement("img");
+    card.className = "proto-confirm-advantage__card";
+    card.src = bootsAdvantageCard;
+    card.alt = "My Advantage Card";
+    card.decoding = "async";
+
+    inner.append(rows, card);
+    block.replaceChildren(inner);
+  }, [current]);
+
   // Book Step 3 — Explore more vaccinations → PLP
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 3) return;
@@ -2159,6 +2229,70 @@ export default function App() {
     return () => {
       exploreBtns.forEach((btn) => btn.removeEventListener("click", goPlp));
       screen.removeEventListener("keydown", onKey);
+    };
+  }, [current]);
+
+  // Book Step 3 — Open Appointment icon+link → tab 9 (Appointment Details)
+  useEffect(() => {
+    if (SCREENS[current]?.childIndex !== 3) return;
+    const screen = document.querySelector(
+      ".proto-viewport > div > div:nth-child(3)"
+    ) as HTMLElement | null;
+    const summary = screen?.querySelector<HTMLElement>(
+      '[data-name="component.appointment.summary"]'
+    );
+    if (!summary) return;
+
+    const exploreBtn = Array.from(
+      summary.querySelectorAll<HTMLElement>('[data-name="component.input.button"]')
+    ).find((btn) =>
+      /explore more/i.test((btn.textContent ?? "").replace(/\s+/g, " ").trim())
+    );
+    const footer = exploreBtn?.parentElement?.parentElement;
+    if (!footer) return;
+
+    let openAppt = footer.querySelector<HTMLButtonElement>(
+      '[data-proto-open-appointment="true"]'
+    );
+    if (!openAppt) {
+      openAppt = document.createElement("button");
+      openAppt.type = "button";
+      openAppt.className = "proto-confirm-open-appointment";
+      openAppt.dataset.protoOpenAppointment = "true";
+      openAppt.setAttribute("aria-label", "Open Appointment");
+
+      const icon = document.createElement("img");
+      icon.className =
+        "proto-secondary-cta-icon proto-confirm-open-appointment__icon";
+      icon.src = iconArrowsSecondary;
+      icon.alt = "";
+      icon.width = 16;
+      icon.height = 16;
+
+      const label = document.createElement("span");
+      label.textContent = "Open Appointment";
+
+      openAppt.append(icon, label);
+      footer.appendChild(openAppt);
+    }
+
+    const goDetails = (e: Event) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setCurrent(protoTabToIndex(9));
+    };
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      if (e.target === openAppt) goDetails(e);
+    };
+
+    openAppt.addEventListener("click", goDetails);
+    openAppt.addEventListener("keydown", onKey);
+
+    return () => {
+      openAppt?.removeEventListener("click", goDetails);
+      openAppt?.removeEventListener("keydown", onKey);
     };
   }, [current]);
 
