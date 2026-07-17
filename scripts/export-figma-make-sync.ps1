@@ -43,7 +43,9 @@ $Files = @(
   "src/app/popups/VaccinePickerPopup.tsx",
   "src/app/popups/RecipientPickerPopup.tsx",
 
-  # Proto logic / wiring
+  # Proto logic / wiring (sync entire folder — App.tsx imports all of these)
+  "src/app/proto/availStores.ts",
+  "src/app/proto/protoSavedLocations.ts",
   "src/app/proto/protoScreens.ts",
   "src/app/proto/useProtoScrollFill.ts",
   "src/app/proto/protoPlpListing.ts",
