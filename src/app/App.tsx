@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useLayoutEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useLayoutEffect, useCallback, useMemo } from "react";
 import Frame219 from "@/imports/Frame1000007317/index";
 import locationsMapChosen from "@/assets/locations-map-chosen.png";
 import bootsAdvantageCard from "@/assets/boots-advantage-card.png";
@@ -29,6 +29,7 @@ import {
 import {
   abortSitePilotChatPlaybackPrelude,
   runSitePilotChatBeforeReveal,
+  runSitePilotChatScenarioFinale,
   stripSitePilotChatDemoCursors,
 } from "@/app/proto/protoSitePilotChatPlayback";
 import {
@@ -816,11 +817,6 @@ function readInitialNavIndex(): number {
   }
 }
 
-const SITE_PILOT_CHAT_PLAYBACK_HOOKS: PlaybackStepHooks = {
-  beforeReveal: runSitePilotChatBeforeReveal,
-  onPreludeAbort: abortSitePilotChatPlaybackPrelude,
-};
-
 export default function App() {
   const [current, setCurrent] = useState(readInitialNavIndex);
   const [availabilityOpen, setAvailabilityOpen] = useState(false);
@@ -877,7 +873,11 @@ export default function App() {
     setAvailIntent(resolved);
     setAvailabilityOpen(true);
   };
+  const openAvailabilityToolRef = useRef(openAvailabilityTool);
+  openAvailabilityToolRef.current = openAvailabilityTool;
   const closeAvailabilityTool = () => setAvailabilityOpen(false);
+  const closeAvailabilityToolRef = useRef(closeAvailabilityTool);
+  closeAvailabilityToolRef.current = closeAvailabilityTool;
   const openVaccinePicker = () => setVaccinePickerOpen(true);
   const closeVaccinePicker = () => setVaccinePickerOpen(false);
   const openRecipientPicker = () => setRecipientPickerOpen(true);
@@ -962,6 +962,20 @@ export default function App() {
     return [];
   }, [activeScenarioConfig]);
 
+  const sitePilotChatPlaybackHooks = useMemo<PlaybackStepHooks>(
+    () => ({
+      beforeReveal: runSitePilotChatBeforeReveal,
+      onPreludeAbort: abortSitePilotChatPlaybackPrelude,
+      onFinale: () =>
+        runSitePilotChatScenarioFinale(
+          (intent) => openAvailabilityToolRef.current(intent),
+          AVAIL_INTENT.dateChat
+        ),
+      onLeaveFinale: () => closeAvailabilityToolRef.current(),
+    }),
+    []
+  );
+
   const scenarioPlayback = useProtoScenarioPlayback({
     active: activeScenarioConfig != null,
     collectFrames: collectScenarioFrames,
@@ -973,16 +987,39 @@ export default function App() {
     playbackStepMs: activeScenarioConfig?.playbackStepMs,
     playbackStepHooks:
       activeScenarioConfig?.id === "site-pilot-chat"
-        ? SITE_PILOT_CHAT_PLAYBACK_HOOKS
+        ? sitePilotChatPlaybackHooks
         : undefined,
   });
 
-  const jumpToEndRef = useRef(scenarioPlayback.jumpToEnd);
-  jumpToEndRef.current = scenarioPlayback.jumpToEnd;
+  const resetToEndRef = useRef(scenarioPlayback.resetToEnd);
+  resetToEndRef.current = scenarioPlayback.resetToEnd;
   const cancelPreRevealPauseRef = useRef(scenarioPlayback.cancelPreRevealPause);
   cancelPreRevealPauseRef.current = scenarioPlayback.cancelPreRevealPause;
   const scenarioVisibleCountRef = useRef(scenarioPlayback.visibleCount);
   scenarioVisibleCountRef.current = scenarioPlayback.visibleCount;
+  const retreatFromFinaleRef = useRef(scenarioPlayback.retreatFromFinale);
+  retreatFromFinaleRef.current = scenarioPlayback.retreatFromFinale;
+  const availabilityWasOpenRef = useRef(false);
+
+  // Closing Availability after frame 9 is the same as stepping back to 8/9.
+  useEffect(() => {
+    const wasOpen = availabilityWasOpenRef.current;
+    availabilityWasOpenRef.current = availabilityOpen;
+
+    if (
+      wasOpen &&
+      !availabilityOpen &&
+      activeScenarioConfig?.id === "site-pilot-chat" &&
+      scenarioPlayback.visibleCount >= scenarioPlayback.totalFrames
+    ) {
+      retreatFromFinaleRef.current();
+    }
+  }, [
+    availabilityOpen,
+    activeScenarioConfig?.id,
+    scenarioPlayback.visibleCount,
+    scenarioPlayback.totalFrames,
+  ]);
 
   // Frame 1 ambient thinking hint — shows the chat is live / dynamic.
   useEffect(() => {
@@ -1006,6 +1043,33 @@ export default function App() {
     scenarioPlayback.isPlaying,
     scenarioPlayback.isPausingBeforeReveal,
   ]);
+
+  // Frame 1 — thread is short; don't let composer pad + min-height fill create a scroll track.
+  useLayoutEffect(() => {
+    const scrollEl = prototypeScrollElRef.current;
+    const atFrameStart =
+      SCREENS[current]?.childIndex === 10 && scenarioPlayback.visibleCount <= 1;
+
+    scrollEl?.classList.toggle("proto-chat-scenario-at-start", atFrameStart);
+
+    const screen = document.querySelector<HTMLElement>(
+      ".proto-viewport > div > div:nth-child(10)"
+    );
+    if (screen) {
+      if (atFrameStart) screen.setAttribute("data-proto-scenario-at-start", "true");
+      else screen.removeAttribute("data-proto-scenario-at-start");
+    }
+
+    if (atFrameStart && scrollEl) {
+      scrollEl.scrollTop = 0;
+      scrollEl.scrollLeft = 0;
+    }
+
+    return () => {
+      scrollEl?.classList.remove("proto-chat-scenario-at-start");
+      screen?.removeAttribute("data-proto-scenario-at-start");
+    };
+  }, [current, scenarioPlayback.visibleCount]);
 
   /** Hide Reset when page states are already pristine (nav position ignored). */
   const isProtoPristine =
@@ -1593,7 +1657,7 @@ export default function App() {
       endSitePilotChatThinking();
       unbindScenarioDeckInterrupt();
       if (sendBtn) setSitePilotChatSendThinkingMode(sendBtn, false);
-      jumpToEndRef.current();
+      resetToEndRef.current();
       finishing = false;
     };
 

@@ -23,6 +23,8 @@
 }
 
 .proto-nav-chrome {
+  position: relative;
+  overflow: visible;
   background: #2e2e2e;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
     0 4px 6px -4px rgba(0, 0, 0, 0.1);
@@ -33,7 +35,10 @@
   grid-template-columns: 1fr minmax(0, auto) 1fr;
   align-items: center;
   gap: 8px;
-  min-height: 36px;
+  /* py-2 (16px) + scenario deck (26px) — keep height stable when controls are absent */
+  min-height: 42px;
+  position: relative;
+  overflow: visible;
 }
 
 .proto-nav-status-bar__start {
@@ -72,6 +77,15 @@
   align-items: center;
   gap: 2px;
   justify-self: end;
+  overflow: visible;
+  min-height: 26px;
+}
+
+.proto-nav-stepper__scenario-slot {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  min-height: 26px;
 }
 
 .proto-nav-scenario {
@@ -79,6 +93,9 @@
   align-items: center;
   gap: 6px;
   margin-right: 6px;
+  overflow: visible;
+  position: relative;
+  transition: filter 0.55s ease, opacity 0.55s ease;
 }
 
 .proto-nav-scenario__label {
@@ -110,6 +127,8 @@
   background: rgba(0, 0, 0, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  position: relative;
+  overflow: visible;
 }
 
 .proto-nav-scenario__deck .proto-nav-scenario__btn {
@@ -127,16 +146,39 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.22),
     inset 0 -1px 0 rgba(0, 0, 0, 0.35),
     0 1px 0 rgba(0, 0, 0, 0.25);
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.08s ease;
 }
 
 .proto-nav-scenario__deck .proto-nav-scenario__btn:hover:not(:disabled) {
-  color: #fff;
-  background: linear-gradient(180deg, #6a6a6a 0%, #454545 48%, #2f2f2f 100%);
+  color: #3d3018;
+  background: linear-gradient(
+    180deg,
+    #faf0d4 0%,
+    #ead9ad 18%,
+    #dcc796 46%,
+    #ccb57f 72%,
+    #bfa56e 100%
+  );
+  border-color: rgba(118, 92, 42, 0.62);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    inset 0 -1px 0 rgba(156, 118, 52, 0.38),
+    0 1px 2px rgba(0, 0, 0, 0.28),
+    0 0 8px rgba(220, 190, 120, 0.22);
 }
 
 .proto-nav-scenario__deck .proto-nav-scenario__btn:active:not(:disabled) {
-  background: linear-gradient(180deg, #2f2f2f 0%, #1f1f1f 100%);
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.55);
+  color: #2e2412;
+  background: linear-gradient(180deg, #c9ae78 0%, #a88d58 48%, #8f7648 100%);
+  border-color: rgba(98, 76, 34, 0.72);
+  box-shadow:
+    inset 0 1px 3px rgba(72, 54, 22, 0.45),
+    0 1px 0 rgba(0, 0, 0, 0.2);
   transform: translateY(0.5px);
 }
 
@@ -147,6 +189,309 @@
 
 .proto-nav-scenario__deck .proto-nav-scenario__btn--play:not(:disabled) {
   color: #f0f4ff;
+}
+
+/* Studio indicator — camera-lens housing; green transport blink while live */
+
+.proto-nav-scenario__on-air {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin-right: 2px;
+  overflow: visible;
+  border-radius: 50%;
+  background: linear-gradient(155deg, #5a5a5a 0%, #242424 52%, #383838 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.55),
+    0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.proto-nav-scenario__on-air-dot {
+  position: relative;
+  z-index: 1;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 34% 28%,
+    #4a5568 0%,
+    #1a2030 36%,
+    #07090d 68%,
+    #151b28 100%
+  );
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.9),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.proto-nav-scenario__on-air-dot::after {
+  content: "";
+  position: absolute;
+  top: 1px;
+  left: 1.5px;
+  width: 2px;
+  height: 1.5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.28);
+  filter: blur(0.2px);
+  pointer-events: none;
+}
+
+.proto-nav-scenario--on-air .proto-nav-scenario__on-air-dot {
+  animation: proto-studio-on-air-dot-blink 3s linear infinite;
+}
+
+.proto-nav-scenario--on-air .proto-nav-scenario__on-air-dot::after {
+  animation: proto-studio-on-air-lens-glint 3s linear infinite;
+}
+
+.proto-nav-scenario__on-air-halo {
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(93, 255, 138, 0.55) 0%, transparent 72%);
+  opacity: 0;
+  transform: scale(0.88);
+  pointer-events: none;
+}
+
+.proto-nav-scenario--on-air .proto-nav-scenario__on-air-halo {
+  animation: proto-studio-on-air-halo-blink 3s linear infinite;
+}
+
+.proto-nav-scenario--on-air .proto-nav-scenario__label {
+  color: rgba(190, 255, 210, 0.72);
+  animation: proto-studio-label-glow-blink 3s linear infinite;
+  transition: color 0.5s ease;
+}
+
+/* Halogen — play button only; fades in/out while on air. */
+.proto-nav-scenario__play-lamp {
+  position: relative;
+  display: inline-flex;
+  align-items: stretch;
+}
+
+.proto-nav-scenario__halogen {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  z-index: 2;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-50%);
+  transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.proto-nav-scenario--on-air .proto-nav-scenario__halogen {
+  opacity: 1;
+}
+
+.proto-nav-scenario__halogen-source,
+.proto-nav-scenario__halogen-bulb,
+.proto-nav-scenario__halogen-beam {
+  position: absolute;
+  left: 50%;
+  pointer-events: none;
+}
+
+.proto-nav-scenario__halogen-source {
+  top: -11px;
+  width: 18px;
+  height: 3px;
+  overflow: hidden;
+  transform: translateX(-50%);
+}
+
+.proto-nav-scenario__halogen-bulb {
+  top: -7px;
+  width: 14px;
+  height: 9px;
+  transform: translateX(-50%);
+  border-radius: 50% 50% 40% 40%;
+  background: radial-gradient(
+    ellipse at center 75%,
+    rgba(255, 248, 220, 0.82) 0%,
+    rgba(255, 214, 130, 0.42) 50%,
+    transparent 100%
+  );
+  filter: blur(0.35px);
+  animation: proto-studio-halogen-flicker 2.8s ease-in-out infinite;
+}
+
+.proto-nav-scenario__halogen-beam {
+  top: -6px;
+  width: 36px;
+  height: 26px;
+  transform: translateX(-50%);
+  background: radial-gradient(
+    ellipse 110% 135% at 50% 0%,
+    rgba(255, 236, 185, 0.22) 0%,
+    rgba(255, 210, 120, 0.09) 46%,
+    transparent 80%
+  );
+  mix-blend-mode: soft-light;
+  filter: blur(3px);
+}
+
+.proto-nav-scenario__play-lamp .proto-nav-scenario__btn--play {
+  position: relative;
+  z-index: 1;
+}
+
+.proto-nav-scenario--on-air .proto-nav-scenario__btn--play:not(:disabled) {
+  color: #3d3018;
+  background: linear-gradient(
+    180deg,
+    #faf0d4 0%,
+    #ead9ad 18%,
+    #dcc796 46%,
+    #ccb57f 72%,
+    #bfa56e 100%
+  );
+  border-color: rgba(118, 92, 42, 0.62);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    inset 0 -1px 0 rgba(156, 118, 52, 0.38),
+    0 1px 2px rgba(0, 0, 0, 0.28),
+    0 0 10px rgba(220, 190, 120, 0.32);
+}
+
+.proto-nav-scenario--on-air .proto-nav-scenario__btn--play:hover:not(:disabled) {
+  color: #2e2412;
+  background: linear-gradient(
+    180deg,
+    #fff8e8 0%,
+    #f2e4c0 18%,
+    #e6d4a6 46%,
+    #d8c48e 72%,
+    #c9b478 100%
+  );
+  border-color: rgba(128, 100, 46, 0.7);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.82),
+    inset 0 -1px 0 rgba(156, 118, 52, 0.42),
+    0 1px 2px rgba(0, 0, 0, 0.28),
+    0 0 12px rgba(230, 200, 130, 0.42);
+}
+
+.proto-nav-scenario--on-air .proto-nav-scenario__btn--play:active:not(:disabled) {
+  color: #2e2412;
+  background: linear-gradient(180deg, #c9ae78 0%, #a88d58 48%, #8f7648 100%);
+  border-color: rgba(98, 76, 34, 0.72);
+  box-shadow:
+    inset 0 1px 3px rgba(72, 54, 22, 0.45),
+    0 1px 0 rgba(0, 0, 0, 0.2);
+  transform: translateY(0.5px);
+}
+
+/* Slow transport LED — short pulse, long lens-off pause: -________ */
+@keyframes proto-studio-on-air-dot-blink {
+  0%,
+  5% {
+    background: #74ffb3;
+    box-shadow:
+      inset 0 1px 1px rgba(255, 255, 255, 0.72),
+      0 0 5px rgba(93, 255, 138, 1),
+      0 0 12px rgba(93, 255, 138, 0.65);
+  }
+  6%,
+  100% {
+    background: radial-gradient(
+      circle at 34% 28%,
+      #4a5568 0%,
+      #1a2030 36%,
+      #07090d 68%,
+      #151b28 100%
+    );
+    box-shadow:
+      inset 0 1px 2px rgba(0, 0, 0, 0.9),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+  }
+}
+
+@keyframes proto-studio-on-air-lens-glint {
+  0%,
+  5% {
+    opacity: 0;
+  }
+  6%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes proto-studio-on-air-halo-blink {
+  0%,
+  5% {
+    opacity: 0.72;
+    transform: scale(1.08);
+  }
+  6%,
+  100% {
+    opacity: 0;
+    transform: scale(0.82);
+  }
+}
+
+@keyframes proto-studio-label-glow-blink {
+  0%,
+  5% {
+    text-shadow: 0 0 8px rgba(93, 255, 138, 0.38);
+  }
+  6%,
+  100% {
+    text-shadow: none;
+  }
+}
+
+@keyframes proto-studio-halogen-flicker {
+  0%,
+  100% {
+    opacity: 0.92;
+    filter: blur(0.2px) brightness(1.08);
+  }
+  45% {
+    opacity: 0.72;
+    filter: blur(0.35px) brightness(0.92);
+  }
+  70% {
+    opacity: 0.98;
+    filter: blur(0.15px) brightness(1.12);
+  }
+}
+
+@keyframes proto-studio-halogen-beam {
+  0%,
+  100% {
+    opacity: 0.52;
+  }
+  50% {
+    opacity: 0.34;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .proto-nav-scenario__on-air-dot,
+  .proto-nav-scenario__on-air-halo,
+  .proto-nav-scenario__halogen-bulb,
+  .proto-nav-scenario--on-air .proto-nav-scenario__label {
+    animation: none;
+  }
+
+  .proto-nav-scenario--on-air .proto-nav-scenario__on-air-dot {
+    background: #5dff8a;
+    box-shadow:
+      0 0 4px rgba(93, 255, 138, 0.75),
+      0 0 10px rgba(93, 255, 138, 0.45);
+  }
 }
 
 .proto-nav-tabs {

@@ -172,6 +172,8 @@ export function setupSitePilotChatComposerDock(
   window.addEventListener("resize", onReposition);
   onReposition();
 
+  syncSitePilotChatFeedbackFrame(screen);
+
   return () => {
     ro.disconnect();
     host.removeEventListener("scroll", onReposition);
@@ -194,7 +196,8 @@ export function collectSitePilotChatScenarioFrames(
     (node): node is HTMLElement =>
       node instanceof HTMLElement &&
       !isSitePilotChatComposerFrame(node) &&
-      !node.hasAttribute("data-proto-chat-thinking")
+      !node.hasAttribute("data-proto-chat-thinking") &&
+      !isSitePilotChatFeedbackFrame(node)
   );
 }
 
@@ -203,4 +206,26 @@ export function isSitePilotChatAgentReplyFrame(frame: HTMLElement): boolean {
   return frame.matches('[data-name="reply"]');
 }
 
+/** Helpfulness prompt — not part of the stepped chat thread. */
+export function isSitePilotChatFeedbackFrame(frame: HTMLElement): boolean {
+  return /was this conversation helpful/i.test(frame.textContent ?? "");
+}
+
 export const SITE_PILOT_CHAT_PLAYBACK_THINK_MS = 1400;
+
+export const SITE_PILOT_CHAT_FINALE_CTA = /choose different date/i;
+
+/** Keep helpfulness prompt out of the stepped thread (finale ends on date CTA). */
+export function syncSitePilotChatFeedbackFrame(screen: ParentNode): void {
+  const summary = screen.querySelector<HTMLElement>(
+    '[data-name="component.appointment.summary"]'
+  );
+  if (!summary) return;
+
+  Array.from(summary.children).forEach((child) => {
+    if (!(child instanceof HTMLElement)) return;
+    if (!isSitePilotChatFeedbackFrame(child)) return;
+    child.classList.add("proto-chat-feedback-frame");
+    child.hidden = true;
+  });
+}

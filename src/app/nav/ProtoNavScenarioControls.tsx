@@ -94,20 +94,21 @@ export function ProtoNavScenarioControls({
 }: ProtoNavScenarioControlsProps) {
   return (
     <div
-      className="proto-nav-scenario"
+      className={`proto-nav-scenario${isPlaying ? " proto-nav-scenario--on-air" : ""}`}
       role="group"
-      aria-label={`${label} scenario playback`}
     >
-      <span className="proto-nav-scenario__label">{label}</span>
+      <span className="proto-nav-scenario__label">{isPlaying ? "Live" : label}</span>
+      <span className="proto-nav-scenario__on-air" aria-hidden>
+        <span className="proto-nav-scenario__on-air-dot" />
+        <span className="proto-nav-scenario__on-air-halo" aria-hidden />
+      </span>
       <span className="proto-nav-scenario__counter" aria-live="polite">
-        {visibleCount}/{totalFrames}
+        {totalFrames > 0 ? `${visibleCount}/${totalFrames}` : "—"}
       </span>
       <div className="proto-nav-scenario__deck">
         <button
           type="button"
           className="proto-nav-step-btn proto-nav-scenario__btn"
-          title="Jump to first frame"
-          aria-label="Jump to first scenario frame"
           disabled={!canJumpToStart}
           onClick={onJumpToStart}
         >
@@ -116,29 +117,31 @@ export function ProtoNavScenarioControls({
         <button
           type="button"
           className="proto-nav-step-btn proto-nav-scenario__btn"
-          title="Step back one frame"
-          aria-label="Step back one scenario frame"
           disabled={!canStepBack}
           onClick={onStepBack}
         >
           <CassetteStepBackIcon />
         </button>
-        <button
-          type="button"
-          className="proto-nav-step-btn proto-nav-scenario__btn proto-nav-scenario__btn--play"
-          title={isPlaying ? "Pause playback" : "Play frames (2s each)"}
-          aria-label={isPlaying ? "Pause scenario playback" : "Play scenario frames"}
-          aria-pressed={isPlaying}
-          disabled={!isPlaying && visibleCount >= totalFrames}
-          onClick={onPlay}
-        >
-          {isPlaying ? <CassettePauseIcon /> : <CassettePlayIcon />}
-        </button>
+        <div className="proto-nav-scenario__play-lamp">
+          <span className="proto-nav-scenario__halogen" aria-hidden>
+            <span className="proto-nav-scenario__halogen-source">
+              <span className="proto-nav-scenario__halogen-bulb" />
+            </span>
+            <span className="proto-nav-scenario__halogen-beam" />
+          </span>
+          <button
+            type="button"
+            className="proto-nav-step-btn proto-nav-scenario__btn proto-nav-scenario__btn--play"
+            aria-pressed={isPlaying}
+            disabled={!isPlaying && !canPlay}
+            onClick={onPlay}
+          >
+            {isPlaying ? <CassettePauseIcon /> : <CassettePlayIcon />}
+          </button>
+        </div>
         <button
           type="button"
           className="proto-nav-step-btn proto-nav-scenario__btn"
-          title="Step forward one frame"
-          aria-label="Step forward one scenario frame"
           disabled={!canStepForward}
           onClick={onStepForward}
         >
@@ -147,8 +150,6 @@ export function ProtoNavScenarioControls({
         <button
           type="button"
           className="proto-nav-step-btn proto-nav-scenario__btn"
-          title="Jump to last frame"
-          aria-label="Jump to last scenario frame"
           disabled={!canJumpToEnd}
           onClick={onJumpToEnd}
         >

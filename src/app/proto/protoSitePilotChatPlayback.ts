@@ -6,9 +6,11 @@ import {
 import {
   findSitePilotChatComposerCard,
   isSitePilotChatAgentReplyFrame,
+  SITE_PILOT_CHAT_FINALE_CTA,
   SITE_PILOT_CHAT_PLAYBACK_THINK_MS,
 } from "@/app/proto/protoSitePilotChatScenario";
 import type { BeforeRevealContext } from "@/app/nav/useProtoScenarioPlayback";
+import type { AvailOpenIntent } from "@/app/AvailabilityTool";
 
 const AGENTIC_QUERY_LINE_PX = 24;
 const AGENTIC_QUERY_MAX_LINES = 5;
@@ -16,8 +18,8 @@ const AGENTIC_QUERY_MAX_LINES = 5;
 const TYPING_MS_PER_CHAR = 26;
 const TYPING_MS_JITTER = 14;
 const SEND_PAUSE_MS = 420;
-const CTA_TRAVEL_MS = 520;
-const CTA_PRESS_MS = 280;
+const CTA_TRAVEL_MS = 820;
+const CTA_PRESS_MS = 380;
 
 /** Which agent CTA Sarah clicks before each scripted user reply. */
 const CTA_BEFORE_USER_FRAME: Record<number, RegExp> = {
@@ -29,9 +31,19 @@ const CURSOR_SVG = `<svg class="block size-full" fill="none" viewBox="0 0 22 26"
 
 let preludeAborted = false;
 
+function clearChatCtaSimStates(): void {
+  document
+    .querySelectorAll<HTMLElement>(".proto-chat-cta--hover, .proto-chat-cta--pressed")
+    .forEach((el) => {
+      el.classList.remove("proto-chat-cta--hover", "proto-chat-cta--pressed");
+    });
+}
+
 export function abortSitePilotChatPlaybackPrelude(): void {
   preludeAborted = true;
   removeDemoCursor();
+  clearSimulatedClickRipples();
+  clearChatCtaSimStates();
 }
 
 function delay(ms: number): Promise<void> {
@@ -106,18 +118,56 @@ function removeDemoCursor(): void {
     .forEach((el) => el.remove());
 }
 
-async function moveDemoCursorTo(target: HTMLElement): Promise<void> {
+function clearSimulatedClickRipples(): void {
+  document
+    .querySelectorAll<HTMLElement>(".proto-sim-click")
+    .forEach((el) => el.remove());
+}
+
+function spawnSimulatedClickRipple(x: number, y: number): void {
+  const hit = document.createElement("div");
+  hit.className = "proto-sim-click";
+  hit.style.left = `${x}px`;
+  hit.style.top = `${y}px`;
+  hit.innerHTML = [
+    '<span class="proto-sim-click__ring proto-sim-click__ring--1" aria-hidden="true"></span>',
+    '<span class="proto-sim-click__ring proto-sim-click__ring--2" aria-hidden="true"></span>',
+    '<span class="proto-sim-click__ring proto-sim-click__ring--3" aria-hidden="true"></span>',
+  ].join("");
+  document.body.appendChild(hit);
+
+  const remove = () => hit.remove();
+  hit.addEventListener("animationend", (event) => {
+    if (
+      event.target instanceof HTMLElement &&
+      event.target.classList.contains("proto-sim-click__ring--3")
+    ) {
+      remove();
+    }
+  });
+  window.setTimeout(remove, 1600);
+}
+
+function tapDemoCursor(cursor: HTMLElement): void {
+  cursor.classList.remove("proto-chat-demo-cursor--tap");
+  void cursor.offsetWidth;
+  cursor.classList.add("proto-chat-demo-cursor--tap");
+}
+
+async function moveDemoCursorTo(target: HTMLElement): Promise<HTMLElement> {
   removeDemoCursor();
   const cursor = document.createElement("div");
   cursor.className = "proto-chat-demo-cursor";
   cursor.innerHTML = CURSOR_SVG;
   document.body.appendChild(cursor);
 
-  const rect = target.getBoundingClientRect();
-  const endX = rect.left + rect.width * 0.72;
-  const endY = rect.top + rect.height * 0.55;
-  const startX = endX + 72;
-  const startY = endY + 48;
+  const end = cursorPositionForTarget(target);
+  const endX = end.left;
+  const endY = end.top;
+  const startX = endX + 168;
+  const startY = endY + 124;
+
+  cursor.style.setProperty("--proto-cursor-travel-ms", `${CTA_TRAVEL_MS}ms`);
 
   cursor.style.left = `${startX}px`;
   cursor.style.top = `${startY}px`;
@@ -126,6 +176,26 @@ async function moveDemoCursorTo(target: HTMLElement): Promise<void> {
   cursor.style.left = `${endX}px`;
   cursor.style.top = `${endY}px`;
   await delay(CTA_TRAVEL_MS);
+  return cursor;
+}
+
+const CURSOR_HOTSPOT_X = 6;
+const CURSOR_HOTSPOT_Y = 4;
+
+function targetCenter(target: HTMLElement): { x: number; y: number } {
+  const rect = target.getBoundingClientRect();
+  return {
+    x: rect.left + rect.width / 2,
+    y: rect.top + rect.height / 2,
+  };
+}
+
+function cursorPositionForTarget(target: HTMLElement): { left: number; top: number } {
+  const { x, y } = targetCenter(target);
+  return {
+    left: x - CURSOR_HOTSPOT_X,
+    top: y - CURSOR_HOTSPOT_Y,
+  };
 }
 
 async function simulateSarahCtaClick(button: HTMLElement): Promise<void> {
@@ -135,12 +205,39 @@ async function simulateSarahCtaClick(button: HTMLElement): Promise<void> {
   await delay(180);
   if (preludeAborted) return;
 
-  await moveDemoCursorTo(button);
+  const cursor = await moveDemoCursorTo(button);
   if (preludeAborted) return;
+
+  button.classList.add("proto-chat-cta--hover");
+
+  const { x, y } = targetCenter(button);
+  spawnSimulatedClickRipple(x, y);
+  tapDemoCursor(cursor);
 
   button.classList.add("proto-chat-cta--pressed");
   await delay(CTA_PRESS_MS);
-  button.classList.remove("proto-chat-cta--pressed");
+  button.classList.remove("proto-chat-cta--pressed", "proto-chat-cta--hover");
+  removeDemoCursor();
+  await delay(160);
+}
+
+async function simulateSarahSendClick(sendBtn: HTMLElement): Promise<void> {
+  if (preludeAborted) return;
+
+  sendBtn.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  await delay(160);
+  if (preludeAborted) return;
+
+  const cursor = await moveDemoCursorTo(sendBtn);
+  if (preludeAborted) return;
+
+  const { x, y } = targetCenter(sendBtn);
+  spawnSimulatedClickRipple(x, y);
+  tapDemoCursor(cursor);
+
+  sendBtn.classList.add("proto-agentic-send--sending");
+  await delay(SEND_PAUSE_MS);
+  sendBtn.classList.remove("proto-agentic-send--sending");
   removeDemoCursor();
   await delay(160);
 }
@@ -149,9 +246,7 @@ async function pulseComposerSend(): Promise<void> {
   const card = findSitePilotChatComposerCard();
   const sendBtn = card?.querySelector<HTMLElement>(".proto-agentic-send");
   if (!sendBtn) return;
-  sendBtn.classList.add("proto-agentic-send--sending");
-  await delay(SEND_PAUSE_MS);
-  sendBtn.classList.remove("proto-agentic-send--sending");
+  await simulateSarahSendClick(sendBtn);
 }
 
 async function simulateSarahCtaSend(): Promise<void> {
@@ -234,5 +329,30 @@ export async function runSitePilotChatBeforeReveal(
     await simulateSarahCtaSend();
   } else {
     await simulateSarahTypingInComposer(text);
+  }
+}
+
+/** Final scenario beat — Sarah picks a date CTA and leaves chat for Availability Tool. */
+export async function runSitePilotChatScenarioFinale(
+  openAvailability: (intent: AvailOpenIntent) => void,
+  intent: AvailOpenIntent
+): Promise<void> {
+  preludeAborted = false;
+
+  const screen = getChatScreen();
+  const agentReplies = Array.from(
+    screen?.querySelectorAll<HTMLElement>('[data-name="reply"]') ?? []
+  );
+  const lastReply = agentReplies[agentReplies.length - 1];
+  const button = lastReply
+    ? findCtaInAgentFrame(lastReply, SITE_PILOT_CHAT_FINALE_CTA)
+    : null;
+
+  if (button) {
+    await simulateSarahCtaClick(button);
+  }
+
+  if (!preludeAborted) {
+    openAvailability(intent);
   }
 }

@@ -374,7 +374,9 @@
   transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.12s ease !important;
 }
 .proto-viewport [data-name="component.input.button"][class*="bg-[#012169]"]:hover,
+.proto-viewport [data-name="component.input.button"][class*="bg-[#012169]"].proto-chat-cta--hover,
 .proto-viewport [data-name="component.input.button"][class*="bg-[#003fcc]"]:hover,
+.proto-viewport [data-name="component.input.button"][class*="bg-[#003fcc]"].proto-chat-cta--hover,
 .proto-site-pilot-composer
   [data-name="Subtotal"]
   [data-name="component.input.button"].proto-agentic-send:hover,
@@ -386,7 +388,9 @@
   transform: translateY(-1px) !important;
 }
 .proto-viewport [data-name="component.input.button"][class*="bg-[#012169]"]:active,
+.proto-viewport [data-name="component.input.button"][class*="bg-[#012169]"].proto-chat-cta--pressed,
 .proto-viewport [data-name="component.input.button"][class*="bg-[#003fcc]"]:active,
+.proto-viewport [data-name="component.input.button"][class*="bg-[#003fcc]"].proto-chat-cta--pressed,
 .proto-site-pilot-composer
   [data-name="Subtotal"]
   [data-name="component.input.button"].proto-agentic-send:active,
@@ -398,21 +402,27 @@
   box-shadow: none !important;
 }
 
-/* Chat “demo hover” primaries (Figma #003fcb) — locked in primary hover look;
- * keep the Figma .utility / cursor affordance visible beside them. */
-.proto-viewport [data-name="component.input.button"][class*="bg-[#003fcb]"] {
+/* Chat primaries — Figma exports hover tint (#003fcb); rest until hover or sim cursor. */
+.proto-viewport > div > div:nth-child(10)
+  [data-name="component.input.button"][class*="bg-[#003fcb]"] {
   cursor: pointer !important;
-  background: #01318f !important;
-  box-shadow: 0 4px 12px rgba(1, 33, 105, 0.35) !important;
-  transform: translateY(-1px) !important;
+  background: #012169 !important;
+  box-shadow: none !important;
+  transform: none !important;
   transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.12s ease !important;
 }
-.proto-viewport [data-name="component.input.button"][class*="bg-[#003fcb]"]:hover {
+.proto-viewport > div > div:nth-child(10)
+  [data-name="component.input.button"][class*="bg-[#003fcb]"]:hover,
+.proto-viewport > div > div:nth-child(10)
+  [data-name="component.input.button"][class*="bg-[#003fcb]"].proto-chat-cta--hover {
   background: #01318f !important;
   box-shadow: 0 4px 12px rgba(1, 33, 105, 0.35) !important;
   transform: translateY(-1px) !important;
 }
-.proto-viewport [data-name="component.input.button"][class*="bg-[#003fcb]"]:active {
+.proto-viewport > div > div:nth-child(10)
+  [data-name="component.input.button"][class*="bg-[#003fcb]"]:active,
+.proto-viewport > div > div:nth-child(10)
+  [data-name="component.input.button"][class*="bg-[#003fcb]"].proto-chat-cta--pressed {
   background: #011a5c !important;
   transform: translateY(0) !important;
   box-shadow: none !important;
@@ -751,6 +761,26 @@
   height: auto !important;
   --proto-scenario-frame-max: 3200px;
 }
+/* Frame 1 — hide vertical scroll track only; never clip the screen (breaks sticky Site Pilot bar) */
+.proto-scroll--prototype.proto-chat-scenario-at-start {
+  overflow-y: hidden !important;
+  overflow-x: hidden !important;
+  overscroll-behavior: none;
+}
+.proto-viewport > div > div:nth-child(10).proto-chat-screen[data-proto-scenario-at-start="true"] {
+  min-height: var(--proto-scroll-min-px, 100%) !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+.proto-scroll--prototype.proto-chat-scenario-at-start
+  .proto-viewport > div > div:nth-child(10).proto-chat-screen > [data-name="body"],
+.proto-scroll--prototype.proto-chat-scenario-at-start
+  .proto-viewport > div > div:nth-child(10).proto-chat-screen
+  > [data-name="body"] > div {
+  min-height: 0 !important;
+  overflow: visible !important;
+}
 .proto-viewport > div > div:nth-child(10).proto-chat-screen > [data-name="body"] {
   flex: 1 1 auto !important;
   min-height: auto !important;
@@ -895,6 +925,9 @@
   width: 14px !important;
   height: 14px !important;
 }
+.proto-viewport > div > div:nth-child(10) .proto-chat-feedback-frame {
+  display: none !important;
+}
 /* Hide static Figma demo cursors — Sarah clicks are simulated in playback */
 .proto-viewport > div > div:nth-child(10) [data-name=".utility / cursor"] {
   display: none !important;
@@ -906,9 +939,60 @@
   height: 37px;
   pointer-events: none;
   transition:
-    left 0.52s cubic-bezier(0.4, 0, 0.2, 1),
-    top 0.52s cubic-bezier(0.4, 0, 0.2, 1);
+    left var(--proto-cursor-travel-ms, 0.82s) cubic-bezier(0.22, 0.05, 0.15, 1),
+    top var(--proto-cursor-travel-ms, 0.82s) cubic-bezier(0.22, 0.05, 0.15, 1),
+    transform 0.12s cubic-bezier(0.4, 0, 0.2, 1),
+    filter 0.12s ease-out;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.22));
+}
+.proto-chat-demo-cursor--tap {
+  transform: scale(0.88);
+  filter: drop-shadow(0 0 8px rgba(1, 33, 105, 0.4))
+    drop-shadow(0 2px 4px rgba(0, 0, 0, 0.22));
+}
+/* Smooth triple ripple on Sarah simulator taps */
+.proto-sim-click {
+  position: fixed;
+  z-index: 10051;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.proto-sim-click__ring {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  border: 2.5px solid rgba(1, 33, 105, 0.82);
+  background: transparent;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
+  animation: proto-sim-click-ring 1.28s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+.proto-sim-click__ring--2 {
+  animation-delay: 0.16s;
+  border-color: rgba(1, 33, 105, 0.62);
+}
+.proto-sim-click__ring--3 {
+  animation-delay: 0.32s;
+  border-color: rgba(1, 33, 105, 0.42);
+  box-shadow: 0 0 12px rgba(1, 33, 105, 0.18);
+}
+@keyframes proto-sim-click-ring {
+  0% {
+    transform: translate(-50%, -50%) scale(0.35);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(5.2);
+    opacity: 0;
+  }
 }
 .proto-viewport > div > div:nth-child(10)
   [data-name="component.input.button"].proto-chat-cta--pressed {

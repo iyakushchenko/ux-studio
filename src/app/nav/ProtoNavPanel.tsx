@@ -154,7 +154,12 @@ export default function ProtoNavPanel({
             <p className="proto-nav-status-bar__title">{navLabel}</p>
 
             <div className="proto-nav-stepper">
-              {scenarioControls}
+              <div
+                className="proto-nav-stepper__scenario-slot"
+                aria-hidden={!scenarioControls}
+              >
+                {scenarioControls}
+              </div>
               <span
                 ref={zoomLabelRef}
                 className="proto-nav-zoom-label"
