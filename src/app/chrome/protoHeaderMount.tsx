@@ -470,6 +470,8 @@ export function setupProtoHeader(
       el.style.display = "none";
     }
   });
+
+  loginCallbacks.onLoginChange?.(isProtoHeaderLoggedIn());
 }
 
 export function syncProtoHeaderLogin(childIndex: number): void {
@@ -477,12 +479,14 @@ export function syncProtoHeaderLogin(childIndex: number): void {
   if (shouldBeLoggedIn && !loggedIn) {
     loggedIn = true;
     updateLoginLabel();
+    loginCallbacks.onLoginChange?.(loggedIn);
   }
 }
 
 export function setProtoHeaderLoggedIn(state: boolean): void {
   loggedIn = state;
   updateLoginLabel();
+  loginCallbacks.onLoginChange?.(loggedIn);
 }
 
 export function isProtoHeaderLoggedIn(): boolean {

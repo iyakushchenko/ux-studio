@@ -100,29 +100,84 @@ const AGENTIC_HOME_HEADING_LOGGED_IN =
   "Sarah, what health services are you focusing on today?";
 
 /** Agentic home hero line — personalised when header login is active. */
+function findAgenticHomeHeading(screen: HTMLElement): HTMLElement | null {
+  const tagged = screen.querySelector<HTMLElement>(
+    "[data-proto-agentic-home-heading]"
+  );
+  if (tagged) return tagged;
+
+  const pilotLogo = screen.querySelector('[data-name="boots.ai assistant 3"]');
+  const heroSibling = pilotLogo?.nextElementSibling;
+  if (heroSibling instanceof HTMLElement && heroSibling.tagName === "P") {
+    heroSibling.dataset.protoAgenticHomeHeading = "true";
+    return heroSibling;
+  }
+
+  return (
+    Array.from(screen.querySelectorAll("p")).find((p) =>
+      /what health services are you focusing on today/i.test(p.textContent ?? "")
+    ) ?? null
+  );
+}
+
+function resolveAgenticHomeLoggedIn(loggedInFlag: boolean): boolean {
+  return loggedInFlag || isProtoHeaderLoggedIn();
+}
+
 function syncAgenticHomeHeading(isLoggedIn: boolean): void {
   const screen = document.querySelector(
     ".proto-viewport > div > div:nth-child(11)"
   ) as HTMLElement | null;
   if (!screen) return;
 
-  let heading = screen.querySelector<HTMLElement>(
-    "[data-proto-agentic-home-heading]"
-  );
-  if (!heading) {
-    heading =
-      Array.from(screen.querySelectorAll("p")).find((p) =>
-        /what health services are you focusing on today/i.test(
-          p.textContent ?? ""
-        )
-      ) ?? null;
-    if (heading) heading.dataset.protoAgenticHomeHeading = "true";
-  }
+  const heading = findAgenticHomeHeading(screen);
   if (!heading) return;
 
-  heading.textContent = isLoggedIn
+  const next = isLoggedIn
     ? AGENTIC_HOME_HEADING_LOGGED_IN
     : AGENTIC_HOME_HEADING_DEFAULT;
+  if (heading.textContent !== next) {
+    heading.textContent = next;
+  }
+}
+
+/** Re-apply after React re-renders reset the Figma export copy. */
+function bindAgenticHomeHeadingSync(isLoggedIn: boolean): () => void {
+  const apply = () => syncAgenticHomeHeading(isLoggedIn);
+
+  apply();
+  let innerRaf = 0;
+  const outerRaf = requestAnimationFrame(() => {
+    apply();
+    innerRaf = requestAnimationFrame(apply);
+  });
+  const t = window.setTimeout(apply, 0);
+
+  const screen = document.querySelector(
+    ".proto-viewport > div > div:nth-child(11)"
+  ) as HTMLElement | null;
+  const heading = screen ? findAgenticHomeHeading(screen) : null;
+  const mo =
+    heading && typeof MutationObserver !== "undefined"
+      ? new MutationObserver(() => {
+          const expected = isLoggedIn
+            ? AGENTIC_HOME_HEADING_LOGGED_IN
+            : AGENTIC_HOME_HEADING_DEFAULT;
+          if ((heading.textContent ?? "").trim() !== expected) apply();
+        })
+      : null;
+  mo?.observe(heading!, {
+    characterData: true,
+    childList: true,
+    subtree: true,
+  });
+
+  return () => {
+    cancelAnimationFrame(outerRaf);
+    cancelAnimationFrame(innerRaf);
+    window.clearTimeout(t);
+    mo?.disconnect();
+  };
 }
 
 const AGENTIC_QUERY_LINE_PX = 24;
@@ -1117,7 +1172,11 @@ export default function App() {
 
     // Sync login state: account/booking pages force logged-in
     syncProtoHeaderLogin(SCREENS[current]?.childIndex ?? 11);
-    setLoggedInFlag(isProtoHeaderLoggedIn());
+    const headerLoggedIn = isProtoHeaderLoggedIn();
+    setLoggedInFlag(headerLoggedIn);
+    if (SCREENS[current]?.childIndex === 11) {
+      syncAgenticHomeHeading(headerLoggedIn);
+    }
 
     const runMaAvatars = () => syncMaAccountAvatars(scrollEl);
     runMaAvatars();
@@ -1128,6 +1187,13 @@ export default function App() {
       window.clearTimeout(t);
     };
   }, [current]);
+
+  // Agentic home heading — re-sync after every commit (Figma export resets copy on re-render).
+  useLayoutEffect(() => {
+    if (SCREENS[current]?.childIndex !== 11) return;
+    const isLoggedIn = resolveAgenticHomeLoggedIn(loggedInFlag);
+    return bindAgenticHomeHeadingSync(isLoggedIn);
+  }, [current, loggedInFlag]);
 
   // Mark active progress step on booking pages
   useEffect(() => {
@@ -1194,8 +1260,6 @@ export default function App() {
     );
     const subtotal = card?.querySelector<HTMLElement>('[data-name="Subtotal"]');
     if (!card || !subtotal) return;
-
-    syncAgenticHomeHeading(loggedInFlag || isProtoHeaderLoggedIn());
 
     let ta = subtotal.querySelector<HTMLTextAreaElement>(
       "textarea.proto-agentic-query"
@@ -1275,7 +1339,7 @@ export default function App() {
       card.removeEventListener("click", onCardClick);
       sendBtn?.removeEventListener("keydown", onSendKey);
     };
-  }, [current, loggedInFlag]);
+  }, [current]);
 
   // Agentic chat (child 10): composer matches home — textarea, mic/send, chip dynamics
   useEffect(() => {
