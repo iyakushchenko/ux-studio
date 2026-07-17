@@ -16,10 +16,18 @@ import LoginPopup from "@/app/popups/LoginPopup";
 import QuickViewPopup from "@/app/popups/QuickViewPopup";
 import ProtoNavPanel from "@/app/nav/ProtoNavPanel";
 import { ProtoNavScenarioControls } from "@/app/nav/ProtoNavScenarioControls";
+import { ProtoNavJourneyMenu } from "@/app/nav/ProtoNavJourneyMenu";
 import { useProtoScenarioPlayback, type PlaybackStepHooks } from "@/app/nav/useProtoScenarioPlayback";
 import ProtoHubViewport from "@/app/hub/ProtoHubViewport";
 import { PROTO_HUB_LABEL, PROTO_INDEX_APPOINTMENT_DETAILS, PROTO_INDEX_APPOINTMENT_HISTORY, PROTO_INDEX_PLP, PROTO_SCREENS, protoTabToIndex } from "@/app/proto/protoScreens";
-import { getProtoScenarioForChildIndex } from "@/app/proto/protoScenarioEngine";
+import { BOOTS_SARAH_PACK } from "@/app/orchestra/brands/bootsSarahJourney";
+import {
+  orchestraShowControls,
+  resolveActiveScreenScenario,
+} from "@/app/orchestra/resolveActiveScreenScenario";
+import type { JourneyRuntime, ProtoOrchestraModeId } from "@/app/orchestra/types";
+import { useOrchestraMode } from "@/app/orchestra/useOrchestraMode";
+import { useProtoJourneyPlayback } from "@/app/orchestra/useProtoJourneyPlayback";
 import {
   collectSitePilotChatScenarioFrames,
   ensureSitePilotChatComposerDock,
@@ -940,27 +948,65 @@ export default function App() {
     setPlpFiltersDirty(arePlpFiltersActive(document));
   }, []);
 
-  const activeScenarioConfig = hubOpen
-    ? undefined
-    : getProtoScenarioForChildIndex(SCREENS[current]?.childIndex ?? -1);
+  const orchestraMode = useOrchestraMode(BOOTS_SARAH_PACK);
+  const {
+    modeId: orchestraModeId,
+    setModeId: setOrchestraModeId,
+    modes: orchestraModes,
+    isCjmMode,
+    beatIndex: journeyBeatIndex,
+    setBeatIndex: setJourneyBeatIndex,
+    resetBeatIndex,
+    journey: activeJourney,
+  } = orchestraMode;
+
+  const journeyRuntime = useMemo<JourneyRuntime>(
+    () => ({
+      goToTab: (screenIndex: number) => {
+        setCurrent(screenIndex);
+      },
+      openAvailability: (intent?: unknown) => {
+        openAvailabilityTool(
+          (intent as AvailOpenIntent | undefined) ?? AVAIL_INTENT.start
+        );
+      },
+      closeAvailability: () => {
+        closeAvailabilityTool();
+      },
+    }),
+    []
+  );
+
+  const activeScreenScenario = useMemo(
+    () =>
+      resolveActiveScreenScenario({
+        hubOpen,
+        modeId: orchestraModeId,
+        beatIndex: journeyBeatIndex,
+        currentTabIndex: current,
+        currentChildIndex: SCREENS[current]?.childIndex ?? -1,
+        brandPack: BOOTS_SARAH_PACK,
+      }),
+    [hubOpen, orchestraModeId, journeyBeatIndex, current]
+  );
 
   const collectScenarioFrames = useCallback(() => {
-    if (!activeScenarioConfig) return [];
+    if (!activeScreenScenario) return [];
     const screen = document.querySelector(
-      `.proto-viewport > div > div:nth-child(${activeScenarioConfig.childIndex})`
+      `.proto-viewport > div > div:nth-child(${activeScreenScenario.childIndex})`
     );
     if (!screen) return [];
 
-    if (activeScenarioConfig.id === "site-pilot-chat" && screen instanceof HTMLElement) {
+    if (activeScreenScenario.id === "site-pilot-chat" && screen instanceof HTMLElement) {
       ensureSitePilotChatComposerDock(screen);
     }
 
-    if (activeScenarioConfig.id === "site-pilot-chat") {
+    if (activeScreenScenario.id === "site-pilot-chat") {
       return collectSitePilotChatScenarioFrames(screen);
     }
 
     return [];
-  }, [activeScenarioConfig]);
+  }, [activeScreenScenario]);
 
   const sitePilotChatPlaybackHooks = useMemo<PlaybackStepHooks>(
     () => ({
@@ -977,18 +1023,60 @@ export default function App() {
   );
 
   const scenarioPlayback = useProtoScenarioPlayback({
-    active: activeScenarioConfig != null,
+    active: activeScreenScenario != null,
     collectFrames: collectScenarioFrames,
-    screenSelector: activeScenarioConfig
-      ? `.proto-viewport > div > div:nth-child(${activeScenarioConfig.childIndex})`
+    screenSelector: activeScreenScenario
+      ? `.proto-viewport > div > div:nth-child(${activeScreenScenario.childIndex})`
       : undefined,
     scrollRootRef: prototypeScrollElRef,
-    minVisibleFrames: activeScenarioConfig?.minVisibleFrames,
-    playbackStepMs: activeScenarioConfig?.playbackStepMs,
+    minVisibleFrames: activeScreenScenario?.minVisibleFrames,
+    playbackStepMs: activeScreenScenario?.playbackStepMs,
     playbackStepHooks:
-      activeScenarioConfig?.id === "site-pilot-chat"
+      activeScreenScenario?.id === "site-pilot-chat"
         ? sitePilotChatPlaybackHooks
         : undefined,
+  });
+
+  const journeyPlayback = useProtoJourneyPlayback({
+    active: isCjmMode && !hubOpen,
+    journey: activeJourney,
+    beatIndex: journeyBeatIndex,
+    setBeatIndex: setJourneyBeatIndex,
+    currentTabIndex: current,
+    runtime: journeyRuntime,
+    screenPlayback: scenarioPlayback,
+    screenBeatActive: activeScreenScenario != null,
+  });
+
+  const playback = isCjmMode ? journeyPlayback : scenarioPlayback;
+
+  const handleOrchestraModeChange = useCallback(
+    (next: ProtoOrchestraModeId) => {
+      if (next === orchestraModeId) return;
+      journeyPlayback.stopJourneyPlay();
+      scenarioPlayback.resetToEnd();
+      if (isCjmMode) {
+        journeyPlayback.resetJourney();
+      }
+      resetBeatIndex();
+      setOrchestraModeId(next);
+    },
+    [
+      isCjmMode,
+      journeyPlayback,
+      orchestraModeId,
+      resetBeatIndex,
+      scenarioPlayback,
+      setOrchestraModeId,
+    ]
+  );
+
+  const showOrchestraControls = orchestraShowControls({
+    hubOpen,
+    modeId: orchestraModeId,
+    brandPack: BOOTS_SARAH_PACK,
+    screenTotalFrames: scenarioPlayback.totalFrames,
+    activeScreenScenario,
   });
 
   const resetToEndRef = useRef(scenarioPlayback.resetToEnd);
@@ -1009,16 +1097,16 @@ export default function App() {
     if (
       wasOpen &&
       !availabilityOpen &&
-      activeScenarioConfig?.id === "site-pilot-chat" &&
-      scenarioPlayback.visibleCount >= scenarioPlayback.totalFrames
+      activeScreenScenario?.id === "site-pilot-chat" &&
+      playback.visibleCount >= playback.totalFrames
     ) {
       retreatFromFinaleRef.current();
     }
   }, [
     availabilityOpen,
-    activeScenarioConfig?.id,
-    scenarioPlayback.visibleCount,
-    scenarioPlayback.totalFrames,
+    activeScreenScenario?.id,
+    playback.visibleCount,
+    playback.totalFrames,
   ]);
 
   // Frame 1 ambient thinking hint — shows the chat is live / dynamic.
@@ -1029,26 +1117,26 @@ export default function App() {
       ".proto-viewport > div > div:nth-child(10)"
     );
     const showHint =
-      scenarioPlayback.visibleCount === 1 &&
-      scenarioPlayback.totalFrames > 1 &&
-      !scenarioPlayback.isPlaying &&
-      !scenarioPlayback.isPausingBeforeReveal;
+      playback.visibleCount === 1 &&
+      playback.totalFrames > 1 &&
+      !playback.isPlaying &&
+      !playback.isPausingBeforeReveal;
     syncSitePilotChatThinkingHint(screen, showHint);
 
     return () => syncSitePilotChatThinkingHint(null, false);
   }, [
     current,
-    scenarioPlayback.visibleCount,
-    scenarioPlayback.totalFrames,
-    scenarioPlayback.isPlaying,
-    scenarioPlayback.isPausingBeforeReveal,
+    playback.visibleCount,
+    playback.totalFrames,
+    playback.isPlaying,
+    playback.isPausingBeforeReveal,
   ]);
 
   // Frame 1 — thread is short; don't let composer pad + min-height fill create a scroll track.
   useLayoutEffect(() => {
     const scrollEl = prototypeScrollElRef.current;
     const atFrameStart =
-      SCREENS[current]?.childIndex === 10 && scenarioPlayback.visibleCount <= 1;
+      SCREENS[current]?.childIndex === 10 && playback.visibleCount <= 1;
 
     scrollEl?.classList.toggle("proto-chat-scenario-at-start", atFrameStart);
 
@@ -1069,7 +1157,7 @@ export default function App() {
       scrollEl?.classList.remove("proto-chat-scenario-at-start");
       screen?.removeAttribute("data-proto-scenario-at-start");
     };
-  }, [current, scenarioPlayback.visibleCount]);
+  }, [current, playback.visibleCount]);
 
   /** Hide Reset when page states are already pristine (nav position ignored). */
   const isProtoPristine =
@@ -1081,7 +1169,7 @@ export default function App() {
     !homeQueryDirty &&
     !chatComposerDirty &&
     !plpFiltersDirty &&
-    !scenarioPlayback.isDirty;
+    !playback.isDirty;
 
   const saveHubScroll = useCallback(() => {
     if (hubScrollElRef.current) {
@@ -1123,7 +1211,7 @@ export default function App() {
 
   const resetPrototype = () => {
     const scenarioOnlyDirty =
-      scenarioPlayback.isDirty &&
+      playback.isDirty &&
       !availabilityOpen &&
       !vaccinePickerOpen &&
       !recipientPickerOpen &&
@@ -1134,6 +1222,9 @@ export default function App() {
       !plpFiltersDirty;
 
     if (scenarioOnlyDirty) {
+      if (isCjmMode) {
+        journeyPlayback.resetJourney();
+      }
       scenarioPlayback.resetToEnd();
       return;
     }
@@ -4282,22 +4373,29 @@ export default function App() {
         onGo={go}
         onReset={resetPrototype}
         scenarioControls={
-          activeScenarioConfig && scenarioPlayback.totalFrames > 0 ? (
+          showOrchestraControls ? (
             <ProtoNavScenarioControls
-              label={activeScenarioConfig.label}
-              visibleCount={scenarioPlayback.visibleCount}
-              totalFrames={scenarioPlayback.totalFrames}
-              isPlaying={scenarioPlayback.isPlaying}
-              canStepBack={scenarioPlayback.canStepBack}
-              canStepForward={scenarioPlayback.canStepForward}
-              canJumpToStart={scenarioPlayback.canJumpToStart}
-              canPlay={scenarioPlayback.canPlay}
-              canJumpToEnd={scenarioPlayback.canJumpToEnd}
-              onJumpToStart={scenarioPlayback.jumpToStart}
-              onStepBack={scenarioPlayback.stepBack}
-              onPlay={scenarioPlayback.play}
-              onStepForward={scenarioPlayback.stepForward}
-              onJumpToEnd={scenarioPlayback.jumpToEnd}
+              journeyMenu={
+                <ProtoNavJourneyMenu
+                  modes={orchestraModes}
+                  value={orchestraModeId}
+                  onChange={handleOrchestraModeChange}
+                  isPlaying={playback.isPlaying}
+                />
+              }
+              visibleCount={playback.visibleCount}
+              totalFrames={playback.totalFrames}
+              isPlaying={playback.isPlaying}
+              canStepBack={playback.canStepBack}
+              canStepForward={playback.canStepForward}
+              canJumpToStart={playback.canJumpToStart}
+              canPlay={playback.canPlay}
+              canJumpToEnd={playback.canJumpToEnd}
+              onJumpToStart={playback.jumpToStart}
+              onStepBack={playback.stepBack}
+              onPlay={playback.play}
+              onStepForward={playback.stepForward}
+              onJumpToEnd={playback.jumpToEnd}
             />
           ) : null
         }

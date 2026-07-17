@@ -28,6 +28,12 @@ export function getProtoScenarioForChildIndex(
   return PROTO_SCENARIO_SCREENS.find((s) => s.childIndex === childIndex);
 }
 
+export function getProtoScenarioById(
+  id: string
+): ProtoScenarioScreenConfig | undefined {
+  return PROTO_SCENARIO_SCREENS.find((s) => s.id === id);
+}
+
 export const PROTO_SCENARIO_FRAME_ANIM_MS = 320;
 export const PROTO_SCENARIO_FRAME_MAX_PX = 3200;
 

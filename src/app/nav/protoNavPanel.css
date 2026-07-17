@@ -108,6 +108,99 @@
   white-space: nowrap;
 }
 
+.proto-nav-journey-menu {
+  position: relative;
+  display: inline-flex;
+  margin-right: 2px;
+}
+
+.proto-nav-journey-menu__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px 2px 0;
+  border: none;
+  border-radius: 3px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.45);
+  cursor: default;
+}
+
+.proto-nav-journey-menu__trigger:hover {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.proto-nav-journey-menu__label {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  max-width: 9.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.proto-nav-journey-menu__chevron {
+  flex-shrink: 0;
+  opacity: 0.65;
+}
+
+.proto-nav-journey-menu__panel {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 11.5rem;
+  padding: 2px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+.proto-nav-journey-menu__option {
+  display: block;
+  width: 100%;
+  padding: 5px 8px;
+  border: none;
+  border-radius: 2px;
+  text-align: left;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.78);
+  background: linear-gradient(180deg, #5a5a5a 0%, #383838 48%, #242424 100%);
+  cursor: default;
+}
+
+.proto-nav-journey-menu__option:hover,
+.proto-nav-journey-menu__option--active {
+  color: #3d3018;
+  background: linear-gradient(
+    180deg,
+    #faf0d4 0%,
+    #ead9ad 18%,
+    #dcc796 46%,
+    #ccb57f 72%,
+    #bfa56e 100%
+  );
+}
+
+.proto-nav-scenario--on-air .proto-nav-journey-menu__trigger {
+  color: rgba(190, 255, 210, 0.72);
+}
+
+.proto-nav-scenario--on-air .proto-nav-journey-menu__label {
+  animation: proto-studio-label-glow-blink 3s linear infinite;
+}
+
 .proto-nav-scenario__counter {
   font-size: 10px;
   font-weight: 600;
@@ -262,12 +355,6 @@
 
 .proto-nav-scenario--on-air .proto-nav-scenario__on-air-halo {
   animation: proto-studio-on-air-halo-blink 3s linear infinite;
-}
-
-.proto-nav-scenario--on-air .proto-nav-scenario__label {
-  color: rgba(190, 255, 210, 0.72);
-  animation: proto-studio-label-glow-blink 3s linear infinite;
-  transition: color 0.5s ease;
 }
 
 /* Halogen — play button only; fades in/out while on air. */
@@ -482,7 +569,7 @@
   .proto-nav-scenario__on-air-dot,
   .proto-nav-scenario__on-air-halo,
   .proto-nav-scenario__halogen-bulb,
-  .proto-nav-scenario--on-air .proto-nav-scenario__label {
+  .proto-nav-scenario--on-air .proto-nav-journey-menu__label {
     animation: none;
   }
 

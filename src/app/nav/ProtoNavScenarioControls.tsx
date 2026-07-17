@@ -1,5 +1,7 @@
+import type { ReactNode } from "react";
+
 export type ProtoNavScenarioControlsProps = {
-  label: string;
+  journeyMenu: ReactNode;
   visibleCount: number;
   totalFrames: number;
   isPlaying: boolean;
@@ -77,7 +79,7 @@ function CassetteJumpToEndIcon() {
 
 /** Nav “control room” — 90s cassette-deck scenario playback. */
 export function ProtoNavScenarioControls({
-  label,
+  journeyMenu,
   visibleCount,
   totalFrames,
   isPlaying,
@@ -97,7 +99,7 @@ export function ProtoNavScenarioControls({
       className={`proto-nav-scenario${isPlaying ? " proto-nav-scenario--on-air" : ""}`}
       role="group"
     >
-      <span className="proto-nav-scenario__label">{isPlaying ? "Live" : label}</span>
+      {journeyMenu}
       <span className="proto-nav-scenario__on-air" aria-hidden>
         <span className="proto-nav-scenario__on-air-dot" />
         <span className="proto-nav-scenario__on-air-halo" aria-hidden />
