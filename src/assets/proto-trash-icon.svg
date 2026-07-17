@@ -1,0 +1,6 @@
+<svg class="proto-tertiary-cta__svg--stroke" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <path d="M2.5 4h11" stroke-linecap="round" />
+  <path d="M5.25 4V3.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75V4" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M4.25 4l.65 8.25a1.25 1.25 0 0 0 1.25 1.25h3.7a1.25 1.25 0 0 0 1.25-1.25L11.75 4" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M6.5 6.75v4.5M9.5 6.75v4.5" stroke-linecap="round" />
+</svg>

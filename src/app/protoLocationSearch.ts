@@ -16,7 +16,7 @@ const PLP_SEARCH_FIELD_SELECTOR =
   '[data-name="Text Fields / Search. Filled"] [data-name="component.input.field"]';
 
 const PLP_SEARCH_WIRE_VERSION = "2";
-const PLP_SEARCH_SYNC_VERSION = "2";
+const PLP_SEARCH_SYNC_VERSION = "3";
 
 type PlpSearchInput = HTMLInputElement & {
   __protoPlpSearchHandler?: () => void;
@@ -37,7 +37,7 @@ function attachPlpFilterSearchSync(
   const handler = () => {
     syncSearchFieldFilled(textField, input.value);
     syncLocationSearchClearBtn(clearBtn, input.value);
-    syncPlpFilterListSearch();
+    syncPlpFilterListSearch(undefined, { refreshResults: false });
   };
   typed.__protoPlpSearchHandler = handler;
   typed.dataset.protoPlpSearchSync = PLP_SEARCH_SYNC_VERSION;
@@ -232,7 +232,7 @@ function wirePlpSearchField(fieldHost: HTMLElement): void {
   const sync = () => {
     syncSearchFieldFilled(textField, input.value);
     syncLocationSearchClearBtn(clearBtn, input.value);
-    syncPlpFilterListSearch();
+    syncPlpFilterListSearch(undefined, { refreshResults: false });
   };
 
   attachPlpFilterSearchSync(input, textField, clearBtn);

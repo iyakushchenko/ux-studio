@@ -1,5 +1,7 @@
 import {
+  handlePlpFilterViewAllClick,
   isByTypeFilterRadio,
+  isPlpFilterCheckboxDisabled,
   isPlpFilterPanelTarget,
   syncPlpListingFilters,
 } from "@/app/protoPlpListing";
@@ -146,7 +148,7 @@ export const PLP_FILTER_VIEW_ALL_SELECTOR =
 const PLP_FILTER_VIEW_ALL = PLP_FILTER_VIEW_ALL_SELECTOR;
 
 function wirePlpFilterViewAllLink(el: HTMLElement): void {
-  if (el.dataset.protoViewAllWired === "1") return;
+  if (el.dataset.protoViewAllWired === "2") return;
 
   let link: HTMLAnchorElement;
   if (el instanceof HTMLAnchorElement) {
@@ -165,8 +167,11 @@ function wirePlpFilterViewAllLink(el: HTMLElement): void {
 
   link.classList.add("proto-link");
   if (!link.classList.contains("block")) link.classList.add("block");
-  link.addEventListener("click", (e) => e.preventDefault());
-  link.dataset.protoViewAllWired = "1";
+  link.addEventListener("click", (e) => {
+    e.preventDefault();
+    handlePlpFilterViewAllClick(link);
+  });
+  link.dataset.protoViewAllWired = "2";
 }
 
 export function wirePlpFilterViewAllLinks(root: ParentNode = document): void {
@@ -199,6 +204,7 @@ export function handleProtoInputClick(target: HTMLElement): boolean {
   const checkboxRow = findCheckboxRow(target);
   if (checkboxRow) {
     if (isBoosterCheckboxRow(checkboxRow)) return false;
+    if (isPlpFilterCheckboxDisabled(checkboxRow)) return false;
 
     ensureCheckboxRow(checkboxRow);
     const wasChecked = checkboxRow.dataset.checkboxChecked === "true";

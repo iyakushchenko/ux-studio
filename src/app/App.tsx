@@ -22,7 +22,7 @@ import type { VaccineItem } from "@/app/protoVaccineList";
 import {
   setupChosenPageMap,
 } from "@/app/protoMap";
-import { syncPlpListingFilters } from "@/app/protoPlpListing";
+import { ensurePlpTileTitleLinks, syncPlpListingFilters } from "@/app/protoPlpListing";
 import { initProtoSearchFields, syncFigmaSearchClearIcons } from "@/app/protoLocationSearch";
 import { setupProtoFooters } from "@/app/protoFooterMount";
 import { setupProtoHeader, syncProtoHeaderLogin, setProtoHeaderLoggedIn, isProtoHeaderLoggedIn, toggleWishlist, isInWishlist, applyWishlistHeartVisual, syncChickenpoxWishlistHearts, PROTO_PDP_WISHLIST_ID } from "@/app/protoHeaderMount";
@@ -1653,6 +1653,8 @@ export default function App() {
     initProtoInputControls();
     initProtoSearchFields();
     syncPlpListingFilters();
+    const plpFilters = document.querySelector('[data-name="module.plp.filters"]');
+    if (plpFilters) initProtoInputControls(plpFilters);
   }, [current]);
 
   // Figma search rows — hide in-field clear (X) when value is empty / placeholder.
@@ -1803,6 +1805,37 @@ export default function App() {
       bookBtns.forEach((btn) => btn.removeEventListener("click", goPdp));
       screen.removeEventListener("keydown", onKey);
     };
+  }, [current]);
+
+  // PLP (child 9) — tile titles → PDP
+  useEffect(() => {
+    if (SCREENS[current]?.childIndex !== 9) return;
+    const screen = document.querySelector(
+      ".proto-viewport > div > div:nth-child(9)"
+    ) as HTMLElement | null;
+    if (!screen) return;
+
+    ensurePlpTileTitleLinks(screen);
+
+    const goPdp = (e: Event) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if ("stopImmediatePropagation" in e) {
+        (e as Event).stopImmediatePropagation();
+      }
+      setCurrent(3); // PDP. Vaccine Details Page
+    };
+
+    const onClick = (e: MouseEvent) => {
+      const link = (e.target as Element | null)?.closest(
+        "a.proto-plp-tile-title-link"
+      );
+      if (!link || !screen.contains(link)) return;
+      goPdp(e);
+    };
+
+    screen.addEventListener("click", onClick, true);
+    return () => screen.removeEventListener("click", onClick, true);
   }, [current]);
 
   // Screen 2 (Account Overview, child 10) has a Site Pilot microheader (Frame337)
