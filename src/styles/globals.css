@@ -542,6 +542,24 @@
 .proto-hub-page__open-cta:active {
   transform: translateY(0);
 }
+.proto-hub-page__deck-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+.proto-hub-page__deck-link {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #012169;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+.proto-hub-page__deck-link:hover {
+  color: #01318f;
+  text-decoration: underline;
+}
 .proto-hub-page__section {
   margin-bottom: 48px;
   scroll-margin-top: 88px;

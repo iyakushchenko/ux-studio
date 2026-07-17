@@ -496,6 +496,28 @@ export default function ProtoHubPage({ onGoToTab }: Props) {
                 Open UX Concept
               </button>
 
+              <nav
+                className="proto-hub-page__deck-links"
+                aria-label="Research decks"
+              >
+                <a
+                  className="proto-hub-page__deck-link"
+                  href="https://www.figma.com/design/YG45YMrcxFuwsO2atQYbjr/-UX--CJM---Boots-Health---Vaccine--Concept-?node-id=1-2571&t=aleVxjRKZLPe2fRN-4"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Open Persona Deck
+                </a>
+                <a
+                  className="proto-hub-page__deck-link"
+                  href="https://www.figma.com/design/YG45YMrcxFuwsO2atQYbjr/-UX--CJM---Boots-Health---Vaccine--Concept-?node-id=1-3253&t=aleVxjRKZLPe2fRN-4"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Open Visual Flow Deck
+                </a>
+              </nav>
+
               <div className="proto-hub-page__powered">
                 <p className="proto-hub-page__powered-meta">
                   Built with UXDS and X Suite, the UX Department's own toolkit,
