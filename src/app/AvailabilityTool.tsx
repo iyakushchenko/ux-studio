@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import { ProtoCloseIcon } from "@/app/chrome/ProtoCloseIcon";
+import { ProtoTertiaryCta } from "@/app/chrome/ProtoTertiaryCta";
+import { ProtoWishlistHeart } from "@/app/chrome/ProtoWishlistHeart";
 import iconSearch from "@/assets/avail/search.svg";
 import iconMapPin from "@/assets/avail/map-pin.svg";
-import iconCheck from "@/assets/avail/check.svg";
 import iconCheckChosen from "@/assets/avail/check-chosen.svg";
 import iconArrows from "@/assets/avail/arrows.svg";
 import iconArrowsSecondary from "@/assets/avail/arrows-secondary.svg";
@@ -17,25 +18,26 @@ import {
   dismissLocationFieldFocus,
   isListSearchView,
   isNearMeMapView,
-  PROTO_LOC_COUNT_DEFAULT,
   PROTO_LOC_COUNT_NEAR,
   PROTO_LOC_SEARCH_DEFAULT,
   PROTO_LOC_SEARCH_NEAR,
   shouldShowLocationSearchClear,
 } from "@/app/proto/protoLocationSearch";
+import {
+  AVAIL_STORES,
+  formatAvailLocationCount,
+  type AvailStore,
+} from "@/app/proto/availStores";
+import {
+  isInSavedLocations,
+  SAVED_LOCATIONS_CHANGE_EVENT,
+} from "@/app/proto/protoSavedLocations";
+import { toggleSavedLocationWithNotify } from "@/app/chrome/protoHeaderMount";
 
 /** Native hover tooltip for the demo “today” cell (12 June 2026). */
 export const PROTO_TODAY_TOOLTIP = "Today is June 12 2026";
 
-export type AvailStore = {
-  id: string;
-  name: string;
-  address: string;
-  phone: string;
-  miles: string;
-  /** Demo: false → noSlots step */
-  hasSlots: boolean;
-};
+export type { AvailStore } from "@/app/proto/availStores";
 
 export type AvailStep =
   | "start"
@@ -70,34 +72,15 @@ type Props = {
   onClose: () => void;
   onBookNow: (store: AvailStore, slot: ChosenBookingSlot) => void;
   onChooseLocation?: (store: AvailStore) => void;
+  loggedIn?: boolean;
+  onOpenLogin?: () => void;
 };
 
-const STORES: AvailStore[] = [
-  {
-    id: "covent",
-    name: "Covent Garden Long Acre",
-    address: "107-115 Long Acre, WC2E 9NT, London, United Kingdom",
-    phone: "02073795875",
-    miles: "0.4 Miles",
-    hasSlots: true,
-  },
-  {
-    id: "strand",
-    name: "Boots Strand",
-    address: "426 Strand, London, Greater London WC2R 0QE",
-    phone: "02078367225",
-    miles: "0.6 Miles",
-    hasSlots: false,
-  },
-  {
-    id: "piccadilly",
-    name: "Piccadilly Circus",
-    address: "44–50 Regent Street, W1B 5RA, London, United Kingdom",
-    phone: "02077346126",
-    miles: "0.8 Miles",
-    hasSlots: true,
-  },
-];
+const STORES = AVAIL_STORES;
+
+/** Shown on list cards for pharmacies with no bookable slots in the demo window. */
+const NO_SLOTS_STATUS =
+  "This location currently has no available slots for the upcoming 28 day period.";
 
 const WEEKDAYS = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"] as const;
 const BOOKING_WEEKDAYS = [
@@ -211,15 +194,17 @@ const EVENING = [
 
 const SEARCH_DEFAULT = PROTO_LOC_SEARCH_DEFAULT;
 const SEARCH_NEAR_PLACEHOLDER = PROTO_LOC_SEARCH_NEAR;
-const COUNT_DEFAULT = PROTO_LOC_COUNT_DEFAULT;
+const COUNT_DEFAULT = formatAvailLocationCount();
 const COUNT_NEAR = PROTO_LOC_COUNT_NEAR;
 
 function AvailMapPanel({
   nearMe,
   onPinClick,
+  pinLabels,
 }: {
   nearMe: boolean;
   onPinClick: (pinIndex: number) => void;
+  pinLabels: string[];
 }) {
   const hostRef = useRef<HTMLDivElement>(null);
   const mapCtrlRef = useRef<ReturnType<typeof setupProtoMapView> | null>(null);
@@ -231,6 +216,7 @@ function AvailMapPanel({
     if (!host) return;
     mapCtrlRef.current = setupProtoMapView(host, {
       onPinClick: (pinIndex) => onPinClickRef.current(pinIndex),
+      pinLabels,
     });
     return () => {
       mapCtrlRef.current?.cleanup();
@@ -295,16 +281,24 @@ function StoreCard({
   store,
   chosen,
   hoursOpen,
+  loggedIn,
+  isSaved,
   onToggleHours,
   onChoose,
   onShowMap,
+  onOpenLogin,
+  onToggleSaved,
 }: {
   store: AvailStore;
   chosen: boolean;
   hoursOpen: boolean;
+  loggedIn: boolean;
+  isSaved: boolean;
   onToggleHours: () => void;
   onChoose: () => void;
   onShowMap: () => void;
+  onOpenLogin?: () => void;
+  onToggleSaved: () => void;
 }) {
   return (
     <div
@@ -312,7 +306,19 @@ function StoreCard({
       data-proto-avail-store={store.id}
     >
       <div className="proto-avail-store__main">
-        <p className="proto-avail-store__name">{store.name}</p>
+        <div className="proto-avail-store__head">
+          <p className="proto-avail-store__name">{store.name}</p>
+          {loggedIn && isSaved ? (
+            <p className="proto-avail-store__status proto-avail-store__status--saved" role="status">
+              This location is saved in My Locations
+            </p>
+          ) : null}
+          {!store.hasSlots ? (
+            <p className="proto-avail-store__status" role="status">
+              {NO_SLOTS_STATUS}
+            </p>
+          ) : null}
+        </div>
         <div className="proto-avail-store__rows">
           <div className="proto-avail-store__row">
             <span>Location</span>
@@ -345,22 +351,51 @@ function StoreCard({
       <div className="proto-avail-store__aside">
         <div className="proto-avail-store__meta">
           <span className="proto-avail-store__from">From you</span>
-          <span className="proto-avail-store__miles">{store.miles}</span>
+          <span className="proto-avail-store__distance">{store.distance}</span>
           <span className="proto-avail-store__access">Disabled access</span>
         </div>
-        <button
-          type="button"
-          className={
-            chosen ? "proto-avail-btn-chosen" : "proto-avail-btn-primary proto-avail-btn-primary--sm"
-          }
-          onClick={(e) => {
-            e.stopPropagation();
-            onChoose();
-          }}
-        >
-          <img className="proto-avail-check-icon" src={chosen ? iconCheckChosen : iconCheck} alt="" width={16} height={16} />
-          {chosen ? "Chosen Location" : "Choose Location"}
-        </button>
+        <div className="proto-avail-store__actions">
+          <button
+            type="button"
+            className={
+              chosen
+                ? "proto-avail-btn-secondary proto-avail-btn-secondary--sm proto-avail-btn-secondary--chosen"
+                : "proto-avail-btn-secondary proto-avail-btn-secondary--sm"
+            }
+            onClick={(e) => {
+              e.stopPropagation();
+              onChoose();
+            }}
+          >
+            <img
+              className={
+                chosen
+                  ? "proto-avail-check-icon"
+                  : "proto-avail-check-icon proto-secondary-cta-icon"
+              }
+              src={iconCheckChosen}
+              alt=""
+              width={16}
+              height={16}
+            />
+            {chosen ? "Chosen Location" : "Choose Location"}
+          </button>
+          <ProtoWishlistHeart
+            active={loggedIn && isSaved}
+            label={
+              loggedIn && isSaved
+                ? `Remove ${store.name} from My Locations`
+                : `Save ${store.name} to My Locations`
+            }
+            onClick={() => {
+              if (!loggedIn) {
+                onOpenLogin?.();
+                return;
+              }
+              onToggleSaved();
+            }}
+          />
+        </div>
       </div>
     </div>
   );
@@ -475,6 +510,8 @@ export default function AvailabilityTool({
   onClose,
   onBookNow,
   onChooseLocation,
+  loggedIn = false,
+  onOpenLogin,
 }: Props) {
   const [step, setStep] = useState<AvailStep>("start");
   const [query, setQuery] = useState("");
@@ -493,9 +530,19 @@ export default function AvailabilityTool({
   const [selectedTime, setSelectedTime] = useState("16:30");
   const storeListRef = useRef<HTMLDivElement>(null);
   const pendingPinScrollRef = useRef<number | null>(null);
+  const pendingStoreScrollIdRef = useRef<string | null>(null);
   const appliedIntentSigRef = useRef<string | null>(null);
   const foundCountRef = useRef<HTMLSpanElement>(null);
   const foundFlashTimerRef = useRef<number | undefined>(undefined);
+  const [, setSavedLocationsTick] = useState(0);
+
+  useEffect(() => {
+    const onSavedChange = () => setSavedLocationsTick((n) => n + 1);
+    document.addEventListener(SAVED_LOCATIONS_CHANGE_EVENT, onSavedChange);
+    return () => {
+      document.removeEventListener(SAVED_LOCATIONS_CHANGE_EVENT, onSavedChange);
+    };
+  }, []);
 
   useEffect(() => {
     if (!open) {
@@ -552,7 +599,21 @@ export default function AvailabilityTool({
   }, [step]);
 
   useEffect(() => {
-    if (step !== "list" || pendingPinScrollRef.current == null) return;
+    if (step !== "list") return;
+
+    const storeId = pendingStoreScrollIdRef.current;
+    if (storeId) {
+      pendingStoreScrollIdRef.current = null;
+      requestAnimationFrame(() => {
+        const card = storeListRef.current?.querySelector<HTMLElement>(
+          `[data-proto-avail-store="${storeId}"]`
+        );
+        card?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      });
+      return;
+    }
+
+    if (pendingPinScrollRef.current == null) return;
     const pinIndex = pendingPinScrollRef.current;
     pendingPinScrollRef.current = null;
     requestAnimationFrame(() => {
@@ -610,6 +671,14 @@ export default function AvailabilityTool({
     setNearMe(false);
     setQuery(seed?.trim() || SEARCH_DEFAULT);
     setStep("list");
+  };
+
+  /** Date step — open list view with the current pharmacy card in view. */
+  const goListWithChosenStore = () => {
+    if (store?.id) {
+      pendingStoreScrollIdRef.current = store.id;
+    }
+    goList();
   };
 
   const goStart = (e?: MouseEvent) => {
@@ -681,6 +750,14 @@ export default function AvailabilityTool({
     setNotifyEmail("");
     setNotifySent(false);
     setStep(s.hasSlots ? "date" : "noSlots");
+  };
+
+  /** List view — resume booking with an already-chosen pharmacy. */
+  const continueWithChosenStore = () => {
+    if (!store) return;
+    setNotifyEmail("");
+    setNotifySent(false);
+    setStep(store.hasSlots ? "date" : "noSlots");
   };
 
   const submitNotify = () => {
@@ -760,6 +837,7 @@ export default function AvailabilityTool({
         )}
 
         {(step === "list" || step === "map") && (
+          <div className="proto-avail-step">
           <div className="proto-avail-body proto-avail-body--stack">
             <div className="proto-avail-search-row">
               <label
@@ -879,6 +957,8 @@ export default function AvailabilityTool({
                       store={s}
                       chosen={store?.id === s.id}
                       hoursOpen={hoursId === s.id}
+                      loggedIn={loggedIn}
+                      isSaved={isInSavedLocations(s.id)}
                       onToggleHours={() =>
                         setHoursId((id) => (id === s.id ? null : s.id))
                       }
@@ -888,13 +968,40 @@ export default function AvailabilityTool({
                         setNearMe(false);
                         setStep("map");
                       }}
+                      onOpenLogin={onOpenLogin}
+                      onToggleSaved={() => {
+                        toggleSavedLocationWithNotify(s.id);
+                      }}
                     />
                   ))}
                 </div>
               ) : (
-                <AvailMapPanel nearMe={nearMe} onPinClick={handleMapPinClick} />
+                <AvailMapPanel
+                  nearMe={nearMe}
+                  onPinClick={handleMapPinClick}
+                  pinLabels={STORES.map((s) => s.name)}
+                />
               )}
             </div>
+          </div>
+          {step === "list" && store && !pickLocation ? (
+            <div className="proto-avail-footer proto-avail-footer--end">
+              <button
+                type="button"
+                className="proto-avail-btn-primary"
+                onClick={continueWithChosenStore}
+              >
+                Continue
+                <img
+                  src={iconArrows}
+                  alt=""
+                  width={16}
+                  height={16}
+                  className="proto-avail-icon-flip"
+                />
+              </button>
+            </div>
+          ) : null}
           </div>
         )}
 
@@ -902,11 +1009,16 @@ export default function AvailabilityTool({
           <div className="proto-avail-body proto-avail-body--stack">
             <div className="proto-avail-panel proto-avail-panel--center proto-avail-panel--grow">
               <AccentIcon variant="search" />
-              <p className="proto-avail-heading">
-                No available slots in
-                <br />
+              <p className="proto-avail-heading">No available slots in</p>
+              <ProtoTertiaryCta
+                compact
+                className="proto-avail-chosen-pharmacy-cta"
+                icon={<img src={accentMap} alt="" width={16} height={16} />}
+                aria-label={`View ${store.name} in pharmacy list`}
+                onClick={goListWithChosenStore}
+              >
                 {store.name}
-              </p>
+              </ProtoTertiaryCta>
               <button
                 type="button"
                 className="proto-avail-btn-primary"
@@ -971,6 +1083,19 @@ export default function AvailabilityTool({
               <div className="proto-avail-hero">
                 <AccentIcon variant="check" />
                 <p className="proto-avail-heading">There are available slots!</p>
+                {store ? (
+                  <ProtoTertiaryCta
+                    compact
+                    className="proto-avail-chosen-pharmacy-cta"
+                    icon={
+                      <img src={accentMap} alt="" width={16} height={16} />
+                    }
+                    aria-label={`View ${store.name} in pharmacy list`}
+                    onClick={goListWithChosenStore}
+                  >
+                    {store.name}
+                  </ProtoTertiaryCta>
+                ) : null}
                 <p className="proto-avail-copy">
                   You can book appointments up to 28 days in advance
                 </p>

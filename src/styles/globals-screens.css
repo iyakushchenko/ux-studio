@@ -333,15 +333,30 @@
   background: #edf6f5 !important;
 }
 .proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-proto-loc-cta="choose"] {
-  background: #012169 !important;
+  background: #ffffff !important;
+  border: 1px solid #afccca !important;
 }
 .proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-proto-loc-cta="choose"] p,
 .proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-proto-loc-cta="choose"] span,
 .proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-proto-loc-cta="choose"] * {
-  color: #ffffff !important;
+  color: #5c5c5c !important;
+}
+.proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-proto-loc-cta="choose"] path {
+  fill: #5c5c5c !important;
+}
+.proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-proto-loc-cta="choose"]:hover {
+  background: #c6e5e1 !important;
+}
+.proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-proto-loc-cta="choose"]:hover p,
+.proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-proto-loc-cta="choose"]:hover span {
+  color: #01318f !important;
+}
+.proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-proto-loc-cta="choose"]:hover path {
+  fill: #01318f !important;
 }
 .proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-proto-loc-cta="chosen"] {
   background: #c6e5e1 !important;
+  border: 1px solid #afccca !important;
 }
 .proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-proto-loc-cta="chosen"] p,
 .proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-proto-loc-cta="chosen"] span {
@@ -2022,12 +2037,46 @@
   flex-direction: column;
   gap: 16px;
 }
+.proto-avail-store__head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 .proto-avail-store__name {
   margin: 0;
   font-size: 18px;
   font-weight: 600;
   line-height: 28px;
   color: #3a3a3a;
+}
+.proto-avail-store__status {
+  margin: 0;
+  padding-left: 10px;
+  border-left: 2px solid #ffe351;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+  color: #5c5c5c;
+}
+.proto-avail-store__status--saved {
+  border-left-color: #afccca;
+}
+.proto-avail-store__status--no-slots {
+  border-left-color: #ffe351;
+}
+.proto-avail-store__status-link {
+  display: inline;
+  font-size: inherit;
+  line-height: inherit;
+  text-decoration: none;
+  vertical-align: baseline;
+}
+.proto-avail-store__status .proto-avail-link {
+  font-size: inherit;
+  line-height: inherit;
+}
+.proto-avail-store__status-link:hover {
+  text-decoration: underline;
 }
 .proto-avail-store__rows {
   display: flex;
@@ -2085,6 +2134,15 @@
   gap: 24px;
   flex-shrink: 0;
 }
+.proto-avail-store__actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+.proto-avail-store__actions .proto-wishlist-heart-hit {
+  flex-shrink: 0;
+}
 .proto-avail-store__meta {
   display: flex;
   flex-direction: column;
@@ -2096,7 +2154,7 @@
   line-height: 12px;
   color: #3a3a3a;
 }
-.proto-avail-store__miles {
+.proto-avail-store__distance {
   font-size: 18px;
   font-weight: 600;
   line-height: 28px;
@@ -2177,6 +2235,21 @@
 }
 .proto-avail-hero .proto-avail-accent {
   margin-bottom: 8px;
+}
+.proto-avail-hero .proto-avail-chosen-pharmacy-cta {
+  margin-top: 4px;
+  max-width: 100%;
+}
+.proto-avail-hero .proto-avail-chosen-pharmacy-cta .proto-tertiary-cta__label {
+  text-align: left;
+  white-space: normal;
+}
+.proto-avail-panel--center .proto-avail-chosen-pharmacy-cta {
+  max-width: 100%;
+}
+.proto-avail-panel--center .proto-avail-chosen-pharmacy-cta .proto-tertiary-cta__label {
+  text-align: left;
+  white-space: normal;
 }
 .proto-avail-calendars {
   display: flex;
@@ -2376,6 +2449,9 @@
   padding-top: 16px;
   margin-top: auto;
 }
+.proto-avail-footer--end {
+  justify-content: flex-end;
+}
 .proto-avail-btn-primary,
 .proto-avail-btn-secondary,
 .proto-avail-btn-chosen {
@@ -2443,6 +2519,25 @@
 }
 .proto-avail-btn-secondary:hover .proto-secondary-cta-icon {
   filter: brightness(0) saturate(100%) invert(15%) sepia(55%) saturate(3000%) hue-rotate(205deg) brightness(0.85);
+}
+.proto-avail-btn-secondary--sm {
+  height: 40px;
+  padding: 8px 16px;
+  font-size: 13px;
+  letter-spacing: -0.39px;
+}
+.proto-avail-btn-secondary--chosen {
+  background: #c6e5e1;
+  border-color: #afccca;
+  color: #3a3a3a;
+  cursor: default;
+}
+.proto-avail-btn-secondary--chosen:hover {
+  background: #c6e5e1;
+  color: #3a3a3a;
+}
+.proto-avail-btn-secondary--chosen:hover .proto-secondary-cta-icon {
+  filter: none;
 }
 .proto-avail-btn-chosen {
   border: none;

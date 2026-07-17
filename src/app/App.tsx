@@ -16,7 +16,8 @@ import LoginPopup from "@/app/popups/LoginPopup";
 import QuickViewPopup from "@/app/popups/QuickViewPopup";
 import ProtoNavPanel from "@/app/nav/ProtoNavPanel";
 import ProtoHubViewport from "@/app/hub/ProtoHubViewport";
-import { PROTO_HUB_LABEL, PROTO_INDEX_PLP, PROTO_SCREENS, protoTabToIndex } from "@/app/proto/protoScreens";
+import { PROTO_HUB_LABEL, PROTO_INDEX_APPOINTMENT_HISTORY, PROTO_INDEX_PLP, PROTO_SCREENS, protoTabToIndex } from "@/app/proto/protoScreens";
+import { resolveAvailStoreId } from "@/app/proto/availStores";
 import iconArrowsSecondary from "@/assets/avail/arrows-secondary.svg";
 import type { VaccineItem } from "@/app/proto/protoVaccineList";
 import {
@@ -238,18 +239,7 @@ const AVAIL_INTENT = {
 
 /** Map Book-flow / popup selection → Availability Tool store id. */
 function mapChosenToAvailStoreId(chosen: ChosenLocation): string {
-  if (
-    chosen.storeId === "covent" ||
-    chosen.storeId === "strand" ||
-    chosen.storeId === "piccadilly"
-  ) {
-    return chosen.storeId;
-  }
-  const name = chosen.name.toLowerCase();
-  if (/covent|long acre/i.test(name)) return "covent";
-  if (/strand/i.test(name)) return "strand";
-  if (/piccadilly/i.test(name)) return "piccadilly";
-  return AVAIL_DEMO_STORE;
+  return resolveAvailStoreId(chosen);
 }
 
 /**
@@ -2409,10 +2399,10 @@ export default function App() {
     if (storeCard) {
       applyChangeLocationCta(storeCard);
 
-      // Store name = 18px title; never the “0.4 Miles” figure
+      // Store name = 18px title; never the distance figure (e.g. “0.6 km”)
       const title = Array.from(storeCard.querySelectorAll("p")).find((p) => {
         const t = (p.textContent ?? "").trim();
-        if (/^\d+(\.\d+)?\s*miles?$/i.test(t)) return false;
+        if (/^\d+(\.\d+)?\s*(km|miles?)$/i.test(t)) return false;
         if (/from you|disabled access|location|contact/i.test(t)) return false;
         const parent = p.parentElement;
         return (
@@ -3961,6 +3951,11 @@ export default function App() {
           closeAvailabilityTool();
           // Defer nav so this click cannot ghost-hit Step 1 Continue → Step 2.
           window.setTimeout(() => setCurrent(4), 0);
+        }}
+        loggedIn={loggedInFlag || isProtoHeaderLoggedIn()}
+        onOpenLogin={() => {
+          setLoginPopupTab("signin");
+          setLoginPopupOpen(true);
         }}
       />
 

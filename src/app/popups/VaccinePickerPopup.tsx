@@ -4,7 +4,6 @@ import {
   readVaccinesFromPlp,
   type VaccineItem,
 } from "@/app/proto/protoVaccineList";
-import iconCheck from "@/assets/avail/check.svg";
 import iconCheckChosen from "@/assets/avail/check-chosen.svg";
 
 type Props = {
@@ -55,8 +54,8 @@ function VaccineTile({
           type="button"
           className={
             chosen
-              ? "proto-avail-btn-chosen proto-avail-btn-primary--sm"
-              : "proto-avail-btn-primary proto-avail-btn-primary--sm"
+              ? "proto-avail-btn-secondary proto-avail-btn-secondary--sm proto-avail-btn-secondary--chosen"
+              : "proto-avail-btn-secondary proto-avail-btn-secondary--sm"
           }
           onClick={(e) => {
             e.stopPropagation();
@@ -64,8 +63,12 @@ function VaccineTile({
           }}
         >
           <img
-            className="proto-avail-check-icon"
-            src={chosen ? iconCheckChosen : iconCheck}
+            className={
+              chosen
+                ? "proto-avail-check-icon"
+                : "proto-avail-check-icon proto-secondary-cta-icon"
+            }
+            src={iconCheckChosen}
             alt=""
             width={16}
             height={16}

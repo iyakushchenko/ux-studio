@@ -5,6 +5,12 @@
  */
 
 import userAvatar from "@/assets/user-avatar.jpg";
+import {
+  getSavedLocationsCount,
+  isInSavedLocations,
+  SAVED_LOCATIONS_CHANGE_EVENT,
+  toggleSavedLocation,
+} from "@/app/proto/protoSavedLocations";
 
 const HEADER_MOUNT_CLASS = "proto-header-mount";
 
@@ -29,7 +35,10 @@ export function isInWishlist(id: string): boolean { return wishlistSet.has(id); 
 
 export const PROTO_PDP_WISHLIST_ID = "chickenpox";
 
-const FILLED_HEART_D =
+export const WISHLIST_HEART_OUTLINE_D =
+  "M8.97666 0.739019C8.65666 0.958352 8.3648 1.22079 8.1094 1.51851L7.9994 1.65068C7.7186 1.29817 7.38906 0.990592 7.023 0.739545C6.16554 0.151519 5.10788 -0.126355 4.00824 0.0548652C3.46077 0.146165 2.92962 0.331285 2.43333 0.607132C1.93684 0.881965 1.49417 1.23659 1.12197 1.65503C-0.520466 3.50007 -0.32604 6.37247 1.48489 7.99807L1.61087 8.10693C1.8692 8.3232 2.1194 8.54207 2.35995 8.76253L8 14L13.642 8.7614C13.8817 8.54007 14.1302 8.32287 14.3873 8.10947C16.3162 6.50553 16.5585 3.54285 14.8775 1.65471C14.5067 1.23784 14.0648 0.884092 13.5664 0.607105C13.1395 0.369819 12.6875 0.199439 12.2241 0.0991519L11.9915 0.0548652C10.8915 -0.126435 9.83333 0.151765 8.97666 0.739019ZM11.76 1.36806C10.7643 1.20945 9.7928 1.60859 9.12726 2.37977L7.97673 3.76238L6.9564 2.48136C6.28529 1.63871 5.26662 1.19928 4.22627 1.37025C3.83047 1.43641 3.44457 1.57051 3.0811 1.77254L3.07907 1.77367C2.71411 1.97569 2.39003 2.2356 2.11822 2.54118C0.973939 3.82661 1.10209 5.8542 2.36709 6.9982L2.47493 7.09393C2.73326 7.3102 2.98346 7.52907 3.22401 7.74953L8 12.2871L12.7773 7.7484C13.017 7.52707 13.2655 7.30987 13.5226 7.09647C14.7852 5.8542 14.9134 3.82661 13.7691 2.54118C13.4973 2.2356 13.1732 1.97569 12.8083 1.77367L12.8062 1.77254C12.4428 1.57051 12.0569 1.43641 11.6611 1.37025C11.7278 1.36912 11.744 1.36806 11.76 1.36806Z";
+
+export const FILLED_HEART_D =
   "M8 13.5C7.6 13.2 1 8.8 1 4.5C1 2.3 2.7 1 4.5 1C6 1 7.3 1.9 8 3C8.7 1.9 10 1 11.5 1C13.3 1 15 2.3 15 4.5C15 8.8 8.4 13.2 8 13.5Z";
 
 /** Shared heart visual for PDP / Quick View — keeps cross-page state in sync. */
@@ -106,17 +115,49 @@ function hideAvatarDot(): void {
   if (!dot) return;
   setTimeout(() => {
     dot.style.display = "none";
-    const badge = flyoutEl?.querySelector(".proto-header-flyout-badge--wishlist") as HTMLElement | null;
-    if (badge) badge.style.background = "";
+    const wishlistBadge = flyoutEl?.querySelector(
+      ".proto-header-flyout-badge--wishlist"
+    ) as HTMLElement | null;
+    const locationsBadge = flyoutEl?.querySelector(
+      ".proto-header-flyout-badge--locations"
+    ) as HTMLElement | null;
+    if (wishlistBadge) wishlistBadge.style.background = "";
+    if (locationsBadge) locationsBadge.style.background = "";
   }, 2000);
 }
 
 function updateFlyoutBadge(highlight = false): void {
-  const badge = flyoutEl?.querySelector(".proto-header-flyout-badge--wishlist") as HTMLElement | null;
+  const badge = flyoutEl?.querySelector(
+    ".proto-header-flyout-badge--wishlist"
+  ) as HTMLElement | null;
   if (badge) {
     badge.textContent = String(wishlistSet.size);
     badge.style.background = highlight ? "#c8247e" : "";
   }
+}
+
+function updateLocationsFlyoutBadge(highlight = false): void {
+  const badge = flyoutEl?.querySelector(
+    ".proto-header-flyout-badge--locations"
+  ) as HTMLElement | null;
+  if (badge) {
+    badge.textContent = String(getSavedLocationsCount());
+    badge.style.background = highlight ? "#c8247e" : "";
+  }
+}
+
+function onSavedLocationsChange(): void {
+  updateLocationsFlyoutBadge(false);
+}
+
+/** Saved pharmacy — same notify pattern as vaccine wishlist (badge + avatar dot). */
+export function toggleSavedLocationWithNotify(id: string): boolean {
+  const adding = !isInSavedLocations(id);
+  const active = toggleSavedLocation(id);
+  updateLocationsFlyoutBadge(adding);
+  if (adding) showAvatarDot();
+  else hideAvatarDotNow();
+  return active;
 }
 
 loadWishlist();
@@ -281,6 +322,10 @@ function updateFlyoutContent(): void {
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="#888" stroke-width="1.5"/><path d="M16 2v4M8 2v4M3 10h18" stroke="#888" stroke-width="1.5" stroke-linecap="round"/></svg>
         <span>My Appointments</span> <span class="proto-header-flyout-badge">3</span>
       </button>
+      <div class="proto-header-flyout-item proto-header-flyout-item--static">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 21s7-4.5 7-11a7 7 0 10-14 0c0 6.5 7 11 7 11z" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.5" stroke="#888" stroke-width="1.5"/></svg>
+        <span>My Locations</span> <span class="proto-header-flyout-badge proto-header-flyout-badge--locations">${getSavedLocationsCount()}</span>
+      </div>
       <button class="proto-header-flyout-item" data-action="wishlist">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <span>My List</span> <span class="proto-header-flyout-badge proto-header-flyout-badge--wishlist">${wishlistSet.size}</span>
@@ -300,6 +345,10 @@ function updateFlyoutContent(): void {
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="10" cy="8" r="4" stroke="#888" stroke-width="1.5"/><path d="M2 20c0-4 4-6 8-6s8 2 8 6" stroke="#888" stroke-width="1.5" stroke-linecap="round"/><path d="M19 8v6M16 11h6" stroke="#888" stroke-width="1.5" stroke-linecap="round"/></svg>
         Create Account
       </button>
+      <div class="proto-header-flyout-item proto-header-flyout-item--static">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 21s7-4.5 7-11a7 7 0 10-14 0c0 6.5 7 11 7 11z" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.5" stroke="#888" stroke-width="1.5"/></svg>
+        <span>My Locations</span> <span class="proto-header-flyout-badge proto-header-flyout-badge--locations">${getSavedLocationsCount()}</span>
+      </div>
       <button class="proto-header-flyout-item" data-action="wishlist">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <span>My List</span> <span class="proto-header-flyout-badge proto-header-flyout-badge--wishlist">${wishlistSet.size}</span>
@@ -349,6 +398,13 @@ function injectFlyoutStyles(): void {
     }
     .proto-header-flyout-item:hover {
       background: #f5f5f5;
+    }
+    .proto-header-flyout-item--static {
+      cursor: default;
+      pointer-events: none;
+    }
+    .proto-header-flyout-item--static:hover {
+      background: none;
     }
 
     .proto-header-flyout::before {
@@ -415,6 +471,9 @@ export function setupProtoHeader(
 
       flyoutEl = createFlyout(item);
       updateFlyoutContent();
+      updateLocationsFlyoutBadge(false);
+
+      document.addEventListener(SAVED_LOCATIONS_CHANGE_EVENT, onSavedLocationsChange);
 
       // Insert avatar/icon for current state
       updateLoginLabel();

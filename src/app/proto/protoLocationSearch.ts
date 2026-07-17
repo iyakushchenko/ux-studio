@@ -1,10 +1,11 @@
 import { syncPlpFilterListSearch } from "@/app/proto/protoPlpListing";
 import { PROTO_CLOSE_ICON_HTML } from "@/app/chrome/ProtoCloseIcon";
+import { formatAvailLocationCount } from "@/app/proto/availStores";
 
 /** Shared copy + counts for Availability Tool and Locations popup. */
 export const PROTO_LOC_SEARCH_DEFAULT = "London";
 export const PROTO_LOC_SEARCH_NEAR = "Search for City, Postcode, Location...";
-export const PROTO_LOC_COUNT_DEFAULT = "13 locations found";
+export const PROTO_LOC_COUNT_DEFAULT = formatAvailLocationCount();
 export const PROTO_LOC_COUNT_NEAR = "63 locations found (in 10km radius)";
 
 const FOUND_DOT_FLASH_MS = 900;

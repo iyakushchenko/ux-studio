@@ -36,3 +36,8 @@ export function protoScreenAtTab(tab: number): ProtoScreen | undefined {
 export const PROTO_INDEX_PLP = PROTO_SCREENS.findIndex(
   (screen) => screen.childIndex === 9,
 );
+
+/** Zero-based `current` index for Appointment History (My Account dummy). */
+export const PROTO_INDEX_APPOINTMENT_HISTORY = PROTO_SCREENS.findIndex(
+  (screen) => screen.childIndex === 2,
+);

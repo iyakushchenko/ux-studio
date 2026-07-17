@@ -51,12 +51,18 @@ export type MapPinSpec = { left: string; top: string; nearOnly?: boolean };
 
 export const MAP_PINS: MapPinSpec[] = [
   { left: "48%", top: "42%" },
-  { left: "36%", top: "55%", nearOnly: true },
-  { left: "62%", top: "38%", nearOnly: true },
-  { left: "54%", top: "62%", nearOnly: true },
-  { left: "28%", top: "40%", nearOnly: true },
-  { left: "70%", top: "52%", nearOnly: true },
-  { left: "44%", top: "28%", nearOnly: true },
+  { left: "44%", top: "50%", nearOnly: true },
+  { left: "52%", top: "38%", nearOnly: true },
+  { left: "40%", top: "45%", nearOnly: true },
+  { left: "58%", top: "52%", nearOnly: true },
+  { left: "35%", top: "38%", nearOnly: true },
+  { left: "62%", top: "45%", nearOnly: true },
+  { left: "46%", top: "32%", nearOnly: true },
+  { left: "50%", top: "58%", nearOnly: true },
+  { left: "38%", top: "52%", nearOnly: true },
+  { left: "54%", top: "48%", nearOnly: true },
+  { left: "42%", top: "58%", nearOnly: true },
+  { left: "56%", top: "35%", nearOnly: true },
 ];
 
 /** Clamp-pan a map surface inside a viewport (no empty gutters). */
@@ -223,7 +229,7 @@ export function setupChosenPageMap(
  */
 export function setupProtoMapView(
   mapView: HTMLElement,
-  opts?: { onPinClick?: (pinIndex: number) => void }
+  opts?: { onPinClick?: (pinIndex: number) => void; pinLabels?: string[] }
 ): {
   setNearMe: (on: boolean) => void;
   cleanup: () => void;
@@ -257,8 +263,9 @@ export function setupProtoMapView(
     pin.style.left = spec.left;
     pin.style.top = spec.top;
     pin.innerHTML = MAP_PIN_SVG;
-    pin.title = i === 0 ? "Covent Garden Long Acre" : `Location ${i + 1}`;
-    pin.setAttribute("aria-label", `View ${pin.title} in list`);
+    const label = opts?.pinLabels?.[i] ?? (i === 0 ? "Covent Garden Long Acre" : `Location ${i + 1}`);
+    pin.title = label;
+    pin.setAttribute("aria-label", `View ${label} in list`);
 
     const activate = (e: Event) => {
       e.preventDefault();
