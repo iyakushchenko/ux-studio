@@ -19,3 +19,11 @@ export function shouldSuppressTransportNoOpForCompletedDirector(options: {
 }): boolean {
   return options.lastAutoRunId === options.beatRunId;
 }
+
+/** True when any director script already completed on this beat (home/tab/book/avail). */
+export function shouldSuppressTransportNoOpForBeat(options: {
+  beatRunId: string;
+  lastAutoRunIds: Array<string | null | undefined>;
+}): boolean {
+  return options.lastAutoRunIds.some((id) => id === options.beatRunId);
+}

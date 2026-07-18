@@ -29,7 +29,7 @@ import {
 } from "@/app/orchestra/journeyBeatDirector";
 import {
   shouldAdvanceCompletedDirectorStep,
-  shouldSuppressTransportNoOpForCompletedDirector,
+  shouldSuppressTransportNoOpForBeat,
 } from "@/app/orchestra/manualDirectorStep";
 import { syncBeatRetreatState } from "@/app/orchestra/journeyRetreatSync";
 import {
@@ -447,9 +447,39 @@ export function useProtoJourneyPlayback({
   const runHomeScriptBeat = useCallback(
     async (
       beat: JourneyBeat,
-      options?: { skip?: boolean; chainScreenFrames?: boolean }
+      options?: {
+        skip?: boolean;
+        chainScreenFrames?: boolean;
+        manualStep?: boolean;
+      }
     ) => {
       if (!beat.homeScript) return false;
+      const beatRunId = `${beatIndexRef.current}:${beat.id}`;
+      if (
+        shouldAdvanceCompletedDirectorStep({
+          manualStep: Boolean(options?.manualStep || options?.chainScreenFrames),
+          advanceAfter: true,
+          lastAutoRunId: lastHomeAutoRunRef.current,
+          beatRunId,
+        })
+      ) {
+        setScriptingActive(true);
+        try {
+          enteredBeatRef.current = null;
+          const next = advanceFrom(beatIndexRef.current);
+          if (next >= beats.length) return true;
+          const nextBeat = beats[next];
+          if (options?.chainScreenFrames && isScreenFramesBeat(nextBeat)) {
+            pendingManualScreenHandoffRef.current = nextBeat.id;
+          }
+          setBeatIndex(next);
+          beatIndexRef.current = next;
+          transportStepAttemptRef.current = null;
+          return true;
+        } finally {
+          setScriptingActive(false);
+        }
+      }
       noteDirectorScriptInteraction(beat, options);
       const runId = ++homeScriptRunRef.current;
       setScriptingActive(true);
@@ -481,6 +511,7 @@ export function useProtoJourneyPlayback({
         }
         setBeatIndex(next);
         beatIndexRef.current = next;
+        transportStepAttemptRef.current = null;
         return true;
       } finally {
         if (runId === homeScriptRunRef.current) {
@@ -488,7 +519,16 @@ export function useProtoJourneyPlayback({
         }
       }
     },
-    [advanceFrom, beats.length, invokeBeatScript, playback, reportScriptFailure, setBeatIndex, setScriptingActive]
+    [
+      advanceFrom,
+      beats,
+      beats.length,
+      invokeBeatScript,
+      playback,
+      reportScriptFailure,
+      setBeatIndex,
+      setScriptingActive,
+    ]
   );
 
   const runAvailScriptBeat = useCallback(
@@ -704,9 +744,14 @@ export function useProtoJourneyPlayback({
       if (isScriptingNow()) return;
       const beatRunId = `${beatIndexRef.current}:${beats[beatIndexRef.current]?.id}`;
       if (
-        shouldSuppressTransportNoOpForCompletedDirector({
-          lastAutoRunId: lastAvailAutoRunRef.current,
+        shouldSuppressTransportNoOpForBeat({
           beatRunId,
+          lastAutoRunIds: [
+            lastAvailAutoRunRef.current,
+            lastHomeAutoRunRef.current,
+            lastTabAutoRunRef.current,
+            lastBookAutoRunRef.current,
+          ],
         })
       ) {
         transportStepAttemptRef.current = null;

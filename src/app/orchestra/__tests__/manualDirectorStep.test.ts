@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   shouldAdvanceCompletedDirectorStep,
+  shouldSuppressTransportNoOpForBeat,
   shouldSuppressTransportNoOpForCompletedDirector,
 } from "@/app/orchestra/manualDirectorStep";
 
@@ -34,5 +35,20 @@ describe("manualDirectorStep", () => {
         beatRunId: "5:avail-book",
       })
     ).toBe(true);
+  });
+
+  it("suppresses transport no-op for any completed director script on the beat", () => {
+    expect(
+      shouldSuppressTransportNoOpForBeat({
+        beatRunId: "0:agentic-home",
+        lastAutoRunIds: [null, "0:agentic-home", null, null],
+      })
+    ).toBe(true);
+    expect(
+      shouldSuppressTransportNoOpForBeat({
+        beatRunId: "0:agentic-home",
+        lastAutoRunIds: [null, null, null, null],
+      })
+    ).toBe(false);
   });
 });
