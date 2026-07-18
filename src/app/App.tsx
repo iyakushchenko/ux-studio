@@ -1209,6 +1209,8 @@ export default function App() {
         counter:
           document.querySelector(".proto-nav-scenario__counter")?.textContent?.trim() ??
           null,
+        beatId: playbackSnapshotRef.current.beatId ?? null,
+        availStep: playbackSnapshotRef.current.availStep ?? null,
       }),
       getOrchestraModeId: () => orchestraModeId,
       setOrchestraMode: (modeId) => handleOrchestraModeChangeRef.current(modeId),

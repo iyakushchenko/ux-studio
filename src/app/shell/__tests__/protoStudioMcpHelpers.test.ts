@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { registerProtoStudioMcpHelpers } from "@/app/shell/protoStudioMcpHelpers";
+import { registerProtoStudioMcpHelpers, parseStudioStepCounter } from "@/app/shell/protoStudioMcpHelpers";
 
 describe("protoStudioMcpHelpers", () => {
   afterEach(() => {
@@ -23,6 +23,8 @@ describe("protoStudioMcpHelpers", () => {
         scrollLock: true,
         label: "Book — date",
         counter: "20 / 25",
+        beatId: "book-step2-date",
+        availStep: null,
       }),
       getOrchestraModeId: () => "agentic-cjm",
     });
@@ -61,6 +63,8 @@ describe("protoStudioMcpHelpers", () => {
         scrollLock: false,
         label: null,
         counter: null,
+        beatId: null,
+        availStep: null,
       }),
     });
 
@@ -84,6 +88,8 @@ describe("protoStudioMcpHelpers", () => {
         scrollLock: false,
         label: null,
         counter: null,
+        beatId: null,
+        availStep: null,
       }),
       getOrchestraModeId: () => mode,
       setOrchestraMode: (next) => {
@@ -115,6 +121,8 @@ describe("protoStudioMcpHelpers", () => {
         scrollLock: false,
         label: null,
         counter: null,
+        beatId: null,
+        availStep: null,
       }),
     });
 
@@ -141,6 +149,8 @@ describe("protoStudioMcpHelpers", () => {
         scrollLock: false,
         label: journeyMode ? "Chat experience — 1/9" : "Agentic home",
         counter: journeyMode ? "3 / 25" : "1 / 25",
+        beatId: journeyMode ? "agentic-chat" : "agentic-home",
+        availStep: null,
       }),
       getOrchestraModeId: () => "agentic-cjm" as const,
       setOrchestraMode: () => {},
@@ -157,5 +167,14 @@ describe("protoStudioMcpHelpers", () => {
     expect(win.__protoTriggerTransport?.("play")).toBe(true);
     expect(transports).toEqual(["play"]);
     expect(typeof win.__protoRunHomePlaySmoke).toBe("function");
+    expect(typeof win.__protoRunRetreatSmoke).toBe("function");
+  });
+
+  it("parses STEPS counter format", () => {
+    expect(parseStudioStepCounter("STEPS: 13 / 25")).toEqual({
+      visible: 13,
+      total: 25,
+    });
+    expect(parseStudioStepCounter("2 / 25").visible).toBe(2);
   });
 });

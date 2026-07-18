@@ -10,7 +10,21 @@ export type ProtoStudioMcpState = {
   orchestraMode: ProtoOrchestraModeId | null;
   label: string | null;
   counter: string | null;
+  beatId: string | null;
+  availStep: string | null;
   logLen: number;
+};
+
+export type ProtoRetreatSmokeCheck = {
+  id: string;
+  pass: boolean;
+  detail?: string;
+  state?: ProtoStudioMcpState;
+};
+
+export type ProtoRetreatSmokeResult = {
+  pass: boolean;
+  checks: ProtoRetreatSmokeCheck[];
 };
 
 export type ProtoSmokeRetreatCheck = {
@@ -57,7 +71,35 @@ declare global {
     __protoRunHomePlaySmoke?: (options?: {
       timeoutMs?: number;
     }) => Promise<ProtoHomePlaySmokeResult>;
+    /** Jump-to-end then step-back — chat counter + avail June 25 baselines. */
+    __protoRunRetreatSmoke?: (options?: {
+      timeoutMs?: number;
+    }) => Promise<ProtoRetreatSmokeResult>;
   }
+}
+
+export function parseStudioStepCounter(counter: string | null): {
+  visible: number;
+  total: number;
+} {
+  const match = counter?.match(/(\d+)\s*\/\s*(\d+)/);
+  return {
+    visible: match ? Number(match[1]) : 0,
+    total: match ? Number(match[2]) : 0,
+  };
+}
+
+export function isAvailRetreatJune25Selected(): boolean {
+  if (typeof document === "undefined") return false;
+  const card = document.querySelector<HTMLElement>(".proto-avail-card");
+  if (!card) return false;
+  const cells = Array.from(
+    card.querySelectorAll<HTMLElement>(
+      ".proto-avail-cal-cell:not(.proto-avail-cal-cell--time):not(.proto-avail-cal-cell--disabled)"
+    )
+  );
+  const june25 = cells.find((el) => el.textContent?.trim() === "25");
+  return june25?.classList.contains("proto-avail-cal-cell--selected") ?? false;
 }
 
 const ORCHESTRA_MODE_IDS: ProtoOrchestraModeId[] = [
@@ -123,10 +165,19 @@ function delay(ms: number): Promise<void> {
 
 function chatHandoffReached(state: ProtoStudioMcpState): boolean {
   if (state.label?.toLowerCase().includes("chat")) return true;
-  const match = state.counter?.match(/(\d+)\s*\/\s*(\d+)/);
-  if (!match) return false;
-  const visible = Number(match[1]);
-  return visible >= 3;
+  return parseStudioStepCounter(state.counter).visible >= 3;
+}
+
+function isOnAgenticChatBeat(state: ProtoStudioMcpState): boolean {
+  return (
+    state.beatId === "agentic-chat" ||
+    state.label?.toLowerCase().includes("chat experience") === true
+  );
+}
+
+function chatRetreatCounterPass(state: ProtoStudioMcpState): boolean {
+  const { visible } = parseStudioStepCounter(state.counter);
+  return visible >= 10 && visible !== 2;
 }
 
 export function registerProtoStudioMcpHelpers(options: {
@@ -192,6 +243,139 @@ export function registerProtoStudioMcpHelpers(options: {
     return true;
   };
 
+  window.__protoRunRetreatSmoke = async (smokeOptions) => {
+    const timeoutMs = smokeOptions?.timeoutMs ?? 90_000;
+    const checks: ProtoRetreatSmokeCheck[] = [];
+    const deadline = Date.now() + timeoutMs;
+
+    const fail = (id: string, detail: string, state?: ProtoStudioMcpState) => {
+      checks.push({ id, pass: false, detail, state });
+      return { pass: false, checks };
+    };
+
+    const setupAgenticJourney = async () => {
+      window.__protoEnsureCleanStudio?.();
+      window.__protoSetOrchestraMode?.("agentic-cjm");
+      await delay(120);
+      if (!window.__protoSetJourneyMode?.(true)) {
+        return false;
+      }
+      await delay(800);
+      return true;
+    };
+
+    if (!(await setupAgenticJourney())) {
+      return fail("journey-mode", "set-journey-mode-unavailable");
+    }
+
+    if (!window.__protoTriggerTransport?.("jump-to-end")) {
+      return fail("jump-to-end", "trigger-jump-to-end-unavailable");
+    }
+    await delay(2800);
+
+    let chatState: ProtoStudioMcpState | undefined;
+    for (let attempt = 0; attempt < 20 && Date.now() < deadline; attempt++) {
+      const state = window.__protoStudioState?.();
+      if (!state) {
+        await delay(250);
+        continue;
+      }
+      if (state.diagnosticOpen) {
+        return fail("chat-retreat", "playback-diagnostic during chat search", state);
+      }
+      if (isOnAgenticChatBeat(state)) {
+        chatState = state;
+        if (chatRetreatCounterPass(state)) {
+          break;
+        }
+        await delay(500);
+        continue;
+      }
+      window.__protoTriggerTransport?.("step-back");
+      await delay(750);
+    }
+
+    if (!chatState) {
+      chatState = window.__protoStudioState?.();
+    }
+    const chatPass = chatState ? chatRetreatCounterPass(chatState) : false;
+    checks.push({
+      id: "chat-retreat-counter",
+      pass: chatPass,
+      detail: chatPass
+        ? undefined
+        : `expected counter >= 10 and not 2/25, got ${chatState?.counter ?? "unknown"}`,
+      state: chatState,
+    });
+
+    // Avail baseline — fresh jump-to-end so we do not step back past avail into home.
+    if (!window.__protoTriggerTransport?.("jump-to-end")) {
+      return fail("avail-jump-to-end", "trigger-jump-to-end-unavailable");
+    }
+    await delay(2800);
+
+    let availState: ProtoStudioMcpState | undefined;
+    let june25 = false;
+    for (let attempt = 0; attempt < 16 && Date.now() < deadline; attempt++) {
+      const state = window.__protoStudioState?.();
+      if (!state) {
+        await delay(250);
+        continue;
+      }
+      if (state.diagnosticOpen) {
+        return fail("avail-retreat", "playback-diagnostic during avail search", state);
+      }
+
+      june25 = isAvailRetreatJune25Selected();
+      if (june25) {
+        availState = state;
+        break;
+      }
+
+      if (state.beatId === "avail-continue" && state.availStep === "date") {
+        availState = state;
+        for (let poll = 0; poll < 8; poll++) {
+          june25 = isAvailRetreatJune25Selected();
+          if (june25) break;
+          await delay(250);
+        }
+        break;
+      }
+
+      if (state.beatId === "agentic-chat" || state.beatId === "agentic-home") {
+        availState = state;
+        break;
+      }
+
+      window.__protoTriggerTransport?.("step-back");
+      await delay(900);
+    }
+
+    if (!availState) {
+      availState = window.__protoStudioState?.();
+    }
+    june25 = isAvailRetreatJune25Selected();
+    checks.push({
+      id: "avail-retreat-june-25",
+      pass: june25,
+      detail: june25
+        ? undefined
+        : `June 25 not selected (beat=${availState?.beatId ?? "?"}, step=${availState?.availStep ?? "?"})`,
+      state: availState,
+    });
+
+    checks.push({
+      id: "no-diagnostic",
+      pass: !window.__protoStudioState?.().diagnosticOpen,
+      state: window.__protoStudioState?.(),
+    });
+
+    return {
+      pass: checks.every((check) => check.pass),
+      checks,
+    };
+  };
+
   window.__protoRunHomePlaySmoke = async (smokeOptions) => {
     const timeoutMs = smokeOptions?.timeoutMs ?? 25000;
     window.__protoEnsureCleanStudio?.();
@@ -237,5 +421,6 @@ export function registerProtoStudioMcpHelpers(options: {
     delete window.__protoSetJourneyMode;
     delete window.__protoTriggerTransport;
     delete window.__protoRunHomePlaySmoke;
+    delete window.__protoRunRetreatSmoke;
   };
 }
