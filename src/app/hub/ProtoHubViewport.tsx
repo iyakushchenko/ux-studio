@@ -1,10 +1,2 @@
-import ProtoHubPage from "@/app/hub/ProtoHubPage";
-
-type Props = {
-  onGoToTab: (screenIndex: number) => void;
-};
-
-/** Hub wiki — always mounted; visibility toggled in App. */
-export default function ProtoHubViewport({ onGoToTab }: Props) {
-  return <ProtoHubPage onGoToTab={onGoToTab} />;
-}
+export { default } from "@/projects/boots-pharmacy/hub/ProtoHubViewport";
+export * from "@/projects/boots-pharmacy/hub/ProtoHubViewport";

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
+import { exitDemoCursor } from "@/app/proto/protoDemoCursor";
 import {
   applyScenarioFrameVisibility,
   bumpScenarioScrollGeneration,
@@ -187,6 +188,7 @@ export function useProtoScenarioPlayback({
       setPlaybackEndToken((token) => token + 1);
     }
     stopPlayback();
+    void exitDemoCursor();
   }, [stopPlayback]);
 
   const syncFrames = useCallback(() => {
@@ -199,12 +201,20 @@ export function useProtoScenarioPlayback({
 
     if (!initializedRef.current && frames.length > 0) {
       initializedRef.current = true;
-      const initialCount = clampVisible(minVisibleFrames, frames.length, minVisibleFrames);
+      const contentTotal = frames.length;
+      const scenarioTotal = scenarioTotalFor(contentTotal, hasFinale);
+      const pristine =
+        hasFinale && contentTotal > 0 ? contentTotal : scenarioTotal;
+      const initialCount = clampVisible(
+        pristine,
+        scenarioTotal,
+        minVisibleFrames
+      );
       visibleCountRef.current = initialCount;
       scrollIntentRef.current = {
         visibleCount: initialCount,
         prevCount: 0,
-        align: "start",
+        align: scrollAlignForCount(initialCount, minVisibleFrames),
         smooth: true,
         timing: "after-init",
       };
@@ -234,7 +244,11 @@ export function useProtoScenarioPlayback({
     const count =
       visibleCountRef.current > 0
         ? visibleCountRef.current
-        : clampVisible(minVisibleFrames, frames.length, minVisibleFrames);
+        : clampVisible(
+            hasFinale && frames.length > 0 ? frames.length : minVisibleFrames,
+            scenarioTotalFor(frames.length, hasFinale),
+            minVisibleFrames
+          );
     applyScenarioFrameVisibility(frames, bubbleVisibleCount(count, frames.length));
     return frames;
   }, [collectFrames, hasFinale, minVisibleFrames]);

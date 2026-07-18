@@ -1,15 +1,17 @@
 import { useLayoutEffect, useRef, type ReactNode, type RefObject } from "react";
 import { ProtoNavLogo } from "@/app/nav/ProtoNavLogo";
-import {
-  PROTO_HUB_LABEL,
-  PROTO_SCREENS,
-  protoNavIndex,
-  type ProtoScreen,
-} from "@/app/proto/protoScreens";
+import { protoNavIndex } from "@/projects/boots-pharmacy/screens/protoScreens";
 import { useProtoNavZoom } from "@/app/nav/protoNavZoom";
 import "./protoNavPanel.css";
 
+export type ProtoNavScreen = {
+  label: string;
+  childIndex: number;
+};
+
 type Props = {
+  screens: readonly ProtoNavScreen[];
+  hubLabel: string;
   current: number;
   hubOpen: boolean;
   navLabel: string;
@@ -31,6 +33,8 @@ type Props = {
  * ⚠️ Do not add height sync, fixed positioning, or layout hacks here — they break zoom.
  */
 export default function ProtoNavPanel({
+  screens,
+  hubLabel,
   current,
   hubOpen,
   navLabel,
@@ -54,7 +58,7 @@ export default function ProtoNavPanel({
     document.getElementById("proto-nav-panel-root")?.remove();
   }, []);
 
-  const screenCount = PROTO_SCREENS.length;
+  const screenCount = screens.length;
   const navIndex = protoNavIndex(hubOpen, current);
 
   const onPrevious = () => {
@@ -83,8 +87,8 @@ export default function ProtoNavPanel({
               type="button"
               onClick={onOpenHub}
               disabled={navPlaybackLocked}
-              title={PROTO_HUB_LABEL}
-              aria-label={`Open ${PROTO_HUB_LABEL}`}
+              title={hubLabel}
+              aria-label={`Open ${hubLabel}`}
               aria-current={hubOpen ? "page" : undefined}
               className={
                 hubOpen
@@ -94,7 +98,7 @@ export default function ProtoNavPanel({
             >
               <ProtoNavLogo />
             </button>
-            {PROTO_SCREENS.map((screen: ProtoScreen, i) => (
+            {screens.map((screen: ProtoNavScreen, i) => (
               <button
                 key={screen.childIndex}
                 ref={(node) => {
@@ -125,7 +129,7 @@ export default function ProtoNavPanel({
                   type="button"
                   onClick={onOpenHub}
                   disabled={navPlaybackLocked}
-                  aria-label={PROTO_HUB_LABEL}
+                  aria-label={hubLabel}
                   aria-current={hubOpen ? "true" : undefined}
                   className={
                     hubOpen
@@ -133,7 +137,7 @@ export default function ProtoNavPanel({
                       : "proto-nav-dot"
                   }
                 />
-                {PROTO_SCREENS.map((_, i) => (
+                {screens.map((_, i) => (
                   <button
                     key={i}
                     type="button"

@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { getJourneyForMode } from "@/app/orchestra/brands/bootsSarahJourney";
+import { getJourneyForMode } from "@/app/orchestra/journeyUtils";
 import {
   PROTO_ORCHESTRA_MODE_OPTIONS,
   readStoredOrchestraMode,
@@ -7,12 +7,13 @@ import {
 } from "@/app/orchestra/protoOrchestraModes";
 import type { ProtoBrandPack, ProtoOrchestraModeId } from "@/app/orchestra/types";
 
+/** @deprecated Prefer `useProtoStudio` from `@/app/shell/useProtoStudio`. */
 export function useOrchestraMode(brandPack: ProtoBrandPack) {
   const [modeId, setModeIdState] = useState<ProtoOrchestraModeId>(readStoredOrchestraMode);
   const [beatIndex, setBeatIndex] = useState(0);
 
   const journey = useMemo(
-    () => getJourneyForMode(brandPack, modeId),
+    () => getJourneyForMode(brandPack.journeys, modeId),
     [brandPack, modeId]
   );
 

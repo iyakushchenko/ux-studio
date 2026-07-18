@@ -1,12 +1,10 @@
-import type { AvailStep } from "@/app/AvailabilityTool";
-import { isSkippedTraditionalLoginBeat } from "@/app/orchestra/brands/bootsSarahJourney";
+import type { AvailStep } from "@/projects/boots-pharmacy/overlays/AvailabilityTool";
 import type { JourneyBeat, ProtoJourneyDefinition } from "@/app/orchestra/types";
+import type { StudioTouchpointEntry } from "@/projects/types";
+
 export const DEFAULT_CHAT_SCENARIO_FRAMES = 9;
 
-export type StudioTouchpointEntry = {
-  key: string;
-  label: string;
-};
+export type { StudioTouchpointEntry };
 
 export type StudioTouchpointInput = {
   beatId?: string;
@@ -29,25 +27,19 @@ export function isSitePilotChatAgentReplyFrameIndex(frameIndex: number): boolean
 }
 
 const AVAIL_STEP_LABELS: Record<AvailStep, string> = {
-  start: "Availability — find pharmacy",
-  list: "Availability — choose pharmacy",
-  map: "Availability — map",
-  noSlots: "Availability — no slots",
-  date: "Availability — date",
-  time: "Availability — time",
+  start: "Find pharmacy",
+  list: "Choose pharmacy",
+  map: "Map",
+  noSlots: "No slots",
+  date: "Choose date",
+  time: "Choose time",
 };
 
 /** Optional popup touchpoints inserted after specific beats per journey. */
-const JOURNEY_POPUP_TOUCHPOINTS: Record<
+const DEFAULT_POPUP_TOUCHPOINTS: Record<
   string,
   Record<string, StudioTouchpointEntry[]>
-> = {
-  "traditional-cjm": {
-    "choose-location": [
-      { key: "popup:availability:list", label: "Availability — choose pharmacy" },
-    ],
-  },
-};
+> = {};
 
 function overlayBeatKey(beat: JourneyBeat): string {
   if (beat.id === "avail-book") return `beat:${beat.id}`;
@@ -92,16 +84,22 @@ function expandBeatToTouchpoints(
 export function buildStudioTouchpointPlaylist(
   journey: ProtoJourneyDefinition | undefined,
   chatScenarioTotalFrames = DEFAULT_CHAT_SCENARIO_FRAMES,
-  options?: { headerLoggedIn?: boolean }
+  options?: {
+    shouldSkipBeat?: (beat: JourneyBeat) => boolean;
+    popupTouchpoints?: Record<string, Record<string, StudioTouchpointEntry[]>>;
+  }
 ): StudioTouchpointEntry[] {
   if (!journey) return [];
 
   const items: StudioTouchpointEntry[] = [];
-  const popupInserts = JOURNEY_POPUP_TOUCHPOINTS[journey.id] ?? {};
-  const headerLoggedIn = options?.headerLoggedIn ?? false;
+  const popupInserts =
+    options?.popupTouchpoints?.[journey.id] ??
+    DEFAULT_POPUP_TOUCHPOINTS[journey.id] ??
+    {};
+  const shouldSkipBeat = options?.shouldSkipBeat ?? (() => false);
 
   for (const beat of journey.beats) {
-    if (isSkippedTraditionalLoginBeat(beat, headerLoggedIn)) continue;
+    if (shouldSkipBeat(beat)) continue;
     items.push(...expandBeatToTouchpoints(beat, chatScenarioTotalFrames));
     const extras = popupInserts[beat.id];
     if (extras) items.push(...extras);
@@ -127,7 +125,7 @@ export function resolveStudioTouchpoint(
   if (input.availabilityOpen && input.availStep) {
     if (input.beatId === "avail-book") {
       return {
-        label: input.beatLabel ?? "Availability — book",
+        label: input.beatLabel ?? "Book",
         key: "beat:avail-book",
       };
     }

@@ -1,21 +1,15 @@
 import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateAction } from "react";
-import { protoTabToIndex } from "@/app/proto/protoScreens";
-import { runJourneyBeatAction, runJourneyAvailScript, runJourneyBookScript, runJourneyHomeScript, runJourneyTabScript } from "@/app/orchestra/journeyActions";
+import { exitDemoCursor } from "@/app/proto/protoDemoCursor";
+import { wasAvailabilityPlaybackAborted } from "@/projects/boots-pharmacy/playback/availability";
+import { wasBookPlaybackAborted } from "@/projects/boots-pharmacy/playback/book";
+import { wasSitePilotHomePlaybackAborted } from "@/projects/boots-pharmacy/playback/sitePilotHome";
+import { wasTraditionalPlaybackAborted } from "@/projects/boots-pharmacy/playback/traditional";
 import {
-  abortAvailabilityPlayback,
-  wasAvailabilityPlaybackAborted,
-} from "@/app/proto/protoAvailabilityPlayback";
-import { abortBookPlayback, wasBookPlaybackAborted } from "@/app/proto/protoBookPlayback";
-import { abortSitePilotHomePlayback, wasSitePilotHomePlaybackAborted } from "@/app/proto/protoSitePilotHomePlayback";
-import {
-  abortTraditionalPlayback,
-  wasTraditionalPlaybackAborted,
-} from "@/app/proto/protoTraditionalPlayback";
-import {
-  isSkippedTraditionalLoginBeat,
+  lastPlayableBeatIndex as findLastPlayableBeatIndex,
   stepBeatIndex,
-} from "@/app/orchestra/brands/bootsSarahJourney";
+} from "@/app/orchestra/journeyUtils";
 import type { JourneyBeat, JourneyRuntime, ProtoJourneyDefinition } from "@/app/orchestra/types";
+import type { ProtoProjectPlayback } from "@/projects/types";
 
 export type ScreenPlaybackApi = {
   totalFrames: number;
@@ -46,8 +40,10 @@ type Options = {
   runtime: JourneyRuntime;
   screenPlayback: ScreenPlaybackApi;
   screenBeatActive: boolean;
-  /** When true, traditional-login beat is omitted from stepping/playback. */
-  headerLoggedIn?: boolean;
+  /** Persona hook — omit beat from stepping/playback (e.g. skip login when logged in). */
+  shouldSkipBeat?: (beat: JourneyBeat | undefined) => boolean;
+  playback: ProtoProjectPlayback;
+  protoTabToIndex: (tab: number) => number;
 };
 
 function isScreenFramesBeat(beat: JourneyBeat | undefined): boolean {
@@ -56,16 +52,6 @@ function isScreenFramesBeat(beat: JourneyBeat | undefined): boolean {
 
 function isOverlayBeat(beat: JourneyBeat | undefined): boolean {
   return beat?.kind === "overlay";
-}
-
-function lastPlayableBeatIndex(
-  beats: JourneyBeat[],
-  headerLoggedIn: boolean
-): number {
-  for (let i = beats.length - 1; i >= 0; i--) {
-    if (!isSkippedTraditionalLoginBeat(beats[i], headerLoggedIn)) return i;
-  }
-  return -1;
 }
 
 export function useProtoJourneyPlayback({
@@ -77,18 +63,20 @@ export function useProtoJourneyPlayback({
   runtime,
   screenPlayback,
   screenBeatActive,
-  headerLoggedIn = false,
+  shouldSkipBeat = () => false,
+  playback,
+  protoTabToIndex,
 }: Options) {
   const beats = journey?.beats ?? [];
 
   const advanceFrom = useCallback(
-    (index: number) => stepBeatIndex(index, beats, headerLoggedIn, 1),
-    [beats, headerLoggedIn]
+    (index: number) => stepBeatIndex(index, beats, shouldSkipBeat, 1),
+    [beats, shouldSkipBeat]
   );
 
   const retreatFrom = useCallback(
-    (index: number) => stepBeatIndex(index, beats, headerLoggedIn, -1),
-    [beats, headerLoggedIn]
+    (index: number) => stepBeatIndex(index, beats, shouldSkipBeat, -1),
+    [beats, shouldSkipBeat]
   );
   const [isPlaying, setIsPlaying] = useState(false);
   const [isScripting, setIsScripting] = useState(false);
@@ -101,8 +89,12 @@ export function useProtoJourneyPlayback({
   const lastBookAutoRunRef = useRef<string | null>(null);
   const lastTabAutoRunRef = useRef<string | null>(null);
   const isPlayingRef = useRef(false);
+  /** Skip beat-enter tab nav on first mount so sessionStorage tab is preserved. */
+  const suppressInitialBeatTabNavRef = useRef(true);
+  const currentTabIndexRef = useRef(currentTabIndex);
 
   beatIndexRef.current = beatIndex;
+  currentTabIndexRef.current = currentTabIndex;
 
   const currentBeat = beats[beatIndex];
   const onScreenFramesBeat = isScreenFramesBeat(currentBeat) && screenBeatActive;
@@ -111,15 +103,12 @@ export function useProtoJourneyPlayback({
   const homeScriptRunRef = useRef(0);
 
   const abortActiveScripts = useCallback(() => {
-    abortAvailabilityPlayback();
-    abortBookPlayback();
-    abortSitePilotHomePlayback();
-    abortTraditionalPlayback();
+    playback.abortAll();
     setIsScripting(false);
     lastAvailAutoRunRef.current = null;
     lastBookAutoRunRef.current = null;
     lastTabAutoRunRef.current = null;
-  }, []);
+  }, [playback]);
 
   const stopJourneyPlay = useCallback(() => {
     isPlayingRef.current = false;
@@ -136,6 +125,7 @@ export function useProtoJourneyPlayback({
       setPlaybackEndToken((token) => token + 1);
     }
     stopJourneyPlay();
+    void exitDemoCursor();
   }, [stopJourneyPlay]);
 
   const runHomeScriptBeat = useCallback(
@@ -143,7 +133,7 @@ export function useProtoJourneyPlayback({
       if (!beat.homeScript) return;
       const runId = ++homeScriptRunRef.current;
       setIsScripting(true);
-      await runJourneyHomeScript(beat.homeScript, options);
+      await playback.runHomeScript(beat.homeScript, options);
       if (runId !== homeScriptRunRef.current) return;
       setIsScripting(false);
       if (wasSitePilotHomePlaybackAborted() && !options?.skip) return;
@@ -160,7 +150,7 @@ export function useProtoJourneyPlayback({
     async (beat: JourneyBeat, advanceAfter: boolean, options?: { skip?: boolean }) => {
       if (!beat.availScript) return false;
       setIsScripting(true);
-      const ok = await runJourneyAvailScript(beat.availScript, options);
+      const ok = await playback.runAvailScript(beat.availScript, options);
       setIsScripting(false);
       if (!ok) {
         lastAvailAutoRunRef.current = null;
@@ -186,7 +176,7 @@ export function useProtoJourneyPlayback({
     async (beat: JourneyBeat, advanceAfter: boolean, options?: { skip?: boolean }) => {
       if (!beat.bookScript) return false;
       setIsScripting(true);
-      const ok = await runJourneyBookScript(beat.bookScript, options);
+      const ok = await playback.runBookScript(beat.bookScript, options);
       setIsScripting(false);
       if (!ok) {
         lastBookAutoRunRef.current = null;
@@ -213,10 +203,10 @@ export function useProtoJourneyPlayback({
       if (!beat.tabScript) return false;
       const runId = `${beatIndexRef.current}:${beat.id}`;
       setIsScripting(true);
-      const ok = await runJourneyTabScript(beat.tabScript, runtime, options);
+      const ok = await playback.runTabScript(beat.tabScript, runtime, options);
       setIsScripting(false);
       if (!ok) {
-        lastTabAutoRunRef.current = runId;
+        lastTabAutoRunRef.current = null;
         if (!options?.skip) {
           stopJourneyPlay();
         }
@@ -260,19 +250,27 @@ export function useProtoJourneyPlayback({
     }
   }, [abortActiveScripts, beats, runAvailScriptBeat, runBookScriptBeat, runHomeScriptBeat, runTabScriptBeat]);
 
-  const runBeatEnter = useCallback(
-    async (beat: JourneyBeat) => {
-      if (beat.protoTab != null) {
-        const tabIndex = protoTabToIndex(beat.protoTab);
-        if (currentTabIndex !== tabIndex) {
-          runtime.goToTab(tabIndex);
-        }
-      }
-      if (beat.onEnter) {
-        runJourneyBeatAction(beat.onEnter, runtime);
+  const navigateBeatTab = useCallback(
+    (beat: JourneyBeat | undefined) => {
+      if (beat?.protoTab == null) return;
+      const tabIndex = protoTabToIndex(beat.protoTab);
+      if (currentTabIndexRef.current !== tabIndex) {
+        runtime.goToTab(tabIndex);
       }
     },
-    [currentTabIndex, runtime]
+    [protoTabToIndex, runtime]
+  );
+
+  const runBeatEnter = useCallback(
+    async (beat: JourneyBeat) => {
+      if (!suppressInitialBeatTabNavRef.current) {
+        navigateBeatTab(beat);
+      }
+      if (beat.onEnter) {
+        playback.runBeatAction(beat.onEnter, runtime);
+      }
+    },
+    [navigateBeatTab, playback, runtime]
   );
 
   const scheduleDwellAdvance = useCallback(() => {
@@ -316,15 +314,15 @@ export function useProtoJourneyPlayback({
   scheduleDwellAdvanceRef.current = scheduleDwellAdvance;
 
   useEffect(() => {
-    if (!active || !headerLoggedIn) return;
+    if (!active) return;
     const beat = beats[beatIndex];
-    if (!isSkippedTraditionalLoginBeat(beat, headerLoggedIn)) return;
+    if (!shouldSkipBeat(beat)) return;
     const next = advanceFrom(beatIndex);
     if (next === beatIndex || next >= beats.length) return;
     enteredBeatRef.current = null;
     setBeatIndex(next);
     beatIndexRef.current = next;
-  }, [active, advanceFrom, beatIndex, beats, headerLoggedIn, setBeatIndex]);
+  }, [active, advanceFrom, beatIndex, beats, shouldSkipBeat, setBeatIndex]);
 
   useEffect(() => {
     if (!active || !currentBeat) return;
@@ -334,6 +332,7 @@ export function useProtoJourneyPlayback({
     lastBookAutoRunRef.current = null;
     lastTabAutoRunRef.current = null;
     void runBeatEnter(currentBeat);
+    suppressInitialBeatTabNavRef.current = false;
   }, [active, currentBeat, runBeatEnter]);
 
   useEffect(() => {
@@ -429,6 +428,10 @@ export function useProtoJourneyPlayback({
   const resetJourney = useCallback(() => {
     stopJourneyPlay();
     enteredBeatRef.current = null;
+    lastAvailAutoRunRef.current = null;
+    lastBookAutoRunRef.current = null;
+    lastTabAutoRunRef.current = null;
+    suppressInitialBeatTabNavRef.current = false;
     setBeatIndex(0);
     beatIndexRef.current = 0;
   }, [setBeatIndex, stopJourneyPlay]);
@@ -462,6 +465,7 @@ export function useProtoJourneyPlayback({
   }, [retreatFrom, setBeatIndex]);
 
   const stepForward = useCallback(() => {
+    suppressInitialBeatTabNavRef.current = false;
     if (isScripting) {
       // Keep isPlaying so chat (and other beats) resume after the skip completes.
       abortActiveScripts();
@@ -510,6 +514,7 @@ export function useProtoJourneyPlayback({
   ]);
 
   const stepBack = useCallback(() => {
+    suppressInitialBeatTabNavRef.current = false;
     if (isScripting) return;
     stopJourneyPlay();
     if (onScreenFramesBeat && screenPlayback.canStepBack) {
@@ -538,9 +543,11 @@ export function useProtoJourneyPlayback({
       return;
     }
 
-    if (beatIndexRef.current >= lastPlayableBeatIndex(beats, headerLoggedIn)) return;
+    if (beatIndexRef.current >= findLastPlayableBeatIndex(beats, shouldSkipBeat)) return;
 
+    suppressInitialBeatTabNavRef.current = false;
     const beat = beats[beatIndexRef.current];
+    navigateBeatTab(beat);
     if (beat?.homeScript) {
       isPlayingRef.current = true;
       setIsPlaying(true);
@@ -571,17 +578,19 @@ export function useProtoJourneyPlayback({
     scheduleDwellAdvance();
   }, [
     beats,
-    headerLoggedIn,
+    shouldSkipBeat,
     isPlaying,
     isScripting,
     onScreenFramesBeat,
     runHomeScriptBeat,
+    navigateBeatTab,
     scheduleDwellAdvance,
     screenPlayback,
     stopJourneyPlay,
   ]);
 
   const jumpToStart = useCallback(() => {
+    suppressInitialBeatTabNavRef.current = false;
     stopJourneyPlay();
     if (onScreenFramesBeat) {
       screenPlayback.jumpToStart();
@@ -590,8 +599,9 @@ export function useProtoJourneyPlayback({
   }, [onScreenFramesBeat, resetJourney, screenPlayback, stopJourneyPlay]);
 
   const jumpToEnd = useCallback(() => {
+    suppressInitialBeatTabNavRef.current = false;
     stopJourneyPlay();
-    const last = lastPlayableBeatIndex(beats, headerLoggedIn);
+    const last = findLastPlayableBeatIndex(beats, shouldSkipBeat);
     if (last < 0) return;
     enteredBeatRef.current = null;
     setBeatIndex(last);
@@ -600,7 +610,7 @@ export function useProtoJourneyPlayback({
     if (isScreenFramesBeat(lastBeat) && screenBeatActive) {
       screenPlayback.jumpToEnd();
     }
-  }, [beats, headerLoggedIn, screenBeatActive, screenPlayback, setBeatIndex, stopJourneyPlay]);
+  }, [beats, screenBeatActive, screenPlayback, setBeatIndex, shouldSkipBeat, stopJourneyPlay]);
 
   const resetToEnd = useCallback(() => {
     stopJourneyPlay();

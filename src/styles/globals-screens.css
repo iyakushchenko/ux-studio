@@ -1833,7 +1833,8 @@
 }
 /* Inset ring — stays inside rounded field (no clip from overflow parents) */
 .proto-avail-field:hover,
-.proto-avail-field:focus-within {
+.proto-avail-field:focus-within,
+.proto-avail-field.proto-chat-cta--hover {
   border-color: #012169;
   box-shadow: inset 0 0 0 2px #012169;
 }
@@ -2464,12 +2465,14 @@
   background: #012169;
   color: #fff;
 }
-.proto-avail-btn-primary:hover {
+.proto-avail-btn-primary:hover,
+.proto-avail-btn-primary.proto-chat-cta--hover {
   background: #01318f;
   box-shadow: 0 4px 12px rgba(1, 33, 105, 0.35);
   transform: translateY(-1px);
 }
-.proto-avail-btn-primary:active {
+.proto-avail-btn-primary:active,
+.proto-avail-btn-primary.proto-chat-cta--pressed {
   background: #011a5c;
   box-shadow: none;
   transform: translateY(0);
@@ -2485,8 +2488,14 @@
   border: 1px solid #afccca;
   color: #5c5c5c;
 }
-.proto-avail-btn-secondary:hover {
+.proto-avail-btn-secondary:hover,
+.proto-avail-btn-secondary.proto-chat-cta--hover {
   background: #c6e5e1;
+  color: #01318f;
+}
+.proto-avail-btn-secondary:active,
+.proto-avail-btn-secondary.proto-chat-cta--pressed {
+  background: #afccca;
   color: #01318f;
 }
 .proto-avail-btn-secondary img {
@@ -2497,7 +2506,10 @@
 .proto-avail-btn-secondary .proto-secondary-cta-icon {
   filter: none;
 }
-.proto-avail-btn-secondary:hover .proto-secondary-cta-icon {
+.proto-avail-btn-secondary:hover .proto-secondary-cta-icon,
+.proto-avail-btn-secondary.proto-chat-cta--hover .proto-secondary-cta-icon,
+.proto-avail-btn-secondary:active .proto-secondary-cta-icon,
+.proto-avail-btn-secondary.proto-chat-cta--pressed .proto-secondary-cta-icon {
   filter: brightness(0) saturate(100%) invert(15%) sepia(55%) saturate(3000%) hue-rotate(205deg) brightness(0.85);
 }
 .proto-avail-btn-secondary--sm {

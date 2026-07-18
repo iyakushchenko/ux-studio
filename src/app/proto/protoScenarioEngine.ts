@@ -12,27 +12,22 @@ export type ProtoScenarioScreenConfig = {
   playbackStepMs?: number;
 };
 
-export const PROTO_SCENARIO_SCREENS: ProtoScenarioScreenConfig[] = [
-  {
-    id: "site-pilot-chat",
-    label: "Chat experience",
-    childIndex: 10,
-    minVisibleFrames: 1,
-    playbackStepMs: 2000,
-  },
-];
-
 export function getProtoScenarioForChildIndex(
+  scenarios: readonly ProtoScenarioScreenConfig[],
   childIndex: number
 ): ProtoScenarioScreenConfig | undefined {
-  return PROTO_SCENARIO_SCREENS.find((s) => s.childIndex === childIndex);
+  return scenarios.find((s) => s.childIndex === childIndex);
 }
 
 export function getProtoScenarioById(
+  scenarios: readonly ProtoScenarioScreenConfig[],
   id: string
 ): ProtoScenarioScreenConfig | undefined {
-  return PROTO_SCENARIO_SCREENS.find((s) => s.id === id);
+  return scenarios.find((s) => s.id === id);
 }
+
+/** @deprecated Import scenario list from active project content instead. */
+export { BOOTS_PHARMACY_SCENARIO_SCREENS as PROTO_SCENARIO_SCREENS } from "@/projects/boots-pharmacy/screens/scenarios";
 
 export const PROTO_SCENARIO_FRAME_ANIM_MS = 320;
 export const PROTO_SCENARIO_FRAME_MAX_PX = 3200;

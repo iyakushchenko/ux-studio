@@ -141,6 +141,14 @@
   margin-right: 2px;
 }
 
+.proto-nav-studio-menus {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-right: 4px;
+}
+
 .proto-nav-journey-menu__trigger {
   display: inline-flex;
   align-items: center;
@@ -207,7 +215,11 @@
   cursor: default;
 }
 
-.proto-nav-journey-menu__option:hover,
+.proto-nav-journey-menu__option:hover:not(.proto-nav-journey-menu__option--active) {
+  color: rgba(255, 255, 255, 0.92);
+  background: linear-gradient(180deg, #4a4a4a 0%, #2e2e2e 48%, #1a1a1a 100%);
+}
+
 .proto-nav-journey-menu__option--active {
   color: #3d3018;
   background: linear-gradient(
@@ -233,16 +245,38 @@
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   color: rgba(255, 255, 255, 0.5);
-  margin-right: 2px;
+  margin-right: 6px;
   min-width: 2.25rem;
   text-align: center;
 }
 
+.proto-nav-scenario__deck-led {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 22px;
+  height: 20px;
+  margin: 0 5px 0 3px;
+  overflow: visible;
+}
+
+.proto-nav-scenario__deck .proto-nav-scenario__on-air {
+  margin: 0;
+  width: 14px;
+  height: 14px;
+}
+
+.proto-nav-scenario__deck .proto-nav-scenario__on-air-dot {
+  width: 6px;
+  height: 6px;
+}
+
 .proto-nav-scenario__deck {
   display: inline-flex;
-  align-items: stretch;
+  align-items: center;
   gap: 1px;
-  padding: 2px;
+  padding: 2px 2px 2px 1px;
   border-radius: 4px;
   background: rgba(0, 0, 0, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -321,7 +355,6 @@
   flex-shrink: 0;
   width: 16px;
   height: 16px;
-  margin-right: 2px;
   overflow: visible;
   border-radius: 50%;
   background: linear-gradient(155deg, #5a5a5a 0%, #242424 52%, #383838 100%);
@@ -363,11 +396,24 @@
 }
 
 .proto-nav-scenario--on-air .proto-nav-scenario__on-air-dot {
-  animation: proto-studio-on-air-dot-blink 3s linear infinite;
+  background: radial-gradient(
+    circle at 38% 30%,
+    #b8ffd8 0%,
+    #74ffb3 36%,
+    #3dd68c 64%,
+    #1f9f5c 100%
+  );
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.72),
+    inset 0 -1px 1px rgba(0, 80, 40, 0.35),
+    0 0 5px rgba(93, 255, 138, 0.95),
+    0 0 11px rgba(93, 255, 138, 0.55);
+  animation: none;
 }
 
 .proto-nav-scenario--on-air .proto-nav-scenario__on-air-dot::after {
-  animation: proto-studio-on-air-lens-glint 3s linear infinite;
+  opacity: 0.42;
+  animation: none;
 }
 
 .proto-nav-scenario__on-air-halo {
@@ -381,7 +427,36 @@
 }
 
 .proto-nav-scenario--on-air .proto-nav-scenario__on-air-halo {
-  animation: proto-studio-on-air-halo-blink 3s linear infinite;
+  opacity: 0.42;
+  transform: scale(1.04);
+  animation: none;
+}
+
+/* Playback transport — amber flash on each simulated demo click (300ms). */
+.proto-nav-scenario--on-air .proto-nav-scenario__on-air--click .proto-nav-scenario__on-air-dot {
+  background: radial-gradient(
+    circle at 38% 30%,
+    #ffd180 0%,
+    #ff9a12 38%,
+    #ef6c00 68%,
+    #e65100 100%
+  );
+  box-shadow:
+    inset 0 1px 1px rgba(255, 248, 220, 0.82),
+    inset 0 -1px 1.5px rgba(120, 45, 0, 0.45),
+    0 0 6px rgba(255, 154, 18, 1),
+    0 0 14px rgba(255, 176, 48, 0.82);
+}
+
+.proto-nav-scenario--on-air .proto-nav-scenario__on-air--click .proto-nav-scenario__on-air-dot::after {
+  opacity: 0.55;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.proto-nav-scenario--on-air .proto-nav-scenario__on-air--click .proto-nav-scenario__on-air-halo {
+  opacity: 0.72;
+  transform: scale(1.1);
+  background: radial-gradient(circle, rgba(255, 154, 18, 0.62) 0%, transparent 72%);
 }
 
 /* Playback end — solid panel LED (no bloom) for 3s. */

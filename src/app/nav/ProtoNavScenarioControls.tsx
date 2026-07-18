@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 
 export type ProtoNavScenarioControlsProps = {
-  journeyMenu: ReactNode;
+  studioMenus: ReactNode;
   segmentLabel?: string;
   /** Changes whenever the active studio touchpoint changes (beat or popup). */
   touchpointKey?: string;
@@ -87,7 +87,7 @@ function CassetteJumpToEndIcon() {
 
 /** Nav “control room” — 90s cassette-deck scenario playback. */
 export function ProtoNavScenarioControls({
-  journeyMenu,
+  studioMenus,
   segmentLabel,
   touchpointKey,
   visibleCount,
@@ -107,18 +107,24 @@ export function ProtoNavScenarioControls({
   onJumpToEnd,
 }: ProtoNavScenarioControlsProps) {
   const STEP_DIODE_MS = 300;
+  const CLICK_DIODE_MS = 300;
   const [blinkToken, setBlinkToken] = useState(0);
   const [diodeEndActive, setDiodeEndActive] = useState(false);
   const [stepBlinkActive, setStepBlinkActive] = useState(false);
+  const [clickBlinkActive, setClickBlinkActive] = useState(false);
   const [stepBlinkToken, setStepBlinkToken] = useState(0);
   const prevTouchpointKeyRef = useRef<string | undefined>(undefined);
   const prevPlaybackEndTokenRef = useRef(0);
   const stepBlinkTimerRef = useRef<number | null>(null);
+  const clickBlinkTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     return () => {
       if (stepBlinkTimerRef.current != null) {
         window.clearTimeout(stepBlinkTimerRef.current);
+      }
+      if (clickBlinkTimerRef.current != null) {
+        window.clearTimeout(clickBlinkTimerRef.current);
       }
     };
   }, []);
@@ -143,6 +149,39 @@ export function ProtoNavScenarioControls({
     prevTouchpointKeyRef.current = touchpointKey;
     setBlinkToken((token) => token + 1);
   }, [isOnAir, touchpointKey]);
+
+  useEffect(() => {
+    if (!isOnAir) return;
+
+    const handleDemoClick = () => {
+      if (clickBlinkTimerRef.current != null) {
+        window.clearTimeout(clickBlinkTimerRef.current);
+      }
+      setClickBlinkActive(true);
+      clickBlinkTimerRef.current = window.setTimeout(() => {
+        setClickBlinkActive(false);
+        clickBlinkTimerRef.current = null;
+      }, CLICK_DIODE_MS);
+    };
+
+    document.addEventListener("proto-demo-click", handleDemoClick);
+    return () => {
+      document.removeEventListener("proto-demo-click", handleDemoClick);
+      if (clickBlinkTimerRef.current != null) {
+        window.clearTimeout(clickBlinkTimerRef.current);
+        clickBlinkTimerRef.current = null;
+      }
+    };
+  }, [isOnAir]);
+
+  useEffect(() => {
+    if (isOnAir) return;
+    setClickBlinkActive(false);
+    if (clickBlinkTimerRef.current != null) {
+      window.clearTimeout(clickBlinkTimerRef.current);
+      clickBlinkTimerRef.current = null;
+    }
+  }, [isOnAir]);
 
   const triggerStepDiodeBlink = () => {
     if (isOnAir) return;
@@ -183,13 +222,17 @@ export function ProtoNavScenarioControls({
     stepBlinkActive && !isOnAir && !diodeEndActive
       ? " proto-nav-scenario__on-air--step"
       : "";
+  const diodeClickClass =
+    clickBlinkActive && isOnAir && !diodeEndActive
+      ? " proto-nav-scenario__on-air--click"
+      : "";
 
   return (
     <div
       className={`proto-nav-scenario${onAirClass}`}
       role="group"
     >
-      {journeyMenu}
+      {studioMenus}
       {segmentLabel ? (
         <span
           key={blinkToken}
@@ -200,24 +243,25 @@ export function ProtoNavScenarioControls({
           {segmentLabel}
         </span>
       ) : null}
-      <span
-        key={
-          diodeEndActive
-            ? "diode-end"
-            : stepBlinkActive
-              ? `step-${stepBlinkToken}`
-              : "diode-idle"
-        }
-        className={`proto-nav-scenario__on-air${diodeEndClass}${diodeStepClass}`}
-        aria-hidden
-      >
-        <span className="proto-nav-scenario__on-air-dot" />
-        <span className="proto-nav-scenario__on-air-halo" aria-hidden />
-      </span>
       <span className="proto-nav-scenario__counter" aria-live="polite">
         {totalFrames > 0 ? `${visibleCount}/${totalFrames}` : "—"}
       </span>
       <div className="proto-nav-scenario__deck">
+        <div className="proto-nav-scenario__deck-led" aria-hidden>
+          <span
+            key={
+              diodeEndActive
+                ? "diode-end"
+                : stepBlinkActive
+                  ? `step-${stepBlinkToken}`
+                  : "diode-idle"
+            }
+            className={`proto-nav-scenario__on-air${diodeEndClass}${diodeStepClass}${diodeClickClass}`}
+          >
+            <span className="proto-nav-scenario__on-air-dot" />
+            <span className="proto-nav-scenario__on-air-halo" />
+          </span>
+        </div>
         <button
           type="button"
           className="proto-nav-step-btn proto-nav-scenario__btn"

@@ -15,7 +15,10 @@ Clickable **UX concept prototype** for Boots Health travel vaccinations. It is *
 ```bash
 npm i && npm run dev    # local preview
 npm run build           # must pass before push
+npm run test            # playback guardrails — run after journey/script changes
 ```
+
+See **`docs/shell/PLAYBACK.md`** for how to change journey scripts safely and the manual smoke checklist.
 
 ---
 
@@ -56,17 +59,21 @@ When adding screen-specific CSS or effects, **always scope by `childIndex` or `d
 ```
 src/
   app/
-    App.tsx              # Orchestrator (~3.7k lines): state, effects, popups
+    App.tsx              # Orchestrator (~4.6k lines): state, effects, popups
+    shell/               # Studio state — project / persona / CJM selection
     AvailabilityTool.tsx # Multi-step availability lightbox
     BootsPharmacyLogo.tsx
-    hub/                 # Tab 0 onboarding wiki
-    nav/                 # Tab strip + zoom (fragile — see below)
+    hub/                 # Tab 0 onboarding wiki (→ move to projects/)
+    nav/                 # Tab strip + zoom + transport controls (shell)
+    orchestra/           # Journey playback engine (shell)
     popups/              # Login, Quick View, vaccine/recipient pickers
     chrome/              # Shared header, footer, icons, tertiary CTAs
-    proto/               # DOM wiring: PLP, filters, maps, pricing, screens
+    proto/               # DOM wiring: PLP, filters, maps, pricing, screens (→ move to projects/)
     components/          # shadcn/Radix UI kit — rarely used by prototype screens
-  imports/
-    Frame1000007317/     # Figma export — treat as read-only layout source
+  projects/
+    registry.ts          # All registered demo projects
+    boots-pharmacy/      # First project — screens, dom, playback, frame, hub, etc.
+      frame/             # Figma export (was imports/Frame1000007317)
   styles/
     globals.css          # Imports hub + chrome + screens partials
     globals-hub.css
@@ -75,12 +82,29 @@ src/
     index.css            # Entry: fonts, tailwind, theme, globals
   assets/                # Images, avail icons, hub figures, user-avatar.jpg
 docs/
+  shell/                 # Shell architecture — read SHELL.md before changing studio
+    SHELL.md
+    PROJECTS.md
   FIGMA_MAKE_SYNC.md     # Cloud Make sync (paths may lag repo — trust AGENTS.md layout)
 scripts/
   export-figma-make-sync.ps1
 ```
 
 **App root** should only hold `App.tsx`, `AvailabilityTool.tsx`, `BootsPharmacyLogo.tsx`. Everything else belongs in subfolders above.
+
+### Shell vs project
+
+| Layer | Location | Docs |
+|-------|----------|------|
+| **Shell** (studio tool) | `nav/`, `orchestra/`, `shell/` | `docs/shell/SHELL.md` |
+| **Project content** | `projects/<id>/` | `docs/shell/PROJECTS.md` |
+| **Journey playback** | `orchestra/` + `projects/<id>/playback/` | `docs/shell/PLAYBACK.md` |
+
+Studio transport bar has three dropdowns: **Project** → **Persona** → **CJM mode**.
+
+Project ids: `brand-subbrand` (e.g. `boots-pharmacy`) or `brand` alone (e.g. `puma`). Use `formatProjectId()` from `@/projects/formatProjectId`.
+
+Active project/persona state: `useProtoStudio()` in `shell/useProtoStudio.ts`. Journey beats live in `projects/<id>/personas/<persona>/journeys.ts`.
 
 ---
 
@@ -179,14 +203,13 @@ See `docs/FIGMA_MAKE_SYNC.md` for zip-based sync; verify paths against this file
 
 ## Common tasks
 
-| Task | Where to work |
-|------|----------------|
-| Change hub copy / deck links | `hub/protoHubContent.ts`, maybe `ProtoHubPage.tsx` |
-| PLP bundles / filters | `proto/protoPlpListing.ts`, `globals-screens.css` |
-| New screen behaviour | `App.tsx` effect gated by `SCREENS[current].childIndex` + small `proto/*.ts` helper |
-| Header login / avatar | `chrome/protoHeaderMount.tsx` |
-| Footer links | `chrome/protoFooterContent.ts`, `protoFooterConfig.ts` |
-| Nav tab labels | `proto/protoScreens.ts` |
+| Change hub copy / deck links | `projects/boots-pharmacy/hub/protoHubContent.ts` |
+| PLP bundles / filters | `projects/boots-pharmacy/data/protoPlpListing.ts`, `globals-screens.css` |
+| New screen behaviour | `projects/boots-pharmacy/wire/BootsPharmacyProjectView.tsx` + `dom/*.ts` |
+| Header login / avatar | `projects/boots-pharmacy/chrome/protoHeaderMount.tsx` |
+| Footer links | `projects/boots-pharmacy/chrome/protoFooterContent.ts` |
+| Nav tab labels | `projects/boots-pharmacy/screens/protoScreens.ts` |
+| **Journey beats / scripts** | `personas/.../journeys.ts` + `playback/*.ts` — see `docs/shell/PLAYBACK.md` |
 
 **Minimize scope.** This codebase favours small, targeted diffs. Do not refactor `App.tsx` or the Figma export without a clear ask.
 
@@ -204,12 +227,20 @@ See `docs/FIGMA_MAKE_SYNC.md` for zip-based sync; verify paths against this file
 ## Sanity checklist (after substantive changes)
 
 - [ ] `npm run build` passes
+- [ ] `npm run test` passes (required after journey/playback/script edits)
 - [ ] Tab 0: hub loads, credits, deck links, Open UX Concept CTA
 - [ ] Tab 3 (PLP): bundles, filters, chips, reset icon (stroke not solid square), tile → PDP
 - [ ] Tabs 1–2: agentic home + chat
 - [ ] Tabs 5–7: booking funnel
 - [ ] Tabs 8–9: MA pages, Sarah sidebar + header avatars when logged in
 - [ ] Nav zoom (Ctrl+/−) still keeps tab strip at 1×
+
+### Playback smoke (after journey/script changes — full list in `docs/shell/PLAYBACK.md`)
+
+- [ ] Agentic CJM: Play from start through chat → availability → book → MA
+- [ ] Traditional CJM logged in: login beat skipped
+- [ ] Step forward/back on 3 beats — touchpoint label tracks
+- [ ] Hard refresh on tab 3+ — tab preserved
 
 ---
 
