@@ -182,13 +182,14 @@ export function beginSitePilotChatThinking(screenOrSummary: ParentNode): void {
 /** Pre-reveal pause while scenario play advances onto an agent reply. */
 export function beginSitePilotChatPlaybackThinking(
   screenOrSummary: ParentNode,
-  anchorFrame?: HTMLElement
+  anchorFrame?: HTMLElement,
+  options?: { scroll?: boolean }
 ): void {
   const summary = resolveSummary(screenOrSummary);
   if (!summary) return;
   if (thinkingMode === "send") return;
 
-  showThinkingBubble(summary, "playback", true, anchorFrame);
+  showThinkingBubble(summary, "playback", options?.scroll ?? true, anchorFrame);
 }
 
 export function endSitePilotChatThinking(): void {

@@ -297,7 +297,7 @@ export function useProtoScenarioPlayback({
       visibleCountRef.current > 0
         ? visibleCountRef.current
         : browseMode
-          ? resolveBrowseScenarioVisibleCount(frames.length)
+          ? minVisibleFrames
           : clampVisible(
               minVisibleFrames,
               scenarioTotalFor(frames.length, hasFinale),
@@ -338,7 +338,11 @@ export function useProtoScenarioPlayback({
     const pendingInit = scrollIntentRef.current?.visibleCount ?? 0;
     const effectiveCount =
       visibleCount > 0 ? visibleCount : pendingInit > 0 ? pendingInit : 0;
-    if (effectiveCount === 0) return;
+
+    if (effectiveCount === 0) {
+      applyScenarioFrameVisibility(frames, 0);
+      return;
+    }
 
     const intent = scrollIntentRef.current;
     if (

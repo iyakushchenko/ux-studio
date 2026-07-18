@@ -84,11 +84,15 @@ import {
   runSitePilotChatScenarioFinale,
 } from "@/projects/boots-pharmacy/playback/sitePilotChat";
 import {
+  beginSitePilotChatPlaybackThinking,
+  endSitePilotChatThinking,
   isSitePilotChatPlaybackThinking,
   syncSitePilotChatThinkingHint,
 } from "@/projects/boots-pharmacy/dom/protoSitePilotChatThinking";
 import { isProtoHeaderLoggedIn } from "@/projects/boots-pharmacy/chrome/protoHeaderMount";
 import { AVAIL_INTENT } from "@/projects/boots-pharmacy/wire/BootsPharmacyProjectView";
+
+const CHAT_SCREEN_SELECTOR = ".proto-viewport > div > div:nth-child(10)";
 
 export default function App() {
   const studio = useProtoStudio();
@@ -659,9 +663,12 @@ export default function App() {
 
   const resetToEndRef = useRef(scenarioPlayback.resetToEnd);
   resetToEndRef.current = scenarioPlayback.resetToEnd;
+  const jumpToStartRef = useRef(scenarioPlayback.jumpToStart);
+  jumpToStartRef.current = scenarioPlayback.jumpToStart;
   const triggerChatBrowseRevealRef = useRef<() => void>(() => {});
   const chatBrowseRevealTimerRef = useRef<number | null>(null);
   const chatBrowseRevealGenerationRef = useRef(0);
+  const lastChatBrowseRevealKeyRef = useRef<string | null>(null);
   const retreatFromFinaleRef = useRef(scenarioPlayback.retreatFromFinale);
   retreatFromFinaleRef.current = scenarioPlayback.retreatFromFinale;
   const cancelPreRevealPauseRef = useRef(scenarioPlayback.cancelPreRevealPause);
@@ -669,55 +676,101 @@ export default function App() {
   const scenarioVisibleCountRef = useRef(scenarioPlayback.visibleCount);
   scenarioVisibleCountRef.current = scenarioPlayback.visibleCount;
   const availabilityWasOpenRef = useRef(false);
+  const chatBrowsePollCancelRef = useRef<(() => void) | null>(null);
 
-  const runChatBrowseReveal = useCallback(() => {
-    if (studioJourneyMode || hubOpen) return;
-    if (SCREENS[current]?.childIndex !== 10) return;
-    if (activeScreenScenario?.id !== "site-pilot-chat") return;
+  const runChatBrowseReveal = useCallback(
+    (options?: { force?: boolean }) => {
+      if (studioJourneyMode || hubOpen) return;
+      if (SCREENS[current]?.childIndex !== 10) return;
+      if (activeScreenScenario?.id !== "site-pilot-chat") return;
 
-    const screen = document.querySelector<HTMLElement>(
-      ".proto-viewport > div > div:nth-child(10)"
-    );
-    if (!screen) return;
+      const revealKey = `${current}:site-pilot-chat`;
+      if (!options?.force && lastChatBrowseRevealKeyRef.current === revealKey) {
+        return;
+      }
+      lastChatBrowseRevealKeyRef.current = revealKey;
 
-    chatBrowseRevealGenerationRef.current += 1;
-    const generation = chatBrowseRevealGenerationRef.current;
+      chatBrowseRevealGenerationRef.current += 1;
+      const generation = chatBrowseRevealGenerationRef.current;
 
-    if (chatBrowseRevealTimerRef.current != null) {
-      window.clearTimeout(chatBrowseRevealTimerRef.current);
-      chatBrowseRevealTimerRef.current = null;
-    }
+      if (chatBrowseRevealTimerRef.current != null) {
+        window.clearTimeout(chatBrowseRevealTimerRef.current);
+        chatBrowseRevealTimerRef.current = null;
+      }
 
-    ensureSitePilotChatComposerDock(screen);
-    scenarioPlayback.cancelPreRevealPause();
-    scenarioPlayback.jumpToStart();
+      const isActive = () => chatBrowseRevealGenerationRef.current === generation;
 
-    const summary = screen.querySelector<HTMLElement>(
-      '[data-name="component.appointment.summary"]'
-    );
-    const firstFrame = summary?.querySelector<HTMLElement>(
-      ":scope > *:not([data-proto-chat-thinking])"
-    );
-    syncSitePilotChatThinkingHint(screen, true, firstFrame ?? undefined);
+      const finishReveal = (screen: HTMLElement) => {
+        if (!isActive()) return;
+        endSitePilotChatThinking();
+        resetToEndRef.current({ smooth: true, force: true });
+        ensureSitePilotChatComposerDock(screen);
+        syncSitePilotChatComposerDock(screen);
+      };
 
-    chatBrowseRevealTimerRef.current = window.setTimeout(() => {
-      chatBrowseRevealTimerRef.current = null;
-      if (chatBrowseRevealGenerationRef.current !== generation) return;
-      syncSitePilotChatThinkingHint(null, false);
-      resetToEndRef.current({ smooth: true, force: true });
-      ensureSitePilotChatComposerDock(screen);
-      syncSitePilotChatComposerDock(screen);
-    }, SITE_PILOT_CHAT_PLAYBACK_THINK_MS);
-  }, [
-    activeScreenScenario?.id,
-    current,
-    hubOpen,
-    scenarioPlayback,
-    studioJourneyMode,
-    SCREENS,
-  ]);
+      const showBrowseThinkingPause = (screen: HTMLElement) => {
+        const frames = collectSitePilotChatScenarioFrames(screen);
+        const anchor =
+          frames.find((frame) => isSitePilotChatAgentReplyFrame(frame)) ??
+          frames[0];
+        if (!anchor) return;
+        beginSitePilotChatPlaybackThinking(screen, anchor, { scroll: false });
+      };
 
-  triggerChatBrowseRevealRef.current = runChatBrowseReveal;
+      const waitForFramesThenFinish = (screen: HTMLElement, attempt = 0) => {
+        if (!isActive()) return;
+        const frameCount = collectSitePilotChatScenarioFrames(screen).length;
+        if (frameCount === 0 && attempt < 40) {
+          chatBrowseRevealTimerRef.current = window.setTimeout(
+            () => waitForFramesThenFinish(screen, attempt + 1),
+            50
+          );
+          return;
+        }
+        finishReveal(screen);
+      };
+
+      let pollRaf = 0;
+      const pollScreen = () => {
+        if (!isActive()) return;
+        const screen = document.querySelector<HTMLElement>(CHAT_SCREEN_SELECTOR);
+        if (!screen) {
+          pollRaf = requestAnimationFrame(pollScreen);
+          return;
+        }
+        const frames = collectSitePilotChatScenarioFrames(screen);
+        if (frames.length === 0) {
+          pollRaf = requestAnimationFrame(pollScreen);
+          return;
+        }
+        ensureSitePilotChatComposerDock(screen);
+        cancelPreRevealPauseRef.current();
+        jumpToStartRef.current();
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            if (!isActive()) return;
+            showBrowseThinkingPause(screen);
+          });
+        });
+        chatBrowseRevealTimerRef.current = window.setTimeout(() => {
+          chatBrowseRevealTimerRef.current = null;
+          waitForFramesThenFinish(screen);
+        }, SITE_PILOT_CHAT_PLAYBACK_THINK_MS);
+      };
+      pollScreen();
+
+      return () => cancelAnimationFrame(pollRaf);
+    },
+    [
+      activeScreenScenario?.id,
+      current,
+      hubOpen,
+      studioJourneyMode,
+      SCREENS,
+    ]
+  );
+
+  triggerChatBrowseRevealRef.current = () => runChatBrowseReveal({ force: true });
 
   useEffect(() => {
     return () => {
@@ -730,17 +783,42 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    chatBrowsePollCancelRef.current?.();
+    chatBrowsePollCancelRef.current = null;
+
     if (studioJourneyMode || hubOpen) return;
-    if (SCREENS[current]?.childIndex !== 10) return;
+    if (SCREENS[current]?.childIndex !== 10) {
+      lastChatBrowseRevealKeyRef.current = null;
+      return;
+    }
     if (activeScreenScenario?.id !== "site-pilot-chat") return;
-    triggerChatBrowseRevealRef.current();
+
+    const cancel = runChatBrowseReveal();
+    chatBrowsePollCancelRef.current = cancel ?? null;
+    return () => {
+      chatBrowseRevealGenerationRef.current += 1;
+      chatBrowsePollCancelRef.current?.();
+      chatBrowsePollCancelRef.current = null;
+      if (chatBrowseRevealTimerRef.current != null) {
+        window.clearTimeout(chatBrowseRevealTimerRef.current);
+        chatBrowseRevealTimerRef.current = null;
+      }
+      endSitePilotChatThinking();
+      lastChatBrowseRevealKeyRef.current = null;
+    };
   }, [
     activeScreenScenario?.id,
     current,
     hubOpen,
+    runChatBrowseReveal,
     studioJourneyMode,
     SCREENS,
   ]);
+
+  useEffect(() => {
+    if (SCREENS[current]?.childIndex === 10) return;
+    syncSitePilotChatThinkingHint(null, false);
+  }, [current, SCREENS]);
 
   useEffect(() => {
     const wasOpen = availabilityWasOpenRef.current;
@@ -759,36 +837,6 @@ export default function App() {
     activeScreenScenario?.id,
     scenarioPlayback.visibleCount,
     scenarioPlayback.totalFrames,
-  ]);
-
-  useEffect(() => {
-    if (SCREENS[current]?.childIndex !== 10) return;
-    if (activeScreenScenario?.id !== "site-pilot-chat") {
-      syncSitePilotChatThinkingHint(null, false);
-      return;
-    }
-
-    const screen = document.querySelector(
-      ".proto-viewport > div > div:nth-child(10)"
-    );
-    const showHint =
-      studioJourneyMode &&
-      scenarioPlayback.visibleCount === 1 &&
-      scenarioPlayback.totalFrames > 1 &&
-      !scenarioPlayback.isPlaying &&
-      !scenarioPlayback.isPausingBeforeReveal;
-    syncSitePilotChatThinkingHint(screen, showHint);
-
-    return () => syncSitePilotChatThinkingHint(null, false);
-  }, [
-    current,
-    activeScreenScenario?.id,
-    scenarioPlayback.visibleCount,
-    scenarioPlayback.totalFrames,
-    scenarioPlayback.isPlaying,
-    scenarioPlayback.isPausingBeforeReveal,
-    studioJourneyMode,
-    SCREENS,
   ]);
 
   const currentBeat = activeJourney?.beats[journeyBeatIndex];

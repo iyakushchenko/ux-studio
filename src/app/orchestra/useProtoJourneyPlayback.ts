@@ -218,6 +218,8 @@ export function useProtoJourneyPlayback({
   atPlaylistEndRef.current = atPlaylistEnd;
   const scheduleDwellAdvanceRef = useRef<() => void>(() => {});
   const homeScriptRunRef = useRef(0);
+  /** After manual home step, chain the first chat scenario frame once chat mounts. */
+  const pendingManualScreenHandoffRef = useRef<string | null>(null);
 
   const abortActiveScripts = useCallback(() => {
     playback.abortAll();
@@ -398,7 +400,10 @@ export function useProtoJourneyPlayback({
   );
 
   const runHomeScriptBeat = useCallback(
-    async (beat: JourneyBeat, options?: { skip?: boolean }) => {
+    async (
+      beat: JourneyBeat,
+      options?: { skip?: boolean; chainScreenFrames?: boolean }
+    ) => {
       if (!beat.homeScript) return false;
       const runId = ++homeScriptRunRef.current;
       setScriptingActive(true);
@@ -424,6 +429,10 @@ export function useProtoJourneyPlayback({
         enteredBeatRef.current = null;
         const next = advanceFrom(beatIndexRef.current);
         if (next >= beats.length) return true;
+        const nextBeat = beats[next];
+        if (options?.chainScreenFrames && isScreenFramesBeat(nextBeat)) {
+          pendingManualScreenHandoffRef.current = nextBeat.id;
+        }
         setBeatIndex(next);
         beatIndexRef.current = next;
         return true;
@@ -880,9 +889,31 @@ export function useProtoJourneyPlayback({
       screenPlayback.jumpToStart();
     }
 
+    let outerHandoffRaf = 0;
+    let innerHandoffRaf = 0;
+    if (
+      !scenarioBrowseMode &&
+      pendingManualScreenHandoffRef.current === currentBeat.id
+    ) {
+      pendingManualScreenHandoffRef.current = null;
+      outerHandoffRaf = requestAnimationFrame(() => {
+        innerHandoffRaf = requestAnimationFrame(() => {
+          if (beatIndexRef.current !== beatIndex) return;
+          if (screenPlayback.canStepForward) {
+            screenPlayback.stepForward();
+          }
+        });
+      });
+    }
+
     if (isPlayingRef.current && !screenPlayback.isPlaying) {
       screenPlayback.play();
     }
+
+    return () => {
+      cancelAnimationFrame(outerHandoffRaf);
+      cancelAnimationFrame(innerHandoffRaf);
+    };
   }, [
     active,
     beatIndex,
@@ -891,6 +922,7 @@ export function useProtoJourneyPlayback({
     screenPlayback,
     screenPlayback.totalFrames,
     screenPlayback.isPlaying,
+    screenPlayback.canStepForward,
     scenarioBrowseMode,
   ]);
 
@@ -1096,7 +1128,7 @@ export function useProtoJourneyPlayback({
     if (currentBeat?.homeScript) {
       setScriptingActive(true);
       noteManualDirectorStep(currentBeat);
-      void runHomeScriptBeat(currentBeat);
+      void runHomeScriptBeat(currentBeat, { chainScreenFrames: true });
       return;
     }
     if (currentBeat?.tabScript) {

@@ -301,9 +301,16 @@ function resolveAvailIntent(
   const hasLocation = !!chosen || isProtoHeaderLoggedIn();
 
   if (!hasLocation) {
-    // Chat/playback intents pin a demo store — open date/time directly, not location picker.
-    if (intent.storeId && (intent.step === "date" || intent.step === "time")) {
-      return { ...intent, storeId: intent.storeId };
+    // Only skip the location picker when the user has already chosen a store.
+    if (
+      chosen &&
+      intent.storeId &&
+      (intent.step === "date" || intent.step === "time")
+    ) {
+      return {
+        ...intent,
+        storeId: mapChosenToAvailStoreId(chosen),
+      };
     }
     if (
       intent.step === "date" ||
