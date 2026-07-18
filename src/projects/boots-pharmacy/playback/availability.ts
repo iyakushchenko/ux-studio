@@ -12,6 +12,7 @@ import {
   computeScrollTopForElement,
 } from "@/app/proto/protoPlaybackScroll";
 import type { AvailabilityScriptId } from "@/app/orchestra/types";
+import type { PlaybackScriptOptions } from "@/projects/playbackScriptOptions";
 import {
   scriptAborted,
   scriptFail,
@@ -338,9 +339,10 @@ async function runSelectLocation(options?: { skip?: boolean }): Promise<Playback
 
 export async function runAvailabilityScript(
   scriptId: AvailabilityScriptId,
-  options?: { skip?: boolean }
+  options?: PlaybackScriptOptions
 ): Promise<PlaybackScriptResult> {
   playbackAborted = false;
+  if (options?.syncState) return scriptOk();
 
   switch (scriptId) {
     case "select-location":

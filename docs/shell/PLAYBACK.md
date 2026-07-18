@@ -184,6 +184,51 @@ Keep shell changes rare. Prefer project-local script runners.
 
 ---
 
+## Retreat sync (universal transport contract)
+
+CJM **step back** must restore DOM, scroll, and wire/React state to the target beat baseline — not leave director outcomes (e.g. robo-selected date) in place.
+
+### Shell-owned (project / page / UX agnostic)
+
+| Piece | Path | Role |
+|-------|------|------|
+| **Retreat trigger** | `useProtoJourneyPlayback` | Sets `retreatSyncRef` on step-back; beat-enter calls `syncBeatRetreatState` |
+| **Universal router** | `app/orchestra/journeyRetreatSync.ts` | Routes by beat metadata (`homeScript`, `availScript`, `bookScript`, `tabScript`) — never by project id or beat id |
+| **Script options** | `projects/playbackScriptOptions.ts` | `{ skip, syncState, instant }` on all `run*Script` runners |
+| **Wire bridge** | `app/proto/protoRetreatBridge.ts` | `proto-retreat-sync` event — wire resets React state playback cannot reach |
+| **Viewport guard** | `transport-retreat-scroll-mismatch` | ~520ms after step-back; optional `checkRetreatViewportGoal` per beat |
+
+```
+step back → retreatSyncRef
+         → syncBeatRetreatState(playback, beat, runtime)
+              ├─ homeScript  → runHomeScript({ syncState: true })
+              ├─ availScript → runAvailScript({ syncState: true })
+              ├─ bookScript  → runBookScript({ syncState: true })
+              ├─ tabScript   → runTabScript({ syncState: true })
+              └─ dwell beat  → playback.syncDwellRetreat(beat)
+         → dispatchProtoRetreatSync({ channel, scriptId, intent? })
+         → wire listens → reset local React state
+```
+
+### Project-owned (implement per screen)
+
+| Hook | When | What to implement |
+|------|------|-------------------|
+| `run*Script` + `syncState` | Beat has a director script | Restore cumulative UI for that script step (DOM + dispatch bridge intent if React state involved) |
+| `syncDwellRetreat` | Dwell landing beat (no script) | Screen baseline only — e.g. Book Step 2 scroll to date block |
+| `checkRetreatViewportGoal` | Optional monitor | Return `{ expectsAnchor, domGoalMet }` for viewport guard after step-back |
+
+**New project checklist:**
+
+1. Implement `syncState` branches in each `playback/*.ts` runner (no-op `scriptOk()` until the screen needs retreat).
+2. Add `syncDwellRetreat` for dwell beats that own scroll/DOM baseline.
+3. Wire listens to `onProtoRetreatSync` filtered by `intent` (not beat ids) when playback cannot update React state alone.
+4. Add `checkRetreatViewportGoal` cases when the beat has a verifiable DOM goal.
+
+Boots Book Step 2 is the reference implementation: `book.ts` (`syncBookBeatState`), `dom/protoBookStep2Calendar.ts` (DOM + `book-step2-default-date` intent), wire `chosenBookingSlot` listener.
+
+---
+
 ## Playback diagnostics
 
 When a journey script fails, times out, or the studio stays on-air without advancing, playback stops automatically and a **Playback diagnostic** card appears (dismissible; does not replace the fatal error boundary).

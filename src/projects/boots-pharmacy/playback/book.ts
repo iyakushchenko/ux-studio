@@ -14,7 +14,7 @@ import {
   snapDemoTargetIntoView,
 } from "@/app/proto/protoPlaybackScroll";
 import type { BookScriptId } from "@/app/orchestra/types";
-import type { BookScriptOptions } from "@/projects/types";
+import type { PlaybackScriptOptions } from "@/projects/playbackScriptOptions";
 import {
   fromBool,
   scriptAborted,
@@ -312,12 +312,12 @@ async function restoreBookDefaultDate(screen: HTMLElement): Promise<boolean> {
 
 async function syncBookBeatState(
   scriptId: BookScriptId,
-  options?: BookScriptOptions
+  options?: PlaybackScriptOptions
 ): Promise<boolean> {
   const screen = await waitForBookStep2Screen();
   if (!screen || shouldAbort()) return false;
 
-  const syncOptions: BookScriptOptions = {
+  const syncOptions: PlaybackScriptOptions = {
     ...options,
     skip: true,
     instant: options?.instant,
@@ -555,7 +555,7 @@ function finishBookResult(ok: boolean, failStep: string): PlaybackScriptResult {
 
 /** CJM step-back onto Book Step 2 dwell — reset selections and scroll to the date block. */
 export async function syncBookStep2LandingRetreat(
-  options?: BookScriptOptions
+  options?: PlaybackScriptOptions
 ): Promise<void> {
   const screen = await waitForBookStep2Screen();
   if (!screen || shouldAbort()) return;
@@ -569,7 +569,7 @@ export async function syncBookStep2LandingRetreat(
 
 export async function runBookScript(
   scriptId: BookScriptId,
-  options?: BookScriptOptions
+  options?: PlaybackScriptOptions
 ): Promise<PlaybackScriptResult> {
   activeRunGeneration = playbackGeneration;
   playbackAborted = false;

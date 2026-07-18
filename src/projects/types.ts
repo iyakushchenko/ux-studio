@@ -19,6 +19,9 @@ import type {
 } from "@/projects/boots-pharmacy/overlays/AvailabilityTool";
 import type { ProtoScenarioScreenConfig } from "@/app/proto/protoScenarioEngine";
 import type { PlaybackScriptResult } from "@/projects/playbackScriptResult";
+import type { PlaybackScriptOptions } from "@/projects/playbackScriptOptions";
+
+export type { PlaybackScriptOptions } from "@/projects/playbackScriptOptions";
 
 export type StudioTouchpointEntry = {
   key: string;
@@ -57,37 +60,34 @@ export type RetreatViewportGoal = {
   domGoalMet: boolean;
 };
 
-/** Project-owned script runners — shell dispatches beats through this, not hardcoded paths. */
-export type BookScriptOptions = {
-  /** Apply clicks instantly — no demo cursor animation. */
-  skip?: boolean;
-  /** Restore cumulative date/time UI for manual beat stepping (no reserve click). */
-  syncState?: boolean;
-  /** Beat-enter / step-back sync — snap scroll and DOM with no eased camera moves. */
-  instant?: boolean;
-};
+/** @deprecated Use PlaybackScriptOptions — kept for gradual migration. */
+export type BookScriptOptions = PlaybackScriptOptions;
 
 export type ProtoProjectPlayback = {
   abortAll: () => void;
   runBeatAction: (actionId: JourneyBeatActionId, runtime: JourneyRuntime) => void;
-  runHomeScript: (scriptId: HomeScriptId, options?: { skip?: boolean }) => Promise<PlaybackScriptResult>;
+  runHomeScript: (
+    scriptId: HomeScriptId,
+    options?: PlaybackScriptOptions
+  ) => Promise<PlaybackScriptResult>;
   runAvailScript: (
     scriptId: AvailabilityScriptId,
-    options?: { skip?: boolean }
+    options?: PlaybackScriptOptions
   ) => Promise<PlaybackScriptResult>;
   runBookScript: (
     scriptId: BookScriptId,
-    options?: BookScriptOptions
+    options?: PlaybackScriptOptions
   ) => Promise<PlaybackScriptResult>;
   runTabScript: (
     scriptId: TabScriptId,
     runtime: JourneyRuntime,
-    options?: { skip?: boolean }
+    options?: PlaybackScriptOptions
   ) => Promise<PlaybackScriptResult>;
-  /** Book Step 2 dwell retreat — snap scroll back to the date section. */
-  syncBookStep2LandingRetreat?: (options?: BookScriptOptions) => Promise<void>;
-  /** CJM step-back — restore DOM/scroll for the target beat without director animation. */
-  syncRetreatState?: (
+  /**
+   * Dwell landing beats (no director script) — project restores screen baseline on step-back.
+   * Shell routes script beats via run*Script({ syncState: true }); only dwell beats use this hook.
+   */
+  syncDwellRetreat?: (
     beat: JourneyBeat,
     options?: RetreatSyncOptions
   ) => Promise<void>;

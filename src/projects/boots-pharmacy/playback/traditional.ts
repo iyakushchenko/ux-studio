@@ -3,6 +3,7 @@ import {
   resetPlpTileBookmarkForPlayback,
 } from "@/projects/boots-pharmacy/chrome/protoHeaderMount";
 import type { JourneyRuntime, TabScriptId } from "@/app/orchestra/types";
+import type { PlaybackScriptOptions } from "@/projects/playbackScriptOptions";
 import { runSelectLocationStore } from "./availability";
 import {
   clearSimulatedClickRipples,
@@ -592,10 +593,11 @@ async function runHistoryViewDetails(
 export async function runTraditionalScript(
   scriptId: TabScriptId,
   runtime: JourneyRuntime,
-  options?: { skip?: boolean }
+  options?: PlaybackScriptOptions
 ): Promise<PlaybackScriptResult> {
   activeRunGeneration = playbackGeneration;
   playbackAborted = false;
+  if (options?.syncState) return scriptOk();
 
   let result: PlaybackScriptResult;
   switch (scriptId) {

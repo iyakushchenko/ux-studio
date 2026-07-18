@@ -4,6 +4,7 @@ import {
   simulateDemoPointerClick,
 } from "@/app/proto/protoDemoCursor";
 import type { HomeScriptId } from "@/app/orchestra/types";
+import type { PlaybackScriptOptions } from "@/projects/playbackScriptOptions";
 import {
   scriptAborted,
   scriptFail,
@@ -162,9 +163,10 @@ async function runSarahQuerySubmit(
 
 export async function runSitePilotHomeScript(
   scriptId: HomeScriptId,
-  options?: { skip?: boolean }
+  options?: PlaybackScriptOptions
 ): Promise<PlaybackScriptResult> {
   playbackAborted = false;
+  if (options?.syncState) return scriptOk();
 
   switch (scriptId) {
     case "sarah-query-submit":

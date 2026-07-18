@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
+import { PROTO_RETREAT_SYNC_EVENT } from "@/app/proto/protoRetreatBridge";
 import {
   BOOK_STEP2_RETREAT_DEFAULT_DATE,
+  BOOK_STEP2_RETREAT_INTENT,
   formatBookStep2DateHeading,
   PROTO_BOOK_STEP2_RETREAT_DEFAULT_EVENT,
 } from "@/projects/boots-pharmacy/dom/protoBookStep2Calendar";
@@ -18,9 +20,8 @@ describe("protoBookStep2Calendar", () => {
     );
   });
 
-  it("uses a stable custom event name for wire React sync", () => {
-    expect(PROTO_BOOK_STEP2_RETREAT_DEFAULT_EVENT).toBe(
-      "proto-book-step2-retreat-default"
-    );
+  it("routes wire React sync through the universal retreat bridge", () => {
+    expect(PROTO_BOOK_STEP2_RETREAT_DEFAULT_EVENT).toBe(PROTO_RETREAT_SYNC_EVENT);
+    expect(BOOK_STEP2_RETREAT_INTENT).toBe("book-step2-default-date");
   });
 });

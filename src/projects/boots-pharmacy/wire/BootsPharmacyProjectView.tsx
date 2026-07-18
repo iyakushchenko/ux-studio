@@ -65,10 +65,10 @@ import {
   PROTO_PDP_WISHLIST_ID,
 } from "@/projects/boots-pharmacy/chrome/protoHeaderMount";
 import { wireProtoIconHits } from "@/projects/boots-pharmacy/dom/protoIconHitWire";
+import { onProtoRetreatSync } from "@/app/proto/protoRetreatBridge";
 import {
-  PROTO_BOOK_STEP2_RETREAT_DEFAULT_EVENT,
+  isBookStep2RetreatSyncDetail,
   syncBookStep2RetreatDefaultDom,
-  type BookStep2RetreatDefaultDetail,
 } from "@/projects/boots-pharmacy/dom/protoBookStep2Calendar";
 import { useProtoScrollFill } from "@/app/proto/useProtoScrollFill";
 import {
@@ -910,25 +910,15 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   );
 
   useEffect(() => {
-    const onRetreatDefault = (event: Event) => {
-      const detail = (event as CustomEvent<BookStep2RetreatDefaultDetail>).detail;
-      if (!detail) return;
+    return onProtoRetreatSync((detail) => {
+      if (!isBookStep2RetreatSyncDetail(detail)) return;
+      const { month, day, clearTime } = detail.data;
       setChosenBookingSlot((prev) => ({
-        month: detail.month,
-        day: detail.day,
-        time: detail.clearTime ? DEFAULT_CHOSEN_BOOKING_SLOT.time : prev.time,
+        month,
+        day,
+        time: clearTime ? DEFAULT_CHOSEN_BOOKING_SLOT.time : prev.time,
       }));
-    };
-    window.addEventListener(
-      PROTO_BOOK_STEP2_RETREAT_DEFAULT_EVENT,
-      onRetreatDefault
-    );
-    return () => {
-      window.removeEventListener(
-        PROTO_BOOK_STEP2_RETREAT_DEFAULT_EVENT,
-        onRetreatDefault
-      );
-    };
+    });
   }, []);
   const [recipientPickerOpen, setRecipientPickerOpen] = useState(false);
   const [loginPopupOpen, setLoginPopupOpen] = useState(false);

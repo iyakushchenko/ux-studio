@@ -1,9 +1,16 @@
 /** Book Step 2 calendar — DOM helpers for journey retreat sync (playback ↔ wire). */
 
+import {
+  dispatchProtoRetreatSync,
+  type ProtoRetreatSyncDetail,
+} from "@/app/proto/protoRetreatBridge";
+
 export const BOOK_STEP2_RETREAT_DEFAULT_DATE = {
   month: "June",
   day: 24,
 } as const;
+
+export const BOOK_STEP2_RETREAT_INTENT = "book-step2-default-date";
 
 export type BookStep2RetreatDefaultDetail = {
   month: "June" | "July";
@@ -11,8 +18,8 @@ export type BookStep2RetreatDefaultDetail = {
   clearTime: boolean;
 };
 
-export const PROTO_BOOK_STEP2_RETREAT_DEFAULT_EVENT =
-  "proto-book-step2-retreat-default";
+/** @deprecated Use PROTO_RETREAT_SYNC_EVENT — kept for tests. */
+export const PROTO_BOOK_STEP2_RETREAT_DEFAULT_EVENT = "proto-retreat-sync";
 
 const BOOKING_WEEKDAYS = [
   "Sunday",
@@ -105,12 +112,13 @@ export function dispatchBookStep2RetreatDefaultEvent(
     clearTime: true,
   }
 ): void {
-  window.dispatchEvent(
-    new CustomEvent<BookStep2RetreatDefaultDetail>(
-      PROTO_BOOK_STEP2_RETREAT_DEFAULT_EVENT,
-      { detail }
-    )
-  );
+  const payload: ProtoRetreatSyncDetail = {
+    beatId: "",
+    channel: "book",
+    intent: BOOK_STEP2_RETREAT_INTENT,
+    data: { ...detail },
+  };
+  dispatchProtoRetreatSync(payload);
 }
 
 export function syncBookStep2RetreatDefaultDom(options?: {
@@ -127,4 +135,19 @@ export function syncBookStep2RetreatDefaultDom(options?: {
     });
   }
   return ok;
+}
+
+export function isBookStep2RetreatSyncDetail(
+  detail: ProtoRetreatSyncDetail
+): detail is ProtoRetreatSyncDetail & {
+  intent: typeof BOOK_STEP2_RETREAT_INTENT;
+  data: BookStep2RetreatDefaultDetail;
+} {
+  return (
+    detail.channel === "book" &&
+    detail.intent === BOOK_STEP2_RETREAT_INTENT &&
+    detail.data != null &&
+    typeof detail.data.month === "string" &&
+    typeof detail.data.day === "number"
+  );
 }

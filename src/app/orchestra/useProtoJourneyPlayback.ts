@@ -23,6 +23,7 @@ import {
   isDwellLandingBeat,
   shouldChainManualDirectorStepOnAdvance,
 } from "@/app/orchestra/journeyBeatDirector";
+import { syncBeatRetreatState } from "@/app/orchestra/journeyRetreatSync";
 import {
   canRetreatJourneyTouchpoint,
   lastPlayableBeatIndex as findLastPlayableBeatIndex,
@@ -740,10 +741,9 @@ export function useProtoJourneyPlayback({
     lastHomeAutoRunRef.current = null;
     void runBeatEnter(currentBeat);
     if (retreatSyncRef.current) {
-      void (playback.syncRetreatState
-        ? playback.syncRetreatState(currentBeat, { instant: true })
-        : Promise.resolve()
-      ).finally(() => {
+      void syncBeatRetreatState(playback, currentBeat, runtime, {
+        instant: true,
+      }).finally(() => {
         retreatSyncRef.current = false;
       });
     } else if (
@@ -758,7 +758,7 @@ export function useProtoJourneyPlayback({
       });
     }
     suppressInitialBeatTabNavRef.current = false;
-  }, [active, currentBeat, playback, runBeatEnter]);
+  }, [active, currentBeat, playback, runBeatEnter, runtime]);
 
   useEffect(() => {
     if (!active || !isPlaying || isScripting || !currentBeat?.homeScript) return;
