@@ -296,6 +296,10 @@ function resolveAvailIntent(
   const hasLocation = !!chosen || isProtoHeaderLoggedIn();
 
   if (!hasLocation) {
+    // Chat/playback intents pin a demo store — open date/time directly, not location picker.
+    if (intent.storeId && (intent.step === "date" || intent.step === "time")) {
+      return { ...intent, storeId: intent.storeId };
+    }
     if (
       intent.step === "date" ||
       intent.step === "time" ||
@@ -853,7 +857,6 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     activeJourneyRef,
     openAvailabilityToolRef,
     closeAvailabilityToolRef,
-    screenFadeChildRef,
     resetToEndRef,
     retreatFromFinaleRef,
     cancelPreRevealPauseRef,
@@ -993,7 +996,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       window.setTimeout(() => {
         setCurrent(5);
         const datetimeBeatIndex =
-          activeJourney?.beats.findIndex((beat) => beat.id === "book-step2-date") ??
+          activeJourney?.beats.findIndex((beat) => beat.id === "book-step2") ??
           -1;
         if (datetimeBeatIndex >= 0) {
           setJourneyBeatIndex(datetimeBeatIndex);
@@ -1039,6 +1042,30 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     window.setTimeout(apply, 120);
   }, []);
 
+  const resetWireInteractionState = useCallback(() => {
+    closeAllPopups();
+    setAvailIntent(AVAIL_INTENT.start);
+    setAvailActiveStep(null);
+    setChosenLocation(DEFAULT_PROTO_UI.chosenLocation);
+    setChosenVaccine(DEFAULT_CHOSEN_VACCINE);
+    setChosenRecipient(DEFAULT_CHOSEN_RECIPIENT);
+    setIncludeBoosterDose(DEFAULT_INCLUDE_BOOSTER_DOSE);
+    setChosenBookingSlot(DEFAULT_CHOSEN_BOOKING_SLOT);
+    setLoggedInFlag(false);
+    setProtoHeaderLoggedIn(false);
+    setHomeQueryDirty(false);
+    setChatComposerDirty(false);
+    setPlpFiltersDirty(false);
+    pendingAgenticHomeQueryRef.current = null;
+    resetPlpFilters(document);
+    clearProtoUiStorage();
+    resetPrototypeScroll();
+    setPlpFiltersDirty(false);
+    if (SCREENS[current]?.childIndex === 11) {
+      syncAgenticHomeHeading(false);
+    }
+  }, [closeAllPopups, current, resetPrototypeScroll]);
+
   const restoreHubScroll = useCallback(() => {
     const el = hubScrollElRef.current;
     if (!el) return;
@@ -1065,19 +1092,11 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
 
     if (scenarioOnlyDirty) {
       transport.resetJourney();
-      scenarioPlayback.resetToEnd();
+      scenarioPlayback.jumpToStart();
       return;
     }
 
-    // Stay on the current nav screen; only wipe interaction / DOM state.
-    try {
-      sessionStorage.setItem(protoNavKey, String(current));
-      storeNavIndex(studio.projectId, current);
-    } catch {
-      /* ignore */
-    }
-    resetPlpFilters(document);
-    clearProtoUiStorage();
+    resetWireInteractionState();
     window.location.reload();
   };
 
@@ -2169,22 +2188,39 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       else if (availabilityOpen) closeAvailabilityTool();
     };
     window.addEventListener("keydown", onKey);
-    if (
+
+    const popupOpen =
       availabilityOpen ||
       vaccinePickerOpen ||
       recipientPickerOpen ||
       loginPopupOpen ||
-      quickViewOpen
-    ) {
-      const prev = document.body.style.overflow;
+      quickViewOpen;
+    const scrollEl = prototypeScrollElRef.current;
+
+    if (popupOpen) {
+      const prevBodyOverflow = document.body.style.overflow;
       document.body.style.overflow = "hidden";
+      scrollEl?.classList.add("proto-scroll--locked");
+      scrollEl?.setAttribute("data-proto-scroll-locked", "true");
       return () => {
         window.removeEventListener("keydown", onKey);
-        document.body.style.overflow = prev;
+        document.body.style.overflow = prevBodyOverflow;
+        scrollEl?.classList.remove("proto-scroll--locked");
+        scrollEl?.removeAttribute("data-proto-scroll-locked");
       };
     }
+
+    scrollEl?.classList.remove("proto-scroll--locked");
+    scrollEl?.removeAttribute("data-proto-scroll-locked");
     return () => window.removeEventListener("keydown", onKey);
-  }, [availabilityOpen, vaccinePickerOpen, recipientPickerOpen, loginPopupOpen, quickViewOpen]);
+  }, [
+    availabilityOpen,
+    vaccinePickerOpen,
+    recipientPickerOpen,
+    loginPopupOpen,
+    quickViewOpen,
+    prototypeScrollElRef,
+  ]);
 
   // PLP (child 9) — Quick View → RTB popup (PDP clone, no Check availability)
   useEffect(() => {
@@ -4034,12 +4070,6 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   const popupOnScreen = (...allowed: number[]) =>
     activeChildIndex != null && allowed.includes(activeChildIndex);
 
-  const shouldFadeActiveScreen =
-    !hubOpen && screenFadeChildRef.current !== childIndex;
-  if (!hubOpen) {
-    screenFadeChildRef.current = childIndex;
-  }
-
   /**
    * Sticky footer: active screen is at least the scroll-area height; footers use
    * margin-top:auto so they sit on the viewport bottom when content is short.
@@ -4092,7 +4122,6 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       overflow: ${isViewportLocked ? "hidden" : "visible"} !important;
       overflow-x: ${isViewportLocked ? "hidden" : "visible"} !important;
       overflow-y: ${isViewportLocked ? "hidden" : "visible"} !important;
-      ${shouldFadeActiveScreen ? "animation: proto-fade 0.25s ease;" : ""}
     }
 
     ${
@@ -4198,11 +4227,6 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     .proto-viewport > div > div:nth-child(7) [data-name="component.input.button"] {
       overflow: visible !important;
     }
-
-    @keyframes proto-fade {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
   `;
 
   const headerLoggedIn = loggedInFlag || isProtoHeaderLoggedIn();
@@ -4239,6 +4263,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       savePrototypeScroll,
       resetPrototypeScroll,
       resetPrototype,
+      resetWireInteractionState,
       openAvailabilityTool,
       closeAvailabilityTool,
       applyDemoLocation,
@@ -4252,7 +4277,6 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       isViewportLocked,
       isScreen1,
       isScreenChat,
-      shouldFadeActiveScreen,
       dynamicCSS,
     };
   });
@@ -4281,7 +4305,6 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     isViewportLocked,
     isScreen1,
     isScreenChat,
-    shouldFadeActiveScreen,
     dynamicCSS,
   ]);
 

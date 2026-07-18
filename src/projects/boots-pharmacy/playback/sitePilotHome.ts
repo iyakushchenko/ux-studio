@@ -4,6 +4,12 @@ import {
   simulateDemoPointerClick,
 } from "@/app/proto/protoDemoCursor";
 import type { HomeScriptId } from "@/app/orchestra/types";
+import {
+  scriptAborted,
+  scriptFail,
+  scriptOk,
+  type PlaybackScriptResult,
+} from "@/projects/playbackScriptResult";
 
 const AGENTIC_QUERY_LINE_PX = 24;
 const AGENTIC_QUERY_MAX_LINES = 5;
@@ -87,12 +93,12 @@ function getHomeSendButton(): HTMLElement | null {
   );
 }
 
-async function simulateSarahHomeTyping(text: string): Promise<void> {
+async function simulateSarahHomeTyping(text: string): Promise<boolean> {
   const ta = await waitForHomeTextarea();
-  if (!ta || shouldAbort()) return;
+  if (!ta || shouldAbort()) return false;
 
   await delay(HOME_DOM_SETTLE_MS);
-  if (shouldAbort()) return;
+  if (shouldAbort()) return false;
 
   ta.value = "";
   syncHomeQueryHeight(ta);
@@ -102,7 +108,7 @@ async function simulateSarahHomeTyping(text: string): Promise<void> {
     if (shouldAbort()) {
       ta.value = "";
       syncHomeQueryHeight(ta);
-      return;
+      return false;
     }
     ta.value = text.slice(0, i + 1);
     ta.dispatchEvent(new Event("input", { bubbles: true }));
@@ -113,39 +119,57 @@ async function simulateSarahHomeTyping(text: string): Promise<void> {
   if (shouldAbort()) {
     ta.value = "";
     syncHomeQueryHeight(ta);
-    return;
+    return false;
   }
 
   const sendBtn = getHomeSendButton();
-  if (!sendBtn) return;
+  if (!sendBtn) return false;
 
-  await simulateDemoPointerClick(sendBtn, { shouldAbort });
+  return simulateDemoPointerClick(sendBtn, { shouldAbort });
 }
 
-async function runSarahQuerySubmit(options?: { skip?: boolean }): Promise<void> {
+async function runSarahQuerySubmit(
+  options?: { skip?: boolean }
+): Promise<PlaybackScriptResult> {
   if (options?.skip) {
     const ta = await waitForHomeTextarea();
-    if (!ta || shouldAbort()) return;
+    if (!ta) {
+      return shouldAbort()
+        ? scriptAborted()
+        : scriptFail("waitForHomeTextarea: textarea.proto-agentic-query missing");
+    }
     ta.value = AGENTIC_HOME_DEMO_QUERY;
     syncHomeQueryHeight(ta);
     ta.dispatchEvent(new Event("input", { bubbles: true }));
-    // Journey beat advance switches to chat — don't click send (it navigates early).
-    return;
+    return scriptOk();
   }
-  await simulateSarahHomeTyping(AGENTIC_HOME_DEMO_QUERY);
+
+  const ta = await waitForHomeTextarea();
+  if (!ta) {
+    return shouldAbort()
+      ? scriptAborted()
+      : scriptFail("waitForHomeTextarea: textarea.proto-agentic-query missing");
+  }
+
+  const typed = await simulateSarahHomeTyping(AGENTIC_HOME_DEMO_QUERY);
+  if (!typed) {
+    return shouldAbort()
+      ? scriptAborted()
+      : scriptFail("simulateSarahHomeTyping: send button missing or click failed");
+  }
+  return scriptOk();
 }
 
 export async function runSitePilotHomeScript(
   scriptId: HomeScriptId,
   options?: { skip?: boolean }
-): Promise<void> {
+): Promise<PlaybackScriptResult> {
   playbackAborted = false;
 
   switch (scriptId) {
     case "sarah-query-submit":
-      await runSarahQuerySubmit(options);
-      break;
+      return runSarahQuerySubmit(options);
     default:
-      break;
+      return scriptFail(`unknown home script: ${String(scriptId)}`);
   }
 }

@@ -18,6 +18,7 @@ import type {
   ChosenBookingSlot,
 } from "@/projects/boots-pharmacy/overlays/AvailabilityTool";
 import type { ProtoScenarioScreenConfig } from "@/app/proto/protoScenarioEngine";
+import type { PlaybackScriptResult } from "@/projects/playbackScriptResult";
 
 export type StudioTouchpointEntry = {
   key: string;
@@ -47,28 +48,38 @@ export type ProtoPersonaDefinition = {
 };
 
 /** Project-owned script runners — shell dispatches beats through this, not hardcoded paths. */
+export type BookScriptOptions = {
+  /** Apply clicks instantly — no demo cursor animation. */
+  skip?: boolean;
+  /** Restore cumulative date/time UI for manual beat stepping (no reserve click). */
+  syncState?: boolean;
+};
+
 export type ProtoProjectPlayback = {
   abortAll: () => void;
   runBeatAction: (actionId: JourneyBeatActionId, runtime: JourneyRuntime) => void;
-  runHomeScript: (scriptId: HomeScriptId, options?: { skip?: boolean }) => Promise<void>;
+  runHomeScript: (scriptId: HomeScriptId, options?: { skip?: boolean }) => Promise<PlaybackScriptResult>;
   runAvailScript: (
     scriptId: AvailabilityScriptId,
     options?: { skip?: boolean }
-  ) => Promise<boolean>;
+  ) => Promise<PlaybackScriptResult>;
   runBookScript: (
     scriptId: BookScriptId,
-    options?: { skip?: boolean }
-  ) => Promise<boolean>;
+    options?: BookScriptOptions
+  ) => Promise<PlaybackScriptResult>;
   runTabScript: (
     scriptId: TabScriptId,
     runtime: JourneyRuntime,
     options?: { skip?: boolean }
-  ) => Promise<boolean>;
+  ) => Promise<PlaybackScriptResult>;
 };
 
 export type StudioSelectOption<T extends string = string> = {
   id: T;
+  /** Full label in the dropdown panel. */
   label: string;
+  /** Collapsed trigger text — defaults to label when omitted. */
+  shortLabel?: string;
 };
 
 /** Product surface reported by the active project wire (popup + pristine state). */
@@ -92,6 +103,8 @@ export type ProtoProjectWireApi = {
   savePrototypeScroll: () => void;
   resetPrototypeScroll: () => void;
   resetPrototype: () => void;
+  /** Soft-reset wire interaction state without a full page reload. */
+  resetWireInteractionState: () => void;
   openAvailabilityTool: (intent?: AvailOpenIntent) => void;
   closeAvailabilityTool: () => void;
   handleAvailabilityBookNow: (
@@ -108,7 +121,6 @@ export type ProtoProjectWireApi = {
   isViewportLocked: boolean;
   isScreen1: boolean;
   isScreenChat: boolean;
-  shouldFadeActiveScreen: boolean;
   dynamicCSS: string;
 };
 

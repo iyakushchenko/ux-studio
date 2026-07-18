@@ -1,5 +1,16 @@
 /** Scenario playback — reusable shell for stepped “frame” reveals on prototype screens. */
 
+import {
+  animateScrollElementIntoView,
+  animateScrollTo,
+  cancelPlaybackScroll,
+  computeScrollTopForElement,
+  getPrototypeScrollRoot,
+  isPlaybackScrollAnimating,
+  registerPlaybackScrollCancelHook,
+} from "@/app/proto/protoPlaybackScroll";
+import { playbackScrollMonitor } from "@/app/shell/protoPlaybackScrollMonitor";
+
 /** Minimum revealed frames — chat never shows a blank thread (first bubble stays). */
 export const PROTO_SCENARIO_MIN_VISIBLE_FRAMES = 1;
 
@@ -173,6 +184,11 @@ export function scrollPrototypeScrollToTop(
     document.querySelector<HTMLElement>(".proto-scroll--prototype");
   if (!el) return;
 
+  if (behavior === "smooth") {
+    void animateScrollTo(el, 0);
+    return;
+  }
+
   const apply = () => {
     el.scrollTop = 0;
     el.scrollLeft = 0;
@@ -206,6 +222,12 @@ export function scrollPrototypeScrollToBottom(
   if (!el) return;
 
   const top = Math.max(0, el.scrollHeight - el.clientHeight);
+  if (behavior === "smooth") {
+    void animateScrollTo(el, top, {
+      resolveTargetTop: () => Math.max(0, el.scrollHeight - el.clientHeight),
+    });
+    return;
+  }
   el.scrollTop = top;
   el.scrollTo({ top, left: 0, behavior });
 }
@@ -223,14 +245,17 @@ export function scrollPrototypeScrollToBottomOnce(
 
 export function scrollScenarioFrameIntoView(
   frame: HTMLElement | null,
-  align: ScenarioScrollAlign = "end"
+  align: ScenarioScrollAlign = "end",
+  smooth = true
 ): void {
   if (!frame) return;
-  frame.scrollIntoView({
-    behavior: "smooth",
-    block: align === "end" ? "end" : align,
-    inline: "nearest",
-  });
+  if (smooth) {
+    void animateScrollElementIntoView(frame, { align });
+    return;
+  }
+  const scrollEl = getPrototypeScrollRoot(frame);
+  if (!scrollEl) return;
+  scrollEl.scrollTop = computeScrollTopForElement(scrollEl, frame, align);
 }
 
 export function scrollScenarioChatAnchor(
@@ -261,11 +286,14 @@ export function scrollScenarioChatAnchor(
       }
       const lastFrame = frames[visibleCount - 1] ?? null;
       if (lastFrame) {
-        lastFrame.scrollIntoView({
-          behavior,
-          block: "end",
-          inline: "nearest",
-        });
+        if (smooth) {
+          void animateScrollElementIntoView(lastFrame, { align: "end" });
+        } else {
+          const root = resolveScrollEl(scrollEl);
+          if (root) {
+            root.scrollTop = computeScrollTopForElement(root, lastFrame, "end");
+          }
+        }
         return;
       }
       scrollPrototypeScrollToBottom(scrollEl, behavior);
@@ -277,7 +305,16 @@ export function scrollScenarioChatAnchor(
   const anchor =
     frames[0]?.closest<HTMLElement>('[data-name="component.appointment.summary"]') ??
     frames[0]?.parentElement;
-  anchor?.scrollIntoView({ behavior, block: "start", inline: "nearest" });
+  if (anchor) {
+    if (smooth) {
+      void animateScrollElementIntoView(anchor, { align: "start" });
+    } else {
+      const root = resolveScrollEl(scrollEl);
+      if (root) {
+        root.scrollTop = computeScrollTopForElement(root, anchor, "start");
+      }
+    }
+  }
 }
 
 export function anchorScenarioScrollToVisibleEnd(
@@ -291,9 +328,10 @@ let activeScrollPinStop: (() => void) | null = null;
 let scenarioScrollGeneration = 0;
 
 /** Drop pending scroll settle timers/pins after a manual transport interrupt. */
-export function bumpScenarioScrollGeneration(): void {
+export function   bumpScenarioScrollGeneration(): void {
   scenarioScrollGeneration += 1;
   activeScrollPinStop?.();
+  cancelPlaybackScroll("abort");
 }
 
 function resolveScrollEl(scrollEl?: HTMLElement | null): HTMLElement | null {
@@ -332,7 +370,13 @@ function startScrollPin(
   const started = performance.now();
   const tick = () => {
     if (stopped) return;
+    if (isPlaybackScrollAnimating()) {
+      stop();
+      return;
+    }
     applyPin();
+    const pinnedEl = resolveScrollEl(scrollEl);
+    if (pinnedEl) playbackScrollMonitor.onPinApply(pinnedEl.scrollTop);
     if (performance.now() - started < durationMs) {
       requestAnimationFrame(tick);
     } else {
@@ -380,16 +424,40 @@ function scrollFrameInRoot(
   scrollEl.scrollTop += deltaTop - (scrollEl.clientHeight - frameRect.height);
 }
 
+function scrollBottomTop(scrollEl: HTMLElement): number {
+  return Math.max(0, scrollEl.scrollHeight - scrollEl.clientHeight);
+}
+
+function animateScrollToBottom(
+  scrollEl: HTMLElement,
+  durationMs?: number
+): void {
+  void animateScrollTo(scrollEl, scrollBottomTop(scrollEl), {
+    durationMs,
+    resolveTargetTop: () => scrollBottomTop(scrollEl),
+  });
+}
+
 function settleScrollAfterForwardStep(
   frames: HTMLElement[],
   visibleCount: number,
-  scrollEl: HTMLElement | null | undefined
+  scrollEl: HTMLElement | null | undefined,
+  smooth = false
 ): void {
   const el = resolveScrollEl(scrollEl);
   const last = frames[visibleCount - 1];
   if (!el || !last) return;
 
   const tallBubble = last.offsetHeight > el.clientHeight * 0.4;
+  if (smooth) {
+    if (tallBubble) {
+      void animateScrollElementIntoView(last, { scrollEl: el, align: "start" });
+      return;
+    }
+    animateScrollToBottom(el);
+    return;
+  }
+
   if (tallBubble) {
     scrollFrameInRoot(last, el, "start");
     return;
@@ -403,19 +471,28 @@ export function scheduleScenarioScroll(
   visibleCount: number,
   align: ScenarioScrollAlign,
   scrollEl: HTMLElement | null | undefined,
-  _smooth: boolean,
+  smooth: boolean,
   timing: ScenarioScrollTiming = "immediate",
   prevCount = visibleCount
 ): void {
   const generation = scenarioScrollGeneration;
+  const el = resolveScrollEl(scrollEl);
 
   if (timing === "after-init" && align === "end") {
+    if (smooth && el) {
+      animateScrollToBottom(el);
+      return;
+    }
     scrollPrototypeScrollToBottom(scrollEl, "instant");
     pinScenarioScrollToBottomDuring(scrollEl, SCENARIO_SCROLL_INITIAL_MS);
     return;
   }
 
   if (align === "start") {
+    if (smooth && el) {
+      void animateScrollTo(el, 0);
+      return;
+    }
     scrollPrototypeScrollToTop(scrollEl, "instant");
     pinScenarioScrollToTopDuring(scrollEl);
     return;
@@ -423,11 +500,25 @@ export function scheduleScenarioScroll(
 
   const steppedForwardOne = visibleCount === prevCount + 1;
 
+  if (smooth) {
+    window.setTimeout(() => {
+      if (generation !== scenarioScrollGeneration) return;
+      if (steppedForwardOne) {
+        settleScrollAfterForwardStep(frames, visibleCount, scrollEl, true);
+        return;
+      }
+      if (el) {
+        animateScrollToBottom(el);
+      }
+    }, SCENARIO_SCROLL_ANIM_PIN_MS);
+    return;
+  }
+
   pinScenarioScrollToBottomDuring(scrollEl);
   window.setTimeout(() => {
     if (generation !== scenarioScrollGeneration) return;
     if (steppedForwardOne) {
-      settleScrollAfterForwardStep(frames, visibleCount, scrollEl);
+      settleScrollAfterForwardStep(frames, visibleCount, scrollEl, false);
       return;
     }
     scrollPrototypeScrollToBottom(scrollEl, "instant");
@@ -453,3 +544,7 @@ export function runScenarioScrollAfterFrames(
     prevCount
   );
 }
+
+registerPlaybackScrollCancelHook(() => {
+  activeScrollPinStop?.();
+});

@@ -17,6 +17,7 @@ import {
 
 const HOME_SCRIPTS = new Set<HomeScriptId>(["sarah-query-submit"]);
 const AVAIL_SCRIPTS = new Set<AvailabilityScriptId>([
+  "select-location",
   "continue-from-date",
   "select-time-slot",
   "book-now",

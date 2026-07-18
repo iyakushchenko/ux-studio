@@ -52,6 +52,13 @@ const TRADITIONAL_BOOKING_BEATS: ProtoJourneyDefinition["beats"] = [
     tabScript: "book-location-pick",
   },
   {
+    id: "book-step2",
+    label: "Book — date and time",
+    kind: "tab-landing",
+    protoTab: 6,
+    dwellMs: 2800,
+  },
+  {
     id: "book-step2-date",
     label: "Book — date",
     kind: "tab-landing",
@@ -78,11 +85,18 @@ const TRADITIONAL_BOOKING_BEATS: ProtoJourneyDefinition["beats"] = [
 /** After Sarah books from chat-driven Availability Tool (location chosen in overlay). */
 const AGENTIC_POST_AVAIL_BEATS: ProtoJourneyDefinition["beats"] = [
   {
+    id: "book-step2",
+    label: "Book — date and time",
+    kind: "tab-landing",
+    protoTab: 6,
+    onEnter: "apply-demo-location",
+    dwellMs: 2800,
+  },
+  {
     id: "book-step2-date",
     label: "Book — date",
     kind: "tab-landing",
     protoTab: 6,
-    onEnter: "apply-demo-location",
     bookScript: "select-book-date",
   },
   {
@@ -121,9 +135,16 @@ export const AGENTIC_CJM_JOURNEY: ProtoJourneyDefinition = {
       scenarioId: "site-pilot-chat",
     },
     {
+      id: "avail-location",
+      label: "Choose pharmacy",
+      kind: "overlay",
+      availScript: "select-location",
+    },
+    {
       id: "avail-continue",
       label: "Choose date",
       kind: "overlay",
+      onEnter: "open-availability-date-chat",
       availScript: "continue-from-date",
     },
     {

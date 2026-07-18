@@ -162,6 +162,27 @@ export function personaSelectOptions(project: ProtoProjectDefinition) {
   }));
 }
 
+function titleCaseProjectSlug(slug: string): string {
+  return slug.charAt(0).toUpperCase() + slug.slice(1);
+}
+
+/** Brand-only label for the collapsed project dropdown trigger. */
+function projectTriggerLabel(project: ProtoProjectDefinition): string {
+  return titleCaseProjectSlug(project.brand);
+}
+
+/** Full project label for the dropdown panel (e.g. Boots - Pharmacy). */
+function projectMenuLabel(project: ProtoProjectDefinition): string {
+  if (project.subbrand) {
+    return `${titleCaseProjectSlug(project.brand)} - ${titleCaseProjectSlug(project.subbrand)}`;
+  }
+  return project.label;
+}
+
 export function projectSelectOptions(projects: ProtoProjectDefinition[]) {
-  return projects.map((project) => ({ id: project.id, label: project.label }));
+  return projects.map((project) => ({
+    id: project.id,
+    label: projectMenuLabel(project),
+    shortLabel: projectTriggerLabel(project),
+  }));
 }

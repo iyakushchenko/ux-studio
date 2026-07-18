@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type MouseEvent } from "react";
 import { ProtoCloseIcon } from "@/app/chrome/ProtoCloseIcon";
+import { useProtoOverlayDismiss } from "@/app/chrome/useProtoOverlayDismiss";
 import {
   readVaccinesFromPlp,
   type VaccineItem,
@@ -86,6 +87,7 @@ export default function VaccinePickerPopup({
   onClose,
   onSelect,
 }: Props) {
+  const { mounted, scrimClassName, onScrimAnimationEnd } = useProtoOverlayDismiss(open);
   const [vaccines, setVaccines] = useState<VaccineItem[]>([]);
 
   useEffect(() => {
@@ -102,10 +104,15 @@ export default function VaccinePickerPopup({
     if (e.target === e.currentTarget) onClose();
   };
 
-  if (!open) return null;
+  if (!mounted) return null;
 
   return (
-    <div className="proto-avail-scrim" role="presentation" onClick={onScrim}>
+    <div
+      className={scrimClassName}
+      role="presentation"
+      onClick={onScrim}
+      onAnimationEnd={onScrimAnimationEnd}
+    >
       <div
         className="proto-avail-card proto-vaccine-picker-card"
         role="dialog"

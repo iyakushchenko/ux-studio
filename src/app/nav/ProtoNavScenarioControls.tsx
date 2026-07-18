@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
-
+import { ProtoStudioJourneySwitch } from "@/app/nav/ProtoStudioJourneySwitch";
 export type ProtoNavScenarioControlsProps = {
   studioMenus: ReactNode;
   segmentLabel?: string;
@@ -8,9 +8,19 @@ export type ProtoNavScenarioControlsProps = {
   touchpointKey?: string;
   visibleCount: number;
   totalFrames: number;
+  /** False until CJM is on; when off shows `-- / N` with the current playlist total. */
+  stepProgressActive?: boolean;
+  /** FL-style switch — journey mode locks screen nav; counter/label always live when on. */
+  journeyMode?: boolean;
+  onJourneyModeChange?: (enabled: boolean) => void;
+  journeyModeSwitchDisabled?: boolean;
+  /** Playback diagnostic is open — red studio diode beside popup. */
+  playbackErrorActive?: boolean;
   isPlaying: boolean;
-  /** Green studio diode + touchpoint blink — live transport only, not manual step scripts. */
+  /** Green studio diode + touchpoint blink — on-air for auto-play and step-script interactions. */
   isOnAir?: boolean;
+  /** CJM reached the last playlist frame — blue end diode until transport moves. */
+  journeyAtEnd?: boolean;
   /** Increments when auto-playback reaches the final touchpoint. */
   playbackEndToken?: number;
   canStepBack: boolean;
@@ -30,6 +40,15 @@ function CassettePauseIcon() {
     <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden>
       <rect x="1" y="0.5" width="2.25" height="9" rx="0.35" />
       <rect x="6.75" y="0.5" width="2.25" height="9" rx="0.35" />
+    </svg>
+  );
+}
+
+/** ■ stop — shown disabled at journey end. */
+function CassetteStopIcon() {
+  return (
+    <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden>
+      <rect x="1.5" y="1.5" width="7" height="7" rx="0.35" />
     </svg>
   );
 }
@@ -85,6 +104,16 @@ function CassetteJumpToEndIcon() {
   );
 }
 
+function formatStepCounter(
+  visibleCount: number,
+  totalFrames: number,
+  stepProgressActive: boolean
+): string {
+  if (totalFrames <= 0) return "—";
+  if (!stepProgressActive) return `-- / ${totalFrames}`;
+  return `${visibleCount} / ${totalFrames}`;
+}
+
 /** Nav “control room” — 90s cassette-deck scenario playback. */
 export function ProtoNavScenarioControls({
   studioMenus,
@@ -92,8 +121,14 @@ export function ProtoNavScenarioControls({
   touchpointKey,
   visibleCount,
   totalFrames,
+  stepProgressActive = false,
+  journeyMode = false,
+  onJourneyModeChange,
+  journeyModeSwitchDisabled = false,
+  playbackErrorActive = false,
   isPlaying,
   isOnAir = isPlaying,
+  journeyAtEnd = false,
   playbackEndToken = 0,
   canStepBack,
   canStepForward,
@@ -109,7 +144,7 @@ export function ProtoNavScenarioControls({
   const STEP_DIODE_MS = 300;
   const CLICK_DIODE_MS = 300;
   const [blinkToken, setBlinkToken] = useState(0);
-  const [diodeEndActive, setDiodeEndActive] = useState(false);
+  const [diodeEndPulse, setDiodeEndPulse] = useState(false);
   const [stepBlinkActive, setStepBlinkActive] = useState(false);
   const [clickBlinkActive, setClickBlinkActive] = useState(false);
   const [stepBlinkToken, setStepBlinkToken] = useState(0);
@@ -134,10 +169,17 @@ export function ProtoNavScenarioControls({
       return;
     }
     prevPlaybackEndTokenRef.current = playbackEndToken;
-    setDiodeEndActive(true);
-    const timer = window.setTimeout(() => setDiodeEndActive(false), 3000);
+    if (journeyAtEnd) return;
+    setDiodeEndPulse(true);
+    const timer = window.setTimeout(() => setDiodeEndPulse(false), 3000);
     return () => window.clearTimeout(timer);
-  }, [playbackEndToken]);
+  }, [journeyAtEnd, playbackEndToken]);
+
+  useEffect(() => {
+    if (journeyAtEnd) {
+      setDiodeEndPulse(false);
+    }
+  }, [journeyAtEnd]);
 
   useEffect(() => {
     if (!touchpointKey || !isOnAir) return;
@@ -216,20 +258,31 @@ export function ProtoNavScenarioControls({
     onJumpToEnd();
   };
 
+  const showEndDiode =
+    (journeyAtEnd || diodeEndPulse) && !playbackErrorActive && !isOnAir;
+  const transportAtEnd = journeyAtEnd && !isOnAir;
+  const playShowsStop = transportAtEnd;
+  const playShowsPause = !playShowsStop && isOnAir;
+  const playDisabled =
+    !journeyMode ||
+    transportAtEnd ||
+    (!isOnAir && !isPlaying && !canPlay);
   const onAirClass = isOnAir ? " proto-nav-scenario--on-air" : "";
-  const diodeEndClass = diodeEndActive && !isOnAir ? " proto-nav-scenario__on-air--end" : "";
+  const journeyModeClass = journeyMode ? " proto-nav-scenario--journey-mode" : "";
+  const diodeErrorClass = playbackErrorActive ? " proto-nav-scenario__on-air--error" : "";
+  const diodeEndClass = showEndDiode ? " proto-nav-scenario__on-air--end" : "";
   const diodeStepClass =
-    stepBlinkActive && !isOnAir && !diodeEndActive
+    stepBlinkActive && !isOnAir && !showEndDiode && !playbackErrorActive
       ? " proto-nav-scenario__on-air--step"
       : "";
   const diodeClickClass =
-    clickBlinkActive && isOnAir && !diodeEndActive
+    clickBlinkActive && isOnAir && !showEndDiode && !playbackErrorActive
       ? " proto-nav-scenario__on-air--click"
       : "";
 
   return (
     <div
-      className={`proto-nav-scenario${onAirClass}`}
+      className={`proto-nav-scenario${onAirClass}${journeyModeClass}`}
       role="group"
     >
       {studioMenus}
@@ -243,20 +296,27 @@ export function ProtoNavScenarioControls({
           {segmentLabel}
         </span>
       ) : null}
-      <span className="proto-nav-scenario__counter" aria-live="polite">
-        {totalFrames > 0 ? `${visibleCount}/${totalFrames}` : "—"}
-      </span>
       <div className="proto-nav-scenario__deck">
+        {onJourneyModeChange ? (
+          <ProtoStudioJourneySwitch
+            checked={journeyMode}
+            onChange={onJourneyModeChange}
+            disabled={journeyModeSwitchDisabled}
+          />
+        ) : null}
+        <span className="proto-nav-scenario__counter" aria-live="polite">
+          {formatStepCounter(visibleCount, totalFrames, stepProgressActive)}
+        </span>
         <div className="proto-nav-scenario__deck-led" aria-hidden>
           <span
             key={
-              diodeEndActive
+              showEndDiode
                 ? "diode-end"
                 : stepBlinkActive
                   ? `step-${stepBlinkToken}`
                   : "diode-idle"
             }
-            className={`proto-nav-scenario__on-air${diodeEndClass}${diodeStepClass}${diodeClickClass}`}
+            className={`proto-nav-scenario__on-air${diodeErrorClass}${diodeEndClass}${diodeStepClass}${diodeClickClass}`}
           >
             <span className="proto-nav-scenario__on-air-dot" />
             <span className="proto-nav-scenario__on-air-halo" />
@@ -265,7 +325,7 @@ export function ProtoNavScenarioControls({
         <button
           type="button"
           className="proto-nav-step-btn proto-nav-scenario__btn"
-          disabled={!canJumpToStart}
+          disabled={!journeyMode || !canJumpToStart}
           onClick={handleJumpToStart}
         >
           <CassetteJumpToStartIcon />
@@ -273,7 +333,7 @@ export function ProtoNavScenarioControls({
         <button
           type="button"
           className="proto-nav-step-btn proto-nav-scenario__btn"
-          disabled={!canStepBack}
+          disabled={!journeyMode || !canStepBack}
           onClick={handleStepBack}
         >
           <CassetteStepBackIcon />
@@ -288,17 +348,23 @@ export function ProtoNavScenarioControls({
           <button
             type="button"
             className="proto-nav-step-btn proto-nav-scenario__btn proto-nav-scenario__btn--play"
-            aria-pressed={isPlaying}
-            disabled={!isPlaying && !canPlay}
+            aria-pressed={isOnAir}
+            disabled={playDisabled}
             onClick={onPlay}
           >
-            {isPlaying ? <CassettePauseIcon /> : <CassettePlayIcon />}
+            {playShowsPause ? (
+              <CassettePauseIcon />
+            ) : playShowsStop ? (
+              <CassetteStopIcon />
+            ) : (
+              <CassettePlayIcon />
+            )}
           </button>
         </div>
         <button
           type="button"
           className="proto-nav-step-btn proto-nav-scenario__btn"
-          disabled={!canStepForward}
+          disabled={!journeyMode || transportAtEnd || !canStepForward}
           onClick={handleStepForward}
         >
           <CassetteStepForwardIcon />
@@ -306,7 +372,7 @@ export function ProtoNavScenarioControls({
         <button
           type="button"
           className="proto-nav-step-btn proto-nav-scenario__btn"
-          disabled={!canJumpToEnd}
+          disabled={!journeyMode || transportAtEnd || !canJumpToEnd}
           onClick={handleJumpToEnd}
         >
           <CassetteJumpToEndIcon />

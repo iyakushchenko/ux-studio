@@ -1,5 +1,6 @@
 import { useEffect, useState, type MouseEvent } from "react";
 import { ProtoCloseIcon } from "@/app/chrome/ProtoCloseIcon";
+import { useProtoOverlayDismiss } from "@/app/chrome/useProtoOverlayDismiss";
 
 export type RecipientMode = "myself" | "someone-else";
 
@@ -44,6 +45,7 @@ export default function RecipientPickerPopup({
   onClose,
   onSelect,
 }: Props) {
+  const { mounted, scrimClassName, onScrimAnimationEnd } = useProtoOverlayDismiss(open);
   const [draft, setDraft] = useState<RecipientMode>(selected);
 
   useEffect(() => {
@@ -59,10 +61,15 @@ export default function RecipientPickerPopup({
     onClose();
   };
 
-  if (!open) return null;
+  if (!mounted) return null;
 
   return (
-    <div className="proto-avail-scrim" role="presentation" onClick={onScrim}>
+    <div
+      className={scrimClassName}
+      role="presentation"
+      onClick={onScrim}
+      onAnimationEnd={onScrimAnimationEnd}
+    >
       <div
         className="proto-avail-card proto-recipient-picker-card"
         role="dialog"

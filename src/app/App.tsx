@@ -14,7 +14,8 @@ import {
   resolveStudioTouchpoint,
   buildStudioTouchpointPlaylist,
   resolveStudioTouchpointProgress,
-  DEFAULT_CHAT_SCENARIO_FRAMES,
+  resolveStudioTouchpointProgressForBeat,
+  resolveStableChatScenarioPlaylistFrames,
 } from "@/app/nav/resolveStudioTouchpoint";
 import { useProtoScenarioPlayback, type PlaybackStepHooks } from "@/app/nav/useProtoScenarioPlayback";
 import {
@@ -23,10 +24,16 @@ import {
 } from "@/app/orchestra/resolveActiveScreenScenario";
 import {
   getJourneyForMode,
+  resolveBeatIndexForScreenTab,
   resolveJourneyStartBeat,
 } from "@/app/orchestra/journeyUtils";
 import type { JourneyRuntime, ProtoJourneyDefinition, ProtoOrchestraModeId } from "@/app/orchestra/types";
 import type { ProtoPersonaId, ProtoProjectId, ProtoProjectWireApi } from "@/projects/types";
+import {
+  removeDemoCursor,
+  resetDemoCursorTravelOrigin,
+  setDemoCursorJourneyMode,
+} from "@/app/proto/protoDemoCursor";
 import { useProtoJourneyPlayback } from "@/app/orchestra/useProtoJourneyPlayback";
 import {
   createShouldSkipBeat,
@@ -35,6 +42,22 @@ import {
   useProtoStudio,
 } from "@/app/shell/useProtoStudio";
 import { ProtoProjectPlaceholder } from "@/app/shell/ProtoProjectPlaceholder";
+import { ProtoPlaybackShield } from "@/app/shell/ProtoPlaybackShield";
+import { ProtoPlaybackDiagnosticOverlay } from "@/app/shell/ProtoPlaybackDiagnosticOverlay";
+import type { PlaybackDiagnosticError } from "@/app/shell/protoPlaybackDiagnostic";
+import {
+  buildPlaybackStudioSnapshot,
+  enrichPlaybackDiagnosticSnapshot,
+  type PlaybackStudioSnapshot,
+} from "@/app/shell/playbackStudioSnapshot";
+import { useProtoPlaybackGuard } from "@/app/shell/useProtoPlaybackGuard";
+import { useProtoPlaybackScrollGuard } from "@/app/shell/useProtoPlaybackScrollGuard";
+import { useProtoPlaybackCursorGuard } from "@/app/shell/useProtoPlaybackCursorGuard";
+import { useProtoPlaybackDirectorGuard } from "@/app/shell/useProtoPlaybackDirectorGuard";
+import { useProtoPlaybackTransportGuard } from "@/app/shell/useProtoPlaybackTransportGuard";
+import { useProtoPlaybackViewportGuard } from "@/app/shell/useProtoPlaybackViewportGuard";
+import { playbackCursorMonitor } from "@/app/shell/protoPlaybackCursorMonitor";
+import { playbackViewportMonitor } from "@/app/shell/protoPlaybackViewportMonitor";
 import {
   readStoredHubOpen,
   readStoredNavIndex,
@@ -43,10 +66,12 @@ import {
   protoNavStorageKey,
 } from "@/app/shell/protoNavStorage";
 import { getProjectWire } from "@/projects/registry";
+import { useProtoNavTransition } from "@/app/shell/useProtoNavTransition";
 import type { AvailOpenIntent } from "@/projects/boots-pharmacy/overlays/AvailabilityTool";
 import {
   collectSitePilotChatScenarioFrames,
   ensureSitePilotChatComposerDock,
+  syncSitePilotChatComposerDock,
 } from "@/projects/boots-pharmacy/dom/protoSitePilotChatScenario";
 import {
   abortSitePilotChatPlaybackPrelude,
@@ -93,7 +118,19 @@ export default function App() {
   );
   const [hubOpen, setHubOpen] = useState(() => readStoredHubOpen(studioProjectId));
   const [wireTick, setWireTick] = useState(0);
+  const [playbackDiagnostic, setPlaybackDiagnostic] =
+    useState<PlaybackDiagnosticError | null>(null);
+  const [studioJourneyMode, setStudioJourneyMode] = useState(false);
+  const stopAllPlaybackRef = useRef<() => void>(() => {});
+  const playbackSnapshotRef = useRef<PlaybackStudioSnapshot>({});
   const onWireApiChange = useCallback(() => setWireTick((t) => t + 1), []);
+
+  const handlePlaybackDiagnostic = useCallback((error: PlaybackDiagnosticError) => {
+    stopAllPlaybackRef.current();
+    setPlaybackDiagnostic((prev) =>
+      prev ?? enrichPlaybackDiagnosticSnapshot(error, playbackSnapshotRef.current)
+    );
+  }, []);
 
   const hubScrollElRef = useRef<HTMLDivElement>(null);
   const prototypeScrollElRef = useRef<HTMLDivElement>(null);
@@ -104,6 +141,13 @@ export default function App() {
   const goRef = useRef<(i: number) => void>(() => {});
   const currentRef = useRef(current);
   const navPlaybackLockedRef = useRef(false);
+  const navTransportLockedRef = useRef(false);
+  const runNavTransitionRef = useRef<
+    (apply: () => void, options?: { instant?: boolean }) => void
+  >((apply) => {
+    apply();
+  });
+  const studioJourneyModeRef = useRef(false);
   const openAvailabilityToolRef = useRef<(intent?: AvailOpenIntent) => void>(() => {});
   const closeAvailabilityToolRef = useRef<() => void>(() => {});
   const screenFadeChildRef = useRef<number | null>(null);
@@ -134,8 +178,11 @@ export default function App() {
 
   const journeyRuntime = useMemo<JourneyRuntime>(
     () => ({
-      goToTab: (screenIndex: number) => {
-        setCurrent(screenIndex);
+      goToTab: (screenIndex: number, options?: { instant?: boolean }) => {
+        runNavTransitionRef.current(
+          () => setCurrent(screenIndex),
+          options?.instant ? { instant: true } : undefined
+        );
       },
       openAvailability: (intent?: unknown) => {
         openAvailabilityToolRef.current(
@@ -144,6 +191,9 @@ export default function App() {
       },
       closeAvailability: () => {
         closeAvailabilityToolRef.current();
+      },
+      closeAllPopups: () => {
+        wireApiRef.current?.closeAllPopups();
       },
       applyDemoLocation: () => {
         wireApiRef.current?.applyDemoLocation();
@@ -229,6 +279,7 @@ export default function App() {
       activeScreenScenario?.id === "site-pilot-chat"
         ? sitePilotChatPlaybackHooks
         : undefined,
+    onDiagnostic: handlePlaybackDiagnostic,
   });
 
   const headerLoggedIn = useMemo(
@@ -242,42 +293,24 @@ export default function App() {
     [studioPersona, headerLoggedIn]
   );
 
-  const journeyPlayback = useProtoJourneyPlayback({
-    active: !hubOpen,
-    journey: activeJourney,
-    beatIndex: journeyBeatIndex,
-    setBeatIndex: setJourneyBeatIndex,
-    currentTabIndex: current,
-    runtime: journeyRuntime,
-    screenPlayback: scenarioPlayback,
-    screenBeatActive: activeScreenScenario != null,
-    shouldSkipBeat,
-    playback: projectPlayback,
-    protoTabToIndex,
-  });
-
-  scenarioIsPlayingRef.current = scenarioPlayback.isPlaying;
-  resumeJourneyPlayRef.current = journeyPlayback.resumeJourneyPlay;
-
-  const transport = journeyPlayback;
-  const navPlaybackLocked =
-    transport.isPlaying || transport.isPausingBeforeReveal;
-  navPlaybackLockedRef.current = navPlaybackLocked;
-
-  const chatFramesForPlaylist =
-    scenarioPlayback.totalFrames > 0
-      ? scenarioPlayback.totalFrames
-      : DEFAULT_CHAT_SCENARIO_FRAMES;
+  const stableChatPlaylistFrames = resolveStableChatScenarioPlaylistFrames(
+    "site-pilot-chat"
+  );
 
   const wire = wireApiRef.current;
 
   const studioPlaylist = useMemo(
     () =>
-      buildStudioTouchpointPlaylist(activeJourney, chatFramesForPlaylist, {
-        shouldSkipBeat: (beat) => shouldSkipBeat(beat),
+      buildStudioTouchpointPlaylist(activeJourney, stableChatPlaylistFrames, {
+        shouldSkipBeat,
         popupTouchpoints: studioProject.popupTouchpoints,
       }),
-    [activeJourney, chatFramesForPlaylist, shouldSkipBeat, studioProject.popupTouchpoints]
+    [
+      activeJourney,
+      shouldSkipBeat,
+      stableChatPlaylistFrames,
+      studioProject.popupTouchpoints,
+    ]
   );
 
   const studioTouchpoint = useMemo(() => {
@@ -302,7 +335,7 @@ export default function App() {
         activeScreenScenario?.id === "site-pilot-chat"
           ? scenarioPlayback.visibleCount
           : undefined,
-      chatFrameTotal: chatFramesForPlaylist,
+      chatFrameTotal: stableChatPlaylistFrames,
       chatPausingBeforeReveal:
         activeScreenScenario?.id === "site-pilot-chat"
           ? scenarioPlayback.isPausingBeforeReveal
@@ -321,21 +354,166 @@ export default function App() {
     activeScreenScenario?.id,
     scenarioPlayback.visibleCount,
     scenarioPlayback.isPausingBeforeReveal,
-    chatFramesForPlaylist,
+    stableChatPlaylistFrames,
     SCREENS,
   ]);
 
-  const studioProgress = useMemo(
-    () => resolveStudioTouchpointProgress(studioPlaylist, studioTouchpoint.key),
-    [studioPlaylist, studioTouchpoint.key]
-  );
+  const journeyPlayback = useProtoJourneyPlayback({
+    active: !hubOpen,
+    journey: activeJourney,
+    beatIndex: journeyBeatIndex,
+    setBeatIndex: setJourneyBeatIndex,
+    currentTabIndex: current,
+    runtime: journeyRuntime,
+    screenPlayback: scenarioPlayback,
+    screenBeatActive: activeScreenScenario != null,
+    shouldSkipBeat,
+    playback: projectPlayback,
+    protoTabToIndex,
+    studioPlaylist,
+    currentTouchpointKey: studioTouchpoint.key,
+    onDiagnostic: handlePlaybackDiagnostic,
+  });
+
+  useEffect(() => {
+    stopAllPlaybackRef.current = () => {
+      journeyPlayback.stopJourneyPlay();
+      scenarioPlayback.abortPlayback();
+    };
+  }, [journeyPlayback, scenarioPlayback]);
+
+  useEffect(() => {
+    if (!playbackDiagnostic) return;
+    stopAllPlaybackRef.current();
+  }, [playbackDiagnostic]);
+
+  scenarioIsPlayingRef.current = scenarioPlayback.isPlaying;
+  resumeJourneyPlayRef.current = journeyPlayback.resumeJourneyPlay;
+
+  const transport = journeyPlayback;
+  const navTransportLocked =
+    transport.isPlaying || transport.isPausingBeforeReveal;
+  const navBrowseLocked = navTransportLocked || studioJourneyMode;
+  navPlaybackLockedRef.current = navBrowseLocked;
+  navTransportLockedRef.current = navTransportLocked;
+  studioJourneyModeRef.current = studioJourneyMode;
+
+  useEffect(() => {
+    setDemoCursorJourneyMode(studioJourneyMode, {
+      parkAfterInteraction: studioJourneyMode && !transport.isPlaying,
+    });
+    if (!studioJourneyMode) {
+      removeDemoCursor();
+      resetDemoCursorTravelOrigin();
+    }
+  }, [studioJourneyMode, transport.isPlaying]);
+
+  const { runNavTransition, navTransitionClass } = useProtoNavTransition();
+  runNavTransitionRef.current = runNavTransition;
+  /** Blocks wire clicks in journey mode or while transport scripts run. */
+  const wireInteractionShield = studioJourneyMode || navTransportLocked;
+  /** Not-allowed cursor only while cassette is actively playing/scripting. */
+  const wirePlaybackCursorLocked = navTransportLocked;
+  const studioProgress = useMemo(() => {
+    const totalFrames = studioPlaylist.length;
+    if (!studioJourneyMode) {
+      return { visibleCount: 0, totalFrames };
+    }
+
+    const currentBeat = activeJourney?.beats[journeyBeatIndex];
+    const touchpointProgress = resolveStudioTouchpointProgressForBeat(
+      studioPlaylist,
+      studioTouchpoint.key,
+      currentBeat
+    );
+    let visibleCount = touchpointProgress.visibleCount;
+    if (!hubOpen && activeJourney) {
+      const screenBeatIndex = resolveBeatIndexForScreenTab(
+        activeJourney,
+        current,
+        shouldSkipBeat
+      );
+      const screenBeat = activeJourney.beats[screenBeatIndex];
+      if (screenBeat) {
+        const screenProgress = resolveStudioTouchpointProgress(
+          studioPlaylist,
+          `beat:${screenBeat.id}`
+        );
+        visibleCount = Math.max(visibleCount, screenProgress.visibleCount);
+      }
+    }
+    return {
+      visibleCount: Math.min(visibleCount, totalFrames),
+      totalFrames,
+    };
+  }, [
+    activeJourney,
+    current,
+    hubOpen,
+    journeyBeatIndex,
+    shouldSkipBeat,
+    studioJourneyMode,
+    studioPlaylist,
+    studioTouchpoint.key,
+  ]);
+
+  const journeyAtEnd =
+    studioJourneyMode &&
+    studioProgress.totalFrames > 0 &&
+    studioProgress.visibleCount >= studioProgress.totalFrames;
 
   const resetStudioPlayback = useCallback(() => {
     journeyPlayback.stopJourneyPlay();
-    scenarioPlayback.resetToEnd();
+    scenarioPlayback.jumpToStart();
     journeyPlayback.resetJourney();
     resetBeatIndex();
+    setStudioJourneyMode(false);
+    wireApiRef.current?.resetWireInteractionState();
+    removeDemoCursor();
+    resetDemoCursorTravelOrigin();
   }, [journeyPlayback, resetBeatIndex, scenarioPlayback]);
+
+  const journeyBootSyncKeyRef = useRef<string | null>(null);
+
+  const syncJourneyBeatToScreen = useCallback(
+    (screenIndex: number) => {
+      journeyPlayback.stopJourneyPlay();
+      scenarioPlayback.cancelPreRevealPause();
+      scenarioPlayback.jumpToStart();
+      setJourneyBeatIndex(
+        resolveBeatIndexForScreenTab(activeJourney, screenIndex, shouldSkipBeat)
+      );
+    },
+    [
+      activeJourney,
+      journeyPlayback,
+      scenarioPlayback,
+      setJourneyBeatIndex,
+      shouldSkipBeat,
+    ]
+  );
+
+  useEffect(() => {
+    if (hubOpen || !activeJourney) return;
+    const bootKey = `${studioProjectId}:${studioPersonaId}:${orchestraModeId}`;
+    if (journeyBootSyncKeyRef.current === bootKey) return;
+    journeyBootSyncKeyRef.current = bootKey;
+
+    scenarioPlayback.jumpToStart();
+    setJourneyBeatIndex(
+      resolveBeatIndexForScreenTab(activeJourney, current, shouldSkipBeat)
+    );
+  }, [
+    hubOpen,
+    activeJourney,
+    studioProjectId,
+    studioPersonaId,
+    orchestraModeId,
+    current,
+    shouldSkipBeat,
+    scenarioPlayback,
+    setJourneyBeatIndex,
+  ]);
 
   const applyJourneyStartTab = useCallback(
     (journey: ProtoJourneyDefinition | undefined) => {
@@ -345,18 +523,55 @@ export default function App() {
       );
       setJourneyBeatIndex(startIndex);
       if (beat?.protoTab != null) {
-        setHubOpen(false);
-        setCurrent(protoTabToIndex(beat.protoTab));
+        const tabIndex = protoTabToIndex(beat.protoTab);
+        runNavTransitionRef.current(() => {
+          setHubOpen(false);
+          setCurrent(tabIndex);
+          if (SCREENS[tabIndex]?.childIndex !== 10) {
+            wireApiRef.current?.resetPrototypeScroll();
+          }
+        });
       }
     },
-    [protoTabToIndex, setJourneyBeatIndex, shouldSkipBeat]
+    [protoTabToIndex, setJourneyBeatIndex, shouldSkipBeat, SCREENS]
+  );
+
+  const restartStudioJourney = useCallback(() => {
+    journeyPlayback.stopJourneyPlay();
+    scenarioPlayback.cancelPreRevealPause();
+    scenarioPlayback.jumpToStart();
+    journeyPlayback.resetJourney();
+    wireApiRef.current?.closeAllPopups();
+    wireApiRef.current?.resetWireInteractionState();
+    removeDemoCursor();
+    resetDemoCursorTravelOrigin();
+    applyJourneyStartTab(activeJourney);
+  }, [
+    activeJourney,
+    applyJourneyStartTab,
+    journeyPlayback,
+    scenarioPlayback,
+  ]);
+
+  const handleStudioJourneyModeChange = useCallback(
+    (enabled: boolean) => {
+      if (enabled) {
+        setHubOpen(false);
+        setStudioJourneyMode(true);
+        restartStudioJourney();
+        return;
+      }
+
+      setStudioJourneyMode(false);
+      journeyPlayback.stopJourneyPlay();
+      scenarioPlayback.cancelPreRevealPause();
+    },
+    [journeyPlayback, restartStudioJourney, scenarioPlayback]
   );
 
   const handleOrchestraModeChange = useCallback(
     (next: ProtoOrchestraModeId) => {
       resetStudioPlayback();
-      wireApiRef.current?.closeAllPopups();
-      wireApiRef.current?.resetPrototypeScroll();
 
       if (next !== orchestraModeId) {
         setOrchestraModeId(next);
@@ -454,12 +669,141 @@ export default function App() {
     SCREENS,
   ]);
 
+  const currentBeat = activeJourney?.beats[journeyBeatIndex];
+
+  playbackSnapshotRef.current = buildPlaybackStudioSnapshot({
+    projectId: studioProjectId,
+    personaId: studioPersonaId,
+    orchestraModeId,
+    journeyId: activeJourney?.id,
+    beatIndex: journeyBeatIndex,
+    beatCount: activeJourney?.beats.length ?? 0,
+    currentBeat,
+    currentTabIndex: current,
+    childIndex: hubOpen ? null : (SCREENS[current]?.childIndex ?? null),
+    touchpointKey: studioTouchpoint.key,
+    touchpointLabel: studioTouchpoint.label,
+    scenarioProgress: `${studioProgress.visibleCount}/${studioProgress.totalFrames}`,
+    hubOpen,
+    wire,
+  });
+
+  useProtoPlaybackGuard({
+    snapshot: {
+      isOnAir: transport.isOnAir,
+      isScripting: transport.isScripting,
+      isPausingBeforeReveal: scenarioPlayback.isPausingBeforeReveal,
+      beatId: currentBeat?.id,
+      beatLabel: currentBeat?.label,
+      journeyId: activeJourney?.id,
+      touchpointKey: studioTouchpoint.key,
+      touchpointLabel: studioTouchpoint.label,
+      visibleProgress: `${studioProgress.visibleCount}/${studioProgress.totalFrames}`,
+      availabilityOpen: wire?.availabilityOpen,
+      availStep: wire?.availActiveStep ?? wire?.availIntent?.step ?? null,
+    },
+    currentBeat,
+    onDiagnostic: handlePlaybackDiagnostic,
+  });
+
+  useProtoPlaybackScrollGuard({
+    snapshot: {
+      isOnAir: transport.isOnAir,
+      isPausingBeforeReveal: transport.isPausingBeforeReveal,
+      journeyMode: studioJourneyMode,
+      journeyAtEnd,
+      childIndex: hubOpen ? null : (SCREENS[current]?.childIndex ?? null),
+      protoTab: currentBeat?.protoTab ?? null,
+      journeyId: activeJourney?.id,
+      beatId: currentBeat?.id,
+      beatLabel: currentBeat?.label,
+      touchpointLabel: studioTouchpoint.label,
+      visibleProgress: `${studioProgress.visibleCount}/${studioProgress.totalFrames}`,
+    },
+    currentBeat,
+    scrollRootRef: prototypeScrollElRef,
+    onDiagnostic: handlePlaybackDiagnostic,
+  });
+
+  useProtoPlaybackCursorGuard({
+    snapshot: {
+      active: !hubOpen,
+      isOnAir: transport.isOnAir,
+      isPausingBeforeReveal: transport.isPausingBeforeReveal,
+      journeyMode: studioJourneyMode,
+      childIndex: hubOpen ? null : (SCREENS[current]?.childIndex ?? null),
+      journeyId: activeJourney?.id,
+      beatId: currentBeat?.id,
+      beatLabel: currentBeat?.label,
+      touchpointLabel: studioTouchpoint.label,
+      visibleProgress: `${studioProgress.visibleCount}/${studioProgress.totalFrames}`,
+    },
+    currentBeat,
+    onDiagnostic: handlePlaybackDiagnostic,
+  });
+
+  useProtoPlaybackDirectorGuard({
+    snapshot: {
+      active: !hubOpen,
+      journeyId: activeJourney?.id,
+      beatId: currentBeat?.id,
+      beatLabel: currentBeat?.label,
+      touchpointLabel: studioTouchpoint.label,
+      visibleProgress: `${studioProgress.visibleCount}/${studioProgress.totalFrames}`,
+    },
+    currentBeat,
+    onDiagnostic: handlePlaybackDiagnostic,
+  });
+
+  useProtoPlaybackTransportGuard({
+    snapshot: {
+      active: !hubOpen,
+      journeyMode: studioJourneyMode,
+      isOnAir: transport.isOnAir,
+      isScripting: transport.isScripting,
+      journeyId: activeJourney?.id,
+      beatId: currentBeat?.id,
+      beatLabel: currentBeat?.label,
+      touchpointKey: studioTouchpoint.key,
+      touchpointLabel: studioTouchpoint.label,
+      visibleProgress: `${studioProgress.visibleCount}/${studioProgress.totalFrames}`,
+      playlist: studioPlaylist,
+      transportStepToken: transport.transportStepToken,
+    },
+    currentBeat,
+    onDiagnostic: handlePlaybackDiagnostic,
+  });
+
+  const screenFramesBeat =
+    activeScreenScenario != null &&
+    activeJourney?.beats[journeyBeatIndex]?.kind === "screen-frames";
+
+  useProtoPlaybackViewportGuard({
+    snapshot: {
+      active: !hubOpen,
+      isOnAir: transport.isOnAir,
+      isPausingBeforeReveal: transport.isPausingBeforeReveal,
+      screenFramesBeat,
+      childIndex: hubOpen ? null : (SCREENS[current]?.childIndex ?? null),
+      journeyId: activeJourney?.id,
+      beatId: currentBeat?.id,
+      beatLabel: currentBeat?.label,
+      touchpointKey: studioTouchpoint.key,
+      touchpointLabel: studioTouchpoint.label,
+      visibleProgress: `${studioProgress.visibleCount}/${studioProgress.totalFrames}`,
+      journeyBeats: activeJourney?.beats,
+    },
+    currentBeat,
+    scrollRootRef: prototypeScrollElRef,
+    onDiagnostic: handlePlaybackDiagnostic,
+  });
+
   useLayoutEffect(() => {
     const scrollEl = prototypeScrollElRef.current;
-    const atFrameStart =
+    const onChatScreen =
       SCREENS[current]?.childIndex === 10 &&
-      activeScreenScenario?.id === "site-pilot-chat" &&
-      scenarioPlayback.visibleCount <= 1;
+      activeScreenScenario?.id === "site-pilot-chat";
+    const atFrameStart = onChatScreen && scenarioPlayback.visibleCount <= 1;
 
     scrollEl?.classList.toggle("proto-chat-scenario-at-start", atFrameStart);
 
@@ -469,6 +813,9 @@ export default function App() {
     if (screen) {
       if (atFrameStart) screen.setAttribute("data-proto-scenario-at-start", "true");
       else screen.removeAttribute("data-proto-scenario-at-start");
+      if (onChatScreen) {
+        syncSitePilotChatComposerDock(screen);
+      }
     }
 
     if (atFrameStart && scrollEl) {
@@ -480,44 +827,51 @@ export default function App() {
       scrollEl?.classList.remove("proto-chat-scenario-at-start");
       screen?.removeAttribute("data-proto-scenario-at-start");
     };
-  }, [current, activeScreenScenario?.id, scenarioPlayback.visibleCount, SCREENS]);
+  }, [
+    current,
+    activeScreenScenario?.id,
+    scenarioPlayback.visibleCount,
+    SCREENS,
+  ]);
 
   const isProtoPristine =
     (wire?.wirePristine ?? true) && !transport.isDirty;
 
   const go = useCallback(
     (i: number) => {
-      if (navPlaybackLockedRef.current) return;
+      if (navPlaybackLockedRef.current || studioJourneyModeRef.current) return;
       const wasHub = hubOpen;
-      if (wasHub) wireApiRef.current?.saveHubScroll();
       const next = Math.max(0, Math.min(SCREENS.length - 1, i));
-      if (wasHub || next !== current) {
+      if (!wasHub && next === current) return;
+
+      runNavTransitionRef.current(() => {
+        if (wasHub) wireApiRef.current?.saveHubScroll();
         wireApiRef.current?.closeAllPopups();
-      }
-      setHubOpen(false);
-      if (wasHub || next !== current) {
+        syncJourneyBeatToScreen(next);
+        setHubOpen(false);
         if (SCREENS[next]?.childIndex !== 10) {
           wireApiRef.current?.resetPrototypeScroll();
         }
-      }
-      setCurrent(next);
+        setCurrent(next);
+      });
     },
-    [current, hubOpen, SCREENS]
+    [current, hubOpen, SCREENS, syncJourneyBeatToScreen]
   );
   goRef.current = go;
 
   const openHub = useCallback(() => {
-    if (navPlaybackLockedRef.current) return;
-    if (hubOpen) {
-      wireApiRef.current?.saveHubScroll();
-      setHubOpen(false);
-      wireApiRef.current?.resetPrototypeScroll();
-      return;
-    }
+    runNavTransitionRef.current(() => {
+      if (hubOpen) {
+        wireApiRef.current?.saveHubScroll();
+        setHubOpen(false);
+        wireApiRef.current?.resetPrototypeScroll();
+        return;
+      }
 
-    wireApiRef.current?.closeAllPopups();
-    wireApiRef.current?.savePrototypeScroll();
-    setHubOpen(true);
+      wireApiRef.current?.closeAllPopups();
+      wireApiRef.current?.savePrototypeScroll();
+      setHubOpen(true);
+    });
   }, [hubOpen]);
 
   const resetPrototype = useCallback(() => {
@@ -563,11 +917,15 @@ export default function App() {
     }
   }, [current]);
 
+  const transitionSetCurrent = useCallback((index: number) => {
+    runNavTransitionRef.current(() => setCurrent(index));
+  }, []);
+
   const bridge = useMemo(
     () => ({
       projectId: studioProjectId,
       current,
-      setCurrent,
+      setCurrent: transitionSetCurrent,
       hubOpen,
       setHubOpen,
       studio,
@@ -575,7 +933,7 @@ export default function App() {
       scenarioPlayback,
       activeScreenScenarioId: activeScreenScenario?.id ?? null,
       showOrchestraControls,
-      navPlaybackLocked,
+      navPlaybackLocked: navBrowseLocked,
       prototypeScrollElRef,
       hubScrollElRef,
       appContentRef,
@@ -615,10 +973,13 @@ export default function App() {
       scenarioPlayback,
       activeScreenScenario,
       showOrchestraControls,
-      navPlaybackLocked,
+      navBrowseLocked,
+      navTransportLocked,
+      studioJourneyMode,
       isProtoPristine,
       go,
       openHub,
+      transitionSetCurrent,
       resetPrototype,
       onWireApiChange,
       transport,
@@ -627,11 +988,26 @@ export default function App() {
 
   const WireComponent = getProjectWire(studioProjectId);
 
+  const projectStudioSelect = (
+    <ProtoNavStudioSelect
+      options={projectSelectOptions(studioProjects)}
+      value={studioProjectId}
+      onChange={handleStudioProjectChange}
+      ariaLabel="Project"
+      isPlaying={transport.isPlaying}
+      controlsLocked={transport.isPausingBeforeReveal || studioJourneyMode}
+    />
+  );
+
   return (
     <div
       className="proto-app-root flex flex-col h-full max-h-[100dvh] overflow-hidden"
       style={{ fontFamily: "'Open Sans', sans-serif" }}
     >
+      <ProtoPlaybackDiagnosticOverlay
+        error={playbackDiagnostic}
+        onDismiss={() => setPlaybackDiagnostic(null)}
+      />
 
       <ProtoNavPanel
         screens={SCREENS}
@@ -640,7 +1016,9 @@ export default function App() {
         hubOpen={hubOpen}
         navLabel={navLabel}
         isProtoPristine={isProtoPristine}
-        navPlaybackLocked={navPlaybackLocked}
+        navBrowseLocked={navBrowseLocked}
+        navResetLocked={navTransportLocked}
+        journeyMode={studioJourneyMode}
         contentRef={appContentRef}
         tabsScrollRef={tabsScrollRef}
         tabBtnRefs={tabBtnRefs}
@@ -652,37 +1030,38 @@ export default function App() {
             <ProtoNavScenarioControls
               studioMenus={
                 <div className="proto-nav-studio-menus">
-                  <ProtoNavStudioSelect
-                    options={projectSelectOptions(studioProjects)}
-                    value={studioProjectId}
-                    onChange={handleStudioProjectChange}
-                    ariaLabel="Project"
-                    isPlaying={transport.isPlaying}
-                    controlsLocked={transport.isPausingBeforeReveal}
-                  />
+                  {projectStudioSelect}
                   <ProtoNavStudioSelect
                     options={personaSelectOptions(studioProject)}
                     value={studioPersonaId}
                     onChange={handleStudioPersonaChange}
                     ariaLabel="Persona"
                     isPlaying={transport.isPlaying}
-                    controlsLocked={transport.isPausingBeforeReveal}
+                    controlsLocked={transport.isPausingBeforeReveal || studioJourneyMode}
                   />
                   <ProtoNavJourneyMenu
                     modes={orchestraModes}
                     value={orchestraModeId}
                     onChange={handleOrchestraModeChange}
                     isPlaying={transport.isPlaying}
-                    controlsLocked={transport.isPausingBeforeReveal}
+                    controlsLocked={transport.isPausingBeforeReveal || studioJourneyMode}
                   />
                 </div>
               }
-              segmentLabel={studioTouchpoint.label}
+              segmentLabel={
+                studioJourneyMode ? studioTouchpoint.label : undefined
+              }
               touchpointKey={studioTouchpoint.key}
               visibleCount={studioProgress.visibleCount}
               totalFrames={studioProgress.totalFrames}
+              stepProgressActive={studioJourneyMode}
+              journeyMode={studioJourneyMode}
+              onJourneyModeChange={handleStudioJourneyModeChange}
+              journeyModeSwitchDisabled={navTransportLocked}
               isPlaying={transport.isPlaying}
               isOnAir={transport.isOnAir}
+              journeyAtEnd={journeyAtEnd}
+              playbackErrorActive={Boolean(playbackDiagnostic)}
               playbackEndToken={Math.max(
                 journeyPlayback.playbackEndToken,
                 scenarioPlayback.playbackEndToken
@@ -692,21 +1071,52 @@ export default function App() {
               canJumpToStart={transport.canJumpToStart}
               canPlay={transport.canPlay}
               canJumpToEnd={transport.canJumpToEnd}
-              onJumpToStart={transport.jumpToStart}
-              onStepBack={transport.stepBack}
-              onPlay={transport.play}
-              onStepForward={transport.stepForward}
-              onJumpToEnd={transport.jumpToEnd}
+              onJumpToStart={() => {
+                playbackCursorMonitor.noteManualTransport("jump-to-start");
+                playbackViewportMonitor.noteManualTransport("jump-to-start");
+                transport.jumpToStart();
+              }}
+              onStepBack={() => {
+                playbackCursorMonitor.noteManualTransport("step-back");
+                playbackViewportMonitor.noteManualTransport("step-back");
+                transport.stepBack();
+              }}
+              onPlay={() => {
+                playbackCursorMonitor.noteManualTransport("play");
+                playbackViewportMonitor.noteManualTransport("play");
+                transport.play();
+              }}
+              onStepForward={() => {
+                playbackCursorMonitor.noteManualTransport("step-forward");
+                playbackViewportMonitor.noteManualTransport("step-forward");
+                transport.stepForward();
+              }}
+              onJumpToEnd={() => {
+                playbackCursorMonitor.noteManualTransport("jump-to-end");
+                playbackViewportMonitor.noteManualTransport("jump-to-end");
+                transport.jumpToEnd();
+              }}
             />
-          ) : null
+          ) : (
+            <div className="proto-nav-scenario">
+              <div className="proto-nav-studio-menus">{projectStudioSelect}</div>
+            </div>
+          )
         }
       />
 
-      {WireComponent ? (
-        <WireComponent bridge={bridge} apiRef={wireApiRef} />
-      ) : (
-        <ProtoProjectPlaceholder projectLabel={studioProject.label} />
-      )}
+      <div
+        className={`proto-wire-mount flex flex-1 min-h-0 min-w-0 flex-col relative${
+          wirePlaybackCursorLocked ? " proto-wire-mount--playback-locked" : ""
+        }${navTransitionClass}`}
+      >
+        {wireInteractionShield ? <ProtoPlaybackShield /> : null}
+        {WireComponent ? (
+          <WireComponent bridge={bridge} apiRef={wireApiRef} />
+        ) : (
+          <ProtoProjectPlaceholder projectLabel={studioProject.label} />
+        )}
+      </div>
     </div>
   );
 }

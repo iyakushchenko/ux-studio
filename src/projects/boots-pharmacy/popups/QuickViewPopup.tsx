@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, type MouseEvent } from "react";
 import { ProtoCloseIcon } from "@/app/chrome/ProtoCloseIcon";
+import { useProtoOverlayDismiss } from "@/app/chrome/useProtoOverlayDismiss";
 import {
   clonePdpRtbStack,
   syncQuickViewBoosterState,
@@ -27,6 +28,7 @@ export default function QuickViewPopup({
   onToggleBooster,
   onOpenLogin,
 }: Props) {
+  const { mounted, scrimClassName, onScrimAnimationEnd } = useProtoOverlayDismiss(open);
   const mountRef = useRef<HTMLDivElement>(null);
   const cleanupRef = useRef<(() => void) | null>(null);
   const onBookNowRef = useRef(onBookNow);
@@ -42,11 +44,19 @@ export default function QuickViewPopup({
   loggedInRef.current = loggedIn;
 
   useLayoutEffect(() => {
+    if (!mounted) {
+      cleanupRef.current?.();
+      cleanupRef.current = null;
+      mountRef.current?.replaceChildren();
+      return;
+    }
+    if (!open) return;
+
     cleanupRef.current?.();
     cleanupRef.current = null;
 
     const mount = mountRef.current;
-    if (!open || !mount) return;
+    if (!mount) return;
 
     mount.replaceChildren();
     const clone = clonePdpRtbStack();
@@ -65,9 +75,8 @@ export default function QuickViewPopup({
     return () => {
       cleanupRef.current?.();
       cleanupRef.current = null;
-      mount.replaceChildren();
     };
-  }, [open, includeBoosterDose]);
+  }, [mounted, open, includeBoosterDose]);
 
   useEffect(() => {
     if (!open) return;
@@ -86,14 +95,19 @@ export default function QuickViewPopup({
     }
   }, [open, includeBoosterDose, loggedIn]);
 
-  if (!open) return null;
+  if (!mounted) return null;
 
   const onScrim = (e: MouseEvent) => {
     if (e.target === e.currentTarget) onClose();
   };
 
   return (
-    <div className="proto-avail-scrim" role="presentation" onClick={onScrim}>
+    <div
+      className={scrimClassName}
+      role="presentation"
+      onClick={onScrim}
+      onAnimationEnd={onScrimAnimationEnd}
+    >
       <div
         className="proto-avail-card proto-quick-view-card"
         role="dialog"

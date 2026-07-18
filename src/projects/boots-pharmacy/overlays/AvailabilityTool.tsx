@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import { ProtoCloseIcon } from "@/app/chrome/ProtoCloseIcon";
+import { useProtoOverlayDismiss } from "@/app/chrome/useProtoOverlayDismiss";
 import { ProtoTertiaryCta } from "@/app/chrome/ProtoTertiaryCta";
 import { ProtoWishlistHeart } from "@/projects/boots-pharmacy/chrome/ProtoWishlistHeart";
 import iconSearch from "@/assets/avail/search.svg";
@@ -515,6 +516,7 @@ export default function AvailabilityTool({
   onOpenLogin,
   onActiveStepChange,
 }: Props) {
+  const { mounted, scrimClassName, onScrimAnimationEnd } = useProtoOverlayDismiss(open);
   const [step, setStep] = useState<AvailStep>("start");
   const [query, setQuery] = useState("");
   const [nearMe, setNearMe] = useState(false);
@@ -651,7 +653,7 @@ export default function AvailabilityTool({
     setShowFoundDot(false);
   }, [nearMe]);
 
-  if (!open) return null;
+  if (!mounted) return null;
 
   const title =
     step === "start"
@@ -776,7 +778,12 @@ export default function AvailabilityTool({
   };
 
   return (
-    <div className="proto-avail-scrim" role="presentation" onClick={onScrim}>
+    <div
+      className={scrimClassName}
+      role="presentation"
+      onClick={onScrim}
+      onAnimationEnd={onScrimAnimationEnd}
+    >
       <div
         className="proto-avail-card"
         role="dialog"

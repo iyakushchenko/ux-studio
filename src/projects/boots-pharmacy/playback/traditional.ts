@@ -8,12 +8,20 @@ import {
   clearSimulatedClickRipples,
   delay,
   isClickableTarget,
+  isDemoCursorJourneyModePinned,
+  releaseDemoCursorAfterScript,
   removeDemoCursor,
   resetDemoCursorTravelOrigin,
   simulateDemoPointerClick,
   simulateDemoPointerHover,
 } from "@/app/proto/protoDemoCursor";
 import { PROTO_SCREENS, protoTabToIndex } from "@/projects/boots-pharmacy/screens/protoScreens";
+import {
+  scriptAborted,
+  scriptFail,
+  scriptOk,
+  type PlaybackScriptResult,
+} from "@/projects/playbackScriptResult";
 
 const AVAIL_DEMO_STORE = "covent";
 const BOOK_STEP1_PICK_INTENT = {
@@ -28,8 +36,11 @@ const CHOSEN_LOCATION_SETTLE_MS = 420;
 const AVATAR_DOT_SHOWCASE_MS = 5000;
 
 let playbackAborted = false;
+let playbackGeneration = 0;
+let activeRunGeneration = 0;
 
 export function abortTraditionalPlayback(): void {
+  playbackGeneration += 1;
   playbackAborted = true;
   resetDemoCursorTravelOrigin();
   removeDemoCursor();
@@ -41,7 +52,22 @@ export function wasTraditionalPlaybackAborted(): boolean {
 }
 
 function shouldAbort(): boolean {
-  return playbackAborted;
+  return (
+    playbackAborted || activeRunGeneration !== playbackGeneration
+  );
+}
+
+function abortOr(step: string): PlaybackScriptResult {
+  return shouldAbort() ? scriptAborted() : scriptFail(step);
+}
+
+async function wrapBool(
+  run: () => Promise<boolean>,
+  failStep: string
+): Promise<PlaybackScriptResult> {
+  const ok = await run();
+  if (ok) return scriptOk();
+  return abortOr(failStep);
 }
 
 async function waitForSelector(
@@ -68,6 +94,24 @@ async function waitForActiveScreen(childIndex: number): Promise<HTMLElement | nu
     await delay(50);
   }
   return null;
+}
+
+function queryVisibleProtoScreen(childIndex: number): HTMLElement | null {
+  const screen = document.querySelector<HTMLElement>(screenSelector(childIndex));
+  if (screen && isClickableTarget(screen)) return screen;
+  return null;
+}
+
+function isAppointmentHistoryReady(): boolean {
+  const historyScreen = queryVisibleProtoScreen(2);
+  if (!historyScreen) return false;
+  const firstCard = historyScreen.querySelector<HTMLElement>(
+    '[data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]'
+  );
+  const viewBtn = firstCard?.querySelector<HTMLElement>(
+    '[data-proto-appointment-view-details="true"]'
+  );
+  return Boolean(viewBtn && isClickableTarget(viewBtn));
 }
 
 async function waitForVisibleTarget(
@@ -138,7 +182,12 @@ function findHeaderSarahAvatarNavItem(): HTMLElement | null {
 async function showcaseSarahAvatarDot(
   options?: { skip?: boolean }
 ): Promise<boolean> {
-  const avatar = findHeaderSarahAvatar();
+  // Traditional CJM hits PLP before login — Sarah's avatar dot is post-login only.
+  if (!isProtoHeaderLoggedIn()) {
+    return true;
+  }
+
+  const avatar = await waitForVisibleTarget(document, () => findHeaderSarahAvatar());
   if (!avatar || shouldAbort()) return false;
 
   if (options?.skip) {
@@ -273,35 +322,51 @@ async function openLoginFromPdpQuickSignIn(
   return settleLoginPopup(card);
 }
 
-async function runPlpOpenPdp(options?: { skip?: boolean }): Promise<boolean> {
+async function runPlpOpenPdp(options?: { skip?: boolean }): Promise<PlaybackScriptResult> {
   resetDemoCursorTravelOrigin();
 
   const screen = await waitForActiveScreen(9);
-  if (!screen || shouldAbort()) return false;
+  if (!screen) {
+    return abortOr("waitForActiveScreen(childIndex=9): PLP screen not visible");
+  }
 
   await delay(SETTLE_MS);
 
   const tile = await waitForVisibleTarget(screen, findFirstVisiblePlpTile);
-  if (!tile || shouldAbort()) return false;
+  if (!tile) {
+    return abortOr(
+      "findFirstVisiblePlpTile: no visible [data-name=boots-pharmacy.service.tile]"
+    );
+  }
 
   resetPlpTileBookmarkForPlayback(tile, 0);
 
-  if (!(await addFirstPlpTileBookmark(tile, options))) return false;
-  if (!(await showcaseSarahAvatarDot(options))) return false;
+  if (!(await addFirstPlpTileBookmark(tile, options))) {
+    return abortOr(
+      "addFirstPlpTileBookmark: Add to bookmarks button missing or click failed"
+    );
+  }
+  if (!(await showcaseSarahAvatarDot(options))) {
+    return abortOr(
+      "showcaseSarahAvatarDot: logged-in header avatar not found or hover aborted"
+    );
+  }
 
   const bookBtn = await waitForVisibleTarget(tile, (scope) =>
     findButtonByText(scope, /^book now$/i)
   );
-  if (!bookBtn || shouldAbort()) return false;
+  if (!bookBtn) {
+    return abortOr('findButtonByText: "Book now" on PLP tile not found');
+  }
 
   if (options?.skip) {
     bookBtn.click();
-    return true;
+    return scriptOk();
   }
 
   await simulateDemoPointerClick(bookBtn, { shouldAbort });
   await delay(SETTLE_MS);
-  return !shouldAbort();
+  return shouldAbort() ? scriptAborted() : scriptOk();
 }
 
 async function runPdpBookNow(
@@ -360,47 +425,7 @@ async function runLoginSignIn(
   if (!(await runLoginPopupSignIn(loginCard, options))) return false;
 
   goToBookStep1(runtime);
-  removeDemoCursor();
   return !shouldAbort();
-}
-
-function prototypeScrollRoot(): HTMLElement | null {
-  return document.querySelector<HTMLElement>(
-    ".proto-scroll--prototype:not(.hidden)"
-  );
-}
-
-async function smoothScrollToTarget(target: HTMLElement): Promise<void> {
-  const scrollRoot = prototypeScrollRoot();
-  target.scrollIntoView({ block: "center", behavior: "smooth" });
-  await delay(280);
-
-  if (!scrollRoot) return;
-
-  const btnRect = target.getBoundingClientRect();
-  const rootRect = scrollRoot.getBoundingClientRect();
-  const padding = 72;
-
-  if (btnRect.bottom > rootRect.bottom - padding) {
-    scrollRoot.scrollTo({
-      top:
-        scrollRoot.scrollTop +
-        (btnRect.bottom - rootRect.bottom) +
-        padding,
-      behavior: "smooth",
-    });
-    await delay(420);
-    return;
-  }
-
-  if (btnRect.top < rootRect.top + padding) {
-    scrollRoot.scrollTo({
-      top:
-        scrollRoot.scrollTop - (rootRect.top + padding - btnRect.top),
-      behavior: "smooth",
-    });
-    await delay(420);
-  }
 }
 
 async function waitForBookStep1ChosenSlot(screen: HTMLElement): Promise<boolean> {
@@ -433,10 +458,7 @@ async function clickBookStep1Continue(
     return true;
   }
 
-  await smoothScrollToTarget(continueBtn);
-  if (shouldAbort()) return false;
-
-  return simulateDemoPointerClick(continueBtn, { shouldAbort, scroll: false });
+  return simulateDemoPointerClick(continueBtn, { shouldAbort });
 }
 
 function findBookStep1SearchField(scope: ParentNode): HTMLElement | null {
@@ -509,6 +531,10 @@ async function runConfirmationOpenAppointments(
   runtime: JourneyRuntime,
   options?: { skip?: boolean }
 ): Promise<boolean> {
+  if (isAppointmentHistoryReady()) {
+    return true;
+  }
+
   const screen = await waitForActiveScreen(3);
   if (!screen || shouldAbort()) return false;
 
@@ -524,12 +550,8 @@ async function runConfirmationOpenAppointments(
     return true;
   }
 
-  await smoothScrollToTarget(openBtn);
-  if (shouldAbort()) return false;
-
   const clicked = await simulateDemoPointerClick(openBtn, {
     shouldAbort,
-    scroll: false,
   });
   if (!clicked || shouldAbort()) return false;
 
@@ -570,12 +592,8 @@ async function runHistoryViewDetails(
     return true;
   }
 
-  await smoothScrollToTarget(viewBtn);
-  if (shouldAbort()) return false;
-
   const clicked = await simulateDemoPointerClick(viewBtn, {
     shouldAbort,
-    scroll: false,
   });
   if (!clicked || shouldAbort()) return false;
 
@@ -587,23 +605,56 @@ export async function runTraditionalScript(
   scriptId: TabScriptId,
   runtime: JourneyRuntime,
   options?: { skip?: boolean }
-): Promise<boolean> {
+): Promise<PlaybackScriptResult> {
+  activeRunGeneration = playbackGeneration;
   playbackAborted = false;
 
+  let result: PlaybackScriptResult;
   switch (scriptId) {
     case "plp-open-pdp":
-      return runPlpOpenPdp(options);
+      result = await runPlpOpenPdp(options);
+      break;
     case "pdp-book-now":
-      return runPdpBookNow(runtime, options);
+      result = await wrapBool(
+        () => runPdpBookNow(runtime, options),
+        "runPdpBookNow: PDP screen or Book now button not ready"
+      );
+      break;
     case "login-sign-in":
-      return runLoginSignIn(runtime, options);
+      result = await wrapBool(
+        () => runLoginSignIn(runtime, options),
+        "runLoginSignIn: login popup flow failed"
+      );
+      break;
     case "book-location-pick":
-      return runBookLocationPick(runtime, options);
+      result = await wrapBool(
+        () => runBookLocationPick(runtime, options),
+        "runBookLocationPick: book step 1 location flow failed"
+      );
+      break;
     case "confirmation-open-appointments":
-      return runConfirmationOpenAppointments(runtime, options);
+      result = await wrapBool(
+        () => runConfirmationOpenAppointments(runtime, options),
+        "runConfirmationOpenAppointments: open appointment control not found"
+      );
+      break;
     case "history-view-details":
-      return runHistoryViewDetails(runtime, options);
+      result = await wrapBool(
+        () => runHistoryViewDetails(runtime, options),
+        "runHistoryViewDetails: view details control not found"
+      );
+      break;
     default:
-      return false;
+      result = scriptFail(`unknown tab script: ${String(scriptId)}`);
   }
+
+  if (!shouldAbort()) {
+    await releaseDemoCursorAfterScript();
+    clearSimulatedClickRipples();
+    if (!isDemoCursorJourneyModePinned()) {
+      resetDemoCursorTravelOrigin();
+    }
+  }
+
+  return result;
 }

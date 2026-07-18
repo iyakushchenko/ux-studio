@@ -1332,7 +1332,14 @@
   background: rgba(33, 43, 65, 0.45);
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
-  animation: proto-avail-fade 0.2s ease;
+  animation: proto-avail-fade 0.28s cubic-bezier(0, 0, 0.2, 1);
+}
+.proto-avail-scrim--closing {
+  animation: proto-avail-fade-out 0.28s cubic-bezier(0.4, 0, 1, 1) forwards;
+  pointer-events: none;
+}
+.proto-avail-scrim--closing .proto-avail-card {
+  animation: proto-avail-slide-out 0.28s cubic-bezier(0.4, 0, 1, 1) forwards;
 }
 .proto-avail-card {
   width: min(608px, calc(100vw - 48px));
@@ -1346,7 +1353,7 @@
   overflow: hidden;
   padding: 24px;
   box-sizing: border-box;
-  animation: proto-avail-slide 0.22s ease;
+  animation: proto-avail-slide 0.32s cubic-bezier(0, 0, 0.2, 1);
   font-family: "Open Sans", sans-serif;
   color-scheme: light;
 }
@@ -2737,9 +2744,17 @@
   from { opacity: 0; }
   to { opacity: 1; }
 }
+@keyframes proto-avail-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
 @keyframes proto-avail-slide {
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
+}
+@keyframes proto-avail-slide-out {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(12px); }
 }
 
 /* Book Step 2 — calendar date + time slot hover / selection */

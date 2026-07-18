@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
-import { exitDemoCursor } from "@/app/proto/protoDemoCursor";
 import {
   applyScenarioFrameVisibility,
   bumpScenarioScrollGeneration,
@@ -11,6 +10,11 @@ import {
   type ScenarioScrollAlign,
   type ScenarioScrollTiming,
 } from "@/app/proto/protoScenarioEngine";
+import {
+  PlaybackDiagnosticError,
+  PLAYBACK_SCENARIO_PRELUDE_TIMEOUT_MS,
+  scenarioStallDiagnostic,
+} from "@/app/shell/protoPlaybackDiagnostic";
 
 type Options = {
   active: boolean;
@@ -20,6 +24,7 @@ type Options = {
   minVisibleFrames?: number;
   playbackStepMs?: number;
   playbackStepHooks?: PlaybackStepHooks;
+  onDiagnostic?: (error: PlaybackDiagnosticError) => void;
 };
 
 export type PlaybackStepHooks = {
@@ -84,6 +89,19 @@ function scenarioTotalFor(contentFrameCount: number, hasFinale: boolean): number
   return contentFrameCount + (hasFinale ? 1 : 0);
 }
 
+/** First frame shown when a scenario activates — always min visible, even with a finale beat. */
+export function resolveInitialScenarioVisibleCount(
+  contentFrameCount: number,
+  hasFinale: boolean,
+  minVisibleFrames: number
+): number {
+  if (contentFrameCount === 0) return 0;
+  const scenarioTotal = scenarioTotalFor(contentFrameCount, hasFinale);
+  return clampVisible(minVisibleFrames, scenarioTotal, minVisibleFrames);
+}
+
+export { scenarioTotalFor };
+
 function bubbleVisibleCount(visibleCount: number, contentFrameCount: number): number {
   if (contentFrameCount === 0) return 0;
   return Math.min(visibleCount, contentFrameCount);
@@ -101,6 +119,7 @@ export function useProtoScenarioPlayback({
   minVisibleFrames = PROTO_SCENARIO_MIN_VISIBLE_FRAMES,
   playbackStepMs = 2000,
   playbackStepHooks,
+  onDiagnostic,
 }: Options) {
   const framesRef = useRef<HTMLElement[]>([]);
   const playTimerRef = useRef<number | null>(null);
@@ -117,8 +136,11 @@ export function useProtoScenarioPlayback({
   const [visibleCount, setVisibleCount] = useState(0);
   const [playbackMode, setPlaybackMode] = useState<PlaybackMode>("idle");
   const [isPausingBeforeReveal, setIsPausingBeforeReveal] = useState(false);
-
   const isPlaying = playbackMode === "playing";
+
+  const onDiagnosticRef = useRef(onDiagnostic);
+  onDiagnosticRef.current = onDiagnostic;
+
   const hasFinale = Boolean(playbackStepHooks?.onFinale);
   const contentFrameCount = hasFinale
     ? Math.max(0, totalFrames - 1)
@@ -183,12 +205,24 @@ export function useProtoScenarioPlayback({
     setPlaybackMode("idle");
   }, [clearPreRevealPause]);
 
+  const reportScenarioStall = useCallback(
+    (detail?: string) => {
+      stopPlayback();
+      onDiagnosticRef.current?.(
+        scenarioStallDiagnostic({
+          frame: visibleCountRef.current,
+          detail,
+        })
+      );
+    },
+    [stopPlayback]
+  );
+
   const completePlayback = useCallback(() => {
     if (isPlayingRef.current) {
       setPlaybackEndToken((token) => token + 1);
     }
     stopPlayback();
-    void exitDemoCursor();
   }, [stopPlayback]);
 
   const syncFrames = useCallback(() => {
@@ -203,11 +237,9 @@ export function useProtoScenarioPlayback({
       initializedRef.current = true;
       const contentTotal = frames.length;
       const scenarioTotal = scenarioTotalFor(contentTotal, hasFinale);
-      const pristine =
-        hasFinale && contentTotal > 0 ? contentTotal : scenarioTotal;
-      const initialCount = clampVisible(
-        pristine,
-        scenarioTotal,
+      const initialCount = resolveInitialScenarioVisibleCount(
+        contentTotal,
+        hasFinale,
         minVisibleFrames
       );
       visibleCountRef.current = initialCount;
@@ -245,7 +277,7 @@ export function useProtoScenarioPlayback({
       visibleCountRef.current > 0
         ? visibleCountRef.current
         : clampVisible(
-            hasFinale && frames.length > 0 ? frames.length : minVisibleFrames,
+            minVisibleFrames,
             scenarioTotalFor(frames.length, hasFinale),
             minVisibleFrames
           );
@@ -330,6 +362,15 @@ export function useProtoScenarioPlayback({
 
   useEffect(() => () => stopPlayback(), [stopPlayback]);
 
+  useEffect(() => {
+    if (!isPausingBeforeReveal || !isPlayingRef.current) return;
+    const timer = window.setTimeout(() => {
+      if (!isPausingBeforeReveal || !isPlayingRef.current) return;
+      reportScenarioStall("Scenario prelude (thinking/typing/finale) exceeded time limit");
+    }, PLAYBACK_SCENARIO_PRELUDE_TIMEOUT_MS);
+    return () => window.clearTimeout(timer);
+  }, [isPausingBeforeReveal, reportScenarioStall]);
+
   const scheduleNext = useCallback(() => {
     if (!isPlayingRef.current) return;
     playTimerRef.current = window.setTimeout(() => {
@@ -376,9 +417,19 @@ export function useProtoScenarioPlayback({
         void (async () => {
           try {
             await playbackStepHooks.onFinale!();
-          } finally {
             if (visibleCountRef.current < contentTotal) return;
             finishFinale();
+          } catch (error) {
+            pauseCleanupRef.current = null;
+            setIsPausingBeforeReveal(false);
+            stopPlayback();
+            if (error instanceof PlaybackDiagnosticError) {
+              onDiagnosticRef.current?.(error);
+            } else {
+              reportScenarioStall(
+                error instanceof Error ? error.message : "Finale hook threw"
+              );
+            }
           }
         })();
 
@@ -398,7 +449,7 @@ export function useProtoScenarioPlayback({
         if (visibleCountRef.current !== fromCount) return;
 
         setIsPausingBeforeReveal(false);
-        queueScroll(next, "end", false, fromCount);
+        queueScroll(next, "end", isPlayingRef.current, fromCount);
         setVisibleCount(next);
 
         if (next >= contentTotal) {
@@ -679,5 +730,6 @@ export function useProtoScenarioPlayback({
     resetToEnd,
     retreatFromFinale,
     cancelPreRevealPause: clearPreRevealPause,
+    abortPlayback: stopPlayback,
   };
 }

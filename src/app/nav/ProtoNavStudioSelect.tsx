@@ -91,7 +91,10 @@ export function ProtoNavStudioSelect<T extends string>({
     }
   };
 
-  const displayLabel = isPlaying && liveLabel ? liveLabel : selected.label;
+  const displayLabel =
+    isPlaying && liveLabel
+      ? liveLabel
+      : (selected.shortLabel ?? selected.label);
 
   return (
     <div className="proto-nav-journey-menu" ref={rootRef}>

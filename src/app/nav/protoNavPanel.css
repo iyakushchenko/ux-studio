@@ -15,6 +15,11 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
+/* No hand cursor anywhere in studio nav chrome — buttons default to pointer in UA styles. */
+.proto-nav-panel-host :is(button, a, [role="button"], [role="switch"], [role="option"]) {
+  cursor: default;
+}
+
 .proto-nav-panel {
   width: 100%;
   font-family: "Open Sans", sans-serif;
@@ -241,13 +246,128 @@
 }
 
 .proto-nav-scenario__counter {
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
-  color: rgba(255, 255, 255, 0.5);
-  margin-right: 6px;
-  min-width: 2.25rem;
-  text-align: center;
+  color: rgba(255, 255, 255, 0.42);
+  flex-shrink: 0;
+  min-width: 3rem;
+  margin: 0 1px 0 0;
+  padding-left: 0;
+  text-align: right;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+/* FL-style journey mode toggle — left of step counter in cassette deck */
+.proto-studio-journey-switch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 22px;
+  height: 20px;
+  margin: 0 2px 0 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: default;
+  border-radius: 2px;
+  outline: none;
+  box-shadow: none;
+}
+
+.proto-studio-journey-switch:focus,
+.proto-studio-journey-switch:focus-visible,
+.proto-studio-journey-switch:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.proto-studio-journey-switch:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.proto-studio-journey-switch__track {
+  position: relative;
+  display: block;
+  width: 20px;
+  height: 10px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #1a1a1a 0%, #2e2e2e 45%, #3a3a3a 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.45),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+  transition:
+    border-color 0.12s ease,
+    box-shadow 0.12s ease,
+    background 0.12s ease;
+}
+
+.proto-studio-journey-switch:not(.proto-studio-journey-switch--on):hover:not(:disabled) .proto-studio-journey-switch__track {
+  border-color: rgba(255, 255, 255, 0.22);
+  background: linear-gradient(180deg, #222 0%, #353535 45%, #424242 100%);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.4),
+    0 0 4px rgba(255, 255, 255, 0.06);
+}
+
+.proto-studio-journey-switch__thumb {
+  position: absolute;
+  top: 50%;
+  left: 1px;
+  width: 7px;
+  height: 7px;
+  border-radius: 1px;
+  transform: translateY(-50%);
+  background: linear-gradient(180deg, #7a7a7a 0%, #454545 55%, #333 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 1px 1px rgba(0, 0, 0, 0.3);
+  transition:
+    left 0.12s ease,
+    background 0.12s ease,
+    box-shadow 0.12s ease,
+    border-color 0.12s ease;
+}
+
+.proto-studio-journey-switch:not(.proto-studio-journey-switch--on):hover:not(:disabled) .proto-studio-journey-switch__thumb {
+  background: linear-gradient(180deg, #9a9a9a 0%, #555 55%, #3a3a3a 100%);
+}
+
+.proto-studio-journey-switch--on .proto-studio-journey-switch__track {
+  background: linear-gradient(180deg, #3d2a10 0%, #5c4018 40%, #7a5520 100%);
+  border-color: rgba(220, 160, 60, 0.55);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.28),
+    0 0 7px rgba(255, 170, 50, 0.38);
+}
+
+.proto-studio-journey-switch--on .proto-studio-journey-switch__thumb {
+  left: 10px;
+  background: linear-gradient(180deg, #ffe8b8 0%, #f0c060 35%, #d89028 100%);
+  border-color: rgba(255, 220, 140, 0.45);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 0 5px rgba(255, 190, 80, 0.65);
+}
+
+.proto-studio-journey-switch--on:hover:not(:disabled) .proto-studio-journey-switch__thumb {
+  background: linear-gradient(180deg, #ffffff 0%, #f5f5f5 45%, #e8e8e8 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    0 0 8px rgba(255, 210, 100, 0.85);
+}
+
+.proto-studio-journey-switch:active:not(:disabled) .proto-studio-journey-switch__thumb {
+  transform: translateY(-50%) scale(0.94);
+}
+
+.proto-nav-scenario--journey-mode .proto-nav-scenario__counter {
+  color: rgba(255, 220, 160, 0.72);
 }
 
 .proto-nav-scenario__deck-led {
@@ -257,7 +377,7 @@
   flex-shrink: 0;
   width: 22px;
   height: 20px;
-  margin: 0 5px 0 3px;
+  margin: 0 5px 0 1px;
   overflow: visible;
 }
 
@@ -276,7 +396,7 @@
   display: inline-flex;
   align-items: center;
   gap: 1px;
-  padding: 2px 2px 2px 1px;
+  padding: 2px 3px 2px 5px;
   border-radius: 4px;
   background: rgba(0, 0, 0, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -293,6 +413,7 @@
   height: 20px;
   padding: 0 5px !important;
   border-radius: 2px;
+  cursor: default;
   color: rgba(255, 255, 255, 0.92);
   background: linear-gradient(180deg, #5a5a5a 0%, #383838 48%, #242424 100%);
   border: 1px solid rgba(0, 0, 0, 0.55);
@@ -459,29 +580,59 @@
   background: radial-gradient(circle, rgba(255, 154, 18, 0.62) 0%, transparent 72%);
 }
 
-/* Playback end — solid panel LED (no bloom) for 3s. */
+/* CJM journey complete — blue end diode while on the last playlist frame. */
 .proto-nav-scenario__on-air--end .proto-nav-scenario__on-air-dot {
   background: radial-gradient(
     circle at 38% 30%,
-    #ff6b6b 0%,
+    #9ed4ff 0%,
+    #4da3ff 38%,
+    #2b7fd4 62%,
+    #1a5a9e 100%
+  );
+  box-shadow:
+    inset 0 1px 1px rgba(220, 240, 255, 0.82),
+    inset 0 -1px 1.5px rgba(0, 40, 90, 0.55),
+    0 0 6px rgba(74, 158, 255, 0.95),
+    0 0 14px rgba(74, 158, 255, 0.62);
+}
+
+.proto-nav-scenario__on-air--end .proto-nav-scenario__on-air-dot::after {
+  opacity: 0.55;
+  background: rgba(220, 240, 255, 0.48);
+  filter: none;
+}
+
+.proto-nav-scenario__on-air--end .proto-nav-scenario__on-air-halo {
+  opacity: 0.52;
+  transform: scale(1.06);
+  background: radial-gradient(circle, rgba(74, 158, 255, 0.48) 0%, transparent 72%);
+}
+
+/* Playback diagnostic error — red glow; shows while diagnostic overlay is open. */
+.proto-nav-scenario__on-air--error .proto-nav-scenario__on-air-dot {
+  background: radial-gradient(
+    circle at 38% 30%,
+    #ff8a80 0%,
     #e53935 38%,
     #c62828 62%,
     #8b0000 100%
   );
   box-shadow:
-    inset 0 1px 1px rgba(255, 230, 230, 0.7),
-    inset 0 -1px 1.5px rgba(60, 0, 0, 0.9),
-    inset 0 0 2px rgba(0, 0, 0, 0.45);
+    inset 0 1px 1px rgba(255, 230, 230, 0.82),
+    inset 0 -1px 1.5px rgba(60, 0, 0, 0.55),
+    0 0 6px rgba(229, 57, 53, 1),
+    0 0 14px rgba(255, 82, 82, 0.82);
 }
 
-.proto-nav-scenario__on-air--end .proto-nav-scenario__on-air-dot::after {
-  opacity: 0.5;
-  background: rgba(255, 255, 255, 0.42);
-  filter: none;
+.proto-nav-scenario__on-air--error .proto-nav-scenario__on-air-dot::after {
+  opacity: 0.55;
+  background: rgba(255, 255, 255, 0.5);
 }
 
-.proto-nav-scenario__on-air--end .proto-nav-scenario__on-air-halo {
-  opacity: 0;
+.proto-nav-scenario__on-air--error .proto-nav-scenario__on-air-halo {
+  opacity: 0.72;
+  transform: scale(1.1);
+  background: radial-gradient(circle, rgba(229, 57, 53, 0.62) 0%, transparent 72%);
 }
 
 /* Manual step — one-shot deep amber blink on |<<, |<, >|, >>| */
@@ -756,22 +907,29 @@
   .proto-nav-scenario__on-air--end .proto-nav-scenario__on-air-dot {
     background: radial-gradient(
       circle at 38% 30%,
-      #ff6b6b 0%,
-      #e53935 38%,
-      #c62828 62%,
-      #8b0000 100%
+      #9ed4ff 0%,
+      #4da3ff 38%,
+      #2b7fd4 62%,
+      #1a5a9e 100%
     );
     box-shadow:
-      inset 0 1px 1px rgba(255, 230, 230, 0.7),
-      inset 0 -1px 1.5px rgba(60, 0, 0, 0.9);
+      inset 0 1px 1px rgba(220, 240, 255, 0.82),
+      inset 0 -1px 1.5px rgba(0, 40, 90, 0.55),
+      0 0 6px rgba(74, 158, 255, 0.85);
   }
 }
 
-.proto-nav-panel-host--playback-locked .proto-nav-tabs,
-.proto-nav-panel-host--playback-locked .proto-nav-dots,
+.proto-nav-panel-host--playback-locked .proto-nav-tab,
+.proto-nav-panel-host--playback-locked .proto-nav-dots .proto-nav-dot:not(.proto-nav-dot--hub),
 .proto-nav-panel-host--playback-locked .proto-nav-reset-state {
   opacity: 0.42;
   pointer-events: none;
+}
+
+.proto-nav-panel-host--playback-locked .proto-nav-logo-btn,
+.proto-nav-panel-host--playback-locked .proto-nav-dot--hub {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .proto-nav-panel-host--playback-locked
@@ -781,12 +939,29 @@
   pointer-events: none;
 }
 
-.proto-nav-panel-host--playback-locked
-  .proto-nav-scenario__deck
-  .proto-nav-scenario__btn:not(.proto-nav-scenario__btn--play),
-.proto-nav-panel-host--playback-locked .proto-nav-journey-menu__trigger {
-  opacity: 0.42;
-  pointer-events: none;
+.proto-nav-panel-host--journey-mode .proto-nav-status-bar {
+  box-shadow: inset 0 1px 0 rgba(255, 190, 90, 0.08);
+}
+
+.proto-nav-panel-host--journey-mode .proto-nav-tab--active {
+  color: #fff;
+  background: linear-gradient(180deg, #9a7030 0%, #7a5520 46%, #5c4018 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 160, 0.22),
+    0 1px 0 rgba(0, 0, 0, 0.2);
+}
+
+.proto-nav-panel-host--journey-mode .proto-nav-tab--active .proto-nav-tab__badge {
+  background: rgba(255, 235, 200, 0.28);
+  color: #fff;
+}
+
+.proto-nav-panel-host--journey-mode .proto-nav-dot--active:not(.proto-nav-dot--hub) {
+  background: linear-gradient(180deg, #c49a4a 0%, #9a7030 55%, #7a5520 100%);
+}
+
+.proto-nav-panel-host--journey-mode .proto-nav-dot--hub.proto-nav-dot--active {
+  background: linear-gradient(180deg, #dcc796 0%, #bfa56e 100%);
 }
 
 .proto-nav-journey-menu__trigger:disabled {
@@ -911,6 +1086,12 @@
   background: transparent;
   cursor: default;
   transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.proto-nav-step-btn--icon-only {
+  justify-content: center;
+  gap: 0;
+  padding: 4px 6px;
 }
 
 .proto-nav-step-btn:hover:not(:disabled) {

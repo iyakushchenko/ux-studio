@@ -112,6 +112,8 @@ Tests live next to the code they protect:
 | `app/orchestra/__tests__/resolveActiveScreenScenario.test.ts` | Chat scenario activation |
 | `projects/boots-pharmacy/screens/__tests__/protoScreens.test.ts` | Tab ↔ index mapping |
 | `projects/boots-pharmacy/personas/.../__tests__/journeys.test.ts` | Beat IDs, script IDs, `protoTab` range |
+| `app/shell/__tests__/protoPlaybackCursorAnomalies.test.ts` | Stale/orphaned cursor heuristics |
+| `app/shell/__tests__/protoPlaybackCursorMonitor.test.ts` | Cursor guard timing after manual transport |
 
 **What tests do not cover:** live DOM scripts, cursor animation timing, Figma export drift. Those require the manual checklist.
 
@@ -179,3 +181,92 @@ src/projects/boots-pharmacy/
 | Popup open/close from script | `JourneyRuntime` in `App.tsx` + wire refs |
 
 Keep shell changes rare. Prefer project-local script runners.
+
+---
+
+## Playback diagnostics
+
+When a journey script fails, times out, or the studio stays on-air without advancing, playback stops automatically and a **Playback diagnostic** card appears (dismissible; does not replace the fatal error boundary).
+
+| Layer | Trigger | What stops |
+|-------|---------|------------|
+| **Script failure** | `runAvailScript` / book / tab / home returns `false` | `stopJourneyPlay()` + diagnostic with beat + script id |
+
+Pausing playback or aborting a script does **not** surface a diagnostic — orchestration suppresses failures when transport is already stopped or a script abort flag is set.
+| **Script timeout** | Script promise exceeds 45s (`withPlaybackScriptTimeout`) | Same |
+| **Scenario stall** | Chat prelude/finale exceeds 60s | `abortPlayback()` + diagnostic |
+| **Stall watchdog** | On-air with no beat/frame/touchpoint change for 22s (`useProtoPlaybackGuard`) | `handlePlaybackDiagnostic` → stops journey + scenario |
+
+Key files:
+
+- `src/app/shell/protoPlaybackDiagnostic.ts` — error types, formatters, timeout helper
+- `src/app/shell/useProtoPlaybackGuard.ts` — stall fingerprint watchdog
+- `src/app/shell/ProtoPlaybackDiagnosticOverlay.tsx` — UI card
+
+If the control room still shows pause/green diode while a popup is stuck, the watchdog should fire within ~22s and surface beat + avail step in technical details.
+
+**Copy report** (playback diagnostic) is optimized for agents:
+
+- `failureStep` — exact script checkpoint (e.g. `findButtonByText: "Book now" on PLP tile not found`)
+- `source` — file + function (`traditional.ts → runPlpOpenPdp()`)
+- `## studio` — project/persona, beat index, protoTab, childIndex, touchpoint, wire flags at failure time
+- No duplicate `## raw` block, no userAgent noise
+
+Scripts return `PlaybackScriptResult` (`{ ok: false, step }`) from project playback runners; registry in `playbackScriptRegistry.ts`.
+
+**Scroll / camera guard** (`useProtoPlaybackScrollGuard`) stays active while journey mode is on (not only on-air) and reports `scroll-anomaly` diagnostics (stops playback) when it sees:
+
+- `scroll-reversal` — direction flips 3+ times in 700ms (pin vs eased scroll fighting)
+- `scroll-jump` — large instant jump while not in eased animation
+- `scroll-stutter` — 3+ animation frames longer than 50ms
+- `scroll-path-deviation` — eased scroll position diverges from expected curve
+- `scroll-interrupted` / `scroll-competing` — animation cancelled, or **multiple eased scroll starts during one viewport director script** (e.g. reserve scroll + cursor travel scroll before click)
+- `scroll-excessive-burst` — after a viewport director script ends (`select-book-time`, `reserve-appointment`), **more than one** additional eased scroll within ~1.4s (not a single long camera move to the next target). Tab/`protoTab` changes clear the burst watch (same as screen navigation grace).
+
+The guard captures the script label when scripting **starts** (`noteDirectorScriptStart`, clears any prior burst watch) and arms post-script burst detection when `isPausingBeforeReveal` falls (`noteDirectorScriptEnd`). Intra-script stacked scrolls are caught on the **second** `onAnimationStart` while the script is still running — not after it ends.
+
+Demo camera easing uses `computeDemoScrollDuration` (~720–1200ms depending on travel distance).
+
+Tab/screen changes (e.g. PLP → PDP on Book now) get a **700ms navigation grace** — scroll resets during intentional screen swaps are not reported as jumps.
+
+**Viewport alignment guard** (`useProtoPlaybackViewportGuard`) catches touchpoint advances where the status bar moves but the prototype scroll root does not follow on the **same screen**:
+
+- `viewport-stall` — touchpoint/beat advanced but `scrollTop` moved less than ~48px and the beat focal element is not in view (~520ms after step/script end)
+- **Book — time** director step: scroll to time grid **and** select 15:30 with demo cursor (one step). Beat-enter sync only ensures date + clears time — no scroll. Reserve scroll happens on the reserve beat only.
+- **Popup touchpoints** (`popup:*` keys from `resolveStudioTouchpoint`) are excluded — modals/overlays do not use prototype scroll follow
+- Screen-frame scenario beats are excluded (scenario engine owns scroll)
+
+**Demo cursor guard** (`useProtoPlaybackCursorGuard`) runs while the prototype is open (not hub) and reports `cursor-anomaly` diagnostics when demo cursors leak in the DOM:
+
+- **Journey mode (CJM):** one visible robo-cursor is **expected** between director steps (parked idle pose). `cursor-stale` and `cursor-orphaned` do **not** fire for `cursorCount=1` while journey mode is on.
+- `cursor-stale` — outside journey mode (or multiple cursors): cursor still visible ~220ms after step/jump/play or script abort when transport is idle
+- `cursor-orphaned` — `cursorCount > 1`, or a leftover cursor after beat/screen change when not in the single-cursor CJM contract (~480ms grace)
+
+The guard does **not** fix cursor cleanup — it surfaces leaks for copy-report / supervisor review. In CJM, only **duplicate** cursors (`cursorCount > 1`) indicate a real problem.
+
+**Director guard** (`useProtoPlaybackDirectorGuard`) reports `cursor-anomaly` using universal patterns (not hardcoded beat ids):
+
+- `selection-without-director` — beat-enter sync applied a director-only outcome, skip click on a director step, or outcome applied without demo cursor (`DirectorOutcomeReport` from project scripts)
+- `director-step-skipped` — step forward from a **dwell landing beat** (`isDwellLandingBeat`) did not start the next beat's director script within ~1.2s
+- `director-step-no-effect` — manual step forward ran a director script but DOM goal was not met (`domGoalMet` on `DirectorOutcomeReport`, e.g. time not selected after `select-book-time`); or step-forward with `advanceAfter` landed on the next beat without running its director script (date → time empty landing)
+
+When a playback diagnostic is showing, the studio transport diode glows **red** (`playbackErrorActive` on `ProtoNavScenarioControls`). When CJM reaches the last playlist frame (e.g. `11/11` for logged-in Traditional CJM with login beat skipped, `12/12` when login is in the playlist), the diode glows **blue** (`journeyAtEnd`) until the user steps back or leaves journey mode.
+
+Studio step counter (`scenarioFrames` in diagnostics) uses the **live touchpoint playlist length** as the denominator and the max of beat-anchored + **current screen tab** playlist index as the numerator — so the counter can show appointment history (`10/11`) while the beat index is still on confirmation until the next transport step. With **CJM off**, the deck shows `-- / N` only (no numerator); `N` is always the current journey playlist length (e.g. `11` for logged-in Traditional, `25` for Agentic) and updates when you switch CJM mode.
+
+**Transport no-op guard** — if manual step forward completes (~1.2s) without changing beat index, reports `transport-no-op` / `transport-step-no-op` (e.g. director script failed silently during manual CJM stepping). Manual script failures also surface via `script-failed` diagnostics (not only during auto-play).
+
+**Transport contract guard** (`useProtoPlaybackTransportGuard`) catches studio deck invariants the DOM-focused monitors do not:
+
+| Check | When it fires |
+|-------|----------------|
+| `playlist-frame-skip` | One manual step advances the raw touchpoint playlist by more than one frame (e.g. 3/12 → 5/12) |
+| `touchpoint-ahead-of-beat` | Runtime touchpoint is **two or more** playlist frames ahead of the active beat (adjacent next frame is OK — e.g. PDP → login popup before beat advances) |
+| `director-script-off-air` | `isScripting` is true while `isOnAir` is false — control panel should show on-air during director scripts |
+
+Key files: `protoPlaybackTransportAnomalies.ts`, `useProtoPlaybackTransportGuard.ts`.
+
+**Viewport guard** derives `expectsViewportFollow` from journey beat metadata (`beatExpectsViewportFollow` in `journeyBeatDirector.ts`): same `protoTab`, chained director scripts on one screen. No per-beat id registry.
+
+Key files: `journeyBeatDirector.ts`, `protoPlaybackDirectorAnomalies.ts`, `protoPlaybackDirectorMonitor.ts`, `useProtoPlaybackDirectorGuard.ts`.
+

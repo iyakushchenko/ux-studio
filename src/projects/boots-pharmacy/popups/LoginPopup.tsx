@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from "react";
 import { ProtoCloseIcon } from "@/app/chrome/ProtoCloseIcon";
+import { useProtoOverlayDismiss } from "@/app/chrome/useProtoOverlayDismiss";
 
 type Props = {
   open: boolean;
@@ -11,6 +12,7 @@ type Props = {
 type Tab = "signin" | "create" | "forgot";
 
 export default function LoginPopup({ open, initialTab, onClose, onSignIn }: Props) {
+  const { mounted, scrimClassName, onScrimAnimationEnd } = useProtoOverlayDismiss(open);
   const [tab, setTab] = useState<Tab>("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -81,7 +83,7 @@ export default function LoginPopup({ open, initialTab, onClose, onSignIn }: Prop
     }
   }, [open]);
 
-  if (!open) return null;
+  if (!mounted) return null;
 
   const onScrim = (e: MouseEvent) => {
     if (e.target === e.currentTarget) onClose();
@@ -93,7 +95,12 @@ export default function LoginPopup({ open, initialTab, onClose, onSignIn }: Prop
   };
 
   return (
-    <div className="proto-avail-scrim" role="presentation" onClick={onScrim}>
+    <div
+      className={scrimClassName}
+      role="presentation"
+      onClick={onScrim}
+      onAnimationEnd={onScrimAnimationEnd}
+    >
       <div
         className="proto-avail-card proto-login-card"
         ref={cardRef}

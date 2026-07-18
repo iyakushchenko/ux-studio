@@ -9,6 +9,7 @@ export type JourneyBeatActionId =
   | "apply-demo-location";
 
 export type AvailabilityScriptId =
+  | "select-location"
   | "continue-from-date"
   | "select-time-slot"
   | "book-now";
@@ -62,9 +63,10 @@ export type ProtoBrandPack = {
 };
 
 export type JourneyRuntime = {
-  goToTab: (screenIndex: number) => void;
+  goToTab: (screenIndex: number, options?: { instant?: boolean }) => void;
   openAvailability: (intent?: unknown) => void;
   closeAvailability: () => void;
+  closeAllPopups: () => void;
   applyDemoLocation: () => void;
 };
 

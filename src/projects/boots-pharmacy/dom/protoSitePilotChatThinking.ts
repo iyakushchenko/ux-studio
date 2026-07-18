@@ -1,4 +1,4 @@
-import { scrollPrototypeScrollToBottom } from "@/app/proto/protoScenarioEngine";
+import { animateScrollTo } from "@/app/proto/protoPlaybackScroll";
 
 const THINKING_ATTR = "data-proto-chat-thinking";
 const THINKING_CLASS = "proto-chat-thinking-bubble";
@@ -103,11 +103,12 @@ function scrollChatToBottom(): void {
   const scrollEl = document.querySelector<HTMLElement>(
     ".proto-scroll--prototype:not(.hidden)"
   );
-  scrollPrototypeScrollToBottom(scrollEl, "smooth");
-  window.setTimeout(
-    () => scrollPrototypeScrollToBottom(scrollEl, "instant"),
-    360
-  );
+  if (!scrollEl) return;
+  const resolveBottom = () =>
+    Math.max(0, scrollEl.scrollHeight - scrollEl.clientHeight);
+  void animateScrollTo(scrollEl, resolveBottom(), {
+    resolveTargetTop: resolveBottom,
+  });
 }
 
 function restartThinkingAnimation(bubble: HTMLElement): void {

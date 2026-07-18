@@ -1,10 +1,23 @@
 import {
   clearSimulatedClickRipples,
   delay,
+  isDemoCursorJourneyModePinned,
+  releaseDemoCursorAfterScript,
   removeDemoCursor,
   simulateDemoPointerClick,
 } from "@/app/proto/protoDemoCursor";
+import {
+  animateScrollElementIntoView,
+  animateScrollTo,
+  computeScrollTopForElement,
+} from "@/app/proto/protoPlaybackScroll";
 import type { AvailabilityScriptId } from "@/app/orchestra/types";
+import {
+  scriptAborted,
+  scriptFail,
+  scriptOk,
+  type PlaybackScriptResult,
+} from "@/projects/playbackScriptResult";
 
 /** Demo date picked during journey playback on the Availability date step. */
 const PLAYBACK_TARGET_DATE_DAY = 21;
@@ -23,6 +36,15 @@ export function wasAvailabilityPlaybackAborted(): boolean {
 
 function shouldAbort(): boolean {
   return playbackAborted;
+}
+
+async function wrapAvailBool(
+  run: () => Promise<boolean>,
+  failStep: string
+): Promise<PlaybackScriptResult> {
+  const ok = await run();
+  if (ok) return scriptOk();
+  return shouldAbort() ? scriptAborted() : scriptFail(failStep);
 }
 
 function availCard(): HTMLElement | null {
@@ -75,14 +97,26 @@ async function findDateCell(
   return null;
 }
 
-async function runContinueFromDate(options?: { skip?: boolean }): Promise<boolean> {
+async function runContinueFromDate(options?: { skip?: boolean }): Promise<PlaybackScriptResult> {
   const card = await waitForAvailCard();
-  if (!card || shouldAbort()) return false;
+  if (!card) {
+    return shouldAbort()
+      ? scriptAborted()
+      : scriptFail("waitForAvailCard: .proto-avail-card missing");
+  }
 
-  if (!(await waitForDateStep(card))) return false;
+  if (!(await waitForDateStep(card))) {
+    return shouldAbort()
+      ? scriptAborted()
+      : scriptFail("waitForDateStep: .proto-avail-calendars not visible");
+  }
 
   const dateCell = await findDateCell(card, PLAYBACK_TARGET_DATE_DAY);
-  if (!dateCell || shouldAbort()) return false;
+  if (!dateCell) {
+    return shouldAbort()
+      ? scriptAborted()
+      : scriptFail(`findDateCell: day ${PLAYBACK_TARGET_DATE_DAY} not found`);
+  }
 
   if (!dateCell.classList.contains("proto-avail-cal-cell--selected")) {
     if (options?.skip) {
@@ -90,7 +124,7 @@ async function runContinueFromDate(options?: { skip?: boolean }): Promise<boolea
     } else {
       await simulateDemoPointerClick(dateCell, { shouldAbort });
     }
-    if (shouldAbort()) return false;
+    if (shouldAbort()) return scriptAborted();
     await delay(280);
   }
 
@@ -98,16 +132,20 @@ async function runContinueFromDate(options?: { skip?: boolean }): Promise<boolea
     card,
     ".proto-avail-footer .proto-avail-btn-primary"
   );
-  if (!continueBtn || shouldAbort()) return false;
+  if (!continueBtn) {
+    return shouldAbort()
+      ? scriptAborted()
+      : scriptFail("waitForSelector: availability Continue button missing");
+  }
 
   if (options?.skip) {
     continueBtn.click();
-    return true;
+    return scriptOk();
   }
 
   await simulateDemoPointerClick(continueBtn, { shouldAbort });
   await delay(320);
-  return !shouldAbort();
+  return shouldAbort() ? scriptAborted() : scriptOk();
 }
 
 async function runSelectTimeSlot(options?: { skip?: boolean }): Promise<boolean> {
@@ -201,22 +239,23 @@ async function scrollWithinAvailList(
 ): Promise<void> {
   const list = card.querySelector<HTMLElement>(".proto-avail-store-list");
   if (!list) {
-    target.scrollIntoView({ block: "center", behavior: "instant" });
-    await delay(options?.skip ? 80 : 160);
+    if (options?.skip) {
+      target.scrollIntoView({ block: "center", behavior: "instant" });
+      return;
+    }
+    await animateScrollElementIntoView(target, {
+      align: "center",
+      shouldAbort,
+    });
     return;
   }
 
-  const listRect = list.getBoundingClientRect();
-  const targetRect = target.getBoundingClientRect();
-  const padding = 28;
-
-  if (targetRect.bottom > listRect.bottom - padding) {
-    list.scrollTop += targetRect.bottom - listRect.bottom + padding;
-  } else if (targetRect.top < listRect.top + padding) {
-    list.scrollTop -= listRect.top + padding - targetRect.top;
+  const targetTop = computeScrollTopForElement(list, target, "nearest", 28);
+  if (options?.skip) {
+    list.scrollTop = targetTop;
+    return;
   }
-
-  await delay(options?.skip ? 120 : 240);
+  await animateScrollTo(list, targetTop, { shouldAbort });
 }
 
 function findChooseLocationButton(storeCard: HTMLElement): HTMLElement | null {
@@ -278,21 +317,45 @@ export async function runSelectLocationStore(
   return false;
 }
 
+async function runSelectLocation(options?: { skip?: boolean }): Promise<PlaybackScriptResult> {
+  const card = await waitForAvailCard();
+  if (!card) {
+    return shouldAbort()
+      ? scriptAborted()
+      : scriptFail("waitForAvailCard: .proto-avail-card missing");
+  }
+
+  if (card.querySelector(".proto-avail-calendars")) {
+    return scriptOk();
+  }
+
+  const ok = await runSelectLocationStore(options);
+  if (ok) return scriptOk();
+  return shouldAbort()
+    ? scriptAborted()
+    : scriptFail("runSelectLocationStore: store list or Choose location failed");
+}
+
 export async function runAvailabilityScript(
   scriptId: AvailabilityScriptId,
   options?: { skip?: boolean }
-): Promise<boolean> {
+): Promise<PlaybackScriptResult> {
   playbackAborted = false;
 
   switch (scriptId) {
+    case "select-location":
+      return runSelectLocation(options);
     case "continue-from-date":
       return runContinueFromDate(options);
     case "select-time-slot":
-      return runSelectTimeSlot(options);
+      return wrapAvailBool(
+        () => runSelectTimeSlot(options),
+        "runSelectTimeSlot: time slot not found"
+      );
     case "book-now":
-      return runBookNow(options);
+      return wrapAvailBool(() => runBookNow(options), "runBookNow: Book now button missing");
     default:
-      return false;
+      return scriptFail(`unknown availability script: ${String(scriptId)}`);
   }
 }
 

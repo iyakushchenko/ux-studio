@@ -1,7 +1,21 @@
+import { createRoot } from "react-dom/client";
+import { ProtoAppErrorBoundary, renderBootstrapError } from "@/app/shell/ProtoAppErrorBoundary";
+import "./styles/index.css";
 
-  import { createRoot } from "react-dom/client";
-  import App from "./app/App.tsx";
-  import "./styles/index.css";
+async function boot(): Promise<void> {
+  const root = document.getElementById("root");
+  if (!root) return;
 
-  createRoot(document.getElementById("root")!).render(<App />);
-  
+  try {
+    const { default: App } = await import("./app/App.tsx");
+    createRoot(root).render(
+      <ProtoAppErrorBoundary>
+        <App />
+      </ProtoAppErrorBoundary>
+    );
+  } catch (error) {
+    renderBootstrapError(root, error);
+  }
+}
+
+void boot();

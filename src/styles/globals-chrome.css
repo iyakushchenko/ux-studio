@@ -1,5 +1,5 @@
 .proto-scroll {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
 }
 
 /* Prototype scroll pane — flex fill + zoom-safe min height (see useProtoScrollFill) */
@@ -15,10 +15,319 @@
   min-height: var(--proto-scroll-min-px, 100%);
 }
 
+.proto-scroll--prototype.proto-scroll--locked {
+  overflow: hidden !important;
+  overscroll-behavior: contain;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .proto-scroll {
     scroll-behavior: auto;
   }
+}
+
+/* Studio playback — block user input on wire (pages + popups); nav deck stays live */
+.proto-wire-mount {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.proto-wire-mount--playback-locked {
+  cursor: not-allowed;
+}
+.proto-wire-mount--playback-locked .proto-app-content {
+  cursor: not-allowed;
+}
+.proto-wire-mount--playback-locked .proto-playback-shield {
+  cursor: not-allowed;
+}
+
+/* Screen / hub navigation — crossfade on wire mount (see useProtoNavTransition) */
+.proto-wire-mount--nav-cross {
+  animation: proto-wire-nav-cross 280ms ease forwards;
+  pointer-events: none;
+}
+
+@keyframes proto-wire-nav-cross {
+  0% {
+    opacity: 1;
+  }
+  46% {
+    opacity: 0;
+  }
+  54% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .proto-wire-mount--nav-cross {
+    animation: none;
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+.proto-playback-shield {
+  position: absolute;
+  inset: 0;
+  z-index: 10045;
+  cursor: default;
+  pointer-events: auto;
+  touch-action: none;
+  background: transparent;
+}
+
+/* Fatal runtime fallback — import/TDZ/render crashes */
+.proto-fatal-error {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: #f5f5f5;
+  color: #212121;
+  font-family: "Open Sans", system-ui, sans-serif;
+}
+.proto-fatal-error__card {
+  width: min(640px, 100%);
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 5px 13px 2px rgba(0, 0, 0, 0.12);
+  padding: 24px 28px;
+}
+.proto-fatal-error__eyebrow {
+  margin: 0 0 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #5c5c5c;
+}
+.proto-fatal-error__title {
+  margin: 0 0 10px;
+  font-size: 22px;
+  line-height: 1.25;
+  color: #012169;
+}
+.proto-fatal-error__summary {
+  margin: 0 0 18px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #333;
+}
+.proto-fatal-error__section {
+  margin-bottom: 16px;
+}
+.proto-fatal-error__heading {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #012169;
+}
+.proto-fatal-error__list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #444;
+}
+.proto-fatal-error__list li + li {
+  margin-top: 4px;
+}
+.proto-fatal-error__details {
+  margin: 16px 0;
+  font-size: 13px;
+}
+.proto-fatal-error__details-summary {
+  cursor: pointer;
+  color: #012169;
+  font-weight: 600;
+}
+.proto-fatal-error__pre {
+  margin: 10px 0 0;
+  padding: 12px;
+  border-radius: 6px;
+  background: #f5f5f5;
+  font-size: 11px;
+  line-height: 1.45;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.proto-fatal-error__pre--stack {
+  margin-top: 8px;
+  color: #555;
+}
+.proto-fatal-error__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.proto-fatal-error__btn {
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.proto-fatal-error__btn--primary {
+  border: none;
+  background: #012169;
+  color: #fff;
+}
+.proto-fatal-error__btn--primary:hover {
+  background: #023a8c;
+}
+.proto-fatal-error__btn--secondary {
+  border: 1px solid #ccc;
+  background: #fff;
+  color: #333;
+}
+.proto-fatal-error__btn--secondary:hover {
+  background: #f5f5f5;
+}
+.proto-fatal-error__btn--copied {
+  border-color: #2f855a;
+  color: #2f855a;
+}
+/* legacy single-button class — keep for bootstrap HTML fallback */
+.proto-fatal-error__reload {
+  margin-top: 8px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  background: #012169;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.proto-fatal-error__reload:hover {
+  background: #023a8c;
+}
+
+/* Playback diagnostic — non-fatal overlay when scripts stall or desync */
+.proto-playback-diagnostic {
+  position: fixed;
+  inset: 0;
+  z-index: 10100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px;
+  pointer-events: none;
+  background: rgba(1, 33, 105, 0.18);
+}
+.proto-playback-diagnostic__card {
+  pointer-events: auto;
+  width: min(640px, 100%);
+  max-height: min(85dvh, 720px);
+  overflow: auto;
+  background: #fff;
+  border-radius: 8px;
+  border: 2px solid #c53030;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
+  padding: 20px 24px;
+}
+.proto-playback-diagnostic__eyebrow {
+  margin: 0 0 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #c53030;
+}
+.proto-playback-diagnostic__title {
+  margin: 0 0 8px;
+  font-size: 20px;
+  line-height: 1.25;
+  color: #012169;
+}
+.proto-playback-diagnostic__summary {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #333;
+}
+.proto-playback-diagnostic__section {
+  margin-bottom: 14px;
+}
+.proto-playback-diagnostic__heading {
+  margin: 0 0 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #012169;
+}
+.proto-playback-diagnostic__list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #444;
+}
+.proto-playback-diagnostic__list li + li {
+  margin-top: 4px;
+}
+.proto-playback-diagnostic__details {
+  margin: 12px 0;
+  font-size: 13px;
+}
+.proto-playback-diagnostic__details-summary {
+  cursor: pointer;
+  color: #012169;
+  font-weight: 600;
+}
+.proto-playback-diagnostic__pre {
+  margin: 8px 0 0;
+  padding: 10px;
+  border-radius: 6px;
+  background: #f5f5f5;
+  font-size: 11px;
+  line-height: 1.45;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.proto-playback-diagnostic__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.proto-playback-diagnostic__btn {
+  padding: 9px 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+  color: #333;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.proto-playback-diagnostic__btn--primary {
+  border-color: #012169;
+  background: #012169;
+  color: #fff;
+}
+.proto-playback-diagnostic__btn--primary:hover {
+  background: #023a8c;
+}
+.proto-playback-diagnostic__btn--copied {
+  border-color: #38a169;
+  background: #276749;
+  color: #fff;
 }
 
 [data-name="component.mega.menu.item"] {
@@ -1040,16 +1349,21 @@
 }
 .proto-chat-demo-cursor__graphic--hand {
   display: none;
-  width: 96%;
-  height: 96%;
+  width: auto;
+  height: 100%;
+  max-width: 100%;
   left: 0;
   top: 0;
+  object-fit: contain;
+  object-position: left top;
+  pointer-events: none;
+  user-select: none;
 }
 .proto-chat-demo-cursor--pointer {
-  transform: translate(-2px, 0);
+  transform: translate(0, 0);
 }
 .proto-chat-demo-cursor--pointer.proto-chat-demo-cursor--tap {
-  transform: translate(-2px, 0) scale(0.88);
+  transform: translate(0, 0) scale(0.88);
 }
 .proto-chat-demo-cursor--pointer .proto-chat-demo-cursor__graphic--arrow {
   display: none;
@@ -1061,6 +1375,13 @@
   transform: scale(0.88);
   filter: drop-shadow(0 0 8px rgba(1, 33, 105, 0.4))
     drop-shadow(0 2px 4px rgba(0, 0, 0, 0.22));
+}
+.proto-chat-demo-cursor--parked {
+  opacity: 0.94;
+  transition:
+    left 0.42s cubic-bezier(0.4, 0, 0.2, 1),
+    top 0.42s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.2s ease;
 }
 .proto-chat-demo-cursor--exit {
   will-change: left, top, opacity;

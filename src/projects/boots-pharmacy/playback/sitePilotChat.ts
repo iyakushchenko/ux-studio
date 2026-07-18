@@ -4,6 +4,7 @@ import {
   moveDemoCursorTo,
   notifyStudioDemoClick,
   removeDemoCursor as removeSharedDemoCursor,
+  settleDemoCursorAfterClick,
   targetCenter,
 } from "@/app/proto/protoDemoCursor";
 import { scrollPrototypeScrollToBottom } from "@/app/proto/protoScenarioEngine";
@@ -142,12 +143,8 @@ function spawnSimulatedClickRipple(x: number, y: number): void {
 async function simulateSarahCtaClick(button: HTMLElement): Promise<void> {
   if (preludeAborted) return;
 
-  button.scrollIntoView({ block: "nearest", behavior: "smooth" });
-  await delay(180);
-  if (preludeAborted) return;
-
-  const cursor = await moveDemoCursorTo(button);
-  if (preludeAborted) return;
+  const cursor = await moveDemoCursorTo(button, { syncPageScroll: true });
+  if (!cursor || preludeAborted) return;
 
   button.classList.add("proto-chat-cta--hover");
 
@@ -159,19 +156,15 @@ async function simulateSarahCtaClick(button: HTMLElement): Promise<void> {
   button.classList.add("proto-chat-cta--pressed");
   await delay(CTA_PRESS_MS);
   button.classList.remove("proto-chat-cta--pressed", "proto-chat-cta--hover");
-  removeDemoCursor();
+  settleDemoCursorAfterClick(cursor, button);
   await delay(160);
 }
 
 async function simulateSarahSendClick(sendBtn: HTMLElement): Promise<void> {
   if (preludeAborted) return;
 
-  sendBtn.scrollIntoView({ block: "nearest", behavior: "smooth" });
-  await delay(160);
-  if (preludeAborted) return;
-
-  const cursor = await moveDemoCursorTo(sendBtn);
-  if (preludeAborted) return;
+  const cursor = await moveDemoCursorTo(sendBtn, { syncPageScroll: true });
+  if (!cursor || preludeAborted) return;
 
   const { x, y } = targetCenter(sendBtn);
   spawnSimulatedClickRipple(x, y);
@@ -181,7 +174,7 @@ async function simulateSarahSendClick(sendBtn: HTMLElement): Promise<void> {
   sendBtn.classList.add("proto-agentic-send--sending");
   await delay(SEND_PAUSE_MS);
   sendBtn.classList.remove("proto-agentic-send--sending");
-  removeDemoCursor();
+  settleDemoCursorAfterClick(cursor, sendBtn);
   await delay(160);
 }
 
@@ -242,6 +235,7 @@ export async function runSitePilotChatBeforeReveal(
   const { frame, frameIndex, frames, currentCount } = ctx;
 
   if (isSitePilotChatAgentReplyFrame(frame)) {
+    removeDemoCursor();
     const screen = getChatScreen();
     if (screen) beginSitePilotChatPlaybackThinking(screen, frame);
     scrollChatToBottom();
@@ -273,6 +267,7 @@ export async function runSitePilotChatBeforeReveal(
   } else {
     await simulateSarahTypingInComposer(text);
   }
+  removeDemoCursor();
 }
 
 /** Final scenario beat — Sarah picks a date CTA and leaves chat for Availability Tool. */

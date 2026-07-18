@@ -1,6 +1,14 @@
+import handIndexCursorUrl from "@/assets/hand-index-cursor.svg";
+import {
+  beginDemoTargetPageScroll,
+  isPrototypeOverlayTarget,
+  isPrototypePageScrollLocked,
+  type PlaybackScrollOptions,
+} from "@/app/proto/protoPlaybackScroll";
+
 const CURSOR_ARROW_SVG = `<svg class="proto-chat-demo-cursor__graphic proto-chat-demo-cursor__graphic--arrow" fill="none" viewBox="0 0 22 26" aria-hidden="true"><path fill="#fff" stroke="#4F4F4F" stroke-width="0.6" d="M3.5 2.5 18.5 12 10.5 14.5 12.5 22.5 9.5 23.5 7.5 15.5 3.5 17.5z"/></svg>`;
 
-const CURSOR_HAND_SVG = `<svg class="proto-chat-demo-cursor__graphic proto-chat-demo-cursor__graphic--hand" fill="none" viewBox="0 0 24 28" aria-hidden="true"><path fill="#fff" stroke="#4F4F4F" stroke-width="0.7" stroke-linejoin="round" stroke-linecap="round" d="M6.2 1.1c1.2-.2 2.4.6 2.6 1.9l.3 7.5c.1.7.6 1.2 1.3 1.4l2.4.5c1.4.3 2.4 1.1 3 2.3.4 1 .6 2 .9 3 .3 1 .9 1.6 1.8 1.9 1 .3 1.6 1.1 1.4 2.1-.2 1.2-1.3 1.9-2.5 1.7l-2.3-.4c-.7-.1-1.3.4-1.4 1.1l-.3 1.3c-.2 1-.9 1.6-1.9 1.4l-3.6-.6c-1.4-.3-2.4-1.4-2.2-2.8l.4-2.4c.2-1-.5-1.9-1.5-2.3l-1.7-.6c-.9-.3-1.4-1.2-1-2.1l1-2.6c.4-.9 1.3-1.4 2.3-1.2l1.2.3c-.5-1.2-.5-2.5-.3-3.7l.6-2.6c.2-1 .5-1.3.8-1.3z"/></svg>`;
+const CURSOR_HAND_SVG = `<img class="proto-chat-demo-cursor__graphic proto-chat-demo-cursor__graphic--hand" src="${handIndexCursorUrl}" width="24" height="37" alt="" aria-hidden="true" draggable="false" />`;
 
 const DEMO_CURSOR_MARKUP = `${CURSOR_ARROW_SVG}${CURSOR_HAND_SVG}`;
 
@@ -9,10 +17,17 @@ const CTA_PRESS_MS = 380;
 const CTA_HOVER_DWELL_MS = 360;
 const CURSOR_EXIT_MS = 1600;
 const CURSOR_EXIT_DRIFT_PX = 10;
-const CURSOR_HOTSPOT_X = 9;
-const CURSOR_HOTSPOT_Y = 3;
+/** Parked robo-cursor in CJM — inset from the right edge, lower-right resting pose. */
+const CURSOR_REST_RIGHT_INSET_RATIO = 0.08;
+const CURSOR_REST_Y_RATIO = 0.54;
+const CURSOR_PARK_DRIFT_PX = 20;
+const CURSOR_PARK_TRAVEL_MS = 520;
+/** Index fingertip in hand-index-cursor.svg (viewBox 24×37). */
+const CURSOR_HOTSPOT_X = 4;
+const CURSOR_HOTSPOT_Y = 1;
 
 export const PROTO_DEMO_CLICK_EVENT = "proto-demo-click";
+export const PROTO_DEMO_CURSOR_PARKED_CLASS = "proto-chat-demo-cursor--parked";
 
 export function notifyStudioDemoClick(): void {
   document.dispatchEvent(new CustomEvent(PROTO_DEMO_CLICK_EVENT));
@@ -20,9 +35,221 @@ export function notifyStudioDemoClick(): void {
 
 let lastCursorPos: { x: number; y: number } | null = null;
 let activeHoverRoot: HTMLElement | null = null;
+let journeyModePinned = false;
+/** Manual CJM steps park after each interaction; cassette play leaves cursor on target. */
+let parkAfterInteraction = false;
+let parkPromise: Promise<void> | null = null;
+let resizeParkListener: (() => void) | null = null;
+let parkGeneration = 0;
+/** Drifted park pose — reused until the cursor leaves rest for a director travel. */
+let parkedRestAnchor: { left: number; top: number } | null = null;
+
+export function isDemoCursorJourneyModePinned(): boolean {
+  return journeyModePinned;
+}
+
+export function shouldParkDemoCursorAfterInteraction(): boolean {
+  return journeyModePinned && parkAfterInteraction;
+}
+
+export function isDemoCursorParked(): boolean {
+  const cursor = document.querySelector<HTMLElement>(".proto-chat-demo-cursor");
+  return cursor?.classList.contains(PROTO_DEMO_CURSOR_PARKED_CLASS) ?? false;
+}
+
+export function waitForDemoCursorParked(): Promise<void> {
+  return parkPromise ?? Promise.resolve();
+}
 
 function randomInRange(min: number, max: number): number {
   return min + Math.random() * (max - min);
+}
+
+export function resolveDemoCursorRestPosition(options?: {
+  /** When true, sample a new drift offset even if a park pose already exists. */
+  resample?: boolean;
+}): { left: number; top: number } {
+  if (parkedRestAnchor && !options?.resample) {
+    return parkedRestAnchor;
+  }
+  const baseLeft = Math.round(
+    window.innerWidth * (1 - CURSOR_REST_RIGHT_INSET_RATIO) - 37
+  );
+  const baseTop = Math.round(window.innerHeight * CURSOR_REST_Y_RATIO);
+  const driftX = randomInRange(-CURSOR_PARK_DRIFT_PX, CURSOR_PARK_DRIFT_PX);
+  const driftY = randomInRange(-CURSOR_PARK_DRIFT_PX, CURSOR_PARK_DRIFT_PX);
+  const margin = 16;
+  const next = {
+    left: Math.round(
+      Math.max(margin, Math.min(window.innerWidth - 37 - margin, baseLeft + driftX))
+    ),
+    top: Math.round(
+      Math.max(margin, Math.min(window.innerHeight - 40 - margin, baseTop + driftY))
+    ),
+  };
+  parkedRestAnchor = next;
+  return next;
+}
+
+function cancelDemoCursorParkInFlight(): void {
+  parkGeneration += 1;
+  parkPromise = null;
+}
+
+function prepareDemoCursorForTravel(cursor: HTMLElement): { x: number; y: number } {
+  parkedRestAnchor = null;
+  cursor.classList.remove(
+    PROTO_DEMO_CURSOR_PARKED_CLASS,
+    "proto-chat-demo-cursor--exit",
+    "proto-chat-demo-cursor--tap"
+  );
+  cursor.style.opacity = "1";
+  cursor.style.transition = "none";
+  const pos = readCursorPosition();
+  if (pos) {
+    lastCursorPos = pos;
+    return pos;
+  }
+  const rect = cursor.getBoundingClientRect();
+  const seeded = { x: Math.round(rect.left), y: Math.round(rect.top) };
+  seedDemoCursorPosition(cursor, seeded);
+  return seeded;
+}
+
+function ensureDemoCursorElement(): HTMLElement {
+  const existing = document.querySelector<HTMLElement>(".proto-chat-demo-cursor");
+  if (existing) return existing;
+
+  const cursor = document.createElement("div");
+  cursor.className = "proto-chat-demo-cursor";
+  cursor.innerHTML = DEMO_CURSOR_MARKUP;
+  document.body.appendChild(cursor);
+  return cursor;
+}
+
+function applyDemoCursorParkedState(cursor: HTMLElement): void {
+  clearDemoCtaStates();
+  cursor.classList.remove(
+    "proto-chat-demo-cursor--exit",
+    "proto-chat-demo-cursor--tap",
+    "proto-chat-demo-cursor--pointer"
+  );
+  cursor.classList.add(PROTO_DEMO_CURSOR_PARKED_CLASS);
+  cursor.style.opacity = "1";
+  setDemoCursorPointerMode(false);
+}
+
+function seedDemoCursorPosition(
+  cursor: HTMLElement,
+  position: { x: number; y: number }
+): void {
+  cursor.style.transition = "none";
+  cursor.style.left = `${position.x}px`;
+  cursor.style.top = `${position.y}px`;
+  lastCursorPos = { x: position.x, y: position.y };
+}
+
+function resolveDemoCursorSeedPosition(): { x: number; y: number } {
+  const current = readCursorPosition();
+  if (current) return current;
+  if (lastCursorPos) return lastCursorPos;
+  const rest = resolveDemoCursorRestPosition();
+  return { x: rest.left, y: rest.top };
+}
+
+/** CJM idle pose — visible on the right, waiting for the next director call. */
+export function parkDemoCursorAtRest(options?: {
+  animate?: boolean;
+}): Promise<void> {
+  if (parkPromise) return parkPromise;
+
+  const generation = parkGeneration;
+  const run = async () => {
+    const cursor = ensureDemoCursorElement();
+    const startX = Number.parseFloat(cursor.style.left);
+    const startY = Number.parseFloat(cursor.style.top);
+    const hasStart = Number.isFinite(startX) && Number.isFinite(startY);
+    const alreadyParked = cursor.classList.contains(PROTO_DEMO_CURSOR_PARKED_CLASS);
+
+    if (alreadyParked && hasStart) {
+      applyDemoCursorParkedState(cursor);
+      seedDemoCursorPosition(cursor, { x: startX, y: startY });
+      parkedRestAnchor = { left: startX, top: startY };
+      lastCursorPos = { x: startX, y: startY };
+      return;
+    }
+
+    const rest = resolveDemoCursorRestPosition({ resample: true });
+
+    if (!hasStart) {
+      seedDemoCursorPosition(cursor, { x: rest.left, y: rest.top });
+      applyDemoCursorParkedState(cursor);
+      return;
+    }
+
+    if (options?.animate) {
+      applyDemoCursorParkedState(cursor);
+      const moved = await animateCursorTravel(
+        cursor,
+        startX,
+        startY,
+        rest.left,
+        rest.top,
+        CURSOR_PARK_TRAVEL_MS,
+        { shouldAbort: () => parkGeneration !== generation }
+      );
+      if (!moved) {
+        if (parkGeneration !== generation) return;
+        seedDemoCursorPosition(cursor, { x: rest.left, y: rest.top });
+      }
+    } else {
+      seedDemoCursorPosition(cursor, { x: rest.left, y: rest.top });
+      applyDemoCursorParkedState(cursor);
+    }
+
+    if (parkGeneration !== generation) return;
+    lastCursorPos = { x: rest.left, y: rest.top };
+    parkedRestAnchor = { left: rest.left, top: rest.top };
+  };
+
+  parkPromise = run().finally(() => {
+    parkPromise = null;
+  });
+  return parkPromise;
+}
+
+export function setDemoCursorJourneyMode(
+  active: boolean,
+  options?: { parkAfterInteraction?: boolean }
+): void {
+  journeyModePinned = active;
+  if (options?.parkAfterInteraction !== undefined) {
+    parkAfterInteraction = options.parkAfterInteraction;
+  } else if (!active) {
+    parkAfterInteraction = false;
+  } else {
+    parkAfterInteraction = true;
+  }
+
+  if (resizeParkListener) {
+    window.removeEventListener("resize", resizeParkListener);
+    resizeParkListener = null;
+  }
+
+  if (!active) {
+    parkedRestAnchor = null;
+    return;
+  }
+
+  parkedRestAnchor = null;
+  void parkDemoCursorAtRest();
+  resizeParkListener = () => {
+    if (journeyModePinned) {
+      parkedRestAnchor = null;
+      void parkDemoCursorAtRest();
+    }
+  };
+  window.addEventListener("resize", resizeParkListener);
 }
 
 function easeOutCubic(t: number): number {
@@ -30,7 +257,18 @@ function easeOutCubic(t: number): number {
 }
 
 export function resetDemoCursorTravelOrigin(): void {
+  if (journeyModePinned) {
+    const current = readCursorPosition();
+    if (current) {
+      lastCursorPos = current;
+      return;
+    }
+    const rest = resolveDemoCursorRestPosition();
+    lastCursorPos = { x: rest.left, y: rest.top };
+    return;
+  }
   lastCursorPos = null;
+  parkedRestAnchor = null;
 }
 
 function cursorHotspotFromPos(left: number, top: number): { x: number; y: number } {
@@ -61,10 +299,22 @@ async function animateCursorTravel(
   options?: {
     onApproach?: () => void;
     approachElement?: HTMLElement;
+    /** Re-read end position each frame (page scroll in progress). */
+    trackTarget?: HTMLElement;
+    shouldAbort?: () => boolean;
   }
-): Promise<void> {
-  const dx = endX - startX;
-  const dy = endY - startY;
+): Promise<boolean> {
+  const resolveEnd = () => {
+    if (options?.trackTarget) {
+      const tracked = cursorPositionForTarget(options.trackTarget);
+      return { x: tracked.left, y: tracked.top };
+    }
+    return { x: endX, y: endY };
+  };
+
+  const initialEnd = resolveEnd();
+  const dx = initialEnd.x - startX;
+  const dy = initialEnd.y - startY;
   const dist = Math.hypot(dx, dy) || 1;
   const arcMag = Math.min(56, dist * 0.14) * (Math.random() > 0.5 ? 1 : -1);
   const ctrlX = startX + dx * 0.42 + (-dy / dist) * arcMag;
@@ -88,14 +338,20 @@ async function animateCursorTravel(
 
   tryApproach(startX, startY);
 
+  let completed = false;
   await new Promise<void>((resolve) => {
     const tick = (now: number) => {
+      if (options?.shouldAbort?.()) {
+        resolve();
+        return;
+      }
       const t = Math.min(1, (now - start) / durationMs);
       const e = easeOutCubic(t);
+      const end = resolveEnd();
       const u = 1 - e;
-      let x = u * u * startX + 2 * u * e * ctrlX + e * e * endX;
-      let y = u * u * startY + 2 * u * e * ctrlY + e * e * endY;
-      if (t > 0.9) {
+      let x = u * u * startX + 2 * u * e * ctrlX + e * e * end.x;
+      let y = u * u * startY + 2 * u * e * ctrlY + e * e * end.y;
+      if (!options?.trackTarget && t > 0.9) {
         x += randomInRange(-1.2, 1.2);
         y += randomInRange(-0.8, 0.8);
       }
@@ -103,14 +359,23 @@ async function animateCursorTravel(
       cursor.style.top = `${y}px`;
       tryApproach(x, y);
       if (t < 1) requestAnimationFrame(tick);
-      else resolve();
+      else {
+        completed = true;
+        resolve();
+      }
     };
     requestAnimationFrame(tick);
   });
 
-  cursor.style.left = `${endX}px`;
-  cursor.style.top = `${endY}px`;
-  lastCursorPos = { x: endX, y: endY };
+  if (!completed || options?.shouldAbort?.()) {
+    return false;
+  }
+
+  const finalEnd = resolveEnd();
+  cursor.style.left = `${finalEnd.x}px`;
+  cursor.style.top = `${finalEnd.y}px`;
+  lastCursorPos = { x: finalEnd.x, y: finalEnd.y };
+  return true;
 }
 
 async function animateCursorExit(
@@ -147,14 +412,75 @@ async function animateCursorExit(
   });
 }
 
+function readCursorPosition(): { x: number; y: number } | null {
+  const cursor = document.querySelector<HTMLElement>(".proto-chat-demo-cursor");
+  if (!cursor) return null;
+  const left = Number.parseFloat(cursor.style.left);
+  const top = Number.parseFloat(cursor.style.top);
+  if (!Number.isFinite(left) || !Number.isFinite(top)) return null;
+  return { x: left, y: top };
+}
+
+function retainDemoCursorInPlace(): void {
+  clearDemoCtaStates();
+  const cursor = document.querySelector<HTMLElement>(".proto-chat-demo-cursor");
+  if (!cursor) return;
+  cursor.classList.remove(
+    PROTO_DEMO_CURSOR_PARKED_CLASS,
+    "proto-chat-demo-cursor--exit",
+    "proto-chat-demo-cursor--tap"
+  );
+  cursor.style.opacity = "1";
+  setDemoCursorPointerMode(false);
+  const pos = readCursorPosition();
+  if (pos) lastCursorPos = pos;
+}
+
+function acquireDemoCursorElement(): HTMLElement {
+  if (journeyModePinned) {
+    const existing = document.querySelector<HTMLElement>(".proto-chat-demo-cursor");
+    if (existing) {
+      existing.style.opacity = "1";
+      if (!Number.isFinite(Number.parseFloat(existing.style.left))) {
+        seedDemoCursorPosition(existing, resolveDemoCursorSeedPosition());
+      }
+      return existing;
+    }
+  } else {
+    document
+      .querySelectorAll<HTMLElement>(".proto-chat-demo-cursor")
+      .forEach((el) => el.remove());
+  }
+
+  const cursor = document.createElement("div");
+  cursor.className = "proto-chat-demo-cursor";
+  cursor.innerHTML = DEMO_CURSOR_MARKUP;
+  document.body.appendChild(cursor);
+  if (journeyModePinned) {
+    seedDemoCursorPosition(cursor, resolveDemoCursorSeedPosition());
+  }
+  return cursor;
+}
+
 function resolveCursorStart(endX: number, endY: number): { x: number; y: number } {
+  const current = readCursorPosition();
+  if (current) return current;
+
   if (lastCursorPos) {
+    if (journeyModePinned) {
+      return { x: lastCursorPos.x, y: lastCursorPos.y };
+    }
     const jitter = randomInRange(6, 18);
     const angle = randomInRange(0, Math.PI * 2);
     return {
       x: lastCursorPos.x + Math.cos(angle) * jitter,
       y: lastCursorPos.y + Math.sin(angle) * jitter,
     };
+  }
+
+  if (journeyModePinned) {
+    const rest = resolveDemoCursorRestPosition();
+    return { x: rest.left, y: rest.top };
   }
 
   const distance = randomInRange(120, 210);
@@ -222,34 +548,84 @@ function setDemoInteractionHover(root: HTMLElement | null, active: boolean): voi
 }
 
 export function removeDemoCursor(): void {
+  if (journeyModePinned) {
+    if (parkAfterInteraction) {
+      void parkDemoCursorAtRest({ animate: true });
+    } else {
+      retainDemoCursorInPlace();
+    }
+    return;
+  }
+
   document
     .querySelectorAll<HTMLElement>(".proto-chat-demo-cursor")
     .forEach((el) => el.remove());
   clearDemoCtaStates();
+  lastCursorPos = null;
 }
 
-/** Scripted playback end — drift cursor off-screen and fade out. */
+/** End of a director script — await before advancing beats in manual CJM. */
+export async function releaseDemoCursorAfterScript(): Promise<void> {
+  if (!journeyModePinned) {
+    document
+      .querySelectorAll<HTMLElement>(".proto-chat-demo-cursor")
+      .forEach((el) => el.remove());
+    clearDemoCtaStates();
+    lastCursorPos = null;
+    return;
+  }
+  if (parkAfterInteraction) {
+    await parkDemoCursorAtRest({ animate: true });
+    return;
+  }
+  retainDemoCursorInPlace();
+}
+
+/** After a scripted click — keep cursor on target; clear press/tap visuals only. */
+export function settleDemoCursorAfterClick(
+  cursor: HTMLElement,
+  interactionRoot?: HTMLElement | null
+): void {
+  cursor.classList.remove("proto-chat-demo-cursor--tap");
+  cursor.classList.remove(PROTO_DEMO_CURSOR_PARKED_CLASS);
+  if (interactionRoot) {
+    interactionRoot.classList.remove("proto-chat-cta--pressed");
+    setDemoInteractionHover(interactionRoot, true);
+  } else {
+    setDemoCursorPointerMode(true);
+  }
+  const left = Number.parseFloat(cursor.style.left);
+  const top = Number.parseFloat(cursor.style.top);
+  if (Number.isFinite(left) && Number.isFinite(top)) {
+    lastCursorPos = { x: left, y: top };
+  }
+}
+
+/** Scripted playback end — drift cursor off-screen and fade out (unless CJM pins it). */
 export async function exitDemoCursor(): Promise<void> {
+  if (journeyModePinned) {
+    if (parkAfterInteraction) {
+      await parkDemoCursorAtRest({ animate: true });
+    } else {
+      retainDemoCursorInPlace();
+    }
+    return;
+  }
+
   clearDemoCtaStates();
 
-  let cursor = document.querySelector<HTMLElement>(".proto-chat-demo-cursor");
+  const cursor = document.querySelector<HTMLElement>(".proto-chat-demo-cursor");
+  if (!cursor) {
+    resetDemoCursorTravelOrigin();
+    return;
+  }
+
   let startX = lastCursorPos?.x ?? window.innerWidth * 0.58;
   let startY = lastCursorPos?.y ?? window.innerHeight * 0.42;
-
-  if (cursor) {
-    const left = Number.parseFloat(cursor.style.left);
-    const top = Number.parseFloat(cursor.style.top);
-    if (Number.isFinite(left)) startX = left;
-    if (Number.isFinite(top)) startY = top;
-  } else {
-    cursor = document.createElement("div");
-    cursor.className = "proto-chat-demo-cursor proto-chat-demo-cursor--exit";
-    cursor.innerHTML = DEMO_CURSOR_MARKUP;
-    cursor.style.left = `${startX}px`;
-    cursor.style.top = `${startY}px`;
-    document.body.appendChild(cursor);
-    await delay(40);
-  }
+  const left = Number.parseFloat(cursor.style.left);
+  const top = Number.parseFloat(cursor.style.top);
+  if (Number.isFinite(left)) startX = left;
+  if (Number.isFinite(top)) startY = top;
 
   cursor.classList.add("proto-chat-demo-cursor--exit");
   await animateCursorExit(cursor, startX, startY);
@@ -374,43 +750,81 @@ function cursorPositionForTarget(target: HTMLElement): { left: number; top: numb
 
 export async function moveDemoCursorTo(
   target: HTMLElement,
-  options?: { applyHover?: boolean }
-): Promise<HTMLElement> {
-  document
-    .querySelectorAll<HTMLElement>(".proto-chat-demo-cursor")
-    .forEach((el) => el.remove());
+  options?: {
+    applyHover?: boolean;
+    syncPageScroll?: boolean;
+    shouldAbort?: () => boolean;
+  }
+): Promise<HTMLElement | null> {
+  const bail = async (): Promise<null> => {
+    await releaseDemoCursorAfterScript();
+    return null;
+  };
+
+  if (options?.shouldAbort?.()) return bail();
+
+  cancelDemoCursorParkInFlight();
 
   const interactionRoot = findDemoInteractionRoot(target);
   const applyHover = options?.applyHover !== false;
+  const syncPageScroll =
+    options?.syncPageScroll !== false &&
+    !isPrototypePageScrollLocked() &&
+    !isPrototypeOverlayTarget(target);
 
-  const cursor = document.createElement("div");
-  cursor.className = "proto-chat-demo-cursor";
-  cursor.innerHTML = DEMO_CURSOR_MARKUP;
-  document.body.appendChild(cursor);
+  const scrollOpts: PlaybackScrollOptions = {
+    shouldAbort: options?.shouldAbort,
+  };
+  const { durationMs: scrollDurationMs, scrollPromise } = syncPageScroll
+    ? await beginDemoTargetPageScroll(target, scrollOpts)
+    : { durationMs: 0, scrollPromise: Promise.resolve() };
+
+  if (options?.shouldAbort?.()) return bail();
+
+  const cursor = acquireDemoCursorElement();
 
   const end = cursorPositionForTarget(target);
   const endX = end.left;
   const endY = end.top;
-  const start = resolveCursorStart(endX, endY);
+  const travelStart = journeyModePinned
+    ? prepareDemoCursorForTravel(cursor)
+    : resolveCursorStart(endX, endY);
 
-  cursor.style.left = `${start.x}px`;
-  cursor.style.top = `${start.y}px`;
+  cursor.style.left = `${travelStart.x}px`;
+  cursor.style.top = `${travelStart.y}px`;
 
   await delay(randomInRange(24, 72));
+  if (options?.shouldAbort?.()) return bail();
 
-  const durationMs = CTA_TRAVEL_MS * randomInRange(0.88, 1.14);
-  await animateCursorTravel(cursor, start.x, start.y, endX, endY, durationMs, {
-    approachElement: applyHover ? interactionRoot : undefined,
-    onApproach: applyHover
-      ? () => {
-          setDemoInteractionHover(interactionRoot, true);
-        }
-      : undefined,
-  });
+  const cursorBaseMs = CTA_TRAVEL_MS * randomInRange(0.88, 1.14);
+  const durationMs = Math.max(cursorBaseMs, scrollDurationMs);
+
+  const traveled = await animateCursorTravel(
+    cursor,
+    travelStart.x,
+    travelStart.y,
+    endX,
+    endY,
+    durationMs,
+    {
+      approachElement: applyHover ? interactionRoot : undefined,
+      trackTarget: syncPageScroll && scrollDurationMs > 0 ? target : undefined,
+      onApproach: applyHover
+        ? () => {
+            setDemoInteractionHover(interactionRoot, true);
+          }
+        : undefined,
+      shouldAbort: options?.shouldAbort,
+    }
+  );
+  await scrollPromise;
+  if (!traveled || options?.shouldAbort?.()) return bail();
+
   if (applyHover) {
     setDemoInteractionHover(interactionRoot, true);
   }
   await delay(randomInRange(40, 110));
+  if (options?.shouldAbort?.()) return bail();
   return cursor;
 }
 
@@ -426,17 +840,16 @@ export async function simulateDemoPointerHover(
 ): Promise<boolean> {
   if (options?.shouldAbort?.()) return false;
 
-  if (options?.scroll !== false) {
-    target.scrollIntoView({ block: "nearest", behavior: "smooth" });
-    await delay(180);
-  }
   if (options?.shouldAbort?.()) return false;
   if (!isClickableTarget(target)) return false;
 
   const interactionRoot = findDemoInteractionRoot(target);
-  await moveDemoCursorTo(target);
-  if (options?.shouldAbort?.()) {
-    removeDemoCursor();
+  const cursor = await moveDemoCursorTo(target, {
+    shouldAbort: options?.shouldAbort,
+    syncPageScroll: options?.scroll !== false,
+  });
+  if (!cursor || options?.shouldAbort?.()) {
+    await releaseDemoCursorAfterScript();
     return false;
   }
 
@@ -444,15 +857,21 @@ export async function simulateDemoPointerHover(
   await delay(dwellMs);
   if (options?.shouldAbort?.()) {
     options?.onHoverEnd?.();
-    removeDemoCursor();
+    await releaseDemoCursorAfterScript();
     return false;
   }
 
   options?.onHoverEnd?.();
   setDemoInteractionHover(interactionRoot, false);
-  document
-    .querySelectorAll<HTMLElement>(".proto-chat-demo-cursor")
-    .forEach((el) => el.remove());
+  const left = Number.parseFloat(
+    document.querySelector<HTMLElement>(".proto-chat-demo-cursor")?.style.left ?? ""
+  );
+  const top = Number.parseFloat(
+    document.querySelector<HTMLElement>(".proto-chat-demo-cursor")?.style.top ?? ""
+  );
+  if (Number.isFinite(left) && Number.isFinite(top)) {
+    lastCursorPos = { x: left, y: top };
+  }
   await delay(120);
   return true;
 }
@@ -466,17 +885,14 @@ export async function simulateDemoPointerClick(
   }
 ): Promise<boolean> {
   if (options?.shouldAbort?.()) return false;
-
-  if (options?.scroll !== false) {
-    target.scrollIntoView({ block: "nearest", behavior: "smooth" });
-    await delay(180);
-  }
-  if (options?.shouldAbort?.()) return false;
   if (!isClickableTarget(target)) return false;
 
-  const cursor = await moveDemoCursorTo(target);
-  if (options?.shouldAbort?.()) {
-    removeDemoCursor();
+  const cursor = await moveDemoCursorTo(target, {
+    shouldAbort: options?.shouldAbort,
+    syncPageScroll: options?.scroll !== false,
+  });
+  if (!cursor || options?.shouldAbort?.()) {
+    await releaseDemoCursorAfterScript();
     return false;
   }
 
@@ -491,7 +907,7 @@ export async function simulateDemoPointerClick(
   await delay(CTA_HOVER_DWELL_MS);
   if (options?.shouldAbort?.()) {
     setDemoInteractionHover(interactionRoot, false);
-    removeDemoCursor();
+    await releaseDemoCursorAfterScript();
     return false;
   }
 
@@ -507,7 +923,7 @@ export async function simulateDemoPointerClick(
   await delay(CTA_PRESS_MS);
   if (options?.shouldAbort?.()) {
     setDemoInteractionHover(interactionRoot, false);
-    removeDemoCursor();
+    await releaseDemoCursorAfterScript();
     return false;
   }
 
@@ -515,8 +931,7 @@ export async function simulateDemoPointerClick(
     dispatchDemoPointerEvent(interactionRoot, "pointerup", x, y);
   }
   target.click();
-  setDemoInteractionHover(interactionRoot, false);
-  removeDemoCursor();
+  settleDemoCursorAfterClick(cursor, interactionRoot);
   await delay(160);
   return true;
 }

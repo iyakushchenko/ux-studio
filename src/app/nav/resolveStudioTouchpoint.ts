@@ -2,9 +2,27 @@ import type { AvailStep } from "@/projects/boots-pharmacy/overlays/AvailabilityT
 import type { JourneyBeat, ProtoJourneyDefinition } from "@/app/orchestra/types";
 import type { StudioTouchpointEntry } from "@/projects/types";
 
+/** Site-pilot-chat playlist size: 8 DOM content frames + 1 virtual finale beat. */
 export const DEFAULT_CHAT_SCENARIO_FRAMES = 9;
 
+/** Stable chat frame count for studio playlists — never tied to live scenario playback. */
+export function resolveStableChatScenarioPlaylistFrames(
+  scenarioId?: string
+): number {
+  if (scenarioId === "site-pilot-chat" || scenarioId == null) {
+    return DEFAULT_CHAT_SCENARIO_FRAMES;
+  }
+  return DEFAULT_CHAT_SCENARIO_FRAMES;
+}
+
 export type { StudioTouchpointEntry };
+
+/** Studio touchpoints for modals/overlays — viewport scroll guard ignores these. */
+export const POPUP_TOUCHPOINT_PREFIX = "popup:" as const;
+
+export function isPopupTouchpoint(touchpointKey?: string): boolean {
+  return touchpointKey?.startsWith(POPUP_TOUCHPOINT_PREFIX) ?? false;
+}
 
 export type StudioTouchpointInput = {
   beatId?: string;
@@ -167,6 +185,51 @@ export function resolveStudioTouchpoint(
   return { label, key };
 }
 
+/** Runtime popup keys that map to a different playlist entry (exact match tried first). */
+const TOUCHPOINT_PLAYLIST_ALIASES: Record<string, string[]> = {
+  "popup:login": ["beat:traditional-login"],
+  "popup:availability:start": ["beat:avail-location", "beat:choose-location"],
+  "popup:availability:list": ["beat:avail-location"],
+  "popup:availability:map": ["beat:avail-location"],
+  "popup:availability:noSlots": ["beat:avail-location"],
+};
+
+export function resolvePlaylistTouchpointIndex(
+  playlist: StudioTouchpointEntry[],
+  touchpointKey: string
+): number {
+  const exactIndex = playlist.findIndex((entry) => entry.key === touchpointKey);
+  if (exactIndex >= 0) return exactIndex;
+
+  const aliasTargets = TOUCHPOINT_PLAYLIST_ALIASES[touchpointKey];
+  if (aliasTargets) {
+    for (const target of aliasTargets) {
+      const aliasIndex = playlist.findIndex((entry) => entry.key === target);
+      if (aliasIndex >= 0) return aliasIndex;
+    }
+  }
+
+  const chatFrameMatch = touchpointKey.match(/^beat:([^:]+):frame:(\d+)/);
+  if (chatFrameMatch) {
+    const [, beatId, frame] = chatFrameMatch;
+    const framePrefix = `beat:${beatId}:frame:${frame}`;
+    const frameIndex = playlist.findIndex((entry) =>
+      entry.key.startsWith(framePrefix)
+    );
+    if (frameIndex >= 0) return frameIndex;
+  }
+
+  const beatPrefix = touchpointKey.match(/^beat:([^:]+)/)?.[1];
+  if (beatPrefix) {
+    const beatIndex = playlist.findIndex((entry) =>
+      entry.key.startsWith(`beat:${beatPrefix}`)
+    );
+    if (beatIndex >= 0) return beatIndex;
+  }
+
+  return -1;
+}
+
 export function resolveStudioTouchpointProgress(
   playlist: StudioTouchpointEntry[],
   touchpointKey: string
@@ -176,20 +239,70 @@ export function resolveStudioTouchpointProgress(
     return { visibleCount: 0, totalFrames: 0 };
   }
 
-  const exactIndex = playlist.findIndex((entry) => entry.key === touchpointKey);
-  if (exactIndex >= 0) {
-    return { visibleCount: exactIndex + 1, totalFrames };
+  const index = resolvePlaylistTouchpointIndex(playlist, touchpointKey);
+  if (index >= 0) {
+    return { visibleCount: index + 1, totalFrames };
   }
 
-  const beatPrefix = touchpointKey.match(/^beat:([^:]+)/)?.[1];
-  if (beatPrefix) {
-    const beatIndex = playlist.findIndex((entry) =>
-      entry.key.startsWith(`beat:${beatPrefix}`)
-    );
-    if (beatIndex >= 0) {
-      return { visibleCount: beatIndex + 1, totalFrames };
-    }
+  return { visibleCount: 0, totalFrames };
+}
+
+/** Availability overlay sub-steps while the journey beat has not advanced yet. */
+export function isPopupSubstepOfBeat(
+  beatId: string | undefined,
+  touchpointKey: string
+): boolean {
+  if (!beatId || !touchpointKey.startsWith(POPUP_TOUCHPOINT_PREFIX)) {
+    return false;
+  }
+  if (
+    beatId === "choose-location" &&
+    touchpointKey.startsWith("popup:availability:")
+  ) {
+    return true;
+  }
+  if (
+    beatId === "avail-location" &&
+    touchpointKey.startsWith("popup:availability:")
+  ) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Step counter for the studio deck — anchors on the active beat so popup
+ * sub-steps (e.g. choose-location → availability list) do not skip a frame.
+ */
+export function resolveStudioTouchpointProgressForBeat(
+  playlist: StudioTouchpointEntry[],
+  touchpointKey: string,
+  beat: JourneyBeat | undefined
+): { visibleCount: number; totalFrames: number } {
+  const touchpointProgress = resolveStudioTouchpointProgress(
+    playlist,
+    touchpointKey
+  );
+  if (!beat || beat.kind === "screen-frames") {
+    return touchpointProgress;
   }
 
-  return { visibleCount: 1, totalFrames };
+  const beatProgress = resolveStudioTouchpointProgress(
+    playlist,
+    `beat:${beat.id}`
+  );
+  if (isPopupSubstepOfBeat(beat.id, touchpointKey)) {
+    return {
+      visibleCount: beatProgress.visibleCount,
+      totalFrames: touchpointProgress.totalFrames,
+    };
+  }
+
+  return {
+    visibleCount: Math.max(
+      beatProgress.visibleCount,
+      touchpointProgress.visibleCount
+    ),
+    totalFrames: touchpointProgress.totalFrames,
+  };
 }

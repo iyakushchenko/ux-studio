@@ -1,5 +1,5 @@
 /**
- * Site Pilot chat — portal composer dock to scroll host (escapes filter/transform traps).
+ * Site Pilot chat — portal composer dock to document.body (escapes scroll clip + transform traps).
  */
 
 const LEGACY_THREAD_CLASS = "proto-chat-thread";
@@ -10,7 +10,16 @@ const COMPOSER_PAD_VAR = "--proto-chat-composer-h";
 const SCREEN_CHILD = 10;
 
 function getScrollHost(): HTMLElement | null {
-  return document.querySelector<HTMLElement>(".proto-scroll--prototype");
+  return (
+    document.querySelector<HTMLElement>(
+      ".proto-scroll--prototype:not(.hidden)"
+    ) ?? document.querySelector<HTMLElement>(".proto-scroll--prototype")
+  );
+}
+
+/** Body portal — scroll host uses overflow:hidden at scenario frame 1, which clips fixed children. */
+function getComposerDockHost(): HTMLElement {
+  return document.body;
 }
 
 function findPortalDock(): HTMLElement | null {
@@ -120,10 +129,21 @@ export function ensureSitePilotChatComposerDock(screen: HTMLElement): void {
   const existing = findPortalDock();
   if (existing) {
     syncDockGeometry(screen, existing);
+    requestAnimationFrame(() => syncDockGeometry(screen, existing));
     return;
   }
   dockCleanupByScreen.get(screen)?.();
   dockCleanupByScreen.set(screen, setupSitePilotChatComposerDock(screen));
+}
+
+/** Re-align portal dock after chat layout / scenario frame changes. */
+export function syncSitePilotChatComposerDock(screen: HTMLElement): void {
+  const dock = findPortalDock();
+  if (!dock) {
+    ensureSitePilotChatComposerDock(screen);
+    return;
+  }
+  syncDockGeometry(screen, dock);
 }
 
 export function teardownSitePilotChatComposerDock(screen: HTMLElement): void {
@@ -140,7 +160,8 @@ export function setupSitePilotChatComposerDock(
     '[data-name="component.appointment.summary"]'
   );
   const paddingDiv = summary?.parentElement ?? null;
-  const host = getScrollHost() ?? document.body;
+  const scrollHost = getScrollHost();
+  const dockHost = getComposerDockHost();
   if (!summary || !paddingDiv) return () => {};
 
   restoreChatDom(summary, paddingDiv);
@@ -160,7 +181,7 @@ export function setupSitePilotChatComposerDock(
   dock.dataset.protoChatScreen = String(SCREEN_CHILD);
   dock.appendChild(composer);
   if (disclaimer) dock.appendChild(disclaimer);
-  host.appendChild(dock);
+  dockHost.appendChild(dock);
 
   screen.classList.add("proto-chat-screen");
 
@@ -168,16 +189,23 @@ export function setupSitePilotChatComposerDock(
 
   const ro = new ResizeObserver(onReposition);
   ro.observe(dock);
-  host.addEventListener("scroll", onReposition, { passive: true });
+  ro.observe(summary);
+  scrollHost?.addEventListener("scroll", onReposition, { passive: true });
   window.addEventListener("resize", onReposition);
+  window.addEventListener("scroll", onReposition, { passive: true });
   onReposition();
+  requestAnimationFrame(() => {
+    onReposition();
+    requestAnimationFrame(onReposition);
+  });
 
   syncSitePilotChatFeedbackFrame(screen);
 
   return () => {
     ro.disconnect();
-    host.removeEventListener("scroll", onReposition);
+    scrollHost?.removeEventListener("scroll", onReposition);
     window.removeEventListener("resize", onReposition);
+    window.removeEventListener("scroll", onReposition);
     screen.classList.remove("proto-chat-screen");
     screen.style.removeProperty(COMPOSER_PAD_VAR);
     restoreChatDom(summary, paddingDiv);
