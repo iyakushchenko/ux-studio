@@ -6,9 +6,17 @@ type Props = {
   value: ProtoOrchestraModeId;
   onChange: (modeId: ProtoOrchestraModeId) => void;
   isPlaying?: boolean;
+  /** Locks mode switch during cursor / type-in animations. */
+  controlsLocked?: boolean;
 };
 
-export function ProtoNavJourneyMenu({ modes, value, onChange, isPlaying }: Props) {
+export function ProtoNavJourneyMenu({
+  modes,
+  value,
+  onChange,
+  isPlaying,
+  controlsLocked = false,
+}: Props) {
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -20,8 +28,8 @@ export function ProtoNavJourneyMenu({ modes, value, onChange, isPlaying }: Props
   const close = useCallback(() => setOpen(false), []);
 
   useEffect(() => {
-    if (isPlaying) close();
-  }, [close, isPlaying]);
+    if (isPlaying || controlsLocked) close();
+  }, [close, controlsLocked, isPlaying]);
 
   useEffect(() => {
     if (!open) return;
@@ -84,7 +92,7 @@ export function ProtoNavJourneyMenu({ modes, value, onChange, isPlaying }: Props
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={listId}
-        disabled={isPlaying}
+        disabled={isPlaying || controlsLocked}
         onClick={() => setOpen((prev) => !prev)}
         onKeyDown={onTriggerKeyDown}
       >

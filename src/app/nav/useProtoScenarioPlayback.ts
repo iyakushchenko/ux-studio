@@ -174,11 +174,20 @@ export function useProtoScenarioPlayback({
     setVisibleCount(contentTotal);
   }, [hasFinale, queueScroll]);
 
+  const [playbackEndToken, setPlaybackEndToken] = useState(0);
+
   const stopPlayback = useCallback(() => {
     clearPreRevealPause();
     isPlayingRef.current = false;
     setPlaybackMode("idle");
   }, [clearPreRevealPause]);
+
+  const completePlayback = useCallback(() => {
+    if (isPlayingRef.current) {
+      setPlaybackEndToken((token) => token + 1);
+    }
+    stopPlayback();
+  }, [stopPlayback]);
 
   const syncFrames = useCallback(() => {
     const frames = collectFrames();
@@ -313,10 +322,10 @@ export function useProtoScenarioPlayback({
       playTimerRef.current = null;
       if (!isPlayingRef.current) return;
       if (!advanceOneFrameRef.current(scheduleNext)) {
-        stopPlayback();
+        completePlayback();
       }
     }, playbackStepMs);
-  }, [playbackStepMs, stopPlayback]);
+  }, [completePlayback, playbackStepMs]);
 
   const advanceOneFrameRef = useRef<
     (onRevealed?: () => void, options?: AdvanceOptions) => boolean
@@ -347,7 +356,7 @@ export function useProtoScenarioPlayback({
           setIsPausingBeforeReveal(false);
           queueScroll(scenarioTotal, "end", false, current);
           setVisibleCount(scenarioTotal);
-          stopPlayback();
+          completePlayback();
         };
 
         void (async () => {
@@ -382,7 +391,7 @@ export function useProtoScenarioPlayback({
           if (onRevealed) {
             onRevealed();
           } else {
-            stopPlayback();
+            completePlayback();
           }
           return;
         }
@@ -452,7 +461,7 @@ export function useProtoScenarioPlayback({
 
       return true;
     },
-    [hasFinale, minVisibleFrames, playbackStepHooks, queueScroll, stopPlayback]
+    [hasFinale, minVisibleFrames, playbackStepHooks, queueScroll, completePlayback, stopPlayback]
   );
 
   advanceOneFrameRef.current = advanceOneFrame;
@@ -637,14 +646,17 @@ export function useProtoScenarioPlayback({
     totalFrames,
     visibleCount,
     isPlaying,
+    isOnAir: isPlaying,
+    playbackEndToken,
     isPausingBeforeReveal,
     atFinaleFrame,
     isDirty,
-    canStepBack: visibleCount > minVisibleFrames,
-    canStepForward: visibleCount < totalFrames,
-    canJumpToStart: visibleCount > minVisibleFrames,
-    canPlay: visibleCount < totalFrames && !isPausingBeforeReveal,
-    canJumpToEnd: visibleCount < totalFrames,
+    canStepBack: !isPausingBeforeReveal && visibleCount > minVisibleFrames,
+    canStepForward: !isPausingBeforeReveal && visibleCount < totalFrames,
+    canJumpToStart: !isPausingBeforeReveal && visibleCount > minVisibleFrames,
+    canPlay:
+      isPlaying || (visibleCount < totalFrames && !isPausingBeforeReveal),
+    canJumpToEnd: !isPausingBeforeReveal && visibleCount < totalFrames,
     stepBack,
     stepForward,
     play,

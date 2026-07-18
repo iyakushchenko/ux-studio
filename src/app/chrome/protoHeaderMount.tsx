@@ -14,7 +14,7 @@ import {
 
 const HEADER_MOUNT_CLASS = "proto-header-mount";
 
-// Screens that always show logged-in state (account pages only)
+// Account / post-booking screens always show Sarah logged in — not browse (PLP/PDP).
 const LOGGED_IN_CHILD_INDICES = [1, 2, 3];
 
 // ── Wishlist state (persisted in localStorage) ──────────────────────────────

@@ -9,6 +9,10 @@ export type ProtoNavScenarioControlsProps = {
   visibleCount: number;
   totalFrames: number;
   isPlaying: boolean;
+  /** Green studio diode + touchpoint blink — live transport only, not manual step scripts. */
+  isOnAir?: boolean;
+  /** Increments when auto-playback reaches the final touchpoint. */
+  playbackEndToken?: number;
   canStepBack: boolean;
   canStepForward: boolean;
   canJumpToStart: boolean;
@@ -89,6 +93,8 @@ export function ProtoNavScenarioControls({
   visibleCount,
   totalFrames,
   isPlaying,
+  isOnAir = isPlaying,
+  playbackEndToken = 0,
   canStepBack,
   canStepForward,
   canJumpToStart,
@@ -100,11 +106,35 @@ export function ProtoNavScenarioControls({
   onStepForward,
   onJumpToEnd,
 }: ProtoNavScenarioControlsProps) {
+  const STEP_DIODE_MS = 300;
   const [blinkToken, setBlinkToken] = useState(0);
+  const [diodeEndActive, setDiodeEndActive] = useState(false);
+  const [stepBlinkActive, setStepBlinkActive] = useState(false);
+  const [stepBlinkToken, setStepBlinkToken] = useState(0);
   const prevTouchpointKeyRef = useRef<string | undefined>(undefined);
+  const prevPlaybackEndTokenRef = useRef(0);
+  const stepBlinkTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (!touchpointKey) return;
+    return () => {
+      if (stepBlinkTimerRef.current != null) {
+        window.clearTimeout(stepBlinkTimerRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!playbackEndToken || playbackEndToken === prevPlaybackEndTokenRef.current) {
+      return;
+    }
+    prevPlaybackEndTokenRef.current = playbackEndToken;
+    setDiodeEndActive(true);
+    const timer = window.setTimeout(() => setDiodeEndActive(false), 3000);
+    return () => window.clearTimeout(timer);
+  }, [playbackEndToken]);
+
+  useEffect(() => {
+    if (!touchpointKey || !isOnAir) return;
     if (prevTouchpointKeyRef.current === undefined) {
       prevTouchpointKeyRef.current = touchpointKey;
       return;
@@ -112,11 +142,51 @@ export function ProtoNavScenarioControls({
     if (touchpointKey === prevTouchpointKeyRef.current) return;
     prevTouchpointKeyRef.current = touchpointKey;
     setBlinkToken((token) => token + 1);
-  }, [touchpointKey]);
+  }, [isOnAir, touchpointKey]);
+
+  const triggerStepDiodeBlink = () => {
+    if (isOnAir) return;
+    if (stepBlinkTimerRef.current != null) {
+      window.clearTimeout(stepBlinkTimerRef.current);
+    }
+    setStepBlinkToken((token) => token + 1);
+    setStepBlinkActive(true);
+    stepBlinkTimerRef.current = window.setTimeout(() => {
+      setStepBlinkActive(false);
+      stepBlinkTimerRef.current = null;
+    }, STEP_DIODE_MS);
+  };
+
+  const handleJumpToStart = () => {
+    triggerStepDiodeBlink();
+    onJumpToStart();
+  };
+
+  const handleStepBack = () => {
+    triggerStepDiodeBlink();
+    onStepBack();
+  };
+
+  const handleStepForward = () => {
+    triggerStepDiodeBlink();
+    onStepForward();
+  };
+
+  const handleJumpToEnd = () => {
+    triggerStepDiodeBlink();
+    onJumpToEnd();
+  };
+
+  const onAirClass = isOnAir ? " proto-nav-scenario--on-air" : "";
+  const diodeEndClass = diodeEndActive && !isOnAir ? " proto-nav-scenario__on-air--end" : "";
+  const diodeStepClass =
+    stepBlinkActive && !isOnAir && !diodeEndActive
+      ? " proto-nav-scenario__on-air--step"
+      : "";
 
   return (
     <div
-      className={`proto-nav-scenario${isPlaying ? " proto-nav-scenario--on-air" : ""}`}
+      className={`proto-nav-scenario${onAirClass}`}
       role="group"
     >
       {journeyMenu}
@@ -130,7 +200,17 @@ export function ProtoNavScenarioControls({
           {segmentLabel}
         </span>
       ) : null}
-      <span className="proto-nav-scenario__on-air" aria-hidden>
+      <span
+        key={
+          diodeEndActive
+            ? "diode-end"
+            : stepBlinkActive
+              ? `step-${stepBlinkToken}`
+              : "diode-idle"
+        }
+        className={`proto-nav-scenario__on-air${diodeEndClass}${diodeStepClass}`}
+        aria-hidden
+      >
         <span className="proto-nav-scenario__on-air-dot" />
         <span className="proto-nav-scenario__on-air-halo" aria-hidden />
       </span>
@@ -142,7 +222,7 @@ export function ProtoNavScenarioControls({
           type="button"
           className="proto-nav-step-btn proto-nav-scenario__btn"
           disabled={!canJumpToStart}
-          onClick={onJumpToStart}
+          onClick={handleJumpToStart}
         >
           <CassetteJumpToStartIcon />
         </button>
@@ -150,7 +230,7 @@ export function ProtoNavScenarioControls({
           type="button"
           className="proto-nav-step-btn proto-nav-scenario__btn"
           disabled={!canStepBack}
-          onClick={onStepBack}
+          onClick={handleStepBack}
         >
           <CassetteStepBackIcon />
         </button>
@@ -175,7 +255,7 @@ export function ProtoNavScenarioControls({
           type="button"
           className="proto-nav-step-btn proto-nav-scenario__btn"
           disabled={!canStepForward}
-          onClick={onStepForward}
+          onClick={handleStepForward}
         >
           <CassetteStepForwardIcon />
         </button>
@@ -183,7 +263,7 @@ export function ProtoNavScenarioControls({
           type="button"
           className="proto-nav-step-btn proto-nav-scenario__btn"
           disabled={!canJumpToEnd}
-          onClick={onJumpToEnd}
+          onClick={handleJumpToEnd}
         >
           <CassetteJumpToEndIcon />
         </button>

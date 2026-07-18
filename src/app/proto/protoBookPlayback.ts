@@ -6,6 +6,10 @@ import {
 } from "@/app/proto/protoDemoCursor";
 import type { BookScriptId } from "@/app/orchestra/types";
 
+/** Demo date/time picked during Book Step 2 journey playback. */
+const PLAYBACK_TARGET_DATE = { month: "June", day: 21 } as const;
+const PLAYBACK_TARGET_TIME = "15:30";
+
 let playbackAborted = false;
 
 export function abortBookPlayback(): void {
@@ -38,25 +42,6 @@ async function waitForBookStep2Screen(): Promise<HTMLElement | null> {
   for (let i = 0; i < 60; i++) {
     const screen = bookStep2Screen();
     if (screen) return screen;
-    await delay(40);
-  }
-  return null;
-}
-
-async function waitForReserveButton(
-  screen: HTMLElement
-): Promise<HTMLElement | null> {
-  for (let i = 0; i < 60; i++) {
-    const btn = Array.from(
-      screen.querySelectorAll<HTMLElement>(
-        '[data-name="component.input.button"]'
-      )
-    ).find((el) =>
-      /^reserve appointment$/i.test(
-        (el.textContent ?? "").replace(/\s+/g, " ").trim()
-      )
-    );
-    if (btn) return btn;
     await delay(40);
   }
   return null;
@@ -95,6 +80,112 @@ async function scrollToElement(target: HTMLElement): Promise<void> {
   }
 }
 
+async function findBookDateCell(
+  screen: HTMLElement,
+  month: string,
+  day: number
+): Promise<HTMLElement | null> {
+  for (let i = 0; i < 80; i++) {
+    const cell = screen.querySelector<HTMLElement>(
+      `[data-name="calendar. date. cell"][data-proto-cal-kind="date"][data-proto-cal-month="${month}"][data-proto-cal-value="${day}"]`
+    );
+    if (cell && cell.dataset.protoCalUnavailable !== "true") return cell;
+    await delay(50);
+  }
+  return null;
+}
+
+async function findBookTimeCell(
+  screen: HTMLElement,
+  time: string
+): Promise<HTMLElement | null> {
+  for (let i = 0; i < 80; i++) {
+    const cell = screen.querySelector<HTMLElement>(
+      `[data-name="calendar. date. cell"][data-proto-cal-kind="time"][data-proto-cal-value="${time}"]`
+    );
+    if (cell && cell.dataset.protoCalUnavailable !== "true") return cell;
+    await delay(50);
+  }
+  return null;
+}
+
+async function waitForReserveButton(
+  screen: HTMLElement
+): Promise<HTMLElement | null> {
+  for (let i = 0; i < 60; i++) {
+    const btn = Array.from(
+      screen.querySelectorAll<HTMLElement>(
+        '[data-name="component.input.button"]'
+      )
+    ).find((el) =>
+      /^reserve appointment$/i.test(
+        (el.textContent ?? "").replace(/\s+/g, " ").trim()
+      )
+    );
+    if (btn) return btn;
+    await delay(40);
+  }
+  return null;
+}
+
+async function clickBookCell(
+  cell: HTMLElement,
+  options?: { skip?: boolean }
+): Promise<boolean> {
+  if (options?.skip) {
+    cell.click();
+    return true;
+  }
+
+  await scrollToElement(cell);
+  if (shouldAbort()) return false;
+
+  await simulateDemoPointerClick(cell, { shouldAbort, scroll: false });
+  await delay(300);
+  return !shouldAbort();
+}
+
+async function runSelectBookDate(options?: { skip?: boolean }): Promise<boolean> {
+  const screen = await waitForBookStep2Screen();
+  if (!screen || shouldAbort()) return false;
+
+  if (!options?.skip) await delay(320);
+
+  const dateCell = await findBookDateCell(
+    screen,
+    PLAYBACK_TARGET_DATE.month,
+    PLAYBACK_TARGET_DATE.day
+  );
+  if (!dateCell || shouldAbort()) return false;
+
+  if (dateCell.dataset.protoCalSelected === "true") {
+    return true;
+  }
+
+  return clickBookCell(dateCell, options);
+}
+
+async function runSelectBookTime(options?: { skip?: boolean }): Promise<boolean> {
+  const screen = await waitForBookStep2Screen();
+  if (!screen || shouldAbort()) return false;
+
+  if (!options?.skip) await delay(280);
+
+  const preferredTimes = [PLAYBACK_TARGET_TIME, "15:00", "16:15", "16:45"];
+  let timeCell: HTMLElement | null = null;
+  for (const time of preferredTimes) {
+    timeCell = await findBookTimeCell(screen, time);
+    if (timeCell) break;
+  }
+  if (!timeCell || shouldAbort()) return false;
+
+  if (timeCell.dataset.protoCalSelected === "true") {
+    return true;
+  }
+
+  return clickBookCell(timeCell, options);
+}
+
 async function runReserveAppointment(options?: { skip?: boolean }): Promise<boolean> {
   const screen = await waitForBookStep2Screen();
   if (!screen || shouldAbort()) return false;
@@ -112,7 +203,7 @@ async function runReserveAppointment(options?: { skip?: boolean }): Promise<bool
   await scrollToElement(reserveBtn);
   if (shouldAbort()) return false;
 
-  await simulateDemoPointerClick(reserveBtn, { shouldAbort });
+  await simulateDemoPointerClick(reserveBtn, { shouldAbort, scroll: false });
   await delay(360);
   return !shouldAbort();
 }
@@ -124,6 +215,10 @@ export async function runBookScript(
   playbackAborted = false;
 
   switch (scriptId) {
+    case "select-book-date":
+      return runSelectBookDate(options);
+    case "select-book-time":
+      return runSelectBookTime(options);
     case "reserve-appointment":
       return runReserveAppointment(options);
     default:

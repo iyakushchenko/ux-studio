@@ -1,6 +1,6 @@
 import type { AvailStep } from "@/app/AvailabilityTool";
+import { isSkippedTraditionalLoginBeat } from "@/app/orchestra/brands/bootsSarahJourney";
 import type { JourneyBeat, ProtoJourneyDefinition } from "@/app/orchestra/types";
-
 export const DEFAULT_CHAT_SCENARIO_FRAMES = 9;
 
 export type StudioTouchpointEntry = {
@@ -43,18 +43,9 @@ const JOURNEY_POPUP_TOUCHPOINTS: Record<
   Record<string, StudioTouchpointEntry[]>
 > = {
   "traditional-cjm": {
-    "traditional-login": [
-      { key: "popup:login", label: "Log in or register" },
-    ],
-    "choose-recipient": [
-      { key: "popup:recipient", label: "Choose recipient" },
-    ],
     "choose-location": [
       { key: "popup:availability:list", label: "Availability — choose pharmacy" },
-      { key: "popup:availability:date", label: "Availability — date" },
-      { key: "popup:availability:time", label: "Availability — time" },
     ],
-    "choose-datetime": [{ key: "popup:vaccine", label: "Choose vaccine" }],
   },
 };
 
@@ -100,14 +91,17 @@ function expandBeatToTouchpoints(
 
 export function buildStudioTouchpointPlaylist(
   journey: ProtoJourneyDefinition | undefined,
-  chatScenarioTotalFrames = DEFAULT_CHAT_SCENARIO_FRAMES
+  chatScenarioTotalFrames = DEFAULT_CHAT_SCENARIO_FRAMES,
+  options?: { headerLoggedIn?: boolean }
 ): StudioTouchpointEntry[] {
   if (!journey) return [];
 
   const items: StudioTouchpointEntry[] = [];
   const popupInserts = JOURNEY_POPUP_TOUCHPOINTS[journey.id] ?? {};
+  const headerLoggedIn = options?.headerLoggedIn ?? false;
 
   for (const beat of journey.beats) {
+    if (isSkippedTraditionalLoginBeat(beat, headerLoggedIn)) continue;
     items.push(...expandBeatToTouchpoints(beat, chatScenarioTotalFrames));
     const extras = popupInserts[beat.id];
     if (extras) items.push(...extras);
@@ -115,7 +109,6 @@ export function buildStudioTouchpointPlaylist(
 
   return items;
 }
-
 export function resolveStudioTouchpoint(
   input: StudioTouchpointInput
 ): { label: string; key: string } {

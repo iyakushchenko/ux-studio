@@ -384,6 +384,40 @@
   animation: proto-studio-on-air-halo-blink 3s linear infinite;
 }
 
+/* Playback end — solid panel LED (no bloom) for 3s. */
+.proto-nav-scenario__on-air--end .proto-nav-scenario__on-air-dot {
+  background: radial-gradient(
+    circle at 38% 30%,
+    #ff6b6b 0%,
+    #e53935 38%,
+    #c62828 62%,
+    #8b0000 100%
+  );
+  box-shadow:
+    inset 0 1px 1px rgba(255, 230, 230, 0.7),
+    inset 0 -1px 1.5px rgba(60, 0, 0, 0.9),
+    inset 0 0 2px rgba(0, 0, 0, 0.45);
+}
+
+.proto-nav-scenario__on-air--end .proto-nav-scenario__on-air-dot::after {
+  opacity: 0.5;
+  background: rgba(255, 255, 255, 0.42);
+  filter: none;
+}
+
+.proto-nav-scenario__on-air--end .proto-nav-scenario__on-air-halo {
+  opacity: 0;
+}
+
+/* Manual step — one-shot deep amber blink on |<<, |<, >|, >>| */
+.proto-nav-scenario__on-air--step .proto-nav-scenario__on-air-dot {
+  animation: proto-studio-on-air-step-dot 0.3s ease-out 1;
+}
+
+.proto-nav-scenario__on-air--step .proto-nav-scenario__on-air-halo {
+  animation: proto-studio-on-air-step-halo 0.3s ease-out 1;
+}
+
 /* Halogen — play button only; fades in/out while on air. */
 .proto-nav-scenario__play-lamp {
   position: relative;
@@ -555,6 +589,43 @@
   }
 }
 
+@keyframes proto-studio-on-air-step-dot {
+  0%,
+  100% {
+    background: radial-gradient(
+      circle at 34% 28%,
+      #4a5568 0%,
+      #1a2030 36%,
+      #07090d 68%,
+      #151b28 100%
+    );
+    box-shadow:
+      inset 0 1px 2px rgba(0, 0, 0, 0.9),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+  }
+  50% {
+    background: #ff9a12;
+    box-shadow:
+      inset 0 1px 1px rgba(255, 248, 220, 0.82),
+      0 0 6px rgba(255, 154, 18, 1),
+      0 0 14px rgba(255, 176, 48, 0.82),
+      0 0 20px rgba(220, 120, 8, 0.42);
+  }
+}
+
+@keyframes proto-studio-on-air-step-halo {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.82);
+  }
+  50% {
+    opacity: 0.78;
+    transform: scale(1.1);
+    background: radial-gradient(circle, rgba(255, 154, 18, 0.72) 0%, transparent 72%);
+  }
+}
+
 @keyframes proto-studio-label-glow-blink {
   0%,
   5% {
@@ -606,6 +677,19 @@
       0 0 4px rgba(93, 255, 138, 0.75),
       0 0 10px rgba(93, 255, 138, 0.45);
   }
+
+  .proto-nav-scenario__on-air--end .proto-nav-scenario__on-air-dot {
+    background: radial-gradient(
+      circle at 38% 30%,
+      #ff6b6b 0%,
+      #e53935 38%,
+      #c62828 62%,
+      #8b0000 100%
+    );
+    box-shadow:
+      inset 0 1px 1px rgba(255, 230, 230, 0.7),
+      inset 0 -1px 1.5px rgba(60, 0, 0, 0.9);
+  }
 }
 
 .proto-nav-panel-host--playback-locked .proto-nav-tabs,
@@ -618,6 +702,14 @@
 .proto-nav-panel-host--playback-locked
   .proto-nav-stepper
   > :not(.proto-nav-stepper__scenario-slot) {
+  opacity: 0.42;
+  pointer-events: none;
+}
+
+.proto-nav-panel-host--playback-locked
+  .proto-nav-scenario__deck
+  .proto-nav-scenario__btn:not(.proto-nav-scenario__btn--play),
+.proto-nav-panel-host--playback-locked .proto-nav-journey-menu__trigger {
   opacity: 0.42;
   pointer-events: none;
 }

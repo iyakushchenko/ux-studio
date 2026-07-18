@@ -1,6 +1,6 @@
 import { isProtoHeaderLoggedIn } from "@/app/chrome/protoHeaderMount";
 import type { JourneyRuntime, TabScriptId } from "@/app/orchestra/types";
-import { runAvailabilityScript } from "@/app/proto/protoAvailabilityPlayback";
+import { runSelectLocationStore } from "@/app/proto/protoAvailabilityPlayback";
 import {
   clearSimulatedClickRipples,
   delay,
@@ -12,6 +12,9 @@ import { PROTO_SCREENS, protoTabToIndex } from "@/app/proto/protoScreens";
 
 const AVAIL_DEMO_STORE = "covent";
 const SETTLE_MS = 320;
+const LOGIN_POPUP_SETTLE_MS = 380;
+const LOGIN_AFTER_SIGNIN_MS = 360;
+const CHOSEN_LOCATION_SETTLE_MS = 420;
 
 let playbackAborted = false;
 
@@ -87,6 +90,94 @@ function goToBookStep1(runtime: JourneyRuntime): void {
   runtime.goToTab(protoTabToIndex(5));
 }
 
+function findLoginSignInButton(loginCard: ParentNode): HTMLElement | null {
+  return (
+    loginCard.querySelector<HTMLElement>(".proto-login-cta") ??
+    Array.from(loginCard.querySelectorAll<HTMLElement>("button")).find((btn) =>
+      /^sign in$/i.test((btn.textContent ?? "").trim())
+    ) ??
+    null
+  );
+}
+
+async function settleLoginPopup(card: HTMLElement): Promise<HTMLElement | null> {
+  if (shouldAbort()) return null;
+  await delay(LOGIN_POPUP_SETTLE_MS);
+  return card;
+}
+
+async function pollForLoginPopup(tries = 40): Promise<HTMLElement | null> {
+  for (let i = 0; i < tries; i++) {
+    if (shouldAbort()) return null;
+    const card = document.querySelector<HTMLElement>(".proto-login-card");
+    if (card && isClickableTarget(card)) return card;
+    await delay(50);
+  }
+  return null;
+}
+
+async function waitForLoginPopupClosed(): Promise<void> {
+  for (let i = 0; i < 60; i++) {
+    if (!document.querySelector<HTMLElement>(".proto-login-card")) return;
+    await delay(50);
+  }
+}
+
+async function runLoginPopupSignIn(
+  loginCard: HTMLElement,
+  options?: { skip?: boolean }
+): Promise<boolean> {
+  const signInBtn = await waitForVisibleTarget(loginCard, findLoginSignInButton);
+  if (!signInBtn || shouldAbort()) return false;
+
+  const clicked = await simulateDemoPointerClick(signInBtn, {
+    shouldAbort,
+    scroll: false,
+  });
+  if (!clicked || shouldAbort()) return false;
+
+  await delay(options?.skip ? LOGIN_AFTER_SIGNIN_MS : LOGIN_AFTER_SIGNIN_MS + 120);
+  await waitForLoginPopupClosed();
+  return true;
+}
+
+async function openLoginFromPdpQuickSignIn(
+  runtime: JourneyRuntime,
+  options?: { skip?: boolean }
+): Promise<HTMLElement | null> {
+  const pdpTabIndex = PROTO_SCREENS.findIndex((screen) => screen.childIndex === 8);
+  if (pdpTabIndex >= 0) {
+    runtime.goToTab(pdpTabIndex);
+    await delay(120);
+  }
+
+  const screen = await waitForActiveScreen(8);
+  if (!screen || shouldAbort()) return null;
+
+  await delay(SETTLE_MS);
+
+  const signInLink = await waitForVisibleTarget(screen, (scope) =>
+    Array.from(scope.querySelectorAll<HTMLElement>("p")).find(
+      (p) => (p.textContent ?? "").trim() === "Quick Sign In"
+    ) ?? null
+  );
+  if (!signInLink || shouldAbort()) return null;
+
+  if (options?.skip) {
+    signInLink.click();
+  } else {
+    const clicked = await simulateDemoPointerClick(signInLink, {
+      shouldAbort,
+      scroll: false,
+    });
+    if (!clicked || shouldAbort()) return null;
+  }
+
+  const card = await pollForLoginPopup(80);
+  if (!card || shouldAbort()) return null;
+  return settleLoginPopup(card);
+}
+
 async function runPlpOpenPdp(options?: { skip?: boolean }): Promise<boolean> {
   const screen = await waitForActiveScreen(9);
   if (!screen || shouldAbort()) return false;
@@ -140,6 +231,12 @@ async function runPdpBookNow(
     await delay(SETTLE_MS);
   }
 
+  if (shouldAbort()) return false;
+
+  if (isProtoHeaderLoggedIn()) {
+    goToBookStep1(runtime);
+  }
+
   return !shouldAbort();
 }
 
@@ -147,133 +244,101 @@ async function runLoginSignIn(
   runtime: JourneyRuntime,
   options?: { skip?: boolean }
 ): Promise<boolean> {
-  const loginAlreadyOpen = Boolean(
-    document.querySelector<HTMLElement>(".proto-login-card")
-  );
-
   if (isProtoHeaderLoggedIn()) {
     goToBookStep1(runtime);
     return true;
   }
 
-  if (!loginAlreadyOpen) {
-    const pdpTabIndex = PROTO_SCREENS.findIndex((screen) => screen.childIndex === 8);
-    if (pdpTabIndex >= 0) {
-      runtime.goToTab(pdpTabIndex);
-      await delay(120);
-    }
-  }
+  const polled = await pollForLoginPopup();
+  const loginCard = polled
+    ? await settleLoginPopup(polled)
+    : await openLoginFromPdpQuickSignIn(runtime, options);
 
-  const screen = await waitForActiveScreen(8);
-  if (!screen || shouldAbort()) return false;
-
-  await delay(loginAlreadyOpen ? 80 : SETTLE_MS);
-
-  if (!loginAlreadyOpen) {
-    const signInLink = await waitForVisibleTarget(screen, (scope) =>
-      Array.from(scope.querySelectorAll<HTMLElement>("p")).find(
-        (p) => (p.textContent ?? "").trim() === "Quick Sign In"
-      ) ?? null
-    );
-    if (!signInLink || shouldAbort()) return false;
-
-    if (options?.skip) {
-      signInLink.click();
-    } else {
-      removeDemoCursor();
-      const clicked = await simulateDemoPointerClick(signInLink, {
-        shouldAbort,
-        scroll: false,
-      });
-      if (!clicked || shouldAbort()) return false;
-      await delay(420);
-    }
-    if (shouldAbort()) return false;
-  } else {
-    await delay(options?.skip ? 80 : 120);
-  }
-
-  const loginCard = await waitForSelector(document, ".proto-login-card");
   if (!loginCard || shouldAbort()) return false;
 
-  await delay(options?.skip ? 80 : 280);
-
-  const signInBtn = await waitForVisibleTarget(loginCard, (scope) =>
-    Array.from(scope.querySelectorAll<HTMLElement>("button")).find((btn) =>
-      /^sign in$/i.test((btn.textContent ?? "").trim())
-    ) ?? null
-  );
-  if (!signInBtn || shouldAbort()) return false;
-
-  if (options?.skip) {
-    signInBtn.click();
-  } else {
-    removeDemoCursor();
-    const clicked = await simulateDemoPointerClick(signInBtn, {
-      shouldAbort,
-      scroll: false,
-    });
-    if (!clicked || shouldAbort()) return false;
-  }
+  if (!(await runLoginPopupSignIn(loginCard, options))) return false;
 
   goToBookStep1(runtime);
   removeDemoCursor();
   return !shouldAbort();
 }
 
-function isRecipientChangeBtn(btn: HTMLElement | null): boolean {
-  if (!btn || btn.getAttribute("data-name") !== "component.input.button") {
-    return false;
-  }
-  if (!/^change$/i.test((btn.textContent ?? "").replace(/\s+/g, " ").trim())) {
-    return false;
-  }
-  const card = btn.closest('[data-name="Week Schedule"]') as HTMLElement | null;
-  if (!card) return false;
-  return Array.from(card.querySelectorAll("p")).some((p) =>
-    /^recipient$/i.test((p.textContent ?? "").trim())
+function prototypeScrollRoot(): HTMLElement | null {
+  return document.querySelector<HTMLElement>(
+    ".proto-scroll--prototype:not(.hidden)"
   );
 }
 
-async function runRecipientConfirm(options?: { skip?: boolean }): Promise<boolean> {
-  const screen = await waitForActiveScreen(7);
-  if (!screen || shouldAbort()) return false;
+async function smoothScrollToTarget(target: HTMLElement): Promise<void> {
+  const scrollRoot = prototypeScrollRoot();
+  target.scrollIntoView({ block: "center", behavior: "smooth" });
+  await delay(280);
 
-  await delay(SETTLE_MS);
+  if (!scrollRoot) return;
 
-  const changeBtn = Array.from(
-    screen.querySelectorAll<HTMLElement>('[data-name="component.input.button"]')
-  ).find((btn) => isRecipientChangeBtn(btn));
+  const btnRect = target.getBoundingClientRect();
+  const rootRect = scrollRoot.getBoundingClientRect();
+  const padding = 72;
 
-  if (!changeBtn || shouldAbort()) return false;
+  if (btnRect.bottom > rootRect.bottom - padding) {
+    scrollRoot.scrollTo({
+      top:
+        scrollRoot.scrollTop +
+        (btnRect.bottom - rootRect.bottom) +
+        padding,
+      behavior: "smooth",
+    });
+    await delay(420);
+    return;
+  }
+
+  if (btnRect.top < rootRect.top + padding) {
+    scrollRoot.scrollTo({
+      top:
+        scrollRoot.scrollTop - (rootRect.top + padding - btnRect.top),
+      behavior: "smooth",
+    });
+    await delay(420);
+  }
+}
+
+async function waitForBookStep1ChosenSlot(screen: HTMLElement): Promise<boolean> {
+  for (let i = 0; i < 80; i++) {
+    if (screen.querySelector(".proto-chosen-slot")) return true;
+    await delay(50);
+  }
+  return false;
+}
+
+function findBookStep1ContinueBtn(screen: HTMLElement): HTMLElement | null {
+  return (
+    Array.from(
+      screen.querySelectorAll<HTMLElement>('[data-name="component.input.button"]')
+    ).find((btn) =>
+      /^continue$/i.test((btn.textContent ?? "").replace(/\s+/g, " ").trim())
+    ) ?? null
+  );
+}
+
+async function clickBookStep1Continue(
+  screen: HTMLElement,
+  options?: { skip?: boolean }
+): Promise<boolean> {
+  const continueBtn = findBookStep1ContinueBtn(screen);
+  if (!continueBtn || shouldAbort()) return false;
 
   if (options?.skip) {
-    changeBtn.click();
-  } else {
-    await simulateDemoPointerClick(changeBtn, { shouldAbort });
-    await delay(360);
+    continueBtn.click();
+    return true;
   }
+
+  await smoothScrollToTarget(continueBtn);
   if (shouldAbort()) return false;
 
-  const picker = await waitForSelector(document, ".proto-recipient-picker-card");
-  if (!picker || shouldAbort()) return false;
-
-  const confirmBtn = Array.from(picker.querySelectorAll<HTMLElement>("button")).find(
-    (btn) => /^confirm$/i.test((btn.textContent ?? "").trim())
-  );
-  if (!confirmBtn || shouldAbort()) return false;
-
-  if (options?.skip) {
-    confirmBtn.click();
-  } else {
-    await simulateDemoPointerClick(confirmBtn, { shouldAbort });
-    await delay(SETTLE_MS);
-  }
-
-  return !shouldAbort();
+  return simulateDemoPointerClick(continueBtn, { shouldAbort, scroll: false });
 }
 
-async function runBookLocationAvail(
+async function runBookLocationPick(
   runtime: JourneyRuntime,
   options?: { skip?: boolean }
 ): Promise<boolean> {
@@ -282,24 +347,124 @@ async function runBookLocationAvail(
 
   await delay(SETTLE_MS);
 
-  runtime.openAvailability({
-    step: "date",
-    storeId: AVAIL_DEMO_STORE,
-    selectedDate: { month: "June", day: 25 },
-  });
+  const searchField =
+    screen.querySelector<HTMLElement>(
+      "[data-name='chosen location'] [data-name='component.input.field']"
+    ) ??
+    screen.querySelector<HTMLElement>("[data-name='component.input.field']") ??
+    screen.querySelector<HTMLElement>("[data-name='Text Field']");
 
-  await delay(options?.skip ? 120 : 400);
+  if (searchField) {
+    if (options?.skip) {
+      searchField.click();
+    } else {
+      const clicked = await simulateDemoPointerClick(searchField, { shouldAbort });
+      if (!clicked || shouldAbort()) return false;
+    }
+  } else {
+    runtime.openAvailability({
+      step: "list",
+      query: "London",
+      pickLocation: true,
+    });
+  }
+
+  await delay(options?.skip ? 200 : 450);
   if (shouldAbort()) return false;
 
-  if (!(await runAvailabilityScript("continue-from-date", options))) return false;
+  if (!(await runSelectLocationStore({ ...options, storeId: AVAIL_DEMO_STORE }))) {
+    return false;
+  }
   if (shouldAbort()) return false;
 
-  if (!(await runAvailabilityScript("select-time-slot", options))) return false;
-  if (shouldAbort()) return false;
+  await delay(options?.skip ? CHOSEN_LOCATION_SETTLE_MS : CHOSEN_LOCATION_SETTLE_MS + 120);
 
-  if (!(await runAvailabilityScript("book-now", options))) return false;
+  const step1Screen = (await waitForActiveScreen(7)) ?? screen;
+  if (!step1Screen || shouldAbort()) return false;
+
+  if (!(await waitForBookStep1ChosenSlot(step1Screen))) return false;
+
+  if (!(await clickBookStep1Continue(step1Screen, options))) return false;
+
+  await delay(SETTLE_MS);
+  return !shouldAbort();
+}
+
+async function runConfirmationOpenAppointments(
+  runtime: JourneyRuntime,
+  options?: { skip?: boolean }
+): Promise<boolean> {
+  const screen = await waitForActiveScreen(3);
+  if (!screen || shouldAbort()) return false;
+
   await delay(SETTLE_MS);
 
+  const openBtn = await waitForVisibleTarget(screen, (scope) =>
+    scope.querySelector<HTMLElement>('[data-proto-open-appointment="true"]')
+  );
+  if (!openBtn || shouldAbort()) return false;
+
+  if (options?.skip) {
+    openBtn.click();
+    return true;
+  }
+
+  await smoothScrollToTarget(openBtn);
+  if (shouldAbort()) return false;
+
+  const clicked = await simulateDemoPointerClick(openBtn, {
+    shouldAbort,
+    scroll: false,
+  });
+  if (!clicked || shouldAbort()) return false;
+
+  await delay(SETTLE_MS);
+  return !shouldAbort();
+}
+
+async function waitForFirstHistoryViewDetails(
+  screen: HTMLElement
+): Promise<HTMLElement | null> {
+  for (let i = 0; i < 80; i++) {
+    const firstCard = screen.querySelector<HTMLElement>(
+      '[data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]'
+    );
+    const viewBtn = firstCard?.querySelector<HTMLElement>(
+      '[data-proto-appointment-view-details="true"]'
+    );
+    if (viewBtn && isClickableTarget(viewBtn)) return viewBtn;
+    await delay(50);
+  }
+  return null;
+}
+
+async function runHistoryViewDetails(
+  runtime: JourneyRuntime,
+  options?: { skip?: boolean }
+): Promise<boolean> {
+  const screen = await waitForActiveScreen(2);
+  if (!screen || shouldAbort()) return false;
+
+  await delay(SETTLE_MS);
+
+  const viewBtn = await waitForFirstHistoryViewDetails(screen);
+  if (!viewBtn || shouldAbort()) return false;
+
+  if (options?.skip) {
+    viewBtn.click();
+    return true;
+  }
+
+  await smoothScrollToTarget(viewBtn);
+  if (shouldAbort()) return false;
+
+  const clicked = await simulateDemoPointerClick(viewBtn, {
+    shouldAbort,
+    scroll: false,
+  });
+  if (!clicked || shouldAbort()) return false;
+
+  await delay(SETTLE_MS);
   return !shouldAbort();
 }
 
@@ -317,10 +482,12 @@ export async function runTraditionalScript(
       return runPdpBookNow(runtime, options);
     case "login-sign-in":
       return runLoginSignIn(runtime, options);
-    case "recipient-confirm":
-      return runRecipientConfirm(options);
-    case "book-location-avail":
-      return runBookLocationAvail(runtime, options);
+    case "book-location-pick":
+      return runBookLocationPick(runtime, options);
+    case "confirmation-open-appointments":
+      return runConfirmationOpenAppointments(runtime, options);
+    case "history-view-details":
+      return runHistoryViewDetails(runtime, options);
     default:
       return false;
   }

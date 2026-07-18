@@ -995,9 +995,8 @@ export default function App() {
       window.setTimeout(() => {
         setCurrent(5);
         const datetimeBeatIndex =
-          activeJourney?.beats.findIndex(
-            (beat) => beat.id === "book-datetime" || beat.id === "choose-datetime"
-          ) ?? -1;
+          activeJourney?.beats.findIndex((beat) => beat.id === "book-step2-date") ??
+          -1;
         if (datetimeBeatIndex >= 0) {
           setJourneyBeatIndex(datetimeBeatIndex);
         }
@@ -1085,6 +1084,8 @@ export default function App() {
         : undefined,
   });
 
+  const headerLoggedIn = loggedInFlag || isProtoHeaderLoggedIn();
+
   const journeyPlayback = useProtoJourneyPlayback({
     active: !hubOpen,
     journey: activeJourney,
@@ -1094,13 +1095,15 @@ export default function App() {
     runtime: journeyRuntime,
     screenPlayback: scenarioPlayback,
     screenBeatActive: activeScreenScenario != null,
+    headerLoggedIn,
   });
 
   scenarioIsPlayingRef.current = scenarioPlayback.isPlaying;
   resumeJourneyPlayRef.current = journeyPlayback.resumeJourneyPlay;
 
   const transport = journeyPlayback;
-  const navPlaybackLocked = transport.isPlaying;
+  const navPlaybackLocked =
+    transport.isPlaying || transport.isPausingBeforeReveal;
   const navPlaybackLockedRef = useRef(navPlaybackLocked);
   navPlaybackLockedRef.current = navPlaybackLocked;
 
@@ -1110,8 +1113,11 @@ export default function App() {
       : DEFAULT_CHAT_SCENARIO_FRAMES;
 
   const studioPlaylist = useMemo(
-    () => buildStudioTouchpointPlaylist(activeJourney, chatFramesForPlaylist),
-    [activeJourney, chatFramesForPlaylist]
+    () =>
+      buildStudioTouchpointPlaylist(activeJourney, chatFramesForPlaylist, {
+        headerLoggedIn,
+      }),
+    [activeJourney, chatFramesForPlaylist, headerLoggedIn]
   );
 
   const studioTouchpoint = useMemo(
@@ -1580,7 +1586,7 @@ export default function App() {
     const h = headerMount ? headerMount.getBoundingClientRect().height : 64;
     document.documentElement.style.setProperty("--sticky-top", `${h}px`);
 
-    // Sync login state: account/booking pages force logged-in
+    // Sync login state: account pages force logged-in (browse stays as user left it)
     syncProtoHeaderLogin(SCREENS[current]?.childIndex ?? 11);
     const headerLoggedIn = isProtoHeaderLoggedIn();
     setLoggedInFlag(headerLoggedIn);
@@ -3435,7 +3441,7 @@ export default function App() {
     };
   }, [current]);
 
-  // Book Step 3 — Open Appointment icon+link → tab 9 (Appointment Details)
+  // Book Step 3 — Open Appointments link → Appointment History (tab 8)
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 3) return;
     const screen = document.querySelector(
@@ -3462,7 +3468,7 @@ export default function App() {
       openAppt.type = "button";
       openAppt.className = "proto-confirm-open-appointment";
       openAppt.dataset.protoOpenAppointment = "true";
-      openAppt.setAttribute("aria-label", "Open Appointment");
+      openAppt.setAttribute("aria-label", "Open Appointments");
 
       const icon = document.createElement("img");
       icon.className =
@@ -3473,28 +3479,32 @@ export default function App() {
       icon.height = 16;
 
       const label = document.createElement("span");
-      label.textContent = "Open Appointment";
+      label.textContent = "Open Appointments";
 
       openAppt.append(icon, label);
       footer.appendChild(openAppt);
+    } else {
+      openAppt.setAttribute("aria-label", "Open Appointments");
+      const label = openAppt.querySelector("span");
+      if (label) label.textContent = "Open Appointments";
     }
 
-    const goDetails = (e: Event) => {
+    const goHistory = (e: Event) => {
       e.preventDefault();
       e.stopPropagation();
-      setCurrent(protoTabToIndex(9));
+      setCurrent(protoTabToIndex(8));
     };
 
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Enter" && e.key !== " ") return;
-      if (e.target === openAppt) goDetails(e);
+      if (e.target === openAppt) goHistory(e);
     };
 
-    openAppt.addEventListener("click", goDetails);
+    openAppt.addEventListener("click", goHistory);
     openAppt.addEventListener("keydown", onKey);
 
     return () => {
-      openAppt?.removeEventListener("click", goDetails);
+      openAppt?.removeEventListener("click", goHistory);
       openAppt?.removeEventListener("keydown", onKey);
     };
   }, [current]);
@@ -4544,6 +4554,7 @@ export default function App() {
                   value={orchestraModeId}
                   onChange={handleOrchestraModeChange}
                   isPlaying={transport.isPlaying}
+                  controlsLocked={transport.isPausingBeforeReveal}
                 />
               }
               segmentLabel={studioTouchpoint.label}
@@ -4551,6 +4562,11 @@ export default function App() {
               visibleCount={studioProgress.visibleCount}
               totalFrames={studioProgress.totalFrames}
               isPlaying={transport.isPlaying}
+              isOnAir={transport.isOnAir}
+              playbackEndToken={Math.max(
+                journeyPlayback.playbackEndToken,
+                scenarioPlayback.playbackEndToken,
+              )}
               canStepBack={transport.canStepBack}
               canStepForward={transport.canStepForward}
               canJumpToStart={transport.canJumpToStart}

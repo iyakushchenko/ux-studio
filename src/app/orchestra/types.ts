@@ -15,15 +15,19 @@ export type AvailabilityScriptId =
 
 export type HomeScriptId = "sarah-query-submit";
 
-export type BookScriptId = "reserve-appointment";
+export type BookScriptId =
+  | "select-book-date"
+  | "select-book-time"
+  | "reserve-appointment";
 
 /** Cursor-guided steps on prototype screens (Traditional CJM). */
 export type TabScriptId =
   | "plp-open-pdp"
   | "pdp-book-now"
   | "login-sign-in"
-  | "recipient-confirm"
-  | "book-location-avail";
+  | "book-location-pick"
+  | "confirmation-open-appointments"
+  | "history-view-details";
 
 export type JourneyBeat = {
   id: string;
@@ -39,7 +43,7 @@ export type JourneyBeat = {
   availScript?: AvailabilityScriptId;
   /** Agentic home — Sarah types a query and submits to chat. */
   homeScript?: HomeScriptId;
-  /** Book step 2 — scroll to and click Reserve Appointment. */
+  /** Book step 2 — cursor-guided date, time, and reserve. */
   bookScript?: BookScriptId;
   /** Traditional path — cursor-guided interaction on the active tab. */
   tabScript?: TabScriptId;
