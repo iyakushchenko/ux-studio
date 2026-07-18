@@ -995,7 +995,9 @@ export default function App() {
       window.setTimeout(() => {
         setCurrent(5);
         const datetimeBeatIndex =
-          activeJourney?.beats.findIndex((beat) => beat.id === "book-datetime") ?? -1;
+          activeJourney?.beats.findIndex(
+            (beat) => beat.id === "book-datetime" || beat.id === "choose-datetime"
+          ) ?? -1;
         if (datetimeBeatIndex >= 0) {
           setJourneyBeatIndex(datetimeBeatIndex);
         }
@@ -1018,6 +1020,7 @@ export default function App() {
 
   const journeyBeatIndexRef = useRef(journeyBeatIndex);
   journeyBeatIndexRef.current = journeyBeatIndex;
+  const screenFadeChildRef = useRef<number | null>(null);
   const setJourneyBeatIndexRef = useRef(setJourneyBeatIndex);
   setJourneyBeatIndexRef.current = setJourneyBeatIndex;
   const activeJourneyRef = useRef(activeJourney);
@@ -2263,6 +2266,11 @@ export default function App() {
     };
     const goBookStep1 = (e: Event) => {
       stop(e);
+      if (!isProtoHeaderLoggedIn() && !loggedInFlag) {
+        setLoginPopupTab("signin");
+        setLoginPopupOpen(true);
+        return;
+      }
       setCurrent(4); // Book - Step 1 - Location
     };
 
@@ -2305,7 +2313,7 @@ export default function App() {
       bookBtns.forEach((btn) => btn.removeEventListener("click", goBookStep1));
       screen.removeEventListener("keydown", onKey);
     };
-  }, [current]);
+  }, [current, loggedInFlag]);
 
   // PDP (child 8) — "Quick Sign In" / "Create Boots Account" links → login popup
   useEffect(() => {
@@ -4337,6 +4345,12 @@ export default function App() {
   const popupOnScreen = (...allowed: number[]) =>
     activeChildIndex != null && allowed.includes(activeChildIndex);
 
+  const shouldFadeActiveScreen =
+    !hubOpen && screenFadeChildRef.current !== childIndex;
+  if (!hubOpen) {
+    screenFadeChildRef.current = childIndex;
+  }
+
   /**
    * Sticky footer: active screen is at least the scroll-area height; footers use
    * margin-top:auto so they sit on the viewport bottom when content is short.
@@ -4389,7 +4403,7 @@ export default function App() {
       overflow: ${isViewportLocked ? "hidden" : "visible"} !important;
       overflow-x: ${isViewportLocked ? "hidden" : "visible"} !important;
       overflow-y: ${isViewportLocked ? "hidden" : "visible"} !important;
-      animation: proto-fade 0.25s ease;
+      ${shouldFadeActiveScreen ? "animation: proto-fade 0.25s ease;" : ""}
     }
 
     ${

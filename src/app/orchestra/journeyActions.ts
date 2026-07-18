@@ -1,7 +1,8 @@
-import type { JourneyBeatActionId, JourneyRuntime, AvailabilityScriptId, HomeScriptId, BookScriptId } from "@/app/orchestra/types";
+import type { AvailabilityScriptId, BookScriptId, HomeScriptId, JourneyRuntime, TabScriptId } from "@/app/orchestra/types";
 import { runAvailabilityScript } from "@/app/proto/protoAvailabilityPlayback";
 import { runBookScript } from "@/app/proto/protoBookPlayback";
 import { runSitePilotHomeScript } from "@/app/proto/protoSitePilotHomePlayback";
+import { runTraditionalScript } from "@/app/proto/protoTraditionalPlayback";
 
 export function runJourneyBeatAction(
   actionId: JourneyBeatActionId,
@@ -44,6 +45,14 @@ export async function runJourneyAvailScript(
 export async function runJourneyBookScript(
   scriptId: BookScriptId,
   options?: { skip?: boolean }
-): Promise<void> {
-  await runBookScript(scriptId, options);
+): Promise<boolean> {
+  return runBookScript(scriptId, options);
+}
+
+export async function runJourneyTabScript(
+  scriptId: TabScriptId,
+  runtime: JourneyRuntime,
+  options?: { skip?: boolean }
+): Promise<boolean> {
+  return runTraditionalScript(scriptId, runtime, options);
 }

@@ -17,6 +17,14 @@ export type HomeScriptId = "sarah-query-submit";
 
 export type BookScriptId = "reserve-appointment";
 
+/** Cursor-guided steps on prototype screens (Traditional CJM). */
+export type TabScriptId =
+  | "plp-open-pdp"
+  | "pdp-book-now"
+  | "login-sign-in"
+  | "recipient-confirm"
+  | "book-location-avail";
+
 export type JourneyBeat = {
   id: string;
   label: string;
@@ -33,6 +41,8 @@ export type JourneyBeat = {
   homeScript?: HomeScriptId;
   /** Book step 2 — scroll to and click Reserve Appointment. */
   bookScript?: BookScriptId;
+  /** Traditional path — cursor-guided interaction on the active tab. */
+  tabScript?: TabScriptId;
 };
 
 export type ProtoJourneyDefinition = {

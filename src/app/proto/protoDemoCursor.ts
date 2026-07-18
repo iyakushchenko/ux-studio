@@ -51,6 +51,16 @@ function tapDemoCursor(cursor: HTMLElement): void {
   cursor.classList.add("proto-chat-demo-cursor--tap");
 }
 
+export function isClickableTarget(target: HTMLElement): boolean {
+  if (!target.isConnected) return false;
+  const rect = target.getBoundingClientRect();
+  if (rect.width < 2 || rect.height < 2) return false;
+  const style = window.getComputedStyle(target);
+  if (style.display === "none" || style.visibility === "hidden") return false;
+  if (Number(style.opacity) === 0) return false;
+  return true;
+}
+
 export function targetCenter(target: HTMLElement): { x: number; y: number } {
   const rect = target.getBoundingClientRect();
   return {
@@ -93,13 +103,16 @@ export async function moveDemoCursorTo(target: HTMLElement): Promise<HTMLElement
 
 export async function simulateDemoPointerClick(
   target: HTMLElement,
-  options?: { shouldAbort?: () => boolean }
+  options?: { shouldAbort?: () => boolean; scroll?: boolean }
 ): Promise<boolean> {
   if (options?.shouldAbort?.()) return false;
 
-  target.scrollIntoView({ block: "nearest", behavior: "smooth" });
-  await delay(180);
+  if (options?.scroll !== false) {
+    target.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    await delay(180);
+  }
   if (options?.shouldAbort?.()) return false;
+  if (!isClickableTarget(target)) return false;
 
   const cursor = await moveDemoCursorTo(target);
   if (options?.shouldAbort?.()) {

@@ -95,38 +95,38 @@ async function scrollToElement(target: HTMLElement): Promise<void> {
   }
 }
 
-async function runReserveAppointment(options?: { skip?: boolean }): Promise<void> {
+async function runReserveAppointment(options?: { skip?: boolean }): Promise<boolean> {
   const screen = await waitForBookStep2Screen();
-  if (!screen || shouldAbort()) return;
+  if (!screen || shouldAbort()) return false;
 
   if (!options?.skip) await delay(320);
 
   const reserveBtn = await waitForReserveButton(screen);
-  if (!reserveBtn || shouldAbort()) return;
+  if (!reserveBtn || shouldAbort()) return false;
 
   if (options?.skip) {
     reserveBtn.click();
-    return;
+    return true;
   }
 
   await scrollToElement(reserveBtn);
-  if (shouldAbort()) return;
+  if (shouldAbort()) return false;
 
   await simulateDemoPointerClick(reserveBtn, { shouldAbort });
   await delay(360);
+  return !shouldAbort();
 }
 
 export async function runBookScript(
   scriptId: BookScriptId,
   options?: { skip?: boolean }
-): Promise<void> {
+): Promise<boolean> {
   playbackAborted = false;
 
   switch (scriptId) {
     case "reserve-appointment":
-      await runReserveAppointment(options);
-      break;
+      return runReserveAppointment(options);
     default:
-      break;
+      return false;
   }
 }

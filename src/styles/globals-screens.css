@@ -706,6 +706,12 @@
   display: none !important;
 }
 
+/* PDP + PLP — hide Figma cursor (Sarah playback simulates clicks) */
+.proto-viewport > div > div:nth-child(8) [data-name=".utility / cursor"],
+.proto-viewport > div > div:nth-child(9) [data-name=".utility / cursor"] {
+  display: none !important;
+}
+
 /* Agentic home — hide Figma cursor affordance on send CTA */
 .proto-viewport > div > div:nth-child(11) [data-name=".utility / cursor"] {
   display: none !important;

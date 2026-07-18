@@ -2,21 +2,20 @@ import type { ProtoBrandPack, ProtoJourneyDefinition } from "@/app/orchestra/typ
 
 /** Shared booking + post-booking beats (onboarding shared funnel). */
 const SHARED_FUNNEL_BEATS: ProtoJourneyDefinition["beats"] = [
-  {
-    id: "choose-recipient",
-    label: "Choose recipient",
-    kind: "tab-landing",
-    protoTab: 4,
-    dwellMs: 2800,
-  },
-  {
-    id: "choose-location",
-    label: "Choose location",
-    kind: "tab-landing",
-    protoTab: 5,
-    dwellMs: 3200,
-    onEnter: "apply-demo-location",
-  },
+    {
+      id: "choose-recipient",
+      label: "Choose recipient",
+      kind: "tab-landing",
+      protoTab: 5,
+      tabScript: "recipient-confirm",
+    },
+    {
+      id: "choose-location",
+      label: "Choose location",
+      kind: "tab-landing",
+      protoTab: 5,
+      tabScript: "book-location-avail",
+    },
   {
     id: "choose-datetime",
     label: "Choose date and time",
@@ -129,21 +128,21 @@ const TRADITIONAL_CJM_JOURNEY: ProtoJourneyDefinition = {
       label: "Vaccination listing",
       kind: "tab-landing",
       protoTab: 3,
-      dwellMs: 2800,
+      tabScript: "plp-open-pdp",
     },
     {
       id: "traditional-pdp",
       label: "Vaccination details",
       kind: "tab-landing",
       protoTab: 4,
-      dwellMs: 2800,
+      tabScript: "pdp-book-now",
     },
     {
       id: "traditional-login",
       label: "Log in or register",
       kind: "tab-landing",
       protoTab: 4,
-      dwellMs: 2400,
+      tabScript: "login-sign-in",
     },
     ...SHARED_FUNNEL_BEATS,
   ],
