@@ -47,4 +47,19 @@ describe("resolveActiveScreenScenario", () => {
       })
     ).toBeUndefined();
   });
+
+  it("activates chat scenario in browse mode from screen childIndex alone", () => {
+    const scenario = resolveActiveScreenScenario({
+      hubOpen: false,
+      modeId: "agentic-cjm",
+      beatIndex: 0,
+      currentTabIndex: protoTabToIndex(2),
+      currentChildIndex: 10,
+      browseMode: true,
+      journeys: [AGENTIC_CJM_JOURNEY],
+      scenarioScreens: BOOTS_PHARMACY_SCENARIO_SCREENS,
+      protoTabToIndex,
+    });
+    expect(scenario?.id).toBe("site-pilot-chat");
+  });
 });

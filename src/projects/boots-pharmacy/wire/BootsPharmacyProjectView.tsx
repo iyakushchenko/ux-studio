@@ -844,6 +844,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     protoNavKey,
     orchestra,
     onWireApiChange,
+    studioJourneyMode,
   } = bridge;
 
   const {
@@ -863,6 +864,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     openAvailabilityToolRef,
     closeAvailabilityToolRef,
     resetToEndRef,
+    triggerChatBrowseRevealRef,
     retreatFromFinaleRef,
     cancelPreRevealPauseRef,
     scenarioVisibleCountRef,
@@ -1115,6 +1117,12 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       !plpFiltersDirty;
 
     if (scenarioOnlyDirty) {
+      if (!studioJourneyMode && SCREENS[current]?.childIndex === 10) {
+        scenarioPlayback.cancelPreRevealPause();
+        triggerChatBrowseRevealRef.current();
+        return;
+      }
+
       transport.resetJourney();
       scenarioPlayback.jumpToStart();
       return;

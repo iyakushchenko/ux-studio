@@ -51,6 +51,25 @@ describe("detectTouchpointAheadOfBeat", () => {
     ).toBeNull();
   });
 
+  it("allows chat scenario frame substeps on agentic-chat beat", () => {
+    expect(
+      detectTouchpointAheadOfBeat({
+        beatPlaylistIndex: 1,
+        touchpointPlaylistIndex: 3,
+        beatId: "agentic-chat",
+        touchpointKey: "beat:agentic-chat:frame:2",
+      })
+    ).toBeNull();
+    expect(
+      detectTouchpointAheadOfBeat({
+        beatPlaylistIndex: 1,
+        touchpointPlaylistIndex: 2,
+        beatId: "agentic-chat",
+        touchpointKey: "beat:agentic-chat:frame:2:thinking",
+      })
+    ).toBeNull();
+  });
+
   it("flags touchpoint ahead of beat when gap is two or more frames", () => {
     const anomaly = detectTouchpointAheadOfBeat({
       beatPlaylistIndex: 3,

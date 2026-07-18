@@ -74,6 +74,8 @@ import type { AvailOpenIntent } from "@/projects/boots-pharmacy/overlays/Availab
 import {
   collectSitePilotChatScenarioFrames,
   ensureSitePilotChatComposerDock,
+  isSitePilotChatAgentReplyFrame,
+  SITE_PILOT_CHAT_PLAYBACK_THINK_MS,
   syncSitePilotChatComposerDock,
 } from "@/projects/boots-pharmacy/dom/protoSitePilotChatScenario";
 import {
@@ -212,6 +214,8 @@ export default function App() {
         modeId: orchestraModeId,
         beatIndex: journeyBeatIndex,
         currentTabIndex: current,
+        currentChildIndex: hubOpen ? null : (SCREENS[current]?.childIndex ?? null),
+        browseMode: !studioJourneyMode,
         journeys: studioPersona.journeys,
         scenarioScreens: PROTO_SCENARIO_SCREENS,
         protoTabToIndex,
@@ -221,9 +225,11 @@ export default function App() {
       orchestraModeId,
       journeyBeatIndex,
       current,
+      studioJourneyMode,
       studioPersona.journeys,
       PROTO_SCENARIO_SCREENS,
       protoTabToIndex,
+      SCREENS,
     ]
   );
 
@@ -248,6 +254,7 @@ export default function App() {
   const sitePilotChatPlaybackHooks = useMemo<PlaybackStepHooks>(
     () => ({
       beforeReveal: runSitePilotChatBeforeReveal,
+      revealScrollSmooth: (frame) => !isSitePilotChatAgentReplyFrame(frame),
       onPreludeAbort: abortSitePilotChatPlaybackPrelude,
       onFinale: async () => {
         const shouldContinueJourney = scenarioIsPlayingRef.current;
@@ -279,9 +286,10 @@ export default function App() {
     minVisibleFrames: activeScreenScenario?.minVisibleFrames,
     playbackStepMs: activeScreenScenario?.playbackStepMs,
     playbackStepHooks:
-      activeScreenScenario?.id === "site-pilot-chat"
+      activeScreenScenario?.id === "site-pilot-chat" && studioJourneyMode
         ? sitePilotChatPlaybackHooks
         : undefined,
+    browseMode: !studioJourneyMode,
     onDiagnostic: handlePlaybackDiagnostic,
   });
 
@@ -335,16 +343,16 @@ export default function App() {
       loginPopupOpen: (wire?.loginPopupOpen ?? false) && childIdx != null,
       quickViewOpen: (wire?.quickViewOpen ?? false) && popupOnScreen(9),
       chatFrameIndex:
-        activeScreenScenario?.id === "site-pilot-chat"
+        activeScreenScenario?.id === "site-pilot-chat" && studioJourneyMode
           ? scenarioPlayback.visibleCount
           : undefined,
       chatFrameTotal: stableChatPlaylistFrames,
       chatPausingBeforeReveal:
-        activeScreenScenario?.id === "site-pilot-chat"
+        activeScreenScenario?.id === "site-pilot-chat" && studioJourneyMode
           ? scenarioPlayback.isPausingBeforeReveal
           : undefined,
       chatPlaybackThinking:
-        activeScreenScenario?.id === "site-pilot-chat"
+        activeScreenScenario?.id === "site-pilot-chat" && studioJourneyMode
           ? isSitePilotChatPlaybackThinking()
           : undefined,
       bookConfirmationScreen: childIdx === 3,
@@ -359,6 +367,7 @@ export default function App() {
     scenarioPlayback.visibleCount,
     scenarioPlayback.isPausingBeforeReveal,
     stableChatPlaylistFrames,
+    studioJourneyMode,
     SCREENS,
   ]);
 
@@ -377,6 +386,7 @@ export default function App() {
     studioPlaylist,
     currentTouchpointKey: studioTouchpoint.key,
     onDiagnostic: handlePlaybackDiagnostic,
+    scenarioBrowseMode: !studioJourneyMode,
   });
 
   useEffect(() => {
@@ -500,7 +510,10 @@ export default function App() {
     (screenIndex: number) => {
       journeyPlayback.stopJourneyPlay();
       scenarioPlayback.cancelPreRevealPause();
-      scenarioPlayback.jumpToStart();
+      const onChatScreen = SCREENS[screenIndex]?.childIndex === 10;
+      if (studioJourneyModeRef.current || !onChatScreen) {
+        scenarioPlayback.jumpToStart();
+      }
       setJourneyBeatIndex(
         resolveBeatIndexForScreenTab(activeJourney, screenIndex, shouldSkipBeat)
       );
@@ -511,6 +524,7 @@ export default function App() {
       scenarioPlayback,
       setJourneyBeatIndex,
       shouldSkipBeat,
+      SCREENS,
     ]
   );
 
@@ -519,6 +533,13 @@ export default function App() {
     const bootKey = `${studioProjectId}:${studioPersonaId}:${orchestraModeId}`;
     if (journeyBootSyncKeyRef.current === bootKey) return;
     journeyBootSyncKeyRef.current = bootKey;
+
+    if (!studioJourneyModeRef.current && SCREENS[current]?.childIndex === 10) {
+      setJourneyBeatIndex(
+        resolveBeatIndexForScreenTab(activeJourney, current, shouldSkipBeat)
+      );
+      return;
+    }
 
     scenarioPlayback.jumpToStart();
     setJourneyBeatIndex(
@@ -586,8 +607,11 @@ export default function App() {
       setStudioJourneyMode(false);
       journeyPlayback.stopJourneyPlay();
       scenarioPlayback.cancelPreRevealPause();
+      if (SCREENS[current]?.childIndex === 10) {
+        window.setTimeout(() => triggerChatBrowseRevealRef.current(), 0);
+      }
     },
-    [journeyPlayback, restartStudioJourney, scenarioPlayback]
+    [current, journeyPlayback, restartStudioJourney, scenarioPlayback, SCREENS]
   );
 
   const handleOrchestraModeChange = useCallback(
@@ -635,6 +659,9 @@ export default function App() {
 
   const resetToEndRef = useRef(scenarioPlayback.resetToEnd);
   resetToEndRef.current = scenarioPlayback.resetToEnd;
+  const triggerChatBrowseRevealRef = useRef<() => void>(() => {});
+  const chatBrowseRevealTimerRef = useRef<number | null>(null);
+  const chatBrowseRevealGenerationRef = useRef(0);
   const retreatFromFinaleRef = useRef(scenarioPlayback.retreatFromFinale);
   retreatFromFinaleRef.current = scenarioPlayback.retreatFromFinale;
   const cancelPreRevealPauseRef = useRef(scenarioPlayback.cancelPreRevealPause);
@@ -642,6 +669,78 @@ export default function App() {
   const scenarioVisibleCountRef = useRef(scenarioPlayback.visibleCount);
   scenarioVisibleCountRef.current = scenarioPlayback.visibleCount;
   const availabilityWasOpenRef = useRef(false);
+
+  const runChatBrowseReveal = useCallback(() => {
+    if (studioJourneyMode || hubOpen) return;
+    if (SCREENS[current]?.childIndex !== 10) return;
+    if (activeScreenScenario?.id !== "site-pilot-chat") return;
+
+    const screen = document.querySelector<HTMLElement>(
+      ".proto-viewport > div > div:nth-child(10)"
+    );
+    if (!screen) return;
+
+    chatBrowseRevealGenerationRef.current += 1;
+    const generation = chatBrowseRevealGenerationRef.current;
+
+    if (chatBrowseRevealTimerRef.current != null) {
+      window.clearTimeout(chatBrowseRevealTimerRef.current);
+      chatBrowseRevealTimerRef.current = null;
+    }
+
+    ensureSitePilotChatComposerDock(screen);
+    scenarioPlayback.cancelPreRevealPause();
+    scenarioPlayback.jumpToStart();
+
+    const summary = screen.querySelector<HTMLElement>(
+      '[data-name="component.appointment.summary"]'
+    );
+    const firstFrame = summary?.querySelector<HTMLElement>(
+      ":scope > *:not([data-proto-chat-thinking])"
+    );
+    syncSitePilotChatThinkingHint(screen, true, firstFrame ?? undefined);
+
+    chatBrowseRevealTimerRef.current = window.setTimeout(() => {
+      chatBrowseRevealTimerRef.current = null;
+      if (chatBrowseRevealGenerationRef.current !== generation) return;
+      syncSitePilotChatThinkingHint(null, false);
+      resetToEndRef.current({ smooth: true, force: true });
+      ensureSitePilotChatComposerDock(screen);
+      syncSitePilotChatComposerDock(screen);
+    }, SITE_PILOT_CHAT_PLAYBACK_THINK_MS);
+  }, [
+    activeScreenScenario?.id,
+    current,
+    hubOpen,
+    scenarioPlayback,
+    studioJourneyMode,
+    SCREENS,
+  ]);
+
+  triggerChatBrowseRevealRef.current = runChatBrowseReveal;
+
+  useEffect(() => {
+    return () => {
+      chatBrowseRevealGenerationRef.current += 1;
+      if (chatBrowseRevealTimerRef.current != null) {
+        window.clearTimeout(chatBrowseRevealTimerRef.current);
+      }
+      syncSitePilotChatThinkingHint(null, false);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (studioJourneyMode || hubOpen) return;
+    if (SCREENS[current]?.childIndex !== 10) return;
+    if (activeScreenScenario?.id !== "site-pilot-chat") return;
+    triggerChatBrowseRevealRef.current();
+  }, [
+    activeScreenScenario?.id,
+    current,
+    hubOpen,
+    studioJourneyMode,
+    SCREENS,
+  ]);
 
   useEffect(() => {
     const wasOpen = availabilityWasOpenRef.current;
@@ -673,6 +772,7 @@ export default function App() {
       ".proto-viewport > div > div:nth-child(10)"
     );
     const showHint =
+      studioJourneyMode &&
       scenarioPlayback.visibleCount === 1 &&
       scenarioPlayback.totalFrames > 1 &&
       !scenarioPlayback.isPlaying &&
@@ -687,6 +787,7 @@ export default function App() {
     scenarioPlayback.totalFrames,
     scenarioPlayback.isPlaying,
     scenarioPlayback.isPausingBeforeReveal,
+    studioJourneyMode,
     SCREENS,
   ]);
 
@@ -825,7 +926,8 @@ export default function App() {
     const onChatScreen =
       SCREENS[current]?.childIndex === 10 &&
       activeScreenScenario?.id === "site-pilot-chat";
-    const atFrameStart = onChatScreen && scenarioPlayback.visibleCount <= 1;
+    const atFrameStart =
+      onChatScreen && studioJourneyMode && scenarioPlayback.visibleCount <= 1;
 
     scrollEl?.classList.toggle("proto-chat-scenario-at-start", atFrameStart);
 
@@ -836,6 +938,7 @@ export default function App() {
       if (atFrameStart) screen.setAttribute("data-proto-scenario-at-start", "true");
       else screen.removeAttribute("data-proto-scenario-at-start");
       if (onChatScreen) {
+        ensureSitePilotChatComposerDock(screen);
         syncSitePilotChatComposerDock(screen);
       }
     }
@@ -853,6 +956,7 @@ export default function App() {
     current,
     activeScreenScenario?.id,
     scenarioPlayback.visibleCount,
+    studioJourneyMode,
     SCREENS,
   ]);
 
@@ -970,6 +1074,7 @@ export default function App() {
       currentRef,
       protoNavKey: protoNavStorageKey(studioProjectId),
       onWireApiChange,
+      studioJourneyMode,
       orchestra: {
         activeScreenScenario,
         scenarioPlayback,
@@ -981,6 +1086,7 @@ export default function App() {
         closeAvailabilityToolRef,
         screenFadeChildRef,
         resetToEndRef,
+        triggerChatBrowseRevealRef,
         retreatFromFinaleRef,
         cancelPreRevealPauseRef,
         scenarioVisibleCountRef,

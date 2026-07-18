@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  resolveBrowseScenarioVisibleCount,
   resolveInitialScenarioVisibleCount,
   scenarioTotalFor,
 } from "@/app/nav/useProtoScenarioPlayback";
@@ -13,5 +14,10 @@ describe("scenario playback counts", () => {
   it("starts chat scenarios at min visible frames, not full disclosure", () => {
     expect(resolveInitialScenarioVisibleCount(8, true, 1)).toBe(1);
     expect(resolveInitialScenarioVisibleCount(0, true, 1)).toBe(0);
+  });
+
+  it("reveals all content frames in browse mode (CJM off)", () => {
+    expect(resolveBrowseScenarioVisibleCount(8)).toBe(8);
+    expect(resolveBrowseScenarioVisibleCount(0)).toBe(0);
   });
 });

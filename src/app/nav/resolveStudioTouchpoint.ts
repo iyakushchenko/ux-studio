@@ -281,6 +281,26 @@ export function isPopupSubstepOfBeat(
   return false;
 }
 
+/** Screen-frames scenario substeps (e.g. chat frame 2/9) while beat index stays put. */
+export function isScenarioFrameSubstepOfBeat(
+  beatId: string | undefined,
+  touchpointKey: string
+): boolean {
+  if (!beatId) return false;
+  return touchpointKey.startsWith(`beat:${beatId}:frame:`);
+}
+
+/** Touchpoint may run ahead of the beat anchor without violating transport contract. */
+export function isAllowedTouchpointAheadOfBeat(
+  beatId: string | undefined,
+  touchpointKey: string
+): boolean {
+  return (
+    isPopupSubstepOfBeat(beatId, touchpointKey) ||
+    isScenarioFrameSubstepOfBeat(beatId, touchpointKey)
+  );
+}
+
 /**
  * Step counter for the studio deck — anchors on the active beat so popup
  * sub-steps (e.g. choose-location → availability list) do not skip a frame.

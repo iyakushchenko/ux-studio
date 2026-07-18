@@ -500,17 +500,13 @@ export function scheduleScenarioScroll(
 
   const steppedForwardOne = visibleCount === prevCount + 1;
 
-  if (smooth) {
-    window.setTimeout(() => {
-      if (generation !== scenarioScrollGeneration) return;
-      if (steppedForwardOne) {
-        settleScrollAfterForwardStep(frames, visibleCount, scrollEl, true);
-        return;
-      }
-      if (el) {
-        animateScrollToBottom(el);
-      }
-    }, SCENARIO_SCROLL_ANIM_PIN_MS);
+  if (!smooth) {
+    if (steppedForwardOne) {
+      settleScrollAfterForwardStep(frames, visibleCount, scrollEl, false);
+    } else {
+      scrollPrototypeScrollToBottom(scrollEl, "instant");
+    }
+    pinScenarioScrollToBottomDuring(scrollEl);
     return;
   }
 
@@ -518,10 +514,12 @@ export function scheduleScenarioScroll(
   window.setTimeout(() => {
     if (generation !== scenarioScrollGeneration) return;
     if (steppedForwardOne) {
-      settleScrollAfterForwardStep(frames, visibleCount, scrollEl, false);
+      settleScrollAfterForwardStep(frames, visibleCount, scrollEl, true);
       return;
     }
-    scrollPrototypeScrollToBottom(scrollEl, "instant");
+    if (el) {
+      animateScrollToBottom(el);
+    }
   }, SCENARIO_SCROLL_ANIM_PIN_MS);
 }
 

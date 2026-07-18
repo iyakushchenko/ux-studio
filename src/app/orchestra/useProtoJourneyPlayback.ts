@@ -76,6 +76,8 @@ type Options = {
   studioPlaylist?: readonly StudioTouchpointEntry[];
   currentTouchpointKey?: string;
   onDiagnostic?: (error: PlaybackDiagnosticError) => void;
+  /** CJM off — screen-frames beats show full scenario content, not frame 1. */
+  scenarioBrowseMode?: boolean;
 };
 
 function isScreenFramesBeat(beat: JourneyBeat | undefined): boolean {
@@ -114,6 +116,7 @@ export function useProtoJourneyPlayback({
   studioPlaylist = [],
   currentTouchpointKey,
   onDiagnostic,
+  scenarioBrowseMode = false,
 }: Options) {
   const beats = journey?.beats ?? [];
   const onDiagnosticRef = useRef(onDiagnostic);
@@ -681,6 +684,10 @@ export function useProtoJourneyPlayback({
   );
 
   const scheduleDwellAdvance = useCallback(() => {
+    if (playTimerRef.current != null) {
+      window.clearTimeout(playTimerRef.current);
+      playTimerRef.current = null;
+    }
     const beat = beats[beatIndexRef.current];
     if (isScreenFramesBeat(beat) || beat?.homeScript || beat?.bookScript || beat?.tabScript) {
       return;
@@ -758,7 +765,22 @@ export function useProtoJourneyPlayback({
       });
     }
     suppressInitialBeatTabNavRef.current = false;
-  }, [active, currentBeat, playback, runBeatEnter, runtime]);
+    if (
+      isPlayingRef.current &&
+      !retreatSyncRef.current &&
+      isDwellLandingBeat(currentBeat) &&
+      !currentBeat.availScript
+    ) {
+      scheduleDwellAdvanceRef.current();
+    }
+  }, [active, currentBeat, isPlaying, playback, runBeatEnter, runtime]);
+
+  useEffect(() => {
+    if (!active || !isPlaying || isScripting || retreatSyncRef.current) return;
+    const beat = beats[beatIndex];
+    if (!beat || !isDwellLandingBeat(beat) || beat.availScript) return;
+    scheduleDwellAdvanceRef.current();
+  }, [active, beatIndex, beats, isPlaying, isScripting]);
 
   useEffect(() => {
     if (!active || !isPlaying || isScripting || !currentBeat?.homeScript) return;
@@ -800,7 +822,13 @@ export function useProtoJourneyPlayback({
       const ok = await runAvailScriptBeat(currentBeat, false);
       if (!ok) return;
       if (!isPlayingRef.current || wasAvailabilityPlaybackAborted()) return;
-      if (currentBeat.availScript === "book-now") return;
+      if (currentBeat.availScript === "book-now") {
+        window.setTimeout(() => {
+          if (!isPlayingRef.current) return;
+          scheduleDwellAdvanceRef.current();
+        }, 120);
+        return;
+      }
       scheduleDwellAdvanceRef.current();
     })();
   }, [
@@ -845,7 +873,9 @@ export function useProtoJourneyPlayback({
     if (screenPlayback.totalFrames === 0) return;
 
     const readyKey = `${beatIndex}:${currentBeat.id}`;
-    if (screenBeatReadyRef.current !== readyKey) {
+    if (scenarioBrowseMode) {
+      screenBeatReadyRef.current = readyKey;
+    } else if (screenBeatReadyRef.current !== readyKey) {
       screenBeatReadyRef.current = readyKey;
       screenPlayback.jumpToStart();
     }
@@ -861,6 +891,7 @@ export function useProtoJourneyPlayback({
     screenPlayback,
     screenPlayback.totalFrames,
     screenPlayback.isPlaying,
+    scenarioBrowseMode,
   ]);
 
   useEffect(() => {

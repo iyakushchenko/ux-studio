@@ -1,4 +1,4 @@
-import { isPopupSubstepOfBeat } from "@/app/nav/resolveStudioTouchpoint";
+import { isAllowedTouchpointAheadOfBeat } from "@/app/nav/resolveStudioTouchpoint";
 
 export type TransportAnomalyKind =
   | "playlist-frame-skip"
@@ -48,7 +48,7 @@ export function detectTouchpointAheadOfBeat(options: {
   const { beatPlaylistIndex, touchpointPlaylistIndex, beatId, touchpointKey } =
     options;
   if (beatPlaylistIndex < 0 || touchpointPlaylistIndex < 0) return null;
-  if (isPopupSubstepOfBeat(beatId, touchpointKey)) return null;
+  if (isAllowedTouchpointAheadOfBeat(beatId, touchpointKey)) return null;
 
   const gap = touchpointPlaylistIndex - beatPlaylistIndex;
   // The immediate next playlist frame may open before the beat index advances

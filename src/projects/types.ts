@@ -158,7 +158,10 @@ export type ProtoProjectOrchestraBridge = {
   openAvailabilityToolRef: MutableRefObject<(intent?: AvailOpenIntent) => void>;
   closeAvailabilityToolRef: MutableRefObject<() => void>;
   screenFadeChildRef: MutableRefObject<number | null>;
-  resetToEndRef: MutableRefObject<() => void>;
+  resetToEndRef: MutableRefObject<
+    (options?: { smooth?: boolean; force?: boolean }) => void
+  >;
+  triggerChatBrowseRevealRef: MutableRefObject<() => void>;
   retreatFromFinaleRef: MutableRefObject<() => void>;
   cancelPreRevealPauseRef: MutableRefObject<() => void>;
   scenarioVisibleCountRef: MutableRefObject<number>;
@@ -194,6 +197,8 @@ export type ProtoProjectShellBridge = {
   currentRef: MutableRefObject<number>;
   protoNavKey: string;
   onWireApiChange?: () => void;
+  /** Browse mode — free screen navigation; chat uses static showcase playback. */
+  studioJourneyMode: boolean;
   orchestra: ProtoProjectOrchestraBridge;
 };
 

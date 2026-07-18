@@ -25,11 +25,15 @@ type Options = {
   playbackStepMs?: number;
   playbackStepHooks?: PlaybackStepHooks;
   onDiagnostic?: (error: PlaybackDiagnosticError) => void;
+  /** CJM off — reveal the full scenario thread (all content frames). */
+  browseMode?: boolean;
 };
 
 export type PlaybackStepHooks = {
   /** Async prelude before a frame is revealed (thinking, typing, CTA clicks). */
   beforeReveal?: (ctx: BeforeRevealContext) => Promise<void>;
+  /** When false, snap scroll on reveal (e.g. agent replies above fixed composer). */
+  revealScrollSmooth?: (frame: HTMLElement) => boolean;
   /** After the last frame is visible — e.g. exit CTA opens another surface. */
   onFinale?: () => Promise<void>;
   /** When leaving the post-content finale beat (e.g. close Availability popup). */
@@ -100,6 +104,13 @@ export function resolveInitialScenarioVisibleCount(
   return clampVisible(minVisibleFrames, scenarioTotal, minVisibleFrames);
 }
 
+/** Browse mode (CJM off) — show the full content thread, not stepped frames. */
+export function resolveBrowseScenarioVisibleCount(
+  contentFrameCount: number
+): number {
+  return contentFrameCount;
+}
+
 export { scenarioTotalFor };
 
 function bubbleVisibleCount(visibleCount: number, contentFrameCount: number): number {
@@ -120,6 +131,7 @@ export function useProtoScenarioPlayback({
   playbackStepMs = 2000,
   playbackStepHooks,
   onDiagnostic,
+  browseMode = false,
 }: Options) {
   const framesRef = useRef<HTMLElement[]>([]);
   const playTimerRef = useRef<number | null>(null);
@@ -237,11 +249,13 @@ export function useProtoScenarioPlayback({
       initializedRef.current = true;
       const contentTotal = frames.length;
       const scenarioTotal = scenarioTotalFor(contentTotal, hasFinale);
-      const initialCount = resolveInitialScenarioVisibleCount(
-        contentTotal,
-        hasFinale,
-        minVisibleFrames
-      );
+      const initialCount = browseMode
+        ? minVisibleFrames
+        : resolveInitialScenarioVisibleCount(
+            contentTotal,
+            hasFinale,
+            minVisibleFrames
+          );
       visibleCountRef.current = initialCount;
       scrollIntentRef.current = {
         visibleCount: initialCount,
@@ -256,14 +270,20 @@ export function useProtoScenarioPlayback({
       setVisibleCount((prev) => {
         // RAF re-sync can run before the init setState lands — keep progressive entry.
         if (prev === 0) {
+          if (browseMode) {
+            return minVisibleFrames;
+          }
           return clampVisible(minVisibleFrames, scenarioTotal, minVisibleFrames);
+        }
+        if (browseMode && prev < frames.length && prev > minVisibleFrames) {
+          return frames.length;
         }
         return clampVisible(prev, scenarioTotal, minVisibleFrames);
       });
     }
 
     return frames;
-  }, [collectFrames, hasFinale, minVisibleFrames]);
+  }, [browseMode, collectFrames, hasFinale, minVisibleFrames]);
 
   const refreshFrameList = useCallback(() => {
     const frames = collectFrames();
@@ -276,14 +296,16 @@ export function useProtoScenarioPlayback({
     const count =
       visibleCountRef.current > 0
         ? visibleCountRef.current
-        : clampVisible(
-            minVisibleFrames,
-            scenarioTotalFor(frames.length, hasFinale),
-            minVisibleFrames
-          );
+        : browseMode
+          ? resolveBrowseScenarioVisibleCount(frames.length)
+          : clampVisible(
+              minVisibleFrames,
+              scenarioTotalFor(frames.length, hasFinale),
+              minVisibleFrames
+            );
     applyScenarioFrameVisibility(frames, bubbleVisibleCount(count, frames.length));
     return frames;
-  }, [collectFrames, hasFinale, minVisibleFrames]);
+  }, [browseMode, collectFrames, hasFinale, minVisibleFrames]);
 
   useLayoutEffect(() => {
     visibleCountRef.current = visibleCount;
@@ -449,7 +471,10 @@ export function useProtoScenarioPlayback({
         if (visibleCountRef.current !== fromCount) return;
 
         setIsPausingBeforeReveal(false);
-        queueScroll(next, "end", isPlayingRef.current, fromCount);
+        const revealSmooth =
+          isPlayingRef.current &&
+          (playbackStepHooks?.revealScrollSmooth?.(frame) ?? true);
+        queueScroll(next, "end", revealSmooth, fromCount);
         setVisibleCount(next);
 
         if (next >= contentTotal) {
@@ -682,25 +707,64 @@ export function useProtoScenarioPlayback({
     setVisibleCount(contentTotal);
   }, [advanceOneFrame, hasFinale, queueScroll, stopPlayback]);
 
-  const resetToEnd = useCallback(() => {
-    stopPlayback();
-    const frames = framesRef.current;
-    const contentTotal = frames.length;
-    const scenarioTotal = scenarioTotalFor(contentTotal, hasFinale);
-    const target =
-      hasFinale && contentTotal > 0 ? contentTotal : scenarioTotal;
-    if (target === 0) return;
+  const resetToEnd = useCallback(
+    (options?: { smooth?: boolean; force?: boolean }) => {
+      stopPlayback();
+      const frames = framesRef.current;
+      const contentTotal = frames.length;
+      const scenarioTotal = scenarioTotalFor(contentTotal, hasFinale);
+      const target =
+        hasFinale && contentTotal > 0 ? contentTotal : scenarioTotal;
+      if (target === 0) return;
 
-    if (hasFinale && visibleCountRef.current >= scenarioTotal) {
-      playbackStepHooks?.onLeaveFinale?.();
+      if (hasFinale && visibleCountRef.current >= scenarioTotal) {
+        playbackStepHooks?.onLeaveFinale?.();
+      }
+
+      const smooth = options?.smooth ?? false;
+      const force = options?.force ?? false;
+      const prev = visibleCountRef.current;
+
+      if (!force && prev === target) return;
+
+      if (force && prev === target) {
+        applyScenarioFrameVisibility(
+          frames,
+          bubbleVisibleCount(target, contentTotal)
+        );
+        scrollIntentRef.current = {
+          visibleCount: target,
+          prevCount: minVisibleFrames,
+          align: "end",
+          smooth,
+          timing: "after-init",
+        };
+        setVisibleCount(target);
+        return;
+      }
+
+      queueScroll(target, "end", smooth, prev);
+      setVisibleCount(target);
+    },
+    [hasFinale, minVisibleFrames, playbackStepHooks, queueScroll, stopPlayback]
+  );
+
+  const prevBrowseModeRef = useRef(browseMode);
+  useEffect(() => {
+    if (!active) {
+      prevBrowseModeRef.current = browseMode;
+      return;
     }
+    const wasBrowse = prevBrowseModeRef.current;
+    prevBrowseModeRef.current = browseMode;
 
-    if (visibleCountRef.current === target) return;
-
-    const prev = visibleCountRef.current;
-    queueScroll(target, "end", false, prev);
-    setVisibleCount(target);
-  }, [hasFinale, playbackStepHooks, queueScroll, stopPlayback]);
+    if (browseMode) {
+      return;
+    }
+    if (wasBrowse) {
+      jumpToStart();
+    }
+  }, [active, browseMode, jumpToStart]);
 
   const isDirty =
     active &&

@@ -7,7 +7,10 @@ import {
   settleDemoCursorAfterClick,
   targetCenter,
 } from "@/app/proto/protoDemoCursor";
-import { scrollPrototypeScrollToBottom } from "@/app/proto/protoScenarioEngine";
+import {
+  pinScenarioScrollToBottomDuring,
+  scrollPrototypeScrollToBottom,
+} from "@/app/proto/protoScenarioEngine";
 import {
   beginSitePilotChatPlaybackThinking,
   endSitePilotChatThinking,
@@ -50,11 +53,11 @@ function getChatScreen(): HTMLElement | null {
   );
 }
 
-function scrollChatToBottom(): void {
+function scrollChatToBottom(instant = false): void {
   const scrollEl = document.querySelector<HTMLElement>(
     ".proto-scroll--prototype:not(.hidden)"
   );
-  scrollPrototypeScrollToBottom(scrollEl, "smooth");
+  scrollPrototypeScrollToBottom(scrollEl, instant ? "instant" : "smooth");
 }
 
 function syncComposerHeight(ta: HTMLTextAreaElement): void {
@@ -237,10 +240,22 @@ export async function runSitePilotChatBeforeReveal(
   if (isSitePilotChatAgentReplyFrame(frame)) {
     removeDemoCursor();
     const screen = getChatScreen();
+    const scrollEl = document.querySelector<HTMLElement>(
+      ".proto-scroll--prototype:not(.hidden)"
+    );
     if (screen) beginSitePilotChatPlaybackThinking(screen, frame);
-    scrollChatToBottom();
+    if (scrollEl) {
+      scrollChatToBottom(true);
+      pinScenarioScrollToBottomDuring(
+        scrollEl,
+        SITE_PILOT_CHAT_PLAYBACK_THINK_MS + 480
+      );
+    }
     await delay(SITE_PILOT_CHAT_PLAYBACK_THINK_MS);
-    if (!preludeAborted) endSitePilotChatThinking();
+    if (!preludeAborted) {
+      endSitePilotChatThinking();
+      scrollChatToBottom(true);
+    }
     return;
   }
 

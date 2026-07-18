@@ -307,7 +307,7 @@ Studio step counter (`scenarioFrames` in diagnostics) uses the **live touchpoint
 | Check | When it fires |
 |-------|----------------|
 | `playlist-frame-skip` | One manual step advances the raw touchpoint playlist by more than one frame (e.g. 3/12 → 5/12) |
-| `touchpoint-ahead-of-beat` | Runtime touchpoint is **two or more** playlist frames ahead of the active beat (adjacent next frame is OK — e.g. PDP → login popup before beat advances) |
+| `touchpoint-ahead-of-beat` | Runtime touchpoint is **two or more** playlist frames ahead of the active beat (adjacent next frame is OK — e.g. PDP → login popup before beat advances; chat `screen-frames` substeps like `beat:agentic-chat:frame:2` are also OK while the beat stays on `agentic-chat`) |
 | `director-script-off-air` | `isScripting` is true while `isOnAir` is false — control panel should show on-air during director scripts |
 
 Key files: `protoPlaybackTransportAnomalies.ts`, `useProtoPlaybackTransportGuard.ts`.
