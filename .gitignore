@@ -4,3 +4,6 @@ dist
 *.local
 .vite
 package-lock.json
+scripts/playwright-out/
+.cursor/
+scripts/inspect-*.mjs

@@ -123,7 +123,7 @@ function delay(ms: number): Promise<void> {
 
 function chatHandoffReached(state: ProtoStudioMcpState): boolean {
   if (state.label?.toLowerCase().includes("chat")) return true;
-  const match = state.counter?.match(/^(\d+)\s*\/\s*(\d+)/);
+  const match = state.counter?.match(/(\d+)\s*\/\s*(\d+)/);
   if (!match) return false;
   const visible = Number(match[1]);
   return visible >= 3;

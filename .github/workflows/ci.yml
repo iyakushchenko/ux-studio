@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium --with-deps
+
+      - name: Start dev server
+        run: npm run dev -- --host 127.0.0.1 --port 5173 &
+
+      - name: Wait for dev server
+        run: |
+          for i in $(seq 1 60); do
+            curl -sf http://127.0.0.1:5173 > /dev/null && exit 0
+            sleep 1
+          done
+          echo "Dev server did not start"
+          exit 1
+
+      - name: Playwright smoke
+        env:
+          PROTO_SMOKE_URL: http://127.0.0.1:5173
+        run: npm run smoke
+
+      - name: Upload smoke report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: proto-smoke-report
+          path: scripts/playwright-out/proto-smoke-report.json
