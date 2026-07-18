@@ -423,6 +423,7 @@ export function ProtoNavScenarioControls({
         <button
           type="button"
           className="proto-nav-step-btn proto-nav-scenario__btn"
+          aria-label="Jump to start"
           disabled={jumpToStartDisabled}
           onPointerDown={() =>
             logBlockedTransport(
@@ -442,6 +443,7 @@ export function ProtoNavScenarioControls({
         <button
           type="button"
           className="proto-nav-step-btn proto-nav-scenario__btn"
+          aria-label="Step back"
           disabled={stepBackDisabled}
           onPointerDown={() =>
             logBlockedTransport(
@@ -468,6 +470,7 @@ export function ProtoNavScenarioControls({
           <button
             type="button"
             className="proto-nav-step-btn proto-nav-scenario__btn proto-nav-scenario__btn--play"
+            aria-label="Play journey"
             aria-pressed={isOnAir}
             disabled={playDisabled}
             onPointerDown={() =>
@@ -495,6 +498,7 @@ export function ProtoNavScenarioControls({
         <button
           type="button"
           className="proto-nav-step-btn proto-nav-scenario__btn"
+          aria-label="Step forward"
           disabled={stepForwardDisabled}
           onPointerDown={() =>
             logBlockedTransport(
@@ -516,6 +520,7 @@ export function ProtoNavScenarioControls({
         <button
           type="button"
           className="proto-nav-step-btn proto-nav-scenario__btn"
+          aria-label="Jump to end"
           disabled={jumpToEndDisabled}
           onPointerDown={() =>
             logBlockedTransport(

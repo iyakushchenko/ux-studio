@@ -690,6 +690,24 @@ export default function App() {
   const handleOrchestraModeChangeRef = useRef(handleOrchestraModeChange);
   handleOrchestraModeChangeRef.current = handleOrchestraModeChange;
 
+  const handleStudioJourneyModeChangeRef = useRef(handleStudioJourneyModeChange);
+  handleStudioJourneyModeChangeRef.current = handleStudioJourneyModeChange;
+
+  const transportActionsRef = useRef({
+    play: () => {},
+    stepBack: () => {},
+    stepForward: () => {},
+    jumpToStart: () => {},
+    jumpToEnd: () => {},
+  });
+  transportActionsRef.current = {
+    play: () => transport.play(),
+    stepBack: () => transport.stepBack(),
+    stepForward: () => transport.stepForward(),
+    jumpToStart: () => transport.jumpToStart(),
+    jumpToEnd: () => transport.jumpToEnd(),
+  };
+
   const resetToEndRef = useRef(scenarioPlayback.resetToEnd);
   resetToEndRef.current = scenarioPlayback.resetToEnd;
 
@@ -1194,6 +1212,32 @@ export default function App() {
       }),
       getOrchestraModeId: () => orchestraModeId,
       setOrchestraMode: (modeId) => handleOrchestraModeChangeRef.current(modeId),
+      setJourneyMode: (enabled) =>
+        handleStudioJourneyModeChangeRef.current(enabled),
+      triggerTransport: (action) => {
+        switch (action) {
+          case "play":
+            notePlaybackTransport("play");
+            transportActionsRef.current.play();
+            break;
+          case "step-back":
+            notePlaybackTransport("step-back");
+            transportActionsRef.current.stepBack();
+            break;
+          case "step-forward":
+            notePlaybackTransport("step-forward");
+            transportActionsRef.current.stepForward();
+            break;
+          case "jump-to-start":
+            notePlaybackTransport("jump-to-start");
+            transportActionsRef.current.jumpToStart();
+            break;
+          case "jump-to-end":
+            notePlaybackTransport("jump-to-end");
+            transportActionsRef.current.jumpToEnd();
+            break;
+        }
+      },
     });
   }, [orchestraModeId]);
 
