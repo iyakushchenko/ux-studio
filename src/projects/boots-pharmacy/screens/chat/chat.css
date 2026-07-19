@@ -163,10 +163,12 @@
   outline-offset: 2px;
 }
 
+/* Make `component.gse.system.message` — centered under reply (PO / register L11). */
 .chat__helpful {
   display: flex;
   align-items: center;
   justify-content: center;
+  align-self: center;
   padding: 8px 16px;
   border-radius: 16px;
   background: rgba(215, 233, 248, 0.57);
@@ -179,6 +181,7 @@
 .chat__helpful-row {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
 }
 
@@ -191,10 +194,58 @@
 }
 
 .chat__helpful-choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
   color: #012169;
+  font-family: inherit;
   font-size: 10px;
   line-height: 12px;
   white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.15s ease, opacity 0.15s ease;
+}
+
+.chat__helpful-choice:hover {
+  color: #01318f;
+  opacity: 0.92;
+}
+
+.chat__helpful-choice:hover .chat__helpful-icon-svg path {
+  fill: #01318f;
+}
+
+.chat__helpful-choice:active {
+  color: #011a5c;
+  opacity: 1;
+}
+
+.chat__helpful-choice:active .chat__helpful-icon-svg path {
+  fill: #011a5c;
+}
+
+.chat__helpful-choice:focus-visible {
+  outline: 2px solid var(--uxds-border-border-focus, #012169);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.chat__helpful-icon {
+  display: block;
+  position: relative;
+  width: 16.376px;
+  height: 16.001px;
+  flex-shrink: 0;
+}
+
+.chat__helpful-icon-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .chat__thinking {

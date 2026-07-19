@@ -33,7 +33,7 @@
 | L8 | **Thread host** — `component.appointment.summary` 864px, `gap-[40px]`, centered in `p-[64px]` | **Present** | **Missing** | `ComponentAppointmentSummary2` |
 | L9 | **User bubbles (`query`)** — mint-tint card `bg-[rgba(245,255,254,0.35)]`, 438px, right-aligned column | **Present** | **Partial** | React live — Uma pixel PROVEN still PENDING |
 | L10 | **Agent bubbles (`reply`)** — white `component.co.order.summary` 16px pad + inline CTAs | **Present** | **Partial** | React live — Uma pixel PROVEN still PENDING |
-| L11 | **Per-reply helpful strip** — “Was this reply helpful?” Yes/No on **reply** frames (not finale) | **Present** | **Partial** | React helpful strip on r0 — live |
+| L11 | **Per-reply helpful strip** — “Was this reply helpful?” + thumbs Yes/No on **reply** (Make: first `Reply`; React: r0 + latest r3, centered) | **Present** | **Partial** | `ChatScreen` `HelpfulStrip` · Make `ComponentGseSystemMessage` / `Frame342`–`343` |
 | L12 | **Conversation feedback (finale band)** — “Was this conversation helpful so far?” — wire **hidden** until scripted | **Present** | **Partial** | React band `hidden` — live |
 | L13 | **Disclaimer** — “SitePilot can make mistakes…” + underlined support link below thread | **Present** | **Partial** | `chat__disclaimer` — live |
 | L14 | **Footer** — absent on Chat Make child 10 | **N/A** | **N/A** | Do not invent |
@@ -72,7 +72,7 @@
 | I11 | **Underlined product links** → PDP tab | **Present** | **Missing** | wire `PRODUCT_LINK_RE` |
 | I12 | **“Go to vaccines catalog”** CTA → PLP | **Present** | **Missing** | wire `goPlp` |
 | I13 | **Availability Checker Tool** underline → overlay | **Present** | **Missing** | wire `AVAIL_BTN_INTENT` |
-| I14 | **Reply helpful Yes/No** | **Present** | **Partial** | Make UI only — wire no-op |
+| I14 | **Reply helpful Yes/No** (+ thumbs, DS hover) | **Present** | **Partial** | React buttons + Make SVG thumbs — wire no-op |
 | I15 | **Conversation helpful** (hidden band) | **Present** | **Missing** | feedback frame hidden |
 | I16 | **CTA hover/press (demo)** — `proto-chat-cta--hover` / `--pressed` during playback | **Present** | **Missing** | `playback/sitePilotChat.ts` |
 | I17 | **Demo cursor** — robo on CTA + send; stripped from DOM | **Present** | **Missing** | `moveDemoCursorTo` · `stripSitePilotChatDemoCursors` |

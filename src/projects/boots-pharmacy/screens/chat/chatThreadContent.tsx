@@ -41,7 +41,7 @@ export const CHAT_THREAD_FRAMES: readonly ChatThreadFrame[] = [
   {
     id: "r0",
     kind: "reply",
-    helpful: true,
+    helpful: true, // Make `Reply` → `ComponentGseSystemMessage`
     ctas: [
       { label: "Book Southeast Asia Vaccine Bundle – £245" },
       { label: "Book Yellow Fever Vaccine only – £75" },
@@ -169,6 +169,7 @@ export const CHAT_THREAD_FRAMES: readonly ChatThreadFrame[] = [
   {
     id: "r3",
     kind: "reply",
+    helpful: true, // latest assistant bubble — PO restore target
     thoughtLabel: "Thought for 12 seconds",
     ctas: [
       { label: "Choose Time Slot" },

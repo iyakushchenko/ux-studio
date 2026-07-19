@@ -20,7 +20,7 @@
 | Field | Value |
 |-------|-------|
 | **Overall** | **IN PROGRESS** — React host live; composer identity vs Site Pilot **PARTIAL**; whole-page **NOT PROVEN** |
-| **§0a typical DS / pointer matrix** | **PARTIAL** — shared kit CSS has mic/send/chip hover+focus+active; reply CTA hover in `chat.css`; MCP hover rows exist — full Nazi side-by-side + feedback Yes/No still open |
+| **§0a typical DS / pointer matrix** | **PARTIAL** — shared kit CSS has mic/send/chip hover+focus+active; reply CTA hover in `chat.css`; helpful Yes/No + thumbs restored (hover CSS); MCP hover rows exist — full Nazi side-by-side still open |
 | **§0b section vertical rhythm** | **PENDING** — thread `gap` / body pad **64px** / bubble **16px** — MCP measure before PARTIAL layout claim |
 | **loading / empty / updating** | **PARTIAL (P0)** — React `ChatThinkingBubble` + Motion enter; send→stop glyph on shared send — still need live timing vs wire `SITE_PILOT_CHAT_PLAYBACK_THINK_MS` |
 | **checkbox / radio hover** | **N/A** — no checkbox/radio on Chat Make frame |
@@ -87,7 +87,7 @@
 | **Send / stop** (primary pill) | default **`#012169`** · stop glyph when thinking · hover/active | **PARTIAL** | Shared send hover + `sendThinking` → stop glyph; probe `chat-composer-send` |
 | **Next dialog chips** | default · **hover** · **active** · keyboard focus | **PARTIAL** | Label **Next dialog options:**; chip `:hover` in shared CSS — MCP `chat-chip-hover` |
 | **Reply pill CTAs** (per frame) | default · hover · active · pressed | **PARTIAL** | `.chat__cta:hover` — MCP `chat-cta-hover`; full frame sweep still open |
-| **Feedback Yes/No** | default · hover · active | **PENDING** | Micro row not yet Nazi-hovered |
+| **Feedback Yes/No** | default · hover · active | **PARTIAL** | Make thumbs + `chat__helpful-choice:hover` — MCP hover prove still open |
 | **SearchField** | **N/A** | **N/A** | |
 | **Quinn MCP hover prove** | Composer mic + ≥1 chip + ≥1 reply CTA | **PASS when recipe green** | Expanded `chatProbeSteps()` — **≠** whole-page PROVEN |
 
