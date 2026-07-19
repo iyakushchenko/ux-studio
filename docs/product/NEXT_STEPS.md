@@ -29,7 +29,7 @@
 
 ## Done recently (context)
 
-- [x] **Fidelity debt (high-ROI)** — kits + Steps 1–3 safe hex→UXDS/theme tokens; localhost color parity; light audit [FE_AUDIT_BOOK_HEX_TOKENS_2026-07-19.md](../projects/boots-pharmacy/audits/FE_AUDIT_BOOK_HEX_TOKENS_2026-07-19.md) **PROVEN**. Residual Make-only hex → NEXT #3.
+- [x] **Fidelity debt (high-ROI)** — kits + Steps 1–3 safe hex→UXDS/theme tokens; localhost color parity; light audit [FE_AUDIT_BOOK_HEX_TOKENS_2026-07-19.md](../projects/boots-pharmacy/audits/FE_AUDIT_BOOK_HEX_TOKENS_2026-07-19.md) **PROVEN** tip `0f112dd`. Residual Make-only hex → NEXT #3.
 - [x] **UXDS book kits** — `BookAppointmentProgress` + `AppointmentSummaryPill` extracted; Steps 1–3 wired; light audit [FE_AUDIT_UXDS_BOOK_KITS_2026-07-19.md](../projects/boots-pharmacy/audits/FE_AUDIT_UXDS_BOOK_KITS_2026-07-19.md) **PROVEN** tip `d56fab1`.
 - [x] **Agent testing overlay (PO rage)** — BR corner status + invisible click capture; MCP `stop({ reload: true })`; tip `4f0e12a`.
 - [x] **Docs layout** — Boots product docs + FE audits under `docs/projects/boots-pharmacy/`; engine doctrine stays in `docs/product/`; old paths keep stubs.

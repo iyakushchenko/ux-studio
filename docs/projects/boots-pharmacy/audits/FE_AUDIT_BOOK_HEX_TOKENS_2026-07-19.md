@@ -3,7 +3,7 @@
 **Surface / slice:** Fidelity debt — Book Steps 1–3 + UXDS book kits hex→tokens  
 **Date:** 2026-07-19  
 **Auditor:** Tech Director (master self — light Nazi QA)  
-**Implementer handoff:** _(stamp after commit)_  
+**Implementer handoff:** `0f112dd`  
 **Checklist:** [../../../product/FE_UI_UX_AUDIT.md](../../../product/FE_UI_UX_AUDIT.md)
 
 ---
