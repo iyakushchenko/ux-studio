@@ -64,6 +64,7 @@ export type RecordingScreenNavApi = {
   setProjectId: (id: string) => void;
   setPersonaId: (id: string) => void;
   setModeId: (id: string) => void;
+  setJourneyMode?: (enabled: boolean) => void;
   setCurrent: (index: number) => void;
   setHubOpen: (open: boolean) => void;
 };
@@ -110,11 +111,13 @@ export function useRecordingReplayBridge(options: {
   const setProjectIdRef = useRef(screenNav.setProjectId);
   const setPersonaIdRef = useRef(screenNav.setPersonaId);
   const setModeIdRef = useRef(screenNav.setModeId);
+  const setJourneyModeRef = useRef(screenNav.setJourneyMode);
   const setCurrentRef = useRef(screenNav.setCurrent);
   const setHubOpenRef = useRef(screenNav.setHubOpen);
   setProjectIdRef.current = screenNav.setProjectId;
   setPersonaIdRef.current = screenNav.setPersonaId;
   setModeIdRef.current = screenNav.setModeId;
+  setJourneyModeRef.current = screenNav.setJourneyMode;
   setCurrentRef.current = screenNav.setCurrent;
   setHubOpenRef.current = screenNav.setHubOpen;
 
@@ -164,12 +167,13 @@ export function useRecordingReplayBridge(options: {
         screenId: event.screenId,
         projectId: event.projectId ?? studioProjectIdRef.current,
         personaId: studioPersonaIdRef.current,
-        modeId: orchestraModeIdRef.current,
+        modeId: orchestraModeIdRef.current ?? undefined,
         screens: screensRef.current,
         currentProjectId: studioProjectIdRef.current,
         setProjectId: setProjectIdRef.current,
         setPersonaId: setPersonaIdRef.current,
         setModeId: setModeIdRef.current,
+        setJourneyMode: setJourneyModeRef.current,
         setCurrent: setCurrentRef.current,
         setHubOpen: setHubOpenRef.current,
         applyModal: applyModalFromUrl,

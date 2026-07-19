@@ -144,7 +144,7 @@ await window.__studioProveRoboCursorFeedback?.(".proto-avail-header .proto-popup
 http://localhost:5173/
 ```
 
-Deep links stay on that origin, e.g. `http://localhost:5173/?project=boots-pharmacy&screen=plp`.  
+Deep links stay on that origin, e.g. `http://localhost:5173/?project=boots-pharmacy&screen=plp` or `…&screen=chat&cjm=on&experience=agentic` ([URL.md](../shell/URL.md) — not legacy `mode=`).  
 `http://127.0.0.1:5173/` is the same server (CI smoke alias) — do **not** invent other ports.
 
 **Config gate:** `vite.config.ts` → `server.port: 5173` + `server.strictPort: true` (fail if busy; never silent bump). Smoke defaults `PROTO_SMOKE_URL=http://localhost:5173` (CI: `http://127.0.0.1:5173`).

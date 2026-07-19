@@ -1,15 +1,25 @@
 /**
  * Studio address-bar URL scheme (query params — GitHub Pages `/ux-studio/` safe).
  *
- * Examples:
- *   /?project=boots-pharmacy&screen=book-step-2
- *   /ux-studio/?project=boots-pharmacy&screen=book-step-1&modal=choose-pharmacy
- *   /ux-studio/?project=boots-pharmacy&screen=site-pilot&mode=agentic-cjm
+ * Canonical:
+ *   /?project=boots-pharmacy&screen=chat&persona=sarah-jenkins&cjm=on&experience=agentic
+ *   /ux-studio/?project=boots-pharmacy&screen=site-pilot&cjm=off&experience=agentic
+ *
+ * Legacy `mode=agentic-cjm` / `traditional-cjm` / bare aliases still parse → normalize
+ * to `cjm` + `experience` (never re-serialized as `mode=`).
  *
  * Ephemeral agent leftovers (`proof`, …) are stripped on boot / overlay stop.
  */
 
-import { normalizeOrchestraModeId } from "@/app/orchestra/orchestraModes";
+import {
+  experienceToOrchestraModeId,
+  normalizeOrchestraModeId,
+  normalizeStudioCjmFlag,
+  normalizeStudioExperienceId,
+  orchestraModeToExperienceId,
+  type StudioExperienceId,
+} from "@/app/orchestra/orchestraModes";
+import type { OrchestraModeId } from "@/app/orchestra/types";
 import {
   normalizeStudioModalId,
   type StudioModalId,
@@ -19,8 +29,11 @@ export const STUDIO_QUERY = {
   project: "project",
   screen: "screen",
   persona: "persona",
-  mode: "mode",
+  cjm: "cjm",
+  experience: "experience",
   modal: "modal",
+  /** Legacy alias only — accepted on parse, never written. */
+  mode: "mode",
 } as const;
 
 /** Never persist these in the address bar. */
@@ -46,7 +59,7 @@ export const STUDIO_POST_AGENT_HOME_SCREEN_ID = HUB_SCREEN_ID;
 export type ResetStudioAfterAgentTestOptions = {
   /**
    * When true: land hub (legacy CJM/journey clean slate).
-   * Default false: keep current project + screen (+ persona/mode);
+   * Default false: keep current project + screen (+ persona/experience/cjm);
    * always strip `&modal=` + ephemeral agent params; dismiss live lightboxes via event.
    */
   resetToHub?: boolean;
@@ -69,7 +82,15 @@ export type StudioUrlState = {
   projectId?: string;
   screenId?: string;
   personaId?: string;
-  modeId?: string;
+  /**
+   * Orchestra journey slot (`agentic-cjm` | `traditional-cjm`).
+   * Derived from canonical `experience=` or legacy `mode=`.
+   */
+  modeId?: OrchestraModeId;
+  /** Canonical experience path — agentic vs traditional (not CJM on/off). */
+  experienceId?: StudioExperienceId;
+  /** CJM playback switch — on vs off. */
+  cjm?: boolean;
   /** Blocking lightbox id (e.g. choose-pharmacy). */
   modalId?: StudioModalId | string;
 };
@@ -98,6 +119,32 @@ function normalizeScreenId(raw: string | null | undefined): string | undefined {
   return SCREEN_ALIASES[trimmed] ?? trimmed;
 }
 
+function finalizeUrlState(partial: {
+  projectId?: string;
+  screenId?: string;
+  personaId?: string;
+  experienceId?: StudioExperienceId;
+  modeId?: OrchestraModeId;
+  cjm?: boolean;
+  modalId?: StudioModalId | string;
+}): StudioUrlState {
+  const experienceId =
+    partial.experienceId ??
+    (partial.modeId ? orchestraModeToExperienceId(partial.modeId) : undefined);
+  const modeId =
+    partial.modeId ??
+    (experienceId ? experienceToOrchestraModeId(experienceId) : undefined);
+  return {
+    projectId: partial.projectId,
+    screenId: partial.screenId,
+    personaId: partial.personaId,
+    experienceId,
+    modeId,
+    cjm: partial.cjm,
+    modalId: partial.modalId,
+  };
+}
+
 export function parseStudioUrl(
   search: string = typeof window !== "undefined" ? window.location.search : ""
 ): StudioUrlState {
@@ -107,18 +154,52 @@ export function parseStudioUrl(
   );
   const projectId = params.get(STUDIO_QUERY.project)?.trim() || undefined;
   const personaId = params.get(STUDIO_QUERY.persona)?.trim() || undefined;
-  const modeId = normalizeOrchestraModeId(params.get(STUDIO_QUERY.mode));
   const screenId = normalizeScreenId(params.get(STUDIO_QUERY.screen));
   const modalId = normalizeStudioModalId(params.get(STUDIO_QUERY.modal));
-  return { projectId, screenId, personaId, modeId, modalId };
+
+  const experienceFromParam = normalizeStudioExperienceId(
+    params.get(STUDIO_QUERY.experience)
+  );
+  const cjmFromParam = normalizeStudioCjmFlag(params.get(STUDIO_QUERY.cjm));
+
+  const legacyModeRaw = params.get(STUDIO_QUERY.mode);
+  const modeFromLegacy = normalizeOrchestraModeId(legacyModeRaw);
+  const experienceFromLegacy = modeFromLegacy
+    ? orchestraModeToExperienceId(modeFromLegacy)
+    : undefined;
+
+  // Canonical params win; legacy `mode=` only fills `experience` (never implies CJM on —
+  // old `mode=agentic-cjm` selected the journey path, not the CJM switch).
+  const experienceId = experienceFromParam ?? experienceFromLegacy;
+  const modeId = experienceId
+    ? experienceToOrchestraModeId(experienceId)
+    : undefined;
+
+  return finalizeUrlState({
+    projectId,
+    screenId,
+    personaId,
+    experienceId,
+    modeId,
+    cjm: cjmFromParam,
+    modalId,
+  });
 }
 
 export function serializeStudioUrl(state: StudioUrlState): string {
   const params = new URLSearchParams();
+  const experienceId =
+    state.experienceId ??
+    (state.modeId ? orchestraModeToExperienceId(state.modeId) : undefined);
   if (state.projectId) params.set(STUDIO_QUERY.project, state.projectId);
   if (state.screenId) params.set(STUDIO_QUERY.screen, state.screenId);
   if (state.personaId) params.set(STUDIO_QUERY.persona, state.personaId);
-  if (state.modeId) params.set(STUDIO_QUERY.mode, state.modeId);
+  if (state.cjm !== undefined) {
+    params.set(STUDIO_QUERY.cjm, state.cjm ? "on" : "off");
+  }
+  if (experienceId) {
+    params.set(STUDIO_QUERY.experience, experienceId);
+  }
   if (state.modalId) params.set(STUDIO_QUERY.modal, state.modalId);
   const qs = params.toString();
   return qs ? `?${qs}` : "";
@@ -167,7 +248,7 @@ export function stripEphemeralStudioQuery(
 
 /**
  * Build hub landing URL state (CJM / journey / explicit resetToHub).
- * Preserves project when present; always hub; never modal / persona / mode.
+ * Preserves project when present; always hub; never modal / persona / experience / cjm.
  */
 export function buildStudioPostAgentHomeState(
   search: string = typeof window !== "undefined" ? window.location.search : ""
@@ -180,7 +261,7 @@ export function buildStudioPostAgentHomeState(
 }
 
 /**
- * Default post-agent stay state: current project + screen (+ persona/mode).
+ * Default post-agent stay state: current project + screen (+ persona/experience/cjm).
  * Never preserves `&modal=` — probe/sitrep/forceClear must leave dialogs closed
  * (sticky choose-pharmacy after MCP was a recurring felony).
  * Ephemeral keys are stripped separately; live lightboxes close via event.
@@ -189,13 +270,15 @@ export function buildStudioPostAgentStayState(
   search: string = typeof window !== "undefined" ? window.location.search : ""
 ): StudioUrlState {
   const current = parseStudioUrl(search);
-  return {
+  return finalizeUrlState({
     projectId: current.projectId ?? DEFAULT_STUDIO_PROJECT_ID,
     screenId: current.screenId ?? STUDIO_POST_AGENT_HOME_SCREEN_ID,
     personaId: current.personaId,
+    experienceId: current.experienceId,
     modeId: current.modeId,
+    cjm: current.cjm,
     // HARD: strip modal — closeAllPopups + applyModal(undefined) via event.
-  };
+  });
 }
 
 /** Ignore nav→URL sync briefly so React cannot re-stamp `&modal=` during sitrep. */
@@ -212,7 +295,7 @@ export function isStudioPostAgentResetSyncLocked(
 
 /**
  * After agent / MCP tests: strip ephemeral + `&modal=`, optionally land hub.
- * Default: stay on current project + screen (+ persona/mode); never keep modal.
+ * Default: stay on current project + screen (+ persona/experience/cjm); never keep modal.
  * Pass `{ resetToHub: true }` for CJM/journey clean slate.
  * Writes the address bar, then dispatches {@link STUDIO_POST_AGENT_RESET_EVENT}
  * so App can dismiss sticky lightboxes / popups and apply nav (no-reload path).
@@ -274,19 +357,38 @@ export function resolveStudioScreenTarget(input: {
   projectId?: string;
   personaId?: string;
   modeId?: string;
+  experienceId?: string;
+  cjm?: boolean;
   modalId?: string;
 }): StudioUrlState {
   const fromUrl = input.studioUrl ? parseStudioUrl(input.studioUrl) : {};
-  return {
+  const experienceId =
+    fromUrl.experienceId ??
+    normalizeStudioExperienceId(input.experienceId) ??
+    (input.modeId
+      ? (() => {
+          const mode = normalizeOrchestraModeId(input.modeId);
+          return mode ? orchestraModeToExperienceId(mode) : undefined;
+        })()
+      : undefined);
+  const modeId =
+    fromUrl.modeId ??
+    (experienceId
+      ? experienceToOrchestraModeId(experienceId)
+      : normalizeOrchestraModeId(input.modeId));
+  const cjm = fromUrl.cjm ?? input.cjm;
+  return finalizeUrlState({
     projectId: fromUrl.projectId ?? (input.projectId?.trim() || undefined),
     screenId: fromUrl.screenId ?? normalizeScreenId(input.screenId),
     personaId: fromUrl.personaId ?? (input.personaId?.trim() || undefined),
-    modeId: fromUrl.modeId ?? (input.modeId?.trim() || undefined),
+    experienceId,
+    modeId,
+    cjm,
     modalId:
       fromUrl.modalId ??
       normalizeStudioModalId(input.modalId) ??
       undefined,
-  };
+  });
 }
 
 export type ApplyStudioScreenInput = {
@@ -295,6 +397,8 @@ export type ApplyStudioScreenInput = {
   projectId?: string;
   personaId?: string;
   modeId?: string;
+  experienceId?: string;
+  cjm?: boolean;
   modalId?: string;
   screens: ReadonlyArray<{ screenId?: string; childIndex: number }>;
   /**
@@ -306,6 +410,7 @@ export type ApplyStudioScreenInput = {
   setProjectId?: (id: string) => void;
   setPersonaId?: (id: string) => void;
   setModeId?: (id: string) => void;
+  setJourneyMode?: (enabled: boolean) => void;
   setCurrent: (index: number) => void;
   setHubOpen: (open: boolean) => void;
   /** Apply blocking lightbox from URL / replay (open/close). */
@@ -343,6 +448,9 @@ export function applyStudioScreen(
     const mode = normalizeOrchestraModeId(state.modeId);
     if (mode) input.setModeId(mode);
   }
+  if (state.cjm !== undefined && input.setJourneyMode) {
+    input.setJourneyMode(state.cjm);
+  }
   if (nav) {
     input.setHubOpen(nav.hubOpen);
     if (!nav.hubOpen) {
@@ -376,13 +484,22 @@ export function writeStudioUrl(
     url.searchParams.delete(key);
   }
   // Wipe then re-apply so param order stays canonical (project → screen → …).
+  // Includes legacy `mode` so old compound params do not stick after normalize.
   for (const key of Object.values(STUDIO_QUERY)) {
     url.searchParams.delete(key);
   }
+  const experienceId =
+    state.experienceId ??
+    (state.modeId ? orchestraModeToExperienceId(state.modeId) : undefined);
   if (state.projectId) url.searchParams.set(STUDIO_QUERY.project, state.projectId);
   if (state.screenId) url.searchParams.set(STUDIO_QUERY.screen, state.screenId);
   if (state.personaId) url.searchParams.set(STUDIO_QUERY.persona, state.personaId);
-  if (state.modeId) url.searchParams.set(STUDIO_QUERY.mode, state.modeId);
+  if (state.cjm !== undefined) {
+    url.searchParams.set(STUDIO_QUERY.cjm, state.cjm ? "on" : "off");
+  }
+  if (experienceId) {
+    url.searchParams.set(STUDIO_QUERY.experience, experienceId);
+  }
   if (state.modalId) url.searchParams.set(STUDIO_QUERY.modal, state.modalId);
 
   const next = `${url.pathname}${url.search}${url.hash}`;

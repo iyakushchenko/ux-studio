@@ -230,6 +230,9 @@ export default function App() {
     apply();
   });
   const studioJourneyModeRef = useRef(false);
+  const handleStudioJourneyModeChangeRef = useRef<(enabled: boolean) => void>(
+    () => {}
+  );
   const openAvailabilityToolRef = useRef<(intent?: AvailOpenIntent) => void>(() => {});
   const closeAvailabilityToolRef = useRef<() => void>(() => {});
   const screenFadeChildRef = useRef<number | null>(null);
@@ -277,6 +280,7 @@ export default function App() {
     projectId: studioProjectId,
     personaId: studioPersonaId,
     modeId: orchestraModeId,
+    journeyMode: studioJourneyMode,
     modalId: studioModalId,
     screens: SCREENS,
     current,
@@ -284,6 +288,8 @@ export default function App() {
     setProjectId: setStudioProjectId,
     setPersonaId: setStudioPersonaId,
     setModeId: setOrchestraModeId,
+    setJourneyMode: (enabled) =>
+      handleStudioJourneyModeChangeRef.current(enabled),
     setCurrent,
     setHubOpen,
     applyModal: applyModalFromUrl,
@@ -301,12 +307,16 @@ export default function App() {
         screenId: state?.screenId ?? HUB_SCREEN_ID,
         personaId: state?.personaId,
         modeId: state?.modeId,
+        experienceId: state?.experienceId,
+        cjm: state?.cjm,
         modalId: undefined,
         screens: SCREENS,
         currentProjectId: studioProjectId,
         setProjectId: setStudioProjectId,
         setPersonaId: setStudioPersonaId,
         setModeId: setOrchestraModeId,
+        setJourneyMode: (enabled) =>
+          handleStudioJourneyModeChangeRef.current(enabled),
         setCurrent,
         setHubOpen,
         applyModal: applyModalFromUrl,
@@ -826,7 +836,6 @@ export default function App() {
   const handleOrchestraModeChangeRef = useRef(handleOrchestraModeChange);
   handleOrchestraModeChangeRef.current = handleOrchestraModeChange;
 
-  const handleStudioJourneyModeChangeRef = useRef(handleStudioJourneyModeChange);
   handleStudioJourneyModeChangeRef.current = handleStudioJourneyModeChange;
 
   const transportActionsRef = useRef({
@@ -1403,6 +1412,8 @@ export default function App() {
       setProjectId: setStudioProjectId,
       setPersonaId: setStudioPersonaId,
       setModeId: setOrchestraModeId,
+      setJourneyMode: (enabled) =>
+        handleStudioJourneyModeChangeRef.current(enabled),
       setCurrent,
       setHubOpen,
     },

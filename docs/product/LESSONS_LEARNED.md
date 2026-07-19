@@ -56,6 +56,11 @@ Agents **must read** this file before claiming a UI or Studio-chrome slice done.
   2. Invalid URL mode (`mode=traditional` / bare aliases) applied via `setModeId` → 0 journey beats → `showOrchestraControls` false → **REC-only** `StudioNavRecordingModeSlot` (empty playback by design).
 - **Gate:** Sync-mount playback when Rec is off (`data-studio-playback-panel`); `normalizeOrchestraModeId` on URL parse + `setModeId` (`traditional`→`traditional-cjm`). Never let an unknown mode zero the cassette deck.
 
+### URL `mode=agentic-cjm` conflates CJM switch with journey path (PO / Arch)
+
+- **Symptom / class:** Deep links used `mode=agentic-cjm` as if “mode” meant both CJM-on and agentic path — logically wrong; CJM is on/off; agentic vs traditional is the experience path.
+- **Gate:** Canonical URL = `cjm=on|off` + `experience=agentic|traditional` ([URL.md](../shell/URL.md)). Legacy `mode=*-cjm` / bare aliases parse → `experience` only (do **not** imply CJM on — protects REC replay). Serialize never writes `mode=`.
+
 ### Robo-cursor on-target re-aim / tap bounce (PO / Finn)
 
 - **Symptom / class:** After travel, cursor jitters / re-aims / “bounces” on the CTA while pressing.

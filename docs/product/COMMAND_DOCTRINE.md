@@ -149,7 +149,7 @@ The PO may override with a clear product veto (“wrong priority for the busines
 | DS strictness on pages | UXDS + theme only; no near-duplicate styles; deviations registered ([DS_STRICTNESS.md](./DS_STRICTNESS.md), [../uxds/DEVIATIONS.md](../uxds/DEVIATIONS.md)) |
 | File naming | New files follow [NAMING.md](./NAMING.md) — Pascal components, camel modules, kebab CSS/folders=`screenId`, SCREAMING product docs; no mass legacy rename |
 | Project docs | Per-concept under `docs/projects/<id>/`; engine doctrine in `docs/product/` |
-| Studio URL | Navigable state via `?project=&screen=` ([../shell/URL.md](../shell/URL.md)); strip ephemeral agent params |
+| Studio URL | Navigable state via `?project=&screen=` (+ optional `persona` / `cjm=on\|off` / `experience=agentic\|traditional` / `modal`) — [../shell/URL.md](../shell/URL.md); strip ephemeral agent params; legacy `mode=*-cjm` aliases only |
 | Studio purpose (early) | Discovery, ideation, solution proofing, hypothesis validation |
 | Governance style | Summarizer-shaped docs/contracts; not a Figma-plugin clone |
 | Engine vs projects | `src/app/` engine; `src/projects/<id>/` concepts |
