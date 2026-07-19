@@ -32,6 +32,8 @@
   --uxds-input-button-surface-surface-commerce-hover: var(--project-brand-cta-navy-hover);
   --uxds-input-button-surface-surface-commerce-active: var(--project-brand-cta-navy-active);
 
+  /* Strong filter pills (All locations / Slots available): brand primary — not UXDS :root #305854.
+   * Gate: npm run check:theme-brand (Auto-Rule theme-brand-active). */
   --uxds-filter-chip-surface-hover: #eef8f7;
   --uxds-filter-chip-surface-selected-strong: var(--project-brand-primary);
   --uxds-filter-chip-surface-selected-strong-hover: var(--project-brand-primary-darkest);

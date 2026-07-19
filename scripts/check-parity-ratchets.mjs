@@ -474,10 +474,100 @@ const REACT_MOUNT_FILES = [
   }
 }
 
+// ── 11) Logged-out avail → Find Pharmacy (start) — Auto-Rule avail-logged-out-start
+{
+  const rel =
+    "src/projects/boots-pharmacy/wire/resolveAvailIntent.ts";
+  const src = requireFile(rel);
+  if (src) {
+    if (!/AVAIL_START_INTENT|step:\s*["']start["']/.test(src)) {
+      fail(
+        `RATCHET avail-logged-out-start: ${rel} must define start intent (Find Pharmacy)`
+      );
+    }
+    if (!/!hasLocation/.test(src) && !/hasLocation\s*=/.test(src)) {
+      fail(
+        `RATCHET avail-logged-out-start: ${rel} must gate on hasLocation / logged-out`
+      );
+    }
+    // Logged-out path must return start for date/time intents.
+    if (
+      !/return AVAIL_START_INTENT/.test(src) &&
+      !/return\s*\{\s*step:\s*["']start["']/.test(src)
+    ) {
+      fail(
+        `RATCHET avail-logged-out-start: ${rel} must return start intent when logged-out without location`
+      );
+    }
+    if (!/isStudioLoggedIn/.test(src)) {
+      fail(
+        `RATCHET avail-logged-out-start: ${rel} must use isStudioLoggedIn SSoT`
+      );
+    }
+  }
+  const testRel =
+    "src/projects/boots-pharmacy/wire/__tests__/resolveAvailIntent.test.ts";
+  if (!fs.existsSync(path.join(ROOT, testRel))) {
+    fail(
+      `RATCHET avail-logged-out-start: missing ${testRel} (unit cover logged-out → start)`
+    );
+  } else {
+    const testSrc = requireFile(testRel);
+    if (
+      testSrc &&
+      !/start/.test(testSrc) &&
+      !/Find Pharmacy|logged.?out/i.test(testSrc)
+    ) {
+      fail(
+        `RATCHET avail-logged-out-start: ${testRel} must cover logged-out → start`
+      );
+    }
+  }
+}
+
+// ── 12) Uma §0b PDP RTB rhythm markers — Auto-Rule pdp-rtb-rhythm ───────────
+{
+  const pdpCss = requireFile(
+    "src/projects/boots-pharmacy/screens/pdp/pdp.css"
+  );
+  if (pdpCss) {
+    const rtbCol = pdpCss.match(/\.pdp__rtb-col\s*\{[^}]+\}/);
+    if (!rtbCol || !/gap:\s*32px/.test(rtbCol[0])) {
+      fail(
+        "RATCHET pdp-rtb-rhythm: .pdp__rtb-col must set gap: 32px (Uma §0b Make parity)"
+      );
+    }
+    if (
+      !/\.studio-react-screen-host\[data-studio-react-screen=["']pdp["']\]\s+\.pdp__rtb-col[\s\S]{0,120}gap:\s*32px\s*!important/.test(
+        pdpCss.replace(/\s+/g, " ")
+      )
+    ) {
+      fail(
+        "RATCHET pdp-rtb-rhythm: host belt must force .pdp__rtb-col gap: 32px !important"
+      );
+    }
+  }
+  const globals = requireFile("src/styles/globals-screens.css");
+  if (globals) {
+    if (
+      !/\[data-name=["']module\.pdp\.rtb["']\]:not\(\.pdp__rtb-card\)/.test(
+        globals
+      )
+    ) {
+      fail(
+        "RATCHET pdp-rtb-rhythm: globals-screens LEGACY module.pdp.rtb rules must exclude .pdp__rtb-card"
+      );
+    }
+  }
+}
+
 // ── Docs companion present ──────────────────────────────────────────────────
 {
   if (!fs.existsSync(path.join(ROOT, "docs/product/PARITY_RATCHETS.md"))) {
     fail("missing docs/product/PARITY_RATCHETS.md (document each ratchet)");
+  }
+  if (!fs.existsSync(path.join(ROOT, "docs/product/STUDIO_AUTO_RULES.md"))) {
+    fail("missing docs/product/STUDIO_AUTO_RULES.md");
   }
 }
 
@@ -487,4 +577,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("parity-ratchets OK (13 contracts)");
+console.log("parity-ratchets OK (15 contracts)");

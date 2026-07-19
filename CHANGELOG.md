@@ -2,6 +2,13 @@
 
 > _Append a bullet on coherent commits via `npm run notes:append -- --lane="<lane>" --intent="<text>"`. Preview with `npm run notes:preview`. On `npm run release:patch` this section is promoted to `## v<X.Y.Z> - DDMMYY` and a fresh empty `## Current` is re-inserted. Policy: `docs/product/VERSIONING.md`._
 
+## v0.0.26 - 190726
+- **shell:** Auto-Rule `agent-teardown-clean` — probe/sitrep/forceClear strips `&modal=`, closes dialogs, hard-removes overlay (sticky choose-pharmacy felony)
+- **engine:** `studioAgentTeardownContract` + `STUDIO_AUTO_RULES` catalog; `check:felonies` §9–10 (teardown + auth-ssot); MCP `__studioWaitAgentTeardownClean`
+- **ci:** Studio Auto-Rules in `npm test` — `check:theme-brand`, parity ratchets `avail-logged-out-start` + `pdp-rtb-rhythm`
+- **docs:** STUDIO_AUTO_RULES framework (PO must not re-ask dismiss/modal/brand-active) + FE_AUDIT_AGENT_TEARDOWN_CLEAN
+- **uxds/boots:** Active strong filter pills (All locations) → theme `--project-brand-primary` (`#467672`), not UXDS `:root` `#305854` — Auto-Rule `theme-brand-active`
+
 ## v0.0.25 - 190726
 - **project:** PDP Check availability logged-out opens Find Pharmacy (start), not Choose Date
 - **engine:** Studio auth SSoT isStudioLoggedIn / __studioIsLoggedIn (+ __proto* aliases)

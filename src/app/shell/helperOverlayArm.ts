@@ -44,6 +44,9 @@ const READ_ONLY_HELPER_SUFFIXES = new Set([
   // start() and leaves stop() stuck at nest>0 (no sitrep / flaky panel).
   "RunMcpPageProbe",
   "RunMcpSanityCheck",
+  // Auto-Rule agent-teardown-clean asserts — must not re-arm overlay while proving clear.
+  "AssertAgentTeardownClean",
+  "WaitAgentTeardownClean",
 ]);
 
 const ARMED_FLAG = "__studioOverlayArmed";

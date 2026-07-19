@@ -13,6 +13,7 @@
 | Artifact | Path | Why |
 |----------|------|-----|
 | Lessons (append-only) | [LESSONS_LEARNED.md](./LESSONS_LEARNED.md) | Failure classes → gates |
+| **Studio Auto-Rules** | [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) | Recurring PO pain → CI/MCP gates (do not re-ask) |
 | Uma fidelity checklist | [UMA_FIDELITY_NOTES.md](./UMA_FIDELITY_NOTES.md) | Make→React Nazi checklist |
 | Parity ratchets | [PARITY_RATCHETS.md](./PARITY_RATCHETS.md) | Programmatic typical-miss contracts |
 | Page final-pass | [PAGE_FINAL_PASS.md](./PAGE_FINAL_PASS.md) | Mandatory structure/naming before NEXT page |
@@ -156,8 +157,24 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 | Modal URL sync — every popup must set `&modal=` (QV + Choose Pharmacy + Login + pickers) | Finn, Ben, Quinn | LESSONS · URL.md · `studioModalRegistry` · ratchet **modal-url-sync** |
 | MCP page probe: **scroll-into-view** before interact; **overlay must be visible on every probe** — FAIL if absent | Quinn, Finn, Ben | LESSONS 2026-07-19 (MCP probe visibility) |
 | Agent overlay: **pre-arm** before steps; sitrep **PASS/FAIL** green/red; **forceClear** hard-remove (no stale popup) | Uma, Finn, Quinn | RECORDING.md · LESSONS · `agentTestingOverlay` |
+| **Studio Auto-Rules framework** — dismiss/modal, auth SSoT, avail start, §0b rhythm, brand-active pills → CI; PO must not re-ask | Arch, Ben, Quinn, Finn, Uma | [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) · `studioAutoRules.ts` · `check:theme-brand` · felonies §9–10 |
+| **Auto-Rule `agent-teardown-clean`** — overlay gone + `&modal=` stripped + dialog closed after probe/sitrep/forceClear | Finn, Ben, Quinn, Arch | `studioAgentTeardownContract` · felonies §9 · `__studioAssertAgentTeardownClean` |
 | Team knowledge database + mandatory use | Arch, all | This file · TEAM.md § Knowledge use |
 | Page final-pass gate before NEXT screen; landmarks + BEM stamp | Finn, Uma, Ben, Arch | PAGE_FINAL_PASS.md · check:page-final-pass |
+
+**Knowledge improved** (2026-07-19 · stream: agent-teardown-clean Auto-Rule · sticky modal felony):
+- Finn (FE): stay state omits modal; App never re-applies `state?.modalId`; probe/session finally resets; forceClear resets then hard-removes overlay — applied: studioUrl + App + probe + overlay
+- Ben (BE): contract + `STUDIO_AUTO_RULES` + felonies §9 + helperOverlayArm read-only Wait/Assert — applied: check:felonies fails if unwired
+- Quinn (QA): MCP `__studioWaitAgentTeardownClean` after open avail + forceClear — applied: PASS prove + FE_AUDIT_AGENT_TEARDOWN_CLEAN
+- Arch (Director): R1 in STUDIO_AUTO_RULES.md hooks `agent-teardown-clean` — applied: catalog + CI family (no parallel gate zoo)
+
+**Knowledge improved** (2026-07-19 · stream: Studio Auto-Rules / Auto-Gates framework · PO recurring pain → CI):
+- Arch (Director): unified catalog [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) + `studioAutoRules.ts` — no parallel unused gate system; PO must not re-ask dismiss/modal/brand-active — applied: doc + catalog ids
+- Finn (FE): `agent-teardown-clean` contract + stay/hub strip `&modal=` + probe/session finally reset — applied: `studioAgentTeardownContract.ts` + URL/App/probe
+- Ben (BE): felonies §9–10 + `check:theme-brand` + parity ratchets avail-start / pdp-rtb-rhythm wired into `npm test` — applied: scripts + package.json
+- Quinn (QA): MCP assert `__studioAssertAgentTeardownClean` / wait helper after settle — applied: window API + unit contract tests
+- Uma (UI/UX): §0b rhythm static markers + brand-active hook for pill ships — applied: ratchet **pdp-rtb-rhythm** + **theme-brand-active**
+- Pax (PO sim): patch bump when teardown/framework user-visible — applied: release when push
 
 **Knowledge improved** (2026-07-19 · stream: PDP PAGE FINAL PASS HARD-GREEN · tip d7ce01c · v0.0.24):
 - Arch (Director): Final Pass stamp only after Quinn re-prove on tip that includes share flip; veto Home until PO `+` — applied: PAGE_FINAL_PASS.json mcpFinalPass + NEXT_STEPS 3e + Reflex

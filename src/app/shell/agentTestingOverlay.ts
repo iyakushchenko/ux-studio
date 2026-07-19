@@ -885,15 +885,18 @@ export function forceClearAgentTestingOverlay(): void {
     unbindBeforeUnload();
     unbindVisibility();
     dismissRoboCursor();
-    teardownDom(true);
     releaseClickGuard();
+    // Reset URL/modals first, then hard-remove overlay last so a helper-arm
+    // race during reset cannot leave a sticky BR panel after forceClear.
     safeResetStudio();
+    teardownDom(true);
   } catch {
     try {
       cancelPendingReload();
       dismissRoboCursor();
-      teardownDom(true);
       releaseClickGuard();
+      safeResetStudio();
+      teardownDom(true);
     } catch {
       /* ignore */
     }

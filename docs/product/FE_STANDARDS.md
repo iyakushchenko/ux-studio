@@ -44,7 +44,7 @@ Search-field glyphs inside inputs are a **different** family (field chrome) — 
 
 ### 1.3 Availability list filter pills
 
-Secondary pills (**All locations** / **Slots available**): use **`.uxds-filter-chip--strong`** (registered). Inactive = quiet outline/neutral; **selected** = `--uxds-filter-chip-surface-selected-strong` + inverse text (Boots theme → brand primary). Keep mini vs List/Map hierarchy. Do **not** use mint / badge selected for this role.
+Secondary pills (**All locations** / **Slots available**): use **`.uxds-filter-chip--strong`** (registered). Inactive = quiet outline/neutral; **selected** = `--uxds-filter-chip-surface-selected-strong` + inverse text (Boots theme → `var(--project-brand-primary)` / `#467672`, **not** UXDS `:root` `#305854`). Keep mini vs List/Map hierarchy. Do **not** use mint / badge selected for this role. **Gate:** `npm run check:theme-brand` (Auto-Rule `theme-brand-active`).
 
 ---
 

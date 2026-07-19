@@ -138,7 +138,7 @@ describe("studioUrl", () => {
     });
   });
 
-  it("buildStudioPostAgentStayState keeps project+screen+modal", () => {
+  it("buildStudioPostAgentStayState keeps project+screen and strips modal", () => {
     expect(
       buildStudioPostAgentStayState(
         "?project=boots-pharmacy&screen=plp&modal=choose-pharmacy&proof=x"
@@ -146,11 +146,10 @@ describe("studioUrl", () => {
     ).toEqual({
       projectId: "boots-pharmacy",
       screenId: "plp",
-      modalId: "choose-pharmacy",
     });
   });
 
-  it("resetStudioAfterAgentTest stays on screen by default and strips proof", () => {
+  it("resetStudioAfterAgentTest stays on screen, strips proof AND modal", () => {
     const replaceState = vi.fn();
     const dispatchEvent = vi.fn();
     vi.stubGlobal("window", {
@@ -169,14 +168,13 @@ describe("studioUrl", () => {
     expect(state).toEqual({
       projectId: "boots-pharmacy",
       screenId: "plp",
-      modalId: "choose-pharmacy",
     });
+    expect(state.modalId).toBeUndefined();
     expect(replaceState).toHaveBeenCalled();
     const next = replaceState.mock.calls.at(-1)?.[2] as string;
-    expect(next).toBe(
-      "/?project=boots-pharmacy&screen=plp&modal=choose-pharmacy"
-    );
+    expect(next).toBe("/?project=boots-pharmacy&screen=plp");
     expect(next).not.toContain("proof");
+    expect(next).not.toContain("modal=");
     expect(dispatchEvent).toHaveBeenCalledWith(
       expect.objectContaining({
         type: STUDIO_POST_AGENT_RESET_EVENT,

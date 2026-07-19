@@ -45,8 +45,8 @@ export const STUDIO_POST_AGENT_HOME_SCREEN_ID = HUB_SCREEN_ID;
 export type ResetStudioAfterAgentTestOptions = {
   /**
    * When true: land hub (legacy CJM/journey clean slate).
-   * Default false: keep current project + screen (+ persona/mode/modal);
-   * strip only ephemeral agent params; dismiss live lightboxes via event.
+   * Default false: keep current project + screen (+ persona/mode);
+   * always strip `&modal=` + ephemeral agent params; dismiss live lightboxes via event.
    */
   resetToHub?: boolean;
 };
@@ -179,8 +179,10 @@ export function buildStudioPostAgentHomeState(
 }
 
 /**
- * Default post-agent stay state: current project + screen (+ persona/mode/modal).
- * Ephemeral keys are stripped separately; sticky agent dirt is closed via event.
+ * Default post-agent stay state: current project + screen (+ persona/mode).
+ * Never preserves `&modal=` — probe/sitrep/forceClear must leave dialogs closed
+ * (sticky choose-pharmacy after MCP was a recurring felony).
+ * Ephemeral keys are stripped separately; live lightboxes close via event.
  */
 export function buildStudioPostAgentStayState(
   search: string = typeof window !== "undefined" ? window.location.search : ""
@@ -191,7 +193,7 @@ export function buildStudioPostAgentStayState(
     screenId: current.screenId ?? STUDIO_POST_AGENT_HOME_SCREEN_ID,
     personaId: current.personaId,
     modeId: current.modeId,
-    modalId: current.modalId,
+    // HARD: strip modal — closeAllPopups + applyModal(undefined) via event.
   };
 }
 
@@ -208,13 +210,13 @@ export function isStudioPostAgentResetSyncLocked(
 }
 
 /**
- * After agent / MCP tests: strip ephemeral params, optionally land hub.
- * Default: stay on current project + screen (+ persona/mode/modal).
+ * After agent / MCP tests: strip ephemeral + `&modal=`, optionally land hub.
+ * Default: stay on current project + screen (+ persona/mode); never keep modal.
  * Pass `{ resetToHub: true }` for CJM/journey clean slate.
  * Writes the address bar, then dispatches {@link STUDIO_POST_AGENT_RESET_EVENT}
  * so App can dismiss sticky lightboxes / popups and apply nav (no-reload path).
  * Call again immediately before `location.reload()` so a settle-window race
- * cannot re-stamp ephemeral keys.
+ * cannot re-stamp ephemeral keys or `&modal=`.
  */
 export function resetStudioAfterAgentTest(
   options?: ResetStudioAfterAgentTestOptions
@@ -222,17 +224,19 @@ export function resetStudioAfterAgentTest(
   const state = options?.resetToHub
     ? buildStudioPostAgentHomeState()
     : buildStudioPostAgentStayState();
+  // Never re-stamp modal from a stale caller detail — stay/hub builders omit it.
+  const cleanState: StudioUrlState = { ...state, modalId: undefined };
   postAgentResetSyncLockUntil = Date.now() + POST_AGENT_RESET_SYNC_LOCK_MS;
   stripEphemeralStudioQuery();
-  writeStudioUrl(state);
+  writeStudioUrl(cleanState);
   if (typeof window !== "undefined" && typeof window.dispatchEvent === "function") {
     window.dispatchEvent(
       new CustomEvent<StudioPostAgentResetDetail>(STUDIO_POST_AGENT_RESET_EVENT, {
-        detail: { state },
+        detail: { state: cleanState },
       })
     );
   }
-  return state;
+  return cleanState;
 }
 
 export function resolveScreenIdFromNav(options: {

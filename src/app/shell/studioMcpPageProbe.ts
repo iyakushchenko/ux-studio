@@ -44,7 +44,10 @@ import {
   isBlockingModalOpen,
   isElementBlockedByModal,
 } from "@/app/shell/studioModalGuard";
-import { parseStudioUrl } from "@/app/shell/studioUrl";
+import {
+  parseStudioUrl,
+  resetStudioAfterAgentTest,
+} from "@/app/shell/studioUrl";
 
 export type McpPageProbeStepResult = {
   id: string;
@@ -1160,6 +1163,10 @@ export async function runMcpPageProbe(
       url: typeof window !== "undefined" ? window.location.href : undefined,
     };
   } finally {
+    // Teardown sequence (HARD — sticky modal after probe is a felony):
+    // 1) stop → sitrep (enterSettle already resets URL + closes popups)
+    // 2) resetStudioAfterAgentTest again — strip `&modal=` + closeAllPopups event
+    // 3) ensureClear → forceClear if overlay DOM still present after settle
     try {
       stopAgentTestingOverlay({
         // Default false — agent testing must not reload-loop Chrome.
@@ -1170,6 +1177,13 @@ export async function runMcpPageProbe(
       });
     } catch {
       forceClearAgentTestingOverlay();
+    }
+    try {
+      resetStudioAfterAgentTest({
+        resetToHub: options?.resetToHub === true,
+      });
+    } catch {
+      /* never leave modal sticky because reset threw */
     }
     scheduleAgentTestingOverlayEnsureClear(settleMs + 1000);
     disableCursorQaEyes();

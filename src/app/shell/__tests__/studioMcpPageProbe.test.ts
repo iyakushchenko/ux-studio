@@ -216,9 +216,25 @@ describe("runMcpPageProbe", () => {
     const locationState = {
       href: "http://localhost:5173/?project=boots-pharmacy&screen=plp",
       search: "?project=boots-pharmacy&screen=plp",
+      pathname: "/",
+      hash: "",
     };
+    const replaceState = vi.fn(
+      (_state: unknown, _title: string, url?: string) => {
+        if (typeof url === "string") {
+          const path = url.startsWith("http")
+            ? new URL(url).pathname + new URL(url).search
+            : url;
+          const qs = path.includes("?") ? path.slice(path.indexOf("?")) : "";
+          locationState.search = qs || "";
+          locationState.href = `http://localhost:5173${path.startsWith("/") ? path : `/${path}`}`;
+        }
+      }
+    );
     vi.stubGlobal("window", {
       location: locationState,
+      history: { state: null, replaceState, pushState: vi.fn() },
+      dispatchEvent: vi.fn(() => true),
     });
     vi.stubGlobal("document", {
       querySelector: (sel: string) => {
@@ -294,6 +310,9 @@ describe("runMcpPageProbe", () => {
     );
     expect(result.checks.find((c) => c.id === "url-screen")?.pass).toBe(true);
     expect(result.pass).toBe(true);
+    // HARD teardown: no sticky &modal= after probe finally
+    expect(locationState.search).not.toContain("modal=");
+    expect(new URLSearchParams(locationState.search).has("modal")).toBe(false);
   });
 
   it("fails overlay-eyes when probe can click through", async () => {
@@ -491,13 +510,24 @@ describe("runMcpPageProbe", () => {
     const locationState = {
       href: "http://localhost:5173/?project=boots-pharmacy&screen=pdp",
       search: "?project=boots-pharmacy&screen=pdp",
+      pathname: "/",
+      hash: "",
     };
+    const replaceState = vi.fn(
+      (_state: unknown, _title: string, url?: string) => {
+        if (typeof url === "string") {
+          const path = url.startsWith("http")
+            ? new URL(url).pathname + new URL(url).search
+            : url;
+          const qs = path.includes("?") ? path.slice(path.indexOf("?")) : "";
+          locationState.search = qs || "";
+          locationState.href = `http://localhost:5173${path.startsWith("/") ? path : `/${path}`}`;
+        }
+      }
+    );
 
     const syncUrl = () => {
       const modalQ = modalKind ? `&modal=${modalKind}` : "";
-      const screen = locationState.search.includes("screen=plp") ? "plp" : "pdp";
-      // screen driven below via search assignment
-      void screen;
       const screenId = /screen=([^&]+)/.exec(locationState.search)?.[1] ?? "pdp";
       locationState.search = `?project=boots-pharmacy&screen=${screenId}${modalQ}`;
       locationState.href = `http://localhost:5173/${locationState.search}`;
@@ -571,6 +601,8 @@ describe("runMcpPageProbe", () => {
 
     vi.stubGlobal("window", {
       location: locationState,
+      history: { state: null, replaceState, pushState: vi.fn() },
+      dispatchEvent: vi.fn(() => true),
       __studioIsLoggedIn: () => false,
     });
     vi.stubGlobal("document", {
@@ -657,5 +689,62 @@ describe("runMcpPageProbe", () => {
     expect(below?.detail ?? "").not.toMatch(/soft-skip/);
     expect(result.checks.find((c) => c.id === "url-screen")?.pass).toBe(true);
     expect(result.pass).toBe(true);
+    // HARD teardown: PDP avail probe must not leave &modal=choose-pharmacy
+    expect(locationState.search).not.toContain("modal=");
+    expect(new URLSearchParams(locationState.search).has("modal")).toBe(false);
+  });
+
+  it("teardown strips sticky choose-pharmacy even if probe left it open", async () => {
+    const pdpRoot = {
+      tagName: "DIV",
+      querySelector: (sel: string) => {
+        if (sel.includes('aria-label="Product"') || sel === "header") {
+          return { tagName: "HEADER" };
+        }
+        if (sel === "main") return { tagName: "MAIN" };
+        return null;
+      },
+    };
+    const locationState = {
+      href: "http://localhost:5173/?project=boots-pharmacy&screen=pdp&modal=choose-pharmacy",
+      search: "?project=boots-pharmacy&screen=pdp&modal=choose-pharmacy",
+      pathname: "/",
+      hash: "",
+    };
+    const replaceState = vi.fn(
+      (_state: unknown, _title: string, url?: string) => {
+        if (typeof url === "string") {
+          const path = url.startsWith("http")
+            ? new URL(url).pathname + new URL(url).search
+            : url;
+          const qs = path.includes("?") ? path.slice(path.indexOf("?")) : "";
+          locationState.search = qs || "";
+          locationState.href = `http://localhost:5173${path.startsWith("/") ? path : `/${path}`}`;
+        }
+      }
+    );
+    vi.stubGlobal("window", {
+      location: locationState,
+      history: { state: null, replaceState, pushState: vi.fn() },
+      dispatchEvent: vi.fn(() => true),
+      __studioIsLoggedIn: () => false,
+    });
+    // Minimal document — force early exit via missing recipe targets is OK;
+    // finally must still clear modal.
+    vi.stubGlobal("document", {
+      styleSheets: [],
+      querySelector: (sel: string) => {
+        if (sel === '.pdp[data-studio-react-screen="pdp"]') return pdpRoot;
+        if (sel === '[data-studio-react-screen="pdp"]') return pdpRoot;
+        return null;
+      },
+      querySelectorAll: () => [],
+    });
+
+    await runMcpPageProbe({ screenId: "pdp", reload: false, settleMs: 0 });
+
+    expect(locationState.search).not.toContain("modal=");
+    expect(new URLSearchParams(locationState.search).get("modal")).toBeNull();
+    expect(locationState.search).toContain("screen=pdp");
   });
 });

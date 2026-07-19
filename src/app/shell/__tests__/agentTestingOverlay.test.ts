@@ -148,12 +148,13 @@ describe("agentTestingOverlay", () => {
     expect(isAgentTestingOverlayActive()).toBe(false);
     expect(isAgentTestingOverlaySettling()).toBe(true);
     expect(reload).not.toHaveBeenCalled();
-    // Sitrep stays on current screen; strips ephemeral proof.
+    // Sitrep stays on current screen; strips ephemeral proof AND sticky modal.
     expect(replaceState).toHaveBeenCalled();
     expect(String(replaceState.mock.calls.at(-1)?.[2])).toBe(
-      "/?project=boots-pharmacy&screen=book-step-1&modal=choose-pharmacy"
+      "/?project=boots-pharmacy&screen=book-step-1"
     );
     expect(String(replaceState.mock.calls.at(-1)?.[2])).not.toContain("proof");
+    expect(String(replaceState.mock.calls.at(-1)?.[2])).not.toContain("modal=");
     expect(dispatchEvent).toHaveBeenCalledWith(
       expect.objectContaining({
         type: "studio-post-agent-reset",
@@ -161,7 +162,6 @@ describe("agentTestingOverlay", () => {
           state: {
             projectId: "boots-pharmacy",
             screenId: "book-step-1",
-            modalId: "choose-pharmacy",
           },
         },
       })
@@ -177,9 +177,9 @@ describe("agentTestingOverlay", () => {
     expect(reload).not.toHaveBeenCalled();
     vi.advanceTimersByTime(120);
     expect(reload).toHaveBeenCalledTimes(1);
-    // Pre-reload reset keeps screen (default stay-on-page).
+    // Pre-reload reset keeps screen (default stay-on-page) without modal.
     expect(String(replaceState.mock.calls.at(-1)?.[2])).toBe(
-      "/?project=boots-pharmacy&screen=book-step-1&modal=choose-pharmacy"
+      "/?project=boots-pharmacy&screen=book-step-1"
     );
   });
 
@@ -267,7 +267,7 @@ describe("agentTestingOverlay", () => {
     expect(isAgentTestingOverlayActive()).toBe(false);
     expect(isAgentTestingOverlaySettling()).toBe(true);
     expect(String(replaceState.mock.calls.at(-1)?.[2])).toBe(
-      "/?project=boots-pharmacy&screen=book-step-1&modal=choose-pharmacy"
+      "/?project=boots-pharmacy&screen=book-step-1"
     );
     expect(dispatchEvent).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -275,7 +275,6 @@ describe("agentTestingOverlay", () => {
           state: {
             projectId: "boots-pharmacy",
             screenId: "book-step-1",
-            modalId: "choose-pharmacy",
           },
         },
       })

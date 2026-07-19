@@ -20,7 +20,7 @@ While an agent drives localhost, Studio shows a **compact bottom-right status pa
 
 | Mode | Behavior |
 |------|----------|
-| **Default (page / sanity / probe)** | Stay on current `project` + `screen` (+ persona/mode/modal). Strip only ephemeral (`proof`, …). Close sticky popups via `studio-post-agent-reset`. **Do not** bounce to hub/onboarding. |
+| **Default (page / sanity / probe)** | Stay on current `project` + `screen` (+ persona/mode). **Always strip `&modal=`** + ephemeral (`proof`, …). Close sticky popups via `studio-post-agent-reset` (never re-apply modal). **Do not** bounce to hub/onboarding. |
 | **`resetToHub: true`** (CJM / journey smokes) | `?project=<current\|boots-pharmacy>&screen=hub` — no modal |
 
 Quinn proves stay-on-page: open PLP → `__studioRunMcpPageProbe()` → stop/reload → still `screen=plp`.  
@@ -45,7 +45,8 @@ Drives the shared CJM/AIR **robo-cursor** (`simulateDemoPointerClick`) to each r
 2. Click/hover → `revealDemoTargetForAgent` + robo-cursor sync scroll on `.studio-scroll--prototype` (REC demo-click also `scroll: true`).
 3. PLP `plp-below-fold-scroll` (`action: "reveal"`) → `button[data-studio-probe-below-fold="true"]` (last tile Quick View): park top → scroll into view with overlay still visible.
 4. Re-arm mid-sitrep abandons settle **without** firing a deferred `reload` from the prior stop.
-5. Probe `finally` → `stop({ result, settleMs })` then `scheduleAgentTestingOverlayEnsureClear(settle+1s)` — overlay DOM **absent** after settle; `forceClear()` always wired.
+5. Probe `finally` → `stop({ result, settleMs })` → `resetStudioAfterAgentTest` (strip `&modal=`) → `scheduleAgentTestingOverlayEnsureClear(settle+1s)` — overlay DOM **absent** after settle; `forceClear()` always wired.
+6. Auto-Rule **`agent-teardown-clean`**: after settle/forceClear, `__studioAssertAgentTeardownClean()` must PASS (no overlay root, no `modal` param, no dialog DOM). See [STUDIO_AUTO_RULES.md](../product/STUDIO_AUTO_RULES.md).
 
 **PLP recipe includes** `overlay-arm`, `plp-search-icons` (icon end + single clear), `plp-filter-view-all`, `plp-filter-option-counters`, `plp-below-fold-scroll`, overlay-eyes. Source contracts: [PARITY_RATCHETS.md](../product/PARITY_RATCHETS.md).
 

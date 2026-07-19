@@ -290,6 +290,7 @@ export default function App() {
   });
 
   // Agent overlay stop → dismiss sticky popups; apply stay/hub URL (already written).
+  // HARD: never re-apply `&modal=` after closeAllPopups (sticky choose-pharmacy felony).
   useEffect(() => {
     const onPostAgentReset = (event: Event) => {
       const detail = (event as CustomEvent<StudioPostAgentResetDetail>).detail;
@@ -300,7 +301,7 @@ export default function App() {
         screenId: state?.screenId ?? HUB_SCREEN_ID,
         personaId: state?.personaId,
         modeId: state?.modeId,
-        modalId: state?.modalId,
+        modalId: undefined,
         screens: SCREENS,
         currentProjectId: studioProjectId,
         setProjectId: setStudioProjectId,

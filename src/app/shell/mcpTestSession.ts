@@ -23,6 +23,7 @@ import {
   disableCursorQaEyes,
   enableCursorQaEyes,
 } from "@/app/shell/playbackCursorDiagnostic";
+import { resetStudioAfterAgentTest } from "@/app/shell/studioUrl";
 
 export function mcpDelay(ms: number): Promise<void> {
   return new Promise((resolve) => {
@@ -84,6 +85,13 @@ export async function withMcpTestSession<T>(
       });
     } catch {
       forceClearAgentTestingOverlay();
+    }
+    try {
+      resetStudioAfterAgentTest({
+        resetToHub: sessionOptions?.resetToHub === true,
+      });
+    } catch {
+      /* never leave sticky &modal= after session end */
     }
     scheduleAgentTestingOverlayEnsureClear(settleMs + 1000);
     disableCursorQaEyes();

@@ -1,7 +1,7 @@
 {
   "name": "ux-studio",
   "private": true,
-  "version": "0.0.25",
+  "version": "0.0.26",
   "type": "module",
   "engines": {
     "node": ">=22"
@@ -15,6 +15,7 @@
     "check:parity-ratchets": "node scripts/check-parity-ratchets.mjs",
     "check:parity-proven": "node scripts/check-parity-proven.mjs",
     "check:page-final-pass": "node scripts/check-page-final-pass.mjs",
+    "check:theme-brand": "node scripts/check-theme-brand.mjs",
     "check:version": "node scripts/check-release-version-changelog-sync.mjs",
     "notes": "node scripts/release-notes.mjs list",
     "notes:list": "node scripts/release-notes.mjs list",
@@ -24,7 +25,7 @@
     "release:patch": "node scripts/release.mjs patch",
     "release:minor": "node scripts/release.mjs minor",
     "release:major": "node scripts/release.mjs major",
-    "test": "npm run check:links && npm run check:hygiene && npm run check:felonies && npm run check:parity-ratchets && npm run check:parity-proven && npm run check:page-final-pass && npm run check:version && vitest run",
+    "test": "npm run check:links && npm run check:hygiene && npm run check:felonies && npm run check:parity-ratchets && npm run check:parity-proven && npm run check:page-final-pass && npm run check:theme-brand && npm run check:version && vitest run",
     "test:watch": "vitest",
     "smoke": "node scripts/playwright-smoke.mjs"
   },

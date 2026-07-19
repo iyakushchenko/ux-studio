@@ -280,6 +280,7 @@ Use [FE_UI_UX_AUDIT.md](./FE_UI_UX_AUDIT.md) ruthlessly, plus [VISUAL_FIDELITY.m
 
 ## Related
 
+- [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) — recurring PO pain → automatic CI/MCP gates (do not re-ask)
 - [TEAM.md](./TEAM.md) — lean UX team callsigns + artifact map (Arch/Bea/Finn/Uma/Quinn/Ben/Pax)
 - [TEAM_KNOWLEDGE.md](./TEAM_KNOWLEDGE.md) — living knowledge index; Knowledge used / Knowledge improved
 - [PAGE_FINAL_PASS.md](./PAGE_FINAL_PASS.md) — hard-green before next migrated page (Finn/Uma checklist + check)

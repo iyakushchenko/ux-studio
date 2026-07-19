@@ -11,12 +11,16 @@
  *  5. studioRelease channel must be alpha|beta|rc|stable
  *  6. version chip must track package.json (no hardcoded UI semver; JSON import present)
  *  7. Overlay eyes — probe/demo-click must guard under-overlay clicks; known modals registered
+ *  8. Modal URL sync registry — every popup syncs `&modal=` on open
+ *  9. Probe teardown — finally forceClear path + resetStudioAfterAgentTest strips `&modal=`
+ * 10. Auth SSoT — studioAuthSession / __studioIsLoggedIn used for logged-in branching
  *
  * Companion gates (also in npm test):
- *  - check:hygiene · check:links · check:version · check:parity-proven
+ *  - check:hygiene · check:links · check:version · check:parity-* · check:theme-brand
+ *  - check:page-final-pass
  *
  * Concept LEGACY `.proto-*` in globals-*.css / Make wire / UXDS link aliases = OK until screen retire.
- * Policy: docs/product/NAMING.md · COMMAND_DOCTRINE.md
+ * Policy: docs/product/NAMING.md · COMMAND_DOCTRINE.md · STUDIO_AUTO_RULES.md
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -490,15 +494,309 @@ if (!fs.existsSync(wirePath)) {
   }
 }
 
+// --- 9) Auto-Rule agent-teardown-clean — sticky modal/overlay after probe = felony ---
+{
+  const RULE_ID = "agent-teardown-clean";
+  const contractPath = path.join(
+    ROOT,
+    "src",
+    "app",
+    "shell",
+    "studioAgentTeardownContract.ts"
+  );
+  const catalogPath = path.join(
+    ROOT,
+    "src",
+    "app",
+    "shell",
+    "studioAutoRules.ts"
+  );
+  const urlPath = path.join(ROOT, "src", "app", "shell", "studioUrl.ts");
+  const probePath = path.join(
+    ROOT,
+    "src",
+    "app",
+    "shell",
+    "studioMcpPageProbe.ts"
+  );
+  const sessionPath = path.join(ROOT, "src", "app", "shell", "mcpTestSession.ts");
+  const helpersPath = path.join(
+    ROOT,
+    "src",
+    "app",
+    "shell",
+    "studioMcpHelpers.ts"
+  );
+
+  if (!fs.existsSync(contractPath)) {
+    fail(
+      `FELONY ${RULE_ID}: missing studioAgentTeardownContract.ts (Auto-Rule contract)`
+    );
+  } else {
+    const contractSrc = fs.readFileSync(contractPath, "utf8");
+    if (!contractSrc.includes(`"${RULE_ID}"`)) {
+      fail(
+        `FELONY ${RULE_ID}: contract must export id literal "${RULE_ID}"`
+      );
+    }
+    if (!/assertStudioAgentTeardownClean/.test(contractSrc)) {
+      fail(
+        `FELONY ${RULE_ID}: contract must export assertStudioAgentTeardownClean`
+      );
+    }
+    if (!/__studioAssertAgentTeardownClean/.test(contractSrc)) {
+      fail(
+        `FELONY ${RULE_ID}: contract must wire window.__studioAssertAgentTeardownClean`
+      );
+    }
+    if (!/__studioWaitAgentTeardownClean|waitForStudioAgentTeardownClean/.test(contractSrc)) {
+      fail(
+        `FELONY ${RULE_ID}: contract must export waitForStudioAgentTeardownClean for MCP prove`
+      );
+    }
+  }
+
+  if (!fs.existsSync(catalogPath)) {
+    fail(`FELONY ${RULE_ID}: missing studioAutoRules.ts catalog for Arch CI`);
+  } else {
+    const catalogSrc = fs.readFileSync(catalogPath, "utf8");
+    if (!catalogSrc.includes(`"${RULE_ID}"`) && !/STUDIO_AUTO_RULE_AGENT_TEARDOWN_ID/.test(catalogSrc)) {
+      fail(`FELONY ${RULE_ID}: studioAutoRules catalog must list the rule id`);
+    }
+    if (!/export const STUDIO_AUTO_RULES/.test(catalogSrc)) {
+      fail("FELONY agent-teardown-clean: studioAutoRules must export STUDIO_AUTO_RULES");
+    }
+  }
+
+  if (!fs.existsSync(urlPath)) {
+    fail("FELONY agent-teardown-clean: missing studioUrl.ts");
+  } else {
+    const urlSrc = fs.readFileSync(urlPath, "utf8");
+    // Stay builder must not copy modalId from current URL (sticky felony).
+    if (/modalId:\s*current\.modalId/.test(urlSrc)) {
+      fail(
+        `FELONY ${RULE_ID}: buildStudioPostAgentStayState must not preserve current.modalId`
+      );
+    }
+    if (!/modalId:\s*undefined/.test(urlSrc)) {
+      fail(
+        `FELONY ${RULE_ID}: resetStudioAfterAgentTest must force modalId: undefined`
+      );
+    }
+  }
+
+  if (!fs.existsSync(appPath)) {
+    fail("FELONY agent-teardown-clean: missing App.tsx");
+  } else {
+    const appSrc = fs.readFileSync(appPath, "utf8");
+    if (!/STUDIO_POST_AGENT_RESET_EVENT/.test(appSrc)) {
+      fail(
+        `FELONY ${RULE_ID}: App must listen for STUDIO_POST_AGENT_RESET_EVENT`
+      );
+    }
+    if (!/closeAllPopups\(\)/.test(appSrc)) {
+      fail(
+        `FELONY ${RULE_ID}: post-agent reset must call closeAllPopups()`
+      );
+    }
+    // Must force modalId: undefined (not state?.modalId) on post-agent apply.
+    if (/modalId:\s*state\?\.modalId/.test(appSrc)) {
+      fail(
+        `FELONY ${RULE_ID}: App onPostAgentReset must not re-apply state?.modalId`
+      );
+    }
+    if (!/modalId:\s*undefined/.test(appSrc)) {
+      fail(
+        `FELONY ${RULE_ID}: App onPostAgentReset must set modalId: undefined`
+      );
+    }
+  }
+
+  for (const [rel, full] of [
+    ["studioMcpPageProbe.ts", probePath],
+    ["mcpTestSession.ts", sessionPath],
+  ]) {
+    if (!fs.existsSync(full)) {
+      fail(`FELONY ${RULE_ID}: missing ${rel}`);
+      continue;
+    }
+    const src = fs.readFileSync(full, "utf8");
+    if (!/resetStudioAfterAgentTest/.test(src)) {
+      fail(
+        `FELONY ${RULE_ID}: ${rel} finally must call resetStudioAfterAgentTest (strip &modal=)`
+      );
+    }
+  }
+
+  if (!fs.existsSync(helpersPath)) {
+    fail("FELONY agent-teardown-clean: missing studioMcpHelpers.ts");
+  } else {
+    const helpersSrc = fs.readFileSync(helpersPath, "utf8");
+    if (!/installStudioAgentTeardownContractApi/.test(helpersSrc)) {
+      fail(
+        `FELONY ${RULE_ID}: studioMcpHelpers must installStudioAgentTeardownContractApi`
+      );
+    }
+  }
+
+  const overlayPath = path.join(
+    ROOT,
+    "src",
+    "app",
+    "shell",
+    "agentTestingOverlay.ts"
+  );
+  if (!fs.existsSync(overlayPath)) {
+    fail("FELONY agent-teardown-clean: missing agentTestingOverlay.ts");
+  } else {
+    const overlaySrc = fs.readFileSync(overlayPath, "utf8");
+    if (!/resetStudioAfterAgentTest|safeResetStudio/.test(overlaySrc)) {
+      fail(
+        `FELONY ${RULE_ID}: forceClear/stop path must call resetStudioAfterAgentTest`
+      );
+    }
+    if (!/export function forceClearAgentTestingOverlay/.test(overlaySrc)) {
+      fail(`FELONY ${RULE_ID}: forceClearAgentTestingOverlay must remain exported`);
+    }
+  }
+
+  const armPath = path.join(ROOT, "src", "app", "shell", "helperOverlayArm.ts");
+  if (!fs.existsSync(armPath)) {
+    fail(`FELONY ${RULE_ID}: missing helperOverlayArm.ts`);
+  } else {
+    const armSrc = fs.readFileSync(armPath, "utf8");
+    if (!/AssertAgentTeardownClean/.test(armSrc) || !/WaitAgentTeardownClean/.test(armSrc)) {
+      fail(
+        `FELONY ${RULE_ID}: helperOverlayArm must treat Assert/WaitAgentTeardownClean as read-only (no re-arm)`
+      );
+    }
+  }
+}
+
+// --- 10) Auth SSoT — studioAuthSession / __studioIsLoggedIn -----------------
+{
+  const RULE_ID = "auth-ssot";
+  const authPath = path.join(
+    ROOT,
+    "src",
+    "app",
+    "shell",
+    "studioAuthSession.ts"
+  );
+  const catalogPath = path.join(
+    ROOT,
+    "src",
+    "app",
+    "shell",
+    "studioAutoRules.ts"
+  );
+
+  if (!fs.existsSync(catalogPath)) {
+    fail(`FELONY ${RULE_ID}: missing studioAutoRules.ts`);
+  } else {
+    const catalogSrc = fs.readFileSync(catalogPath, "utf8");
+    for (const id of [
+      "agent-teardown-clean",
+      "auth-ssot",
+      "avail-logged-out-start",
+      "pdp-rtb-rhythm",
+      "theme-brand-active",
+    ]) {
+      if (!catalogSrc.includes(`"${id}"`) && !catalogSrc.includes(`'${id}'`)) {
+        fail(
+          `FELONY ${RULE_ID}: studioAutoRules catalog missing id "${id}" (see STUDIO_AUTO_RULES.md)`
+        );
+      }
+    }
+  }
+
+  if (!fs.existsSync(authPath)) {
+    fail(`FELONY ${RULE_ID}: missing src/app/shell/studioAuthSession.ts`);
+  } else {
+    const authSrc = fs.readFileSync(authPath, "utf8");
+    if (!/export function isStudioLoggedIn/.test(authSrc)) {
+      fail(`FELONY ${RULE_ID}: must export isStudioLoggedIn`);
+    }
+    if (!/export function setStudioLoggedIn/.test(authSrc)) {
+      fail(`FELONY ${RULE_ID}: must export setStudioLoggedIn`);
+    }
+    if (!/window\.__studioIsLoggedIn\s*=/.test(authSrc)) {
+      fail(`FELONY ${RULE_ID}: must install window.__studioIsLoggedIn`);
+    }
+    if (!/window\.__studioSetLoggedIn\s*=/.test(authSrc)) {
+      fail(`FELONY ${RULE_ID}: must install window.__studioSetLoggedIn`);
+    }
+  }
+
+  const availIntentPath = path.join(
+    ROOT,
+    "src",
+    "projects",
+    "boots-pharmacy",
+    "wire",
+    "resolveAvailIntent.ts"
+  );
+  if (fs.existsSync(availIntentPath)) {
+    const intentSrc = fs.readFileSync(availIntentPath, "utf8");
+    if (!/isStudioLoggedIn/.test(intentSrc)) {
+      fail(
+        `FELONY ${RULE_ID}: resolveAvailIntent must use isStudioLoggedIn`
+      );
+    }
+    if (!/from\s+["']@\/app\/shell\/studioAuthSession["']/.test(intentSrc)) {
+      fail(
+        `FELONY ${RULE_ID}: resolveAvailIntent must import from studioAuthSession`
+      );
+    }
+  }
+
+  if (fs.existsSync(pageProbePath)) {
+    const probeSrc = fs.readFileSync(pageProbePath, "utf8");
+    if (!/__studioIsLoggedIn/.test(probeSrc)) {
+      fail(
+        `FELONY ${RULE_ID}: studioMcpPageProbe must read window.__studioIsLoggedIn`
+      );
+    }
+  }
+
+  const headerMount = path.join(
+    ROOT,
+    "src",
+    "projects",
+    "boots-pharmacy",
+    "chrome",
+    "headerMount.tsx"
+  );
+  if (fs.existsSync(headerMount)) {
+    const hdr = fs.readFileSync(headerMount, "utf8");
+    if (/export function isHeaderLoggedIn/.test(hdr)) {
+      const alias = hdr.match(
+        /export function isHeaderLoggedIn[\s\S]{0,160}?^\}/m
+      );
+      if (alias && !/isStudioLoggedIn\(\)/.test(alias[0])) {
+        fail(
+          `FELONY ${RULE_ID}: isHeaderLoggedIn must alias isStudioLoggedIn()`
+        );
+      }
+    }
+  }
+
+  if (
+    !fs.existsSync(path.join(ROOT, "docs", "product", "STUDIO_AUTO_RULES.md"))
+  ) {
+    fail("FELONY: missing docs/product/STUDIO_AUTO_RULES.md");
+  }
+}
+
 if (errors.length) {
   console.error("[check:felonies] FAIL — agent felony gate:\n");
   for (const e of errors) console.error(`  • ${e}`);
   console.error(
-    `\n[check:felonies] ${errors.length} violation(s). See NAMING.md + COMMAND_DOCTRINE.md`
+    `\n[check:felonies] ${errors.length} violation(s). See NAMING.md + COMMAND_DOCTRINE.md + STUDIO_AUTO_RULES.md`
   );
   process.exit(1);
 }
 
 console.log(
-  "[check:felonies] OK — filenames, PANEL CSS, data-proto, BOOTS stubs, channel, version chip, overlay eyes, modal URL sync"
+  "[check:felonies] OK — filenames, PANEL CSS, data-proto, BOOTS stubs, channel, version chip, overlay eyes, modal URL sync, agent-teardown-clean, auth-ssot"
 );

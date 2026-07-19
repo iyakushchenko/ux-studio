@@ -1,7 +1,8 @@
 /**
  * UXDS filter chip. Default selected = badge/mint.
- * Strong selected = .uxds-filter-chip--strong (registered).
- * @see docs/uxds/DEVIATIONS.md · docs/product/DS_STRICTNESS.md
+ * Strong selected = .uxds-filter-chip--strong (registered) →
+ *   var(--uxds-filter-chip-surface-selected-strong) (Boots theme → brand primary).
+ * @see docs/uxds/DEVIATIONS.md · docs/product/DS_STRICTNESS.md · check:theme-brand
  */
 
 .uxds-filter-chip-row {

@@ -51,6 +51,10 @@ import {
   withMcpTestSession,
 } from "@/app/shell/mcpTestSession";
 import {
+  installStudioAgentTeardownContractApi,
+  uninstallStudioAgentTeardownContractApi,
+} from "@/app/shell/studioAgentTeardownContract";
+import {
   runMcpPageProbe,
   type McpPageProbeOptions,
   type McpPageProbeResult,
@@ -603,6 +607,7 @@ export function registerStudioMcpHelpers(options: {
   if (typeof window === "undefined") return () => {};
 
   installAgentTestingOverlayApi();
+  installStudioAgentTeardownContractApi();
   stripEphemeralStudioQuery();
 
   window.__protoDismissPlaybackDiagnostic = () => {
@@ -1224,6 +1229,7 @@ export function registerStudioMcpHelpers(options: {
 
   return () => {
     uninstallAgentTestingOverlayApi();
+    uninstallStudioAgentTeardownContractApi();
     delete window.__protoDismissPlaybackDiagnostic;
     delete window.__protoStudioState;
     delete window.__protoEnsureCleanStudio;
