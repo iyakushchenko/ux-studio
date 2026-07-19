@@ -64,7 +64,8 @@ window.__studioAgentTestingOverlay?.logStep?.({ label: "step-forward · traditio
 window.__studioAgentTestingOverlay?.setTimeline?.(["tp:a", "tp:b"])
 window.__studioAgentTestingOverlay?.ringAlarm?.("PO spotted drift")
 window.__studioAgentTestingOverlay?.flagCursorWeird?.()
-window.__studioDownloadAgentTestingDump?.() // last FAIL/alarm dump (not every step)
+window.__studioAgentTestingOverlay?.flagScrollIssue?.("camera stuck mid-flight")
+window.__studioDownloadAgentTestingDump?.() // last FAIL/alarm/scroll dump (not every step)
 window.__studioAgentTestingOverlay?.stop() // nest-aware → DONE settle ~9s; no reload
 window.__studioAgentTestingOverlay?.stop({ force: true }) // clear immediately
 window.__studioAgentTestingOverlay?.forceClear() // Dismiss / stuck recovery — always works; hard-removes DOM
@@ -73,7 +74,7 @@ window.__studioAgentTestingOverlay?.stop({ settleMs: 9000, reload: true, result:
 window.__studioAgentTestingOverlay?.isActive() // false during settle
 ```
 
-**Mid-flight QA shell (2026-07-20 · PP-10):** code under `src/app/shell/agent-testing/`. Readable coalesced steps (beat/touchpoint/action), ok/amber/red rows, elapsed timer, control-panel sitrep, Alarm + Cursor + Dump CTAs, script timeline strip, console `AGENT TEST START/END` separators. **Dump policy:** last-N JSON in `sessionStorage` (`studioAgentTestingDumps`) on FAIL sitrep or PO alarm/cursor only — never every step (noise/hang). Track: [PAINPOINTS.md](../product/PAINPOINTS.md).
+**Mid-flight QA shell (2026-07-20 · PP-10):** code under `src/app/shell/agent-testing/`. Readable coalesced steps (beat/touchpoint/action), ok/amber/red rows, elapsed timer, control-panel sitrep, Alarm + Cursor + Scroll + Dump CTAs, script timeline strip, console `AGENT TEST START/END` separators. **Dump policy:** last-N JSON in `sessionStorage` (`studioAgentTestingDumps`) on FAIL sitrep or PO alarm/cursor/scroll only — never every step (noise/hang). Track: [PAINPOINTS.md](../product/PAINPOINTS.md).
 
 ### Lifecycle (must not stick)
 

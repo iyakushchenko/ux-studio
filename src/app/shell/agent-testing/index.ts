@@ -24,6 +24,7 @@ export {
   logAgentTestingHelper,
   ringAgentTestingAlarm,
   flagAgentTestingCursorWeird,
+  flagAgentTestingScrollIssue,
   setAgentTestingTimeline,
   markAgentTestingTimeline,
   isAgentTestingOverlayDomPresent,

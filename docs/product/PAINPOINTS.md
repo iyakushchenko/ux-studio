@@ -49,6 +49,7 @@ Lean ship (this stream). Residuals stay OPEN until proven on `:5173`.
 | 4 | Control-panel sitrep | Mode / CJM / experience / screen / beat counter in panel | COMPLETE (MVP) |
 | 5 | Alarm bell CTA | PO rings → log event + optional dump hook | COMPLETE (MVP) |
 | 6 | Cursor weird flag | Clickable flag + auto-log known parks/issues → `__studioPlaybackDiag` error code | COMPLETE (MVP) |
+| 6b | Scroll issue flag | Clickable **Scroll** CTA → amber `SCROLL_ISSUE_REPORTED` + host/`scrollTop` + dump; optional auto scrollIntoView/path-deviation | COMPLETE (MVP) |
 | 7 | Script timeline strip | Touchpoint keys; white/amber/red after step | COMPLETE (MVP) |
 | 8 | Console separators | Clear START/END per test sequence | COMPLETE (MVP) |
 | 9 | Console dump auto-save | Opt-in / last-N to `sessionStorage` + downloadable JSON on FAIL or alarm — **not** every step | COMPLETE (MVP) |
@@ -57,7 +58,7 @@ Lean ship (this stream). Residuals stay OPEN until proven on `:5173`.
 
 ### Dump policy (Arch — locked for MVP)
 
-- **When:** FAIL sitrep (`stop({ result: "fail" })`) or PO **Alarm** / **Cursor weird** (explicit).
+- **When:** FAIL sitrep (`stop({ result: "fail" })`) or PO **Alarm** / **Cursor weird** / **Scroll** (explicit).
 - **What:** last-N (default 5) JSON blobs in `sessionStorage` (`studioAgentTestingDumps`) + downloadable via overlay / `__studioDownloadAgentTestingDump`.
 - **Why not every step:** noisy, hangs the tab, floods storage; mid-flight UI already shows steps. Diag-first ≠ spam-first.
 - **Rejected overkill:** no heavy APM (Sentry/Datadog/full session replay). Prefer Motion (existing) + PLAYBACK_DIAG + this shell. Tiny util only if ROI is obvious.

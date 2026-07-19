@@ -104,7 +104,7 @@ Filter DevTools console: `[PLAYBACK_DIAG]`.
 | `__studioDownloadAgentTestingDump` | Last FAIL/alarm dump JSON (sessionStorage last-N — not every step) |
 | `__studioCursorDiagnostics` + scroll reveal | Camera / scroll host |
 
-**Overlay ↔ diag:** PO **Alarm** / **Cursor** flags and auto `CURSOR_UNEXPECTED_DWELL` log point here (`[AGENT_TESTING] cursor issue detected` + dump). Filter console: `[PLAYBACK_DIAG]` + `[AGENT_TESTING]`. Painpoints: [PAINPOINTS.md](../product/PAINPOINTS.md) PP-10.
+**Overlay ↔ diag:** PO **Alarm** / **Cursor** / **Scroll** flags and auto `CURSOR_UNEXPECTED_DWELL` / optional scrollIntoView·path-deviation soft-fails log here (`[AGENT_TESTING] … issue detected` + dump). Scroll CTA code: `SCROLL_ISSUE_REPORTED` (+ host/`scrollTop` snapshot via `playbackDiagScroll`). Filter console: `[PLAYBACK_DIAG]` + `[AGENT_TESTING]`. Painpoints: [PAINPOINTS.md](../product/PAINPOINTS.md) PP-10.
 
 **Note:** `__protoTriggerTransport` requires an active MCP session (`__protoRun*` / recording). UI Step buttons always work; for console step use a smoke runner or click the nav button. Helper arm coalesces identical transport rows on the overlay (no monotonous spam).
 

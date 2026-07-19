@@ -10,7 +10,12 @@ import { getControlPanelLogEntries } from "@/app/shell/controlPanelLog";
 export const AGENT_TESTING_DUMP_KEY = "studioAgentTestingDumps";
 export const AGENT_TESTING_DUMP_MAX = 5;
 
-export type AgentTestingDumpReason = "fail" | "alarm" | "cursor" | "manual";
+export type AgentTestingDumpReason =
+  | "fail"
+  | "alarm"
+  | "cursor"
+  | "scroll"
+  | "manual";
 
 export type AgentTestingDump = {
   atIso: string;

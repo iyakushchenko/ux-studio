@@ -28,9 +28,12 @@ import {
   stripEphemeralStudioQuery,
 } from "@/app/shell/studioUrl";
 import { removeDemoCursor } from "@/app/scenario/demoCursor";
+import { getPrototypeScrollRoot } from "@/app/scenario/playbackScroll";
 import { getControlPanelSnapshot } from "@/app/shell/controlPanelLog";
 import { getCursorDiagnosticState } from "@/app/shell/playbackCursorDiagnostic";
 import { getMcpTestSession } from "@/app/shell/mcpTestGuard";
+import { getPlaybackDiagBundle, playbackDiagScroll } from "@/app/shell/playbackDiag";
+import { getRecentDiagnosticFlashes } from "@/app/shell/playbackDiagnosticFlash";
 import {
   buildLogEntryFromPlain,
   buildLogEntryFromStep,
@@ -117,6 +120,8 @@ type OverlayApi = {
   logHelper: (suffix: string) => void;
   ringAlarm: (note?: string) => void;
   flagCursorWeird: (note?: string) => void;
+  /** PO mid-flight scroll problem report (amber + dump + PLAYBACK_DIAG). */
+  flagScrollIssue: (note?: string) => void;
   setTimeline: (keys: string[]) => void;
   markTimeline: (key: string, outcome: AgentTestingStepOutcome) => void;
   downloadDump: () => boolean;
@@ -152,6 +157,8 @@ let settleResetToHub = false;
 let settleResult: AgentTestingOverlayResult = "neutral";
 let timelineKeys: AgentTestingTimelineKey[] = [];
 let lastUnexpectedDwellCount = 0;
+/** Latch auto scroll soft-fails so we do not spam amber rows. */
+let lastAutoScrollFlagKey = "";
 let lastSitrepLine = "";
 
 /**
@@ -272,6 +279,7 @@ function armElapsedTimer(): void {
     setElapsedLabel(formatElapsed(Date.now() - sessionStartedAt));
     refreshSitrepDom();
     maybeAutoFlagCursorIssue();
+    maybeAutoFlagScrollIssue();
   };
   tick();
   elapsedTimer = setInterval(tick, ELAPSED_TICK_MS);
@@ -333,7 +341,49 @@ export function markAgentTestingTimeline(
   renderTimeline();
 }
 
-function saveDump(reason: "fail" | "alarm" | "cursor" | "manual"): void {
+function describeScrollHostForOverlay(scrollEl: HTMLElement): string {
+  const id = scrollEl.id ? `#${scrollEl.id}` : "";
+  const cls = scrollEl.className
+    ? `.${String(scrollEl.className).trim().split(/\s+/).slice(0, 2).join(".")}`
+    : "";
+  return `${scrollEl.tagName.toLowerCase()}${id}${cls}`;
+}
+
+function readScrollSnapshot(): {
+  host: string | null;
+  scrollTop: number | null;
+  scrollHeight: number | null;
+  clientHeight: number | null;
+} {
+  try {
+    const host = getPrototypeScrollRoot();
+    if (!host) {
+      return {
+        host: null,
+        scrollTop: null,
+        scrollHeight: null,
+        clientHeight: null,
+      };
+    }
+    return {
+      host: describeScrollHostForOverlay(host),
+      scrollTop: host.scrollTop,
+      scrollHeight: host.scrollHeight,
+      clientHeight: host.clientHeight,
+    };
+  } catch {
+    return {
+      host: null,
+      scrollTop: null,
+      scrollHeight: null,
+      clientHeight: null,
+    };
+  }
+}
+
+function saveDump(
+  reason: "fail" | "alarm" | "cursor" | "scroll" | "manual"
+): void {
   try {
     const dump = buildAgentTestingDump({
       reason,
@@ -396,6 +446,52 @@ export function flagAgentTestingCursorWeird(note?: string): void {
   saveDump("cursor");
 }
 
+export function flagAgentTestingScrollIssue(note?: string): void {
+  const detail = note?.trim() ? ` — ${note.trim()}` : "";
+  const snap = readScrollSnapshot();
+  const snapLabel =
+    snap.host != null
+      ? ` · host=${snap.host} scrollTop=${snap.scrollTop ?? "?"}`
+      : " · host=none";
+  pushLogEntry(
+    buildLogEntryFromStep({
+      kind: "scroll",
+      outcome: "soft-fail",
+      label: `scroll issue detected · SCROLL_ISSUE_REPORTED${detail}${snapLabel} · see __studioPlaybackDiag`,
+    })
+  );
+  try {
+    playbackDiagScroll({
+      detail: `SCROLL_ISSUE_REPORTED${detail}`,
+      host: snap.host,
+      beforeTop: snap.scrollTop,
+      afterTop: snap.scrollTop,
+      intoViewRequested: false,
+      intoViewDone: false,
+    });
+  } catch {
+    /* hang-safe */
+  }
+  try {
+    console.warn(
+      "[AGENT_TESTING] scroll issue detected",
+      "SCROLL_ISSUE_REPORTED",
+      "→ window.__studioPlaybackDiag()",
+      snap,
+      note ?? ""
+    );
+    console.warn("[PLAYBACK_DIAG]", "scroll", {
+      code: "SCROLL_ISSUE_REPORTED",
+      host: snap.host,
+      scrollTop: snap.scrollTop,
+      note: note ?? "",
+    });
+  } catch {
+    /* ignore */
+  }
+  saveDump("scroll");
+}
+
 function maybeAutoFlagCursorIssue(): void {
   if (!active || settling) return;
   try {
@@ -421,6 +517,88 @@ function maybeAutoFlagCursorIssue(): void {
       } catch {
         /* ignore */
       }
+    }
+  } catch {
+    /* hang-safe */
+  }
+}
+
+/** Optional: amber-log known scrollIntoView / path-deviation diags (manual Scroll still required). */
+function maybeAutoFlagScrollIssue(): void {
+  if (!active || settling) return;
+  try {
+    const flashes = getRecentDiagnosticFlashes(6);
+    for (let i = flashes.length - 1; i >= 0; i--) {
+      const flash = flashes[i];
+      const hay = `${flash.kind ?? ""} ${flash.failureStep ?? ""} ${flash.message}`;
+      if (
+        !/scroll-anomaly|scroll-path-deviation|scrollIntoView/i.test(hay)
+      ) {
+        continue;
+      }
+      const key = `flash:${flash.id}:${flash.failureStep ?? flash.kind ?? "scroll"}`;
+      if (key === lastAutoScrollFlagKey) return;
+      lastAutoScrollFlagKey = key;
+      const code = /path-deviation/i.test(hay)
+        ? "SCROLL_PATH_DEVIATION"
+        : /scrollIntoView/i.test(hay)
+          ? "SCROLL_INTO_VIEW_FAIL"
+          : "SCROLL_ANOMALY";
+      const snap = readScrollSnapshot();
+      pushLogEntry(
+        buildLogEntryFromStep({
+          kind: "scroll",
+          outcome: "soft-fail",
+          label: `scroll issue detected · ${code} · see __studioPlaybackDiag`,
+          beatId: flash.beatId,
+        })
+      );
+      try {
+        console.warn(
+          "[AGENT_TESTING] scroll issue detected",
+          code,
+          snap,
+          flash.message
+        );
+      } catch {
+        /* ignore */
+      }
+      return;
+    }
+
+    const bundle = getPlaybackDiagBundle();
+    const scrolls = bundle.events.filter((e) => e.kind === "scroll");
+    for (let i = scrolls.length - 1; i >= 0; i--) {
+      const ev = scrolls[i];
+      const detail = ev.detail ?? "";
+      const skipped =
+        /scrollIntoView skipped/i.test(detail) ||
+        (ev.scroll?.intoViewRequested === true &&
+          ev.scroll?.intoViewDone === false &&
+          /skipped|fail|no host/i.test(detail));
+      if (!skipped) continue;
+      const key = `diag:${ev.t}:${detail}`;
+      if (key === lastAutoScrollFlagKey) return;
+      lastAutoScrollFlagKey = key;
+      pushLogEntry(
+        buildLogEntryFromStep({
+          kind: "scroll",
+          outcome: "soft-fail",
+          label:
+            "scroll issue detected · SCROLL_INTO_VIEW_FAIL · see __studioPlaybackDiag",
+          beatId: ev.beatId ?? undefined,
+        })
+      );
+      try {
+        console.warn(
+          "[AGENT_TESTING] scroll issue detected",
+          "SCROLL_INTO_VIEW_FAIL",
+          detail
+        );
+      } catch {
+        /* ignore */
+      }
+      return;
     }
   } catch {
     /* hang-safe */
@@ -644,6 +822,7 @@ function ensureRoot(): HTMLElement | null {
       <div class="studio-agent-testing-overlay__actions">
         <button type="button" class="studio-agent-testing-overlay__alarm" title="Ring alarm — something looks wrong">Alarm</button>
         <button type="button" class="studio-agent-testing-overlay__cursor-flag" title="Flag cursor weird">Cursor</button>
+        <button type="button" class="studio-agent-testing-overlay__scroll-flag" title="Flag scroll problem">Scroll</button>
         <button type="button" class="studio-agent-testing-overlay__dump" title="Download last FAIL/alarm dump JSON">Dump</button>
       </div>
       <ol class="studio-agent-testing-overlay__log"></ol>
@@ -666,6 +845,13 @@ function ensureRoot(): HTMLElement | null {
     )
     ?.addEventListener("click", () => {
       flagAgentTestingCursorWeird();
+    });
+  root
+    .querySelector<HTMLButtonElement>(
+      ".studio-agent-testing-overlay__scroll-flag"
+    )
+    ?.addEventListener("click", () => {
+      flagAgentTestingScrollIssue();
     });
   root
     .querySelector<HTMLButtonElement>(".studio-agent-testing-overlay__dump")
@@ -983,6 +1169,7 @@ export function startAgentTestingOverlay(title?: string): void {
     logEntries = [];
     timelineKeys = [];
     lastUnexpectedDwellCount = 0;
+    lastAutoScrollFlagKey = "";
     sessionStartedAt = Date.now();
     lastStepAt = sessionStartedAt;
     renderTimeline();
@@ -1301,6 +1488,7 @@ export function installAgentTestingOverlayApi(): void {
     logHelper: logAgentTestingHelper,
     ringAlarm: ringAgentTestingAlarm,
     flagCursorWeird: flagAgentTestingCursorWeird,
+    flagScrollIssue: flagAgentTestingScrollIssue,
     setTimeline: setAgentTestingTimeline,
     markTimeline: markAgentTestingTimeline,
     downloadDump: () => downloadAgentTestingDump(),

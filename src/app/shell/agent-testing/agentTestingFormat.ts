@@ -45,19 +45,27 @@ export function inferOutcomeFromText(text: string): AgentTestingStepOutcome {
     /\bfail\b/.test(t) ||
     /\berror\b/.test(t) ||
     /\bhard fail\b/.test(t) ||
-    t.includes("cursor issue detected")
+    t.includes("cursor issue detected") ||
+    t.includes("scroll issue detected")
   ) {
     if (t.includes("soft-fail") || t.includes("unexpected") || t.includes("warn")) {
       return "soft-fail";
     }
-    if (t.includes("cursor issue") || t.includes("soft")) return "soft-fail";
+    if (
+      t.includes("cursor issue") ||
+      t.includes("scroll issue") ||
+      t.includes("soft")
+    ) {
+      return "soft-fail";
+    }
     return "fail";
   }
   if (
     t.includes("soft-fail") ||
     t.includes("unexpected") ||
     t.includes("warn") ||
-    t.includes("stale")
+    t.includes("stale") ||
+    t.includes("scroll_issue")
   ) {
     return "soft-fail";
   }

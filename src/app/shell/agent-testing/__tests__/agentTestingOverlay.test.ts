@@ -6,6 +6,7 @@ vi.mock("@/app/scenario/demoCursor", () => ({
 
 import {
   DEFAULT_SETTLE_MS,
+  flagAgentTestingScrollIssue,
   forceClearAgentTestingOverlay,
   formatPreArmHint,
   formatSitrepHint,
@@ -27,6 +28,20 @@ describe("agentTestingOverlay", () => {
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
     vi.useRealTimers();
+  });
+
+  it("flagScrollIssue soft-fails with SCROLL_ISSUE_REPORTED when active", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    startAgentTestingOverlay("scroll-flag");
+    expect(() => flagAgentTestingScrollIssue("mid-flight")).not.toThrow();
+    expect(
+      warn.mock.calls.some(
+        (c) =>
+          String(c[0]).includes("[AGENT_TESTING]") &&
+          String(c[1]).includes("SCROLL_ISSUE_REPORTED")
+      )
+    ).toBe(true);
+    stopAgentTestingOverlay({ force: true });
   });
 
   it("strips garbled helper names from titles", () => {

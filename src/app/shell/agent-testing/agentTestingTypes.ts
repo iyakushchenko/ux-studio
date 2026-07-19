@@ -11,6 +11,7 @@ export type AgentTestingLogKind =
   | "helper"
   | "alarm"
   | "cursor"
+  | "scroll"
   | "sequence";
 
 export type AgentTestingLogEntry = {

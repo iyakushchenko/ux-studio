@@ -235,6 +235,7 @@
 
 .studio-agent-testing-overlay__alarm,
 .studio-agent-testing-overlay__cursor-flag,
+.studio-agent-testing-overlay__scroll-flag,
 .studio-agent-testing-overlay__dump {
   margin: 0;
   padding: 3px 8px;
@@ -250,6 +251,7 @@
 
 .studio-agent-testing-overlay__alarm:hover,
 .studio-agent-testing-overlay__cursor-flag:hover,
+.studio-agent-testing-overlay__scroll-flag:hover,
 .studio-agent-testing-overlay__dump:hover {
   color: #fff;
   border-color: rgba(255, 255, 255, 0.45);
@@ -263,6 +265,11 @@
 .studio-agent-testing-overlay__cursor-flag {
   border-color: rgba(255, 138, 138, 0.45);
   color: #ffb3b3;
+}
+
+.studio-agent-testing-overlay__scroll-flag {
+  border-color: rgba(120, 190, 255, 0.5);
+  color: #a8d4ff;
 }
 
 .studio-agent-testing-overlay__log {
@@ -330,7 +337,8 @@
   color: #ff8a8a;
 }
 
-.studio-agent-testing-overlay__log li[data-kind="alarm"] {
+.studio-agent-testing-overlay__log li[data-kind="alarm"],
+.studio-agent-testing-overlay__log li[data-kind="scroll"] {
   font-weight: 700;
 }
 

@@ -24,7 +24,7 @@ A screen is **DONE** only when **all** are true:
 
 ## NOW
 
-0. [x] **Agent testing mid-flight QA shell (PP-10)** — `src/app/shell/agent-testing/`; R11 `:5173` mid-flight prove PASS 2026-07-20 (colors/names/timer/sitrep/alarm/cursor/timeline/START-END/dumps). Track: [PAINPOINTS.md](./PAINPOINTS.md).
+0. [x] **Agent testing mid-flight QA shell (PP-10)** — `src/app/shell/agent-testing/`; R11 `:5173` mid-flight prove PASS 2026-07-20 (colors/names/timer/sitrep/alarm/cursor/scroll/timeline/START-END/dumps). Track: [PAINPOINTS.md](./PAINPOINTS.md).
 0b. [ ] **Playback reliability / diag-first (PP-01…PP-08)** — keep PLAYBACK_DIAG + control-panel honesty; see painpoints board.
 1. [x] **PLP React migration** — DONE by erase-Make definition. Brief: [PLP_REACT.md](../projects/boots-pharmacy/features/PLP_REACT.md) · audit [FE_AUDIT_PLP_2026-07-19.md](../projects/boots-pharmacy/audits/FE_AUDIT_PLP_2026-07-19.md).
 2. [x] **PLP Make parity restore** — register [PLP_MAKE_PARITY_REGISTER.md](../projects/boots-pharmacy/features/PLP_MAKE_PARITY_REGISTER.md); P0 gaps fixed (bg fill, hero shadow, listing wrapper, preloader, filter chips); audit PROVEN; patch `0.0.5`.

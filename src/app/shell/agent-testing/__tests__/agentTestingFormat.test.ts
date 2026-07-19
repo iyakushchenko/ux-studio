@@ -31,6 +31,9 @@ describe("agentTestingFormat", () => {
     expect(inferOutcomeFromText("FAIL  click")).toBe("fail");
     expect(inferOutcomeFromText("soft-fail unexpected dwell")).toBe("soft-fail");
     expect(inferOutcomeFromText("cursor issue detected")).toBe("soft-fail");
+    expect(inferOutcomeFromText("scroll issue detected · SCROLL_ISSUE_REPORTED")).toBe(
+      "soft-fail"
+    );
   });
 
   it("coalesces identical helper spam", () => {
