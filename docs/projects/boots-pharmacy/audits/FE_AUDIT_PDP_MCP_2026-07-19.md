@@ -14,12 +14,12 @@
 | Field | Value |
 |-------|-------|
 | **Quinn MCP matrix** | **PASS** (re-prove on `cbbd97d` / v0.0.24) |
-| **PROVEN / PAGE FINAL PASS HARD-GREEN?** | **No** — Uma §0a fidelity still **IN PROGRESS** / **NOT PASS**; `pdp` not stamped in `PAGE_FINAL_PASS.json` / `PARITY_PROVEN.json` |
+| **PROVEN / PAGE FINAL PASS HARD-GREEN?** | **No** — Uma §0a now **PASS** but overall fidelity still **IN PROGRESS** / **not PROVEN** (P2 share + B1 accordion); `pdp` not stamped in `PAGE_FINAL_PASS.json` / `PARITY_PROVEN.json` |
 | **PO green-light?** | **No** until Uma PROVEN + Final Pass gates |
 
 **Team check line:** `Quinn MCP — pdp — PASS` (interaction matrix only; tip `cbbd97d`)
 
-**Knowledge used:** QUINN_PDP_PROBE_CRITERIA · RECORDING.md (overlay + scroll-into-view + overlay-eyes) · PAGE_FINAL_PASS.md (refuse HARD-GREEN without Uma §0a) · UMA_FIDELITY_PDP (§0b rhythm measured; §0a NOT PASS) · playbackScroll `isDemoTargetInPrototypeView` full-rect rule
+**Knowledge used:** QUINN_PDP_PROBE_CRITERIA · RECORDING.md (overlay + scroll-into-view + overlay-eyes) · PAGE_FINAL_PASS.md (refuse HARD-GREEN without Uma PROVEN) · UMA_FIDELITY_PDP (§0a PASS + §0b PASS; not PROVEN) · playbackScroll `isDemoTargetInPrototypeView` full-rect rule
 
 ---
 
@@ -71,8 +71,8 @@ Earlier tip `eaf9aa3` / v0.0.22 also matrix **PASS**; compact below-fold stamp f
 | Gate | Status |
 |------|--------|
 | Quinn MCP interaction matrix | **PASS** (this re-prove · `cbbd97d`) |
-| Uma fidelity §0a / PROVEN | **IN PROGRESS / NOT PASS** — [UMA_FIDELITY_PDP_2026-07-19.md](./UMA_FIDELITY_PDP_2026-07-19.md) |
-| `PAGE_FINAL_PASS.json` `pdp` + `mcpFinalPass` HARD-GREEN | **Not stamped** (Uma §0a incomplete) |
+| Uma fidelity §0a / PROVEN | §0a **PASS**; overall **IN PROGRESS / not PROVEN** — [UMA_FIDELITY_PDP_2026-07-19.md](./UMA_FIDELITY_PDP_2026-07-19.md) |
+| `PAGE_FINAL_PASS.json` `pdp` + `mcpFinalPass` HARD-GREEN | **Not stamped** (Uma PROVEN incomplete — residuals) |
 | `PARITY_PROVEN.json` `pdp` | **Not required / not stamped** |
 | `check:page-final-pass` for Home unblock | **Blocked** until above |
 
