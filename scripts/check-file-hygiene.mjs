@@ -33,7 +33,7 @@ const ALLOWLIST = {
   "src/app/orchestra/useJourneyPlayback.ts": 1800, // CJM orchestrator; extract advance/retreat next
   "src/app/App.tsx": 1800, // control-room root; recording bridge extracted to useRecordingReplayBridge
   "src/app/nav/studioNavPanel.css": 1600, // PANEL chrome + version chip; keep one stylesheet
-  "src/app/shell/studioMcpHelpers.ts": 1280, // MCP surface + Auto-Rule teardown API install; split by verb when growing
+  "src/app/shell/studioMcpHelpers.ts": 1350, // MCP surface + R15 PO poll in step/play; extract stepForwardSmoke when next growth
   "src/app/scenario/demoCursor.ts": 1500, // demo cursor + R10 + PLAYBACK_DIAG click evidence; split park/travel next
   "src/projects/boots-pharmacy/wire/BootsPharmacyProjectView.tsx": 4800, // hybrid Make wire; shrink by screen migrate
   "src/projects/boots-pharmacy/data/plpListing.ts": 2000, // Make PLP DOM; retire with PLP React

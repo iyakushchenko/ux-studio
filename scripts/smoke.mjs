@@ -14,6 +14,10 @@
  * 8. evaluate_script → await window.__protoRunTraditionalStepForwardSmoke?.()
  * 9. evaluate_script → await window.__protoRunTraditionalRetreatSmoke?.()
  *
+ * PO mid-flight (R15): step-forward + Play smokes poll __studioConsumePoSignal
+ * each beat. Alarm → fail with reason po-alarm:* + poSignal.diagSnapshot.
+ * Soft Alarm: { softFailPoAlarm: true }. See docs/shell/PLAYBACK_DIAG.md.
+ *
  * Or: npm run smoke (Playwright headless, needs dev server)
  */
 
@@ -30,4 +34,10 @@ Traditional CJM (MCP):
   await window.__protoRunTraditionalPlaySmoke?.()
   await window.__protoRunTraditionalStepForwardSmoke?.()
   await window.__protoRunTraditionalRetreatSmoke?.()
+
+PO Alarm mid-smoke (R15 — wired into Play / step-forward):
+  // smokes poll __studioConsumePoSignal each beat; Alarm aborts with poSignal
+  window.__studioAgentTestingOverlay?.touch?.()
+  const run = window.__protoRunAgenticPlaySmoke?.({ timeoutMs: 90_000 })
+  // ring Alarm while on-air → expect pass:false reason po-alarm:*
 `);

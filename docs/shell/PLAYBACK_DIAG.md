@@ -111,13 +111,25 @@ Filter DevTools console: `[PLAYBACK_DIAG]`.
 **Mid-smoke poll (Quinn/Finn — mandatory):**
 
 ```js
-// each beat / step of MCP smoke:
+// each beat / step of MCP smoke (manual agents):
 const sig = window.__studioConsumePoSignal?.() // or peek via __studioAgentTestingTakeover
 if (sig?.type === "alarm") {
   // pause play / investigate progressive disclosure — do NOT keep stepping blind
   console.warn("PO Alarm", sig.code, sig.beat, sig.diagSnapshot)
 }
 ```
+
+**Wired into smoke helpers (R15 — 2026-07-20):** `pollSmokePoSignal` (`src/app/shell/smokePoSignalPoll.ts`) runs **each beat** inside:
+
+| Smoke | Window API |
+|-------|------------|
+| Agentic step-forward | `__protoRunAgenticStepForwardSmoke` |
+| Traditional step-forward | `__protoRunTraditionalStepForwardSmoke` |
+| Agentic Play → start | `__protoRunAgenticPlaySmoke` |
+| Traditional Play → start | `__protoRunTraditionalPlaySmoke` |
+| Home Play (chat handoff) | `__protoRunHomePlaySmoke` |
+
+On `type:'alarm'`: pause Play (toggle transport) → **fail** result with `reason: "po-alarm:ALARM_SEQUENCE_MISMATCH"`, `poSignal` (+ `diagSnapshot`). Cursor/Scroll = soft-fail + `[PLAYBACK_DIAG]` log (matrix continues). Opt-in soft Alarm: `{ softFailPoAlarm: true }`.
 
 **Note:** `__protoTriggerTransport` requires an active MCP session (`__protoRun*` / recording). UI Step buttons always work; for console step use a smoke runner or click the nav button. Helper arm coalesces identical transport rows on the overlay (no monotonous spam).
 
@@ -146,6 +158,17 @@ window.__studioPlaybackDiag?.()
 **Traditional settle (2026-07-19):** After each Step, wait until transport is idle (`!isOnAir && !isPlaying`). Login chains into `book-location-pick` — early Step aborts mid-picker → stray Availability on `book-step2`.
 
 **Play end → CJM start (2026-07-20):** Product Play finish returns to the first journey beat (not hub, not stuck on last). Diag: `play-end` + `journey-reset` + `__studioAssertPlayEndedAtStart({ startBeatId, startScreenId })`. Smokes: `__protoRunTraditionalPlaySmoke` / `__protoRunAgenticPlaySmoke` (harness may still `resetToHub` after assert).
+
+**PO Alarm mid-Play prove (R11 `:5173`):**
+
+```js
+window.__studioAgentTestingOverlay?.touch?.()
+const run = window.__protoRunAgenticPlaySmoke?.({ timeoutMs: 90_000 })
+// after Play is on-air (~2–4s), ring Alarm on the overlay
+document.querySelector(".studio-agent-testing-overlay__alarm")?.click()
+const r = await run
+// expect: r.pass === false && r.reason?.startsWith("po-alarm:") && r.poSignal?.diagSnapshot
+```
 
 PASS criteria:
 

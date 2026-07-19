@@ -78,6 +78,8 @@ import {
   runPlayJourneyToStartSmoke,
   type PlayJourneySmokeResult,
 } from "@/app/shell/playJourneySmoke";
+import type { AgentTestingPoSignal } from "@/app/shell/agent-testing/agentTestingPoSignal";
+import { pollSmokePoSignal } from "@/app/shell/smokePoSignalPoll";
 
 export { directorTransportBusy } from "@/app/shell/stepForwardSmokeSettle";
 
@@ -167,6 +169,8 @@ export type StepForwardSmokeResult = {
   reason?: string;
   steps: StepForwardSmokeStep[];
   finalState?: StudioMcpState;
+  /** Set when PO Alarm aborted (or soft-failed) mid step-forward. */
+  poSignal?: AgentTestingPoSignal | null;
 };
 
 declare global {
@@ -201,19 +205,23 @@ declare global {
     __protoRunAgenticStepForwardSmoke?: (options?: {
       timeoutMs?: number;
       maxSteps?: number;
+      softFailPoAlarm?: boolean;
     }) => Promise<StepForwardSmokeResult>;
     /** Manual step-forward through the full traditional CJM playlist (dev-only). */
     __protoRunTraditionalStepForwardSmoke?: (options?: {
       timeoutMs?: number;
       maxSteps?: number;
+      softFailPoAlarm?: boolean;
     }) => Promise<StepForwardSmokeResult>;
     /** Traditional CJM Play → end → CJM start (async, dev-only). */
     __protoRunTraditionalPlaySmoke?: (options?: {
       timeoutMs?: number;
+      softFailPoAlarm?: boolean;
     }) => Promise<PlayJourneySmokeResult>;
     /** Agentic CJM Play → end → CJM start (async, dev-only). */
     __protoRunAgenticPlaySmoke?: (options?: {
       timeoutMs?: number;
+      softFailPoAlarm?: boolean;
     }) => Promise<PlayJourneySmokeResult>;
     /** Jump-to-end then step-back — traditional book / confirmation / browse baselines. */
     __protoRunTraditionalRetreatSmoke?: (options?: {
@@ -412,22 +420,29 @@ async function dismissDiagnosticsUntilClear(maxMs = 4000): Promise<boolean> {
 
   async function runStepForwardSmokeForMode(
   orchestraMode: OrchestraModeId,
-  smokeOptions?: { timeoutMs?: number; maxSteps?: number }
+  smokeOptions?: {
+    timeoutMs?: number;
+    maxSteps?: number;
+    softFailPoAlarm?: boolean;
+  }
 ): Promise<StepForwardSmokeResult> {
   const timeoutMs = smokeOptions?.timeoutMs ?? 600_000;
   const maxSteps =
     smokeOptions?.maxSteps ?? (orchestraMode === "traditional-cjm" ? 15 : 28);
   const steps: StepForwardSmokeStep[] = [];
   const deadline = Date.now() + timeoutMs;
+  let lastSoftPo: AgentTestingPoSignal | null = null;
 
   const fail = (
     reason: string,
-    state?: StudioMcpState
+    state?: StudioMcpState,
+    poSignal?: AgentTestingPoSignal | null
   ): StepForwardSmokeResult => ({
     pass: false,
     reason,
     steps,
     finalState: state ?? window.__protoStudioState?.(),
+    poSignal: poSignal ?? lastSoftPo,
   });
 
   playbackDiagClear();
@@ -471,9 +486,21 @@ async function dismissDiagnosticsUntilClear(maxMs = 4000): Promise<boolean> {
       return fail(`diagnostic-before-step-${index + 1}`, before);
     }
 
+    // R15 — consume live PO latch each beat (Alarm aborts mid step-forward).
+    const po = pollSmokePoSignal({
+      context: `step-fwd:${orchestraMode}:${index + 1}:${before.beatId ?? "?"}`,
+      softFailAlarm: smokeOptions?.softFailPoAlarm,
+    });
+    if (po.hit) {
+      lastSoftPo = po.signal;
+      if (po.abort) {
+        return fail(po.reason ?? "po-alarm", before, po.signal);
+      }
+    }
+
     const { visible, total: stepTotal } = parseStudioStepCounter(before.counter);
     if (stepTotal > 0 && visible >= stepTotal) {
-      return { pass: true, steps, finalState: before };
+      return { pass: true, steps, finalState: before, poSignal: lastSoftPo };
     }
 
     const beforeFingerprint = stateFingerprint(before);
@@ -514,6 +541,24 @@ async function dismissDiagnosticsUntilClear(maxMs = 4000): Promise<boolean> {
       return fail(`diagnostic-on-step-${index + 1}`, settled);
     }
     const settledAfter = settled ?? after;
+
+    // Poll again after settle — Alarm during director travel.
+    const poAfter = pollSmokePoSignal({
+      context: `step-fwd-after:${orchestraMode}:${index + 1}:${settledAfter.beatId ?? "?"}`,
+      softFailAlarm: smokeOptions?.softFailPoAlarm,
+    });
+    if (poAfter.hit) {
+      lastSoftPo = poAfter.signal;
+      if (poAfter.abort) {
+        steps.push({
+          index: index + 1,
+          before,
+          after: settledAfter,
+          ms: Date.now() - stepStart,
+        });
+        return fail(poAfter.reason ?? "po-alarm", settledAfter, poAfter.signal);
+      }
+    }
 
     steps.push({
       index: index + 1,
@@ -999,6 +1044,22 @@ export function registerStudioMcpHelpers(options: {
         await delay(200);
         continue;
       }
+      // R15 — mid-Play PO Alarm must abort (home-play shares Play poll contract).
+      const po = pollSmokePoSignal({
+        context: `home-play:${state.beatId ?? "?"}`,
+        pausePlay: () => {
+          if (state.isPlaying || state.isOnAir) {
+            window.__protoTriggerTransport?.("play");
+          }
+        },
+      });
+      if (po.hit && po.abort) {
+        return {
+          pass: false,
+          reason: po.reason ?? "po-alarm",
+          state,
+        };
+      }
       if (state.diagnosticOpen) {
         return { pass: false, reason: "playback-diagnostic", state };
       }
@@ -1035,13 +1096,14 @@ export function registerStudioMcpHelpers(options: {
     orchestraMode: OrchestraModeId,
     startBeatId: string,
     startScreenId: string,
-    smokeOptions?: { timeoutMs?: number }
+    smokeOptions?: { timeoutMs?: number; softFailPoAlarm?: boolean }
   ) =>
     runPlayJourneyToStartSmoke({
       orchestraMode,
       startBeatId,
       startScreenId,
       timeoutMs: smokeOptions?.timeoutMs,
+      softFailPoAlarm: smokeOptions?.softFailPoAlarm,
       delay,
       ensureClean: () => {
         window.__protoEnsureCleanStudio?.();

@@ -236,8 +236,9 @@ Deep links stay on that origin, e.g. `http://localhost:5173/?project=boots-pharm
 3. On `type:'alarm'` → pause/branch investigate (progressive disclosure etc.) using `diagSnapshot` — dump is secondary.
 4. Consume clears the latch so the next PO ring is visible.
 
-**CI:** Vitest latch/consume. Prove: R11 `:5173` Alarm click → takeover non-null → consume → null.  
-**Docs:** [PLAYBACK_DIAG.md](../shell/PLAYBACK_DIAG.md) · [RECORDING.md](../shell/RECORDING.md).
+**CI:** Vitest latch/consume + `smokePoSignalPoll`. Prove: R11 `:5173` Alarm click → takeover non-null → consume → null; mid-Play Alarm aborts `__protoRunAgenticPlaySmoke` with `po-alarm:*` + `poSignal.diagSnapshot`.  
+**Smokes that poll each beat:** agentic/traditional step-forward + Play (+ home-play). Helper: `smokePoSignalPoll.ts`.  
+**Docs:** [PLAYBACK_DIAG.md](../shell/PLAYBACK_DIAG.md) · [RECORDING.md](../shell/RECORDING.md) · `scripts/smoke.mjs`.
 
 ---
 

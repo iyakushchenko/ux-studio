@@ -1,6 +1,9 @@
 /**
  * Playwright — agentic CJM manual step-forward through full playlist.
  * Usage: node scripts/step-forward-smoke.mjs
+ *
+ * R15: in-page runner polls __studioConsumePoSignal each beat; PO Alarm
+ * fails the smoke with reason po-alarm:* + poSignal.diagSnapshot.
  */
 
 import { chromium } from "playwright";

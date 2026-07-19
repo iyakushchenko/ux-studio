@@ -5,7 +5,8 @@
 | Script | Command | Purpose |
 |--------|---------|---------|
 | `playwright-smoke.mjs` | `npm run smoke` | Headless smoke: home play + retreat baselines (chat counter, avail June 25) |
-| `smoke.mjs` | `node scripts/smoke.mjs` | Prints MCP helper cheat sheet for DevTools |
+| `smoke.mjs` | `node scripts/smoke.mjs` | Prints MCP helper cheat sheet for DevTools (incl. R15 PO Alarm poll on Play / step-forward) |
+| `step-forward-smoke.mjs` | `node scripts/step-forward-smoke.mjs` | Agentic step-forward matrix (polls `__studioConsumePoSignal` each beat) |
 | `release-notes.mjs` | `npm run notes:*` | Append/list/preview/check `CHANGELOG.md` `## Current` |
 | `release.mjs` | `npm run release:patch` etc. | Local semver bump + CHANGELOG promote (no GitHub Release CI) |
 | `check-release-version-changelog-sync.mjs` | `npm run check:version` | `package.json` ↔ latest `## vX.Y.Z` |

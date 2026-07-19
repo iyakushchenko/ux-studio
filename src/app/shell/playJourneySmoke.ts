@@ -1,8 +1,11 @@
 /**
  * Play → journey end → CJM start smoke (product path; harness may still resetToHub after).
+ *
+ * Polls `__studioConsumePoSignal` each beat (R15). Alarm → pause + fail with diagSnapshot.
  */
 
 import type { OrchestraModeId } from "@/app/orchestra/types";
+import type { AgentTestingPoSignal } from "@/app/shell/agent-testing/agentTestingPoSignal";
 import {
   assertPlaybackPlayEndedAtStart,
   getPlaybackDiagBundle,
@@ -10,6 +13,7 @@ import {
   playbackDiagLog,
   type PlayEndAtStartAssertResult,
 } from "@/app/shell/playbackDiag";
+import { pollSmokePoSignal } from "@/app/shell/smokePoSignalPoll";
 
 export type PlayJourneySmokeState = {
   diagnosticOpen?: boolean;
@@ -27,6 +31,8 @@ export type PlayJourneySmokeResult = {
   assert?: PlayEndAtStartAssertResult;
   peakVisible?: number;
   peakCounter?: string | null;
+  /** Set when PO Alarm aborted (or soft-failed) mid-Play. */
+  poSignal?: AgentTestingPoSignal | null;
 };
 
 function parseVisible(counter: string | null | undefined): {
@@ -49,6 +55,8 @@ export async function runPlayJourneyToStartSmoke(options: {
   startBeatId: string;
   startScreenId: string;
   timeoutMs?: number;
+  /** Alarm soft-fails + logs instead of aborting (default: hard fail). */
+  softFailPoAlarm?: boolean;
   delay: (ms: number) => Promise<void>;
   ensureClean: () => void;
   setOrchestraMode: (mode: OrchestraModeId) => void;
@@ -83,6 +91,7 @@ export async function runPlayJourneyToStartSmoke(options: {
   let peakVisible = 0;
   let peakCounter: string | null = null;
   let peakTotal = 0;
+  let lastSoftPo: AgentTestingPoSignal | null = null;
 
   while (Date.now() < deadline) {
     const state = options.getState();
@@ -103,6 +112,30 @@ export async function runPlayJourneyToStartSmoke(options: {
         }
       ).__protoAgentTestingOverlay;
     overlayApi?.touch?.("AGENT TESTING — play-smoke");
+
+    // R15 — poll live PO latch each beat (Alarm must not be ignored mid-Play).
+    const po = pollSmokePoSignal({
+      context: `play:${options.orchestraMode}:${state.beatId ?? "?"}`,
+      softFailAlarm: options.softFailPoAlarm,
+      pausePlay: () => {
+        if (state.isPlaying || state.isOnAir) {
+          options.triggerTransport("play");
+        }
+      },
+    });
+    if (po.hit) {
+      lastSoftPo = po.signal;
+      if (po.abort) {
+        return {
+          pass: false,
+          reason: po.reason ?? "po-alarm",
+          state,
+          poSignal: po.signal,
+          peakVisible,
+          peakCounter,
+        };
+      }
+    }
 
     if (state.diagnosticOpen) {
       // Known flake: agentic chat eased-scroll path can flash ±40px mid-Play.
@@ -175,6 +208,7 @@ export async function runPlayJourneyToStartSmoke(options: {
         assert,
         peakVisible,
         peakCounter,
+        poSignal: lastSoftPo,
       };
     }
 
@@ -195,5 +229,6 @@ export async function runPlayJourneyToStartSmoke(options: {
     assert,
     peakVisible,
     peakCounter,
+    poSignal: lastSoftPo,
   };
 }
