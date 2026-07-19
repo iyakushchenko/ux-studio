@@ -57,9 +57,9 @@
       "status": "proven",
       "auditPath": "docs/projects/boots-pharmacy/audits/UMA_FIDELITY_PDP_2026-07-19.md",
       "mcpMatrixAt": {
-        "sha": "7bce2b3",
+        "sha": "9f47e24",
         "date": "2026-07-19",
-        "note": "Quinn MCP 23/23 PASS @ tip 7bce2b3 / v0.0.31 hang guards (reload:false, teardown clean, hang residual none); Uma §0a PROVEN @ 76e2433 (docs 331998b). Arch Final Pass HARD-GREEN still pending."
+        "note": "Quinn MCP 23/23 PASS @ tip 7bce2b3 / v0.0.31 hang guards (prove 9f47e24; reload:false, teardown clean, hang residual none); Uma §0a PROVEN @ 76e2433 (docs 331998b). Arch Final Pass HARD-GREEN still pending."
       },
       "requireMcp": true
     }

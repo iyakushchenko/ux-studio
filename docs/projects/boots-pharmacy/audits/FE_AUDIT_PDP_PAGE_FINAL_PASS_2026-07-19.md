@@ -33,7 +33,7 @@
 
 **Session:** Chrome DevTools MCP · `http://127.0.0.1:5193/?project=boots-pharmacy&screen=pdp`  
 **Version chip:** `v0.0.31`  
-**Code tip proved:** `7bce2b3` · Quinn prove: this commit  
+**Code tip proved:** `7bce2b3` · Quinn prove: `9f47e24`  
 **Helper:** `await window.__studioRunMcpPageProbe({ screenId: "pdp", reload: false })`  
 **Result:** `{ pass: true, screenId: "pdp" }` · `failed: []` · **23/23** checks  
 **Overlay:** AGENT TESTING armed (`overlay-arm`) and visible through matrix including below-fold reveal + both overlay-eyes steps  

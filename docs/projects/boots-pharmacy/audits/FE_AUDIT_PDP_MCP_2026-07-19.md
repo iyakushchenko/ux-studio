@@ -4,7 +4,7 @@
 **Date:** 2026-07-19  
 **Auditor:** Quinn (QA) — Chrome DevTools MCP localhost  
 **Ship tip (latest prove):** `7bce2b3` · **v0.0.31** — Chrome hang guards (capped robo hover bridge, cancel travel rAF, Accordion thrash guards)  
-**Probe stamp:** this commit — Full Pass re-prove after Final Pass **NEEDS-REPROVE** (prior tip `76e2433` / v0.0.30)  
+**Probe stamp:** `9f47e24` — Full Pass re-prove after Final Pass **NEEDS-REPROVE** (prior tip `76e2433` / v0.0.30)  
 **Uma §0a:** **PROVEN** @ tip `76e2433` / v0.0.30 (docs tip `331998b`) — still valid; hang-fix tip does not reopen FAQ/Accordion §0a  
 **Prior prove (superseded):** `76e2433` · **v0.0.30** (prove `bacc4d6`)  
 **Policy:** [QUINN_PDP_PROBE_CRITERIA_2026-07-19.md](./QUINN_PDP_PROBE_CRITERIA_2026-07-19.md) · [RECORDING.md](../../../shell/RECORDING.md) · recipe `studioMcpPageProbe.ts`  
