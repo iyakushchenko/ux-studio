@@ -100,9 +100,11 @@ Default push = unit + build (+ cheap contracts). Playwright = `workflow_dispatch
 
 Deploy green ≠ visual proof. Verify `data-studio-react-screen`, deep link, overlay on live host after chrome ships.
 
-### 10. Agent overlay — POLICY (landed + clean slate)
+### 10. Agent overlay — POLICY (landed → mid-flight QA shell)
 
 BR **AGENT TESTING** + invisible click guard; `touch()`; MCP `stop({ reload: true })`; never lightbox / sticky `?proof=`. Post-test default: stay on current screen; `resetToHub: true` only for CJM/journey. Screen ships: `__studioRunMcpPageProbe` + `check:parity-proven`.
+
+**2026-07-20 vision (PP-10):** overlay is a mid-flight QA shell — readable steps (not helper spam), outcome colors, elapsed timer, control-panel sitrep, alarm + cursor flag, script timeline strip, console START/END, last-N dumps on FAIL/alarm only. Code: `src/app/shell/agent-testing/`. Track: [PAINPOINTS.md](./PAINPOINTS.md). Prefer existing Motion + PLAYBACK_DIAG; reject heavy APM.
 
 ### 11. Versioning — HABIT THEN AUTOMATION
 

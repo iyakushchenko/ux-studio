@@ -51,7 +51,7 @@ import {
   stopAgentTestingOverlay,
   touchAgentTestingOverlay,
   uninstallAgentTestingOverlayApi,
-} from "@/app/shell/agentTestingOverlay";
+} from "@/app/shell/agent-testing";
 import { armOverlayOnStudioHelpers } from "@/app/shell/helperOverlayArm";
 import {
   mcpDelay as delay,
@@ -191,6 +191,10 @@ declare global {
     }) => Promise<HomePlaySmokeResult>;
     /** Jump-to-end then step-back — chat counter + avail June 25 baselines. */
     __protoRunRetreatSmoke?: (options?: {
+      timeoutMs?: number;
+    }) => Promise<RetreatSmokeResult>;
+    /** Alias → `__protoRunRetreatSmoke` (agentic CJM retreat). */
+    __protoRunAgenticRetreatSmoke?: (options?: {
       timeoutMs?: number;
     }) => Promise<RetreatSmokeResult>;
     /** Manual step-forward through the full agentic CJM playlist (dev-only). */
@@ -1206,6 +1210,8 @@ export function registerStudioMcpHelpers(options: {
     });
 
   armOverlayOnStudioHelpers();
+  // Re-bind after overlay wrap so alias === retreat smoke (same reference).
+  window.__protoRunAgenticRetreatSmoke = window.__protoRunRetreatSmoke;
 
   return () => {
     uninstallAgentTestingOverlayApi();
@@ -1220,6 +1226,7 @@ export function registerStudioMcpHelpers(options: {
     delete window.__protoTriggerTransport;
     delete window.__protoRunHomePlaySmoke;
     delete window.__protoRunRetreatSmoke;
+    delete window.__protoRunAgenticRetreatSmoke;
     delete window.__protoRunAgenticStepForwardSmoke;
     delete window.__protoRunTraditionalStepForwardSmoke;
     delete window.__protoRunTraditionalPlaySmoke;

@@ -13,6 +13,7 @@
 | Artifact | Path | Why |
 |----------|------|-----|
 | Lessons (append-only) | [LESSONS_LEARNED.md](./LESSONS_LEARNED.md) | Failure classes → gates |
+| **PO painpoints (trackable)** | [PAINPOINTS.md](./PAINPOINTS.md) | Living OPEN→COMPLETE board — do not lose PO sentiments |
 | **Studio Auto-Rules** | [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) | Recurring PO pain → CI/MCP gates (do not re-ask) |
 | Uma fidelity checklist | [UMA_FIDELITY_NOTES.md](./UMA_FIDELITY_NOTES.md) | Make→React Nazi checklist |
 | Parity ratchets | [PARITY_RATCHETS.md](./PARITY_RATCHETS.md) | Programmatic typical-miss contracts |
@@ -42,7 +43,7 @@
 | [PAGE_FINAL_PASS.md](./PAGE_FINAL_PASS.md) | No next migrated page until previous hard-green |
 | [TEAM_RETRO_2026-07-19_PLP.md](./TEAM_RETRO_2026-07-19_PLP.md) | After HARD-GREEN: micro-retro → this index (Reflex) |
 | [LESSONS_LEARNED.md](./LESSONS_LEARNED.md) (latest + surface) | Reject “done” without applied lessons |
-| [NEXT_STEPS.md](./NEXT_STEPS.md) · [PRODUCT_FORECAST.md](./PRODUCT_FORECAST.md) | Board / forecast |
+| [NEXT_STEPS.md](./NEXT_STEPS.md) · [PRODUCT_FORECAST.md](./PRODUCT_FORECAST.md) · [PAINPOINTS.md](./PAINPOINTS.md) | Board / forecast / painpoints |
 | [PARITY_RATCHETS.md](./PARITY_RATCHETS.md) | New typical fail → ratchet same ship |
 
 **Knowledge used tip:** doctrine §0.1 + PAGE_FINAL_PASS sequencing + latest LESSONS for the stream + this Arch section.
@@ -142,6 +143,14 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 - Ben (BE): <gate/version/CI> — applied: <script/check>
 - Pax (PO sim): <accept bar / bump call> — applied: <decision>
 ```
+
+**Knowledge improved** (2026-07-20 · stream: agent-testing mid-flight QA shell · PP-10 COMPLETE · R12):
+- Arch (Director): Locked dump policy (FAIL/alarm last-N only; reject heavy APM); painpoints board; PP-10 COMPLETE after `:5173` prove — applied: PAINPOINTS.md · PRODUCT_FORECAST §10 · NEXT_STEPS NOW 0
+- Bea (BA): Stored full PO sentiment list (playback/diag/CJM/hub/fuchsia/agentic/stale-green/logging/listening/overlay) as trackable COMPLETE rows — applied: PAINPOINTS.md
+- Finn (FE): Relocated shell to `src/app/shell/agent-testing/`; readable coalesced steps + sitrep + timeline + dumps — applied: agent-testing/* · helperOverlayArm · page probe timeline
+- Uma (UI/UX): Outcome colors (ok/amber/red), elapsed, Alarm/Cursor/Dump CTAs, timeline chips — applied: agent-testing-overlay.css
+- Quinn (QA): R11 `:5173` mid-flight prove PASS (coalesce×2, colors, sitrep, timeline, alarm/cursor, console END, dumps); Play engaged no SendGlyph fatal — applied: evaluate_script prove
+- Pax (PO sim): Overlay mid-flight QA shell accepted — PP-10 COMPLETE
 
 **Knowledge improved** (2026-07-19 · stream: CJM playback straighten — type-in + fade + PLAYBACK_DIAG · R12):
 - Arch (Director): R13 `playback-diag` Auto-Rule + PLAYBACK_DIAG contract; no false Chat PROVEN/Final Pass — applied: STUDIO_AUTO_RULES · PLAYBACK_DIAG.md

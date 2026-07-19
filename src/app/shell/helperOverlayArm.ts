@@ -11,9 +11,9 @@
  */
 
 import {
-  logAgentTestingOverlay,
+  logAgentTestingHelper,
   touchAgentTestingOverlay,
-} from "@/app/shell/agentTestingOverlay";
+} from "@/app/shell/agent-testing";
 
 const READ_ONLY_HELPER_SUFFIXES = new Set([
   "AgentTestingOverlay",
@@ -65,10 +65,10 @@ function isReadOnlySuffix(suffix: string): boolean {
 function wrapHelper(suffix: string, fn: (...args: unknown[]) => unknown) {
   if ((fn as { [ARMED_FLAG]?: boolean })[ARMED_FLAG]) return fn;
   const wrapped = (...args: unknown[]) => {
-    // Clean title only — log the helper name in the status list.
+    // Clean title only — structured helper row (coalesces transport spam).
     touchAgentTestingOverlay();
     try {
-      logAgentTestingOverlay(`helper: __studio${suffix}`);
+      logAgentTestingHelper(suffix);
     } catch {
       /* ignore */
     }

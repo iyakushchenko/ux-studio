@@ -26,7 +26,7 @@
 
 /* ── PANEL — engine chrome only (`src/app/nav/`; `src/app/shell/`) ─── */
 @import '../app/nav/studioNavPanel.css';
-@import '../app/shell/agent-testing-overlay.css';
+@import '../app/shell/agent-testing/agent-testing-overlay.css';
 
 /* ── LEGACY — Make quarantine (`globals-*.css`); do not grow for React pages */
 @import './globals.css';

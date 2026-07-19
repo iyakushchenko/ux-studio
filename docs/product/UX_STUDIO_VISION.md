@@ -79,11 +79,15 @@ See [PROJECTS.md](../shell/PROJECTS.md), [PLAYBACK.md](../shell/PLAYBACK.md), [R
 4. ✅ UXDS Larkin linked + variables inventoried (`docs/uxds/`); X-Suite integration intent documented
 5. ✅ Recording UI (save/load files without MCP) — engine
 6. ✅ Thin UXDS CSS token bridge + interaction kits + Boots styleguide (Availability Tool enrichment)
-7. 🔲 Pilot: one Boots **screen** rebuilt React + UXDS
-8. 🔲 Figma → Project scaffold command
-9. 🔲 X-Suite import seam (persona / IA / CJM baseline → Studio journeys)
-9. 🔲 Compiler: recording → journey beat proposals
-10. 🔲 Multi-project / persona packaging for client delivery
+7. ✅ Pilot: Boots screens rebuilt React + UXDS (PLP/PDP hard-green; Home/Chat in flight)
+8. 🔲 **Agent testing mid-flight QA shell** — not a dull helper log; see [PAINPOINTS.md](./PAINPOINTS.md) PP-10
+9. 🔲 **Playback reliability + diag-first** — PLAYBACK_DIAG / CJM micro-fails / hub≠journey-start (PP-01…PP-08)
+10. 🔲 Figma → Project scaffold command
+11. 🔲 X-Suite import seam (persona / IA / CJM baseline → Studio journeys)
+12. 🔲 Compiler: recording → journey beat proposals
+13. 🔲 Multi-project / persona packaging for client delivery
+
+**PO painpoints (trackable COMPLETE):** [PAINPOINTS.md](./PAINPOINTS.md) — playback reliability, diag-first, CJM micro-fails, hub vs journey-start, fuchsia/step2/retreat scroll, agentic full chat, control-panel stale green, insufficient logging, team listening, agent-testing overlay vision.
 
 ---
 

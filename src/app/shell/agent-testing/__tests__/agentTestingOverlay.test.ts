@@ -19,7 +19,7 @@ import {
   stopAgentTestingOverlay,
   touchAgentTestingOverlay,
   uninstallAgentTestingOverlayApi,
-} from "@/app/shell/agentTestingOverlay";
+} from "@/app/shell/agent-testing";
 
 describe("agentTestingOverlay", () => {
   afterEach(() => {

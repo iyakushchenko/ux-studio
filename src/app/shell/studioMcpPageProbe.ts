@@ -25,12 +25,15 @@ import {
   forceClearAgentTestingOverlay,
   isAgentTestingOverlayDomVisible,
   logAgentTestingOverlay,
+  logAgentTestingStep,
+  markAgentTestingTimeline,
   preArmAgentTestingOverlay,
   scheduleAgentTestingOverlayEnsureClear,
+  setAgentTestingTimeline,
   startAgentTestingOverlay,
   stopAgentTestingOverlay,
   touchAgentTestingOverlay,
-} from "@/app/shell/agentTestingOverlay";
+} from "@/app/shell/agent-testing";
 import { logControlPanel } from "@/app/shell/controlPanelLog";
 import {
   beginMcpTestSession,
@@ -184,7 +187,14 @@ function delay(ms: number): Promise<void> {
 function logStep(id: string, pass: boolean, detail?: string): void {
   const tag = pass ? "PASS" : "FAIL";
   const line = detail ? `${tag}  ${id} — ${detail}` : `${tag}  ${id}`;
-  logAgentTestingOverlay(line);
+  logAgentTestingStep({
+    kind: "step",
+    label: line,
+    action: id,
+    touchpointKey: id,
+    outcome: pass ? "ok" : "fail",
+  });
+  markAgentTestingTimeline(id, pass ? "ok" : "fail");
 }
 
 /** HARD FAIL — overlay must stay painted for the whole probe. */
@@ -1339,6 +1349,13 @@ export async function runMcpPageProbe(
         url: typeof window !== "undefined" ? window.location.href : undefined,
       };
     }
+
+    setAgentTestingTimeline([
+      "overlay-arm",
+      ...steps.map((s) => s.id),
+      "url-screen",
+    ]);
+    markAgentTestingTimeline("overlay-arm", "ok");
 
     for (const step of steps) {
       const result = await runProbeStep(step);

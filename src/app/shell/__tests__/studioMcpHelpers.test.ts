@@ -184,6 +184,7 @@ describe("studioMcpHelpers", () => {
     expect(typeof win.__studioCursorDiagnostics).toBe("function");
     expect(typeof win.__protoRunHomePlaySmoke).toBe("function");
     expect(typeof win.__protoRunRetreatSmoke).toBe("function");
+    expect(win.__protoRunAgenticRetreatSmoke).toBe(win.__protoRunRetreatSmoke);
     expect(typeof win.__protoRunAgenticStepForwardSmoke).toBe("function");
     expect(typeof win.__protoRunTraditionalStepForwardSmoke).toBe("function");
     expect(typeof win.__protoRunTraditionalPlaySmoke).toBe("function");

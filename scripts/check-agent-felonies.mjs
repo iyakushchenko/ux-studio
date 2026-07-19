@@ -639,17 +639,29 @@ if (!fs.existsSync(wirePath)) {
     }
   }
 
-  const overlayPath = path.join(
+  const overlayCompatPath = path.join(
     ROOT,
     "src",
     "app",
     "shell",
     "agentTestingOverlay.ts"
   );
-  if (!fs.existsSync(overlayPath)) {
-    fail("FELONY agent-teardown-clean: missing agentTestingOverlay.ts");
+  const overlayImplPath = path.join(
+    ROOT,
+    "src",
+    "app",
+    "shell",
+    "agent-testing",
+    "agentTestingOverlay.ts"
+  );
+  if (!fs.existsSync(overlayCompatPath) && !fs.existsSync(overlayImplPath)) {
+    fail(
+      "FELONY agent-teardown-clean: missing agent-testing/agentTestingOverlay.ts (or compat re-export)"
+    );
   } else {
-    const overlaySrc = fs.readFileSync(overlayPath, "utf8");
+    const overlaySrc = fs.existsSync(overlayImplPath)
+      ? fs.readFileSync(overlayImplPath, "utf8")
+      : fs.readFileSync(overlayCompatPath, "utf8");
     if (!/resetStudioAfterAgentTest|safeResetStudio/.test(overlaySrc)) {
       fail(
         `FELONY ${RULE_ID}: forceClear/stop path must call resetStudioAfterAgentTest`

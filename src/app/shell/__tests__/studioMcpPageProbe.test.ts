@@ -14,7 +14,7 @@ vi.mock("@/app/scenario/demoCursor", () => ({
     simulateDemoPointerHover(...args),
 }));
 
-vi.mock("@/app/shell/agentTestingOverlay", () => ({
+vi.mock("@/app/shell/agent-testing", () => ({
   DEFAULT_PREARM_MS: 0,
   DEFAULT_SETTLE_MS: 9000,
   startAgentTestingOverlay: vi.fn(),
@@ -23,6 +23,9 @@ vi.mock("@/app/shell/agentTestingOverlay", () => ({
   scheduleAgentTestingOverlayEnsureClear: vi.fn(),
   preArmAgentTestingOverlay: vi.fn(async () => {}),
   logAgentTestingOverlay: vi.fn(),
+  logAgentTestingStep: vi.fn(),
+  markAgentTestingTimeline: vi.fn(),
+  setAgentTestingTimeline: vi.fn(),
   touchAgentTestingOverlay: vi.fn(),
   ensureAgentTestingOverlayDomArmed: vi.fn(() => true),
   isAgentTestingOverlayDomVisible: vi.fn(() => true),

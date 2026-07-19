@@ -68,6 +68,17 @@ export function registerControlPanelSnapshotProvider(
   snapshotProvider = provider;
 }
 
+/** Latest control-panel snapshot (for agent-testing sitrep). */
+export type ControlPanelSnapshot = PlaybackStudioSnapshot & Record<string, unknown>;
+
+export function getControlPanelSnapshot(): ControlPanelSnapshot | null {
+  try {
+    return snapshotProvider?.() ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export type ControlPanelLogDetail = Record<string, unknown> & {
   blocked?: boolean;
   blockReason?: string;
@@ -125,9 +136,14 @@ export function logControlPanel(
   return entry;
 }
 
+/** In-memory ring copy (no console). Used by agent-testing FAIL/alarm dumps. */
+export function getControlPanelLogEntries(): ControlPanelLogEntry[] {
+  return [...ring];
+}
+
 /** Print recent control-panel interactions — also on `window.dumpProtoControlPanelLog()`. */
 export function dumpControlPanelLog(): ControlPanelLogEntry[] {
-  const copy = [...ring];
+  const copy = getControlPanelLogEntries();
   console.group(`${CONTROL_PANEL_LOG_PREFIX} dump (${copy.length} entries)`);
   console.table(
     copy.map((entry) => ({

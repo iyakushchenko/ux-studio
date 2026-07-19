@@ -80,6 +80,12 @@ export const STUDIO_AUTO_RULES: readonly StudioAutoRule[] = [
     ciGate: "vitest",
     mcpAssert: "__studioAssertTypeIn",
   },
+  {
+    id: "agent-testing-midflight",
+    title:
+      "AGENT TESTING mid-flight QA shell (readable steps/colors/timer/sitrep/alarm/timeline/dumps) — not helper spam",
+    ciGate: "vitest",
+  },
 ] as const;
 
 /** Ids Arch/Ben expect wired — felony scan fails if catalog drops one. */

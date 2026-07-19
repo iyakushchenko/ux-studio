@@ -202,6 +202,26 @@ Deep links stay on that origin, e.g. `http://localhost:5173/?project=boots-pharm
 
 ---
 
+## R14 — Agent-testing mid-flight shell (soft → harden)
+
+**Fail class:** AGENT TESTING panel is a monotonous identical `helper: __studioTriggerTransport` log — PO cannot QA mid-flight (PP-10).
+
+**Contract (MVP landed 2026-07-20):**
+
+1. Code lives under `src/app/shell/agent-testing/` (compat re-export OK).
+2. Helper arm uses coalesced/readable rows (beat/touchpoint when snapshot available).
+3. Outcome colors: fail red-ish · soft-fail amber · ok default.
+4. Elapsed timer + control-panel sitrep line visible while active.
+5. Alarm + Cursor CTAs log + optional dump; auto `CURSOR_UNEXPECTED_DWELL` points at `__studioPlaybackDiag`.
+6. Probe sets script timeline strip; chips update by outcome.
+7. Console START/END separators per sequence.
+8. Dumps: last-N `sessionStorage` on FAIL/alarm only — **not** every step.
+
+**CI:** Vitest `agentTestingFormat.test.ts` + existing overlay lifecycle tests.  
+**Docs:** [PAINPOINTS.md](./PAINPOINTS.md) · [RECORDING.md](../shell/RECORDING.md) · [PLAYBACK_DIAG.md](../shell/PLAYBACK_DIAG.md).
+
+---
+
 ## Adding a rule (Arch / Ben)
 
 1. Reproduce once in [LESSONS_LEARNED.md](./LESSONS_LEARNED.md).  

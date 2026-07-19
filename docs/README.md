@@ -32,6 +32,7 @@ Agents **do not** offer A/B/C tech menus. They decide, document, build, report. 
 4. [product/ARCHITECTURE.md](./product/ARCHITECTURE.md) · [product/HYGIENE.md](./product/HYGIENE.md) — engine folder map + LOC ratchet
 5. [product/POST_CHANGE_CHECKLIST.md](./product/POST_CHANGE_CHECKLIST.md) — local gates before “done”
 6. [product/NEXT_STEPS.md](./product/NEXT_STEPS.md) — living NOW / NEXT / LATER board
+6b. [product/PAINPOINTS.md](./product/PAINPOINTS.md) — PO painpoints board (trackable COMPLETE)
 7. [product/SOLUTION_REQUIREMENTS.md](./product/SOLUTION_REQUIREMENTS.md) — readiness + locked defaults (proceed checklist)
 8. [product/PRODUCT_OWNER_BRIEF.md](./product/PRODUCT_OWNER_BRIEF.md) — A–Z for the Product Owner
 9. [product/CONCEPT_INTAKE.md](./product/CONCEPT_INTAKE.md) — **messy concepts in → Studio pages out** (business logic)

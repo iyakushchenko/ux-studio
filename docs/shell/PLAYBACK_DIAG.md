@@ -100,10 +100,13 @@ Filter DevTools console: `[PLAYBACK_DIAG]`.
 | `__protoRunAgenticStepForwardSmoke` | Full agentic step matrix |
 | `__protoRunTraditionalStepForwardSmoke` | Traditional step matrix |
 | `__protoRunRetreatSmoke` / `__protoRunTraditionalRetreatSmoke` | Retreat |
-| `__studioAgentTestingOverlay` | Visible prove panel ([RECORDING.md](./RECORDING.md)) |
+| `__studioAgentTestingOverlay` | Mid-flight QA shell — steps/colors/timer/sitrep/alarm/timeline ([RECORDING.md](./RECORDING.md) · `src/app/shell/agent-testing/`) |
+| `__studioDownloadAgentTestingDump` | Last FAIL/alarm dump JSON (sessionStorage last-N — not every step) |
 | `__studioCursorDiagnostics` + scroll reveal | Camera / scroll host |
 
-**Note:** `__protoTriggerTransport` requires an active MCP session (`__protoRun*` / recording). UI Step buttons always work; for console step use a smoke runner or click the nav button.
+**Overlay ↔ diag:** PO **Alarm** / **Cursor** flags and auto `CURSOR_UNEXPECTED_DWELL` log point here (`[AGENT_TESTING] cursor issue detected` + dump). Filter console: `[PLAYBACK_DIAG]` + `[AGENT_TESTING]`. Painpoints: [PAINPOINTS.md](../product/PAINPOINTS.md) PP-10.
+
+**Note:** `__protoTriggerTransport` requires an active MCP session (`__protoRun*` / recording). UI Step buttons always work; for console step use a smoke runner or click the nav button. Helper arm coalesces identical transport rows on the overlay (no monotonous spam).
 
 Harness `resetToHub` after smokes is **labeled harness-only** — product Play/end/reset must stay on journey start.
 
