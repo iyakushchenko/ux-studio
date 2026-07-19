@@ -4460,9 +4460,9 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       align-items: center !important;
     }
 
-    /* Search field on screen 5 gets a hover ring so the click affordance is clear */
-    .studio-viewport > div > div:nth-child(7) [data-name='component.input.field']:hover [data-name='Text Field'] > [aria-hidden],
-    .studio-viewport > div > div:nth-child(7) [data-name='component.input.field']:focus-within [data-name='Text Field'] > [aria-hidden] {
+    /* Search field on screen 5 — Make absolute border overlay only (not magnifier) */
+    .studio-viewport > div > div:nth-child(7) [data-name='component.input.field']:hover [data-name='Text Field'] > [aria-hidden].absolute,
+    .studio-viewport > div > div:nth-child(7) [data-name='component.input.field']:focus-within [data-name='Text Field'] > [aria-hidden].absolute {
       border-color: #012169 !important;
       box-shadow: inset 0 0 0 2px #012169 !important;
     }

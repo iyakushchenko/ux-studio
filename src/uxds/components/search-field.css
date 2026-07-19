@@ -71,6 +71,11 @@
   height: 24px;
   pointer-events: none;
   color: var(--uxds-icon-icon-accent-soft);
+  /* Decorative glyph only — never inherit Make Text Field border-overlay hover */
+  border: none !important;
+  box-shadow: none !important;
+  background: none;
+  outline: none;
 }
 
 .uxds-search-field__icon img {

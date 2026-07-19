@@ -461,9 +461,9 @@
   cursor: pointer;
 }
 .proto-lb-open .studio-viewport > div > div:nth-child(6) .proto-lb-search-field:hover
-  [data-name="Text Field"] > [aria-hidden],
+  [data-name="Text Field"] > [aria-hidden].absolute,
 .proto-lb-open .studio-viewport > div > div:nth-child(6) .proto-lb-search-field:focus-within
-  [data-name="Text Field"] > [aria-hidden] {
+  [data-name="Text Field"] > [aria-hidden].absolute {
   border-color: #012169 !important;
   box-shadow: inset 0 0 0 2px #012169 !important;
 }

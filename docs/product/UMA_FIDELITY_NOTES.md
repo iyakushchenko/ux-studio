@@ -85,9 +85,11 @@ Run against Make (or Make frame export) **side-by-side** with React localhost.
 
 - [ ] Every search input uses UXDS `SearchField` (or stamps same markers) — not a bespoke bare input
 - [ ] Magnifier side matches PO/Make wire — PLP / Availability / Book Step 1 = **RIGHT** (`data-studio-search-icon-pos="end"`)
+- [ ] Magnifier is a **bare glyph** — no box border / inset ring on the icon (Make paints the ring on the field’s absolute `[aria-hidden].absolute` overlay only; UXDS control border owns hover/focus)
 - [ ] **One** clear control only (`data-studio-search-clear`) — never `type="search"` native X + custom X
 - [ ] Marker `data-studio-search-icon="true"` present (ratchet #1)
 - [ ] Quinn MCP `plp-search-icons` (or screen equivalent) PASS
+- [ ] **FAIL class:** navy/grey box around the search icon from LEGACY `Text Field > [aria-hidden]` hover stealing the magnifier = ship fail
 
 ### 7c. Filter lists (View all + counters)
 

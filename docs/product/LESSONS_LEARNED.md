@@ -21,6 +21,16 @@ Agents **must read** this file before claiming a UI or Studio-chrome slice done.
   4. Distrust prior PROVEN on filter/search until re-proved.
 - **Process:** Every new PO miss → ratchet same ship ([PARITY_RATCHETS.md](./PARITY_RATCHETS.md)).
 
+### Search icon boxed by Make border-overlay hover (PO)
+
+- **Symptom:** PLP “Search countries” / “Search diseases” magnifier showed a weird navy/grey **box border** around the icon.
+- **Root cause:** LEGACY chrome targeted `Text Field > [aria-hidden]` for Make’s absolute inset border overlay. UXDS `SearchField` stamps `aria-hidden` on the magnifier (direct child of `Text Field`), so hover/focus painted the overlay ring on the icon.
+- **Gate (GLOBAL):**
+  1. Make overlay hover selectors must be `> [aria-hidden].absolute` only — never bare `[aria-hidden]`.
+  2. UXDS `.uxds-search-field__icon` forces `border/box-shadow: none` (defense in depth).
+  3. Uma §7b: magnifier = bare glyph; boxed icon = FAIL.
+- **Process:** When porting Make `aria-hidden` overlays into React kits, do not reuse overlay selectors on decorative icons.
+
 ### Missing search icon = classic Make→React parity fail
 
 - **Symptom:** React PLP filter fields (“Search countries” / “Search diseases”) shipped with no magnifying glass.
