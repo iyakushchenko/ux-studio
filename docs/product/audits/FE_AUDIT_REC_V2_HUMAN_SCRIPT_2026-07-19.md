@@ -3,7 +3,7 @@
 **Surface / slice:** REC human click capture + director/retreat-sync replay wiring (no chrome redesign)  
 **Date:** 2026-07-19  
 **Auditor:** implementer light pass (engine-only; parent may re-audit)  
-**Implementer handoff:** tip after Recording v2 human/script ship  
+**Implementer handoff:** tip `789cfdc` (Recording v2 human/script ship)  
 **Checklist:** [../FE_UI_UX_AUDIT.md](../FE_UI_UX_AUDIT.md)
 
 ---
