@@ -1,4 +1,4 @@
-/* Book Step 1 — React + UXDS pilot (Boots brand via theme.css) */
+/* Book Step 1 — React pilot; visual source = Make Body5 + live wire CSS */
 
 .proto-react-screen-host[data-proto-react-screen="book-step-1"] {
   display: flex;
@@ -16,33 +16,59 @@
   width: 100%;
   min-width: 1200px;
   flex: 1 1 auto;
-  background: #ffffff;
   color: #3a3a3a;
   font-family: "Open Sans", sans-serif;
+  background: #ffffff;
 }
 
+/*
+ * Boots content grid (header logo / ProtoFooter):
+ *   shell: max-width 1440 + horizontal padding 64
+ *   inner: max-width 1312, width 100%, centered
+ * Do NOT put side padding on the 1312 inner — that shifts crumbs past the logo.
+ */
+.book-step1__shell {
+  width: 100%;
+  max-width: 1440px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 64px;
+  padding-right: 64px;
+  box-sizing: border-box;
+}
+
+.book-step1__shell-inner {
+  width: 100%;
+  max-width: 1312px;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+}
+
+/* Make module.breadcrumbs — white, no bottom border */
 .book-step1__crumbs {
   width: 100%;
-  background: var(--uxds-surface-neutral);
-  border-bottom: 1px solid var(--uxds-border-border-default);
+  background: #ffffff;
+  position: relative;
+  z-index: 1;
+  padding-top: 16px;
+  padding-bottom: 16px;
 }
 
 .book-step1__crumbs-inner {
   display: flex;
   align-items: center;
-  gap: var(--gap-space-s);
-  max-width: 1312px;
-  margin: 0 auto;
-  padding: var(--gap-space-m) var(--gap-space-3xl);
+  gap: 8px;
   font-size: 10px;
   line-height: 12px;
 }
 
+/* Make Home link — #305854 (live token --uxds-text-link-link-dark) */
 .book-step1__crumb-link {
   border: none;
   background: none;
   padding: 0;
-  color: var(--uxds-text-link-link-dark, #012169);
+  color: #305854;
   text-decoration: underline;
   cursor: pointer;
   font: inherit;
@@ -50,7 +76,7 @@
 }
 
 .book-step1__crumb-link:hover {
-  color: #01318f;
+  color: #012169;
   text-decoration: none;
 }
 
@@ -67,14 +93,55 @@
   color: #7a7d87;
 }
 
+/*
+ * Make Body5 page fill:
+ * absolute white base + decorative PNG @ opacity 0.31, object-position bottom.
+ */
+.book-step1__body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  flex: 1 1 auto;
+}
+
+.book-step1__body-fill {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.book-step1__body-fill-solid {
+  position: absolute;
+  inset: 0;
+  background: #ffffff;
+}
+
+.book-step1__body-fill-img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: bottom;
+  opacity: 0.31;
+}
+
+/* Vertical pad only — horizontal inset comes from .book-step1__shell */
 .book-step1__main {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 56px;
   width: 100%;
-  max-width: 1312px;
-  padding: var(--gap-space-3xl);
+  padding: 64px 0;
   box-sizing: border-box;
 }
 
@@ -88,12 +155,15 @@
   color: #3a3a3a;
 }
 
-/* Match Make Body4/Body5 `component.book.appointment.progress` */
+/*
+ * Progress — live Make globals-screens: 863px row, 16px labels,
+ * active navy bold + #c6e5e1 bar, inactive white bar.
+ */
 .book-step1__progress {
   display: flex;
   align-items: flex-start;
   gap: 16px;
-  width: 560px;
+  width: 863px;
   max-width: 100%;
   min-height: 40px;
   overflow: clip;
@@ -118,16 +188,16 @@
   list-style: decimal;
   width: 100%;
   min-height: 0;
-  font-size: 10px;
-  line-height: 12px;
+  font-size: 16px;
+  line-height: 1.4;
   font-weight: 400;
   color: #3a3a3a;
 }
 
 .book-step1__progress-step.is-active ol,
 .book-step1__progress-step[data-proto-step-active="true"] ol {
-  font-weight: 600;
-  color: #3a3a3a;
+  font-weight: 700;
+  color: #012169;
 }
 
 .book-step1__progress-step li {
@@ -135,10 +205,9 @@
 }
 
 .book-step1__progress-step li span {
-  line-height: 12px;
+  line-height: 1.4;
 }
 
-/* Flat 8px underlines — teal active / white inactive (Make: no radius, no border) */
 .book-step1__progress-bar {
   height: 8px;
   width: 100%;
@@ -153,12 +222,13 @@
   background: #c6e5e1;
 }
 
+/* Live Make card width override: 863px (not Figma export 758px) */
 .book-step1__card {
   display: flex;
   flex-direction: column;
   gap: 72px;
   align-items: center;
-  width: min(758px, 100%);
+  width: min(863px, 100%);
   padding: 64px;
   border-radius: 24px;
   background: #ffffff;
@@ -169,7 +239,7 @@
 .book-step1__pill-stack {
   display: flex;
   flex-direction: column;
-  gap: var(--gap-space-m);
+  gap: 16px;
   width: 100%;
 }
 
@@ -189,35 +259,45 @@
   margin: 0;
   flex: 1 1 99px;
   max-width: 125px;
-  font-size: var(--font-body-size-m);
-  line-height: var(--font-body-line-height-m);
+  font-size: 13px;
+  line-height: 24px;
+  font-weight: 400;
+  color: #3a3a3a;
 }
 
 .book-step1__pill-value {
   margin: 0;
   flex: 1 1 144px;
-  font-size: var(--font-body-size-m);
-  line-height: var(--font-body-line-height-m);
+  font-size: 13px;
+  line-height: 24px;
   font-weight: 600;
+  color: #3a3a3a;
 }
 
-/* Make tertiary CTA — no wash; label → black, icon → navy */
+/* Make tertiary CTA — no wash; label → black, icon → navy; never wrap */
 .book-step1__pill-change {
   display: inline-flex;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: center;
-  gap: var(--gap-space-s);
+  gap: 8px;
   height: 32px;
   padding: 8px 12px;
   border: none;
-  border-radius: var(--radius-full);
+  border-radius: 360px;
   background: transparent;
   color: #5c5c5c;
   font-size: 12px;
   font-weight: 600;
   line-height: 16px;
+  letter-spacing: -0.36px;
+  white-space: nowrap;
   cursor: pointer;
   transition: color 0.18s ease;
+}
+
+.book-step1__pill-change span {
+  white-space: nowrap;
 }
 
 .book-step1__pill-change svg path {
@@ -251,15 +331,34 @@
   color: #3a3a3a;
 }
 
+/* Make Frame209: wrap search + near-me side-by-side */
 .book-step1__location {
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: var(--gap-space-m);
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 16px;
   width: 100%;
 }
 
-/* Make Text Field: pill (360), #c3c3c3 border, inset navy ring on hover/focus */
+.book-step1__location-field {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 220px;
+}
+
+.book-step1__field-label {
+  margin: 0;
+  font-size: 13px;
+  line-height: 24px;
+  font-weight: 400;
+  letter-spacing: 0.1px;
+  color: #3a3a3a;
+}
+
+/* Make Text Field: pill 360, #c3c3c3 border, inset navy ring on hover/focus */
 .book-step1__search {
   display: flex;
   align-items: center;
@@ -292,10 +391,13 @@
   overflow: hidden;
 }
 
-.book-step1__search img {
+.book-step1__search-icon {
   flex-shrink: 0;
-  width: 22px;
-  height: 22px;
+  display: flex;
+  width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
 }
 
 .book-step1__search p {
@@ -309,15 +411,24 @@
   white-space: nowrap;
 }
 
-/* Near-me: Make tertiary CTA (no fill wash; label/icon color shift) */
+/* Make Frame102: h-72, pt-24, tertiary near-me — icon+label single line */
 .book-step1__near-me {
   display: flex;
   align-items: center;
-  min-height: 48px;
-  padding-top: 8px;
+  height: 72px;
+  padding-top: 24px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.book-step1__near-me .uxds-filter-chip-row {
+  flex-wrap: nowrap;
 }
 
 .book-step1__near-me .uxds-filter-chip {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  align-items: center;
   gap: 8px;
   min-height: 32px;
   padding: 8px 12px;
@@ -329,11 +440,22 @@
   font-weight: 600;
   line-height: 16px;
   letter-spacing: -0.36px;
+  white-space: nowrap;
   transition: color 0.18s ease;
 }
 
-.book-step1__near-me .uxds-filter-chip img {
-  transition: filter 0.18s ease;
+.book-step1__near-me .uxds-filter-chip svg {
+  flex-shrink: 0;
+}
+
+/* Same icon language as .book-step1__pill-change (Change baseline) */
+.book-step1__near-me .uxds-filter-chip svg path {
+  fill: #afccca;
+  transition: fill 0.18s ease;
+}
+
+.book-step1__near-me .uxds-filter-chip span {
+  white-space: nowrap;
 }
 
 .book-step1__near-me .uxds-filter-chip.is-selected,
@@ -351,9 +473,8 @@
   color: #000000;
 }
 
-.book-step1__near-me .uxds-filter-chip:hover img {
-  filter: brightness(0) saturate(100%) invert(15%) sepia(55%) saturate(3000%)
-    hue-rotate(205deg) brightness(0.85);
+.book-step1__near-me .uxds-filter-chip:hover svg path {
+  fill: #012169;
 }
 
 .book-step1__near-me .uxds-filter-chip:focus-visible {
@@ -377,7 +498,7 @@
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
-  background: var(--uxds-surface-subtle);
+  background: #f5f5f5;
 }
 
 .book-step1__map img {
@@ -392,35 +513,35 @@
   flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
-  gap: var(--gap-space-m);
-  padding: var(--gap-space-m);
+  gap: 16px;
+  padding: 16px;
 }
 
 .book-step1__store-name {
   margin: 0 0 4px;
-  font-size: var(--font-body-size-m);
-  line-height: var(--font-body-line-height-m);
+  font-size: 13px;
+  line-height: 24px;
   font-weight: 600;
+  color: #3a3a3a;
 }
 
 .book-step1__store-address {
   margin: 0;
-  font-size: var(--font-body-size-m);
-  line-height: var(--font-body-line-height-m);
-  color: var(--uxds-text-text-secondary);
+  font-size: 13px;
+  line-height: 24px;
+  color: #7a7d87;
 }
 
 .book-step1__booster {
   display: flex;
   flex-direction: column;
-  gap: var(--gap-space-s);
+  gap: 8px;
   width: 100%;
 }
 
 /*
- * Make `component.input.checkbox` — 24px, radius 2px;
- * unchecked white/#c3c3c3; hover fill #c6e5e1; checked #afccca + #305854 mark.
- * !important beats Make globals-chrome so React-owned booster keeps concept L&F.
+ * Live Make child-7 booster (globals-screens):
+ * unchecked white/#c3c3c3; hover #c6e5e1; checked #afccca + #305854 mark.
  */
 .book-step1__checkbox-row {
   display: flex;
@@ -516,10 +637,11 @@
   border: none;
   background: none;
   padding: 0;
-  color: var(--project-brand-cta-navy, #012169);
+  color: #012169;
   text-decoration: underline;
   font: inherit;
-  font-size: var(--font-body-size-m);
+  font-size: 13px;
+  line-height: 24px;
   cursor: pointer;
   transition: color 0.18s ease;
 }
@@ -536,26 +658,30 @@
 
 .book-step1__learn-body {
   margin-left: 40px;
-  font-size: var(--font-body-size-m);
-  line-height: var(--font-body-line-height-m);
-  color: var(--uxds-text-text-primary);
+  font-size: 13px;
+  line-height: 24px;
+  color: #3a3a3a;
 }
 
 .book-step1__cta-wrap {
   display: flex;
   justify-content: center;
   width: 100%;
-  padding-top: var(--gap-space-l);
+  padding-top: 24px;
 }
 
 .book-step1__continue.uxds-btn-primary {
   min-width: 230px;
   min-height: 48px;
+  height: 48px;
   padding: 12px 24px;
-  border-radius: var(--radius-full);
-  background: var(--project-brand-cta-navy, #012169);
+  border-radius: 360px;
+  background: #012169;
   font-size: 16px;
   line-height: 16px;
+  font-weight: 600;
+  letter-spacing: -0.32px;
+  color: #ffffff;
 }
 
 .book-step1__continue.uxds-btn-primary:hover:not(:disabled) {
@@ -582,7 +708,7 @@
 }
 
 .book-step1__help a {
-  color: var(--project-brand-primary-darkest, #305854);
+  color: #305854;
   text-decoration: underline;
   transition: color 0.18s ease;
 }

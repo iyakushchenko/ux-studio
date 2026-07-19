@@ -23,7 +23,7 @@ Engine repo. **Boots Pharmacy** (`src/projects/boots-pharmacy/`) is the first re
 5. [docs/product/CONCEPT_INTAKE.md](docs/product/CONCEPT_INTAKE.md) — messy concepts in; agent fills UXDS gap  
 6. [docs/product/PROJECT_STYLEGUIDE.md](docs/product/PROJECT_STYLEGUIDE.md) — brand delta → project theme.css  
 7. [docs/product/PAGE_BUILD_CONTRACT.md](docs/product/PAGE_BUILD_CONTRACT.md) — React + UXDS  
-8. [docs/product/FE_STANDARDS.md](docs/product/FE_STANDARDS.md) — icon+text nowrap, 1440/64/1312 logo grid, scoped CSS  
+8. [docs/product/FE_STANDARDS.md](docs/product/FE_STANDARDS.md) — icon+text nowrap, tertiary icon language, 1440/64/1312 logo grid, scoped CSS  
 9. [docs/product/VISUAL_FIDELITY.md](docs/product/VISUAL_FIDELITY.md) — concept L&F, no visual zoo, behavior parity on rebuilds  
 10. [docs/product/INTERACTION_FIDELITY.md](docs/product/INTERACTION_FIDELITY.md) — recording needs interactive pages + shared kits  
 11. [docs/product/FE_UI_UX_AUDIT.md](docs/product/FE_UI_UX_AUDIT.md) — post-UI audit checklist (PROVEN before PO)  
@@ -75,7 +75,7 @@ Full transport smokes require `__protoRun*` helpers — use sparingly; prefer sa
 - Engine code in `src/app/` — project-agnostic
 - Boots-specific DOM/scripts in `src/projects/boots-pharmacy/` only until React+UXDS rebuild
 - Concept pages target: React + UXDS ([PAGE_BUILD_CONTRACT.md](docs/product/PAGE_BUILD_CONTRACT.md))
-- FE standards — icon+text nowrap, 1440/64/1312 content column, scoped CSS ([FE_STANDARDS.md](docs/product/FE_STANDARDS.md))
+- FE standards — icon+text nowrap, one tertiary icon language, 1440/64/1312 content column, scoped CSS ([FE_STANDARDS.md](docs/product/FE_STANDARDS.md))
 - Visual fidelity + no zoo + rebuild behavior parity ([VISUAL_FIDELITY.md](docs/product/VISUAL_FIDELITY.md))
 - Interaction fidelity before record — shared kits `src/uxds/interactions/` ([INTERACTION_FIDELITY.md](docs/product/INTERACTION_FIDELITY.md))
 - After UI handoffs: FE/UI/UX audit PROVEN before PO ([FE_UI_UX_AUDIT.md](docs/product/FE_UI_UX_AUDIT.md)); not “tests passed” alone

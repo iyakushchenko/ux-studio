@@ -1,42 +1,41 @@
-/* UXDS primary CTA — Make Boots hover/active language (lift + navy darken). */
-
-.uxds-btn-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--gap-space-s);
-  min-height: 40px;
-  padding: 8px 16px;
-  border: none;
-  border-radius: var(--radius-full);
-  background: var(--uxds-input-button-surface-surface-primary-solid);
-  color: var(--uxds-text-text-inverse);
-  font-size: var(--font-btn-size-m);
-  font-weight: var(--font-btn-weight-m);
-  line-height: var(--font-btn-line-height-m);
-  cursor: pointer;
-  transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.12s ease;
-}
-
-.uxds-btn-primary:hover:not(:disabled) {
-  background: #01318f;
-  box-shadow: 0 4px 12px rgba(1, 33, 105, 0.35);
-  transform: translateY(-1px);
-}
-
-.uxds-btn-primary:active:not(:disabled) {
-  background: #011a5c;
-  box-shadow: none;
-  transform: translateY(0);
-}
-
-.uxds-btn-primary:focus-visible {
-  outline: 2px solid #012169;
-  outline-offset: 2px;
-}
-
-.uxds-btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
+/* UXDS primary CTA — Make Boots hover/active language (lift + navy darken). */
+
+.uxds-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap-space-s);
+  min-height: 40px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--uxds-input-button-surface-surface-primary-solid);
+  color: var(--uxds-text-text-inverse);
+  font-size: var(--font-btn-size-m);
+  font-weight: var(--font-btn-weight-m);
+  line-height: var(--font-btn-line-height-m);
+  cursor: pointer;
+  transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.12s ease;
+}
+
+.uxds-btn-primary:hover:not(:disabled) {
+  background: #01318f;
+  box-shadow: 0 4px 12px rgba(1, 33, 105, 0.35);
+  transform: translateY(-1px);
+}
+
+.uxds-btn-primary:active:not(:disabled) {
+  background: #011a5c;
+  box-shadow: none;
+  transform: translateY(0);
+}
+
+.uxds-btn-primary:focus-visible {
+  outline: 2px solid #012169;
+  outline-offset: 2px;
+}
+
+.uxds-btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
