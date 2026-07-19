@@ -118,7 +118,7 @@ async function main() {
 
   if (!report.pass) {
     if (!sanity?.pass) console.error("sanity failed");
-    if (!homePlay?.pass) console.error("homePlay failed:", homePlay?.reason);
+    if (isFull && !homePlay?.pass) console.error("homePlay failed:", homePlay?.reason);
     if (!retreat?.pass) {
       console.error(
         "retreat failed:",

@@ -1,6 +1,9 @@
 # UX Studio — product vision
 
-## What we're building
+**Repo:** [github.com/iyakushchenko/ux-studio](https://github.com/iyakushchenko/ux-studio) · **Demo:** [iyakushchenko.github.io/ux-studio](https://iyakushchenko.github.io/ux-studio/)
+
+This repository **is** the engine. **`src/projects/boots-pharmacy/`** is the first reference project (test rabbit) — not the product name.
+
 
 **UX Studio** is a control room for clickable UX concepts. The business goal: ship journey maps (CJMs) and deep scenario exploration fast — not polished production sites.
 

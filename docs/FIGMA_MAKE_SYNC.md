@@ -80,7 +80,7 @@ Run npm install if needed, then fix all build/import errors until the preview ru
 
 ## GitHub (optional second source of truth)
 
-https://github.com/iyakushchenko/UXCJM-BootsHealth-VaccineConcept
+https://github.com/iyakushchenko/ux-studio
 
 Figma Make → GitHub is one-way. This repo is master; update Make via the zip above.
 

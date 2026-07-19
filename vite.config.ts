@@ -17,7 +17,7 @@ function figmaAssetResolver() {
 }
 
 export default defineConfig({
-  // GitHub Pages project site: /UXCJM-BootsHealth-VaccineConcept/
+  // GitHub Pages project site: /ux-studio/
   base: process.env.VITE_BASE_PATH ?? '/',
   server: {
     // Studio shows build/HMR errors via ProtoFatalErrorScreen — avoid duplicate Vite overlay.

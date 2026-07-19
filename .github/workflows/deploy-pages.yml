@@ -31,7 +31,7 @@ jobs:
 
       - name: Build
         env:
-          VITE_BASE_PATH: /UXCJM-BootsHealth-VaccineConcept/
+          VITE_BASE_PATH: /ux-studio/
         run: npm run build
 
       - name: Upload artifact
