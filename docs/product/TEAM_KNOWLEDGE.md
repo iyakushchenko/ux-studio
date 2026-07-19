@@ -195,6 +195,11 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 - Quinn (QA): MCP prove Check availability bg/border + Book now + popup close — applied: `__studioProveRoboCursorFeedback` border check
 - Arch (Director): shell-only; does not demote PDP Final Pass product matrix — applied: TEAM_KNOWLEDGE
 
+**Knowledge improved** (2026-07-19 · stream: PDP Accordion Motion Quinn re-prove · tip 5c1d90f · v0.0.37 · prove `cdf5c5f`):
+- Quinn (QA): full PDP MCP `reload:false` 23/23 ~29s on canonical `:5173` reuse tab; Accordion Motion mid-tween assertable; teardown forceClear PASS — applied: FE_AUDIT_PDP_MCP + PAGE_FINAL_PASS mcpFinalPass PASS; Arch unblocked for HARD-GREEN
+- Uma (UI/UX): §0a remains PROVEN @ `76e2433` — Motion height ship does not reopen FAQ copy/CTA — applied: no re-open
+- Arch (Director): restore HARD-GREEN only after this Quinn PASS — applied: hardGreen false until Arch stamp
+
 **Knowledge improved** (2026-07-19 · stream: PDP PAGE FINAL PASS HARD-GREEN restored · tip 57775a3 · v0.0.36):
 - Arch (Director): tip `57775a3` / v0.0.36 (playback panel + cursor lock) past HARD-GREEN @ `48f2016` → honest NEEDS-REPROVE → Quinn 23/23 → restore HARD-GREEN; veto Home until PO `+` — applied: PAGE_FINAL_PASS.json tip 57775a3 + FE_AUDIT_PDP_* + NEXT_STEPS 3e
 - Quinn (QA): full PDP MCP `reload:false` 23/23 ~27s; teardown assert PASS; playback panel present; Check availability robo hover PASS — applied: FE_AUDIT_PDP_MCP

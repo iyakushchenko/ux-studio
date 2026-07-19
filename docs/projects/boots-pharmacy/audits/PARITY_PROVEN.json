@@ -57,9 +57,9 @@
       "status": "proven",
       "auditPath": "docs/projects/boots-pharmacy/audits/UMA_FIDELITY_PDP_2026-07-19.md",
       "mcpMatrixAt": {
-        "sha": "5c1d90f",
+        "sha": "cdf5c5f",
         "date": "2026-07-19",
-        "note": "Quinn MCP 23/23 PASS @ tip 5c1d90f / v0.0.37 Accordion Motion height (reload:false ~29s, teardown clean); Motion mid-tween 0→~111→144 assertable; Uma §0a PROVEN @ 76e2433; Arch HARD-GREEN pending (mcpFinalPass PASS)."
+        "note": "Quinn MCP 23/23 PASS @ tip 5c1d90f / v0.0.37 Accordion Motion height (prove cdf5c5f; reload:false ~29s, teardown clean); Motion mid-tween 0→~111→144 assertable; Uma §0a PROVEN @ 76e2433; Arch HARD-GREEN pending (mcpFinalPass PASS)."
       },
       "requireMcp": true
     }

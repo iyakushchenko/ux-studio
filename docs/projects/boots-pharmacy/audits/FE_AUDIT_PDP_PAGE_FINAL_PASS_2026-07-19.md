@@ -4,6 +4,8 @@
 **Date:** 2026-07-19  
 **Auditor:** Quinn (QA) MCP matrix · Uma (UI/UX) §0a · Arch (Director) HARD-GREEN pending  
 **Ship tip proved:** `5c1d90f` · **v0.0.37** — Accordion Motion height  
+**Prove docs tip:** `cdf5c5f`  
+ 
 **Prior HARD-GREEN (demoted):** `57775a3` · **v0.0.36**  
 **Uma §0a tip:** `76e2433` · **v0.0.30** — FAQ 6/6 + TertiaryCta soft + muted chevrons  
 **Policy:** [PAGE_FINAL_PASS.md](../../../product/PAGE_FINAL_PASS.md) · manifest [PAGE_FINAL_PASS.json](./PAGE_FINAL_PASS.json) · criteria [QUINN_PDP_PROBE_CRITERIA_2026-07-19.md](./QUINN_PDP_PROBE_CRITERIA_2026-07-19.md)

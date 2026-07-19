@@ -131,11 +131,11 @@
         "status": "PASS",
         "pass": true,
         "stampedAt": {
-          "sha": "5c1d90f",
+          "sha": "cdf5c5f",
           "date": "2026-07-19",
           "version": "0.0.37",
           "auditor": "Quinn (QA)",
-          "note": "MCP __studioRunMcpPageProbe({ screenId:\"pdp\", reload:false }) 23/23 PASS @ code tip 5c1d90f / v0.0.37 (~28686ms); Accordion Motion height spot PASS (6× data-studio-accordion-motion=height; mid-tween 0→~111→144); teardown forceClear + __studioAssertAgentTeardownClean PASS; canonical localhost:5173 reuse tab. Uma §0a PROVEN @ 76e2433. hardGreen false until Arch restore. Audit: FE_AUDIT_PDP_MCP_2026-07-19.md"
+          "note": "MCP __studioRunMcpPageProbe({ screenId:\"pdp\", reload:false }) 23/23 PASS @ code tip 5c1d90f / v0.0.37 (~28686ms; prove docs cdf5c5f); Accordion Motion height spot PASS (6× data-studio-accordion-motion=height; mid-tween 0→~111→144); teardown forceClear + __studioAssertAgentTeardownClean PASS; canonical localhost:5173 reuse tab. Uma §0a PROVEN @ 76e2433. hardGreen false until Arch restore. Audit: FE_AUDIT_PDP_MCP_2026-07-19.md"
         },
         "url": "http://localhost:5173/?project=boots-pharmacy&screen=pdp",
         "auditPath": "docs/projects/boots-pharmacy/audits/FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md",

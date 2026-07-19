@@ -4,6 +4,7 @@
 **Date:** 2026-07-19  
 **Auditor:** Quinn (QA) — Chrome DevTools MCP localhost  
 **Ship tip (latest prove):** `5c1d90f` · **v0.0.37** — Accordion Motion height (`data-studio-accordion-motion="height"`)  
+**Prove docs tip:** `cdf5c5f`  
 **Prior prove (superseded stamp):** `57775a3` · **v0.0.36** — playback panel + on-target cursor lock  
 **Uma §0a:** **PROVEN** @ tip `76e2433` / v0.0.30 — still valid; Motion height ship does not reopen FAQ copy / TertiaryCta §0a  
 **Policy:** [QUINN_PDP_PROBE_CRITERIA_2026-07-19.md](./QUINN_PDP_PROBE_CRITERIA_2026-07-19.md) · [RECORDING.md](../../../shell/RECORDING.md) · recipe `studioMcpPageProbe.ts`  
