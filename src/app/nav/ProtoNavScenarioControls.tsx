@@ -427,28 +427,38 @@ export function ProtoNavScenarioControls({
       ) : null}
       <div className="proto-nav-scenario__deck">
         {recordingControls ? (
-          <ProtoStudioPlaybackRecSwitch
-            checked={recMode}
-            onChange={handlePlaybackRecModeChange}
-          />
+          <span className="proto-nav-scenario__mode-control">
+            <span className="proto-nav-scenario__mode-label" aria-hidden>
+              REC
+            </span>
+            <ProtoStudioPlaybackRecSwitch
+              checked={recMode}
+              onChange={handlePlaybackRecModeChange}
+            />
+          </span>
         ) : null}
         {recordingControls && recMode ? (
           recordingControls
         ) : (
           <>
             {onJourneyModeChange ? (
-              <ProtoStudioJourneySwitch
-                checked={journeyMode}
-                onChange={(enabled) => {
-                  logControlPanel("studio:journey-mode", {
-                    enabled,
-                    previous: journeyMode,
-                    switchDisabled: journeyModeSwitchDisabled,
-                  });
-                  onJourneyModeChange(enabled);
-                }}
-                disabled={journeyModeSwitchDisabled}
-              />
+              <span className="proto-nav-scenario__cjm-group">
+                <span className="proto-nav-scenario__mode-label" aria-hidden>
+                  CJM
+                </span>
+                <ProtoStudioJourneySwitch
+                  checked={journeyMode}
+                  onChange={(enabled) => {
+                    logControlPanel("studio:journey-mode", {
+                      enabled,
+                      previous: journeyMode,
+                      switchDisabled: journeyModeSwitchDisabled,
+                    });
+                    onJourneyModeChange(enabled);
+                  }}
+                  disabled={journeyModeSwitchDisabled}
+                />
+              </span>
             ) : null}
             <span className="proto-nav-scenario__counter" aria-live="polite">
               {formatStepCounter(visibleCount, totalFrames, stepProgressActive)}

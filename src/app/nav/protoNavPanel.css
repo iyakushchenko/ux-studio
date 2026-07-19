@@ -287,6 +287,43 @@
   white-space: nowrap;
 }
 
+/* Mode labels (REC / CJM) — match STEPS counter type */
+.proto-nav-scenario__mode-label {
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.42);
+  flex-shrink: 0;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.proto-nav-scenario__mode-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+  margin-right: 2px;
+}
+
+/* CJM toggle between pipe separators — same bar as zoom delimiters */
+.proto-nav-scenario__cjm-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+  margin: 0 2px 0 1px;
+  padding: 0 6px;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.proto-nav-scenario--journey-mode .proto-nav-scenario__cjm-group .proto-nav-scenario__mode-label {
+  color: rgba(255, 220, 160, 0.72);
+}
+
 /* FL-style journey mode toggle — left of step counter in cassette deck */
 .proto-studio-journey-switch {
   display: inline-flex;
@@ -295,7 +332,7 @@
   flex-shrink: 0;
   width: 22px;
   height: 20px;
-  margin: 0 2px 0 0;
+  margin: 0;
   padding: 0;
   border: none;
   background: transparent;
@@ -429,6 +466,11 @@
   border-radius: 2px;
   outline: none;
   box-shadow: none;
+}
+
+.proto-nav-scenario__mode-control:has(.proto-studio-playback-rec-switch--on)
+  .proto-nav-scenario__mode-label {
+  color: rgba(255, 160, 160, 0.78);
 }
 
 .proto-studio-playback-rec-switch:focus,

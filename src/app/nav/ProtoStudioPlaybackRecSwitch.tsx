@@ -18,11 +18,11 @@ export function ProtoStudioPlaybackRecSwitch({
       type="button"
       role="switch"
       aria-checked={checked}
-      aria-label={checked ? "Recording mode" : "Playback mode"}
+      aria-label={checked ? "REC on" : "REC off"}
       title={
         checked
-          ? "Rec mode — recording controls (playback transport hidden)"
-          : "Playback mode — cassette transport (recording controls hidden)"
+          ? "REC on — recording controls (playback transport hidden)"
+          : "REC off — cassette transport (recording controls hidden)"
       }
       disabled={disabled}
       className={`proto-studio-playback-rec-switch${

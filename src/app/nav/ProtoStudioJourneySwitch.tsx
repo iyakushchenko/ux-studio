@@ -17,11 +17,11 @@ export function ProtoStudioJourneySwitch({
       type="button"
       role="switch"
       aria-checked={checked}
-      aria-label="Journey mode"
+      aria-label="CJM"
       title={
         checked
-          ? "Journey mode on — use cassette transport"
-          : "Browse mode — free screen navigation"
+          ? "CJM on — use cassette transport"
+          : "CJM off — free screen navigation"
       }
       disabled={disabled}
       className={`proto-studio-journey-switch${

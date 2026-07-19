@@ -169,21 +169,26 @@ export function ProtoNavRecordingModeSlot({
 
   return (
     <div className="proto-nav-scenario__deck">
-      <ProtoStudioPlaybackRecSwitch
-        checked={recMode}
-        onChange={(enabled) => {
-          logControlPanel("studio:playback-rec-mode", {
-            enabled,
-            previous: recMode,
-            source: "standalone-slot",
-          });
-          // Leaving Rec → Playback: pause a live capture; do not stop/destroy the session.
-          if (!enabled && isRecordingActive()) {
-            pauseRecording();
-          }
-          setRecMode(enabled);
-        }}
-      />
+      <span className="proto-nav-scenario__mode-control">
+        <span className="proto-nav-scenario__mode-label" aria-hidden>
+          REC
+        </span>
+        <ProtoStudioPlaybackRecSwitch
+          checked={recMode}
+          onChange={(enabled) => {
+            logControlPanel("studio:playback-rec-mode", {
+              enabled,
+              previous: recMode,
+              source: "standalone-slot",
+            });
+            // Leaving Rec → Playback: pause a live capture; do not stop/destroy the session.
+            if (!enabled && isRecordingActive()) {
+              pauseRecording();
+            }
+            setRecMode(enabled);
+          }}
+        />
+      </span>
       {recMode ? (
         <ProtoNavRecordingControls
           getStartOptions={getStartOptions}
