@@ -121,21 +121,21 @@
     {
       "screenId": "pdp",
       "status": "proven",
-      "hardGreen": true,
+      "hardGreen": false,
       "stampedAt": {
         "sha": "5c1d90f",
         "date": "2026-07-19",
-        "note": "Finn structure/naming + UXDS Accordion kit + ButtonPrimary Book now; header crumbs + main RTB/below; BEM pdp; data-studio-react-screen + make-retired; FAQ 6/6 + TertiaryCta soft + muted chevrons. Restored HARD-GREEN after Quinn 23/23 re-prove on tip 5c1d90f / v0.0.37 (Accordion Motion height; prove docs cdf5c5f)."
+        "note": "Finn structure/naming + UXDS Accordion kit + ButtonPrimary Book now; header crumbs + main RTB/below; BEM pdp; data-studio-react-screen + make-retired; FAQ 6/6 + TertiaryCta soft + muted chevrons. Structure retained. Prior HARD-GREEN @ 5c1d90f / v0.0.37 (Accordion Motion). hardGreen false until Quinn re-prove + Arch restore after v0.0.38."
       },
       "mcpFinalPass": {
-        "status": "HARD-GREEN",
-        "pass": true,
+        "status": "NEEDS-REPROVE",
+        "pass": false,
         "stampedAt": {
-          "sha": "5c1d90f",
+          "sha": "bd01c07",
           "date": "2026-07-19",
-          "version": "0.0.37",
-          "auditor": "Arch (Director) — Quinn MCP + Uma §0a",
-          "note": "HARD-GREEN restored. Quinn MCP 23/23 PASS @ tip 5c1d90f / v0.0.37 (prove docs cdf5c5f; Arch restore f93ade5; reload:false ~28686ms; teardown clean); Accordion Motion height spot PASS (6× data-studio-accordion-motion=height; mid-tween 0→~111→144); Uma §0a still PROVEN @ 76e2433. Evidence: FE_AUDIT_PDP_MCP + FE_AUDIT_PDP_PAGE_FINAL_PASS. Home waits PO +."
+          "version": "0.0.38",
+          "auditor": "Arch (Director) — PromoMessageStrip + tip-stable cursor demote",
+          "note": "Honest demote: tip bd01c07 / v0.0.38 past HARD-GREEN @ 5c1d90f. PromoMessageStrip kit extract rewired PDP promo band (DOM/class path) + tip-stable robo-cursor (shell hotspot; not structure-only). Token CSS 1:1 ≠ Quinn waiver. Quinn must re-prove MCP matrix on tip before HARD-GREEN restore. Home waits PO +."
         },
         "url": "http://localhost:5173/?project=boots-pharmacy&screen=pdp",
         "auditPath": "docs/projects/boots-pharmacy/audits/FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md",
