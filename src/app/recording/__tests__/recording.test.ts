@@ -27,6 +27,10 @@ import {
   resolvePlaybackSelectorChain,
   resolveRecordingHumanClickTarget,
   shouldCaptureRecordingHumanClick,
+  shouldCaptureRecordingTypedText,
+  captureScroll,
+  captureTypedText,
+  ensureRecordingDomCapture,
 } from "@/app/recording/recordingCapture";
 import { applyRecordingProjectScript } from "@/app/recording/recordingScriptApply";
 import { notePlaybackTransport } from "@/app/shell/playbackInteractionContext";
@@ -603,6 +607,163 @@ describe("replayRecordingSession", () => {
     ]);
     expect(result.replayed).toBe(2);
     expect(result.unsupported).toBe(0);
+  });
+
+  it("replays beat-enter, scroll, and typed-text when apply hooks succeed", async () => {
+    const applyBeatEnter = vi.fn(() => true);
+    const applyScroll = vi.fn(() => true);
+    const applyTypedText = vi.fn(() => true);
+
+    const result = await replayRecordingSession(
+      {
+        id: "v3-gaps-replay",
+        version: 1,
+        startedAt: "2026-07-19T00:00:00.000Z",
+        events: [
+          {
+            kind: "beat-enter",
+            actionId: "apply-demo-location",
+            beatId: "book-step2",
+            atMs: 1,
+          },
+          {
+            kind: "beat-enter",
+            actionId: "sync-select-book-date",
+            beatId: "book-step2",
+            atMs: 2,
+          },
+          { kind: "scroll", scrollTop: 240, atMs: 3 },
+          {
+            kind: "typed-text",
+            value: "London",
+            selectorChain: ['[data-studio-action="avail-search-query"]'],
+            element: 'data-studio-action="avail-search-query"',
+            inputType: "text",
+            atMs: 4,
+          },
+        ],
+      },
+      {
+        applyBeatEnter,
+        applyScroll,
+        applyTypedText,
+        stepDelayMs: 0,
+      }
+    );
+
+    expect(applyBeatEnter).toHaveBeenCalledTimes(2);
+    expect(applyBeatEnter.mock.calls.map((c) => c[0].actionId)).toEqual([
+      "apply-demo-location",
+      "sync-select-book-date",
+    ]);
+    expect(applyScroll).toHaveBeenCalledWith({
+      scrollTop: 240,
+      anchorSelector: undefined,
+    });
+    expect(applyTypedText).toHaveBeenCalledWith(
+      expect.objectContaining({ value: "London" })
+    );
+    expect(result.replayed).toBe(4);
+    expect(result.unsupported).toBe(0);
+    expect(result.errors).toHaveLength(0);
+  });
+
+  it("counts beat-enter / scroll / typed-text unsupported when apply hooks missing", async () => {
+    const result = await replayRecordingSession(
+      {
+        id: "v3-unsupported",
+        version: 1,
+        startedAt: "2026-07-19T00:00:00.000Z",
+        events: [
+          { kind: "beat-enter", actionId: "apply-demo-location", atMs: 1 },
+          { kind: "scroll", scrollTop: 10, atMs: 2 },
+          {
+            kind: "typed-text",
+            value: "x",
+            selectorChain: ['[data-studio-action="avail-search-query"]'],
+            atMs: 3,
+          },
+          { kind: "transport", action: "step-forward", atMs: 4 },
+        ],
+      },
+      {
+        triggerTransport: vi.fn(),
+        stepDelayMs: 0,
+      }
+    );
+
+    expect(result.replayed).toBe(1);
+    expect(result.unsupported).toBe(3);
+  });
+});
+
+describe("recording scroll + typed-text capture", () => {
+  beforeEach(() => {
+    resetRecordingSessionForTests();
+    resetRecordingCaptureForTests();
+  });
+
+  afterEach(() => {
+    resetRecordingSessionForTests();
+    resetRecordingCaptureForTests();
+  });
+
+  it("captures scroll and typed-text only while recording is active", () => {
+    captureScroll({ scrollTop: 50 });
+    captureTypedText({
+      value: "nope",
+      selectorChain: ['[data-studio-action="avail-search-query"]'],
+    });
+    expect(getActiveRecordingSession()).toBeNull();
+
+    startRecording();
+    captureScroll({ scrollTop: 120 });
+    captureTypedText({
+      value: "London",
+      selectorChain: ['[data-studio-action="avail-search-query"]'],
+      element: 'data-studio-action="avail-search-query"',
+      inputType: "text",
+    });
+
+    const session = getActiveRecordingSession();
+    expect(session?.events.map((e) => e.kind)).toEqual([
+      "scroll",
+      "typed-text",
+    ]);
+    expect(session?.events[0]).toMatchObject({
+      kind: "scroll",
+      scrollTop: 120,
+    });
+    expect(session?.events[1]).toMatchObject({
+      kind: "typed-text",
+      value: "London",
+    });
+  });
+
+  it("rejects password / checkbox fields for typed-text", () => {
+    const mockField = (type: string) =>
+      ({
+        matches: (sel: string) => {
+          if (type === "textarea") return sel.includes("textarea");
+          if (type === "password" || type === "checkbox") {
+            return false;
+          }
+          return sel.startsWith("input");
+        },
+        closest: () => null,
+        getAttribute: () => null,
+      }) as unknown as Element;
+
+    expect(shouldCaptureRecordingTypedText(mockField("password"))).toBe(false);
+    expect(shouldCaptureRecordingTypedText(mockField("checkbox"))).toBe(false);
+    expect(shouldCaptureRecordingTypedText(mockField("text"))).toBe(true);
+    expect(shouldCaptureRecordingTypedText(mockField("textarea"))).toBe(true);
+  });
+
+  it("installs dom capture cleanup without throwing", () => {
+    const cleanup = ensureRecordingDomCapture();
+    expect(typeof cleanup).toBe("function");
+    cleanup();
   });
 });
 

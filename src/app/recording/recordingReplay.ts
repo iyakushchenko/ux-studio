@@ -67,8 +67,9 @@ export function compileRecordingToBeatTimeline(
 }
 
 /**
- * v2 replays transport + screen + dwell + demo-click + wire-intent + director-script
- * (when wired). scroll, beat-enter, studio, touchpoint — counted as unsupported.
+ * v3 replays transport + screen + dwell + demo-click + wire-intent +
+ * director-script + beat-enter + scroll + typed-text (when wired).
+ * studio / touchpoint — counted as unsupported (markers only).
  */
 export async function replayRecordingSession(
   session: RecordingSession,
@@ -86,15 +87,21 @@ export async function replayRecordingSession(
   const applyDemoClick = options.applyDemoClick;
   const applyWireIntent = options.applyWireIntent;
   const applyDirectorScript = options.applyDirectorScript;
+  const applyBeatEnter = options.applyBeatEnter;
+  const applyScroll = options.applyScroll;
+  const applyTypedText = options.applyTypedText;
   if (
     !trigger &&
     !applyScreen &&
     !applyDemoClick &&
     !applyWireIntent &&
-    !applyDirectorScript
+    !applyDirectorScript &&
+    !applyBeatEnter &&
+    !applyScroll &&
+    !applyTypedText
   ) {
     result.errors.push(
-      "triggerTransport, applyScreen, applyDemoClick, applyWireIntent, or applyDirectorScript is required for replay"
+      "triggerTransport, applyScreen, applyDemoClick, applyWireIntent, applyDirectorScript, applyBeatEnter, applyScroll, or applyTypedText is required for replay"
     );
     return result;
   }
@@ -255,6 +262,97 @@ export async function replayRecordingSession(
       continue;
     }
 
+    if (event.kind === "beat-enter") {
+      if (!applyBeatEnter) {
+        result.unsupported += 1;
+        continue;
+      }
+      try {
+        const applied = await applyBeatEnter({
+          actionId: event.actionId,
+          beatId: event.beatId,
+        });
+        if (applied === false) {
+          result.skipped += 1;
+          result.errors.push(
+            `beat-enter ${event.actionId}: apply returned false`
+          );
+          continue;
+        }
+        result.replayed += 1;
+        if (stepDelayMs > 0) {
+          await delay(stepDelayMs);
+        }
+      } catch (err) {
+        result.errors.push(
+          `beat-enter ${event.actionId}: ${
+            err instanceof Error ? err.message : String(err)
+          }`
+        );
+      }
+      continue;
+    }
+
+    if (event.kind === "scroll") {
+      if (!applyScroll) {
+        result.unsupported += 1;
+        continue;
+      }
+      try {
+        const applied = await applyScroll({
+          scrollTop: event.scrollTop,
+          anchorSelector: event.anchorSelector,
+        });
+        if (applied === false) {
+          result.skipped += 1;
+          result.errors.push("scroll: apply returned false");
+          continue;
+        }
+        result.replayed += 1;
+        if (stepDelayMs > 0) {
+          await delay(stepDelayMs);
+        }
+      } catch (err) {
+        result.errors.push(
+          `scroll: ${err instanceof Error ? err.message : String(err)}`
+        );
+      }
+      continue;
+    }
+
+    if (event.kind === "typed-text") {
+      if (!applyTypedText) {
+        result.unsupported += 1;
+        continue;
+      }
+      try {
+        const applied = await applyTypedText({
+          value: event.value,
+          selectorChain: event.selectorChain,
+          element: event.element,
+          inputType: event.inputType,
+        });
+        if (applied === false) {
+          result.skipped += 1;
+          result.errors.push(
+            `typed-text ${event.element ?? "field"}: target not found or apply failed`
+          );
+          continue;
+        }
+        result.replayed += 1;
+        if (stepDelayMs > 0) {
+          await delay(stepDelayMs);
+        }
+      } catch (err) {
+        result.errors.push(
+          `typed-text ${event.element ?? "field"}: ${
+            err instanceof Error ? err.message : String(err)
+          }`
+        );
+      }
+      continue;
+    }
+
     result.unsupported += 1;
   }
 
@@ -271,6 +369,9 @@ export function summarizeRecordingSession(session: RecordingSession): {
   demoClickCount: number;
   wireIntentCount: number;
   directorScriptCount: number;
+  beatEnterCount: number;
+  scrollCount: number;
+  typedTextCount: number;
   durationMs: number | null;
 } {
   const byKind: Record<string, number> = {};
@@ -292,6 +393,9 @@ export function summarizeRecordingSession(session: RecordingSession): {
     demoClickCount: byKind["demo-click"] ?? 0,
     wireIntentCount: byKind["wire-intent"] ?? 0,
     directorScriptCount: byKind["director-script"] ?? 0,
+    beatEnterCount: byKind["beat-enter"] ?? 0,
+    scrollCount: byKind.scroll ?? 0,
+    typedTextCount: byKind["typed-text"] ?? 0,
     durationMs,
   };
 }

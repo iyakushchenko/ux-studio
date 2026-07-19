@@ -17,7 +17,20 @@ import type {
 let snapshotProvider: (() => RecordingSnapshot | undefined) | null = null;
 let lastTouchpointKey: string | undefined;
 let humanClickCaptureInstalled = false;
-let humanClickUnsubSession: (() => void) | null = null;
+let scrollCaptureInstalled = false;
+let typedTextCaptureInstalled = false;
+let domCaptureUnsubSession: (() => void) | null = null;
+let scrollCaptureTimer: ReturnType<typeof setTimeout> | null = null;
+let typedTextCaptureTimer: ReturnType<typeof setTimeout> | null = null;
+let lastCapturedScrollTop: number | undefined;
+
+const SCROLL_CAPTURE_DEBOUNCE_MS = 120;
+const TYPED_TEXT_CAPTURE_DEBOUNCE_MS = 280;
+
+const TYPED_TEXT_FIELD_SELECTOR = [
+  'input:not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="file"]):not([type="hidden"]):not([type="password"]):not([type="image"])',
+  "textarea",
+].join(", ");
 
 export function registerRecordingSnapshotProvider(
   provider: (() => RecordingSnapshot | undefined) | null
@@ -154,10 +167,27 @@ export function captureScroll(options: {
   scrollTop?: number;
   anchorSelector?: string;
 }): void {
+  if (!getActiveRecordingSession()) return;
   captureRecordingEvent({
     kind: "scroll",
     scrollTop: options.scrollTop,
     anchorSelector: options.anchorSelector,
+  });
+}
+
+export function captureTypedText(options: {
+  value: string;
+  selectorChain?: string[];
+  element?: string;
+  inputType?: string;
+}): void {
+  if (!getActiveRecordingSession()) return;
+  captureRecordingEvent({
+    kind: "typed-text",
+    value: options.value,
+    selectorChain: options.selectorChain,
+    element: options.element,
+    inputType: options.inputType,
   });
 }
 
@@ -349,9 +379,118 @@ function onRecordingHumanClick(event: Event): void {
   notifyRecordingDemoClick(target, describeRecordingClickTarget(target));
 }
 
-function syncRecordingHumanClickListener(): void {
+function resolvePrototypeScrollRoot(): HTMLElement | null {
+  if (typeof document === "undefined") return null;
+  return (
+    document.querySelector<HTMLElement>(
+      ".studio-scroll--prototype:not(.hidden)"
+    ) ??
+    document.querySelector<HTMLElement>(".studio-scroll--prototype")
+  );
+}
+
+function flushRecordingScrollCapture(): void {
+  scrollCaptureTimer = null;
+  if (!isRecordingActive()) return;
+  const root = resolvePrototypeScrollRoot();
+  if (!root) return;
+  const scrollTop = Math.round(root.scrollTop);
+  if (lastCapturedScrollTop === scrollTop) return;
+  lastCapturedScrollTop = scrollTop;
+  captureScroll({ scrollTop });
+}
+
+function onRecordingScroll(event: Event): void {
+  if (!isRecordingActive()) return;
+  if (!("isTrusted" in event) || event.isTrusted !== true) return;
+  const root = resolvePrototypeScrollRoot();
+  if (!root || event.target !== root) return;
+  if (scrollCaptureTimer != null) clearTimeout(scrollCaptureTimer);
+  scrollCaptureTimer = setTimeout(
+    flushRecordingScrollCapture,
+    SCROLL_CAPTURE_DEBOUNCE_MS
+  );
+}
+
+function isTypedTextField(el: Element | null): el is HTMLInputElement | HTMLTextAreaElement {
+  if (!el || typeof (el as Element).matches !== "function") return false;
+  if (isRecordingChromeTarget(el)) return false;
+  try {
+    return el.matches(TYPED_TEXT_FIELD_SELECTOR);
+  } catch {
+    return false;
+  }
+}
+
+function describeTypedTextTarget(el: HTMLElement): string {
+  const action = el.getAttribute("data-studio-action");
+  if (action) return `data-studio-action="${action}"`;
+  const dataName = el.getAttribute("data-name");
+  if (dataName) return `data-name="${dataName}"`;
+  const tag = el.tagName.toLowerCase();
+  const type =
+    el instanceof HTMLInputElement ? el.type || "text" : "textarea";
+  return `<${tag} type="${type}">`;
+}
+
+function flushTypedTextCapture(el: HTMLInputElement | HTMLTextAreaElement): void {
+  typedTextCaptureTimer = null;
+  if (!isRecordingActive()) return;
+  if (!isTypedTextField(el)) return;
+  const chain = buildPlaybackSelectorChain(el);
+  if (chain.length === 0) return;
+  captureTypedText({
+    value: el.value,
+    selectorChain: chain,
+    element: describeTypedTextTarget(el),
+    inputType:
+      el instanceof HTMLInputElement ? el.type || "text" : "textarea",
+  });
+}
+
+function scheduleTypedTextCapture(el: HTMLInputElement | HTMLTextAreaElement): void {
+  if (typedTextCaptureTimer != null) clearTimeout(typedTextCaptureTimer);
+  typedTextCaptureTimer = setTimeout(
+    () => flushTypedTextCapture(el),
+    TYPED_TEXT_CAPTURE_DEBOUNCE_MS
+  );
+}
+
+function onRecordingTypedTextInput(event: Event): void {
+  if (!isRecordingActive()) return;
+  if (!("isTrusted" in event) || event.isTrusted !== true) return;
+  const el = event.target;
+  if (!isTypedTextField(el as Element)) return;
+  scheduleTypedTextCapture(el as HTMLInputElement | HTMLTextAreaElement);
+}
+
+function onRecordingTypedTextChange(event: Event): void {
+  if (!isRecordingActive()) return;
+  if (!("isTrusted" in event) || event.isTrusted !== true) return;
+  const el = event.target;
+  if (!isTypedTextField(el as Element)) return;
+  if (typedTextCaptureTimer != null) {
+    clearTimeout(typedTextCaptureTimer);
+    typedTextCaptureTimer = null;
+  }
+  flushTypedTextCapture(el as HTMLInputElement | HTMLTextAreaElement);
+}
+
+function clearDomCaptureTimers(): void {
+  if (scrollCaptureTimer != null) {
+    clearTimeout(scrollCaptureTimer);
+    scrollCaptureTimer = null;
+  }
+  if (typedTextCaptureTimer != null) {
+    clearTimeout(typedTextCaptureTimer);
+    typedTextCaptureTimer = null;
+  }
+}
+
+function syncRecordingDomCaptureListeners(): void {
   if (typeof document === "undefined") return;
   const want = isRecordingActive();
+
   if (want && !humanClickCaptureInstalled) {
     document.addEventListener("click", onRecordingHumanClick, true);
     humanClickCaptureInstalled = true;
@@ -359,26 +498,69 @@ function syncRecordingHumanClickListener(): void {
     document.removeEventListener("click", onRecordingHumanClick, true);
     humanClickCaptureInstalled = false;
   }
+
+  if (want && !scrollCaptureInstalled) {
+    document.addEventListener("scroll", onRecordingScroll, true);
+    scrollCaptureInstalled = true;
+    lastCapturedScrollTop = undefined;
+  } else if (!want && scrollCaptureInstalled) {
+    document.removeEventListener("scroll", onRecordingScroll, true);
+    scrollCaptureInstalled = false;
+    lastCapturedScrollTop = undefined;
+  }
+
+  if (want && !typedTextCaptureInstalled) {
+    document.addEventListener("input", onRecordingTypedTextInput, true);
+    document.addEventListener("change", onRecordingTypedTextChange, true);
+    typedTextCaptureInstalled = true;
+  } else if (!want && typedTextCaptureInstalled) {
+    document.removeEventListener("input", onRecordingTypedTextInput, true);
+    document.removeEventListener("change", onRecordingTypedTextChange, true);
+    typedTextCaptureInstalled = false;
+  }
+
+  if (!want) clearDomCaptureTimers();
 }
 
 /**
- * Install document click capture for human REC clicks.
- * Listener is live only while `isRecordingActive()` (paused/stopped = off).
+ * Install document capture for human REC clicks, prototype scroll, and typed text.
+ * Listeners are live only while `isRecordingActive()` (paused/stopped = off).
  */
-export function ensureRecordingHumanClickCapture(): () => void {
+export function ensureRecordingDomCapture(): () => void {
   if (typeof document === "undefined") return () => {};
-  if (!humanClickUnsubSession) {
-    humanClickUnsubSession = subscribeRecordingSession(syncRecordingHumanClickListener);
+  if (!domCaptureUnsubSession) {
+    domCaptureUnsubSession = subscribeRecordingSession(
+      syncRecordingDomCaptureListeners
+    );
   }
-  syncRecordingHumanClickListener();
+  syncRecordingDomCaptureListeners();
   return () => {
-    humanClickUnsubSession?.();
-    humanClickUnsubSession = null;
+    domCaptureUnsubSession?.();
+    domCaptureUnsubSession = null;
+    clearDomCaptureTimers();
     if (humanClickCaptureInstalled) {
       document.removeEventListener("click", onRecordingHumanClick, true);
       humanClickCaptureInstalled = false;
     }
+    if (scrollCaptureInstalled) {
+      document.removeEventListener("scroll", onRecordingScroll, true);
+      scrollCaptureInstalled = false;
+    }
+    if (typedTextCaptureInstalled) {
+      document.removeEventListener("input", onRecordingTypedTextInput, true);
+      document.removeEventListener("change", onRecordingTypedTextChange, true);
+      typedTextCaptureInstalled = false;
+    }
+    lastCapturedScrollTop = undefined;
   };
+}
+
+/** @deprecated alias — use `ensureRecordingDomCapture`. */
+export const ensureRecordingHumanClickCapture = ensureRecordingDomCapture;
+
+/** Whether a field is eligible for typed-text capture (tests + guards). */
+export function shouldCaptureRecordingTypedText(el: Element | null): boolean {
+  return isTypedTextField(el);
 }
 
 function parseTransportAction(label: string): ManualTransportAction | null {
@@ -395,10 +577,23 @@ export function resetRecordingCaptureForTests(): void {
   snapshotProvider = null;
   lastTouchpointKey = undefined;
   lastScreenKey = undefined;
-  if (typeof document !== "undefined" && humanClickCaptureInstalled) {
-    document.removeEventListener("click", onRecordingHumanClick, true);
+  clearDomCaptureTimers();
+  if (typeof document !== "undefined") {
+    if (humanClickCaptureInstalled) {
+      document.removeEventListener("click", onRecordingHumanClick, true);
+    }
+    if (scrollCaptureInstalled) {
+      document.removeEventListener("scroll", onRecordingScroll, true);
+    }
+    if (typedTextCaptureInstalled) {
+      document.removeEventListener("input", onRecordingTypedTextInput, true);
+      document.removeEventListener("change", onRecordingTypedTextChange, true);
+    }
   }
   humanClickCaptureInstalled = false;
-  humanClickUnsubSession?.();
-  humanClickUnsubSession = null;
+  scrollCaptureInstalled = false;
+  typedTextCaptureInstalled = false;
+  lastCapturedScrollTop = undefined;
+  domCaptureUnsubSession?.();
+  domCaptureUnsubSession = null;
 }

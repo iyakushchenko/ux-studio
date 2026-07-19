@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, type MutableRefObject } from "react";
 import type { JourneyBeatActionId, JourneyRuntime } from "@/app/orchestra/types";
 import {
-  ensureRecordingHumanClickCapture,
+  ensureRecordingDomCapture,
   resolvePlaybackSelectorChain,
 } from "@/app/recording/recordingCapture";
 import { registerRecordingMcpHelpers } from "@/app/recording/recordingMcpHelpers";
@@ -10,6 +10,7 @@ import type { RecordingReplayOptions } from "@/app/recording/recordingTypes";
 import type { StartRecordingOptions } from "@/app/recording/recordingSession";
 import type { ManualTransportAction } from "@/app/shell/playbackInteractionContext";
 import { simulateDemoPointerClick } from "@/app/scenario/demoCursor";
+import { getPrototypeScrollRoot } from "@/app/scenario/playbackScroll";
 import {
   resolveClickTargetRespectingModal,
   STUDIO_MODAL,
@@ -17,6 +18,24 @@ import {
 import { applyStudioScreen } from "@/app/shell/studioUrl";
 import { retreatScriptOptions } from "@/projects/playbackScriptOptions";
 import type { ProjectPlayback } from "@/projects/types";
+
+function setNativeInputValue(
+  el: HTMLInputElement | HTMLTextAreaElement,
+  value: string
+): void {
+  const proto =
+    el instanceof HTMLTextAreaElement
+      ? HTMLTextAreaElement.prototype
+      : HTMLInputElement.prototype;
+  const desc = Object.getOwnPropertyDescriptor(proto, "value");
+  if (desc?.set) {
+    desc.set.call(el, value);
+  } else {
+    el.value = value;
+  }
+  el.dispatchEvent(new Event("input", { bubbles: true }));
+  el.dispatchEvent(new Event("change", { bubbles: true }));
+}
 
 const JOURNEY_BEAT_ACTION_IDS = new Set<JourneyBeatActionId>([
   "open-availability-start",
@@ -51,7 +70,8 @@ export type RecordingScreenNavApi = {
 
 /**
  * App-facing recording replay wiring — transport / screen / demo-click /
- * wire-intent / director-script + human click capture + MCP helpers.
+ * wire-intent / director-script / beat-enter / scroll / typed-text +
+ * DOM capture + MCP helpers.
  */
 export function useRecordingReplayBridge(options: {
   transportActionsRef: MutableRefObject<RecordingTransportActions>;
@@ -223,6 +243,81 @@ export function useRecordingReplayBridge(options: {
     []
   );
 
+  const applyRecordingBeatEnter = useCallback(
+    async (event: { actionId: string; beatId?: string }) => {
+      const { actionId } = event;
+      if (actionId.startsWith("sync-")) {
+        const scriptId = actionId.slice("sync-".length);
+        if (!scriptId) return false;
+        return applyRecordingProjectScript(
+          { scriptId, scriptKind: "book" },
+          projectPlaybackRef.current,
+          journeyRuntimeRef.current,
+          retreatScriptOptions(true)
+        );
+      }
+      if (!isJourneyBeatActionId(actionId)) return false;
+      projectPlaybackRef.current.runBeatAction(
+        actionId,
+        journeyRuntimeRef.current
+      );
+      return true;
+    },
+    []
+  );
+
+  const applyRecordingScroll = useCallback(
+    async (event: { scrollTop?: number; anchorSelector?: string }) => {
+      if (event.anchorSelector) {
+        let anchor: HTMLElement | null = null;
+        try {
+          anchor = document.querySelector<HTMLElement>(event.anchorSelector);
+        } catch {
+          anchor = null;
+        }
+        if (!anchor) return false;
+        anchor.scrollIntoView({ block: "nearest", inline: "nearest" });
+        return true;
+      }
+      if (event.scrollTop == null || !Number.isFinite(event.scrollTop)) {
+        return false;
+      }
+      const root = getPrototypeScrollRoot();
+      if (!root) return false;
+      root.scrollTop = event.scrollTop;
+      return true;
+    },
+    []
+  );
+
+  const applyRecordingTypedText = useCallback(
+    async (event: {
+      value: string;
+      selectorChain?: string[];
+      element?: string;
+      inputType?: string;
+    }) => {
+      const resolved = resolvePlaybackSelectorChain(
+        event.selectorChain,
+        document
+      );
+      const target = resolveClickTargetRespectingModal(resolved, {
+        resolveInModal: (modal) =>
+          resolvePlaybackSelectorChain(event.selectorChain, modal),
+      });
+      if (
+        !target ||
+        (!(target instanceof HTMLInputElement) &&
+          !(target instanceof HTMLTextAreaElement))
+      ) {
+        return false;
+      }
+      setNativeInputValue(target, event.value);
+      return true;
+    },
+    []
+  );
+
   const replayRecordingOptions = useCallback(
     (): RecordingReplayOptions => ({
       triggerTransport: triggerRecordingTransport,
@@ -230,19 +325,25 @@ export function useRecordingReplayBridge(options: {
       applyDemoClick: applyRecordingDemoClick,
       applyWireIntent: applyRecordingWireIntent,
       applyDirectorScript: applyRecordingDirectorScript,
+      applyBeatEnter: applyRecordingBeatEnter,
+      applyScroll: applyRecordingScroll,
+      applyTypedText: applyRecordingTypedText,
       stepDelayMs: 200,
     }),
     [
+      applyRecordingBeatEnter,
       applyRecordingDemoClick,
       applyRecordingDirectorScript,
       applyRecordingScreen,
+      applyRecordingScroll,
+      applyRecordingTypedText,
       applyRecordingWireIntent,
       triggerRecordingTransport,
     ]
   );
 
   useEffect(() => {
-    return ensureRecordingHumanClickCapture();
+    return ensureRecordingDomCapture();
   }, []);
 
   const onJourneySavedRef = useRef(onJourneySaved);

@@ -1559,9 +1559,11 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       ta.rows = 1;
       ta.spellcheck = true;
       ta.setAttribute("aria-label", "Ask Site Pilot");
+      ta.setAttribute("data-studio-action", "agentic-home-query");
       ta.placeholder = "Ask about health services…";
       prompt.replaceWith(ta);
     }
+    ta.setAttribute("data-studio-action", "agentic-home-query");
 
     const pendingQuery =
       pendingAgenticHomeQueryRef.current ??
@@ -1735,9 +1737,11 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       ta.rows = 5;
       ta.spellcheck = true;
       ta.setAttribute("aria-label", "Ask Boots SitePilot");
+      ta.setAttribute("data-studio-action", "agentic-chat-query");
       ta.placeholder = "Ask Boots SitePilot";
       prompt.replaceWith(ta);
     }
+    ta.setAttribute("data-studio-action", "agentic-chat-query");
 
     const syncComposerDirty = () => {
       setChatComposerDirty(ta!.value.trim().length > 0);

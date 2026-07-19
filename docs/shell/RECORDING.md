@@ -147,7 +147,7 @@ Leaving Rec while a capture is live **pauses** the session (does not stop/destro
 | ■ | Stop — keeps session for export / replay |
 | ↓ | Download `.recording.json` |
 | ↑ | Import a saved `.recording.json` |
-| ↺ | Replay last stopped or imported session (v2: transport + screen + demo/human-click + wire-intent + director-script) |
+| ↺ | Replay last stopped or imported session (v3: transport + screen + demo/human-click + wire-intent + director-script + beat-enter + scroll + typed-text) |
 | ⌁ (save) | **Save as journey** — compile → replace current CJM slot in the runtime catalog + download `journey-*.json` |
 
 UI and MCP share `recordingSession` + `replayRecordingSession` — no second session store.
@@ -163,10 +163,11 @@ UI and MCP share `recordingSession` + `replayRecordingSession` — no second ses
 | `screen` | Address-bar / tab screen change (`useStudioUrlSync`) | Yes — `applyStudioScreen` via `screenId` / `studioUrl` |
 | `demo-click` | Robo-cursor via `notePlaybackDemoClick` **or** trusted human REC clicks | Yes — `resolvePlaybackSelectorChain` → `simulateDemoPointerClick` |
 | `director-script` | Journey director via `notePlaybackDirectorScript` | Yes — `applyRecordingProjectScript` → `run*Script` by channel |
-| `beat-enter` | Beat onEnter via `notePlaybackBeatEnter` | No |
+| `beat-enter` | Beat onEnter via `notePlaybackBeatEnter` | Yes — known `JourneyBeatActionId` → `runBeatAction`; `sync-<bookScript>` → book script with `syncState` |
 | `wire-intent` | Retreat sync / `captureWireIntent` / beat actions | Yes — known `JourneyBeatActionId` via `runBeatAction`; `retreat-sync` → script runner with `syncState` when `scriptId` resolves |
 | `studio` | Journey/orchestra mode changes (manual API) | No |
-| `scroll` | Manual API | No |
+| `scroll` | Debounced prototype root scroll while REC active (`captureScroll`) | Yes — restore `scrollTop` on `.studio-scroll--prototype` (or `anchorSelector` → `scrollIntoView`) |
+| `typed-text` | Debounced trusted `input`/`change` on text-like fields with selector chain | Yes — set value + dispatch `input`/`change` (modal eyes) |
 | `dwell` | Manual API or compiled pauses | Yes (delay) |
 
 Each event may include a `snapshot` (`PlaybackStudioSnapshot` + journey/orchestra fields), including `screenId` and `studioUrl` when the bar is synced.
@@ -249,19 +250,29 @@ Prefer `__studio*`; `__proto*` aliases remain. Export / replay / compile fall ba
 
 **Mapped into beats:** touchpoint segments (or screen/director fallback), `director-script` → home/avail/book/tab scripts, known `wire-intent` / `beat-enter` → `onEnter`, `dwell` → `dwellMs`, snapshot `protoTab` / `currentTabIndex`.
 
-**Not compiled (honest gaps — use REC ↺ replay):** `scroll`, unknown wire intents, typed-text / form capture, writing durable `journeys.ts` source (runtime overlay only).
+**Not compiled (honest gaps — use REC ↺ replay):** `scroll`, `typed-text`, unknown wire intents / unknown beat-enter ids, writing durable `journeys.ts` source (runtime overlay only).
+
+### Beat-enter + scroll + typed-text replay (v3)
+
+| Kind | Capture | Replay |
+|------|---------|--------|
+| `beat-enter` | Flight recorder (`notePlaybackBeatEnter`) | `applyBeatEnter` → `runBeatAction` or `sync-*` book script |
+| `scroll` | Debounced scroll on `.studio-scroll--prototype` while REC | `applyScroll` → `scrollTop` / optional anchor |
+| `typed-text` | Debounced trusted text field `input`/`change` (needs selector chain) | `applyTypedText` → native value + events |
+
+Stable field selectors: `data-studio-action="avail-search-query"` / `agentic-home-query` / `agentic-chat-query` / `avail-notify-email`. Password / checkbox / radio / file / chrome skipped.
 
 ---
 
-## v2 vs future
+## v3 vs future
 
-| v2 (now) | Later |
+| v3 (now) | Later |
 |----------|-------|
 | In-memory session + JSON export | Persist compile into persona `journeys.ts` / `data/journeys/` commit path |
-| Studio REC deck + MCP helpers | beat-enter / scroll **replay** (capture exists; replay still unsupported) |
-| Transport + screen + dwell + **demo-click** + **human REC click** | Richer human capture (forms / drag / typed text) |
+| Studio REC deck + MCP helpers | Nested scroll containers beyond prototype root |
+| Transport + screen + dwell + demo-click + human REC click + **beat-enter + scroll + typed-text** | Drag / contenteditable / rich form widgets |
 | Director-script + retreat-sync via shared script apply | — |
-| **Compile → ephemeral journey catalog** (Save as journey) | Multi-journey free ids beyond the two CJM slots |
+| **Compile → ephemeral journey catalog** (Save as journey) | Multi-journey free ids beyond the two CJM slots; compile scroll/typed into beats |
 
 ---
 

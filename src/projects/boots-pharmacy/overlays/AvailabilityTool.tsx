@@ -851,6 +851,7 @@ export default function AvailabilityTool({
                 >
                   <input
                     type="text"
+                    data-studio-action="avail-search-query"
                     placeholder="Enter city, post code or any part of the address"
                     value={query}
                     readOnly
@@ -889,6 +890,7 @@ export default function AvailabilityTool({
               >
                 <input
                   type="text"
+                  data-studio-action="avail-search-query"
                   value={query}
                   placeholder={nearMe ? SEARCH_NEAR_PLACEHOLDER : undefined}
                   readOnly={nearMe}
@@ -1117,6 +1119,7 @@ export default function AvailabilityTool({
                   <label className="proto-avail-field proto-avail-field--flex">
                     <input
                       type="email"
+                      data-studio-action="avail-notify-email"
                       placeholder="Your email address"
                       value={notifyEmail}
                       onChange={(e) => setNotifyEmail(e.target.value)}

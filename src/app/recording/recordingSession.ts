@@ -57,6 +57,8 @@ function eventDedupeKey(event: RecordedEvent): string {
       return `wire-intent:${event.intentId}:${JSON.stringify(event.payload ?? {})}`;
     case "scroll":
       return `scroll:${event.scrollTop ?? ""}:${event.anchorSelector ?? ""}`;
+    case "typed-text":
+      return `typed-text:${(event.selectorChain ?? []).join(">")}:${event.value}`;
     case "touchpoint":
       return `touchpoint:${event.touchpointKey}`;
     case "dwell":

@@ -66,6 +66,9 @@ export function registerRecordingMcpHelpers(options?: {
   applyDemoClick?: import("@/app/recording/recordingTypes").RecordingReplayOptions["applyDemoClick"];
   applyWireIntent?: import("@/app/recording/recordingTypes").RecordingReplayOptions["applyWireIntent"];
   applyDirectorScript?: import("@/app/recording/recordingTypes").RecordingReplayOptions["applyDirectorScript"];
+  applyBeatEnter?: import("@/app/recording/recordingTypes").RecordingReplayOptions["applyBeatEnter"];
+  applyScroll?: import("@/app/recording/recordingTypes").RecordingReplayOptions["applyScroll"];
+  applyTypedText?: import("@/app/recording/recordingTypes").RecordingReplayOptions["applyTypedText"];
   onJourneySaved?: () => void;
 }): () => void {
   if (typeof window === "undefined") return () => {};
@@ -138,10 +141,13 @@ export function registerRecordingMcpHelpers(options?: {
       !options?.applyScreen &&
       !options?.applyDemoClick &&
       !options?.applyWireIntent &&
-      !options?.applyDirectorScript
+      !options?.applyDirectorScript &&
+      !options?.applyBeatEnter &&
+      !options?.applyScroll &&
+      !options?.applyTypedText
     ) {
       throw new Error(
-        "triggerTransport, applyScreen, applyDemoClick, applyWireIntent, or applyDirectorScript not available"
+        "triggerTransport, applyScreen, applyDemoClick, applyWireIntent, applyDirectorScript, applyBeatEnter, applyScroll, or applyTypedText not available"
       );
     }
     return replayRecordingSession(target, {
@@ -150,6 +156,9 @@ export function registerRecordingMcpHelpers(options?: {
       applyDemoClick: options.applyDemoClick,
       applyWireIntent: options.applyWireIntent,
       applyDirectorScript: options.applyDirectorScript,
+      applyBeatEnter: options.applyBeatEnter,
+      applyScroll: options.applyScroll,
+      applyTypedText: options.applyTypedText,
       stepDelayMs: 200,
     });
   };

@@ -10,13 +10,13 @@
 ## NOW
 
 1. [x] **Post-agent clean slate** — sticky Choose Pharmacy after MCP/agent tests: `stop({ reload: true })` → hub URL + dismiss modal before reload ([RECORDING.md](../shell/RECORDING.md)). Quinn proved localhost 2026-07-19.
-2. [ ] **Versioning habit** — append notes on every user-visible ship; Pax decides patch; Ben executes ([VERSIONING.md](./VERSIONING.md)).
+2. [x] **REC capture gaps** — beat-enter / scroll / typed-text capture+replay (v3); journey compile still gaps scroll/typed ([RECORDING.md](../shell/RECORDING.md), [REC_CAPTURE_GAPS.md](../projects/boots-pharmacy/features/REC_CAPTURE_GAPS.md)).
+3. [ ] **Versioning habit** — append notes on every user-visible ship; Pax decides patch; Ben executes ([VERSIONING.md](./VERSIONING.md)).
 
 ---
 
 ## NEXT
 
-3. [ ] **REC capture gaps** — beat-enter / scroll / typed-text replay (capture partial; replay unsupported) unless a trivial win appears.
 4. [ ] **LEGACY retirement (by screen)** — no LEGACY growth; shrink Make wire + `globals-screens` as React pages land. Concept `.proto-*` classes retire with their screen.
 5. [ ] **Engine monster splits** — on next touch of `App.tsx` / `useJourneyPlayback.ts`, extract by domain (recording bridge / beat advance) — not micro-files.
 6. [ ] **Grow UXDS by page** — extract only on second use ([COMPONENT_LIBRARY.md](./COMPONENT_LIBRARY.md)).
@@ -35,6 +35,7 @@
 
 ## Done recently (context)
 
+- [x] **REC capture gaps (v3)** — beat-enter / scroll / typed-text capture+replay; compile still gaps scroll/typed; brief `REC_CAPTURE_GAPS.md`.
 - [x] **Post-agent clean slate** — `resetStudioAfterAgentTest()` → `?project=…&screen=hub` (no modal) on overlay stop + pre-reload; sync lock; Quinn localhost PROVEN ([RECORDING.md](../shell/RECORDING.md)).
 - [x] **Lean UX team OS + modal URL + sitrep z-index** — Arch/Bea/Finn/Uma/Quinn/Ben/Pax; `&modal=choose-pharmacy`; overlay above avail ([TEAM.md](./TEAM.md), [URL.md](../shell/URL.md)).
 - [x] **Recording compile→journeys (vertical)** — `compileRecordingToJourney` + REC **Save as journey** / `__studioSaveRecordingAsJourney` merges into `journeyRuntimeStore`; play via CJM ([RECORDING.md](../shell/RECORDING.md)).

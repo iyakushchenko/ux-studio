@@ -85,6 +85,12 @@ function sessionWithTouchpoints(): RecordingSession {
         scrollTop: 120,
         atMs: 100,
       },
+      {
+        kind: "typed-text",
+        value: "London",
+        selectorChain: ['[data-studio-action="avail-search-query"]'],
+        atMs: 110,
+      },
     ],
   };
 }
@@ -125,6 +131,7 @@ describe("compileRecordingToJourney", () => {
       kind: "tab-landing",
     });
     expect(gaps).toContain("scroll");
+    expect(gaps).toContain("typed-text");
   });
 
   it("falls back to screen/director markers without touchpoints", () => {

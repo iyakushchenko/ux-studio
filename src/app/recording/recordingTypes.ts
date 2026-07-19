@@ -56,6 +56,19 @@ export type RecordedScrollEvent = {
   snapshot?: RecordingSnapshot;
 };
 
+/** Settled text entry on input/textarea (debounced) for REC ↺ replay. */
+export type RecordedTypedTextEvent = {
+  kind: "typed-text";
+  value: string;
+  /** Nearest data-studio-* / data-name chain for replay targeting. */
+  selectorChain?: string[];
+  /** Human-readable descriptor (action / name / tag). */
+  element?: string;
+  inputType?: string;
+  atMs: number;
+  snapshot?: RecordingSnapshot;
+};
+
 export type RecordedTouchpointEvent = {
   kind: "touchpoint";
   touchpointKey: string;
@@ -107,6 +120,7 @@ export type RecordedEvent =
   | RecordedDemoClickEvent
   | RecordedWireIntentEvent
   | RecordedScrollEvent
+  | RecordedTypedTextEvent
   | RecordedTouchpointEvent
   | RecordedDwellEvent
   | RecordedDirectorEvent
@@ -183,6 +197,23 @@ export type RecordingDirectorScriptApplyInput = {
   manual?: boolean;
 };
 
+export type RecordingBeatEnterApplyInput = {
+  actionId: string;
+  beatId?: string;
+};
+
+export type RecordingScrollApplyInput = {
+  scrollTop?: number;
+  anchorSelector?: string;
+};
+
+export type RecordingTypedTextApplyInput = {
+  value: string;
+  selectorChain?: string[];
+  element?: string;
+  inputType?: string;
+};
+
 export type RecordingReplayOptions = {
   triggerTransport?: (action: ManualTransportAction) => void | Promise<void>;
   /**
@@ -214,6 +245,27 @@ export type RecordingReplayOptions = {
    */
   applyDirectorScript?: (
     event: RecordingDirectorScriptApplyInput
+  ) => boolean | void | Promise<boolean | void>;
+  /**
+   * v3 — re-fire beat onEnter actions (`runBeatAction` / sync-* book script).
+   * When omitted, beat-enter events count as unsupported.
+   */
+  applyBeatEnter?: (
+    event: RecordingBeatEnterApplyInput
+  ) => boolean | void | Promise<boolean | void>;
+  /**
+   * v3 — restore prototype scroll position (or scrollIntoView via anchor).
+   * When omitted, scroll events count as unsupported.
+   */
+  applyScroll?: (
+    event: RecordingScrollApplyInput
+  ) => boolean | void | Promise<boolean | void>;
+  /**
+   * v3 — restore typed text into a resolved input/textarea.
+   * When omitted, typed-text events count as unsupported.
+   */
+  applyTypedText?: (
+    event: RecordingTypedTextApplyInput
   ) => boolean | void | Promise<boolean | void>;
   /** Delay between transport / screen / demo-click events (ms). Default 400. */
   stepDelayMs?: number;

@@ -232,6 +232,10 @@ function compileSegmentToBeat(
     if (event.kind === "scroll") {
       gaps.push("scroll");
     }
+
+    if (event.kind === "typed-text") {
+      gaps.push("typed-text");
+    }
   }
 
   const protoTab = readProtoTab(segment.events);
@@ -323,6 +327,10 @@ function compileFallbackBeats(
 
     if (event.kind === "scroll") {
       gaps.push("scroll");
+    }
+
+    if (event.kind === "typed-text") {
+      gaps.push("typed-text");
     }
   }
 
