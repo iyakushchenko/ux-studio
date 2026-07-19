@@ -1,10 +1,11 @@
 import { dispatchRetreatSync } from "@/app/scenario/retreatBridge";
+import { snapDemoTargetIntoView } from "@/app/scenario/playbackScroll";
 import {
   beatDirectorScriptLabel,
   isDwellLandingBeat,
 } from "@/app/orchestra/journeyBeatDirector";
 import type { JourneyBeat, JourneyRuntime } from "@/app/orchestra/types";
-import { playbackDiagLog } from "@/app/shell/playbackDiag";
+import { playbackDiagLog, playbackDiagScroll } from "@/app/shell/playbackDiag";
 import { notePlaybackRetreatSync } from "@/app/shell/playbackInteractionContext";
 import { playbackScrollMonitor } from "@/app/shell/playbackScrollMonitor";
 import { resolvePlaybackScriptKind } from "@/app/shell/playbackScriptRegistry";
@@ -16,6 +17,35 @@ import type {
   RetreatSelectionGoal,
   RetreatViewportGoal,
 } from "@/projects/types";
+
+/** Best-effort active control for retreat scrollIntoView (engine-agnostic). */
+function resolveRetreatScrollTarget(beat: JourneyBeat): HTMLElement | null {
+  if (typeof document === "undefined") return null;
+  const selectors = [
+    "[data-studio-cal-selected='true']",
+    "[aria-pressed='true']",
+    ".proto-avail-cal-cell--selected",
+    "[data-studio-action='book-step-1-continue']",
+    "button.chat__cta",
+    "textarea.site-pilot-composer__query",
+    "textarea.proto-agentic-query",
+    "[data-studio-wishlist-id]",
+    ".uxds-btn-primary",
+  ];
+  for (const sel of selectors) {
+    const el = document.querySelector<HTMLElement>(sel);
+    if (el && el.getClientRects().length > 0) return el;
+  }
+  // Screen host fallback so retreat never leaves the camera on a blank fold.
+  const tab = beat.protoTab;
+  if (tab != null) {
+    const screen = document.querySelector<HTMLElement>(
+      `.studio-viewport > div > div:nth-child(${tab + 1})`
+    );
+    if (screen) return screen;
+  }
+  return null;
+}
 
 export type BeatRetreatScriptChannel = "home" | "avail" | "book" | "tab";
 
@@ -69,8 +99,24 @@ export async function syncBeatRetreatState(
   });
   playbackScrollMonitor.noteRetreatSync();
 
+  const finishRetreatCamera = () => {
+    const target = resolveRetreatScrollTarget(beat);
+    if (!target) {
+      playbackDiagScroll({
+        beatId: beat.id,
+        detail: "retreat scrollIntoView — no target",
+        intoViewRequested: true,
+        intoViewDone: false,
+        retreat: true,
+      });
+      return;
+    }
+    snapDemoTargetIntoView(target, { retreat: true });
+  };
+
   if (channel === "home" && beat.homeScript) {
     await playback.runHomeScript(beat.homeScript, syncOptions);
+    finishRetreatCamera();
     dispatchRetreatSync({
       beatId: beat.id,
       channel,
@@ -83,6 +129,7 @@ export async function syncBeatRetreatState(
     syncAvailBeatRetreat(beat, runtime);
     await playback.runAvailScript(beat.availScript, syncOptions);
     syncAvailBeatRetreat(beat, runtime);
+    finishRetreatCamera();
     dispatchRetreatSync({
       beatId: beat.id,
       channel,
@@ -93,6 +140,7 @@ export async function syncBeatRetreatState(
 
   if (channel === "book" && beat.bookScript) {
     await playback.runBookScript(beat.bookScript, syncOptions);
+    finishRetreatCamera();
     dispatchRetreatSync({
       beatId: beat.id,
       channel,
@@ -103,6 +151,7 @@ export async function syncBeatRetreatState(
 
   if (channel === "tab" && beat.tabScript) {
     await playback.runTabScript(beat.tabScript, runtime, syncOptions);
+    finishRetreatCamera();
     dispatchRetreatSync({
       beatId: beat.id,
       channel,
@@ -113,11 +162,14 @@ export async function syncBeatRetreatState(
 
   if (isDwellLandingBeat(beat) && playback.syncDwellRetreat) {
     await playback.syncDwellRetreat(beat, options);
+    finishRetreatCamera();
     dispatchRetreatSync({
       beatId: beat.id,
       channel: "dwell",
       scriptId: beatDirectorScriptLabel(beat),
     });
+  } else {
+    finishRetreatCamera();
   }
 }
 

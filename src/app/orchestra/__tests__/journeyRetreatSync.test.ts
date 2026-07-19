@@ -22,6 +22,9 @@ describe("journeyRetreatSync", () => {
     vi.stubGlobal("window", {
       dispatchEvent: vi.fn(),
     });
+    vi.stubGlobal("document", {
+      querySelector: vi.fn(() => null),
+    });
   });
 
   it("routes book scripts through runBookScript with syncState", async () => {

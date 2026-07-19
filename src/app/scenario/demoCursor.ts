@@ -16,6 +16,10 @@ import {
   notePlaybackCursorEvent,
 } from "@/app/shell/playbackCursorDiagnostic";
 import {
+  playbackDiagClick,
+  playbackDiagTarget,
+} from "@/app/shell/playbackDiag";
+import {
   isElementBlockedByModal,
   resolveClickTargetRespectingModal,
 } from "@/app/shell/studioModalGuard";
@@ -1284,15 +1288,52 @@ export async function simulateDemoPointerClick(
     dispatchPointerEvents?: boolean;
   }
 ): Promise<boolean> {
-  if (options?.shouldAbort?.()) return false;
-  if (!isClickableTarget(target)) return false;
+  const selector = describeCursorTarget(target);
+  const rect = target.getBoundingClientRect();
+  const bbox = {
+    x: Math.round(rect.x),
+    y: Math.round(rect.y),
+    w: Math.round(rect.width),
+    h: Math.round(rect.height),
+  };
+  playbackDiagTarget({
+    selector,
+    found: true,
+    element: target,
+    detail: "click target resolve",
+  });
+
+  if (options?.shouldAbort?.()) {
+    playbackDiagClick({
+      ok: false,
+      selector,
+      bbox,
+      detail: "click FAIL — aborted before travel",
+    });
+    return false;
+  }
+  if (!isClickableTarget(target)) {
+    playbackDiagClick({
+      ok: false,
+      selector,
+      bbox,
+      detail: "click FAIL — not clickable",
+    });
+    return false;
+  }
 
   // Overlay eyes — never click through an open blocking dialog/scrim.
   const guarded = resolveClickTargetRespectingModal(target);
   if (!guarded || isElementBlockedByModal(target)) {
     notePlaybackCursorEvent("abort", {
-      target: describeCursorTarget(target),
+      target: selector,
       abortReason: "blocked-by-modal",
+    });
+    playbackDiagClick({
+      ok: false,
+      selector,
+      bbox,
+      detail: "click FAIL — blocked-by-modal",
     });
     return false;
   }
@@ -1308,6 +1349,12 @@ export async function simulateDemoPointerClick(
     syncPageScroll: options?.scroll !== false,
   });
   if (!cursor || options?.shouldAbort?.()) {
+    playbackDiagClick({
+      ok: false,
+      selector,
+      bbox,
+      detail: "click FAIL — cursor travel aborted",
+    });
     await releaseDemoCursorAfterScript();
     return false;
   }
@@ -1324,6 +1371,12 @@ export async function simulateDemoPointerClick(
     notePlaybackCursorEvent("abort", {
       target: describeCursorTarget(target),
       abortReason: "click-aborted",
+    });
+    playbackDiagClick({
+      ok: false,
+      selector,
+      bbox,
+      detail: "click FAIL — aborted during hover",
     });
     await releaseDemoCursorAfterScript();
     return false;
@@ -1353,6 +1406,12 @@ export async function simulateDemoPointerClick(
   if (options?.shouldAbort?.()) {
     interactionRoot.classList.remove(DEMO_PRESSED_CLASS);
     setDemoInteractionHover(interactionRoot, false, { x, y });
+    playbackDiagClick({
+      ok: false,
+      selector,
+      bbox,
+      detail: "click FAIL — aborted during press",
+    });
     await releaseDemoCursorAfterScript();
     return false;
   }
@@ -1374,6 +1433,12 @@ export async function simulateDemoPointerClick(
     target: describeCursorTarget(interactionRoot),
     animated: true,
     detail: options?.scroll === false ? "scroll-disabled" : "scroll-enabled",
+  });
+  playbackDiagClick({
+    ok: true,
+    selector,
+    bbox,
+    detail: `click ok (${options?.scroll === false ? "scroll-disabled" : "scroll-enabled"})`,
   });
   // Default arrow after click — CSS tip-align keeps left/top (no tip teleport).
   settleDemoCursorAfterClick(cursor, interactionRoot);

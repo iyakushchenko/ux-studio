@@ -1,5 +1,6 @@
 /** Playback scroll — eased, awaitable scroll for studio scripts (not browser smooth). */
 
+import { playbackDiagScroll } from "@/app/shell/playbackDiag";
 import { playbackScrollMonitor } from "@/app/shell/playbackScrollMonitor";
 
 export type PlaybackScrollAlign = "start" | "center" | "end" | "nearest";
@@ -198,16 +199,44 @@ export function computeDemoScrollDuration(distance: number): number {
   return Math.min(1200, Math.max(720, Math.abs(distance) * 0.82));
 }
 
+function describeScrollHost(scrollEl: HTMLElement): string {
+  const id = scrollEl.id ? `#${scrollEl.id}` : "";
+  const cls = scrollEl.className
+    ? `.${String(scrollEl.className).trim().split(/\s+/).slice(0, 2).join(".")}`
+    : "";
+  return `${scrollEl.tagName.toLowerCase()}${id}${cls}`;
+}
+
 export async function animateDemoTargetIntoView(
   target: HTMLElement,
   options?: PlaybackScrollOptions & {
     scrollEl?: HTMLElement;
     align?: PlaybackScrollAlign;
     padding?: number;
+    retreat?: boolean;
   }
 ): Promise<void> {
   const scrollEl = options?.scrollEl ?? getPrototypeScrollRoot(target);
-  if (!scrollEl || shouldSkipPrototypePageScroll(target, scrollEl)) return;
+  if (!scrollEl || shouldSkipPrototypePageScroll(target, scrollEl)) {
+    playbackDiagScroll({
+      detail: "scrollIntoView skipped — no host / overlay target",
+      intoViewRequested: true,
+      intoViewDone: false,
+      retreat: options?.retreat,
+      host: scrollEl ? describeScrollHost(scrollEl) : null,
+    });
+    return;
+  }
+
+  const beforeTop = scrollEl.scrollTop;
+  playbackDiagScroll({
+    detail: "scrollIntoView requested (eased)",
+    host: describeScrollHost(scrollEl),
+    beforeTop,
+    intoViewRequested: true,
+    intoViewDone: false,
+    retreat: options?.retreat,
+  });
 
   await new Promise<void>((resolve) => {
     requestAnimationFrame(() => {
@@ -230,6 +259,16 @@ export async function animateDemoTargetIntoView(
     durationMs,
     resolveTargetTop,
   });
+
+  playbackDiagScroll({
+    detail: "scrollIntoView done (eased)",
+    host: describeScrollHost(scrollEl),
+    beforeTop,
+    afterTop: scrollEl.scrollTop,
+    intoViewRequested: true,
+    intoViewDone: true,
+    retreat: options?.retreat,
+  });
 }
 
 /** Instant scroll for CJM step-back beat-enter sync — no eased camera move. */
@@ -239,16 +278,36 @@ export function snapDemoTargetIntoView(
     scrollEl?: HTMLElement;
     align?: PlaybackScrollAlign;
     padding?: number;
+    retreat?: boolean;
   }
 ): void {
   const scrollEl = options?.scrollEl ?? getPrototypeScrollRoot(target);
-  if (!scrollEl || shouldSkipPrototypePageScroll(target, scrollEl)) return;
+  if (!scrollEl || shouldSkipPrototypePageScroll(target, scrollEl)) {
+    playbackDiagScroll({
+      detail: "retreat scrollIntoView skipped — no host",
+      intoViewRequested: true,
+      intoViewDone: false,
+      retreat: options?.retreat ?? true,
+      host: scrollEl ? describeScrollHost(scrollEl) : null,
+    });
+    return;
+  }
 
+  const beforeTop = scrollEl.scrollTop;
   const align = options?.align ?? DEMO_TARGET_SCROLL_ALIGN;
   const padding = options?.padding ?? demoScrollPadding();
   const targetTop = computeScrollTopForElement(scrollEl, target, align, padding);
   const maxScroll = Math.max(0, scrollEl.scrollHeight - scrollEl.clientHeight);
   scrollEl.scrollTop = Math.min(Math.max(0, targetTop), maxScroll);
+  playbackDiagScroll({
+    detail: "retreat scrollIntoView done (snap)",
+    host: describeScrollHost(scrollEl),
+    beforeTop,
+    afterTop: scrollEl.scrollTop,
+    intoViewRequested: true,
+    intoViewDone: true,
+    retreat: options?.retreat ?? true,
+  });
 }
 
 /**

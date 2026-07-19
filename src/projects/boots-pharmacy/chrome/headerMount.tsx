@@ -65,7 +65,20 @@ export function resetPlpTileBookmarkForPlayback(
   const id = plpTileWishlistId(tileIndex);
   clearWishlistItemForPlayback(id);
   const heart = tile.querySelector<HTMLElement>('[data-name="icon=add to wishlist"]');
-  if (heart) applyPlpTileHeartVisual(heart, false);
+  if (!heart) return;
+  // React PLP owns fuchsia via `.is-active` + `currentColor`. Mutating SVG
+  // `fill` here overrides currentColor and leaves the heart stuck mint after click.
+  if (
+    tile.closest('[data-studio-react-screen="plp"]') ||
+    tile.querySelector("[data-studio-wishlist-id]")
+  ) {
+    heart.classList.remove("is-active");
+    heart.removeAttribute("data-fav-active");
+    const path = heart.querySelector<SVGPathElement>("svg path");
+    if (path) path.setAttribute("fill", "currentColor");
+    return;
+  }
+  applyPlpTileHeartVisual(heart, false);
 }
 
 export const PDP_WISHLIST_ID = "chickenpox";

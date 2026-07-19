@@ -1,16 +1,17 @@
 import {
   clearSimulatedClickRipples,
   delay,
-  moveDemoCursorTo,
-  notifyStudioDemoClick,
   removeDemoCursor as removeSharedDemoCursor,
-  settleDemoCursorAfterClick,
+  simulateDemoPointerClick,
 } from "@/app/scenario/demoCursor";
 import {
   pinScenarioScrollToBottomDuring,
   scrollPrototypeScrollToBottom,
 } from "@/app/scenario/scenarioEngine";
 import {
+  playbackDiagClick,
+  playbackDiagSkip,
+  playbackDiagTarget,
   playbackDiagTypeInEnd,
   playbackDiagTypeInProgress,
   playbackDiagTypeInStart,
@@ -37,10 +38,15 @@ const TYPING_MS_JITTER = 14;
 const SEND_PAUSE_MS = 420;
 const CTA_PRESS_MS = 380;
 
-/** Which agent CTA Sarah clicks before each scripted user reply. */
+/**
+ * Which agent CTA Sarah clicks before each scripted user reply.
+ * Keys = 0-based `frameIndex` of the user query being revealed
+ * (see useScenarioPlayback beforeReveal). Off-by-one vs 1-based Make indexing
+ * broke React chat progressive CTA clicks after migration.
+ */
 const CTA_BEFORE_USER_FRAME: Record<number, RegExp> = {
-  5: /check availability slot for me/i,
-  7: /find available slots for today/i,
+  4: /check availability slot for me/i,
+  6: /find available slots for today/i,
 };
 
 let preludeAborted = false;
@@ -126,12 +132,21 @@ function findCtaInAgentFrame(
   agentFrame: HTMLElement,
   pattern: RegExp
 ): HTMLElement | null {
+  const candidates = Array.from(
+    agentFrame.querySelectorAll<HTMLElement>(
+      [
+        "button.chat__cta",
+        "button.uxds-btn-primary",
+        '[data-name="component.input.button"]',
+      ].join(", ")
+    )
+  );
   return (
-    Array.from(
-      agentFrame.querySelectorAll<HTMLElement>(
-        '[data-name="component.input.button"]'
-      )
-    ).find((btn) => pattern.test(btn.textContent ?? "")) ?? null
+    candidates.find((btn) => {
+      // Skip helpful Yes/No strip — same data-name, not a progressive CTA.
+      if (btn.closest(".chat__helpful, [data-studio-chat-helpful]")) return false;
+      return pattern.test((btn.textContent ?? "").replace(/\s+/g, " ").trim());
+    }) ?? null
   );
 }
 
@@ -139,44 +154,46 @@ function removeDemoCursor(): void {
   removeSharedDemoCursor({ fade: true });
 }
 
-function tapDemoCursor(cursor: HTMLElement): void {
-  cursor.classList.remove("proto-chat-demo-cursor--tap");
-  void cursor.offsetWidth;
-  cursor.classList.add("proto-chat-demo-cursor--tap");
-}
-
 async function simulateSarahCtaClick(button: HTMLElement): Promise<void> {
   if (preludeAborted) return;
-
-  const cursor = await moveDemoCursorTo(button, { syncPageScroll: true });
-  if (!cursor || preludeAborted) return;
-
-  button.classList.add("proto-chat-cta--hover");
-
-  tapDemoCursor(cursor);
-  notifyStudioDemoClick();
-
-  button.classList.add("proto-chat-cta--pressed");
-  await delay(CTA_PRESS_MS);
-  button.classList.remove("proto-chat-cta--pressed", "proto-chat-cta--hover");
-  settleDemoCursorAfterClick(cursor, button);
-  await delay(160);
+  // Pin bottom first — then click with scroll:false so director scroll does not
+  // fight scenario scroll pins (scroll-path-deviation → diagnostic-on-step-N).
+  scrollChatToBottom(true);
+  await delay(80);
+  playbackDiagTarget({
+    selector: (button.textContent ?? "").replace(/\s+/g, " ").trim().slice(0, 64),
+    found: true,
+    element: button,
+    detail: "agentic chat CTA control-point",
+  });
+  const ok = await simulateDemoPointerClick(button, {
+    shouldAbort: () => preludeAborted,
+    scroll: false,
+  });
+  playbackDiagClick({
+    ok,
+    selector: "chat-agent-cta",
+    detail: ok ? "agentic CTA click ok" : "agentic CTA click FAIL",
+  });
+  if (ok) await delay(CTA_PRESS_MS);
 }
 
 async function simulateSarahSendClick(sendBtn: HTMLElement): Promise<void> {
   if (preludeAborted) return;
-
-  const cursor = await moveDemoCursorTo(sendBtn, { syncPageScroll: true });
-  if (!cursor || preludeAborted) return;
-
-  tapDemoCursor(cursor);
-  notifyStudioDemoClick();
-
+  scrollChatToBottom(true);
+  await delay(80);
   sendBtn.classList.add("proto-agentic-send--sending");
-  await delay(SEND_PAUSE_MS);
+  const ok = await simulateDemoPointerClick(sendBtn, {
+    shouldAbort: () => preludeAborted,
+    scroll: false,
+  });
   sendBtn.classList.remove("proto-agentic-send--sending");
-  settleDemoCursorAfterClick(cursor, sendBtn);
-  await delay(160);
+  playbackDiagClick({
+    ok,
+    selector: "chat-composer-send",
+    detail: ok ? "composer send click ok" : "composer send click FAIL",
+  });
+  if (ok) await delay(SEND_PAUSE_MS);
 }
 
 async function pulseComposerSend(): Promise<void> {
@@ -265,7 +282,13 @@ export async function runSitePilotChatBeforeReveal(
     return;
   }
 
-  if (!isSitePilotChatUserQueryFrame(frame) || frameIndex <= 1) return;
+  if (!isSitePilotChatUserQueryFrame(frame) || frameIndex <= 1) {
+    playbackDiagSkip({
+      reason: "chat-query-prelude-skip",
+      detail: `frameIndex=${frameIndex} — no type/CTA prelude`,
+    });
+    return;
+  }
 
   const ctaPattern = CTA_BEFORE_USER_FRAME[frameIndex];
   let sentViaCta = false;
@@ -276,12 +299,23 @@ export async function runSitePilotChatBeforeReveal(
       if (button) {
         await simulateSarahCtaClick(button);
         sentViaCta = true;
+      } else {
+        playbackDiagSkip({
+          reason: "chat-cta-missing",
+          detail: `frameIndex=${frameIndex} CTA pattern unmatched — falling back to type-in`,
+        });
       }
     }
   }
 
   const text = extractSitePilotChatUserMessageText(frame);
-  if (!text) return;
+  if (!text) {
+    playbackDiagSkip({
+      reason: "chat-query-text-missing",
+      detail: `frameIndex=${frameIndex}`,
+    });
+    return;
+  }
 
   if (sentViaCta) {
     await simulateSarahCtaSend();

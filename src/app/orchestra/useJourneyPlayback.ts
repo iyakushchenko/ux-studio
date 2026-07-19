@@ -54,7 +54,11 @@ import {
   cancelDemoCursorJourneyEndFade,
   parkDemoCursorAtRest,
 } from "@/app/scenario/demoCursor";
-import { playbackDiagPlayEnd } from "@/app/shell/playbackDiag";
+import {
+  playbackDiagBeat,
+  playbackDiagJourneyReset,
+  playbackDiagPlayEnd,
+} from "@/app/shell/playbackDiag";
 import type { JourneyBeat, JourneyRuntime, JourneyDefinition } from "@/app/orchestra/types";
 import type { ProjectPlayback } from "@/projects/types";
 import type { StudioTouchpointEntry } from "@/projects/types";
@@ -306,6 +310,11 @@ export function useJourneyPlayback({
       fromBeatId: fromBeat?.id,
       toBeatId: firstBeat?.id,
       detail: "play-end → journey-start",
+    });
+    playbackDiagJourneyReset({
+      fromBeatId: fromBeat?.id,
+      startBeatId: firstBeat?.id,
+      detail: "play-end journey-reset → selected journey start (never hub)",
     });
   }, [beats, shouldSkipBeat, stopJourneyPlay]);
 
@@ -1633,6 +1642,7 @@ export function useJourneyPlayback({
   ]);
 
   const jumpToStart = useCallback(() => {
+    const fromBeat = beats[beatIndexRef.current];
     suppressInitialBeatTabNavRef.current = false;
     stopJourneyPlay();
     beginRetreatSync();
@@ -1646,8 +1656,25 @@ export function useJourneyPlayback({
     resetJourney();
     const firstBeat = beats.find((beat) => !shouldSkipBeat(beat));
     if (firstBeat) {
+      // Prefer first *playable* beat index (skip login when logged-in).
+      const startIndex = beats.findIndex((beat) => !shouldSkipBeat(beat));
+      if (startIndex >= 0) {
+        setBeatIndex(startIndex);
+        beatIndexRef.current = startIndex;
+      }
       navigateBeatTab(firstBeat, { instant: true });
     }
+    playbackDiagJourneyReset({
+      fromBeatId: fromBeat?.id,
+      startBeatId: firstBeat?.id,
+      detail: "jump-to-start → selected journey start (never hub)",
+    });
+    playbackDiagBeat({
+      phase: "enter",
+      beatId: firstBeat?.id,
+      beatKind: firstBeat?.kind,
+      detail: `journey start beat ${firstBeat?.id ?? "?"}`,
+    });
   }, [
     beats,
     beginRetreatSync,
@@ -1656,6 +1683,7 @@ export function useJourneyPlayback({
     resetJourney,
     runtime,
     screenPlayback,
+    setBeatIndex,
     shouldSkipBeat,
     stopJourneyPlay,
   ]);

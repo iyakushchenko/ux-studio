@@ -342,8 +342,13 @@ export default function App() {
   const journeyRuntime = useMemo<JourneyRuntime>(
     () => ({
       goToTab: (screenIndex: number, options?: { instant?: boolean }) => {
+        // Product journey nav must leave hub — hubOpen=true + setCurrent alone
+        // leaves the hub overlay up (Play/end/reset looked like "return to hub").
         runNavTransitionRef.current(
-          () => setCurrent(screenIndex),
+          () => {
+            setHubOpen(false);
+            setCurrent(screenIndex);
+          },
           options?.instant ? { instant: true } : undefined
         );
       },

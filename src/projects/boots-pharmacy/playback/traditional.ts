@@ -194,10 +194,19 @@ export function findPdpBookNowBtn(root: ParentNode): HTMLElement | null {
 const PLP_TILE_SELECTOR = '[data-name="boots-pharmacy.service.tile"]';
 
 function findFirstVisiblePlpTile(scope: ParentNode): HTMLElement | null {
+  const reactHost =
+    scope instanceof Element
+      ? scope.querySelector<HTMLElement>(
+          '[data-studio-react-screen="plp"], .studio-react-screen-host .plp, main.plp'
+        )
+      : null;
+  const searchRoot = reactHost ?? scope;
   return (
-    Array.from(scope.querySelectorAll<HTMLElement>(PLP_TILE_SELECTOR)).find(
+    Array.from(searchRoot.querySelectorAll<HTMLElement>(PLP_TILE_SELECTOR)).find(
       (tile) =>
-        !tile.classList.contains("proto-plp-tile--hidden") && isClickableTarget(tile)
+        !tile.closest("[data-studio-make-retired]") &&
+        !tile.classList.contains("proto-plp-tile--hidden") &&
+        isClickableTarget(tile)
     ) ?? null
   );
 }
@@ -534,14 +543,19 @@ async function clickBookStep1Continue(
   options?: { skip?: boolean }
 ): Promise<boolean> {
   const continueBtn = findBookStep1ContinueBtn(screen);
-  if (!continueBtn || shouldAbort()) return false;
+  if (!continueBtn || shouldAbort()) {
+    // Diag via cursor path — missing React Continue often looks like "scroll only".
+    return false;
+  }
 
   if (options?.skip) {
     continueBtn.click();
     return true;
   }
 
-  return simulateDemoPointerClick(continueBtn, { shouldAbort, scroll: false });
+  // Scroll into view then click — Continue sits below the chosen-location card.
+  // scroll:false left the camera scrolling (dwell/retreat) without a real click.
+  return simulateDemoPointerClick(continueBtn, { shouldAbort, scroll: true });
 }
 
 function findBookStep1SearchField(scope: ParentNode): HTMLElement | null {

@@ -10,6 +10,12 @@ Agents **must read** this file before claiming a UI or Studio-chrome slice done.
 
 ## 2026-07-20
 
+### PLAYBACK_DIAG cursor blindness + hub/`goToTab` + agentic CTA off-by-one (PO / Finn + Quinn + Ben)
+
+- **Symptom / class:** Micro-fails (PLP heart not fuchsia, Step2 Continue scroll-only, retreat no scrollIntoView, Play returns hub, agentic chat skips progressive CTAs) with no console proof the cursor did its job; panel mint/green dropdowns stale.
+- **Root cause:** Diag logged type-in/step labels only. `goToTab` set `current` without `setHubOpen(false)`. React PLP `resetPlpTileBookmarkForPlayback` wrote SVG `fill` that overrode `currentColor`/`.is-active`. Chat `CTA_BEFORE_USER_FRAME` keys were 1-based vs 0-based `frameIndex`. Retreat sync did not always scrollIntoView the active control.
+- **Gate (R13 expand):** Every beat logs target/bbox, cursor park reason, scroll before/after + retreat intoView, click results, journey-reset destination. Product reset never hub. Prove: `__studioPlaybackDiag` dump after traditional + agentic step/retreat on R11 `:5173`.
+
 ### Play end stuck on last beat / hub — return to CJM start (PO / Finn)
 
 - **Symptom / class:** After Play finishes, transport sits on last beat (or agent teardown dumps hub); PO wants **CJM journey start** of the active script.

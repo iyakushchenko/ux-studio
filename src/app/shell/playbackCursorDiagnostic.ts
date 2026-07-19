@@ -1,8 +1,10 @@
 import { describePlaybackElement } from "@/app/shell/playbackInteractionContext";
 import { logQaCheck, logQaCursor } from "@/app/shell/controlPanelQa";
+import { playbackDiagCursor } from "@/app/shell/playbackDiag";
 import {
   isDemoCursorFadedAtJourneyEnd,
   isDemoCursorJourneyModePinned,
+  isDemoCursorPointerMode,
   readDemoCursorDomState,
 } from "@/app/scenario/demoCursor";
 
@@ -328,30 +330,7 @@ export function notePlaybackCursorEvent(
 
   const track = shouldTrackCursorDiagnostics();
   const atMs = performance.now();
-  if (!track) {
-    return {
-      seq: 0,
-      ts: atMs,
-      atMs,
-      action,
-      beatId,
-      scriptId,
-      phase,
-      target: detail?.target,
-      instant: detail?.instant,
-      animated: detail?.animated,
-      scroll: detail?.scroll,
-      abortReason: detail?.abortReason,
-      guardReason: detail?.guardReason,
-      detail: detail?.detail,
-      unexpectedOnDwell,
-    };
-  }
-
-  const event: PlaybackCursorEvent = {
-    seq: ++seq,
-    ts: atMs,
-    atMs,
+  const summarySeed = {
     action,
     beatId,
     scriptId,
@@ -364,6 +343,44 @@ export function notePlaybackCursorEvent(
     guardReason: detail?.guardReason,
     detail: detail?.detail,
     unexpectedOnDwell,
+    seq: 0,
+    ts: atMs,
+    atMs,
+  } satisfies PlaybackCursorEvent;
+  const summary = formatPlaybackCursorEventSummary(summarySeed);
+
+  // Always mirror to PLAYBACK_DIAG — even when QA eyes are off (PO cursor visibility).
+  const parked = action === "park";
+  const path = getCursorPathDiagnostic();
+  playbackDiagCursor({
+    action,
+    beatId,
+    selector: detail?.target,
+    detail: parked
+      ? `PARKED — ${detail?.detail ?? "journey-park"} (${summary})`
+      : summary,
+    parked,
+    parkReason: parked ? detail?.detail ?? "journey-park" : null,
+    hoverApplied:
+      action === "hover" || action === "hover-dwell" || action === "press",
+    press: action === "press",
+    release: action === "release",
+    onTarget: action === "settle" || action === "press" || action === "click",
+    graphicState:
+      typeof document !== "undefined" && isDemoCursorPointerMode()
+        ? "pointer"
+        : "default",
+    samples: path.sampleCount,
+    travelEnd: path.settle,
+  });
+
+  if (!track) {
+    return summarySeed;
+  }
+
+  const event: PlaybackCursorEvent = {
+    ...summarySeed,
+    seq: ++seq,
   };
 
   ring.push(event);
@@ -371,7 +388,7 @@ export function notePlaybackCursorEvent(
     ring.splice(0, ring.length - MAX_EVENTS);
   }
 
-  lastSummary = formatPlaybackCursorEventSummary(event);
+  lastSummary = summary;
 
   logQaCursor({
     action,
