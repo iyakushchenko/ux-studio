@@ -8,6 +8,12 @@ import {
   type ProtoJourneyBundleFile,
   type ProtoJourneyFile,
 } from "@/app/journey/protoJourneyFile";
+import {
+  applyImportedJourneyBundle,
+  applyImportedJourneyFile,
+  clearImportedJourneys,
+  getImportedJourneys,
+} from "@/app/journey/protoJourneyRuntimeStore";
 import type { ProtoPersonaId, ProtoProjectId } from "@/projects/types";
 
 declare global {
@@ -17,6 +23,12 @@ declare global {
     __protoExportJourneyBundle?: () => string;
     __protoImportJourney?: (json: string) => ProtoJourneyFile;
     __protoImportJourneyBundle?: (json: string) => ProtoJourneyBundleFile;
+    __protoApplyJourney?: (json: string) => ReturnType<typeof summarizeJourney>;
+    __protoApplyJourneyBundle?: (
+      json: string
+    ) => ReturnType<typeof summarizeJourney>[];
+    __protoClearImportedJourneys?: () => void;
+    __protoHasImportedJourneys?: () => boolean;
   }
 }
 
@@ -25,6 +37,7 @@ export function registerProtoJourneyMcpHelpers(options: {
   personaId: ProtoPersonaId;
   getJourneys: () => ProtoJourneyDefinition[];
   getActiveJourneyId?: () => string | undefined;
+  onJourneysApplied?: () => void;
 }): () => void {
   if (typeof window === "undefined") return () => {};
 
@@ -60,11 +73,36 @@ export function registerProtoJourneyMcpHelpers(options: {
   window.__protoImportJourneyBundle = (json) =>
     deserializeJourneyBundleFile(json);
 
+  window.__protoApplyJourney = (json) => {
+    const file = deserializeJourneyFile(json);
+    applyImportedJourneyFile(file);
+    options.onJourneysApplied?.();
+    return summarizeJourney(file.journey);
+  };
+
+  window.__protoApplyJourneyBundle = (json) => {
+    const bundle = deserializeJourneyBundleFile(json);
+    applyImportedJourneyBundle(bundle);
+    options.onJourneysApplied?.();
+    return bundle.journeys.map((journey) => summarizeJourney(journey));
+  };
+
+  window.__protoClearImportedJourneys = () => {
+    clearImportedJourneys();
+    options.onJourneysApplied?.();
+  };
+
+  window.__protoHasImportedJourneys = () => getImportedJourneys().length > 0;
+
   return () => {
     delete window.__protoListJourneys;
     delete window.__protoExportJourney;
     delete window.__protoExportJourneyBundle;
     delete window.__protoImportJourney;
     delete window.__protoImportJourneyBundle;
+    delete window.__protoApplyJourney;
+    delete window.__protoApplyJourneyBundle;
+    delete window.__protoClearImportedJourneys;
+    delete window.__protoHasImportedJourneys;
   };
 }

@@ -278,6 +278,13 @@ export function isPopupSubstepOfBeat(
   ) {
     return true;
   }
+  // PDP Book now opens login before beat index catches up (may still be on plp/pdp).
+  if (
+    touchpointKey === "popup:login" &&
+    (beatId === "traditional-plp" || beatId === "traditional-pdp")
+  ) {
+    return true;
+  }
   return false;
 }
 

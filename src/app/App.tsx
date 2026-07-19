@@ -133,6 +133,7 @@ export default function App() {
     persona: studioPersona,
     personaId: studioPersonaId,
     setPersonaId: setStudioPersonaId,
+    journeys: studioJourneys,
     modeId: orchestraModeId,
     setModeId: setOrchestraModeId,
     modes: orchestraModes,
@@ -258,7 +259,7 @@ export default function App() {
         currentTabIndex: current,
         currentChildIndex: hubOpen ? null : (SCREENS[current]?.childIndex ?? null),
         browseMode: !studioJourneyMode,
-        journeys: studioPersona.journeys,
+        journeys: studioJourneys,
         scenarioScreens: PROTO_SCENARIO_SCREENS,
         protoTabToIndex,
       }),
@@ -268,7 +269,7 @@ export default function App() {
       journeyBeatIndex,
       current,
       studioJourneyMode,
-      studioPersona.journeys,
+      studioJourneys,
       PROTO_SCENARIO_SCREENS,
       protoTabToIndex,
       SCREENS,
@@ -683,14 +684,14 @@ export default function App() {
         setOrchestraModeId(next);
       }
 
-      applyJourneyStartTab(getJourneyForMode(studioPersona.journeys, next));
+      applyJourneyStartTab(getJourneyForMode(studioJourneys, next));
     },
     [
       applyJourneyStartTab,
       orchestraModeId,
       resetStudioPlayback,
       setOrchestraModeId,
-      studioPersona.journeys,
+      studioJourneys,
     ]
   );
 
@@ -715,7 +716,7 @@ export default function App() {
   const showOrchestraControls = orchestraShowControls({
     hubOpen,
     modeId: orchestraModeId,
-    journeys: studioPersona.journeys,
+    journeys: studioJourneys,
   });
 
   const handleOrchestraModeChangeRef = useRef(handleOrchestraModeChange);
@@ -1264,7 +1265,7 @@ export default function App() {
         personaId: playbackSnapshotRef.current.personaId,
         journeyId: playbackSnapshotRef.current.journeyId,
         orchestraMode: orchestraModeId,
-        journeyCatalog: studioPersona.journeys.map((journey) =>
+        journeyCatalog: studioJourneys.map((journey) =>
           summarizeJourney(journey)
         ),
         metadata: { recordedFrom: "mcp" },
@@ -1289,16 +1290,20 @@ export default function App() {
         }
       },
     });
-  }, [orchestraModeId, studioPersona.journeys]);
+  }, [orchestraModeId, studioJourneys]);
 
   useEffect(() => {
     return registerProtoJourneyMcpHelpers({
       projectId: studioProjectId,
       personaId: studioPersonaId,
-      getJourneys: () => studioPersona.journeys,
+      getJourneys: () => studioJourneys,
       getActiveJourneyId: () => activeJourney?.id,
+      onJourneysApplied: () => {
+        resetBeatIndex();
+        transportActionsRef.current.jumpToStart();
+      },
     });
-  }, [activeJourney?.id, studioPersona.journeys, studioPersonaId, studioProjectId]);
+  }, [activeJourney?.id, studioJourneys, studioPersonaId, studioProjectId, resetBeatIndex]);
 
   useEffect(() => {
     return registerProtoStudioMcpHelpers({

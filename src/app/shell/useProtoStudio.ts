@@ -1,5 +1,10 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
 import { getJourneyForMode } from "@/app/orchestra/journeyUtils";
+import {
+  getImportedJourneysSnapshot,
+  resolveRuntimeJourneys,
+  subscribeImportedJourneys,
+} from "@/app/journey/protoJourneyRuntimeStore";
 import {
   PROTO_ORCHESTRA_MODE_OPTIONS,
   readStoredOrchestraMode,
@@ -79,12 +84,23 @@ export function useProtoStudio() {
     [personaId, project]
   );
 
+  const importVersion = useSyncExternalStore(
+    subscribeImportedJourneys,
+    getImportedJourneysSnapshot,
+    getImportedJourneysSnapshot
+  );
+
+  const journeys = useMemo(
+    () => resolveRuntimeJourneys(persona.journeys),
+    [persona.journeys, importVersion]
+  );
+
   const [modeId, setModeIdState] = useState<ProtoOrchestraModeId>(readStoredOrchestraMode);
   const [beatIndex, setBeatIndex] = useState(0);
 
   const journey = useMemo(
-    () => getJourneyForMode(persona.journeys, modeId),
-    [modeId, persona.journeys]
+    () => getJourneyForMode(journeys, modeId),
+    [modeId, journeys]
   );
 
   const modeLabel =
@@ -131,6 +147,7 @@ export function useProtoStudio() {
     personaId: persona.id,
     persona,
     setPersonaId,
+    journeys,
     modeId,
     setModeId,
     modeLabel,

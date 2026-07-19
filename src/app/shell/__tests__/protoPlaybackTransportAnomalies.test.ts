@@ -82,6 +82,17 @@ describe("detectTouchpointAheadOfBeat", () => {
     ).toBeNull();
   });
 
+  it("allows login popup while beat is still on traditional-plp (PDP script lag)", () => {
+    expect(
+      detectTouchpointAheadOfBeat({
+        beatPlaylistIndex: 0,
+        touchpointPlaylistIndex: 2,
+        beatId: "traditional-plp",
+        touchpointKey: "popup:login",
+      })
+    ).toBeNull();
+  });
+
   it("flags touchpoint ahead of beat when gap is two or more frames", () => {
     const anomaly = detectTouchpointAheadOfBeat({
       beatPlaylistIndex: 3,
