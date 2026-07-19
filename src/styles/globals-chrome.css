@@ -2,16 +2,19 @@
   scroll-behavior: auto;
 }
 
-/* Shell/document — reserve classic scrollbar track before any modal/body overflow:hidden */
-html {
-  scrollbar-gutter: stable;
-}
-
-/* Prototype scroll pane — flex fill + zoom-safe min height (see useScrollFill) */
+/*
+ * Prototype scroll pane — flex fill + zoom-safe min height (see useScrollFill).
+ * Do NOT always-on `scrollbar-gutter: stable` — that reserves an empty white strip
+ * on short pages (Home Site Pilot) when scrollHeight <= clientHeight.
+ * Overflow marker is toggled by syncStudioScrollOverflowGutter (useScrollFill).
+ */
 .studio-scroll--prototype:not(.hidden) {
   display: flex;
   flex-direction: column;
-  /* Reserve classic scrollbar track so modal/journey lock doesn't shift content on X */
+}
+
+/* Tall pages only — reserve classic track so modal/journey lock does not shift X */
+.studio-scroll--prototype.studio-scroll--overflow:not(.hidden) {
   scrollbar-gutter: stable;
 }
 
@@ -24,11 +27,15 @@ html {
 
 .studio-scroll--prototype.studio-scroll--locked,
 .studio-scroll--prototype.studio-scroll--journey-locked {
-  /* Disable scroll without collapsing the reserved gutter (see scrollbar-gutter above) */
   overflow: hidden !important;
-  scrollbar-gutter: stable;
   overscroll-behavior: contain;
   touch-action: none;
+}
+
+.studio-scroll--prototype.studio-scroll--locked.studio-scroll--overflow,
+.studio-scroll--prototype.studio-scroll--journey-locked.studio-scroll--overflow {
+  /* Keep reserved gutter while locked so hiding the scrollbar does not jump X */
+  scrollbar-gutter: stable;
 }
 
 @media (prefers-reduced-motion: reduce) {

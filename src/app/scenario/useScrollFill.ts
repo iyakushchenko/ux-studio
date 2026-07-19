@@ -1,4 +1,9 @@
 import { useLayoutEffect, type RefObject } from "react";
+import {
+  STUDIO_SCROLL_OVERFLOW_ATTR,
+  STUDIO_SCROLL_OVERFLOW_CLASS,
+  syncStudioScrollOverflowGutter,
+} from "./studioScrollOverflow";
 
 const MIN_H_VAR = "--studio-scroll-min-px";
 
@@ -18,12 +23,16 @@ export function useScrollFill(
       if (h > 0) {
         el.style.setProperty(MIN_H_VAR, `${h}px`);
       }
+      // Reserve classic scrollbar track only when Y actually overflows (no empty white strip).
+      syncStudioScrollOverflowGutter(el);
     };
 
     apply();
 
     const ro = new ResizeObserver(apply);
     ro.observe(el);
+    const viewport = el.querySelector<HTMLElement>(":scope > .studio-viewport");
+    if (viewport) ro.observe(viewport);
 
     const vv = window.visualViewport;
     vv?.addEventListener("resize", apply);
@@ -37,6 +46,8 @@ export function useScrollFill(
       window.removeEventListener("resize", apply);
       window.clearInterval(pollId);
       el.style.removeProperty(MIN_H_VAR);
+      el.classList.remove(STUDIO_SCROLL_OVERFLOW_CLASS);
+      el.removeAttribute(STUDIO_SCROLL_OVERFLOW_ATTR);
     };
   }, [scrollRef, enabled]);
 }

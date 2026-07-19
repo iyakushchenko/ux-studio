@@ -2,7 +2,8 @@
 
 > _Append a bullet on coherent commits via `npm run notes:append -- --lane="<lane>" --intent="<text>"`. Preview with `npm run notes:preview`. On `npm run release:patch` this section is promoted to `## v<X.Y.Z> - DDMMYY` and a fresh empty `## Current` is re-inserted. Policy: `docs/product/VERSIONING.md`._
 
-- **project:** Home screen first React+UXDS mount (childIndex=11): homeContract/mountHomeScreen/HomeScreen/home.css; wired BootsPharmacyProjectView with Make-effect gating via isHomeReactMounted(); logged-in/out heading, chip+send route to Chat; PDP Final Pass untouched, Home intentionally excluded from PAGE_FINAL_PASS.json
+## v0.0.39 - 190726
+- **shell:** Overflow-only `scrollbar-gutter` on prototype scroll — no empty white track on short Home; modal lock still X-stable on PLP/PDP
 
 ## v0.0.38 - 190726
 - PromoMessageStrip + tip-stable robo-cursor

@@ -140,6 +140,10 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 - Pax (PO sim): <accept bar / bump call> — applied: <decision>
 ```
 
+**Knowledge improved** (2026-07-19 · stream: overflow-only scrollbar gutter · v0.0.39):
+- Finn (FE): never always-on `scrollbar-gutter: stable` — toggle `studio-scroll--overflow` via `syncStudioScrollOverflowGutter` / `useScrollFill`; keep gutter only while overflowing (+ locked) — applied: `studioScrollOverflow.ts` + `globals-chrome.css`
+- Pax (PO sim): user-visible shell fix → patch bump — applied: v0.0.39
+
 **Minimum after a ship:** at least the roles that worked the stream fill a line. Empty “n/a” only if the role was truly out of scope. Arch rejects a close-out that only says “appended LESSONS” with no **applied** proof.
 
 ---

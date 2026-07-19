@@ -10,6 +10,12 @@ Agents **must read** this file before claiming a UI or Studio-chrome slice done.
 
 ## 2026-07-19
 
+### Scrollbar gutter always-on → empty white strip on short pages (PO / Finn)
+
+- **Symptom / class:** Home Site Pilot shows a white bar / fake scrollbar track with nothing to scroll.
+- **Root cause:** `scrollbar-gutter: stable` on `html` + `.studio-scroll--prototype` (v0.0.33/35) always reserves classic track width even when `scrollHeight <= clientHeight`.
+- **Gate:** Reserve gutter **only when overflowing** (`studio-scroll--overflow` via `syncStudioScrollOverflowGutter` / `useScrollFill`). Keep gutter while modal/journey lock if overflow marker is set — do **not** always-on gutter to prevent modal X jump. Prove: Home no gutter; PLP/PDP modal open → content X unchanged.
+
 ### Robo-cursor hand↔arrow tip jump — CSS-align hotspots (PO / Finn + Uma)
 
 - **Symptom / class:** After press/release, default arrow appeared to teleport vs hand; hand↔default felt like a flicker/jump even when `left`/`top` stayed locked.
