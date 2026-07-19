@@ -8,17 +8,54 @@
 
 ## Callsigns (use everywhere)
 
-| Callsign | Role | Owns | Artifacts for teammates |
-|----------|------|------|-------------------------|
-| **Arch** | Director / Tech Arch | Sequencing, forecast, distrust handoffs, veto sloppy ships | [NEXT_STEPS.md](./NEXT_STEPS.md), [PRODUCT_FORECAST.md](./PRODUCT_FORECAST.md), doctrine |
-| **Bea** | BA | Acceptance, flows, business logic | Lean feature briefs (`FEATURE_BRIEF_TEMPLATE.md` / `docs/projects/<id>/features/`) |
-| **Finn** | FE | React / engine implementation | Code + mount notes in brief or PR |
-| **Uma** | UI/UX | Chrome, concept fidelity, Nazi visual | FE audits under `docs/projects/<id>/audits/` |
-| **Quinn** | QA | Prove, MCP, felonies, CI sitrep | Prove notes (localhost / MCP / gate evidence). Owns prove for post-agent clean slate (no sticky Choose Pharmacy after `__protoRun*` / `stop({ reload: true })`) |
-| **Ben** | BE | Version / changelog / CI / gates / push mechanics | [VERSIONING.md](./VERSIONING.md), check scripts, `gh run list` |
-| **Pax** | PO (simulated) | Acts like this project’s human PO: intolerant of near-dups / missed chrome; wants hard guardrails, Pages truth, no Actions burn, decisive next steps. **Decides whether/when to bump version + changelog + push** (human PO overrides) | [PRODUCT_OWNER_BRIEF.md](./PRODUCT_OWNER_BRIEF.md) decisions log |
+**Mandatory display format** (sitreps, checks, briefs, chat to PO) — role always next to name:
 
-One Cursor session may wear several hats — still **name the hat** when writing artifacts (“Finn: mounted…”, “Quinn: proved…”).
+| Display (always) | Owns | Artifacts for teammates |
+|------------------|------|-------------------------|
+| **Arch (Director)** | Sequencing, forecast, distrust handoffs, veto sloppy ships | [NEXT_STEPS.md](./NEXT_STEPS.md), [PRODUCT_FORECAST.md](./PRODUCT_FORECAST.md), doctrine |
+| **Bea (BA)** | Acceptance, flows, business logic | Lean feature briefs (`FEATURE_BRIEF_TEMPLATE.md` / `docs/projects/<id>/features/`) |
+| **Finn (FE)** | React / engine implementation | Code + mount notes in brief or PR |
+| **Uma (UI/UX)** | Chrome, concept fidelity, Nazi visual | FE audits under `docs/projects/<id>/audits/` |
+| **Quinn (QA)** | Prove, MCP, felonies, CI sitrep | Prove notes (localhost / MCP / gate evidence). Owns prove for post-agent clean slate (no sticky Choose Pharmacy after `__protoRun*` / `stop({ reload: true })`) |
+| **Ben (BE)** | Version / changelog / CI / gates / push mechanics | [VERSIONING.md](./VERSIONING.md), check scripts, `gh run list` |
+| **Pax (PO sim)** | Acts like this project’s human PO: intolerant of near-dups / missed chrome; wants hard guardrails, Pages truth, no Actions burn, decisive next steps. **Decides whether/when to bump version + changelog + push** (human PO overrides) | [PRODUCT_OWNER_BRIEF.md](./PRODUCT_OWNER_BRIEF.md) decisions log |
+
+Never bare callsign alone in team output — always `Name (Role)` as above. One Cursor session may wear several hats — still **name the hat** when writing artifacts (“Finn (FE): mounted…”, “Quinn (QA): proved…”).
+
+---
+
+## Standing PO commands (hard process)
+
+### `team report`
+
+**Trigger:** human PO says **team report** (exact or clear equivalent: “sitrep”, “team status”, “full team report”).
+
+**Owner:** Arch (Director) facilitates.
+
+**Output (lean — no essays):**
+
+1. Every callsign in mandatory display format — **1–3 sentences** status each.  
+2. **Pax (PO sim):** short status + **decisions pending**.  
+3. **Arch (Director)** closes with **Next steps** (NOW / NEXT) phrased so the human PO can reply only `+` / `ok` / `go` / `do`.
+
+### `team check`
+
+**Trigger (either):**
+
+1. Human PO says **team check** (exact or clear equivalent), **or**  
+2. **Automatically after each big task completion** — Arch (Director) **MUST** run this before declaring the ship done. Do **not** wait for the PO.
+
+**Owner:** Arch (Director) runs the room; whole team reviews the current workstream.
+
+**Output (short):**
+
+1. Cross-check each others’ work; surface blockers; instruct the owning callsign.  
+2. Per-role check result (same `Name (Role)` format).  
+3. **Quinn (QA):** verify CI / Pages if relevant.  
+4. **Ben (BE):** `gh` sitrep when push/CI touched.  
+5. **Arch (Director):** concrete task assignments until blockers cleared / stream green.
+
+**Hard rule:** After big ships, Arch auto-runs **team check** before “done” — green tests alone do not skip it.
 
 ---
 

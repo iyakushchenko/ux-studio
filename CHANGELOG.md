@@ -3,6 +3,7 @@
 > _Append a bullet on coherent commits via `npm run notes:append -- --lane="<lane>" --intent="<text>"`. Preview with `npm run notes:preview`. On `npm run release:patch` this section is promoted to `## v<X.Y.Z> - DDMMYY` and a fresh empty `## Current` is re-inserted. Policy: `docs/product/VERSIONING.md`._
 
 - **shell:** Post-agent clean slate: strip modal + land hub on overlay stop/reload (no sticky Choose Pharmacy)
+- **docs:** Standing PO commands team report / team check (TEAM + doctrine + director + AGENTS)
 
 ## v0.0.2 - 190726
 

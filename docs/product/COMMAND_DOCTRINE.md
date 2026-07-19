@@ -35,6 +35,17 @@ For any more-or-less serious change (chrome, URL, REC, page behavior, CI gates):
 
 Trivial one-line docs may skip; **do not** skip for user-visible or REC/URL work.
 
+### 0.2 Standing PO commands — `team report` / `team check`
+
+**Locked (PO mandate, 2026-07-19).** Full procedure: [TEAM.md](./TEAM.md) § Standing PO commands. Callsigns always display as `Name (Role)` — e.g. `Arch (Director)`, `Finn (FE)`, `Pax (PO sim)`.
+
+| Command | When | What |
+|---------|------|------|
+| **`team report`** | PO says it (or clear equivalent) | Arch facilitates lean sitrep: every callsign 1–3 sentences; Pax status + decisions pending; Arch closes with NOW/NEXT so PO can answer only `+` / `ok` / `go` / `do`. No essays. |
+| **`team check`** | PO says it **or Arch auto-triggers after each big task completion** (do not wait for PO) | Whole-team workstream review; cross-check; surface blockers + instruct owning callsign; Quinn CI/Pages if relevant; Ben `gh` sitrep; Arch assigns concrete tasks until green. Short per-role results + Arch assignments. |
+
+**Hard rule:** After a big ship, Arch runs **team check** before declaring done — tests green alone do not skip it.
+
 ### Proactive forecasting (mandatory on every task)
 
 While doing **anything** the PO asks, the agent must **spot issues or forecast them** — do not wait for the PO to chase ghosts. At minimum scan for:
