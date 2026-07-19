@@ -62,6 +62,7 @@ Cassette deck mode toggles (labels match STEPS type; pipe bars match zoom delimi
 
 - **Left (muted, same as CJM-off) / REC off** — playback mode: `REC [switch] | CJM [switch] | STEPS: N` (journey) — shared `.proto-studio-mode-switch` off chrome; no recording counter. Recording event counter and REC transport are unmounted.
 - **Right (red) / REC on** — rec mode: `REC [switch] STEPS: N` (recording events) + REC deck. Journey STEPS / cassette transport are unmounted.
+- **Transition:** `framer-motion` `AnimatePresence` (`mode="wait"`) in `ProtoNavScenarioControls` — `.proto-nav-scenario__panel-swap` crossfades Playback ↔ Rec (0.34s, shared `protoStudioMotion` timings). XOR preserved: only one interactive panel. Touchpoint label width also uses `framer-motion` (same duration).
 
 Leaving Rec while a capture is live **pauses** the session (does not stop/destroy it).
 

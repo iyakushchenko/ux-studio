@@ -128,6 +128,24 @@ Use `nowrap` for short CTAs, chips, crumb current labels, and tertiary pills unl
 
 ---
 
+## 9. UI motion — `framer-motion` (NON-NEGOTIABLE)
+
+**Default library:** [`framer-motion`](https://www.npmjs.com/package/framer-motion) (direct `package.json` dependency). Import from `framer-motion`.
+
+| Do | Do not |
+|----|--------|
+| `motion.*` + `AnimatePresence` for mount/unmount, layout, panel swaps | Invent parallel CSS `@keyframes` zoos for UI chrome |
+| Shared timings in `src/app/nav/protoStudioMotion.ts` for shell | Hand-roll width/opacity JS without the library |
+| Register a DS deviation if a bespoke animation is truly required | Claim “we use framer-motion” without importing it |
+
+**Allowed without deviation:** trivial one-property CSS transitions (e.g. hover `color` / `opacity`); Make-parity ports while a screen is still bridged.
+
+**Honesty (2026-07-19):** Before this checkpoint, `package.json` listed unused `motion` (no `src/` imports). Touchpoint label resize was custom CSS (`width 0.34s ease`); Playback↔Rec swapped with a hard mount/unmount. Now: direct dependency `framer-motion@12.42.2` is imported and used for panel swap + touchpoint label width. Studio LED blink keyframes in `protoNavPanel.css` remain CSS until migrated (register if expanded).
+
+**Shell reference:** `ProtoNavScenarioControls` — `AnimatePresence mode="wait"` on `.proto-nav-scenario__panel-swap`.
+
+---
+
 ## Agent checklist (FE)
 
 1. Content shell matches logo column (1440 / 64 / 1312).  
@@ -140,4 +158,5 @@ Use `nowrap` for short CTAs, chips, crumb current labels, and tertiary pills unl
 8. Design-delta table written (fills in scope).  
 9. Behavior parity verified.  
 10. No near-duplicate control styles; deviations registered if needed.  
-11. CSS scoped to the screen/kit — build still passes.
+11. CSS scoped to the screen/kit — build still passes.  
+12. UI motion uses `framer-motion` (§9) — no new keyframe zoos.

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { ProtoStudioJourneySwitch } from "@/app/nav/ProtoStudioJourneySwitch";
 import { ProtoStudioPlaybackRecSwitch } from "@/app/nav/ProtoStudioPlaybackRecSwitch";
 import {
@@ -7,6 +8,10 @@ import {
   flashControlRoomButton,
 } from "@/app/nav/protoControlRoomTap";
 import { ProtoNavRecordingEventCounter } from "@/app/nav/ProtoNavRecordingControls";
+import {
+  STUDIO_LABEL_SHRINK_DELAY_S,
+  studioPanelTransition,
+} from "@/app/nav/protoStudioMotion";
 import {
   isRecordingActive,
   pauseRecording,
@@ -130,7 +135,7 @@ function formatStepCounter(
   return `STEPS: ${visibleCount} / ${totalFrames}`;
 }
 
-/** Width-animates touchpoint label so studio menus slide instead of jumping. */
+/** Width-animates touchpoint label via Motion so studio menus slide instead of jumping. */
 function ProtoNavSegmentLabel({
   label,
   blinkToken,
@@ -140,9 +145,8 @@ function ProtoNavSegmentLabel({
 }) {
   const innerRef = useRef<HTMLSpanElement>(null);
   const prevWidthRef = useRef<number | null>(null);
-  const [width, setWidth] = useState<number | null>(null);
+  const [width, setWidth] = useState<number | "auto">("auto");
   const [shrink, setShrink] = useState(false);
-  const [animate, setAnimate] = useState(false);
 
   useLayoutEffect(() => {
     const el = innerRef.current;
@@ -154,17 +158,15 @@ function ProtoNavSegmentLabel({
     setWidth(next);
   }, [label]);
 
-  useEffect(() => {
-    const id = requestAnimationFrame(() => setAnimate(true));
-    return () => cancelAnimationFrame(id);
-  }, []);
-
   return (
-    <span
-      className={`proto-nav-scenario__label-slot${
-        animate ? " proto-nav-scenario__label-slot--animate" : ""
-      }${shrink ? " proto-nav-scenario__label-slot--shrink" : ""}`}
-      style={width != null ? { width } : undefined}
+    <motion.span
+      className="proto-nav-scenario__label-slot"
+      initial={false}
+      animate={{ width }}
+      transition={{
+        ...studioPanelTransition,
+        delay: shrink ? STUDIO_LABEL_SHRINK_DELAY_S : 0,
+      }}
     >
       <span
         key={blinkToken}
@@ -175,7 +177,7 @@ function ProtoNavSegmentLabel({
       >
         {label}
       </span>
-    </span>
+    </motion.span>
   );
 }
 
@@ -436,171 +438,208 @@ export function ProtoNavScenarioControls({
               checked={recMode}
               onChange={handlePlaybackRecModeChange}
             />
-            {recMode ? <ProtoNavRecordingEventCounter /> : null}
+            <AnimatePresence initial={false} mode="popLayout">
+              {recMode ? (
+                <motion.span
+                  key="rec-event-counter"
+                  className="proto-nav-scenario__panel-motion-inline"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={studioPanelTransition}
+                >
+                  <ProtoNavRecordingEventCounter />
+                </motion.span>
+              ) : null}
+            </AnimatePresence>
           </span>
         ) : null}
-        {recordingControls && recMode ? (
-          recordingControls
-        ) : (
-          <>
-            {onJourneyModeChange ? (
-              <span className="proto-nav-scenario__cjm-group">
-                <span className="proto-nav-scenario__mode-label" aria-hidden>
-                  CJM
-                </span>
-                <ProtoStudioJourneySwitch
-                  checked={journeyMode}
-                  onChange={(enabled) => {
-                    logControlPanel("studio:journey-mode", {
-                      enabled,
-                      previous: journeyMode,
-                      switchDisabled: journeyModeSwitchDisabled,
-                    });
-                    onJourneyModeChange(enabled);
-                  }}
-                  disabled={journeyModeSwitchDisabled}
-                />
-              </span>
-            ) : null}
-            <span className="proto-nav-scenario__counter" aria-live="polite">
-              {formatStepCounter(visibleCount, totalFrames, stepProgressActive)}
-            </span>
-            <div className="proto-nav-scenario__deck-led" aria-hidden>
-              <span
-                key={
-                  showEndDiode
-                    ? "diode-end"
-                    : stepBlinkActive
-                      ? `step-${stepBlinkToken}`
-                      : "diode-idle"
-                }
-                className={`proto-nav-scenario__on-air${diodeErrorClass}${diodeEndClass}${diodeStepClass}${diodeClickClass}`}
+        <div className="proto-nav-scenario__panel-swap" aria-live="polite">
+          <AnimatePresence initial={false} mode="wait">
+            {recordingControls && recMode ? (
+              <motion.div
+                key="rec-panel"
+                className="proto-nav-scenario__panel-swap-item"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={studioPanelTransition}
               >
-                <span className="proto-nav-scenario__on-air-dot" />
-                <span className="proto-nav-scenario__on-air-halo" />
-              </span>
-            </div>
-            <button
-              type="button"
-              className="proto-nav-step-btn proto-nav-scenario__btn"
-              aria-label="Jump to start"
-              disabled={jumpToStartDisabled}
-              onPointerDown={() =>
-                logBlockedTransport(
-                  "transport:jump-to-start",
-                  jumpToStartDisabled,
-                  !journeyMode
-                    ? "journey-mode-off"
-                    : playbackActive
-                      ? "playback-active"
-                      : "canJumpToStart=false"
-                )
-              }
-              onClick={handleJumpToStart}
-            >
-              <CassetteJumpToStartIcon />
-            </button>
-            <button
-              type="button"
-              className="proto-nav-step-btn proto-nav-scenario__btn"
-              aria-label="Step back"
-              disabled={stepBackDisabled}
-              onPointerDown={() =>
-                logBlockedTransport(
-                  "transport:step-back",
-                  stepBackDisabled,
-                  !journeyMode
-                    ? "journey-mode-off"
-                    : playbackActive
-                      ? "playback-active"
-                      : "canStepBack=false"
-                )
-              }
-              onClick={handleStepBack}
-            >
-              <CassetteStepBackIcon />
-            </button>
-            <div className="proto-nav-scenario__play-lamp">
-              <span className="proto-nav-scenario__halogen" aria-hidden>
-                <span className="proto-nav-scenario__halogen-source">
-                  <span className="proto-nav-scenario__halogen-bulb" />
-                </span>
-                <span className="proto-nav-scenario__halogen-beam" />
-              </span>
-              <button
-                type="button"
-                className="proto-nav-step-btn proto-nav-scenario__btn proto-nav-scenario__btn--play"
-                aria-label="Play journey"
-                aria-pressed={isOnAir}
-                disabled={playDisabled}
-                onPointerDown={() =>
-                  logBlockedTransport(
-                    "transport:play",
-                    playDisabled,
-                    !journeyMode
-                      ? "journey-mode-off"
-                      : transportAtEnd
-                        ? "journey-at-end"
-                        : "canPlay=false"
-                  )
-                }
-                onClick={handlePlay}
+                {recordingControls}
+              </motion.div>
+            ) : (
+              <motion.div
+                key="playback-panel"
+                className="proto-nav-scenario__panel-swap-item"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={studioPanelTransition}
               >
-                {playShowsPause ? (
-                  <CassettePauseIcon />
-                ) : playShowsStop ? (
-                  <CassetteStopIcon />
-                ) : (
-                  <CassettePlayIcon />
-                )}
-              </button>
-            </div>
-            <button
-              type="button"
-              className="proto-nav-step-btn proto-nav-scenario__btn"
-              aria-label="Step forward"
-              disabled={stepForwardDisabled}
-              onPointerDown={() =>
-                logBlockedTransport(
-                  "transport:step-forward",
-                  stepForwardDisabled,
-                  !journeyMode
-                    ? "journey-mode-off"
-                    : playbackActive
-                      ? "playback-active"
-                      : transportAtEnd
-                        ? "journey-at-end"
-                        : "canStepForward=false"
-                )
-              }
-              onClick={handleStepForward}
-            >
-              <CassetteStepForwardIcon />
-            </button>
-            <button
-              type="button"
-              className="proto-nav-step-btn proto-nav-scenario__btn"
-              aria-label="Jump to end"
-              disabled={jumpToEndDisabled}
-              onPointerDown={() =>
-                logBlockedTransport(
-                  "transport:jump-to-end",
-                  jumpToEndDisabled,
-                  !journeyMode
-                    ? "journey-mode-off"
-                    : playbackActive
-                      ? "playback-active"
-                      : transportAtEnd
-                        ? "journey-at-end"
-                        : "canJumpToEnd=false"
-                )
-              }
-              onClick={handleJumpToEnd}
-            >
-              <CassetteJumpToEndIcon />
-            </button>
-          </>
-        )}
+                {onJourneyModeChange ? (
+                  <span className="proto-nav-scenario__cjm-group">
+                    <span className="proto-nav-scenario__mode-label" aria-hidden>
+                      CJM
+                    </span>
+                    <ProtoStudioJourneySwitch
+                      checked={journeyMode}
+                      onChange={(enabled) => {
+                        logControlPanel("studio:journey-mode", {
+                          enabled,
+                          previous: journeyMode,
+                          switchDisabled: journeyModeSwitchDisabled,
+                        });
+                        onJourneyModeChange(enabled);
+                      }}
+                      disabled={journeyModeSwitchDisabled}
+                    />
+                  </span>
+                ) : null}
+                <span className="proto-nav-scenario__counter" aria-live="polite">
+                  {formatStepCounter(
+                    visibleCount,
+                    totalFrames,
+                    stepProgressActive
+                  )}
+                </span>
+                <div className="proto-nav-scenario__deck-led" aria-hidden>
+                  <span
+                    key={
+                      showEndDiode
+                        ? "diode-end"
+                        : stepBlinkActive
+                          ? `step-${stepBlinkToken}`
+                          : "diode-idle"
+                    }
+                    className={`proto-nav-scenario__on-air${diodeErrorClass}${diodeEndClass}${diodeStepClass}${diodeClickClass}`}
+                  >
+                    <span className="proto-nav-scenario__on-air-dot" />
+                    <span className="proto-nav-scenario__on-air-halo" />
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  className="proto-nav-step-btn proto-nav-scenario__btn"
+                  aria-label="Jump to start"
+                  disabled={jumpToStartDisabled}
+                  onPointerDown={() =>
+                    logBlockedTransport(
+                      "transport:jump-to-start",
+                      jumpToStartDisabled,
+                      !journeyMode
+                        ? "journey-mode-off"
+                        : playbackActive
+                          ? "playback-active"
+                          : "canJumpToStart=false"
+                    )
+                  }
+                  onClick={handleJumpToStart}
+                >
+                  <CassetteJumpToStartIcon />
+                </button>
+                <button
+                  type="button"
+                  className="proto-nav-step-btn proto-nav-scenario__btn"
+                  aria-label="Step back"
+                  disabled={stepBackDisabled}
+                  onPointerDown={() =>
+                    logBlockedTransport(
+                      "transport:step-back",
+                      stepBackDisabled,
+                      !journeyMode
+                        ? "journey-mode-off"
+                        : playbackActive
+                          ? "playback-active"
+                          : "canStepBack=false"
+                    )
+                  }
+                  onClick={handleStepBack}
+                >
+                  <CassetteStepBackIcon />
+                </button>
+                <div className="proto-nav-scenario__play-lamp">
+                  <span className="proto-nav-scenario__halogen" aria-hidden>
+                    <span className="proto-nav-scenario__halogen-source">
+                      <span className="proto-nav-scenario__halogen-bulb" />
+                    </span>
+                    <span className="proto-nav-scenario__halogen-beam" />
+                  </span>
+                  <button
+                    type="button"
+                    className="proto-nav-step-btn proto-nav-scenario__btn proto-nav-scenario__btn--play"
+                    aria-label="Play journey"
+                    aria-pressed={isOnAir}
+                    disabled={playDisabled}
+                    onPointerDown={() =>
+                      logBlockedTransport(
+                        "transport:play",
+                        playDisabled,
+                        !journeyMode
+                          ? "journey-mode-off"
+                          : transportAtEnd
+                            ? "journey-at-end"
+                            : "canPlay=false"
+                      )
+                    }
+                    onClick={handlePlay}
+                  >
+                    {playShowsPause ? (
+                      <CassettePauseIcon />
+                    ) : playShowsStop ? (
+                      <CassetteStopIcon />
+                    ) : (
+                      <CassettePlayIcon />
+                    )}
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  className="proto-nav-step-btn proto-nav-scenario__btn"
+                  aria-label="Step forward"
+                  disabled={stepForwardDisabled}
+                  onPointerDown={() =>
+                    logBlockedTransport(
+                      "transport:step-forward",
+                      stepForwardDisabled,
+                      !journeyMode
+                        ? "journey-mode-off"
+                        : playbackActive
+                          ? "playback-active"
+                          : transportAtEnd
+                            ? "journey-at-end"
+                            : "canStepForward=false"
+                    )
+                  }
+                  onClick={handleStepForward}
+                >
+                  <CassetteStepForwardIcon />
+                </button>
+                <button
+                  type="button"
+                  className="proto-nav-step-btn proto-nav-scenario__btn"
+                  aria-label="Jump to end"
+                  disabled={jumpToEndDisabled}
+                  onPointerDown={() =>
+                    logBlockedTransport(
+                      "transport:jump-to-end",
+                      jumpToEndDisabled,
+                      !journeyMode
+                        ? "journey-mode-off"
+                        : playbackActive
+                          ? "playback-active"
+                          : transportAtEnd
+                            ? "journey-at-end"
+                            : "canJumpToEnd=false"
+                    )
+                  }
+                  onClick={handleJumpToEnd}
+                >
+                  <CassetteJumpToEndIcon />
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   );

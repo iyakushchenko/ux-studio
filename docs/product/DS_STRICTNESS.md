@@ -69,12 +69,14 @@ Allowed without a deviation entry:
 - Layout (shell 1440/64/1312, flex/grid, sticky mounts)
 - Concept structure that does not redefine a shared control’s color/hover language
 - Temporary Make bridge CSS while a screen is not yet React (retire screen-by-screen)
+- Trivial one-property CSS transitions (hover color/opacity) — **not** UI enter/exit/layout motion
 
 Requires a **registered deviation** ([../uxds/DEVIATIONS.md](../uxds/DEVIATIONS.md)):
 
 - New control family or intentional break from an existing role
 - Concept chrome that cannot yet be expressed as a token remap
 - Any new hex that will be reused on more than one surface
+- Bespoke `@keyframes` / custom animation systems (default UI motion is **`framer-motion`** — [FE_STANDARDS.md](./FE_STANDARDS.md) §9)
 
 ---
 

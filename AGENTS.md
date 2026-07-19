@@ -76,6 +76,7 @@ Full transport smokes require `__protoRun*` helpers — use sparingly; prefer sa
 - Engine code in `src/app/` — project-agnostic
 - Boots-specific DOM/scripts in `src/projects/boots-pharmacy/` only until React+UXDS rebuild
 - Concept pages target: React + UXDS ([PAGE_BUILD_CONTRACT.md](docs/product/PAGE_BUILD_CONTRACT.md))
+- **UI motion default = `framer-motion`** — import from `framer-motion`; use `AnimatePresence` / `motion.*` for enter/exit/layout. No bespoke `@keyframes` zoos or hand-rolled width/opacity animators unless registered as a DS deviation. Trivial one-property CSS (`color`/`opacity` hover) and Make-parity ports are OK. See [FE_STANDARDS.md](docs/product/FE_STANDARDS.md) §9.
 - FE standards — icon+text nowrap, one tertiary icon language, 1440/64/1312 content column, scoped CSS ([FE_STANDARDS.md](docs/product/FE_STANDARDS.md))
 - DS strictness — one pattern per role; `var(--uxds-…)`; theme remaps only; no anonymous page CSS ([DS_STRICTNESS.md](docs/product/DS_STRICTNESS.md), [DEVIATIONS.md](docs/uxds/DEVIATIONS.md))
 - Visual fidelity + no zoo + rebuild behavior parity ([VISUAL_FIDELITY.md](docs/product/VISUAL_FIDELITY.md))

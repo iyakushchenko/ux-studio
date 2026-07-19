@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { flashControlRoomButton } from "@/app/nav/protoControlRoomTap";
 import { ProtoStudioPlaybackRecSwitch } from "@/app/nav/ProtoStudioPlaybackRecSwitch";
+import { studioPanelTransition } from "@/app/nav/protoStudioMotion";
 import {
   getActiveRecordingSession,
   getLastRecordingSession,
@@ -226,14 +228,40 @@ export function ProtoNavRecordingModeSlot({
             setRecMode(enabled);
           }}
         />
-        {recMode ? <ProtoNavRecordingEventCounter /> : null}
+        <AnimatePresence initial={false} mode="popLayout">
+          {recMode ? (
+            <motion.span
+              key="rec-event-counter"
+              className="proto-nav-scenario__panel-motion-inline"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={studioPanelTransition}
+            >
+              <ProtoNavRecordingEventCounter />
+            </motion.span>
+          ) : null}
+        </AnimatePresence>
       </span>
-      {recMode ? (
-        <ProtoNavRecordingControls
-          getStartOptions={getStartOptions}
-          onReplay={onReplay}
-        />
-      ) : null}
+      <div className="proto-nav-scenario__panel-swap" aria-live="polite">
+        <AnimatePresence initial={false} mode="wait">
+          {recMode ? (
+            <motion.div
+              key="rec-panel"
+              className="proto-nav-scenario__panel-swap-item"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={studioPanelTransition}
+            >
+              <ProtoNavRecordingControls
+                getStartOptions={getStartOptions}
+                onReplay={onReplay}
+              />
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }

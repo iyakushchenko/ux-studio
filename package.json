@@ -51,6 +51,7 @@
     "cmdk": "1.1.1",
     "date-fns": "3.6.0",
     "embla-carousel-react": "8.6.0",
+    "framer-motion": "12.42.2",
     "input-otp": "1.4.2",
     "lucide-react": "0.487.0",
     "motion": "12.23.24",
@@ -72,9 +73,9 @@
   },
   "devDependencies": {
     "@playwright/test": "1.61.1",
-    "playwright": "1.61.1",
     "@tailwindcss/vite": "4.1.12",
     "@vitejs/plugin-react": "4.7.0",
+    "playwright": "1.61.1",
     "tailwindcss": "4.1.12",
     "vite": "6.3.5",
     "vitest": "3.2.4"
