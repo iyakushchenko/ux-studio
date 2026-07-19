@@ -14,9 +14,9 @@
 
 | Field | Value |
 |-------|-------|
-| **Overall** | **FAIL** |
-| **PO green-light allowed?** | **No** — close does not clear modal |
-| **Quinn interaction matrix** | **FAIL** — `plp-quick-view-close` |
+| **Overall** | **FAIL** *(superseded)* → **PROVEN** on tip `1624f79` / v0.0.19 — re-prove [FE_AUDIT_OVERLAY_PREARM_SITREP_2026-07-19.md](./FE_AUDIT_OVERLAY_PREARM_SITREP_2026-07-19.md) |
+| **PO green-light allowed?** | **Yes** after `1624f79` (was No on tip `43c1ec8`) |
+| **Quinn interaction matrix** | Was **FAIL** `plp-quick-view-close` → **PASS** on re-prove |
 
 ---
 
