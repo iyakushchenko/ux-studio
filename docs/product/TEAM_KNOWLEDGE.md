@@ -147,6 +147,7 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 
 | Delta | Hats | LESSONS / artifact |
 |-------|------|--------------------|
+| **PDP FAQ 6/6 + Accordion motion + TertiaryCta soft** — Uma §0a PROVEN @ `76e2433` / v0.0.30; Arch Final Pass waits Quinn MCP | Uma, Quinn, Arch, Finn | UMA_FIDELITY_PDP · PAGE_FINAL_PASS NEEDS-REPROVE · DEV-20260719-tertiary-soft |
 | **PDP FAQ/CTA/focus polish (PO)** — Make-sourced FAQ bodies 3/6; download tertiary unify (no leaflet stub); accordion focus-none; v0.0.28 | Bea, Uma, Finn, Quinn, Arch | PDP_MAKE_PARITY_REGISTER · UMA_FIDELITY_PDP · PAGE_FINAL_PASS.json |
 | **PDP PAGE FINAL PASS** — **HARD-GREEN** @ `c6e8931` (Quinn 23/23 @ `bf59041` · Uma §0a @ `8d80d5f`; prior `828ab2b` demoted then re-proved) | Arch, Finn, Uma, Quinn, Ben, Pax | PAGE_FINAL_PASS.json · FE_AUDIT_PDP_MCP · FE_AUDIT_PDP_PAGE_FINAL_PASS · check:page-final-pass |
 | **PDP RTB vertical rhythm** — LEGACY Make `module.pdp.rtb > div > div` stole React column gap (48≠32) + forced title-block 1:1; Uma must MCP-measure section gaps before fidelity IN PROGRESS; Quinn PASS ≠ rhythm done | Uma, Finn, Arch | UMA_FIDELITY_NOTES §0b · UMA_FIDELITY_PDP · globals-screens `:not(.pdp__rtb-card)` |
@@ -163,6 +164,11 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 | **Auto-Rule `agent-teardown-clean`** — overlay gone + `&modal=` stripped + dialog closed after probe/sitrep/forceClear | Finn, Ben, Quinn, Arch | `studioAgentTeardownContract` · felonies §9 · `__studioAssertAgentTeardownClean` |
 | Team knowledge database + mandatory use | Arch, all | This file · TEAM.md § Knowledge use |
 | Page final-pass gate before NEXT screen; landmarks + BEM stamp | Finn, Uma, Ben, Arch | PAGE_FINAL_PASS.md · check:page-final-pass |
+
+**Knowledge improved** (2026-07-19 · stream: PDP v0.0.30 Uma §0a re-prove · tip 76e2433):
+- Uma (UI/UX): §0a PROVEN — FAQ 6/6 bodies, Accordion CSS grid-template-rows motion, muted closed chevrons, Find out more = TertiaryCta soft (no `.pdp__pill--mint`) — applied: UMA_FIDELITY_PDP + PARITY_PROVEN note
+- Arch (Director): Final Pass only after Quinn MCP PASS on polish tip — applied: PAGE_FINAL_PASS stays NEEDS-REPROVE; no false HARD-GREEN
+- Quinn (QA): must re-run `__studioRunMcpPageProbe({ screenId:"pdp" })` on `76e2433` before Arch stamp — applied: NEXT_STEPS 3e
 
 **Knowledge improved** (2026-07-19 · stream: robo-cursor native feedback · Auto-Rule R10):
 - Finn (FE): global agent/robo click path — full pointer enter/move/down/up + CSS `:hover`/`:active` bridge; settle clears hand → default; mild travel overshoot — applied: `demoCursor` + `demoCursorPseudoBridge` + popup-close pressed wash

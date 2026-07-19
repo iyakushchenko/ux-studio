@@ -178,4 +178,4 @@ Kickoff fidelity targets live under `docs/projects/<id>/audits/UMA_FIDELITY_<SCR
 
 | Screen | Stamp | Status |
 |--------|-------|--------|
-| **PDP** (`pdp`) | [../projects/boots-pharmacy/audits/UMA_FIDELITY_PDP_2026-07-19.md](../projects/boots-pharmacy/audits/UMA_FIDELITY_PDP_2026-07-19.md) | **PROVEN** — §0a/§0b PASS + P2 share Make flip MCP `matrix(1,0,0,-1,0,0)`; B1 static accordion **accepted**; Arch may run PAGE FINAL PASS |
+| **PDP** (`pdp`) | [../projects/boots-pharmacy/audits/UMA_FIDELITY_PDP_2026-07-19.md](../projects/boots-pharmacy/audits/UMA_FIDELITY_PDP_2026-07-19.md) | **PROVEN** — §0a @ `76e2433` / v0.0.30 (FAQ 6/6 + Accordion grid motion + muted chevrons + TertiaryCta soft); §0b/P2 carried; Arch Final Pass **after** Quinn MCP PASS |

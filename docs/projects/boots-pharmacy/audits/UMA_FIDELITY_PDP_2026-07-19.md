@@ -3,9 +3,9 @@
 **Surface:** Boots Pharmacy PDP (`screenId: pdp`, Frame child **8**)  
 **Date:** 2026-07-19  
 **Owner:** Uma (UI/UX)  
-**Status:** **PROVEN** (§0a re-prove @ tip `bf59041` · **v0.0.28**)  
-**Code tip proved:** `bf59041` · **v0.0.28** — FAQ Make bodies + download CTA unify + accordion focus-none  
-**Prior PROVEN tip:** `d6e4951` · v0.0.27 — superseded by polish; re-proved here  
+**Status:** **PROVEN** (§0a re-prove @ tip `76e2433` · **v0.0.30**)  
+**Code tip proved:** `76e2433` · **v0.0.30** — FAQ 6/6 bodies · Accordion grid motion · muted closed chevrons · Find out more `TertiaryCta soft` (no custom mint pill CSS)  
+**Prior PROVEN tip:** `bf59041` · v0.0.28 — superseded by PO polish; re-proved here  
 **Prior RTB / share tip:** `553e29c` · v0.0.24 (§0b / P2 still valid; not re-opened)  
 **React:** `src/projects/boots-pharmacy/screens/pdp/*` (L1–L20 RTB + below-fold)  
 **Make truth:** `frame/index.tsx` `ModuleBreadcrumbs` / `Body6` / `Body7` / `ModulePdpRtb` / `ComponentPdpRtb` / `ComponentPdpAccordion` · `globals-screens` child-8 · `globals-chrome` checkbox/CTA/icon hits  
@@ -19,18 +19,19 @@
 | Field | Value |
 |-------|-------|
 | **Overall** | **PROVEN** |
-| **§0a typical DS / pointer matrix** | **PASS** — FAQ bodies + CTA unify + accordion focus-none (v0.0.28) |
-| **§0a FAQ Accordion (UXDS kit)** | **PASS** — 3 Make-sourced bodies; hover navy; **no focus ring** (PO/Make); 3 residual headers static |
-| **§0a download CTAs (tertiary)** | **PASS** — Guide + Leaflet **same** `.pdp__pill`; **no** `.pdp__pill--bordered` stub / CSS |
+| **§0a typical DS / pointer matrix** | **PASS** — FAQ 6/6 + Accordion kit motion/chevrons + TertiaryCta soft Find out more (v0.0.30) |
+| **§0a FAQ Accordion (UXDS kit)** | **PASS** — **6/6** interactive panels with bodies; hover navy; **no focus ring** (PO/Make); CSS grid-template-rows collapse; muted closed chevrons |
+| **§0a download CTAs (tertiary)** | **PASS** — Guide + Leaflet **same** `.pdp__pill`; **no** `.pdp__pill--bordered` stub / CSS (carried v0.0.28) |
+| **§0a Find out more (GP promo)** | **PASS** — `TertiaryCta` `soft` → `.studio-tertiary-cta--soft`; **no** `.pdp__pill--mint` (CSSOM + DOM) |
 | **§0b RTB vertical rhythm** | **PASS** — carried from v0.0.24 measure (`32px` stack; title-block `72px`) |
 | **P2 share glyph Make flip** | **PASS** — carried from v0.0.24 MCP matrix |
-| **PO green-light allowed?** | **No** — wait PO `+` before Home (Final Pass HARD-GREEN restored) |
-| **PAGE FINAL PASS** | **HARD-GREEN** @ tip `c6e8931` |
-| **Arch Final Pass after Quinn?** | **Done** — Uma §0a + Quinn 23/23 → Arch HARD-GREEN restored |
+| **PO green-light allowed?** | **No** — wait Quinn MCP re-prove + Arch Final Pass; then PO `+` before Home |
+| **PAGE FINAL PASS** | **NEEDS-REPROVE** — Arch stamps only after Quinn PASS on tip `76e2433` |
+| **Arch Final Pass after Quinn?** | **Blocked** — Uma §0a PROVEN; Quinn MCP matrix not yet re-run on v0.0.30 |
 
 **Honest residuals:**  
-1. **FAQ headers without Make body** — `nhs-vaccination` / `already-have-chickenpox` / `personal-data`: static headers only (no empty expand shells; no invented copy).  
-2. **No download URLs** — Guide / Leaflet are `<button>` with no `href` / download asset (Make parity).
+1. **Download URLs** — Guide / Leaflet are `<button>` with no `href` / download asset (Make parity).  
+2. **FAQ body sourcing** — 3 Make+Bea, 3 Bea-sourced for former header-only Make residuals (PO ask; register documents).
 
 ---
 
@@ -56,44 +57,68 @@
 
 ---
 
-## Browser evidence (Uma — localhost · v0.0.28 · tip `bf59041`)
+## Browser evidence (Uma — localhost · v0.0.30 · tip `76e2433`)
 
-**URL:** `http://127.0.0.1:5190/?project=boots-pharmacy&screen=pdp&persona=sarah-jenkins&mode=agentic-cjm`  
+**URL:** `http://127.0.0.1:5191/?project=boots-pharmacy&screen=pdp&persona=sarah-jenkins&mode=agentic-cjm`  
 **Viewport:** 1440×900 (Studio shell)  
-**Method:** Chrome DevTools MCP `evaluate_script` + `__studioRunMcpPageProbe` + a11y snapshot  
-**Version chip:** `v0.0.28` (+ ALPHA badge)  
-**Mount:** `.pdp[data-studio-react-screen=pdp]` present · UXDS `Accordion` `[data-name="component.pdp.accordion"]` · 6 items · default open `who-is-at-risk`
+**Method:** Chrome DevTools MCP `evaluate_script` + CSSOM rule scan  
+**Version chip:** `v0.0.30`  
+**Mount:** `.pdp[data-studio-react-screen=pdp]` present · UXDS `Accordion` `[data-name="component.pdp.accordion"]` · **6 items** · default open `who-is-at-risk`  
+**Note:** MCP browser has `prefers-reduced-motion: reduce` → live `transition: none`; kit CSSOM still ships `grid-template-rows` 0fr↔1fr + 0.32s ease (PASS for motion contract).
 
-### §0a — FAQ bodies (3 Make-sourced) + residuals
+### §0a — FAQ bodies (6/6 interactive)
 
 | Panel | Source | Live body / DOM | Pass |
 |-------|--------|-----------------|------|
-| `how-can-boots-help` | Make RTB service blurb | Opens; text starts “Our private Chickenpox Vaccination Service…” | **PASS** |
-| `who-is-at-risk` | Make Accordion `Description` | Default open; “weakened immune system” present | **PASS** |
-| `what-happens-at-appointment` | Appt strip + specs Administration | “Typical appointment takes around 15 minutes. Given in the upper arm…” | **PASS** |
-| `nhs-vaccination` | residual | `[data-studio-faq-residual]` static header; **not** a button; no body | **PASS** (accepted) |
-| `already-have-chickenpox` | residual | static header only | **PASS** (accepted) |
-| `personal-data` | residual | static header only | **PASS** (accepted) |
+| `how-can-boots-help` | Make RTB + Bea | Opens; “Our private Chickenpox Vaccination Service…” (417 chars) | **PASS** |
+| `who-is-at-risk` | Make Accordion + Bea | Default open; “weakened immune system” (377 chars) | **PASS** |
+| `what-happens-at-appointment` | Appt strip + specs + Bea | “Typical appointment takes around 15 minutes…” (327 chars) | **PASS** |
+| `nhs-vaccination` | Bea (Make header-only) | Interactive body present (397 chars); **not** residual static | **PASS** |
+| `already-have-chickenpox` | Bea (Make header-only) | Interactive body present (444 chars) | **PASS** |
+| `personal-data` | Bea (Make header-only) | Interactive body present (529 chars) | **PASS** |
 
-**Probe:** `pdp-faq-accordion-toggle` / `pdp-faq-accordion-reopen` / `pdp-faq-help-body` → **PASS** (residual count = 3; help body Make RTB copy; focus-none CSSOM present).
+**Counts:** `itemCount=6` · `bodiesWithText=6` · `residuals=0` (no `[data-studio-faq-residual]`).
 
-### §0a — Accordion focus-none (Make parity)
+### §0a — Accordion motion (smooth collapse)
+
+| Probe | Evidence | Pass |
+|-------|----------|------|
+| Content shell | `.uxds-accordion-content { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.32s … }` in CSSOM | **PASS** |
+| Open state | `[data-state=open]` → `grid-template-rows: 1fr`; live open measured ~120px row | **PASS** |
+| Clip child | `.uxds-accordion-content__clip { grid-row: 1 / span 2; overflow: hidden }` | **PASS** |
+| Reduced motion | `@media (prefers-reduced-motion: reduce)` zeros transitions (MCP browser matches) | **PASS** (a11y) |
+| No height:auto stutter | Kit uses grid rows (not height animation) | **PASS** |
+
+### §0a — Muted closed chevrons
+
+| State | Computed chevron `color` | Pass |
+|-------|--------------------------|------|
+| Closed (5 panels) | `rgb(175, 204, 202)` = `--uxds-icon-icon-accent-soft` | **PASS** |
+| Open (`who-is-at-risk`) | `rgb(70, 118, 114)` = `--uxds-icon-icon-accent-strong` | **PASS** |
+| Kit CSSOM | closed soft → open strong + `rotate(180deg)` | **PASS** |
+
+### §0a — Find out more as TertiaryCta soft
+
+| Probe | Evidence | Pass |
+|-------|----------|------|
+| DOM class | `studio-tertiary-cta studio-tertiary-cta--compact studio-tertiary-cta--soft` | **PASS** |
+| Rest fill | `background: rgb(224, 251, 248)` + inset mint ring (CSSOM soft rules) | **PASS** |
+| No custom mint pill | **no** `.pdp__pill--mint` in DOM / CSSOM; deviation `DEV-20260719-tertiary-soft` | **PASS** |
+| Label | “Find out more” | **PASS** |
+
+### §0a — Accordion focus-none (Make parity · carried)
 
 | Probe | Computed / CSSOM | Pass |
 |-------|------------------|------|
-| Header **hover** CSS | `.pdp__accordion-header:hover .pdp__accordion-title` + chevron → link navy token | **PASS** |
-| Header **:focus / :focus-visible** | `outline-style: none`; `box-shadow: none`; CSSOM rule `.pdp__accordion-header:focus, .pdp__accordion-header:focus-visible { outline: none }` | **PASS** |
-| Keyboard expand | button + `aria-expanded` still works (no ring required per PO/Make) | **PASS** |
+| Header **hover** CSS | `.pdp__accordion-header:hover` title + chevron → link navy token | **PASS** |
+| Header **:focus / :focus-visible** | `outline: none` (PO/Make) | **PASS** (carried) |
 
-### §0a — Download CTAs tertiary (unified)
+### §0a — Download CTAs tertiary (unified · carried)
 
 | Control | Rest computed | Pass |
 |---------|---------------|------|
-| Chickenpox Guide `.pdp__pill` | label `rgb(92,92,92)`; icon navy `#012169`; **border none**; class `pdp__pill` | **PASS** |
-| Vaccine Information Leaflet `.pdp__pill` | **same** class + rest colors as Guide; **no** `pdp__pill--bordered` | **PASS** |
-| CSSOM | `.pdp__pill:hover:not(:disabled)` + icon hover; **no** `.pdp__pill--bordered` rule | **PASS** |
-
-**Note:** Mid-matrix `__studioRunMcpPageProbe` once flaked `pdp-download-cta-hover` class equality after prior wishlist mutation; direct DOM re-check on same tip = both `className === "pdp__pill"`. Quinn should re-run full matrix clean (Sign Out + empty heart) for Final Pass.
+| Chickenpox Guide `.pdp__pill` | same tertiary pill language | **PASS** (carried v0.0.28) |
+| Vaccine Information Leaflet `.pdp__pill` | **no** `pdp__pill--bordered` | **PASS** (carried) |
 
 ### §0a pointer matrix (prior RTB — still in force)
 
@@ -116,7 +141,7 @@
 |------|-------|
 | `loading states` | **N/A** — Make has no page loader / empty list / updating overlay (LE1–LE3). No skeleton/spinner invent observed on mount. |
 | `checkbox/radio hover` | **PASS** — real MCP `:hover` mint on unchecked booster box (v0.0.24) |
-| `typical DS checks` | **PASS** — §0a pointer matrix + FAQ bodies + CTA unify + accordion focus-none (tip `bf59041` / v0.0.28) |
+| `typical DS checks` | **PASS** — §0a FAQ 6/6 + Accordion motion/chevrons + TertiaryCta soft + focus-none + download unify (tip `76e2433` / v0.0.30) |
 | `fidelity checklist` | **PROVEN** — §0a polish re-proved; §0b/P2 carried |
 
 ---
@@ -143,8 +168,8 @@
 | **L16** | Intro copy | **PASS** | 864 / two paras |
 | **L17** | Appointment strip | **PASS** | `#e5f1f8` pill + icon |
 | **L18** | Specs table | **PASS** | 864 card / `#dadada` / rows + download tertiary **unified**; **no URLs** residual |
-| **L19** | FAQ accordion | **PASS** | 3 Make bodies + 3 header residuals; hover navy; **focus-none** Make parity |
-| **L20** | GP promo | **PASS** (layout) | Mint 24 radius + Find out more static |
+| **L19** | FAQ accordion | **PASS** | **6/6** bodies; grid motion; muted closed chevrons; hover navy; focus-none |
+| **L20** | GP promo | **PASS** | Mint band + **Find out more** `TertiaryCta soft` (no `.pdp__pill--mint`) |
 
 ---
 
@@ -152,10 +177,9 @@
 
 | Residual | Severity | Owner |
 |----------|----------|-------|
-| FAQ headers without Make body (3/6) | **Accepted Make parity** — static headers; do not invent FAQ copy | PO / content |
 | Download CTAs have no file URLs | **Accepted Make parity** — buttons only until assets exist | PO / Pax |
-| PAGE FINAL PASS / `check:page-final-pass` hardGreen | **HARD-GREEN** @ `c6e8931` | Arch |
-| Register React column catch-up notes | Doc | Bea |
+| PAGE FINAL PASS / `mcpFinalPass` | **NEEDS-REPROVE** — Quinn MCP on `76e2433` then Arch | Quinn → Arch |
+| FAQ Bea-sourced bodies (3 panels) | **Accepted** — PO ask; register documents Make header-only gap | Bea / PO |
 
 ---
 
@@ -173,7 +197,11 @@
 | Booster row tint | **Clear** |
 | 50/50 drift | **Clear** |
 | Price confusion | **Clear** |
-| Static accordion invent | **Clear** — UXDS Accordion; bodies = Make-sourced or header residual |
+| Static accordion invent | **Clear** — UXDS Accordion; **6/6** bodies |
+| FAQ header-only residual | **Clear** — all 6 expandable with bodies |
+| Custom mint Find out more pill | **Clear** — `TertiaryCta soft` only; no `.pdp__pill--mint` |
+| Accordion height:auto stutter | **Clear** — CSS grid-template-rows kit motion |
+| Loud closed chevrons | **Clear** — muted soft closed / strong open |
 | Download tertiary stub border | **Clear** — both `.pdp__pill`; no `#c7e4ff` leaflet stub |
 | Accordion focus ring (anti-Make) | **Clear** — outline none on `:focus` / `:focus-visible` |
 | Make visual leak | **Clear** |
@@ -186,18 +214,19 @@
 ## team check report lines (Uma)
 
 ```
-Uma (UI/UX): fidelity checklist — PROVEN (§0a PASS FAQ bodies×3 + CTA unify + accordion focus-none; §0b PASS; P2 share flip PASS; residuals: 3 FAQ headers, no download URLs)
+Uma (UI/UX): fidelity checklist — PROVEN (§0a PASS FAQ 6/6 + Accordion grid motion + muted closed chevrons + TertiaryCta soft Find out more; §0b PASS; P2 share flip PASS; residual: no download URLs)
 Uma (UI/UX): section vertical rhythm (§0b) — PASS (32px stack; title-block 72px; tip 87c0fc8 / cbbd97d)
 Uma (UI/UX): loading states — N/A (no Make loader; invent = FAIL) — PASS for absence
 Uma (UI/UX): checkbox/radio hover — PASS (MCP :hover mint on unchecked booster)
-Uma (UI/UX): typical DS checks (state matrix) — PASS (§0a; tip bf59041 / v0.0.28 — FAQ bodies + CTA unify + focus-none)
-Uma (UI/UX): FAQ Accordion UXDS — PASS (3 Make bodies; 3 residual headers; hover navy CSS; focus outline none)
-Uma (UI/UX): download CTA tertiary unify — PASS (Guide+Leaflet .pdp__pill; no bordered stub; rest label #5c5c5c / icon navy)
+Uma (UI/UX): typical DS checks (state matrix) — PASS (§0a; tip 76e2433 / v0.0.30)
+Uma (UI/UX): FAQ Accordion UXDS — PASS (6/6 bodies; grid-template-rows motion CSSOM; closed chevron soft #afccca; open strong #467672)
+Uma (UI/UX): Find out more — PASS (TertiaryCta soft; no .pdp__pill--mint; DEV-20260719-tertiary-soft)
+Uma (UI/UX): download CTA tertiary unify — PASS (carried v0.0.28)
 Uma (UI/UX): share glyph Make flip — PASS (carried v0.0.24)
-Uma (UI/UX): Arch Final Pass — HARD-GREEN restored @ c6e8931 (Uma §0a + Quinn 23/23)
+Uma (UI/UX): Arch Final Pass — BLOCKED until Quinn MCP PASS on 76e2433 (PAGE FINAL PASS NEEDS-REPROVE)
 ```
 
-**Knowledge used:** UMA_FIDELITY_NOTES §0/§0a/**§0b** · VISUAL_FIDELITY · DS_STRICTNESS · PDP_MAKE_PARITY_REGISTER L18–L19 · UXDS Accordion kit · `pdp.css` tertiary pill + accordion focus-none · Make `ComponentPdpAccordion` · PAGE_FINAL_PASS.md (Arch after Quinn).
+**Knowledge used:** UMA_FIDELITY_NOTES §0/§0a/**§0b** · VISUAL_FIDELITY · DS_STRICTNESS · PDP_MAKE_PARITY_REGISTER L18–L20 · UXDS Accordion kit (`accordion.css` grid rows) · `TertiaryCta soft` · DEVIATIONS `DEV-20260719-tertiary-soft` · PAGE_FINAL_PASS.md (Arch after Quinn).
 
 ---
 
