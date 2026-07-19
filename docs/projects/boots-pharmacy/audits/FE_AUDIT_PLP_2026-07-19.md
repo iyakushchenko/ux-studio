@@ -3,7 +3,7 @@
 **Surface / slice:** PLP Vaccinations — Make→React parity restore (bg fill, hero shadow, listing wrapper, preloader, filter chips)  
 **Date:** 2026-07-19  
 **Auditor:** Uma (UI/UX) + Quinn (QA) — strict (“Nazi QA”) parity pass  
-**Implementer handoff / audited tip:** pending commit after this stamp (package `0.0.5`; parent tip was `42d922c`)  
+**Implementer handoff / audited tip:** `3266316` (patch `0.0.5`; parent `42d922c`)  
 **Checklist:** [../../../product/FE_UI_UX_AUDIT.md](../../../product/FE_UI_UX_AUDIT.md) · [VISUAL_FIDELITY.md](../../../product/VISUAL_FIDELITY.md) · [FE_STANDARDS.md](../../../product/FE_STANDARDS.md) · [DS_STRICTNESS.md](../../../product/DS_STRICTNESS.md)  
 **Register:** [../features/PLP_MAKE_PARITY_REGISTER.md](../features/PLP_MAKE_PARITY_REGISTER.md)  
 **Brief:** [../features/PLP_REACT.md](../features/PLP_REACT.md)
