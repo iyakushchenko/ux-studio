@@ -14,7 +14,7 @@
       "screenId": "book-step-1",
       "status": "proven",
       "stampedAt": {
-        "sha": "c5cce1a",
+        "sha": "d6c3907",
         "date": "2026-07-19",
         "note": "Uma+Finn structure/naming final pass — header+main landmarks; BEM book-step-1; data-studio-react-screen + make-retired; ButtonPrimary + search-icon markers. Quinn MCP follow-up."
       },
@@ -31,7 +31,7 @@
       "screenId": "book-step-2",
       "status": "proven",
       "stampedAt": {
-        "sha": "c5cce1a",
+        "sha": "d6c3907",
         "date": "2026-07-19",
         "note": "Uma+Finn structure/naming final pass — header+main; BEM book-step-2; ButtonPrimary; Make time-rule hrs retained (not invent filter seps). Quinn MCP follow-up."
       },
@@ -48,7 +48,7 @@
       "screenId": "book-step-3",
       "status": "proven",
       "stampedAt": {
-        "sha": "c5cce1a",
+        "sha": "d6c3907",
         "date": "2026-07-19",
         "note": "Uma+Finn structure/naming final pass — header+main; BEM book-step-3; ButtonPrimary kits. Quinn MCP follow-up."
       },
@@ -65,7 +65,7 @@
       "screenId": "plp",
       "status": "proven",
       "stampedAt": {
-        "sha": "c5cce1a",
+        "sha": "d6c3907",
         "date": "2026-07-19",
         "note": "Uma+Finn structure/naming final pass — header crumbs + main body + section listing + aside filters; BEM plp; SearchField + ButtonPrimary; no filter-section invent seps; DS states via kit ratchets. Board lock: PDP blocked until this stamp. Quinn MCP follow-up."
       },

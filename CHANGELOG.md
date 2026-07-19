@@ -2,6 +2,7 @@
 
 > _Append a bullet on coherent commits via `npm run notes:append -- --lane="<lane>" --intent="<text>"`. Preview with `npm run notes:preview`. On `npm run release:patch` this section is promoted to `## v<X.Y.Z> - DDMMYY` and a fresh empty `## Current` is re-inserted. Policy: `docs/product/VERSIONING.md`._
 
+## v0.0.17 - 190726
 - **docs:** PAGE FINAL PASS hard-green before next migrated page (doctrine + check:page-final-pass)
 - **project:** PLP+book steps: semantic landmarks (header/main/section) for page final-pass structure
 - **docs:** PAGE_FINAL_PASS gate + check:page-final-pass hard CI fail before NEXT page (PDP blocked until Quinn MCP HARD-GREEN)
