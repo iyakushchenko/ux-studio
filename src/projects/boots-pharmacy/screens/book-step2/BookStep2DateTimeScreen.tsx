@@ -1,3 +1,4 @@
+import type { KeyboardEvent } from "react";
 import imgBodyFill from "@/projects/boots-pharmacy/frame/6d60145a5be9172088977b4513e3f4859a70c66a.png";
 import { PROTO_TODAY_TOOLTIP } from "@/projects/boots-pharmacy/overlays/AvailabilityTool";
 import type { ChosenBookingSlot } from "@/projects/boots-pharmacy/overlays/AvailabilityTool";
@@ -35,6 +36,8 @@ export type BookStep2DateTimeScreenProps = {
   onChangeLocation: () => void;
   onSlotChange: (next: ChosenBookingSlot) => void;
   onReserve: () => void;
+  /** Progress step 1 — back to Book Step 1 (React owns; Make wire gated). */
+  onBackToStep1: () => void;
 };
 
 const PROGRESS_STEPS = [
@@ -82,7 +85,7 @@ function SummaryPill({
   );
 }
 
-function BookProgress() {
+function BookProgress({ onBackToStep1 }: { onBackToStep1: () => void }) {
   return (
     <div
       className="book-step2__progress"
@@ -91,6 +94,7 @@ function BookProgress() {
       {PROGRESS_STEPS.map((step) => {
         const isActive = step.state === "active";
         const isCompleted = step.state === "completed";
+        const isStep1Back = step.n === 1 && isCompleted;
         return (
           <div
             key={step.n}
@@ -103,6 +107,21 @@ function BookProgress() {
               .join(" ")}
             {...(isActive
               ? { "data-proto-step-active": "true" as const }
+              : {})}
+            {...(isStep1Back
+              ? {
+                  "data-proto-book-step-back": "true" as const,
+                  role: "button" as const,
+                  tabIndex: 0,
+                  "aria-label": "Go back to Choose Location",
+                  onClick: onBackToStep1,
+                  onKeyDown: (e: KeyboardEvent) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      onBackToStep1();
+                    }
+                  },
+                }
               : {})}
           >
             <ol start={step.n}>
@@ -253,16 +272,6 @@ function TimeSection({
                 </button>
               );
             })}
-            {Array.from({ length: Math.max(0, 7 - row.length) }).map(
-              (_, i) => (
-                <span
-                  key={`pad-${ri}-${i}`}
-                  className="book-step2__cal-cell book-step2__cal-cell--pad"
-                  data-name="calendar. date. cell"
-                  aria-hidden
-                />
-              )
-            )}
           </div>
         ))}
       </div>
@@ -284,6 +293,7 @@ export function BookStep2DateTimeScreen({
   onChangeLocation,
   onSlotChange,
   onReserve,
+  onBackToStep1,
 }: BookStep2DateTimeScreenProps) {
   const locationValue =
     chosenLocation?.address?.trim() ||
@@ -329,7 +339,7 @@ export function BookStep2DateTimeScreen({
         <div className="book-step2__shell">
           <div className="book-step2__shell-inner book-step2__main">
             <h1 className="book-step2__title">Book Appointment</h1>
-            <BookProgress />
+            <BookProgress onBackToStep1={onBackToStep1} />
 
             <section
               className="book-step2__card"

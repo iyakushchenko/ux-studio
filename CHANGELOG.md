@@ -6,6 +6,7 @@
 - **project:** Ship Book Step 2 React Date/Time pilot (Frame child 4); hide Make chrome; Nazi QA PROVEN; no LEGACY growth
 - **docs:** Stamp Book Step 2 FE audit handoff SHA af50556
 - **docs:** NEXT_STEPS: Step 2 + Pages verify DONE; Book Step 3 is NOW
+- **project:** Book Step 2: left-align time-slot last rows; stop agentic browse snap from Step 1 tab to Home
 
 ## v0.0.1 - 190726
 

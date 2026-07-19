@@ -33,6 +33,7 @@ import {
   shouldSuppressTransportNoOpForBeat,
 } from "@/app/orchestra/manualDirectorStep";
 import { syncBeatRetreatState } from "@/app/orchestra/journeyRetreatSync";
+import { shouldNavigateBeatTabOnEnter } from "@/app/orchestra/beatTabNavigation";
 import {
   canRetreatJourneyTouchpoint,
   lastPlayableBeatIndex as findLastPlayableBeatIndex,
@@ -900,7 +901,15 @@ export function useProtoJourneyPlayback({
 
   const runBeatEnter = useCallback(
     async (beat: JourneyBeat) => {
-      if (!suppressInitialBeatTabNavRef.current) {
+      // Browse (CJM off): beat index may fall back to journey-start for tabs
+      // outside the active CJM (e.g. Book Step 1 under agentic-cjm). Never snap
+      // the viewport to that fallback tab — manual nav owns the screen.
+      if (
+        shouldNavigateBeatTabOnEnter(
+          scenarioBrowseMode,
+          suppressInitialBeatTabNavRef.current
+        )
+      ) {
         navigateBeatTab(beat);
       }
       if (beat.id === "book-step2" && !scenarioBrowseMode) {

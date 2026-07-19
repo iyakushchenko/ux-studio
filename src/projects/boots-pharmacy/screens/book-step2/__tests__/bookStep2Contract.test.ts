@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 import { PROTO_SCREENS } from "@/projects/boots-pharmacy/screens/protoScreens";
 import {
   BOOK_STEP2_AFTERNOON,
+  BOOK_STEP2_EVENING,
   BOOK_STEP2_MORNING,
+  chunkRows,
   formatBookStep2Heading,
 } from "../bookStep2CalendarData";
 import {
@@ -30,5 +32,21 @@ describe("bookStep2Contract", () => {
     expect(BOOK_STEP2_AFTERNOON.find((s) => s.t === "16:30")?.ok).toBe(true);
     expect(BOOK_STEP2_AFTERNOON.find((s) => s.t === "15:30")?.ok).toBe(true);
     expect(BOOK_STEP2_MORNING.find((s) => s.t === "11:20")?.ok).toBe(true);
+  });
+
+  it("chunks time bands into rows of 7 (CSS grid left-aligns short tails)", () => {
+    const afternoonRows = chunkRows(BOOK_STEP2_AFTERNOON, 7);
+    const eveningRows = chunkRows(BOOK_STEP2_EVENING, 7);
+    expect(afternoonRows.at(-1)?.length).toBeLessThan(7);
+    expect(eveningRows.at(-1)?.length).toBeLessThan(7);
+    // Contract: page CSS uses grid 7×65px — short rows must not pad with
+    // narrower spacers under space-between (regression: right-shifted last row).
+    expect(afternoonRows.at(-1)?.map((s) => s.t)).toEqual([
+      "15:45",
+      "16:00",
+      "16:15",
+      "16:30",
+      "16:45",
+    ]);
   });
 });

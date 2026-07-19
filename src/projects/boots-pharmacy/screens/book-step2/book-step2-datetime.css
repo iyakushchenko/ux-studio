@@ -184,6 +184,13 @@
   color: var(--uxds-text-link-link);
 }
 
+.book-step2__progress-step[data-proto-book-step-back="true"] {
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+  pointer-events: auto;
+}
+
 .book-step2__progress-step li {
   margin-left: 15px;
 }
@@ -399,11 +406,20 @@
   width: 100%;
 }
 
-.book-step2__month-row,
-.book-step2__time-row {
+.book-step2__month-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
+  height: 32px;
+}
+
+/* Time slots: 7-col grid so short last rows stay left-aligned (not space-between). */
+.book-step2__time-row {
+  display: grid;
+  grid-template-columns: repeat(7, 65px);
+  justify-content: space-between;
+  align-items: center;
   width: 100%;
   height: 32px;
 }

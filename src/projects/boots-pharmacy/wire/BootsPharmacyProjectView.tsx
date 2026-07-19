@@ -849,6 +849,9 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     PROTO_SCENARIO_SCREENS,
     PROTO_INDEX_APPOINTMENT_DETAILS,
     PROTO_INDEX_APPOINTMENT_HISTORY,
+    PROTO_INDEX_BOOK_STEP1,
+    PROTO_INDEX_BOOK_STEP2,
+    PROTO_INDEX_BOOK_STEP3,
     PROTO_INDEX_PLP,
     protoTabToIndex,
     ProjectFrame,
@@ -978,8 +981,8 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   }, [setCurrent, setHubOpen]);
   const onQuickViewBookNow = useCallback(() => {
     setQuickViewOpen(false);
-    setCurrent(4);
-  }, [setCurrent]);
+    setCurrent(PROTO_INDEX_BOOK_STEP1);
+  }, [setCurrent, PROTO_INDEX_BOOK_STEP1]);
   const onQuickViewViewDetails = useCallback(() => {
     setQuickViewOpen(false);
     setCurrent(3);
@@ -1031,7 +1034,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
         return;
       }
       window.setTimeout(() => {
-        setCurrent(5);
+        setCurrent(PROTO_INDEX_BOOK_STEP2);
         const datetimeBeatIndex =
           activeJourney?.beats.findIndex((beat) => beat.id === "book-step2") ??
           -1;
@@ -1402,7 +1405,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
         openPickLocations("list", { locationRequired: true });
         return;
       }
-      setCurrent(5); // Book - Step 2 - Date and Time
+      setCurrent(PROTO_INDEX_BOOK_STEP2);
     };
 
     mountBookStep1Screen({
@@ -1451,7 +1454,8 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       onChangeRecipient: openRecipientPicker,
       onChangeLocation: () => openPickLocations("list"),
       onSlotChange: setChosenBookingSlot,
-      onReserve: () => setCurrent(6), // Book - Step 3 - Confirmation
+      onReserve: () => setCurrent(PROTO_INDEX_BOOK_STEP3),
+      onBackToStep1: () => setCurrent(PROTO_INDEX_BOOK_STEP1),
     });
 
     setupProtoFooters({
@@ -2143,7 +2147,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
         setLoginPopupOpen(true);
         return;
       }
-      setCurrent(4); // Book - Step 1 - Location
+      setCurrent(PROTO_INDEX_BOOK_STEP1);
     };
 
     const allBtns = Array.from(
@@ -3196,7 +3200,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       }
       const slot = readBookingSlotFromScreen(screen);
       if (slot) setChosenBookingSlot(slot);
-      setCurrent(6); // Book - Step 3 - Confirmation
+      setCurrent(PROTO_INDEX_BOOK_STEP3);
     };
 
     reserveBtns.forEach((btn) => {
@@ -3813,6 +3817,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   }, [current]);
 
   // Book Step 2 — Step 1 progress column → back to Step 1 (Location)
+  // Make path only — React Step 2 wires onBackToStep1 in-component.
   useEffect(() => {
     const childIndex = SCREENS[current]?.childIndex;
 
@@ -3858,6 +3863,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     }
 
     if (childIndex !== 4) return;
+    if (isBookStep2ReactMounted()) return;
 
     let step1Col: HTMLElement | null = null;
     let progress: HTMLElement | null = null;
@@ -3868,7 +3874,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       if ("stopImmediatePropagation" in e) {
         (e as Event).stopImmediatePropagation();
       }
-      setCurrent(4); // Book - Step 1 - Location
+      setCurrent(PROTO_INDEX_BOOK_STEP1);
     };
 
     const onKey = (e: KeyboardEvent) => {
@@ -3970,7 +3976,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
         openPickLocations("list", { locationRequired: true });
         return;
       }
-      setCurrent(5); // Book - Step 2 - Date and Time
+      setCurrent(PROTO_INDEX_BOOK_STEP2);
     };
 
     continueBtns.forEach((btn) => {

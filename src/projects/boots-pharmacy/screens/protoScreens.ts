@@ -37,6 +37,21 @@ export const PROTO_INDEX_PLP = PROTO_SCREENS.findIndex(
   (screen) => screen.childIndex === 9,
 );
 
+/** Zero-based `current` index for Book Step 1 — Location (child 7). */
+export const PROTO_INDEX_BOOK_STEP1 = PROTO_SCREENS.findIndex(
+  (screen) => screen.childIndex === 7,
+);
+
+/** Zero-based `current` index for Book Step 2 — Date and Time (child 4). */
+export const PROTO_INDEX_BOOK_STEP2 = PROTO_SCREENS.findIndex(
+  (screen) => screen.childIndex === 4,
+);
+
+/** Zero-based `current` index for Book Step 3 — Confirmation (child 3). */
+export const PROTO_INDEX_BOOK_STEP3 = PROTO_SCREENS.findIndex(
+  (screen) => screen.childIndex === 3,
+);
+
 /** Zero-based `current` index for Appointment History (My Account dummy). */
 export const PROTO_INDEX_APPOINTMENT_HISTORY = PROTO_SCREENS.findIndex(
   (screen) => screen.childIndex === 2,

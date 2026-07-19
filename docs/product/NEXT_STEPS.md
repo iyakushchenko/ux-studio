@@ -30,6 +30,7 @@
 
 ## Done recently (context)
 
+- [x] **Book Step 2 hotfix** — time-slot last-row left-align (CSS grid); agentic-cjm browse no longer snaps Book Step 1 → Home (`shouldNavigateBeatTabOnEnter`); audit note on [FE_AUDIT_BOOK_STEP2_2026-07-19.md](./audits/FE_AUDIT_BOOK_STEP2_2026-07-19.md).
 - [x] **Book Step 2 React migration** — Date/Time Frame child **4**; Make chrome hidden; calendar/reserve gated; audit [FE_AUDIT_BOOK_STEP2_2026-07-19.md](./audits/FE_AUDIT_BOOK_STEP2_2026-07-19.md) **PROVEN** (`af50556` / tip `76b5f55`).
 - [x] **GitHub Pages verify (Step 2)** — deploy green; Pages shows `data-proto-react-screen=book-step-2` + host; MCP sanity REC⊗CJM pass on deployed build.
 - [x] **REC ⊗ CJM** — REC disabled when CJM on; XOR both ways; AIR locks both (`800ec61`). Unit + MCP sanity.
