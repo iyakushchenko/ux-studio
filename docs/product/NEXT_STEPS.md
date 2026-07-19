@@ -8,16 +8,15 @@
 
 ## NOW
 
-1. [ ] **Verify GitHub Pages** after Step 2 deploy — `https://iyakushchenko.github.io/ux-studio/` loads; Book Step 2 React visible; REC⊗CJM chrome still correct on deployed build.
-2. [ ] **Book Step 3 React migration** (Confirmation) — BASE→THEME→PANEL; no LEGACY growth; Nazi QA **PROVEN** before PO.
+1. [ ] **Book Step 3 React migration** (Confirmation) — BASE→THEME→PANEL; no LEGACY growth; Nazi QA **PROVEN** before PO.
 
 ---
 
 ## NEXT
 
-3. [ ] **Grow UXDS by page** — extract kits only when a second screen needs them; retire LEGACY screen-by-screen ([COMPONENT_LIBRARY.md](./COMPONENT_LIBRARY.md)).
-4. [ ] **Fidelity debt (non-blocking)** — Step 1/2 hex→tokens harden; dead child-7 / child-4 LEGACY CSS cleanup when touching those files; tertiary CTA layer extraction when next shared use forces it.
-5. [ ] **Versioning habit** — append notes on every user-visible ship (`npm run notes:append`). Release/tag CI stays **later**.
+2. [ ] **Grow UXDS by page** — extract kits only when a second screen needs them; retire LEGACY screen-by-screen ([COMPONENT_LIBRARY.md](./COMPONENT_LIBRARY.md)).
+3. [ ] **Fidelity debt (non-blocking)** — Step 1/2 hex→tokens harden; dead child-7 / child-4 LEGACY CSS cleanup when touching those files; tertiary CTA layer extraction when next shared use forces it.
+4. [ ] **Versioning habit** — append notes on every user-visible ship (`npm run notes:append`). Release/tag CI stays **later**.
 
 ---
 
@@ -31,7 +30,8 @@
 
 ## Done recently (context)
 
-- [x] **Book Step 2 React migration** — Date/Time Frame child **4**; Make chrome hidden; calendar/reserve gated; audit [FE_AUDIT_BOOK_STEP2_2026-07-19.md](./audits/FE_AUDIT_BOOK_STEP2_2026-07-19.md) **PROVEN**.
+- [x] **Book Step 2 React migration** — Date/Time Frame child **4**; Make chrome hidden; calendar/reserve gated; audit [FE_AUDIT_BOOK_STEP2_2026-07-19.md](./audits/FE_AUDIT_BOOK_STEP2_2026-07-19.md) **PROVEN** (`af50556` / tip `76b5f55`).
+- [x] **GitHub Pages verify (Step 2)** — deploy green; Pages shows `data-proto-react-screen=book-step-2` + host; MCP sanity REC⊗CJM pass on deployed build.
 - [x] **REC ⊗ CJM** — REC disabled when CJM on; XOR both ways; AIR locks both (`800ec61`). Unit + MCP sanity.
 - [x] **Slim CI** — unit + build default; Playwright smoke `workflow_dispatch` only (`009fb2b`).
 - [x] **Actions bump** — checkout/setup-node v5; Node 22 app runtime (`3bec858`).
