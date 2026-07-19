@@ -43,11 +43,11 @@
     {
       "screenId": "plp",
       "status": "proven",
-      "auditPath": "docs/projects/boots-pharmacy/audits/FE_AUDIT_PLP_2026-07-19_RAGE6.md",
+      "auditPath": "docs/projects/boots-pharmacy/audits/FE_AUDIT_PLP_2026-07-19_SEARCHFIELD_v0015.md",
       "mcpMatrixAt": {
-        "sha": "4a74c1c",
+        "sha": "7b6d397",
         "date": "2026-07-19",
-        "note": "region→country cascade + clear country checks (I3b); search icon end/borderless; counters/View all/10; reset count-hide; overlay eyes; stay on plp; version chip 0.0.14 — MCP __studioRunMcpPageProbe FINAL PASS"
+        "note": "SearchField hover+focus-within inset navy (#012169) 2px on control (diseases+countries); magnifier borderless end; chip 0.0.15; overlay+__studioRunMcpPageProbe PASS; CI green tip"
       },
       "requireMcp": true
     }
