@@ -42,7 +42,7 @@ Full smoke: **manual / local** — `PROTO_SMOKE_PROFILE=full npm run smoke` when
 
 | Lever | Change |
 |-------|--------|
-| npm | `npm ci` + `actions/setup-node` `cache: npm` (CI + Pages + smoke) |
+| npm | Tracked `package-lock.json` → `npm ci` + `actions/setup-node` `cache: npm` (CI + Pages + smoke) |
 | Parallel jobs | `test` ∥ `build` (same ref concurrency group; cancel in-progress) |
 | Gates | Parallel `test:gates` — fail-fast report, no sequential `&&` chain |
 | Smoke | Remains dispatch-only; Playwright browser dir cached |
