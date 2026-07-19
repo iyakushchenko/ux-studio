@@ -20,6 +20,11 @@ import {
   logControlPanel,
   type ControlPanelAction,
 } from "@/app/shell/protoControlPanelLog";
+import {
+  isJourneyModeSwitchDisabled,
+  isRecModeLocked,
+  resolveRecModeLockReason,
+} from "@/app/nav/studioModeXor";
 export type ProtoNavScenarioControlsProps = {
   studioMenus: ReactNode;
   segmentLabel?: string;
@@ -223,8 +228,26 @@ export function ProtoNavScenarioControls({
   const stepBlinkTimerRef = useRef<number | null>(null);
   const clickBlinkTimerRef = useRef<number | null>(null);
 
-  /** Same lock as CJM / cassette transport: AIR (browse playback live) freezes mode chrome. */
-  const recModeLocked = isOnAir || isPlaying;
+  /**
+   * REC ⊗ CJM ⊗ AIR:
+   * - CJM on → REC disabled (cannot enter Rec)
+   * - AIR / play → REC forced off (same as cassette freeze)
+   * - REC on → CJM disabled (and forced off when entering Rec)
+   */
+  const recLockReason = resolveRecModeLockReason({
+    isOnAir,
+    isPlaying,
+    journeyMode,
+  });
+  const recModeLocked = isRecModeLocked({
+    isOnAir,
+    isPlaying,
+    journeyMode,
+  });
+  const cjmSwitchDisabled = isJourneyModeSwitchDisabled({
+    transportLocked: journeyModeSwitchDisabled,
+    recMode,
+  });
 
   const handlePlaybackRecModeChange = (enabled: boolean) => {
     if (recModeLocked && enabled) {
@@ -232,7 +255,7 @@ export function ProtoNavScenarioControls({
         enabled,
         previous: recMode,
         blocked: true,
-        blockReason: "air-active",
+        blockReason: recLockReason ?? "air-active",
       });
       return;
     }
@@ -244,23 +267,27 @@ export function ProtoNavScenarioControls({
     if (!enabled && isRecordingActive()) {
       pauseRecording();
     }
+    // Entering Rec → force CJM off (XOR both directions).
+    if (enabled && journeyMode) {
+      onJourneyModeChange?.(false);
+    }
     setRecMode(enabled);
   };
 
-  // AIR / play active → force Playback deck (REC switch + recording controls unavailable).
+  // CJM / AIR / play → force Playback deck (REC switch + recording controls unavailable).
   useEffect(() => {
     if (!recModeLocked || !recMode) return;
     logControlPanel("studio:playback-rec-mode", {
       enabled: false,
       previous: true,
       forced: true,
-      reason: "air-active",
+      reason: recLockReason ?? "air-active",
     });
     if (isRecordingActive()) {
       pauseRecording();
     }
     setRecMode(false);
-  }, [recModeLocked, recMode]);
+  }, [recModeLocked, recMode, recLockReason]);
 
   useEffect(() => {
     return () => {
@@ -468,6 +495,7 @@ export function ProtoNavScenarioControls({
               checked={recMode}
               onChange={handlePlaybackRecModeChange}
               disabled={recModeLocked}
+              lockReason={recLockReason}
             />
             <AnimatePresence initial={false} mode="popLayout">
               {recMode && !recModeLocked ? (
@@ -518,11 +546,19 @@ export function ProtoNavScenarioControls({
                         logControlPanel("studio:journey-mode", {
                           enabled,
                           previous: journeyMode,
-                          switchDisabled: journeyModeSwitchDisabled,
+                          switchDisabled: cjmSwitchDisabled,
                         });
+                        if (cjmSwitchDisabled) return;
                         onJourneyModeChange(enabled);
                       }}
-                      disabled={journeyModeSwitchDisabled}
+                      disabled={cjmSwitchDisabled}
+                      disabledTitle={
+                        recMode
+                          ? "CJM unavailable while REC is on"
+                          : journeyModeSwitchDisabled
+                            ? "CJM unavailable while AIR / playback is live"
+                            : undefined
+                      }
                     />
                   </span>
                 ) : null}

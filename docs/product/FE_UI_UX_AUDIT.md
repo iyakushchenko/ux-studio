@@ -109,6 +109,7 @@ Refs: [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) §6
 | G3 | Panel XOR: at most one conflicting panel open as designed | | |
 | G4 | REC vs play chrome labels/gates match JSX source of truth | | |
 | G5 | **Studio chrome parity when AIR / browse:** while AIR (playback live), REC mode switch + recording controls are disabled/forced off the same way cassette step buttons / CJM switch lock — no REC usable during AIR | | |
+| G6 | **REC ⊗ CJM:** when CJM (journey mode) is ON, REC switch is `disabled` (clear visual disabled) and cannot enter Rec mode; when REC is ON, CJM is off/disabled. Gate: `studioModeXor.ts` + MCP sanity `rec-disabled-when-cjm-on` | | |
 
 ### H. Regressions
 

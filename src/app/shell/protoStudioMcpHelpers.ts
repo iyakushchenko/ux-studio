@@ -222,6 +222,12 @@ function journeyModeSwitch(): HTMLElement | null {
   );
 }
 
+function recModeSwitch(): HTMLButtonElement | null {
+  return document.querySelector<HTMLButtonElement>(
+    '[role="switch"][aria-label="REC off"], [role="switch"][aria-label="REC on"]'
+  );
+}
+
 function runSmokeRetreatChecks(): ProtoSmokeRetreatResult {
   const checks: ProtoSmokeRetreatCheck[] = [];
 
@@ -230,6 +236,13 @@ function runSmokeRetreatChecks(): ProtoSmokeRetreatResult {
     id: "journey-switch-present",
     pass: journeySwitch != null,
     detail: journeySwitch ? undefined : "Missing role=switch CJM control",
+  });
+
+  const recSwitch = recModeSwitch();
+  checks.push({
+    id: "rec-switch-present",
+    pass: recSwitch != null,
+    detail: recSwitch ? undefined : "Missing role=switch REC control",
   });
 
   const duplicateJourneyLabels = Array.from(
@@ -669,13 +682,65 @@ export function registerProtoStudioMcpHelpers(options: {
     return window.__protoStudioState!();
   };
 
+  /** Hard gate: CJM on ⇒ REC disabled + off (cannot silently regress). */
+  async function runRecCjmXorSanityChecks(): Promise<ProtoSmokeRetreatResult> {
+    const checks: ProtoSmokeRetreatCheck[] = [];
+    const setJourney = window.__protoSetJourneyMode;
+    if (typeof setJourney !== "function") {
+      checks.push({
+        id: "rec-disabled-when-cjm-on",
+        pass: false,
+        detail: "__protoSetJourneyMode unavailable",
+      });
+      return { pass: false, checks };
+    }
+
+    setJourney(true);
+    await delay(120);
+    const recWhileCjm = recModeSwitch();
+    const recLocked =
+      recWhileCjm != null &&
+      recWhileCjm.disabled === true &&
+      recWhileCjm.getAttribute("aria-checked") !== "true";
+    checks.push({
+      id: "rec-disabled-when-cjm-on",
+      pass: recLocked,
+      detail: recLocked
+        ? undefined
+        : `REC must be disabled+off while CJM on (disabled=${String(
+            recWhileCjm?.disabled
+          )}, aria-checked=${recWhileCjm?.getAttribute("aria-checked") ?? "missing"})`,
+    });
+
+    setJourney(false);
+    await delay(120);
+    const recIdle = recModeSwitch();
+    const state = window.__protoStudioState?.();
+    const airLive = Boolean(state?.isOnAir || state?.isPlaying);
+    const recUnlocked = recIdle != null && (airLive || recIdle.disabled === false);
+    checks.push({
+      id: "rec-enabled-when-cjm-off-idle",
+      pass: recUnlocked,
+      detail: recUnlocked
+        ? undefined
+        : `REC should be enabled after CJM off (unless AIR); disabled=${String(
+            recIdle?.disabled
+          )} airLive=${String(airLive)}`,
+    });
+
+    return { pass: checks.every((check) => check.pass), checks };
+  }
+
   window.__protoRunMcpSanityCheck = async () => {
     window.__protoAbortAll?.();
     const baseline = runSmokeRetreatChecks();
-    logControlPanel("qa:run", { source: "sanity-check", pass: baseline.pass });
+    const xor = await runRecCjmXorSanityChecks();
+    const checks = [...baseline.checks, ...xor.checks];
+    const pass = checks.every((check) => check.pass);
+    logControlPanel("qa:run", { source: "sanity-check", pass });
     return {
-      pass: baseline.pass,
-      checks: baseline.checks,
+      pass,
+      checks,
       state: window.__protoStudioState?.(),
     };
   };

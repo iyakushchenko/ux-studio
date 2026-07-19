@@ -202,7 +202,8 @@ function downloadRecordingJson(session: ProtoRecordingSession): void {
 /**
  * Standalone deck when orchestra scenario controls are absent.
  * Same exclusive Playback|Rec gate: left = empty playback slot, right = REC only.
- * AIR lock mirrors ProtoNavScenarioControls — REC disabled while playback is live.
+ * Lock mirrors ProtoNavScenarioControls — REC disabled while AIR/play live
+ * (standalone slot has no CJM; orchestra path also locks REC when CJM is on).
  */
 export function ProtoNavRecordingModeSlot({
   getStartOptions,

@@ -4,6 +4,8 @@ type Props = {
   checked: boolean;
   onChange: (checked: boolean) => void;
   disabled?: boolean;
+  /** Optional override when locked by REC / AIR (clearer than generic off title). */
+  disabledTitle?: string;
 };
 
 /** FL-style mini toggle — locks screen nav when on; cassette deck stays live. */
@@ -11,6 +13,7 @@ export function ProtoStudioJourneySwitch({
   checked,
   onChange,
   disabled = false,
+  disabledTitle,
 }: Props) {
   return (
     <button
@@ -19,9 +22,11 @@ export function ProtoStudioJourneySwitch({
       aria-checked={checked}
       aria-label="CJM"
       title={
-        checked
-          ? "CJM on — use cassette transport"
-          : "CJM off — free screen navigation"
+        disabled && disabledTitle
+          ? disabledTitle
+          : checked
+            ? "CJM on — use cassette transport"
+            : "CJM off — free screen navigation"
       }
       disabled={disabled}
       className={`proto-studio-mode-switch proto-studio-journey-switch${

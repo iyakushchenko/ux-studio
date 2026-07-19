@@ -1,10 +1,16 @@
 import { flashControlRoomButton } from "@/app/nav/protoControlRoomTap";
+import {
+  recModeLockTitle,
+  type RecModeLockReason,
+} from "@/app/nav/studioModeXor";
 
 type Props = {
   /** false = Playback (left), true = Rec (right) */
   checked: boolean;
   onChange: (checked: boolean) => void;
   disabled?: boolean;
+  /** Why REC is locked — drives disabled tooltip (CJM vs AIR). */
+  lockReason?: RecModeLockReason | null;
 };
 
 /** FL-style mini toggle — REC off shares muted mode-switch chrome; on is red. */
@@ -12,7 +18,10 @@ export function ProtoStudioPlaybackRecSwitch({
   checked,
   onChange,
   disabled = false,
+  lockReason = null,
 }: Props) {
+  const disabledTitle = recModeLockTitle(lockReason) ||
+    "REC unavailable while AIR / playback is live";
   return (
     <button
       type="button"
@@ -21,7 +30,7 @@ export function ProtoStudioPlaybackRecSwitch({
       aria-label={checked ? "REC on" : "REC off"}
       title={
         disabled
-          ? "REC unavailable while AIR / playback is live"
+          ? disabledTitle
           : checked
             ? "REC on — recording controls (playback transport hidden)"
             : "REC off — cassette transport (recording controls hidden)"
