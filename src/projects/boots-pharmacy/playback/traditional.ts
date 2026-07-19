@@ -140,8 +140,38 @@ function findButtonByText(
   );
 }
 
-function findPdpBookNowBtn(root: ParentNode): HTMLElement | null {
-  return findButtonByText(root, /^book now/i);
+/**
+ * Prefer React PDP Book now. Make `[data-name="component.input.button"]`
+ * under `data-studio-make-retired` still wins first-match and can transport-no-op
+ * when wire is gated by `isPdpReactMounted()` — same class as Chat/Home (LESSONS).
+ */
+export function findPdpBookNowBtn(root: ParentNode): HTMLElement | null {
+  const scope = root instanceof Element ? root : document;
+  const reactBtn =
+    scope.querySelector<HTMLElement>(
+      [
+        '.studio-react-screen-host button[data-studio-action="pdp-book-now"]',
+        '[data-studio-react-screen="pdp"] button[data-studio-action="pdp-book-now"]',
+        '.pdp button[data-studio-action="pdp-book-now"]',
+      ].join(", ")
+    ) ?? null;
+  if (reactBtn && !reactBtn.closest("[data-studio-make-retired]")) {
+    return reactBtn;
+  }
+
+  return (
+    Array.from(
+      scope.querySelectorAll<HTMLElement>(
+        'button[data-studio-action="pdp-book-now"], [data-name="component.input.button"]'
+      )
+    ).find((btn) => {
+      if (btn.closest("[data-studio-make-retired]")) return false;
+      if (btn.getAttribute("data-studio-action") === "pdp-book-now") return true;
+      return /^book now/i.test(
+        (btn.textContent ?? "").replace(/\s+/g, " ").trim()
+      );
+    }) ?? null
+  );
 }
 
 const PLP_TILE_SELECTOR = '[data-name="boots-pharmacy.service.tile"]';

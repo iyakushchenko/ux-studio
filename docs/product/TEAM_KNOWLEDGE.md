@@ -142,6 +142,13 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 - Pax (PO sim): <accept bar / bump call> — applied: <decision>
 ```
 
+**Knowledge improved** (2026-07-19 · stream: traditional pdp-book-now + Chat recipe · R12):
+- Finn (FE): Prefer React PDP `data-studio-action=pdp-book-now`; skip make-retired — applied: findPdpBookNowBtn · traditional.ts
+- Uma (UI/UX): §0a PARTIAL — composer identity PASS vs Site Pilot + Motion ownership; no whole-page PROVEN — applied: UMA_FIDELITY_CHAT
+- Quinn (QA): Expanded `chatProbeSteps` (host/retired/composer/hovers/motion); recipe PASS ≠ Final Pass — applied: studioMcpPageProbe · QUINN_CHAT_PROBE_CRITERIA
+- Ben (BE): R12 one push no CI await — applied: peek only
+- Pax (PO sim): traditional CJM fix user-visible → patch bump — applied: release:patch
+
 **Knowledge improved** (2026-07-19 · stream: Chat React mount ON · step-forward unblock · R12):
 - Arch (Director): Mount ON after Make smoke unblock + React agentic P1–P10; no false Chat PROVEN/Final Pass; PDP HARD-GREEN untouched — applied: NEXT_STEPS §6
 - Finn (FE): Prefer React host over Make-retired first-match (`getAgenticHomeCard` / `getChatSummary`); React controlled textarea native setter; shared `SitePilotComposer` — applied: sitePilotHome · sitePilotChatScenario

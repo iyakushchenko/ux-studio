@@ -2,6 +2,9 @@
 
 > _Append a bullet on coherent commits via `npm run notes:append -- --lane="<lane>" --intent="<text>"`. Preview with `npm run notes:preview`. On `npm run release:patch` this section is promoted to `## v<X.Y.Z> - DDMMYY` and a fresh empty `## Current` is re-inserted. Policy: `docs/product/VERSIONING.md`._
 
+## v0.0.43 - 190726
+- **project:** Traditional pdp-book-now prefers React PDP host (skip make-retired); Chat MCP recipe expanded; Uma §0a PARTIAL composer identity — no Chat Final Pass
+
 ## v0.0.42 - 190726
 - **engine:** CI: node_modules cache + Vitest forks; R12 no-await CI/Pages on routine ships (target ≤20–25s warm)
 - **engine:** CI: Vitest-only page-probe delay compress + fake timers (MCP settles untouched; hard gates kept)

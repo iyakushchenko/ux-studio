@@ -3,15 +3,15 @@
 **Surface:** Boots Pharmacy Site Pilot Chat (`screenId: chat`, Frame child **10**, Make `Body9`)  
 **Date:** 2026-07-19  
 **Owner:** Uma (UI/UX)  
-**Status:** **IN PROGRESS** — hybrid Make + DOM composer dock; **NOT PROVEN**  
-**React target:** `screens/chat/*` scaffold — **runtime off** (`CHAT_REACT_MOUNT_ENABLED=false`; no live `data-studio-react-screen="chat"` until playback port)  
+**Status:** **IN PROGRESS** — React Chat host **ON**; **NOT PROVEN** (no false Final Pass)  
+**React target:** `screens/chat/*` — **live** (`CHAT_REACT_MOUNT_ENABLED=true`; Make child 10 `data-studio-make-retired=chat`)  
 **Make truth:** `frame/index.tsx` `Body9` · `ComponentAppointmentSummary2` · `query` / `reply` bubbles · `component.co.order.summary` · `component.gse.system.message` (feedback + chips) · `ComponentCoOrderSummary8` (composer) · `globals-chrome.css` child-10 · `globals-screens.css` chat flash  
-**Wire / DOM today:** `sitePilotChatScenario.ts` (fixed composer dock) · `sitePilotChatThinking.ts` (thinking bubble) · `BootsPharmacyProjectView.tsx` (textarea · mic/send · scenario wiring) · `sitePilotChat.ts` (playback)  
+**Wire / DOM today:** React `ChatScreen` + shared `SitePilotComposer` · `chatThinkingBridge` · Motion frames via `@/uxds/motion` · playback `sitePilotChat.ts`  
 **Register:** [CHAT_MAKE_PARITY_REGISTER.md](../features/CHAT_MAKE_PARITY_REGISTER.md) · brief [CHAT_REACT.md](../features/CHAT_REACT.md)  
-**Shared composer:** `screens/shared/SitePilotComposer.tsx` (Home live; Chat scaffold)  
+**Shared composer:** `screens/shared/SitePilotComposer.tsx` (Home + Chat)  
 **Checklist:** [../../../product/UMA_FIDELITY_NOTES.md](../../../product/UMA_FIDELITY_NOTES.md) · [MOTION.md](../../../product/MOTION.md) · [VISUAL_FIDELITY.md](../../../product/VISUAL_FIDELITY.md) · [FE_UI_UX_AUDIT.md](../../../product/FE_UI_UX_AUDIT.md) · [PAGE_FINAL_PASS.md](../../../product/PAGE_FINAL_PASS.md)
 
-**Gate:** PDP PAGE FINAL PASS **HARD-GREEN** @ tip `53da33f` / v0.0.38 — **do not demote PDP**. PO override kickoff: Chat started while Site Pilot Final Pass still NOT-GREEN ([NEXT_STEPS.md](../../../product/NEXT_STEPS.md) §6).
+**Gate:** PDP PAGE FINAL PASS **HARD-GREEN** — **do not demote PDP**. Chat Final Pass / whole-page PROVEN blocked until §0a + §0b complete.
 
 ---
 
@@ -19,15 +19,16 @@
 
 | Field | Value |
 |-------|-------|
-| **Overall** | **IN PROGRESS** — checklist seeded; hybrid Make thread + DOM composer only |
-| **§0a typical DS / pointer matrix** | **PENDING** — composer mic · send/stop · textarea · reply CTAs · dialog chips · feedback Yes/No |
-| **§0b section vertical rhythm** | **PENDING** — thread `gap-[40px]` on `component.appointment.summary` · body pad **64px** · bubble internal **16px** — MCP measure before PARTIAL layout claim |
-| **loading / empty / updating** | **PENDING (P0)** — Make has **thinking dots** bubble on send/playback (`proto-chat-thinking-bubble`); not a page loader — prove mechanism matches wire, **do not invent** skeleton/spinner |
+| **Overall** | **IN PROGRESS** — React host live; composer identity vs Site Pilot **PARTIAL**; whole-page **NOT PROVEN** |
+| **§0a typical DS / pointer matrix** | **PARTIAL** — shared kit CSS has mic/send/chip hover+focus+active; reply CTA hover in `chat.css`; MCP hover rows exist — full Nazi side-by-side + feedback Yes/No still open |
+| **§0b section vertical rhythm** | **PENDING** — thread `gap` / body pad **64px** / bubble **16px** — MCP measure before PARTIAL layout claim |
+| **loading / empty / updating** | **PARTIAL (P0)** — React `ChatThinkingBubble` + Motion enter; send→stop glyph on shared send — still need live timing vs wire `SITE_PILOT_CHAT_PLAYBACK_THINK_MS` |
 | **checkbox / radio hover** | **N/A** — no checkbox/radio on Chat Make frame |
-| **Composer ↔ Home shared kit** | **Partial** — `SitePilotComposer` shared; Home live; Chat React off (Make dock authoritative) — Uma pixel sign-off **PENDING** before PROVEN |
-| **Accordion / history** | **N/A on Make chat** — `Body9` has **no** `component.gse.accordion`; sticky Site Pilot bar (`data-studio-sticky-group`) is **not** an accordion — do not port PDP FAQ accordion here |
+| **Composer ↔ Home shared kit** | **PASS (identity)** — same `SitePilotComposer` + `site-pilot-composer.css`; Chat label **“Next dialog options:”** (not Home “Suggested…”); dual-class `proto-agentic-*` retained |
+| **Motion** | **PASS (ownership)** — frames + thinking via `@/uxds/motion` (`AnimatePresence` / `motion.*`); no new max-height thrash on React path |
+| **Accordion / history** | **N/A on Make chat** — do not port PDP FAQ accordion here |
 | **PO green-light allowed?** | **No** — IN PROGRESS only |
-| **PAGE FINAL PASS** | **NOT-GREEN** — not started; blocked until stamp → PROVEN + Quinn MCP + `PAGE_FINAL_PASS.json` row |
+| **PAGE FINAL PASS** | **NOT-GREEN** — no false stamp |
 
 **Honest scope (Make `Body9` / summary column):**
 
@@ -75,20 +76,20 @@
 
 ---
 
-## §0a — Typical DS state matrix (PENDING)
+## §0a — Typical DS state matrix (PARTIAL — not whole-page PROVEN)
 
-**Hard rule:** Rest-state green + missing hover = **FAIL**. Invent hover not in Make / Home parity = **FAIL**. Composer controls **must** match Site Pilot Home matrix once shared kit lands.
+**Hard rule:** Rest-state green + missing hover = **FAIL**. Invent hover not in Make / Home parity = **FAIL**. Composer controls **must** match Site Pilot Home matrix (shared kit).
 
 | Control | States to prove (Make + Home parity) | Status | Evidence |
 |---------|--------------------------------------|--------|----------|
-| **Textarea** (`agentic-chat-query`) | default · placeholder · filled · focus · 1–5 line growth | **PENDING** | Wire replaces static “Ask…” paragraph |
-| **Mic** (48px circle) | default · **hover** · **active** · focus-visible | **PENDING** | Same LEGACY values as Home H8 |
-| **Send / stop** (primary pill) | default **`#012169`** · sending press · **stop** glyph when thinking · hover/active | **PENDING** | `proto-agentic-send--sending` / `--stop` in chrome CSS |
-| **Next dialog chips** | default · **hover** · **active** · keyboard focus | **PENDING** | Make chip hover block (Home H11 family) |
-| **Reply pill CTAs** (per frame) | default · hover · active · pressed (`proto-chat-cta--pressed`) | **PENDING** | Each scenario frame with CTAs |
-| **Feedback Yes/No** | default · hover · active | **PENDING** | `component.input.button` micro row |
+| **Textarea** (`agentic-chat-query`) | default · placeholder · filled · focus · 1–5 line growth | **PARTIAL** | Shared `site-pilot-composer__query`; Chat placeholder **Ask Boots SitePilot** |
+| **Mic** (48px circle) | default · **hover** · **active** · focus-visible | **PARTIAL** | Shared CSS `:hover` `#eef8f7` / border `#afccca` — MCP `chat-composer-mic-hover` |
+| **Send / stop** (primary pill) | default **`#012169`** · stop glyph when thinking · hover/active | **PARTIAL** | Shared send hover + `sendThinking` → stop glyph; probe `chat-composer-send` |
+| **Next dialog chips** | default · **hover** · **active** · keyboard focus | **PARTIAL** | Label **Next dialog options:**; chip `:hover` in shared CSS — MCP `chat-chip-hover` |
+| **Reply pill CTAs** (per frame) | default · hover · active · pressed | **PARTIAL** | `.chat__cta:hover` — MCP `chat-cta-hover`; full frame sweep still open |
+| **Feedback Yes/No** | default · hover · active | **PENDING** | Micro row not yet Nazi-hovered |
 | **SearchField** | **N/A** | **N/A** | |
-| **Quinn MCP hover prove** | Composer + ≥1 reply CTA + ≥1 chip | **PENDING** | `screenId: chat` probe TBD |
+| **Quinn MCP hover prove** | Composer mic + ≥1 chip + ≥1 reply CTA | **PASS when recipe green** | Expanded `chatProbeSteps()` — **≠** whole-page PROVEN |
 
 ---
 
@@ -108,13 +109,13 @@
 
 | Area | Today | Gap vs Make / Home |
 |------|--------|-------------------|
-| **React mount** | Make frame child 10 only | No `screens/chat/*` · no `data-studio-make-retired=chat` |
-| **Composer** | DOM dock clones last `component.co.order.summary` with “Next dialog options” · classes `proto-site-pilot-composer` | **Not** the same implementation as React Home composer — risk of padding/hover drift |
-| **Composer row** | Wire promotes `textarea.proto-agentic-query` | Chat Make rest shows static placeholder line — wire behavior OK if visuals match Home textarea |
-| **Thread** | Make static DOM; scenario engine toggles `.proto-scenario-frame--hidden` | Motion policy not yet on `@/uxds/motion` |
-| **Thinking** | `sitePilotChatThinking.ts` + LEGACY keyframes | Needs Motion migration + Uma side-by-side on send |
-| **Sticky bar** | `data-studio-sticky-group` CSS + JS | PENDING scroll-at-start behavior (`proto-chat-scenario-at-start`) |
-| **Shared kit** | **Partial** | `screens/shared/SitePilotComposer.tsx` — Home live; Chat scaffold; pixel sign-off + mount flip still blockers for PROVEN |
+| **React mount** | Host ON · Make `data-studio-make-retired=chat` | Pixel Final Pass still open |
+| **Composer** | Shared `SitePilotComposer` + dock | Identity PASS; Home↔Chat pixel side-by-side still open |
+| **Composer row** | `textarea.site-pilot-composer__query` + dual-class send | Placeholder Chat-specific — OK |
+| **Thread** | React frames + `@/uxds/motion` | §0b gap measure PENDING |
+| **Thinking** | `ChatThinkingBubble` Motion + bridge | Timing prove vs wire still open |
+| **Sticky bar** | Make sticky may still apply via chrome | PENDING scroll-at-start prove |
+| **Shared kit** | **Identity PASS** | Whole-page PROVEN blocked on §0a finish + §0b |
 
 ---
 
@@ -168,43 +169,41 @@
 
 ---
 
-## Mandatory sign-off stamps (kickoff — all PENDING)
+## Mandatory sign-off stamps (mount ON — honest)
 
 | Line | Stamp |
 |------|-------|
-| `loading states` | **PENDING** — thinking bubble P0 |
+| `loading states` | **PARTIAL** — thinking bubble present; timing prove open |
 | `checkbox/radio hover` | **N/A** |
-| `typical DS checks` | **PENDING** — §0a composer + CTAs + chips |
-| `fidelity checklist` | **IN PROGRESS** — not PROVEN |
+| `typical DS checks` | **PARTIAL** — composer identity + hover CSS; feedback + full frame sweep open |
+| `fidelity checklist` | **IN PROGRESS** — **not PROVEN** |
 | `PAGE FINAL PASS` | **NOT-GREEN** |
 
 ---
 
-## team check report lines (Uma — kickoff template)
+## team check report lines (Uma — mount ON)
 
 ```
-Uma (UI/UX): fidelity checklist — IN PROGRESS (Chat kickoff; NOT PROVEN)
-Uma (UI/UX): section vertical rhythm — PENDING (summary gap 40px + body pad 64px measure)
-Uma (UI/UX): loading states — PENDING (thinking dots bubble P0; no invent loader)
-Uma (UI/UX): checkbox/radio hover — N/A (no controls on Chat Make)
-Uma (UI/UX): typical DS checks (state matrix) — PENDING (composer mic/send/chips + reply CTAs)
-Uma (UI/UX): motion ownership — LOCKED (@/uxds/motion for thread/thinking/presence; no max-height thrash)
-Uma (UI/UX): composer shared kit — Partial (`SitePilotComposer`); Chat mount off + pixel sign-off PENDING
-Uma (UI/UX): accordion/history — N/A (no Make accordion on Body9)
+Uma (UI/UX): fidelity checklist — IN PROGRESS (React Chat ON; NOT PROVEN / no Final Pass)
+Uma (UI/UX): section vertical rhythm — PENDING (§0b MCP gap measure)
+Uma (UI/UX): loading states — PARTIAL (ChatThinkingBubble + Motion; timing prove open)
+Uma (UI/UX): checkbox/radio hover — N/A
+Uma (UI/UX): typical DS checks (state matrix) — PARTIAL (shared composer §0a + CTA/chip hover; feedback PENDING)
+Uma (UI/UX): motion ownership — PASS (@/uxds/motion frames + thinking)
+Uma (UI/UX): composer shared kit — PASS identity (SitePilotComposer Home↔Chat; Next dialog options:)
+Uma (UI/UX): accordion/history — N/A
 PAGE FINAL PASS — chat — NOT-GREEN
 ```
 
-**Knowledge used:** UMA_FIDELITY_NOTES §0/§0a/§0b · MOTION.md (motion ownership + Accordion path) · VISUAL_FIDELITY · FE_UI_UX_AUDIT gate · HOME stamp H5–H11 composer parity · Make `Body9` / `ComponentAppointmentSummary2` · wire `sitePilotChatScenario` / `sitePilotChatThinking` — **no PROVEN claim**.
+**Knowledge used:** UMA_FIDELITY_NOTES §0/§0a/§0b · MOTION.md · VISUAL_FIDELITY · HOME H5–H11 composer parity · shared `site-pilot-composer.css` — **no whole-page PROVEN claim**.
 
 ---
 
 ## Blockers for PROVEN
 
-1. **Bea:** `CHAT_MAKE_PARITY_REGISTER.md` with all C1–C15 bands + 9 scenario frames + P0 thinking row.  
-2. **Finn:** Shared **SitePilotComposer** extracted; flip `CHAT_REACT_MOUNT_ENABLED` only after thread/thinking/playback port + motion for frames.  
-3. **Uma:** §0b MCP measures + §0a full matrix + Home↔Chat composer pixel sign-off.  
-4. **Quinn:** `__studioRunMcpPageProbe({ screenId: "chat" })` with overlay on every step + hover matrix evidence → FE audit + `PARITY_PROVEN.json`.  
-5. **Arch:** Home PAGE FINAL PASS **HARD-GREEN** before Chat is sequencing-unblocked per NEXT_STEPS (Chat Final Pass remains NOT-GREEN until above).
+1. **Uma:** §0b MCP measures + finish §0a (feedback Yes/No + full CTA frame sweep) + Home↔Chat pixel side-by-side.  
+2. **Quinn:** Expanded probe may PASS recipe rows — still need FE audit artifact + playback P1–P10 before `PARITY_PROVEN.json`.  
+3. **Arch:** No Chat Final Pass until Uma PROVEN; PDP HARD-GREEN untouched.
 
 ---
 
