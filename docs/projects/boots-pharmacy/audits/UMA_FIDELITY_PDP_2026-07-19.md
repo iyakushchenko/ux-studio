@@ -4,7 +4,7 @@
 **Date:** 2026-07-19  
 **Owner:** Uma (UI/UX)  
 **Status:** **PROVEN**  
-**Tip at PROVEN:** `d6e4951` · **v0.0.27** · FAQ UXDS Accordion + download tertiary DS hover (Final Pass NEEDS-REPROVE close)  
+**Tip at PROVEN:** `d6e4951` · **v0.0.27** · FAQ UXDS Accordion + download tertiary DS hover (Final Pass HARD-GREEN restored @ `828ab2b`)  
 **Prior PROVEN tip (RTB / share):** `553e29c` · v0.0.24 (still valid for §0b / P2; not re-opened this pass)  
 **React:** `src/projects/boots-pharmacy/screens/pdp/*` (L1–L20 RTB + below-fold)  
 **Make truth:** `frame/index.tsx` `ModuleBreadcrumbs` / `Body6` / `Body7` / `ModulePdpRtb` / `ComponentPdpRtb` / `ComponentPdpAccordion` · `globals-screens` child-8 · `globals-chrome` checkbox/CTA/icon hits  
@@ -23,8 +23,8 @@
 | **§0a download CTAs (tertiary)** | **PASS** — hover label → `#000`; icon → navy `#012169` (`--uxds-text-link-link`) |
 | **§0b RTB vertical rhythm** | **PASS** — carried from v0.0.24 measure (`32px` stack; title-block `72px`) |
 | **P2 share glyph Make flip** | **PASS** — carried from v0.0.24 MCP matrix |
-| **PO green-light allowed?** | **Yes for Uma fidelity** — Arch may re-run **PAGE FINAL PASS** after Quinn MCP stamp on this tip |
-| **PAGE FINAL PASS** | **Unblocked for Arch (post-Quinn)** — needs `PAGE_FINAL_PASS.json` stamp + `check:page-final-pass` (not this Uma stamp) |
+| **PO green-light allowed?** | **Yes for Uma fidelity** — Arch restored PAGE FINAL PASS HARD-GREEN @ `828ab2b` |
+| **PAGE FINAL PASS** | **HARD-GREEN** (Arch) — Uma fidelity gate closed; Home still waits PO `+` |
 
 **Honest residuals (do not block §0a / PROVEN):**  
 1. **Empty FAQ panels** — 5/6 panels have `body: null` (Make only ships copy for “Who is at risk?”); expand toggles a11y + chevron only.  
@@ -143,7 +143,7 @@
 |----------|----------|-------|
 | FAQ panels without body copy (5/6) | **Accepted Make parity** — do not invent FAQ copy | PO / content |
 | Download CTAs have no file URLs | **Accepted Make parity** — buttons only until assets exist | PO / Pax |
-| PAGE FINAL PASS / `check:page-final-pass` | P0 sequencing — Arch re-runs after Quinn MCP on `d6e4951` | Quinn + Arch |
+| PAGE FINAL PASS / `check:page-final-pass` | **Done** — Arch HARD-GREEN @ `828ab2b` | Arch |
 | Register React column catch-up notes | Doc | Bea |
 
 ---

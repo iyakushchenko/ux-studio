@@ -147,8 +147,8 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 
 | Delta | Hats | LESSONS / artifact |
 |-------|------|--------------------|
-| **PDP FAQ Accordion + download CTA hover (PO go)** — B1 closed; UXDS Accordion + `pdp__pill` DS hover; Final Pass demoted NEEDS-REPROVE; Quinn MCP matrix **PASS** @ `d6e4951`/v0.0.27 (FAQ toggle/reopen + download hover + full prior matrix); HARD-GREEN awaits Uma §0a + Arch; Home still waits PO `+` | Arch, Bea, Finn, Uma, Quinn, Pax | PDP_MAKE_PARITY_REGISTER · FE_AUDIT_PDP_MCP · FE_AUDIT_PDP_PLP_CONVENTIONS · PAGE_FINAL_PASS.json |
-| **PDP PAGE FINAL PASS HARD-GREEN** — tip `d7ce01c` / v0.0.24 (**stale** after FAQ/CTA ship); prior B1 static accepted then PO go | Arch, Finn, Uma, Quinn, Ben, Pax | PAGE_FINAL_PASS.json · FE_AUDIT_PDP_PAGE_FINAL_PASS · check:page-final-pass (5 screens) |
+| **PDP FAQ Accordion + download CTA hover (PO go)** — B1 closed; UXDS Accordion + `pdp__pill` DS hover; Final Pass demoted then **HARD-GREEN restored** @ `828ab2b`; Quinn MCP **PASS** 22/22 @ `d6e4951`/v0.0.27; Uma §0a PROVEN @ `c037d19`; Home still waits PO `+` | Arch, Bea, Finn, Uma, Quinn, Pax | PDP_MAKE_PARITY_REGISTER · FE_AUDIT_PDP_MCP · FE_AUDIT_PDP_PLP_CONVENTIONS · PAGE_FINAL_PASS.json |
+| **PDP PAGE FINAL PASS HARD-GREEN** — tip `828ab2b` / v0.0.27 (restored after FAQ/CTA NEEDS-REPROVE; prior `d7ce01c` superseded) | Arch, Finn, Uma, Quinn, Ben, Pax | PAGE_FINAL_PASS.json · FE_AUDIT_PDP_PAGE_FINAL_PASS · check:page-final-pass (5 screens) |
 | **PDP RTB vertical rhythm** — LEGACY Make `module.pdp.rtb > div > div` stole React column gap (48≠32) + forced title-block 1:1; Uma must MCP-measure section gaps before fidelity IN PROGRESS; Quinn PASS ≠ rhythm done | Uma, Finn, Arch | UMA_FIDELITY_NOTES §0b · UMA_FIDELITY_PDP · globals-screens `:not(.pdp__rtb-card)` |
 | **PDP kickoff** — Bea register before code; Finn L1–L13 mount; Uma fidelity IN PROGRESS; Quinn probe criteria prep (no false PROVEN); accordion B1 static | Arch, Bea, Finn, Uma, Quinn, Ben | [PDP_MAKE_PARITY_REGISTER.md](../projects/boots-pharmacy/features/PDP_MAKE_PARITY_REGISTER.md) · screens/pdp |
 | **PAGE FINAL PASS** — no new migrated page until previous hard-green; Finn/Uma checklist + check; parallel callsigns + Knowledge used still required | Arch, Finn, Uma, Bea | [PAGE_FINAL_PASS.md](./PAGE_FINAL_PASS.md) · TEAM · doctrine · NEXT_STEPS |
@@ -162,6 +162,13 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 | **Auto-Rule `agent-teardown-clean`** — overlay gone + `&modal=` stripped + dialog closed after probe/sitrep/forceClear | Finn, Ben, Quinn, Arch | `studioAgentTeardownContract` · felonies §9 · `__studioAssertAgentTeardownClean` |
 | Team knowledge database + mandatory use | Arch, all | This file · TEAM.md § Knowledge use |
 | Page final-pass gate before NEXT screen; landmarks + BEM stamp | Finn, Uma, Ben, Arch | PAGE_FINAL_PASS.md · check:page-final-pass |
+
+**Knowledge improved** (2026-07-19 · stream: PDP PAGE FINAL PASS HARD-GREEN restored · tip 828ab2b · v0.0.27):
+- Arch (Director): restore HARD-GREEN only after Quinn 22/22 (FAQ+download) + Uma §0a PROVEN + Accordion source contract; veto Home until PO `+` — applied: PAGE_FINAL_PASS.json mcpFinalPass + FE_AUDIT_PDP_PAGE_FINAL_PASS + NEXT_STEPS 3e
+- Quinn (QA): re-prove MCP after interaction surface change (not false-PROVEN from prior HARD-GREEN) — applied: FE_AUDIT_PDP_MCP 22/22 @ d6e4951 / sync 828ab2b
+- Uma (UI/UX): §0a real MCP hover/focus/expand on Accordion + download tertiary before Arch stamp — applied: UMA_FIDELITY_PDP PROVEN @ c037d19
+- Finn (FE): `check:page-final-pass` requires UXDS `<Accordion>` on PDP (PO interactive) — applied: scripts/check-page-final-pass.mjs + PdpScreen kit
+- Pax (PO sim): sequencing unblocked ≠ start Home — applied: wait PO `+`
 
 **Knowledge improved** (2026-07-19 · stream: agent-teardown-clean Auto-Rule · sticky modal felony):
 - Finn (FE): stay state omits modal; App never re-applies `state?.modalId`; probe/session finally resets; forceClear resets then hard-removes overlay — applied: studioUrl + App + probe + overlay

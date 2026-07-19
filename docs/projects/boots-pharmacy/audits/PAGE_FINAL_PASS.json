@@ -121,21 +121,21 @@
     {
       "screenId": "pdp",
       "status": "proven",
-      "hardGreen": false,
+      "hardGreen": true,
       "stampedAt": {
-        "sha": "d7ce01c",
+        "sha": "828ab2b",
         "date": "2026-07-19",
-        "note": "Structure stamp retained (BEM/landmarks/mount). Interactive FAQ Accordion + download CTA hover shipped after HARD-GREEN — Quinn must re-prove MCP matrix + Uma §0a extras before hardGreen again."
+        "note": "Finn structure/naming + UXDS Accordion kit (PO interactive FAQ) + ButtonPrimary Book now; header crumbs + main RTB/below; BEM pdp; data-studio-react-screen + make-retired; download tertiary DS hover; no SearchField (N/A). Restored after FAQ/CTA NEEDS-REPROVE."
       },
       "mcpFinalPass": {
-        "status": "NEEDS-REPROVE",
-        "pass": false,
+        "status": "HARD-GREEN",
+        "pass": true,
         "stampedAt": {
-          "sha": "d6e4951",
+          "sha": "828ab2b",
           "date": "2026-07-19",
           "version": "0.0.27",
-          "auditor": "Quinn (QA)",
-          "note": "Quinn MCP full matrix PASS @ d6e4951/v0.0.27 (incl. pdp-faq-accordion-* + pdp-download-cta-hover + logged-out avail start + overlay-eyes + teardown). Uma §0a FAQ/download PROVEN — Arch may re-run PAGE FINAL PASS. HARD-GREEN not restored by Quinn. Evidence: FE_AUDIT_PDP_MCP_2026-07-19.md + UMA_FIDELITY_PDP_2026-07-19.md"
+          "auditor": "Arch (Director) — Quinn MCP + Uma §0a",
+          "note": "Restored HARD-GREEN after FAQ Accordion + download CTA ship. Quinn MCP 22/22 PASS @ d6e4951/v0.0.27 (incl. pdp-faq-accordion-* + pdp-download-cta-hover + logged-out avail start + overlay-eyes + teardown); Uma §0a PROVEN @ c037d19; Quinn sync docs @ 828ab2b. Evidence: FE_AUDIT_PDP_MCP + UMA_FIDELITY_PDP + FE_AUDIT_PDP_PAGE_FINAL_PASS."
         },
         "url": "http://127.0.0.1:5188/?project=boots-pharmacy&screen=pdp",
         "auditPath": "docs/projects/boots-pharmacy/audits/FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md",

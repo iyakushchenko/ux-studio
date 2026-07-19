@@ -2,7 +2,7 @@
 
 **Project:** `boots-pharmacy`  
 **Callsigns:** Bea (BA) · Finn (FE) · Uma (UI/UX) · Quinn (QA) · Pax (PO sim) · Arch (Director)  
-**Status:** L1–L20 mounted · FAQ Accordion interactive (PO go) · download CTA DS hover · Final Pass **NEEDS-REPROVE**  
+**Status:** L1–L20 mounted · FAQ Accordion interactive (PO go) · download CTA DS hover · Final Pass **HARD-GREEN**  
 **Updated:** 2026-07-19  
 **Refs:** [BOOTS_REACT_SCREEN_PILOT.md](../BOOTS_REACT_SCREEN_PILOT.md) · [PDP_MAKE_PARITY_REGISTER.md](./PDP_MAKE_PARITY_REGISTER.md) · [PLP_REACT.md](./PLP_REACT.md) · [PAGE_FINAL_PASS.md](../../../product/PAGE_FINAL_PASS.md) · [NEXT_STEPS.md](../../../product/NEXT_STEPS.md) · Uma [../audits/UMA_FIDELITY_PDP_2026-07-19.md](../audits/UMA_FIDELITY_PDP_2026-07-19.md) · Quinn Final Pass [../audits/FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md](../audits/FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md) · Convention [../audits/FE_AUDIT_PDP_PLP_CONVENTIONS_2026-07-19.md](../audits/FE_AUDIT_PDP_PLP_CONVENTIONS_2026-07-19.md)
 
@@ -12,7 +12,7 @@
 
 Erase-Make **closed for PDP** after PLP HARD-GREEN. Vaccine PDP (`screenId: pdp`, Frame child **8**) is the Traditional CJM bridge between PLP and Book Step 1. Make truth: chickenpox single-SKU RTB + below-fold education bands. React mount follows Book Step 1 / PLP pilot pattern — UXDS + scoped CSS, Make child retired from view, no new LEGACY growth.
 
-**Gate:** Prior HARD-GREEN @ `d7ce01c` **stale** after FAQ/CTA interaction ship — Quinn re-prove before Home. **Home waits PO `+`.**
+**Gate:** PAGE FINAL PASS **HARD-GREEN** @ tip `828ab2b` (≥ `d6e4951` / v0.0.27). **Home waits PO `+`.**
 
 ## Business logic
 
@@ -67,7 +67,7 @@ Erase-Make **closed for PDP** after PLP HARD-GREEN. Vaccine PDP (`screenId: pdp`
 - **MCP matrix PASS** 2026-07-19 tip `d6e4951` / v0.0.27 — [FE_AUDIT_PDP_MCP_2026-07-19.md](../audits/FE_AUDIT_PDP_MCP_2026-07-19.md) (`__studioRunMcpPageProbe({ screenId:"pdp", reload:false })` · 22/22 incl. FAQ accordion + download CTA hover)
 - Localhost: mount + Make leak=0; PLP→PDP; Book now login gate; Check availability Find Pharmacy start; overlay-arm + overlay-eyes; teardown clean
 - Booster £150↔£75; empty-heart hover; below-fold reveal; FAQ toggle/reopen; `.pdp__pill:hover`
-- Final Pass HARD-GREEN — **NEEDS-REPROVE** until Arch re-stamp; Quinn matrix PASS + Uma §0a PROVEN @ `d6e4951` / docs `c037d19`
+- Final Pass **HARD-GREEN** restored — Arch stamp tip `828ab2b` (Quinn 22/22 @ `d6e4951` + Uma §0a @ `c037d19`)
 - Register prove matrix: [PDP_MAKE_PARITY_REGISTER.md](./PDP_MAKE_PARITY_REGISTER.md)
 
 ## Pax
@@ -77,7 +77,8 @@ Erase-Make **closed for PDP** after PLP HARD-GREEN. Vaccine PDP (`screenId: pdp`
 - [ ] Notes/CHANGELOG when bump
 - [x] Resolve B1 accordion — PO go interactive (2026-07-19)
 - [x] Quinn re-prove MCP matrix (FAQ/download) @ `d6e4951` / v0.0.27
-- [x] Uma §0a for FAQ/download @ `d6e4951` / docs `c037d19` — Arch Final Pass next
+- [x] Uma §0a for FAQ/download @ `d6e4951` / docs `c037d19`
+- [x] Arch PAGE FINAL PASS HARD-GREEN @ `828ab2b` — Home still waits PO `+`
 
 ## Honest residual (expected)
 
@@ -88,6 +89,5 @@ Erase-Make **closed for PDP** after PLP HARD-GREEN. Vaccine PDP (`screenId: pdp`
 | FAQ panels without Make body | Expand/collapse + a11y only — **no invented FAQ copy** |
 | Download / GP CTAs | DS hover shipped; no file URL journey wire |
 | Single chickenpox SKU | CJM scope |
-| Final Pass HARD-GREEN | **NEEDS-REPROVE** after this interaction ship |
 
 **Parity P0 for full page L&F:** L1–L20 bands + journey CTAs + booster/price + wishlist + modals URL + no invented loader — see register.

@@ -57,9 +57,9 @@
       "status": "proven",
       "auditPath": "docs/projects/boots-pharmacy/audits/UMA_FIDELITY_PDP_2026-07-19.md",
       "mcpMatrixAt": {
-        "sha": "553e29c",
+        "sha": "828ab2b",
         "date": "2026-07-19",
-        "note": "Uma PROVEN — §0a/§0b + P2 share flip MCP matrix(1,0,0,-1,0,0); Quinn FE_AUDIT_PDP_MCP PASS @ 87c0fc8; B1 static accordion accepted; PAGE FINAL PASS next for Arch"
+        "note": "Uma §0a PROVEN FAQ Accordion + download tertiary @ c037d19/d6e4951; Quinn MCP 22/22 PASS @ d6e4951 (sync 828ab2b); PAGE FINAL PASS HARD-GREEN restored"
       },
       "requireMcp": true
     }

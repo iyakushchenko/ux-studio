@@ -2,7 +2,7 @@
 
 **Project:** `boots-pharmacy`  
 **Callsigns:** Bea (BA) owns register truth · Quinn (QA) owns prove · Finn/Uma restore gaps  
-**Updated:** 2026-07-19 (PO go: FAQ Accordion interactive + download CTA DS hover; B1 closed; Final Pass **NEEDS-REPROVE** — prior HARD-GREEN @ `d7ce01c` stale)  
+**Updated:** 2026-07-19 (PO go: FAQ Accordion interactive + download CTA DS hover; B1 closed; Final Pass **HARD-GREEN** restored @ `828ab2b`)  
 **Make source:** Frame child **8** (`PDP. Vaccine Details Page` / `BTS-PHRM.Product - Deal Details Page`, `screenId: "pdp"`) + `globals-screens` child-8 rules + `BootsPharmacyProjectView` wire + `frame/index.tsx`  
 **React target:** `src/projects/boots-pharmacy/screens/pdp/*`  
 **Refs:** [PDP_REACT.md](./PDP_REACT.md) · [PLP_MAKE_PARITY_REGISTER.md](./PLP_MAKE_PARITY_REGISTER.md) (format) · [URL.md](../../../shell/URL.md) (modal ids)  
@@ -11,7 +11,7 @@
 **Status legend:** Present · Partial · Missing · Fixed · N/A
 
 **Make column:** inventory truth from Frame + wire + LEGACY CSS (2026-07-19).  
-**React column:** L1–L20 mounted; FAQ = UXDS Accordion kit (default open Who is at risk?); download CTAs = live buttons + tertiary/mint hover; Quinn MCP matrix **PASS** @ `d6e4951`/v0.0.27; Final Pass **NEEDS-REPROVE** until Uma §0a + Arch HARD-GREEN.
+**React column:** L1–L20 mounted; FAQ = UXDS Accordion kit (default open Who is at risk?); download CTAs = live buttons + tertiary/mint hover; Quinn MCP matrix **PASS** @ `d6e4951`/v0.0.27; Final Pass **HARD-GREEN** @ `828ab2b`.
 
 **Bea rule:** Every band before Finn codes — including loading/empty/updating as **P0** when Make has them. No invented bands.
 

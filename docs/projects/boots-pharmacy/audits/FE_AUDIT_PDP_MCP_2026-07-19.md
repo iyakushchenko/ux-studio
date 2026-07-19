@@ -7,7 +7,7 @@
 **Prior prove (superseded):** `d7ce01c` · **v0.0.24** (pre–FAQ/CTA interaction — Final Pass HARD-GREEN then demoted NEEDS-REPROVE)  
 **Earlier tips (history):** `cbbd97d` / `87c0fc8` · `eaf9aa3` / `03687d3`  
 **Policy:** [QUINN_PDP_PROBE_CRITERIA_2026-07-19.md](./QUINN_PDP_PROBE_CRITERIA_2026-07-19.md) · [RECORDING.md](../../../shell/RECORDING.md) · recipe `studioMcpPageProbe.ts`  
-**Final Pass audit:** [FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md](./FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md) — **not** re-stamped HARD-GREEN by Quinn (Arch unblocked — Uma §0a PROVEN)
+**Final Pass audit:** [FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md](./FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md) — Arch restored **HARD-GREEN** @ tip `828ab2b` (Quinn does not stamp HARD-GREEN)
 
 ---
 
@@ -18,8 +18,8 @@
 | **Quinn MCP matrix** | **PASS** (re-prove on tip `d6e4951` / v0.0.27) |
 | **New steps** | `pdp-faq-accordion-toggle` · `pdp-faq-accordion-reopen` · `pdp-download-cta-hover` — all **PASS** |
 | **Uma fidelity §0a (FAQ/CTA extras)** | **PROVEN** — [UMA_FIDELITY_PDP_2026-07-19.md](./UMA_FIDELITY_PDP_2026-07-19.md) tip `d6e4951` / v0.0.27 |
-| **PAGE FINAL PASS HARD-GREEN?** | **NOT stamped by Quinn** — matrix PASS + Uma §0a PROVEN; Arch may re-run Final Pass (`hardGreen` still false / `mcpFinalPass` NEEDS-REPROVE until Arch) |
-| **PO green-light / Home?** | **Blocked** until Arch Final Pass HARD-GREEN |
+| **PAGE FINAL PASS HARD-GREEN?** | **HARD-GREEN** (Arch stamp tip `828ab2b` — Quinn matrix PASS cited; Quinn does not stamp) |
+| **PO green-light / Home?** | **Sequencing unblocked** — Home still waits PO `+` |
 
 **Team check line:** `Quinn MCP — pdp — PASS` (interaction matrix; tip `d6e4951` / v0.0.27)
 
@@ -89,9 +89,9 @@
 | Gate | Status |
 |------|--------|
 | Quinn MCP interaction matrix | **PASS** (this re-prove · `d6e4951` / v0.0.27) |
-| Uma §0a extras (Accordion + download hover) | **Awaiting Uma** |
-| `PAGE_FINAL_PASS.json` `mcpFinalPass` HARD-GREEN | **Not stamped by Quinn** — Arch after Uma §0a |
-| `hardGreen` | **false** (NEEDS-REPROVE until Arch) |
+| Uma §0a extras (Accordion + download hover) | **PROVEN** (`c037d19`) |
+| `PAGE_FINAL_PASS.json` `mcpFinalPass` HARD-GREEN | **HARD-GREEN** — Arch stamp tip `828ab2b` |
+| `hardGreen` | **true** |
 
 ---
 
