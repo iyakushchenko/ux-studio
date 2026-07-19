@@ -2,6 +2,9 @@
 
 > _Append a bullet on coherent commits via `npm run notes:append -- --lane="<lane>" --intent="<text>"`. Preview with `npm run notes:preview`. On `npm run release:patch` this section is promoted to `## v<X.Y.Z> - DDMMYY` and a fresh empty `## Current` is re-inserted. Policy: `docs/product/VERSIONING.md`._
 
+## v0.0.16 - 190726
+- **shell:** MCP page probe scroll-into-view + always-visible AGENT TESTING overlay (`overlay-arm`, `plp-below-fold-scroll`)
+
 ## v0.0.15 - 190726
 - **docs:** Mandate typical DS state checks (hover/focus/active/disabled vs kit+Make) before screen PROVEN; Uma signs; Quinn MCP-hovers SearchField; missing DS hover = FAIL; parallel callsigns still required
 - **uxds:** SearchField control shell Make hover/focus inset ring + `search-field-states` parity ratchet (DS state rule of thumb)

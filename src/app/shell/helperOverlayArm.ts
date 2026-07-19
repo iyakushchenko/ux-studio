@@ -39,6 +39,10 @@ const READ_ONLY_HELPER_SUFFIXES = new Set([
   // Cleanup / abort manage overlay themselves — do not re-arm mid-reset.
   "EnsureCleanStudio",
   "AbortAll",
+  // Page probe / sanity manage start+stop themselves — wrapping touch() nest-bumps
+  // start() and leaves stop() stuck at nest>0 (no sitrep / flaky panel).
+  "RunMcpPageProbe",
+  "RunMcpSanityCheck",
 ]);
 
 const ARMED_FLAG = "__studioOverlayArmed";

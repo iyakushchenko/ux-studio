@@ -12,6 +12,18 @@ vi.mock("@/app/shell/agentTestingOverlay", () => ({
   startAgentTestingOverlay: vi.fn(),
   stopAgentTestingOverlay: vi.fn(),
   logAgentTestingOverlay: vi.fn(),
+  touchAgentTestingOverlay: vi.fn(),
+  ensureAgentTestingOverlayDomArmed: vi.fn(() => true),
+  isAgentTestingOverlayDomVisible: vi.fn(() => true),
+}));
+
+vi.mock("@/app/scenario/playbackScroll", () => ({
+  getPrototypeScrollRoot: vi.fn(() => null),
+  isDemoTargetInPrototypeView: vi.fn(() => true),
+  revealDemoTargetForAgent: vi.fn(async () => ({
+    scrolled: true,
+    inView: true,
+  })),
 }));
 
 vi.mock("@/app/shell/playbackCursorDiagnostic", () => ({
@@ -73,6 +85,11 @@ describe("runMcpPageProbe", () => {
     const reset = { tagName: "BUTTON" };
     const quick = {
       tagName: "BUTTON",
+      getBoundingClientRect: () => ({ width: 40, height: 24 }),
+    };
+    const belowFold = {
+      tagName: "BUTTON",
+      isConnected: true,
       getBoundingClientRect: () => ({ width: 40, height: 24 }),
     };
     const book = { tagName: "BUTTON" };
@@ -196,6 +213,7 @@ describe("runMcpPageProbe", () => {
         if (sel.includes("data-studio-plp-listing-phase")) return listingHost;
         if (sel.includes("data-studio-plp-listing-loader")) return listingLoader;
         if (sel.includes("data-studio-plp-results")) return resultsCount;
+        if (sel.includes("data-studio-probe-below-fold")) return belowFold;
         if (sel.includes("button[data-studio-quick-view")) return quick;
         if (sel.includes('button[data-studio-action="plp-book-now"]'))
           return book;
@@ -221,6 +239,7 @@ describe("runMcpPageProbe", () => {
       reload: false,
     });
     expect(result.screenId).toBe("plp");
+    expect(result.checks.find((c) => c.id === "overlay-arm")?.pass).toBe(true);
     expect(result.checks.find((c) => c.id === "plp-host")?.pass).toBe(true);
     expect(result.checks.find((c) => c.id === "plp-search-icons")?.pass).toBe(
       true
@@ -240,6 +259,9 @@ describe("runMcpPageProbe", () => {
     expect(result.checks.find((c) => c.id === "plp-quick-view-ready")?.pass).toBe(
       true
     );
+    expect(
+      result.checks.find((c) => c.id === "plp-below-fold-scroll")?.pass
+    ).toBe(true);
     expect(result.checks.find((c) => c.id === "plp-overlay-eyes")?.pass).toBe(
       true
     );
@@ -253,6 +275,11 @@ describe("runMcpPageProbe", () => {
     const reset = { tagName: "BUTTON" };
     const quick = {
       tagName: "BUTTON",
+      getBoundingClientRect: () => ({ width: 40, height: 24 }),
+    };
+    const belowFold = {
+      tagName: "BUTTON",
+      isConnected: true,
       getBoundingClientRect: () => ({ width: 40, height: 24 }),
     };
     const book = { tagName: "BUTTON" };
@@ -351,6 +378,7 @@ describe("runMcpPageProbe", () => {
         if (sel.includes("data-studio-plp-listing-phase")) return listingHost;
         if (sel.includes("data-studio-plp-listing-loader")) return listingLoader;
         if (sel.includes("data-studio-plp-results")) return resultsCount;
+        if (sel.includes("data-studio-probe-below-fold")) return belowFold;
         if (sel.includes("button[data-studio-quick-view")) return quick;
         if (sel.includes('button[data-studio-action="plp-book-now"]'))
           return book;

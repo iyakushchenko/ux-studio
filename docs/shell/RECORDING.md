@@ -30,13 +30,20 @@ Journey proves hub: retreat/robot-qa sessions pass `resetToHub: true`.
 await window.__studioRunMcpPageProbe?.() // current ?screen=
 await window.__studioRunMcpPageProbe?.({ screenId: "plp" })
 // optional: { resetToHub: true } — only for journey clean slate
+// prove without reload: { screenId: "plp", reload: false }
 ```
 
 Drives the shared CJM/AIR **robo-cursor** (`simulateDemoPointerClick`) to each recipe target and logs **PASS** / **FAIL** on the AGENT TESTING panel. Prefer this over silent `evaluate_script` clicks for every React screen ship.
 
-**HARD FAIL (Quinn + Finn — LESSONS 2026-07-19):** Before every probe interact, **scroll the target into view**. The agent testing overlay **must be visible on every probe step** — if absent/hidden → that step and the probe **FAIL**. Do not stamp PASS without overlay chrome the PO can see. Code gate: coordinate with Quinn/Finn; do not clobber parallel overlay/scroll ships.
+**HARD FAIL (Quinn + Finn — LESSONS 2026-07-19):** Before every probe interact, **scroll the target into view**. The agent testing overlay **must be visible on every probe step** — if absent/hidden → that step and the probe **FAIL**. Do not stamp PASS without overlay chrome the PO can see.
 
-**PLP recipe includes** `plp-search-icons` (icon end + single clear), `plp-filter-view-all`, `plp-filter-option-counters`. Source contracts: [PARITY_RATCHETS.md](../product/PARITY_RATCHETS.md).
+**Code gate (shipped):**
+1. Probe start → `overlay-arm` (`start` + `ensureAgentTestingOverlayDomArmed`) — BR panel must paint.
+2. Click/hover → `revealDemoTargetForAgent` + robo-cursor sync scroll on `.studio-scroll--prototype` (REC demo-click also `scroll: true`).
+3. PLP `plp-below-fold-scroll` (`action: "reveal"`) → `button[data-studio-probe-below-fold="true"]` (last tile Quick View): park top → scroll into view with overlay still visible.
+4. Re-arm mid-sitrep abandons settle **without** firing a deferred `reload` from the prior stop.
+
+**PLP recipe includes** `overlay-arm`, `plp-search-icons` (icon end + single clear), `plp-filter-view-all`, `plp-filter-option-counters`, `plp-below-fold-scroll`, overlay-eyes. Source contracts: [PARITY_RATCHETS.md](../product/PARITY_RATCHETS.md).
 
 ```js
 window.__studioAgentTestingOverlay?.start("optional title") // prefer __studio*; __proto* alias OK

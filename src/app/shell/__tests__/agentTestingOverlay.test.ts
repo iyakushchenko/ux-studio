@@ -257,4 +257,42 @@ describe("agentTestingOverlay", () => {
     expect(isAgentTestingOverlayActive()).toBe(false);
     expect(isAgentTestingOverlaySettling()).toBe(false);
   });
+
+  it("re-arm during reload sitrep does not schedule that reload", () => {
+    vi.useFakeTimers();
+    const reload = vi.fn();
+    vi.stubGlobal("window", {
+      setTimeout: (fn: TimerHandler, ms?: number) =>
+        globalThis.setTimeout(fn as () => void, ms),
+      clearTimeout: (id: ReturnType<typeof setTimeout>) =>
+        globalThis.clearTimeout(id),
+      setInterval: (fn: TimerHandler, ms?: number) =>
+        globalThis.setInterval(fn as () => void, ms),
+      clearInterval: (id: ReturnType<typeof setInterval>) =>
+        globalThis.clearInterval(id),
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: vi.fn(),
+      location: {
+        reload,
+        href: "http://localhost:5173/?project=boots-pharmacy&screen=plp",
+        pathname: "/",
+        search: "?project=boots-pharmacy&screen=plp",
+        hash: "",
+      },
+      history: { state: null, replaceState: vi.fn(), pushState: vi.fn() },
+    });
+
+    startAgentTestingOverlay("first");
+    stopAgentTestingOverlay({ reload: true });
+    expect(isAgentTestingOverlaySettling()).toBe(true);
+
+    // New probe mid-sitrep must abandon settle without firing the pending reload.
+    startAgentTestingOverlay("AGENT TESTING — plp probe");
+    expect(isAgentTestingOverlayActive()).toBe(true);
+    expect(isAgentTestingOverlaySettling()).toBe(false);
+
+    vi.advanceTimersByTime(DEFAULT_SETTLE_MS + 500);
+    expect(reload).not.toHaveBeenCalled();
+  });
 });

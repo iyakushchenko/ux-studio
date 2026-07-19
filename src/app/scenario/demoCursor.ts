@@ -2,8 +2,11 @@ import defaultCursorUrl from "@/assets/default-cursor.svg";
 import handIndexCursorUrl from "@/assets/hand-index-cursor.svg";
 import {
   beginDemoTargetPageScroll,
+  isDemoTargetInPrototypeView,
   isPrototypeOverlayTarget,
   isPrototypePageScrollLocked,
+  revealDemoTargetForAgent,
+  snapDemoTargetIntoView,
   type PlaybackScrollOptions,
 } from "@/app/scenario/playbackScroll";
 import { notePlaybackDemoClick } from "@/app/shell/playbackInteractionContext";
@@ -926,17 +929,33 @@ export async function moveDemoCursorTo(
   const scrollOpts: PlaybackScrollOptions = {
     shouldAbort: options?.shouldAbort,
   };
-  const { durationMs: scrollDurationMs, scrollPromise } = syncPageScroll
-    ? await beginDemoTargetPageScroll(target, scrollOpts)
-    : { durationMs: 0, scrollPromise: Promise.resolve() };
-
-  if (scrollDurationMs > 0) {
-    notePlaybackCursorEvent("scroll-into-view", {
-      target: describeCursorTarget(target),
-      animated: true,
-      scroll: true,
-      detail: `sync-page-scroll ${scrollDurationMs}ms`,
-    });
+  let scrollDurationMs = 0;
+  let scrollPromise: Promise<void> = Promise.resolve();
+  if (syncPageScroll) {
+    // Always bring the target into the prototype viewport before travel so
+    // PO can see below-fold work while agent-testing clicks are blocked.
+    const began = await beginDemoTargetPageScroll(target, scrollOpts);
+    scrollDurationMs = began.durationMs;
+    scrollPromise = began.scrollPromise;
+    if (
+      scrollDurationMs === 0 &&
+      !isDemoTargetInPrototypeView(target)
+    ) {
+      snapDemoTargetIntoView(target);
+      notePlaybackCursorEvent("scroll-into-view", {
+        target: describeCursorTarget(target),
+        animated: false,
+        scroll: true,
+        detail: "snap-into-view",
+      });
+    } else if (scrollDurationMs > 0) {
+      notePlaybackCursorEvent("scroll-into-view", {
+        target: describeCursorTarget(target),
+        animated: true,
+        scroll: true,
+        detail: `sync-page-scroll ${scrollDurationMs}ms`,
+      });
+    }
   }
 
   if (options?.shouldAbort?.()) return bail();
@@ -1009,6 +1028,12 @@ export async function simulateDemoPointerHover(
   if (options?.shouldAbort?.()) return false;
   if (!isClickableTarget(target)) return false;
 
+  if (options?.scroll !== false) {
+    await revealDemoTargetForAgent(target, {
+      shouldAbort: options?.shouldAbort,
+    });
+  }
+
   const interactionRoot = findDemoInteractionRoot(target);
   const cursor = await moveDemoCursorTo(target, {
     shouldAbort: options?.shouldAbort,
@@ -1065,6 +1090,12 @@ export async function simulateDemoPointerClick(
       abortReason: "blocked-by-modal",
     });
     return false;
+  }
+
+  if (options?.scroll !== false) {
+    await revealDemoTargetForAgent(target, {
+      shouldAbort: options?.shouldAbort,
+    });
   }
 
   const cursor = await moveDemoCursorTo(target, {

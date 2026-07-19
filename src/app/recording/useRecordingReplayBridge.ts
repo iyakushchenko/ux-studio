@@ -193,7 +193,9 @@ export function useRecordingReplayBridge(options: {
           resolvePlaybackSelectorChain(event.selectorChain, modal),
       });
       if (!target) return false;
-      return simulateDemoPointerClick(target, { scroll: false });
+      // Scroll prototype root so below-fold REC replay stays visible to the PO
+      // (agent-testing click guard blocks manual wheel/scroll).
+      return simulateDemoPointerClick(target, { scroll: true });
     },
     []
   );

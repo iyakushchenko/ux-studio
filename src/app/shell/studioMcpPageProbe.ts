@@ -8,9 +8,17 @@
 
 import { simulateDemoPointerClick } from "@/app/scenario/demoCursor";
 import {
+  getPrototypeScrollRoot,
+  isDemoTargetInPrototypeView,
+  revealDemoTargetForAgent,
+} from "@/app/scenario/playbackScroll";
+import {
+  ensureAgentTestingOverlayDomArmed,
+  isAgentTestingOverlayDomVisible,
   logAgentTestingOverlay,
   startAgentTestingOverlay,
   stopAgentTestingOverlay,
+  touchAgentTestingOverlay,
 } from "@/app/shell/agentTestingOverlay";
 import { logControlPanel } from "@/app/shell/controlPanelLog";
 import {
@@ -59,8 +67,9 @@ type ProbeStep = {
    * click — robo-click (refuses if under overlay).
    * assert — presence / custom assert.
    * refuse-click — PASS only when overlay is open AND click is refused.
+   * reveal — scroll prototype root to target (no click); proves below-fold visibility.
    */
-  action?: "click" | "assert" | "refuse-click";
+  action?: "click" | "assert" | "refuse-click" | "reveal";
   /** Optional assert after click / for assert-only steps. */
   assert?: () => boolean | string;
   /** Extra wait after click (ms) for loaders / reveal. */
@@ -79,6 +88,37 @@ function logStep(id: string, pass: boolean, detail?: string): void {
   const tag = pass ? "PASS" : "FAIL";
   const line = detail ? `${tag}  ${id} — ${detail}` : `${tag}  ${id}`;
   logAgentTestingOverlay(line);
+}
+
+/** HARD FAIL — overlay must stay painted for the whole probe. */
+function requireOverlayVisible(stepId: string): McpPageProbeStepResult | null {
+  touchAgentTestingOverlay();
+  if (
+    !ensureAgentTestingOverlayDomArmed() ||
+    !isAgentTestingOverlayDomVisible()
+  ) {
+    const detail = "agent testing overlay not visible";
+    logStep(stepId, false, detail);
+    return { id: stepId, pass: false, detail };
+  }
+  return null;
+}
+
+async function revealTargetForProbe(
+  el: HTMLElement
+): Promise<{ scrolled: boolean; inView: boolean }> {
+  const scrollEl = getPrototypeScrollRoot(el);
+  if (scrollEl && scrollEl.scrollTop > 0) {
+    // Optional: leave as-is; reveal centers the target from current offset.
+  }
+  return revealDemoTargetForAgent(el);
+}
+
+/** After a step, keep the action target clear of the BR sitrep panel. */
+async function postStepReveal(el: HTMLElement | null): Promise<void> {
+  if (!el?.isConnected) return;
+  if (isDemoTargetInPrototypeView(el)) return;
+  await revealDemoTargetForAgent(el, { instant: true });
 }
 
 function resolveScreenId(options?: McpPageProbeOptions): string {
@@ -308,6 +348,14 @@ function plpProbeSteps(): ProbeStep[] {
       },
     },
     {
+      // Below-fold prove — last tile Quick View (stamped data-studio-probe-below-fold).
+      // Scrolls prototype root into view; no click (QV open is the next step).
+      id: "plp-below-fold-scroll",
+      selector:
+        '[data-studio-react-screen="plp"] button[data-studio-probe-below-fold="true"]',
+      action: "reveal",
+    },
+    {
       id: "plp-quick-view",
       selector:
         '[data-studio-react-screen="plp"] button[data-studio-quick-view="true"]',
@@ -372,6 +420,9 @@ async function waitForAssert(
 }
 
 async function runProbeStep(step: ProbeStep): Promise<McpPageProbeStepResult> {
+  const overlayFail = requireOverlayVisible(step.id);
+  if (overlayFail) return overlayFail;
+
   if (step.action === "assert") {
     const runAssert = () => {
       const el = document.querySelector<HTMLElement>(step.selector);
@@ -398,6 +449,34 @@ async function runProbeStep(step: ProbeStep): Promise<McpPageProbeStepResult> {
     return { id: step.id, pass: false, detail };
   }
 
+  if (step.action === "reveal") {
+    const scrollEl = getPrototypeScrollRoot(el);
+    // Park at top so a mid-list/last-tile target is honestly below-fold first.
+    if (scrollEl && scrollEl.scrollTop > 8) {
+      scrollEl.scrollTop = 0;
+      await delay(80);
+    }
+    const beforeInView = isDemoTargetInPrototypeView(el);
+    const { scrolled, inView } = await revealTargetForProbe(el);
+    if (!inView) {
+      const detail = "target still out of prototype view after scroll-into-view";
+      logStep(step.id, false, detail);
+      return { id: step.id, pass: false, detail };
+    }
+    if (!isAgentTestingOverlayDomVisible()) {
+      const detail = "overlay vanished during reveal";
+      logStep(step.id, false, detail);
+      return { id: step.id, pass: false, detail };
+    }
+    const detail =
+      scrolled || !beforeInView
+        ? "scroll-into-view + overlay visible"
+        : "already in view + overlay visible";
+    logStep(step.id, true, detail);
+    await postStepReveal(el);
+    return { id: step.id, pass: true, detail };
+  }
+
   if (step.action === "refuse-click") {
     if (!isBlockingModalOpen()) {
       const detail = "expected blocking overlay open before refuse-click";
@@ -419,6 +498,8 @@ async function runProbeStep(step: ProbeStep): Promise<McpPageProbeStepResult> {
     return { id: step.id, pass: true, detail: "overlay eyes refused under-click" };
   }
 
+  // click (default)
+  await revealDemoTargetForAgent(el);
   const clicked = await simulateDemoPointerClick(el, { scroll: true });
   if (!clicked) {
     const detail = isElementBlockedByModal(el)
@@ -437,7 +518,13 @@ async function runProbeStep(step: ProbeStep): Promise<McpPageProbeStepResult> {
       return { id: step.id, pass: false, detail };
     }
   }
+  if (!isAgentTestingOverlayDomVisible()) {
+    const detail = "overlay vanished after click";
+    logStep(step.id, false, detail);
+    return { id: step.id, pass: false, detail };
+  }
   logStep(step.id, true);
+  await postStepReveal(el);
   return { id: step.id, pass: true };
 }
 
@@ -459,10 +546,35 @@ export async function runMcpPageProbe(
   }
   const sessionId = beginMcpTestSession(`page-probe-${screenId}`);
   enableCursorQaEyes();
+  // Single start (not touch+start) — avoids nest>1 so stop() always enters sitrep.
+  // ensure* repairs settle/orphan DOM races without bumping nest again.
   startAgentTestingOverlay(`AGENT TESTING — ${screenId} probe`);
-  logAgentTestingOverlay(`probe: ${screenId}`);
+  const overlayArmed = ensureAgentTestingOverlayDomArmed(
+    `AGENT TESTING — ${screenId} probe`
+  );
 
   try {
+    if (!overlayArmed || !isAgentTestingOverlayDomVisible()) {
+      const detail = "overlay failed to arm at probe start";
+      logAgentTestingOverlay(`FAIL  overlay-arm — ${detail}`);
+      checks.push({ id: "overlay-arm", pass: false, detail });
+      logAgentTestingOverlay("FINAL  FAIL");
+      logControlPanel("qa:run", {
+        source: "page-probe",
+        screenId,
+        pass: false,
+      });
+      return {
+        pass: false,
+        screenId,
+        checks,
+        url: typeof window !== "undefined" ? window.location.href : undefined,
+      };
+    }
+    logAgentTestingOverlay("PASS  overlay-arm — BR panel visible");
+    checks.push({ id: "overlay-arm", pass: true, detail: "BR panel visible" });
+    logAgentTestingOverlay(`probe: ${screenId}`);
+
     if (!steps) {
       const detail = `no probe recipe for screen "${screenId}"`;
       logStep("probe-recipe", false, detail);
@@ -479,7 +591,16 @@ export async function runMcpPageProbe(
     }
 
     for (const step of steps) {
-      checks.push(await runProbeStep(step));
+      const result = await runProbeStep(step);
+      checks.push(result);
+      // Hard stop if overlay disappeared mid-run.
+      if (
+        !result.pass &&
+        typeof result.detail === "string" &&
+        /overlay/i.test(result.detail)
+      ) {
+        break;
+      }
     }
 
     const urlScreen = parseStudioUrl().screenId;

@@ -232,6 +232,7 @@ function ServiceTile({
   wishlisted,
   staggerMs,
   reveal,
+  probeBelowFold,
   onToggleWishlist,
   onBookNow,
   onQuickView,
@@ -241,6 +242,8 @@ function ServiceTile({
   wishlisted: boolean;
   staggerMs?: number;
   reveal?: boolean;
+  /** Last-tile marker for MCP below-fold scroll prove. */
+  probeBelowFold?: boolean;
   onToggleWishlist: () => void;
   onBookNow: () => void;
   onQuickView: () => void;
@@ -323,6 +326,9 @@ function ServiceTile({
               className="plp__tertiary"
               data-name="component.input.button"
               data-studio-quick-view="true"
+              {...(probeBelowFold
+                ? { "data-studio-probe-below-fold": "true" }
+                : {})}
               onClick={onQuickView}
             >
               <span className="plp__tertiary-icon" data-name="icon=view">
@@ -893,6 +899,7 @@ export function PlpScreen({
                     const wishlisted =
                       wishlistTick >= 0 && isInWishlist(wishId);
                     const staggerMs = Math.min(tileIndex, 8) * 50;
+                    const isLastTile = tileIndex === displayItems.length - 1;
                     return (
                       <ServiceTile
                         key={item.id}
@@ -903,6 +910,7 @@ export function PlpScreen({
                           listingPhase === "reveal" ? staggerMs : undefined
                         }
                         reveal={listingPhase === "reveal"}
+                        probeBelowFold={isLastTile && displayItems.length > 1}
                         onToggleWishlist={() => {
                           toggleWishlist(wishId);
                           setWishlistTick((n) => n + 1);

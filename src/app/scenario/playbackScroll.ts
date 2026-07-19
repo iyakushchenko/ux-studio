@@ -74,6 +74,112 @@ function computeDuration(distance: number, durationMs?: number): number {
 /** Demo robot targets — slightly longer, always centers the CTA in the pane. */
 export const DEMO_TARGET_SCROLL_ALIGN: PlaybackScrollAlign = "center";
 export const DEMO_TARGET_SCROLL_PADDING = 88;
+/** Extra bottom inset so targets clear the BR AGENT TESTING panel. */
+export const AGENT_TESTING_SCROLL_BOTTOM_PAD = 200;
+
+/** True when the target is comfortably inside the prototype scroll viewport. */
+export function isDemoTargetInPrototypeView(
+  target: HTMLElement,
+  options?: {
+    scrollEl?: HTMLElement | null;
+    paddingTop?: number;
+    paddingBottom?: number;
+  }
+): boolean {
+  const scrollEl = options?.scrollEl ?? getPrototypeScrollRoot(target);
+  if (!scrollEl || !target.isConnected) return false;
+  const padTop = options?.paddingTop ?? DEMO_TARGET_SCROLL_PADDING;
+  const padBottom =
+    options?.paddingBottom ??
+    (isAgentTestingScrollPadActive()
+      ? AGENT_TESTING_SCROLL_BOTTOM_PAD
+      : DEMO_TARGET_SCROLL_PADDING);
+  const rootRect = scrollEl.getBoundingClientRect();
+  const targetRect = target.getBoundingClientRect();
+  if (targetRect.width < 2 || targetRect.height < 2) return false;
+  return (
+    targetRect.top >= rootRect.top + padTop &&
+    targetRect.bottom <= rootRect.bottom - padBottom &&
+    targetRect.left < rootRect.right &&
+    targetRect.right > rootRect.left
+  );
+}
+
+function isAgentTestingScrollPadActive(): boolean {
+  if (typeof document === "undefined") return false;
+  if (document.documentElement.dataset.studioAgentTesting === "true") return true;
+  const root = document.getElementById("agent-testing-overlay");
+  return root?.dataset.active === "true" || root?.dataset.settling === "true";
+}
+
+function demoScrollPadding(): number {
+  return isAgentTestingScrollPadActive()
+    ? AGENT_TESTING_SCROLL_BOTTOM_PAD
+    : DEMO_TARGET_SCROLL_PADDING;
+}
+
+/**
+ * Scroll the prototype root so the PO can see the robo-cursor target.
+ * Prefers eased scroll; snaps if still out of view (agent-testing / below-fold).
+ */
+export async function revealDemoTargetForAgent(
+  target: HTMLElement,
+  options?: PlaybackScrollOptions & {
+    scrollEl?: HTMLElement;
+    align?: PlaybackScrollAlign;
+    /** Force instant snap (no eased camera). */
+    instant?: boolean;
+  }
+): Promise<{ scrolled: boolean; inView: boolean }> {
+  const scrollEl = options?.scrollEl ?? getPrototypeScrollRoot(target);
+  if (
+    !scrollEl ||
+    !target.isConnected ||
+    shouldSkipPrototypePageScroll(target, scrollEl)
+  ) {
+    return {
+      scrolled: false,
+      inView: isDemoTargetInPrototypeView(target, { scrollEl }),
+    };
+  }
+
+  const padding = demoScrollPadding();
+  const align = options?.align ?? DEMO_TARGET_SCROLL_ALIGN;
+  const alreadyInView = isDemoTargetInPrototypeView(target, {
+    scrollEl,
+    paddingTop: DEMO_TARGET_SCROLL_PADDING,
+    paddingBottom: padding,
+  });
+  if (alreadyInView && !options?.instant) {
+    return { scrolled: false, inView: true };
+  }
+
+  if (options?.instant) {
+    snapDemoTargetIntoView(target, { scrollEl, align, padding });
+  } else {
+    await animateDemoTargetIntoView(target, {
+      ...options,
+      scrollEl,
+      align,
+      padding,
+    });
+  }
+
+  let inView = isDemoTargetInPrototypeView(target, {
+    scrollEl,
+    paddingTop: DEMO_TARGET_SCROLL_PADDING,
+    paddingBottom: padding,
+  });
+  if (!inView) {
+    snapDemoTargetIntoView(target, { scrollEl, align, padding });
+    inView = isDemoTargetInPrototypeView(target, {
+      scrollEl,
+      paddingTop: Math.min(48, DEMO_TARGET_SCROLL_PADDING),
+      paddingBottom: Math.min(96, padding),
+    });
+  }
+  return { scrolled: true, inView };
+}
 
 export function computeDemoScrollDuration(distance: number): number {
   return Math.min(1200, Math.max(720, Math.abs(distance) * 0.82));
@@ -98,7 +204,7 @@ export async function animateDemoTargetIntoView(
   if (isAborted(options)) return;
 
   const align = options?.align ?? DEMO_TARGET_SCROLL_ALIGN;
-  const padding = options?.padding ?? DEMO_TARGET_SCROLL_PADDING;
+  const padding = options?.padding ?? demoScrollPadding();
   const targetTop = computeScrollTopForElement(scrollEl, target, align, padding);
   const distance = Math.abs(targetTop - scrollEl.scrollTop);
   const durationMs =
@@ -126,7 +232,7 @@ export function snapDemoTargetIntoView(
   if (!scrollEl || shouldSkipPrototypePageScroll(target, scrollEl)) return;
 
   const align = options?.align ?? DEMO_TARGET_SCROLL_ALIGN;
-  const padding = options?.padding ?? DEMO_TARGET_SCROLL_PADDING;
+  const padding = options?.padding ?? demoScrollPadding();
   const targetTop = computeScrollTopForElement(scrollEl, target, align, padding);
   const maxScroll = Math.max(0, scrollEl.scrollHeight - scrollEl.clientHeight);
   scrollEl.scrollTop = Math.min(Math.max(0, targetTop), maxScroll);
@@ -163,13 +269,25 @@ export async function beginDemoTargetPageScroll(
   }
 
   const align = options?.align ?? DEMO_TARGET_SCROLL_ALIGN;
-  const padding = options?.padding ?? DEMO_TARGET_SCROLL_PADDING;
+  const padding = options?.padding ?? demoScrollPadding();
   const targetTop = computeScrollTopForElement(scrollEl, target, align, padding);
   const distance = Math.abs(targetTop - scrollEl.scrollTop);
   const durationMs =
     options?.durationMs ?? computeDemoScrollDuration(distance);
 
   if (distance < 2) {
+    // Still snap if the element is clipped (padding / BR panel) even when
+    // center-delta is tiny — keeps below-fold + agent-testing reveals honest.
+    if (
+      !isDemoTargetInPrototypeView(target, {
+        scrollEl,
+        paddingTop: DEMO_TARGET_SCROLL_PADDING,
+        paddingBottom: padding,
+      })
+    ) {
+      snapDemoTargetIntoView(target, { scrollEl, align, padding });
+      return { durationMs: 0, scrollPromise: Promise.resolve() };
+    }
     return { durationMs: 0, scrollPromise: Promise.resolve() };
   }
 

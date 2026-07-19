@@ -139,6 +139,10 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 | MCP page probe: **scroll-into-view** before interact; **overlay must be visible on every probe** — FAIL if absent | Quinn, Finn, Ben | LESSONS 2026-07-19 (MCP probe visibility) |
 | Team knowledge database + mandatory use | Arch, all | This file · TEAM.md § Knowledge use |
 
+**Knowledge improved** (2026-07-19 · stream: MCP probe scroll + overlay · SHA a6a686e · v0.0.16):
+- Finn (FE): `revealDemoTargetForAgent` + demo-click `scroll: true`; abandon settle without deferred reload; exclude `RunMcpPageProbe` from helper nest-arm — applied: code
+- Quinn (QA): `overlay-arm` + `plp-below-fold-scroll` reveal step; overlay missing = FAIL every step — applied: probe recipe + RECORDING.md · MCP PLP prove PASS
+
 ---
 
 ## How to maintain

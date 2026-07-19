@@ -440,6 +440,20 @@ function cancelSettle(instantReload?: boolean): void {
   }
 }
 
+/**
+ * Abandon DONE/SITREP to re-arm a new session — never fire a deferred reload
+ * from the previous stop({ reload: true }). That race left PO with "no overlay"
+ * after a mid-settle start/touch (page reloaded / panel stayed display:none).
+ */
+function abandonSettleForRearch(): void {
+  settleReload = false;
+  settleResetToHub = false;
+  settling = false;
+  clearSettleTimer();
+  dismissRoboCursor();
+  teardownDom();
+}
+
 function enterSettle(options?: StopAgentTestingOverlayOptions): void {
   const settleMs = clampSettleMs(options?.settleMs);
   settleReload = !!options?.reload;
@@ -480,7 +494,7 @@ function enterSettle(options?: StopAgentTestingOverlayOptions): void {
 }
 export function startAgentTestingOverlay(title?: string): void {
   if (settling) {
-    cancelSettle(false);
+    abandonSettleForRearch();
   }
   nest += 1;
   active = true;
@@ -506,6 +520,45 @@ export function startAgentTestingOverlay(title?: string): void {
     logLines = [];
     logAgentTestingOverlay("overlay start");
   }
+  // DOM visibility gate — re-stamp if ensureRoot raced / orphan teardown.
+  ensureAgentTestingOverlayDomArmed(resolved);
+}
+
+/**
+ * True when the BR panel is painted (data-active / settling) — not only the JS flag.
+ */
+export function isAgentTestingOverlayDomVisible(): boolean {
+  if (typeof document === "undefined") return false;
+  const root = document.getElementById(ROOT_ID);
+  if (!root) return false;
+  return root.dataset.active === "true" || root.dataset.settling === "true";
+}
+
+/**
+ * Force the BR panel into the painted active state. Safe to call every probe start.
+ */
+export function ensureAgentTestingOverlayDomArmed(title?: string): boolean {
+  if (typeof document === "undefined") return false;
+  const resolved = resolveAgentTestingOverlayTitle(title ?? sessionTitle);
+  const root = ensureRoot();
+  if (!root) return false;
+  active = true;
+  settling = false;
+  root.dataset.active = "true";
+  root.dataset.settling = "false";
+  document.documentElement.dataset.studioAgentTesting = "true";
+  setTitle(resolved);
+  if (!root.querySelector(".studio-agent-testing-overlay__panel")) {
+    // Corrupt orphan — rebuild.
+    root.remove();
+    const rebuilt = ensureRoot();
+    if (!rebuilt) return false;
+    rebuilt.dataset.active = "true";
+    rebuilt.dataset.settling = "false";
+    document.documentElement.dataset.studioAgentTesting = "true";
+    setTitle(resolved);
+  }
+  return isAgentTestingOverlayDomVisible();
 }
 export function stopAgentTestingOverlay(
   options?: StopAgentTestingOverlayOptions
@@ -558,7 +611,7 @@ export function stopAgentTestingOverlay(
  */
 export function touchAgentTestingOverlay(title?: string): void {
   if (settling) {
-    cancelSettle(false);
+    abandonSettleForRearch();
   }
   if (active) {
     noteActivity();
@@ -566,6 +619,10 @@ export function touchAgentTestingOverlay(title?: string): void {
     if (title?.trim()) {
       sessionTitle = resolved;
       setTitle(resolved);
+    }
+    // Repair invisible DOM (HMR / orphan teardown / z-index race).
+    if (!isAgentTestingOverlayDomVisible()) {
+      ensureAgentTestingOverlayDomArmed(resolved);
     }
     return;
   }

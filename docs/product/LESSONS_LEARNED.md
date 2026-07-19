@@ -18,7 +18,7 @@ Agents **must read** this file before claiming a UI or Studio-chrome slice done.
   1. Before every probe interact (hover/click/type): **`scrollIntoView`** (or equivalent) so the target is in the prototype viewport — note `scroll-into-view` in cursor/probe diagnostics when used.
   2. **Agent testing overlay must be visible** for the **entire** probe run (start → each step PASS/FAIL → sitrep/stop). If overlay is absent/hidden at any probe step → that step and the probe **FAIL** (do not continue as PASS).
   3. Prefer `__studioRunMcpPageProbe` so robo-cursor + overlay sitrep are mandatory; Quinn cites overlay-visible + scroll in the MCP evidence log.
-  4. Coordinate Quinn/Finn on implementation — do not clobber parallel overlay/scroll ships; lesson lands in docs first; code gate follows same ship when they land.
+  4. **Code gate shipped:** `revealDemoTargetForAgent` + probe `overlay-arm` / `plp-below-fold-scroll`; mid-sitrep re-arm must not fire deferred reload; `RunMcpPageProbe` excluded from helper nest-arm. See [RECORDING.md](../shell/RECORDING.md).
 - **Process:** Index in [TEAM_KNOWLEDGE.md](./TEAM_KNOWLEDGE.md); Quinn re-reads this before every MCP prove. Arch rejects PROVEN without overlay-visible evidence.
 
 ### Team knowledge must be used, not only written (PO)
