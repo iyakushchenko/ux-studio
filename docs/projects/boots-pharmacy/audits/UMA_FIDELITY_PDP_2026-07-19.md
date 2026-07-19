@@ -26,7 +26,7 @@
 | **§0b RTB vertical rhythm** | **PASS** — carried from v0.0.24 measure (`32px` stack; title-block `72px`) |
 | **P2 share glyph Make flip** | **PASS** — carried from v0.0.24 MCP matrix |
 | **PO green-light allowed?** | **No** — wait PO `+` before Home (Final Pass HARD-GREEN restored) |
-| **PAGE FINAL PASS** | **HARD-GREEN** @ tip `48f2016` |
+| **PAGE FINAL PASS** | **HARD-GREEN** @ tip `57775a3` / v0.0.36 |
 | **Arch Final Pass after Quinn?** | **Done** — Uma §0a + Quinn 23/23 → Arch HARD-GREEN restored |
 
 **Honest residuals:**  
@@ -178,7 +178,7 @@
 | Residual | Severity | Owner |
 |----------|----------|-------|
 | Download CTAs have no file URLs | **Accepted Make parity** — buttons only until assets exist | PO / Pax |
-| PAGE FINAL PASS / `mcpFinalPass` | **HARD-GREEN** @ `48f2016` | Arch |
+| PAGE FINAL PASS / `mcpFinalPass` | **HARD-GREEN** @ `57775a3` | Arch |
 | FAQ Bea-sourced bodies (3 panels) | **Accepted** — PO ask; register documents Make header-only gap | Bea / PO |
 
 ---
@@ -223,7 +223,7 @@ Uma (UI/UX): FAQ Accordion UXDS — PASS (6/6 bodies; grid-template-rows motion 
 Uma (UI/UX): Find out more — PASS (TertiaryCta soft; no .pdp__pill--mint; DEV-20260719-tertiary-soft)
 Uma (UI/UX): download CTA tertiary unify — PASS (carried v0.0.28)
 Uma (UI/UX): share glyph Make flip — PASS (carried v0.0.24)
-Uma (UI/UX): Arch Final Pass — HARD-GREEN retained @ 48f2016 (Uma §0a + Quinn 23/23)
+Uma (UI/UX): Arch Final Pass — HARD-GREEN restored @ 57775a3 / v0.0.36 (Uma §0a + Quinn 23/23)
 ```
 
 **Knowledge used:** UMA_FIDELITY_NOTES §0/§0a/**§0b** · VISUAL_FIDELITY · DS_STRICTNESS · PDP_MAKE_PARITY_REGISTER L18–L20 · UXDS Accordion kit (`accordion.css` grid rows) · `TertiaryCta soft` · DEVIATIONS `DEV-20260719-tertiary-soft` · PAGE_FINAL_PASS.md (Arch after Quinn).

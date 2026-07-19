@@ -57,9 +57,9 @@
       "status": "proven",
       "auditPath": "docs/projects/boots-pharmacy/audits/UMA_FIDELITY_PDP_2026-07-19.md",
       "mcpMatrixAt": {
-        "sha": "841ab32",
+        "sha": "57775a3",
         "date": "2026-07-19",
-        "note": "Quinn MCP 23/23 PASS @ tip 7c7c9e1 / v0.0.32 Motion easeInOut travel (prove 841ab32; reload:false, teardown clean); Uma §0a PROVEN @ 76e2433 (docs 331998b); Arch PAGE FINAL PASS HARD-GREEN retained @ 48f2016 / v0.0.35 (confirm 23/23 after shell tip advance)."
+        "note": "Quinn MCP 23/23 PASS @ tip 57775a3 / v0.0.36 playback panel + cursor lock (reload:false ~27s, teardown clean); Check availability robo hover PASS; Uma §0a PROVEN @ 76e2433 (docs 331998b); Arch PAGE FINAL PASS HARD-GREEN restored @ 57775a3."
       },
       "requireMcp": true
     }

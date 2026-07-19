@@ -12,7 +12,7 @@
 
 Erase-Make **closed for PDP** after PLP HARD-GREEN. Vaccine PDP (`screenId: pdp`, Frame child **8**) is the Traditional CJM bridge between PLP and Book Step 1. Make truth: chickenpox single-SKU RTB + below-fold education bands. React mount follows Book Step 1 / PLP pilot pattern — UXDS + scoped CSS, Make child retired from view, no new LEGACY growth.
 
-**Gate:** PAGE FINAL PASS **HARD-GREEN** @ tip `48f2016` (Quinn 23/23 @ `7c7c9e1` · Uma §0a @ `76e2433`). **Home waits PO `+`.**
+**Gate:** PAGE FINAL PASS **HARD-GREEN** @ tip `57775a3` / v0.0.36 (Quinn 23/23 re-prove · Uma §0a @ `76e2433`). **Home waits PO `+`.**
 
 ## Business logic
 
@@ -66,7 +66,7 @@ Erase-Make **closed for PDP** after PLP HARD-GREEN. Vaccine PDP (`screenId: pdp`
 ## Prove notes (Quinn)
 
 - **MCP matrix** — prior PASS @ `d6e4951` / 22/22 **stale** after FAQ body + CTA + focus ship; Quinn must re-prove (now includes `pdp-faq-help-body` + matched download CTAs)
-- Quinn MCP **PASS** (23/23) — Arch HARD-GREEN retained @ `48f2016`
+- Quinn MCP **PASS** (23/23) — Arch HARD-GREEN restored @ `57775a3` / v0.0.36
 - Register: [PDP_MAKE_PARITY_REGISTER.md](./PDP_MAKE_PARITY_REGISTER.md)
 
 ## Pax

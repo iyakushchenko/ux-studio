@@ -153,7 +153,7 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 | **Fixed localhost + reuse tab** — canonical `http://localhost:5173/`; Vite `strictPort`; one `npm run dev`; Chrome MCP `list_pages`→reuse (`new_page` only if empty); Auto-Rule R11 + felony | Arch, Finn, Ben, Quinn | [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R11 · `vite.config.ts` · LESSONS |
 | **Platform Motion standard** — `framer-motion` via `@/uxds/motion`; remove unused `motion` twin; Accordion stays CSS `0fr/1fr`; shell pilots: diagnostic overlay + studio select; PDP Final Pass not demoted (shell-only) | Arch, Finn, Uma, Ben, Pax | [MOTION.md](./MOTION.md) · `src/uxds/motion/` |
 | **Robo-cursor travel** — Motion `animate` ease-in-out only (no back/overshoot/bounce); cancel via `.stop()` on forceClear; hang caps retained | Finn, Arch, Quinn | [MOTION.md](./MOTION.md) · `demoCursor.ts` · LESSONS bounce gate |
-| **PDP PAGE FINAL PASS** — **HARD-GREEN** @ `48f2016` / v0.0.35 (Quinn 23/23 @ `7c7c9e1` / prove `841ab32` · Uma §0a @ `76e2433`; Arch confirm after shell `042dbaf`+scrollbar) | Arch, Finn, Uma, Quinn, Ben, Pax | PAGE_FINAL_PASS.json · FE_AUDIT_PDP_MCP · FE_AUDIT_PDP_PAGE_FINAL_PASS · check:page-final-pass |
+| **PDP PAGE FINAL PASS** — **HARD-GREEN** @ `57775a3` / v0.0.36 (Quinn 23/23 re-prove after playback panel + cursor lock · Uma §0a @ `76e2433`; prior stamp `48f2016` demoted NEEDS-REPROVE then restored) | Arch, Finn, Uma, Quinn, Ben, Pax | PAGE_FINAL_PASS.json · FE_AUDIT_PDP_MCP · FE_AUDIT_PDP_PAGE_FINAL_PASS · check:page-final-pass |
 | **PDP Motion travel re-prove** — Quinn MCP **PASS** 23/23 @ `7c7c9e1` / v0.0.32; teardown clean; Uma §0a still PROVEN @ `76e2433` | Quinn, Arch, Finn, Uma | FE_AUDIT_PDP_MCP · PAGE_FINAL_PASS mcpFinalPass HARD-GREEN |
 | **PDP hang-guard re-prove** — Quinn MCP **PASS** 23/23 @ `7bce2b3` / v0.0.31 (superseded MCP stamp by `7c7c9e1`) | Quinn, Arch, Finn, Uma | FE_AUDIT_PDP_MCP · PAGE_FINAL_PASS mcpFinalPass PASS |
 | **PDP FAQ 6/6 + Accordion motion + TertiaryCta soft** — Uma §0a PROVEN + Quinn MCP **PASS** 23/23 @ `76e2433` / v0.0.30 (superseded MCP stamp by `7bce2b3`) | Uma, Quinn, Arch, Finn | UMA_FIDELITY_PDP · FE_AUDIT_PDP_MCP · PAGE_FINAL_PASS mcpFinalPass PASS · DEV-20260719-tertiary-soft |
@@ -186,6 +186,12 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 - Ben (BE): R10 ratchet “everywhere not chat-only”; Vitest `:is()` + PDP secondary; patch bump — applied: STUDIO_AUTO_RULES + tests + LESSONS
 - Quinn (QA): MCP prove Check availability bg/border + Book now + popup close — applied: `__studioProveRoboCursorFeedback` border check
 - Arch (Director): shell-only; does not demote PDP Final Pass product matrix — applied: TEAM_KNOWLEDGE
+
+**Knowledge improved** (2026-07-19 · stream: PDP PAGE FINAL PASS HARD-GREEN restored · tip 57775a3 · v0.0.36):
+- Arch (Director): tip `57775a3` / v0.0.36 (playback panel + cursor lock) past HARD-GREEN @ `48f2016` → honest NEEDS-REPROVE → Quinn 23/23 → restore HARD-GREEN; veto Home until PO `+` — applied: PAGE_FINAL_PASS.json tip 57775a3 + FE_AUDIT_PDP_* + NEXT_STEPS 3e
+- Quinn (QA): full PDP MCP `reload:false` 23/23 ~27s; teardown assert PASS; playback panel present; Check availability robo hover PASS — applied: FE_AUDIT_PDP_MCP
+- Uma (UI/UX): §0a remains PROVEN @ `76e2433` — shell tips do not reopen FAQ/Accordion — applied: no re-open
+- Pax (PO sim): sequencing unblocked ≠ start Home — applied: wait PO `+`
 
 **Knowledge improved** (2026-07-19 · stream: PDP PAGE FINAL PASS HARD-GREEN retained · tip 48f2016 · v0.0.35):
 - Arch (Director): shell tip advance (robo hover `042dbaf` / v0.0.34 + scrollbar `48f2016` / v0.0.35) → quick confirm 23/23; retain HARD-GREEN; veto Home until PO `+` — applied: PAGE_FINAL_PASS.json tip 48f2016 + FE_AUDIT_PDP_PAGE_FINAL_PASS + NEXT_STEPS 3e
