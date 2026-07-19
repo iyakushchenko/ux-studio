@@ -50,7 +50,7 @@ Aliases accepted on parse: `book-step2` → `book-step-2`, `onboarding` → `hub
 
 | `modal` | Surface | Opened from |
 |---------|---------|-------------|
-| `choose-pharmacy` | Availability / Choose Pharmacy (`.studio-avail-scrim`, `data-studio-modal`) | Book Step 1 Continue (no location), Search / Near me / Change location, journey beats |
+| `choose-pharmacy` | Availability / Choose Pharmacy (`.studio-avail-scrim`, `data-studio-modal`) | PDP Check availability, Book Step 1 Continue (no location), Search / Near me / Change location, journey beats |
 | `quick-view` | PLP Quick View lightbox | PLP tile Quick View CTA (single-SKU chickenpox RTB today; optional `&jab=` later if multi-SKU) |
 | `login` | Login / Create account | Header Sign in, PDP / Quick View account CTAs, Check availability when logged out |
 | `vaccine-picker` | Vaccine picker | Book Step 1 / 2 Change vaccine |

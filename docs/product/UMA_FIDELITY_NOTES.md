@@ -146,3 +146,13 @@ When **team check** runs, Uma must report:
 `Uma (UI/UX): typical DS checks (state matrix) — PASS | FAIL`
 
 Ship cannot be “done” if Uma reports **FAIL** on any of these lines.
+
+---
+
+## Screen stamps (per-page kickoff / audit)
+
+Kickoff fidelity targets live under `docs/projects/<id>/audits/UMA_FIDELITY_<SCREEN>_*.md` — **not PROVEN** until full mount + MCP matrix.
+
+| Screen | Stamp | Status |
+|--------|-------|--------|
+| **PDP** (`pdp`) | [../projects/boots-pharmacy/audits/UMA_FIDELITY_PDP_2026-07-19.md](../projects/boots-pharmacy/audits/UMA_FIDELITY_PDP_2026-07-19.md) | **IN PROGRESS** (kickoff) — loading LE1–LE3 **N/A**; B1 accordion **static**; L1–L20 + DS matrix stamped for Finn scaffold |

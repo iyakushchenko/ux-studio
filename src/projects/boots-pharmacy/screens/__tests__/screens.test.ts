@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+  INDEX_PDP,
+  INDEX_PLP,
   PROJECT_SCREENS,
   studioNavIndex,
   studioScreenAtTab,
@@ -40,13 +42,17 @@ describe("PROJECT_SCREENS", () => {
     expect(new Set(indices).size).toBe(indices.length);
   });
 
-  it("exposes stable screenId deep-link keys for book flow + home", () => {
+  it("exposes stable screenId deep-link keys for catalog + book flow", () => {
     const byId = Object.fromEntries(
       PROJECT_SCREENS.map((s) => [s.screenId, s.childIndex])
     );
     expect(byId.home).toBe(11);
+    expect(byId.plp).toBe(9);
+    expect(byId.pdp).toBe(8);
     expect(byId["book-step-1"]).toBe(7);
     expect(byId["book-step-2"]).toBe(4);
     expect(byId["book-step-3"]).toBe(3);
+    expect(PROJECT_SCREENS[INDEX_PLP]?.screenId).toBe("plp");
+    expect(PROJECT_SCREENS[INDEX_PDP]?.screenId).toBe("pdp");
   });
 });

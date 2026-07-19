@@ -2,9 +2,9 @@
 
 **Project:** `boots-pharmacy`  
 **Callsigns:** Bea (BA) · Finn (FE) · Uma (UI/UX) · Quinn (QA) · Pax (PO sim) · Arch (Director)  
-**Status:** ready (register first-cut)  
+**Status:** scaffold mounted (not PROVEN / not Final Pass)  
 **Updated:** 2026-07-19  
-**Refs:** [BOOTS_REACT_SCREEN_PILOT.md](../BOOTS_REACT_SCREEN_PILOT.md) · [PDP_MAKE_PARITY_REGISTER.md](./PDP_MAKE_PARITY_REGISTER.md) · [PLP_REACT.md](./PLP_REACT.md) · [PAGE_FINAL_PASS.md](../../../product/PAGE_FINAL_PASS.md) · [NEXT_STEPS.md](../../../product/NEXT_STEPS.md)
+**Refs:** [BOOTS_REACT_SCREEN_PILOT.md](../BOOTS_REACT_SCREEN_PILOT.md) · [PDP_MAKE_PARITY_REGISTER.md](./PDP_MAKE_PARITY_REGISTER.md) · [PLP_REACT.md](./PLP_REACT.md) · [PAGE_FINAL_PASS.md](../../../product/PAGE_FINAL_PASS.md) · [NEXT_STEPS.md](../../../product/NEXT_STEPS.md) · Uma [../audits/UMA_FIDELITY_PDP_2026-07-19.md](../audits/UMA_FIDELITY_PDP_2026-07-19.md) · Quinn [../audits/QUINN_PDP_PROBE_CRITERIA_2026-07-19.md](../audits/QUINN_PDP_PROBE_CRITERIA_2026-07-19.md)
 
 ---
 
@@ -12,7 +12,7 @@
 
 Erase-Make **next page after PLP HARD-GREEN**. Vaccine PDP (`screenId: pdp`, Frame child **8**) is the Traditional CJM bridge between PLP and Book Step 1. Make truth: chickenpox single-SKU RTB + below-fold education bands. React mount follows Book Step 1 / PLP pilot pattern — UXDS + scoped CSS, Make child retired from view, no new LEGACY growth.
 
-**Gate:** PLP PAGE FINAL PASS **HARD-GREEN** satisfied (2026-07-19). PDP register is first-cut; React not started.
+**Gate:** PLP PAGE FINAL PASS **HARD-GREEN** satisfied (2026-07-19). React scaffold L1–L13 mounted; below-fold + Quinn MCP + Uma PROVEN still open.
 
 ## Business logic
 
@@ -33,15 +33,15 @@ Erase-Make **next page after PLP HARD-GREEN**. Vaccine PDP (`screenId: pdp`, Fra
 
 ## Acceptance (Bea → Quinn)
 
-- [ ] React host mounts at child 8; Make direct children retired (`data-studio-make-retired=pdp`)
-- [ ] Make wire effects for PDP (CTAs, booster, toggle, hearts, login links, crumb) early-return when React mounted
-- [ ] URL `?project=boots-pharmacy&screen=pdp` restores tab; recording `kind: "screen"` `pdp` unchanged
-- [ ] No new styles in `globals-screens` LEGACY for React path — `screens/pdp/*.css` + UXDS + theme only
-- [ ] Scaffold P0 bands L1–L13 + interactions I5–I12, I8–I10 per register
-- [ ] Modal URL sync: `login`, `choose-pharmacy` from PDP CTAs ([URL.md](../../../shell/URL.md))
-- [ ] PAGE FINAL PASS: landmarks `header`+`main`, BEM=`pdp`, `check:page-final-pass` green
-- [ ] `npm test` + build green; Uma audit **not PROVEN** until full matrix + below-fold bands
-- [ ] Honest residual: Make Frame child 8 in DOM until delete phase; accordion B1 if static-only
+- [x] React host mounts at child 8; Make direct children retired (`data-studio-make-retired=pdp`)
+- [x] Make wire effects for PDP (CTAs, booster, toggle, hearts, login links, crumb) early-return when React mounted
+- [x] URL `?project=boots-pharmacy&screen=pdp` restores tab; recording `kind: "screen"` `pdp` unchanged
+- [x] No new styles in `globals-screens` LEGACY for React path — `screens/pdp/*.css` + UXDS + theme only
+- [x] Scaffold P0 bands L1–L13 + interactions I5–I12, I8–I10 per register
+- [x] Modal URL sync: `login`, `choose-pharmacy` from PDP CTAs ([URL.md](../../../shell/URL.md)) — wire reuses existing modals
+- [ ] PAGE FINAL PASS: landmarks `header`+`main`, BEM=`pdp` present in scaffold; stamp + `check:page-final-pass` after Quinn MCP
+- [x] `npm test` green on scaffold; Uma audit **not PROVEN** until full matrix + below-fold bands
+- [ ] Honest residual: Make Frame child 8 in DOM until delete phase; accordion B1 if static-only; L14–L20 missing
 
 ## Chrome / fidelity (Uma)
 

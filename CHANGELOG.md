@@ -2,6 +2,10 @@
 
 > _Append a bullet on coherent commits via `npm run notes:append -- --lane="<lane>" --intent="<text>"`. Preview with `npm run notes:preview`. On `npm run release:patch` this section is promoted to `## v<X.Y.Z> - DDMMYY` and a fresh empty `## Current` is re-inserted. Policy: `docs/product/VERSIONING.md`._
 
+## v0.0.21 - 190726
+- **project:** PDP React scaffold: mount child 8, retire Make, RTB L1-L13 (booster/price/CTAs/wishlist/Advantage)
+- **docs:** PDP Make parity register + Uma fidelity kickoff + Quinn probe criteria prep
+
 ## v0.0.20 - 190726
 - **shell:** Agent testing overlay: pre-arm preparing countdown, PASS/FAIL sitrep badge, forceClear hard-remove + ensure-clear failsafe
 - **shell:** agent overlay pre-arm + PASS/FAIL sitrep + forceClear cancels reload; page probe reload:false default (crash-safe)

@@ -123,6 +123,11 @@ import {
   mountPlpScreen,
   unmountPlpScreen,
 } from "@/projects/boots-pharmacy/screens/plp/mountPlpScreen";
+import {
+  isPdpReactMounted,
+  mountPdpScreen,
+  unmountPdpScreen,
+} from "@/projects/boots-pharmacy/screens/pdp/mountPdpScreen";
 
 /**
  * DOM child order inside Frame219's root div (JSX order = DOM order):
@@ -1568,6 +1573,48 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     return () => unmountPlpScreen();
   }, []);
 
+  // PDP — React + UXDS migration (retires Make HTML for this screen only)
+  useLayoutEffect(() => {
+    if (SCREENS[current]?.childIndex !== 8) {
+      unmountPdpScreen();
+      return;
+    }
+
+    mountPdpScreen({
+      includeBoosterDose,
+      onToggleBooster: () => setIncludeBoosterDose((prev) => !prev),
+      onBookNow: () => {
+        if (!isHeaderLoggedIn() && !loggedInFlag) {
+          openLoginPopup("signin");
+          return;
+        }
+        setCurrent(INDEX_BOOK_STEP1);
+      },
+      onCheckAvailability: () => openAvailabilityTool(AVAIL_INTENT.browse),
+      onGoPlp: () => goRef.current(INDEX_PLP),
+      onGoHome: () => goRef.current(INDEX_HOME),
+      onOpenLogin: (tab) => openLoginPopup(tab),
+      loggedIn: loggedInFlag || isHeaderLoggedIn(),
+    });
+
+    setupFooters({
+      onGoToPlp: () => goRef.current(INDEX_PLP),
+    });
+  }, [
+    current,
+    includeBoosterDose,
+    loggedInFlag,
+    INDEX_HOME,
+    INDEX_PLP,
+    INDEX_BOOK_STEP1,
+    openAvailabilityTool,
+    openLoginPopup,
+  ]);
+
+  useEffect(() => {
+    return () => unmountPdpScreen();
+  }, []);
+
   // Book – Step 1 (child 7): breadcrumb rewrite — Make path only
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 7) return;
@@ -2222,6 +2269,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   // PDP (child 8) — Check availability → Availability Tool; Book now → Step 1
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 8) return;
+    if (isPdpReactMounted()) return;
     const screen = document.querySelector(
       ".studio-viewport > div > div:nth-child(8)"
     ) as HTMLElement | null;
@@ -2291,6 +2339,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   // PDP (child 8) — "Quick Sign In" / "Create Boots Account" links → login popup
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 8) return;
+    if (isPdpReactMounted()) return;
     const screen = document.querySelector(
       ".studio-viewport > div > div:nth-child(8)"
     ) as HTMLElement | null;
@@ -2347,12 +2396,15 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     const hearts = viewport.querySelectorAll<HTMLElement>('[data-name="icon=add to wishlist"]');
     const handlers: Array<[HTMLElement, () => void]> = [];
     const plpReact = isPlpReactMounted();
+    const pdpReact = isPdpReactMounted();
 
     hearts.forEach((heart, i) => {
       // PDP / Quick View chickenpox heart uses PDP_WISHLIST_ID (cross-experience).
       if (heart.closest('[data-name="module.pdp.rtb"]')) return;
       // React PLP tiles — skip Make wire (handlers live in PlpScreen).
       if (plpReact && heart.closest('[data-studio-react-screen="plp"]')) return;
+      // React PDP heart — skip Make wire (handler lives in PdpScreen).
+      if (pdpReact && heart.closest('[data-studio-react-screen="pdp"]')) return;
 
       const btn = heart.closest('[data-name="component.input.button"]') as HTMLElement | null;
       const target = btn || heart;
@@ -4180,10 +4232,12 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       wireBoosterCheckbox(page5);
     }
 
-    const pdpScreen = document.querySelector(
-      ".studio-viewport > div > div:nth-child(8)"
-    ) as HTMLElement | null;
-    wireBoosterCheckbox(pdpScreen, { isPdp: true });
+    if (!isPdpReactMounted()) {
+      const pdpScreen = document.querySelector(
+        ".studio-viewport > div > div:nth-child(8)"
+      ) as HTMLElement | null;
+      wireBoosterCheckbox(pdpScreen, { isPdp: true });
+    }
 
     return () => cleanups.forEach((fn) => fn());
   }, [current, chosenLocation]);
@@ -4209,16 +4263,19 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
         ".studio-viewport > div > div:nth-child(7)"
       ) as HTMLElement | null
     );
-    syncRow(
-      document.querySelector(
-        ".studio-viewport > div > div:nth-child(8)"
-      ) as HTMLElement | null,
-      true
-    );
+    if (!isPdpReactMounted()) {
+      syncRow(
+        document.querySelector(
+          ".studio-viewport > div > div:nth-child(8)"
+        ) as HTMLElement | null,
+        true
+      );
+    }
   }, [includeBoosterDose, current]);
 
   // PDP — keep checkbox section white; sync Book now price from shared booster state
   useEffect(() => {
+    if (isPdpReactMounted()) return;
     const screen = document.querySelector(
       ".studio-viewport > div > div:nth-child(8)"
     ) as HTMLElement | null;
@@ -4268,6 +4325,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   // We tag each tab with data-toggle-index so CSS can apply the correct 3-sided
   // border (no shared inner edge) to whichever tab is inactive.
   useEffect(() => {
+    if (isPdpReactMounted()) return;
     const screen = document.querySelector(
       ".studio-viewport > div > div:nth-child(8)"
     ) as HTMLElement | null;
@@ -4316,6 +4374,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   useEffect(() => {
     syncChickenpoxWishlistHearts();
 
+    if (isPdpReactMounted()) return;
     const screen = document.querySelector(
       ".studio-viewport > div > div:nth-child(8)"
     ) as HTMLElement | null;
