@@ -139,7 +139,7 @@ const PLP_COUNTRY_CATALOG = [
 ] as const;
 
 /** Top travel countries per PLP region filter label (up to 10 each). */
-const PLP_TRAVEL_COUNTRIES_BY_REGION: Record<string, readonly string[]> = {
+export const PLP_TRAVEL_COUNTRIES_BY_REGION: Record<string, readonly string[]> = {
   Europe: [
     "France",
     "Spain",
@@ -532,7 +532,8 @@ function inferCountriesFromText(text: string): string[] {
   return found;
 }
 
-function getPlpCountryCandidates(selectedRegions: string[]): string[] {
+/** Make wire — region selection narrows the By Country candidate pool. */
+export function getPlpCountryCandidates(selectedRegions: string[]): string[] {
   if (selectedRegions.length) {
     const set = new Set<string>();
     for (const region of selectedRegions) {

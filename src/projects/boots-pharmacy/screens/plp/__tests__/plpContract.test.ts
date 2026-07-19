@@ -4,12 +4,17 @@ import {
   PROJECT_SCREENS,
 } from "@/projects/boots-pharmacy/screens/screens";
 import {
+  getPlpCountryCandidates,
+  PLP_TRAVEL_COUNTRIES_BY_REGION,
+} from "@/projects/boots-pharmacy/data/plpListing";
+import {
   DEFAULT_PLP_FILTERS,
   PLP_COUNTRY_OPTIONS,
   PLP_FILTER_LIST_MAX,
   PLP_LISTING_LOAD_MS,
   capPlpFilterOptionList,
   collectPlpActiveFilterChips,
+  collectPlpCountryFilterLabels,
   countPlpFacetOption,
   filterOptionList,
   filterPlpCatalog,
@@ -118,6 +123,45 @@ describe("plpCatalog filters", () => {
       "Thailand"
     );
     expect(thai).toBeGreaterThan(0);
+  });
+
+  it("narrows By Country list when a region is selected (Make cascade)", () => {
+    const europeCandidates = getPlpCountryCandidates(["Europe"]);
+    expect(europeCandidates).toEqual([
+      ...PLP_TRAVEL_COUNTRIES_BY_REGION.Europe,
+    ]);
+    expect(europeCandidates).toContain("France");
+    expect(europeCandidates).not.toContain("Thailand");
+
+    const withEurope = togglePlpFilterValue(
+      DEFAULT_PLP_FILTERS,
+      "regions",
+      "Europe"
+    );
+    const labels = collectPlpCountryFilterLabels(withEurope);
+    expect(labels.length).toBeGreaterThan(0);
+    expect(labels.every((c) => europeCandidates.includes(c))).toBe(true);
+    expect(labels).toContain("France");
+    expect(labels).not.toContain("Thailand");
+
+    // Counters stay on the cascade (score > 0 only).
+    for (const label of labels) {
+      expect(
+        countPlpFacetOption(withEurope, "countries", label)
+      ).toBeGreaterThan(0);
+    }
+  });
+
+  it("clears country selections when region toggles (Make wire)", () => {
+    const withCountry = togglePlpFilterValue(
+      DEFAULT_PLP_FILTERS,
+      "countries",
+      "Thailand"
+    );
+    expect(withCountry.countries).toEqual(["Thailand"]);
+    const withRegion = togglePlpFilterValue(withCountry, "regions", "Europe");
+    expect(withRegion.regions).toEqual(["Europe"]);
+    expect(withRegion.countries).toEqual([]);
   });
 });
 

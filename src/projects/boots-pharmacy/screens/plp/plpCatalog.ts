@@ -1,5 +1,6 @@
 import {
   PLP_BUNDLE_ITEMS,
+  getPlpCountryCandidates,
   type PlpBundleItem,
 } from "@/projects/boots-pharmacy/data/plpListing";
 
@@ -284,8 +285,13 @@ export function togglePlpFilterValue(
   if (key === "ages") {
     return { ...state, allAges: false, ages: next };
   }
+  // Make wire: region change rebuilds country labels and clears country checks.
+  if (key === "regions") {
+    return { ...state, regions: next, countries: [] };
+  }
   return { ...state, [key]: next };
 }
+
 
 export function isPlpFiltersDirty(state: PlpFilterState): boolean {
   if (state.showBundles) return true;
@@ -435,6 +441,30 @@ export function countPlpFacetOption(
   const base = filtersWithoutFacet(state, facet);
   const pool = filterPlpCatalog(base, jabs, bundles);
   return pool.filter((item) => itemMatchesFacet(item, facet, value)).length;
+}
+
+/**
+ * Make `collectPlpCountryFilterLabels` — candidates from
+ * `getPlpCountryCandidates(regions)`, keep score > 0, sort by availability.
+ * Does not slice to `PLP_FILTER_LIST_MAX` (View all / search cap stays in UI).
+ */
+export function collectPlpCountryFilterLabels(
+  state: PlpFilterState,
+  jabs: PlpCatalogItem[] = PLP_JAB_ITEMS,
+  bundles: PlpCatalogItem[] = PLP_BUNDLE_CATALOG
+): string[] {
+  const candidates = getPlpCountryCandidates(state.regions);
+  return candidates
+    .map((country) => ({
+      country,
+      score: countPlpFacetOption(state, "countries", country, jabs, bundles),
+    }))
+    .filter((entry) => entry.score > 0)
+    .sort(
+      (a, b) =>
+        b.score - a.score || a.country.localeCompare(b.country, "en")
+    )
+    .map((entry) => entry.country);
 }
 
 /** By Type radio counters (Individual jabs / Bundles). */

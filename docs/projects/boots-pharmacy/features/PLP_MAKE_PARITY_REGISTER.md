@@ -178,11 +178,11 @@ Disease candidates are **not** narrowed by selected region; region still affects
 | Re-applied after every listing finalize | **L1186**, **L1205** |
 | View all with filled search → clear field | `handlePlpFilterViewAllClick` **L1564–1572** |
 
-### Finn restore notes (no UI in this Bea pass)
+### Finn restore notes
 
-1. **P0 I3b:** Derive country options from `getPlpCountryCandidates(filters.regions)` (+ optional availability score/cap like Make). On region change / candidate-key change → clear `filters.countries` that are no longer candidates (or clear all countries, matching Make L737–738).
-2. **P0 I3c:** When `countPlpFacetOption` / type count is `0`, disable row and drop that value from state; if any drop, re-filter listing (mirror Make double-pass).
-3. **P0 match:** Port or share `jabCoversCountry` for jab country filtering/counts when `item.countries` empty.
+1. **P0 I3b:** **Done** — `collectPlpCountryFilterLabels` + region toggle clears countries; shared wire `getPlpCountryCandidates` / `PLP_TRAVEL_COUNTRIES_BY_REGION`.
+2. **P0 I3c:** When `countPlpFacetOption` / type count is `0`, disable row and drop that value from state; if any drop, re-filter listing (mirror Make double-pass). **Still open.**
+3. **P0 match:** Port or share `jabCoversCountry` for jab country filtering/counts when `item.countries` empty. **Still open** (React curated items all have countries today).
 4. **Do not** invent a second region→country map — reuse `PLP_TRAVEL_COUNTRIES_BY_REGION` from wire.
 5. Wire path remains authoritative until Make child 9 delete; React must match these rules for CJM demos.
 
@@ -193,6 +193,7 @@ Disease candidates are **not** narrowed by selected region; region still affects
 | Item | Localhost | Interaction |
 |------|-----------|-------------|
 | L4 Filter / Reset → spinner **in-band**, **one** “Updating results…” (overlay only), **count hidden**, **no jump**, then **real** count | Required | MCP: `plp-reset-filters` empty count mid-load; `plp-reset-count-ready`; loader once |
+| I3b Region → countries cascade | Required | Check South-East Asia → country list SEA-only; prior country checks cleared; counters remain |
 | I1b Unchecked checkbox/radio mint hover | Required | Hover sidebar filter row |
 | L5 Advantage bar visible + copy | Required | Visual |
 | L10 no tile border | Required | Visual |

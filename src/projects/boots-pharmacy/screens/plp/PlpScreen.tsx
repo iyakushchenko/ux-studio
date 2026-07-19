@@ -22,13 +22,13 @@ import {
 import {
   DEFAULT_PLP_FILTERS,
   PLP_AGE_OPTIONS,
-  PLP_COUNTRY_OPTIONS,
   PLP_DISEASE_OPTIONS,
   PLP_FILTER_LIST_MAX,
   PLP_LISTING_LOAD_MS,
   PLP_REGION_OPTIONS,
   capPlpFilterOptionList,
   collectPlpActiveFilterChips,
+  collectPlpCountryFilterLabels,
   countPlpFacetOption,
   countPlpTypeOption,
   filterOptionList,
@@ -439,10 +439,9 @@ export function PlpScreen({
     PLP_DISEASE_OPTIONS,
     filters.diseaseQuery
   );
-  const countryFiltered = filterOptionList(
-    PLP_COUNTRY_OPTIONS,
-    filters.countryQuery
-  );
+  // Make wire: region selection narrows country candidates (counters kept).
+  const countryPool = collectPlpCountryFilterLabels(filters);
+  const countryFiltered = filterOptionList(countryPool, filters.countryQuery);
   const diseaseQuerying = filters.diseaseQuery.trim().length > 0;
   const countryQuerying = filters.countryQuery.trim().length > 0;
   const diseaseOptions = capPlpFilterOptionList(diseaseFiltered, {
@@ -695,11 +694,12 @@ export function PlpScreen({
                           checked={filters.regions.includes(label)}
                           label={label}
                           count={countPlpFacetOption(filters, "regions", label)}
-                          onToggle={() =>
+                          onToggle={() => {
+                            setCountryExpanded(false);
                             setFilters(
                               togglePlpFilterValue(filters, "regions", label)
-                            )
-                          }
+                            );
+                          }}
                         />
                       ))}
                     </div>
