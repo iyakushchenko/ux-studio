@@ -279,10 +279,11 @@
   font-variant-numeric: tabular-nums;
   color: rgba(255, 255, 255, 0.42);
   flex-shrink: 0;
-  min-width: 5.75rem;
+  /* Content-sized — avoid right-aligned min-width gap after | CJM | in playback */
+  min-width: 0;
   margin: 0 1px 0 0;
   padding-left: 0;
-  text-align: right;
+  text-align: left;
   letter-spacing: 0.02em;
   white-space: nowrap;
 }
@@ -329,8 +330,8 @@
   align-items: center;
   gap: 3px;
   flex-shrink: 0;
-  margin: 0 2px 0 1px;
-  padding: 0 6px;
+  margin: 0 1px;
+  padding: 0 5px;
   border-left: 1px solid rgba(255, 255, 255, 0.12);
   border-right: 1px solid rgba(255, 255, 255, 0.12);
 }
