@@ -1167,9 +1167,20 @@
   cursor: not-allowed;
 }
 
+/* Tabs scroll left; version chip sticky right and always wins overflow. */
+.studio-nav-tabs-row {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+  position: relative;
+  background: #2e2e2e;
+}
+
 .studio-nav-tabs {
   display: flex;
   align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
   overflow-x: auto;
   overflow-y: hidden;
   padding: 8px 8px 0;
@@ -1177,6 +1188,72 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
   overscroll-behavior-x: contain;
+}
+
+.studio-nav-version {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 3;
+  margin-left: 0;
+  padding: 8px 10px 6px 12px;
+  background: #2e2e2e;
+  box-shadow: -10px 0 12px 4px #2e2e2e;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  user-select: none;
+  pointer-events: none;
+}
+
+.studio-nav-version__semver {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.72);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.studio-nav-version__channel {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 14px;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.82);
+  background: linear-gradient(180deg, #4a4a4a 0%, #2e2e2e 55%, #242424 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.studio-nav-version__channel--alpha {
+  color: #d8c49a;
+  border-color: rgba(191, 165, 110, 0.35);
+  background: linear-gradient(180deg, #3d3420 0%, #2a2418 55%, #1e1a12 100%);
+}
+
+.studio-nav-version__channel--beta {
+  color: #b8c8e0;
+  border-color: rgba(140, 168, 210, 0.35);
+  background: linear-gradient(180deg, #2a3340 0%, #1e2630 55%, #161c24 100%);
+}
+
+.studio-nav-version__channel--rc {
+  color: #e0c8a8;
+  border-color: rgba(200, 160, 100, 0.4);
+  background: linear-gradient(180deg, #403028 0%, #2c221c 55%, #1c1612 100%);
+}
+
+.studio-nav-version__channel--stable {
+  color: #b8d4b8;
+  border-color: rgba(120, 170, 120, 0.35);
+  background: linear-gradient(180deg, #2a382a 0%, #1e281e 55%, #141c14 100%);
 }
 
 .studio-nav-tabs::-webkit-scrollbar {

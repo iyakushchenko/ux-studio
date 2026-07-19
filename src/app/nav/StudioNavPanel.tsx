@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef, type ReactNode, type RefObject } from "react";
 import { StudioNavLogo } from "@/app/nav/StudioNavLogo";
+import { StudioNavVersionChip } from "@/app/nav/StudioNavVersionChip";
 import { studioNavIndex } from "@/projects/boots-pharmacy/screens/screens";
 import { useStudioNavZoom } from "@/app/nav/studioNavZoom";
 import { logControlPanel } from "@/app/shell/controlPanelLog";
@@ -174,39 +175,42 @@ export default function StudioNavPanel({
     >
       <div ref={shellRef} className="studio-nav-panel">
         <div className="studio-nav-chrome">
-          <div ref={tabsScrollRef} className="studio-nav-tabs">
-            <button
-              type="button"
-              onClick={handleOpenHub}
-              title={hubLabel}
-              aria-label={`Open ${hubLabel}`}
-              aria-current={hubOpen ? "page" : undefined}
-              className={
-                hubOpen
-                  ? "studio-nav-logo-btn studio-nav-logo-btn--active"
-                  : "studio-nav-logo-btn"
-              }
-            >
-              <StudioNavLogo />
-            </button>
-            {screens.map((screen: StudioNavScreen, i) => (
+          <div className="studio-nav-tabs-row">
+            <div ref={tabsScrollRef} className="studio-nav-tabs">
               <button
-                key={screen.childIndex}
-                ref={(node) => {
-                  if (tabBtnRefs.current) tabBtnRefs.current[i] = node;
-                }}
-                onClick={() => handleGoTab(i)}
-                disabled={navBrowseLocked}
+                type="button"
+                onClick={handleOpenHub}
+                title={hubLabel}
+                aria-label={`Open ${hubLabel}`}
+                aria-current={hubOpen ? "page" : undefined}
                 className={
-                  !hubOpen && i === current
-                    ? "studio-nav-tab studio-nav-tab--active"
-                    : "studio-nav-tab"
+                  hubOpen
+                    ? "studio-nav-logo-btn studio-nav-logo-btn--active"
+                    : "studio-nav-logo-btn"
                 }
               >
-                <span className="studio-nav-tab__badge">{i + 1}</span>
-                {screen.label}
+                <StudioNavLogo />
               </button>
-            ))}
+              {screens.map((screen: StudioNavScreen, i) => (
+                <button
+                  key={screen.childIndex}
+                  ref={(node) => {
+                    if (tabBtnRefs.current) tabBtnRefs.current[i] = node;
+                  }}
+                  onClick={() => handleGoTab(i)}
+                  disabled={navBrowseLocked}
+                  className={
+                    !hubOpen && i === current
+                      ? "studio-nav-tab studio-nav-tab--active"
+                      : "studio-nav-tab"
+                  }
+                >
+                  <span className="studio-nav-tab__badge">{i + 1}</span>
+                  {screen.label}
+                </button>
+              ))}
+            </div>
+            <StudioNavVersionChip />
           </div>
 
           <div className="studio-nav-status-bar px-4 py-2 bg-black/20 border-t border-white/10">

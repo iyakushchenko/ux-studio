@@ -1,8 +1,12 @@
 import { defineConfig } from 'vite'
+import fs from 'node:fs'
 import path from 'path'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 
+const pkg = JSON.parse(
+  fs.readFileSync(path.resolve(__dirname, 'package.json'), 'utf8')
+)
 
 function figmaAssetResolver() {
   return {
@@ -19,6 +23,10 @@ function figmaAssetResolver() {
 export default defineConfig({
   // GitHub Pages project site: /ux-studio/
   base: process.env.VITE_BASE_PATH ?? '/',
+  define: {
+    // Single source: package.json → chrome version chip (studioRelease.ts)
+    __STUDIO_PACKAGE_VERSION__: JSON.stringify(pkg.version),
+  },
   server: {
     // Studio shows build/HMR errors via ProtoFatalErrorScreen — avoid duplicate Vite overlay.
     hmr: {

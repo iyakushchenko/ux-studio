@@ -1,8 +1,33 @@
 # Versioning + changelog (UX Studio)
 
-**Status:** Skeleton adopted (local-only) — 2026-07-19  
+**Status:** Skeleton + chrome version chip — 2026-07-19  
 **Inspired by:** Summarizer `release.mjs` + `scripts/release-notes.mjs` + `docs/RELEASE.md`  
 **Do not:** add GitHub Release / tag CI until criteria below are met (Actions budget).
+
+---
+
+## 0. Role ownership (versioning)
+
+| Hat | Owns |
+|-----|------|
+| **BE** | Semver bumps (`npm run release:*`), CHANGELOG promote, `check:version` / `check:felonies` green, post-push `gh run list` |
+| **FE/UI/UX** | Top-bar version chip (tabs row, sticky right, overflow wins); match Studio PANEL aesthetic |
+| **QA** | Prove chip readable when tabs overflow; no tab/version collision; channel label correct |
+| **BA / Director** | When to bump (see §6); default channel for maturity |
+| **PO** | Accepts **channel** (`alpha` \| `beta` \| `rc` \| `stable`) — not the semver digit |
+
+---
+
+## 0.1 Chrome version chip (how-to)
+
+| Piece | Source |
+|-------|--------|
+| Semver display `v0.0.1` | `package.json` `version` → Vite/Vitest `define` `__STUDIO_PACKAGE_VERSION__` → `getStudioRelease()` |
+| Channel badge | `STUDIO_RELEASE_CHANNEL` in `src/app/shell/studioRelease.ts` (**alpha** while on `0.0.x`) |
+| UI | `StudioNavVersionChip` — right of page tabs (`.studio-nav-tabs-row`) |
+| Overflow | Chip `flex-shrink: 0`, solid `#2e2e2e` fill, `z-index: 3`, left shadow so scrolling tabs never cover it |
+
+**No hardcoded drift:** never paste a version string into JSX. Change semver only via `release.mjs` / `package.json`.
 
 ---
 
@@ -85,8 +110,31 @@ Do **not** invent a GitHub Release workflow “to be helpful.”
 
 ---
 
+## 6. When to bump (Director lock)
+
+| Change | Bump | Notes |
+|--------|------|-------|
+| User-visible ship (chrome, page, REC behavior PO can see) | Consider **patch** after notes habit; or keep notes in `## Current` until a named demo | Chip updates when `package.json` bumps |
+| Engine-breaking API / journey schema / URL contract break | **minor** (still 0.x) | Document in CHANGELOG |
+| Impossible without PO / public promise break | **major** | Rare at 0.x |
+| Docs-only / felony gate / rename with no user delta | Usually **no bump** — notes optional |
+
+### Channel policy
+
+| Channel | Meaning | Who |
+|---------|---------|-----|
+| **alpha** | Default for `0.0.x` — unstable, agent-heavy | Director sets; **current** |
+| **beta** | Feature-complete enough for wider internal demos | PO accepts |
+| **rc** | Release candidate for a named milestone | PO accepts |
+| **stable** | PO-accepted production channel | PO accepts |
+
+Change channel by editing `STUDIO_RELEASE_CHANNEL` in `studioRelease.ts` (not by inventing a second config file).
+
+---
+
 ## Related
 
 - [CI_ACTIONS_BUDGET.md](./CI_ACTIONS_BUDGET.md) — no expensive release CI yet  
 - [POST_CHANGE_CHECKLIST.md](./POST_CHANGE_CHECKLIST.md) — when to note + test  
+- [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) — felony = CI/test fail  
 - Summarizer: `docs/RELEASE.md`, `docs/CHANGELOG_STORYTELLING.md`, `release.mjs`  

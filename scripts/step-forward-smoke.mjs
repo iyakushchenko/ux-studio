@@ -31,7 +31,7 @@ async function main() {
   const report = { baseUrl, at: new Date().toISOString(), stepForward, diagnosticText };
   await mkdir(outDir, { recursive: true });
   await writeFile(
-    path.join(outDir, "proto-step-forward-report.json"),
+    path.join(outDir, "step-forward-report.json"),
     JSON.stringify(report, null, 2)
   );
 

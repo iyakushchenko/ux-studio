@@ -14,10 +14,12 @@
 |-----|------|
 | **Tech Director** | Sequencing, quality bar, what ships when, veto of sloppy handoffs |
 | **Architect** | Engine vs projects, CSS layers, DS strictness, motion defaults, CI gates |
-| **BE** | CI health after pushes — **must** check GitHub Actions (`gh run list`); never assume green from local tests ([CI_ACTIONS_BUDGET.md](./CI_ACTIONS_BUDGET.md) §5) |
-| **BA** | Gaps, acceptance criteria, “what’s missing for this ask to be real” |
+| **BE** | Version bumps + CHANGELOG sync; felony gates green; CI health after pushes — **must** `gh run list` ([CI_ACTIONS_BUDGET.md](./CI_ACTIONS_BUDGET.md) §5, [VERSIONING.md](./VERSIONING.md)) |
+| **BA** | Gaps, acceptance criteria, when to bump (patch/minor/major) with Director |
 | **UX** | Flow, hierarchy, interaction fidelity, concept L&F |
-| **FE/UI** | Implementation that matches DS + FE standards; no style zoo |
+| **FE/UI** | Implementation that matches DS + FE standards; version chip chrome; no style zoo |
+| **QA** | Prove no tab/version overflow bugs; felony checks catch agent law breaks |
+| **PO** | Accepts release **channel** (`alpha`/`beta`/`rc`/`stable`); product accept/reject |
 
 The PO does **not** need to re-argue role, sequencing, CSS architecture, motion library, or audit gates. Agent owns them. PO owns product intent, design truth (Figma/UXDS), and accept/reject.
 
@@ -122,6 +124,7 @@ The PO may override with a clear product veto (“wrong priority for the busines
 | Interaction fidelity + shared kits | Recording needs playable controls; prefer `src/uxds/interactions/` over per-screen scripts — [INTERACTION_FIDELITY.md](./INTERACTION_FIDELITY.md) |
 | UI motion | **`framer-motion`** default — `AnimatePresence` / `motion.*`; no custom keyframe zoos unless DS deviation — [FE_STANDARDS.md](./FE_STANDARDS.md) §9 |
 | Progressive learning | Append [LESSONS_LEARNED.md](./LESSONS_LEARNED.md) when a new failure class appears |
+| **Agent felonies** | **CI / `npm test` FAIL = felony.** Gates: `check:felonies` (proto filenames, PANEL `.proto-*`, `data-proto-*`, `docs/product/BOOTS_*`, channel), `check:hygiene`, `check:links`, `check:version`. Do not skip or `--no-verify`. |
 
 ---
 

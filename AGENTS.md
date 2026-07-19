@@ -40,10 +40,12 @@ Catalog → [docs/README.md](docs/README.md)
 ```bash
 npm install
 npm run dev
-npm test             # check:links + check:hygiene + vitest
+npm test             # check:links + hygiene + felonies + version + vitest
 npm run build
 npm run smoke        # lean profile — local / on-demand CI only; PROTO_SMOKE_PROFILE=full for marathon
 ```
+
+**Version chip:** top tabs row shows `v{package.json}` + channel (`alpha` default). Policy: [docs/product/VERSIONING.md](docs/product/VERSIONING.md). **Felony = test fail** — [COMMAND_DOCTRINE.md](docs/product/COMMAND_DOCTRINE.md).
 
 **GitHub Pages:** `https://iyakushchenko.github.io/ux-studio/`
 

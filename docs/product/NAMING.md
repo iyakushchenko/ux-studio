@@ -38,6 +38,8 @@ This product is **UX Studio**, not a prototype nickname.
 - Concept LEGACY classes (`.proto-footer`, `.proto-chat-*`, avail cards, wire helpers) until screen retirement  
 - Historical storage keys `boots-vaccine-proto-*` (read-migrate only)
 
+**Filename leftovers (2026-07-19):** `src/` + `scripts/` + `docs/` basenames starting with `proto`/`Proto` = **0**. Smoke reports use `smoke-report.json` / `step-forward-report.json` (not `proto-*-report.json`). Enforced by `npm run check:felonies`.
+
 ---
 
 ## Rule of thumb

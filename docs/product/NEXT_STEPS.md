@@ -9,18 +9,17 @@
 
 ## NOW
 
-1. [x] **Recording v2 (demo-click vertical)** — selector-chain resolve → `simulateDemoPointerClick`; wire-intent for known `JourneyBeatActionId`; Boots book CTA `data-studio-action` markers ([RECORDING.md](../shell/RECORDING.md)).
-2. [ ] **Versioning habit** — append notes on every user-visible ship (`npm run notes:append`). Release/tag CI stays **later**.
+1. [ ] **Recording v2 gaps** — resume after version-chip/felony pack: human REC click capture; `retreat-sync` / director-script / tab·home·book·avail **script** replay; only then compile→journeys ([RECORDING.md](../shell/RECORDING.md)).
+2. [ ] **Versioning habit** — append notes on every user-visible ship; consider patch when PO wants a named demo ([VERSIONING.md](./VERSIONING.md)).
 
 ---
 
 ## NEXT
 
-3. [ ] **Recording v2 gaps** — human REC click capture; `retreat-sync` / director-script / tab·home·book·avail **script** replay; only then compile→journeys.
-4. [ ] **LEGACY retirement (by screen)** — no LEGACY growth; shrink Make wire + `globals-screens` as React pages land. Concept `.proto-*` classes retire with their screen.
-5. [ ] **Engine monster splits** — on next touch of `App.tsx` / `useJourneyPlayback.ts`, extract by domain (recording bridge / beat advance) — not micro-files.
-6. [ ] **Grow UXDS by page** — extract only on second use ([COMPONENT_LIBRARY.md](./COMPONENT_LIBRARY.md)).
-7. [ ] **Residual fidelity (low)** — Book Steps 1–3 Make-only hexes with no bridge token yet. Do **not** invent aliases.
+3. [ ] **LEGACY retirement (by screen)** — no LEGACY growth; shrink Make wire + `globals-screens` as React pages land. Concept `.proto-*` classes retire with their screen.
+4. [ ] **Engine monster splits** — on next touch of `App.tsx` / `useJourneyPlayback.ts`, extract by domain (recording bridge / beat advance) — not micro-files.
+5. [ ] **Grow UXDS by page** — extract only on second use ([COMPONENT_LIBRARY.md](./COMPONENT_LIBRARY.md)).
+6. [ ] **Residual fidelity (low)** — Book Steps 1–3 Make-only hexes with no bridge token yet. Do **not** invent aliases.
 
 ---
 
@@ -35,7 +34,8 @@
 
 ## Done recently (context)
 
-- [x] **Recording v2 demo-click replay** — `resolvePlaybackSelectorChain` + `applyDemoClick` / partial `applyWireIntent`; book CTA `data-studio-action`.
+- [x] **Version chip + felony gate** — tabs-row `vX.Y.Z` + channel; `check:felonies` + `check:version` in `npm test`; proto filename leftovers → 0 in src/scripts/docs ([VERSIONING.md](./VERSIONING.md)).
+- [x] **Recording v2 demo-click replay** — `resolvePlaybackSelectorChain` + `applyDemoClick` / partial `applyWireIntent`; book CTA `data-studio-action` (gaps = NOW).
 - [x] **Domain CSS/attrs phase 2** — `.proto-nav-*` / shell chrome → `.studio-*`; `data-proto-*` → `data-studio-*`; events/storage migrate with legacy read ([NAMING.md](./NAMING.md)).
 - [x] **Hygiene gate** — Summarizer-lean LOC ratchet; LEGACY allowlisted.
 - [x] **Retire `proto*` filenames** — modules → `studio*` / domain; `__studio*` + `__proto*` aliases.
@@ -58,6 +58,7 @@
 | **CI budget** | No auto marathon Playwright on every push |
 | **Post-push sitrep** | `gh run list` after push |
 | **Hygiene** | `check:hygiene` must stay green |
+| **Felonies** | `check:felonies` + `check:version` in `npm test` — CI/test fail = agent felony |
 | **Naming** | [NAMING.md](./NAMING.md); folder = `screenId` |
 | **Lessons** | Append [LESSONS_LEARNED.md](./LESSONS_LEARNED.md) |
 | **Clean URL** | No sticky `?proof=*` |

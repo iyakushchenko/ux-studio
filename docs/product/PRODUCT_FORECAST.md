@@ -21,14 +21,13 @@ Ship the **control room** first: deep-linkable screens, recordable interactions,
 
 | Work | Why | Status |
 |------|-----|--------|
-| Recording v2 demo-click vertical | Selector chain → `simulateDemoPointerClick`; book CTAs stable | **Acting this tip** |
-| Versioning habit | `npm run notes:append` on user-visible ships | Habit — every ship |
+| Recording v2 gaps | Human REC clicks + script/retreat-sync matrix before compile→journeys | **Parked NOW** (resume after version pack) |
+| Versioning habit | notes + consider patch on named demos | Habit — every ship |
 
 ### NEXT
 
 | Work | Why |
 |------|-----|
-| Recording v2 gaps (human REC clicks, script / retreat-sync matrix) | Finish fidelity before compile→journeys |
 | LEGACY retirement by screen | No LEGACY growth; shrink `globals-screens` + Make wire as React pages land |
 | Concept `.proto-*` class debt | Boots wire/footer/chat/avail cards still `.proto-*` in LEGACY — retire with page migrate |
 | Engine monster splits | `App.tsx` / `useJourneyPlayback.ts` — extract by domain when next touched |
@@ -61,11 +60,11 @@ Shareable `?project=&screen=`; URL wins on refresh; strip `proof` / ephemeral. O
 
 Shared kits in `src/uxds/interactions/`. Dead CTAs forbidden. Fake data OK.
 
-### 4. Domain identity — PHASE 2 (this tip)
+### 4. Domain identity — LANDED (+ felony gate)
 
 | Surface | Rule |
 |---------|------|
-| Filenames / modules | `studio*` / domain verbs — done |
+| Filenames / modules | `studio*` / domain verbs — done; `check:felonies` locks proto* basenames |
 | PANEL/chrome CSS | `.studio-nav-*`, `.studio-*`, `.studio-agent-testing-*` — this tip |
 | DOM attrs | `data-studio-*` (+ `dataset.studio*`) — this tip |
 | Window APIs | Prefer `__studio*`; keep `__proto*` aliases |
@@ -128,8 +127,8 @@ Documented handshake; do not build a second studio inside Summarizer.
 1. URL + overlay + clean bar — landed  
 2. Recording screen markers → replay — landed  
 3. Domain CSS/attrs + hygiene — landed  
-4. Recording v2 demo-click vertical — **this tip**  
-5. Recording v2 gaps + Boots fidelity debt (parallel)  
+4. Version chip + agent felony gate — **this tip**  
+5. Recording v2 gaps (NOW) + Boots fidelity debt (parallel)  
 6. LEGACY shrink by screen + UXDS extract-on-second-use  
 7. Second project rabbit  
 8. Release CI + broader CSS contracts  

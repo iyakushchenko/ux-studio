@@ -11,6 +11,7 @@
     "dev": "vite",
     "check:links": "node scripts/check-text-link-contract.mjs",
     "check:hygiene": "node scripts/check-file-hygiene.mjs",
+    "check:felonies": "node scripts/check-agent-felonies.mjs",
     "check:version": "node scripts/check-release-version-changelog-sync.mjs",
     "notes": "node scripts/release-notes.mjs list",
     "notes:list": "node scripts/release-notes.mjs list",
@@ -20,7 +21,7 @@
     "release:patch": "node scripts/release.mjs patch",
     "release:minor": "node scripts/release.mjs minor",
     "release:major": "node scripts/release.mjs major",
-    "test": "npm run check:links && npm run check:hygiene && vitest run",
+    "test": "npm run check:links && npm run check:hygiene && npm run check:felonies && npm run check:version && vitest run",
     "test:watch": "vitest",
     "smoke": "node scripts/playwright-smoke.mjs"
   },
