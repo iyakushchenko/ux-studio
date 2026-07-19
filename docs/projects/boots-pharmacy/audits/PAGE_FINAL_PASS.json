@@ -131,7 +131,7 @@
         "status": "PASS",
         "pass": true,
         "stampedAt": {
-          "sha": "PENDING_COMMIT",
+          "sha": "67a5b7c",
           "date": "2026-07-19",
           "version": "0.0.28",
           "auditor": "Quinn (QA)",
