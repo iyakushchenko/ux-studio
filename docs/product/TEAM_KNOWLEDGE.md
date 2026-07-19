@@ -151,16 +151,13 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 - Finn (FE): `revealDemoTargetForAgent` + demo-click `scroll: true`; abandon settle without deferred reload; exclude `RunMcpPageProbe` from helper nest-arm — applied: code
 - Quinn (QA): `overlay-arm` + `plp-below-fold-scroll` reveal step; overlay missing = FAIL every step — applied: probe recipe + RECORDING.md · MCP PLP prove PASS
 
-**Knowledge improved** (2026-07-19 · stream: page final-pass gate · tip c5cce1a):
-- Uma (UI/UX): migrated pages need `<header>`/`<main>`/`<section>` + BEM=`screenId` before NEXT page — applied: checklist + PLP/book stamps
-- Finn (FE): PLP + book steps landmark fix; `check:page-final-pass` source contracts — applied: code + npm test wire
-- Ben (BE): final-pass felony in `npm test` — applied: script + package.json
-- Arch (Director): PDP blocked until PLP final-pass proven — applied: NEXT_STEPS + doctrine
-
-**Knowledge improved** (2026-07-19 · stream: PAGE FINAL PASS sequencing · SHA pending):
-- Arch (Director): no next migrated page until previous hard-green; doctrine/TEAM/NEXT_STEPS/AGENTS/director rule + thin PAGE_FINAL_PASS.md — applied: gate
-- Finn (FE) / Uma (UI/UX): own checklist rows + `check:page-final-pass` (do not fork contract) — applied: pending flesh
-- Bea (BA): no next-page brief until previous Final Pass hard-green — applied: TEAM artifact map
+**Knowledge improved** (2026-07-19 · stream: PAGE FINAL PASS sequencing · tip after notes stamp):
+- Arch (Director): no next migrated page until previous hard-green; doctrine/TEAM/NEXT_STEPS/AGENTS/director rule + PAGE_FINAL_PASS.md — applied: gate; PDP blocked until Quinn MCP HARD-GREEN
+- Uma (UI/UX): landmarks + BEM=`screenId` checklist keys; PLP/book stamps — applied: PAGE_FINAL_PASS.json
+- Finn (FE): landmark fix + `check:page-final-pass` source contracts — applied: code + npm test wire
+- Ben (BE): final-pass in `npm test` — applied: script + package.json
+- Bea (BA): no next-page brief until previous Final Pass hard-green — applied: TEAM
+- Quinn (QA): MCP team-check still required for PLP HARD-GREEN — applied: board 2e open
 
 ---
 
