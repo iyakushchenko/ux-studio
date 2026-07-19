@@ -2,7 +2,8 @@
 
 **Status:** Locked (architect mandate, 2026-07-19)  
 **Entry:** `src/styles/index.css`  
-**Audience:** Every agent touching styles. No CSS dump. No whack-a-mole.
+**Audience:** Every agent touching styles. No CSS dump. No whack-a-mole.  
+**Doctrine:** [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) §0 — Director owns layer discipline; proactive forecasting must catch layer violations on every task.
 
 ---
 
@@ -130,8 +131,10 @@ Tailwind v4 fails the production build with `Invalid declaration: `` ` when a CS
 
 ## Related
 
-- [`DS_STRICTNESS.md`](./DS_STRICTNESS.md)  
-- [`COMMAND_DOCTRINE.md`](./COMMAND_DOCTRINE.md)  
+- [`COMMAND_DOCTRINE.md`](./COMMAND_DOCTRINE.md) §0 — Director + proactive (spot layer dump early)  
+- [`DS_STRICTNESS.md`](./DS_STRICTNESS.md) — no near-duplicates; no React growth in LEGACY  
+- [`FE_UI_UX_AUDIT.md`](./FE_UI_UX_AUDIT.md) — audit gate before PO  
 - [`PROJECT_STYLEGUIDE.md`](./PROJECT_STYLEGUIDE.md)  
 - [`../uxds/TOKEN_BRIDGE.md`](../uxds/TOKEN_BRIDGE.md)  
-- [`../../AGENTS.md`](../../AGENTS.md)
+- [`../../AGENTS.md`](../../AGENTS.md)  
+- [`../../.cursor/rules/ux-studio-director.mdc`](../../.cursor/rules/ux-studio-director.mdc)

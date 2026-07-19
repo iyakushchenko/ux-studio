@@ -5,5 +5,8 @@ dist
 .vite
 package-lock.json
 scripts/playwright-out/
-.cursor/
+# Local Cursor config (MCP, etc.) — keep project rules tracked
+.cursor/*
+!.cursor/rules/
+!.cursor/rules/**
 scripts/inspect-*.mjs

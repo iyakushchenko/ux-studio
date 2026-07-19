@@ -2,7 +2,7 @@
 
 **Status:** Locked (Product Owner directive, 2026-07-19)  
 **Audience:** Every agent building or restyling concept UI.  
-**Companions:** [CSS_BASE_THEME.md](./CSS_BASE_THEME.md) · [FE_STANDARDS.md](./FE_STANDARDS.md) · [VISUAL_FIDELITY.md](./VISUAL_FIDELITY.md) · [PROJECT_STYLEGUIDE.md](./PROJECT_STYLEGUIDE.md) · [../uxds/TOKEN_BRIDGE.md](../uxds/TOKEN_BRIDGE.md) · [../uxds/DEVIATIONS.md](../uxds/DEVIATIONS.md)
+**Companions:** [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) §0 (Director + proactive) · [CSS_BASE_THEME.md](./CSS_BASE_THEME.md) · [FE_STANDARDS.md](./FE_STANDARDS.md) · [VISUAL_FIDELITY.md](./VISUAL_FIDELITY.md) · [PROJECT_STYLEGUIDE.md](./PROJECT_STYLEGUIDE.md) · [../uxds/TOKEN_BRIDGE.md](../uxds/TOKEN_BRIDGE.md) · [../uxds/DEVIATIONS.md](../uxds/DEVIATIONS.md)
 
 ---
 
@@ -99,10 +99,11 @@ Requires a **registered deviation** ([../uxds/DEVIATIONS.md](../uxds/DEVIATIONS.
 
 ## Related
 
-- [CSS_BASE_THEME.md](./CSS_BASE_THEME.md)  
+- [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) §0 — composite Director role; proactive style-zoo / layer forecasting  
+- [CSS_BASE_THEME.md](./CSS_BASE_THEME.md) — BASE → THEME → PANEL → LEGACY  
+- [FE_UI_UX_AUDIT.md](./FE_UI_UX_AUDIT.md) — Nazi QA before PO  
 - [FE_STANDARDS.md](./FE_STANDARDS.md)  
 - [VISUAL_FIDELITY.md](./VISUAL_FIDELITY.md)  
 - [PROJECT_STYLEGUIDE.md](./PROJECT_STYLEGUIDE.md)  
-- [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md)  
 - [../uxds/TOKEN_BRIDGE.md](../uxds/TOKEN_BRIDGE.md)  
 - [../uxds/DEVIATIONS.md](../uxds/DEVIATIONS.md)

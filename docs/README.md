@@ -8,16 +8,18 @@
 
 | Role | Who | Owns |
 |------|-----|------|
-| **Commander / tech architect / builder** | Cursor agent | **All** tech direction, next steps, architecture, implementation — see [product/COMMAND_DOCTRINE.md](./product/COMMAND_DOCTRINE.md) |
-| **Product Owner** | Human | Product intent, Figma/UXDS truth, accept/reject, explicit product veto |
+| **Tech Director + Architect + BA + UX + FE/UI** | Cursor agent | **All** tech direction, next steps, architecture, implementation, proactive risk spotting — see [product/COMMAND_DOCTRINE.md](./product/COMMAND_DOCTRINE.md) §0–§2 |
+| **Product Owner** | Human | Product intent, Figma/UXDS truth, accept/reject, explicit product veto — **does not re-argue** role/tech/gates |
 
-Agents **do not** offer A/B/C tech menus. They decide, document, build, report.
+Agents **do not** offer A/B/C tech menus. They decide, document, build, report. **Proactive forecasting** on every task is mandatory (layout drift, style zoo, CSS layers, bad handoffs, REC bugs, CI).
+
+**Always-on Cursor rule:** [`.cursor/rules/ux-studio-director.mdc`](../.cursor/rules/ux-studio-director.mdc) · agent entry [AGENTS.md](../AGENTS.md)
 
 **Parent / tech-director agents:** subagent handoffs are **BAD until proven** — verify chrome/modes/counters/panels/migrated pages before telling the PO it’s fine ([product/COMMAND_DOCTRINE.md](./product/COMMAND_DOCTRINE.md) §6). After UI-facing ships, spawn/run a **strict (“Nazi QA”) FE audit** until **PROVEN** ([product/FE_UI_UX_AUDIT.md](./product/FE_UI_UX_AUDIT.md); doctrine §7) — **cannot skip** for “tests passed”; store results in [product/audits/](./product/audits/).
 
 ## Start here (reading order)
 
-1. [product/COMMAND_DOCTRINE.md](./product/COMMAND_DOCTRINE.md) — **who decides what** + §6–§7 handoff + FE audit (read first every session)
+1. [product/COMMAND_DOCTRINE.md](./product/COMMAND_DOCTRINE.md) — **composite role + proactive** + who decides + §6–§7 handoff + FE audit (read first every session)
 2. [product/SOLUTION_REQUIREMENTS.md](./product/SOLUTION_REQUIREMENTS.md) — readiness + locked defaults (proceed checklist)
 3. [product/PRODUCT_OWNER_BRIEF.md](./product/PRODUCT_OWNER_BRIEF.md) — A–Z for the Product Owner
 4. [product/CONCEPT_INTAKE.md](./product/CONCEPT_INTAKE.md) — **messy concepts in → Studio pages out** (business logic)
@@ -35,6 +37,13 @@ Agents **do not** offer A/B/C tech menus. They decide, document, build, report.
 16. [shell/SHELL.md](./shell/SHELL.md) · [shell/PROJECTS.md](./shell/PROJECTS.md) · [shell/PLAYBACK.md](./shell/PLAYBACK.md) · [shell/RECORDING.md](./shell/RECORDING.md)
 
 Agent entry: [../AGENTS.md](../AGENTS.md)
+
+## Hard-wired agent rules (outside `docs/`)
+
+| Path | Purpose |
+|------|---------|
+| [../AGENTS.md](../AGENTS.md) | First bullets: Director composite + proactive + handoff + Nazi QA |
+| [../.cursor/rules/ux-studio-director.mdc](../.cursor/rules/ux-studio-director.mdc) | Always-applied Cursor rule — same mandate |
 
 ## Doc ownership rule
 

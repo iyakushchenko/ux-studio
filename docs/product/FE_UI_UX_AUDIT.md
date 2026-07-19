@@ -2,7 +2,8 @@
 
 **Status:** Locked (PO directive, 2026-07-19)  
 **Audience:** Master / parent agents and **separate** audit subagents.  
-**Doctrine:** [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) §6–§7  
+**Doctrine:** [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) §0 (Director + proactive) · §6–§7 (handoff + Nazi QA)  
+**Always-on rule:** [`.cursor/rules/ux-studio-director.mdc`](../../.cursor/rules/ux-studio-director.mdc)  
 **Report template:** [templates/FE_AUDIT_RESULT.md](./templates/FE_AUDIT_RESULT.md)
 
 ---
@@ -143,11 +144,13 @@ Unit tests, `npm run build`, and lean smoke alone **never** equal PROVEN for vis
 
 ## 5. Related
 
-- [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) §7  
-- [FE_STANDARDS.md](./FE_STANDARDS.md)  
+- [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) §0 · §7 — Director owns audit gate; proactive spotting does not replace PROVEN  
+- [CSS_BASE_THEME.md](./CSS_BASE_THEME.md) — BASE → THEME → PANEL → LEGACY  
 - [DS_STRICTNESS.md](./DS_STRICTNESS.md)  
+- [FE_STANDARDS.md](./FE_STANDARDS.md)  
 - [VISUAL_FIDELITY.md](./VISUAL_FIDELITY.md)  
 - [INTERACTION_FIDELITY.md](./INTERACTION_FIDELITY.md)  
 - [PAGE_BUILD_CONTRACT.md](./PAGE_BUILD_CONTRACT.md)  
 - [templates/FE_AUDIT_RESULT.md](./templates/FE_AUDIT_RESULT.md)  
 - Results store: [audits/](./audits/)  
+

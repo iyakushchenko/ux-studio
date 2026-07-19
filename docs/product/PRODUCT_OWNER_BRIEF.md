@@ -1,9 +1,13 @@
 # Product Owner brief — UX Studio (A–Z)
 
 **Audience:** Product Owner (you).  
-**Commander:** Cursor agent = tech architect, integrator, and builder — **decides all tech direction and next steps.**  
-**Doctrine:** [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md)  
+**Commander:** Cursor agent = **Tech Director + Architect + BA + UX + FE/UI** composite — **decides all tech direction and next steps**; forecasts risks proactively.  
+**Doctrine:** [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) §0–§2 · always-on rule [`.cursor/rules/ux-studio-director.mdc`](../../.cursor/rules/ux-studio-director.mdc)  
 **Last updated:** 2026-07-19
+
+### PO note — you don’t need to re-argue this
+
+The agent **owns** role, tech, sequencing, CSS layers, motion defaults, handoff distrust, and the FE audit gate. You do **not** need to remind or re-debate those. You own product intent, Figma/UXDS truth, and accept/reject. If something feels wrong for the business or brand, veto in product language — the agent adjusts.
 
 ---
 
@@ -36,17 +40,18 @@ If Cursor still shows the old name, you opened the wrong folder. Use **File → 
 
 ## C. Your role vs the agent’s role
 
-| You (Product Owner) | Agent (commander / architect / builder) |
-|---------------------|----------------------------------------|
+| You (Product Owner) | Agent (Director / Architect / BA / UX / FE) |
+|---------------------|---------------------------------------------|
 | Product intent + veto if something is wrong for the business | **Decides** tech direction, architecture, and **next steps** — always |
-| Own Figma / UXDS as design truth (deliver links when asked) | Translates UXDS into React + engine wiring |
+| Own Figma / UXDS as design truth (deliver links when asked) | Translates UXDS into React + engine wiring; fills BA/UX gaps |
 | Accept / reject how the product feels | Builds it; documents decisions the same turn |
 | Say what “good” looks like in product language | Does not ask you to pick among tech options |
+| Do **not** re-argue role / CSS / motion / audit gates | **Proactively** spots layout drift, style zoo, bad handoffs, REC bugs, CI gaps |
 
 You do **not** need to be technical. You do **not** choose the build order.  
 You **do** open `E:\UX\ux-studio` and supply UXDS/Figma when the commander requests assets.
 
-Full rules: [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md).
+Full rules: [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) §0–§2.
 
 ---
 
@@ -201,5 +206,6 @@ Avoid:
 | 2026-07-19 | **FE/UI/UX audit before PO green-light:** after any UI-facing subagent ship, master must run or spawn a rigorous FE/UI/UX audit; implementer “done” and tests-passed alone are BAD until audit PROVEN. Covers visual fidelity, layout/max-width/alignment, icon+text CTA nowrap, hover/focus, behavior parity, control hierarchy/no zoo, nav chrome (mode XOR, counters), regressions. See COMMAND_DOCTRINE.md §7, FE_UI_UX_AUDIT.md, FE_STANDARDS.md |
 | 2026-07-19 | **Strict (“Nazi QA”) interface audit is doctrine:** before any UI handoff is accepted, a separate strict FE audit agent must **PROVEN**; master treats implementer done as BAD until then; **cannot skip** for tests/build/smoke. Fail on drift, duplicates, slop, near-duplicate styles, layout gaps, lost L&F. Store results in `docs/product/audits/`. See COMMAND_DOCTRINE.md §7, FE_UI_UX_AUDIT.md |
 | 2026-07-19 | **DS strictness (pages):** no near-duplicate styles (one pattern per role); pages use UXDS components/tokens/kits + project brand theme only — no anonymous one-off CSS; deviations must be named + registered in `docs/uxds/DEVIATIONS.md`; brand theme optional — turn off via removing `data-proto-project` / not importing `theme.css`; UI defaults to UXDS baseline colors; `theme.css` remaps variables only. See DS_STRICTNESS.md, TOKEN_BRIDGE.md, PROJECT_STYLEGUIDE.md |
+| 2026-07-19 | **Composite Director role + proactive forecasting (permanent):** agent = picky Tech Director + Architect + BA + UX + FE/UI; must spot/forecast issues on every task (layout drift, style zoo, bad handoffs, missing hover, unused framer-motion, CSS layer violations, REC chrome bugs, CI). PO does not re-argue — agent owns it. Hard-wired in COMMAND_DOCTRINE §0–§2, AGENTS.md, `.cursor/rules/ux-studio-director.mdc`. Cross: CSS_BASE_THEME, DS_STRICTNESS, FE_UI_UX_AUDIT |
 
 New durable decisions get a row here in the same session they are made.
