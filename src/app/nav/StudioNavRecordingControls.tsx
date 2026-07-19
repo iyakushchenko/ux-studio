@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "@/uxds/motion";
 import { flashControlRoomButton } from "@/app/nav/controlRoomTap";
 import { StudioPlaybackRecSwitch } from "@/app/nav/StudioPlaybackRecSwitch";
 import { studioPanelTransition } from "@/app/nav/studioMotion";

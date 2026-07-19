@@ -12,6 +12,70 @@ import {
 } from "@/app/scenario/demoCursor";
 import { removeDemoPseudoBridge } from "@/app/scenario/demoCursorPseudoBridge";
 
+/**
+ * Motion's frame batcher captures requestAnimationFrame at import time, so
+ * Vitest fake-timer stubs never drive the real `animate`. Provide a compatible
+ * progress tween that uses the live global rAF (stubbed below) + easeInOut.
+ */
+vi.mock("@/uxds/motion", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/uxds/motion")>();
+  const easeInOut =
+    typeof actual.easeInOut === "function"
+      ? actual.easeInOut
+      : (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
+
+  return {
+    ...actual,
+    animate(
+      from: number,
+      to: number,
+      options: {
+        duration?: number;
+        onUpdate?: (value: number) => void;
+      }
+    ) {
+      let rafId: number | null = null;
+      let stopped = false;
+      const durationMs = Math.max(1, (options.duration ?? 0.3) * 1000);
+      const start = performance.now();
+      let settle!: () => void;
+      const finished = new Promise<void>((resolve) => {
+        settle = resolve;
+      });
+
+      const tick = (now: number) => {
+        rafId = null;
+        if (stopped) {
+          settle();
+          return;
+        }
+        const t = Math.min(1, (now - start) / durationMs);
+        const progress = from + (to - from) * easeInOut(t);
+        options.onUpdate?.(progress);
+        if (t < 1) {
+          rafId = requestAnimationFrame(tick);
+        } else {
+          settle();
+        }
+      };
+      rafId = requestAnimationFrame(tick);
+
+      return {
+        stop() {
+          stopped = true;
+          if (rafId != null) cancelAnimationFrame(rafId);
+          rafId = null;
+          settle();
+        },
+        then(onFulfilled?: (value: void) => unknown, onRejected?: (reason: unknown) => unknown) {
+          return finished.then(onFulfilled, onRejected);
+        },
+        animations: [],
+      };
+    },
+  };
+});
+
 vi.mock("@/app/scenario/playbackScroll", () => ({
   beginDemoTargetPageScroll: vi.fn(async () => ({
     durationMs: 0,
@@ -170,19 +234,61 @@ describe("demoCursor interaction contract", () => {
     expect(btn.classList.contains("proto-chat-cta--pressed")).toBe(false);
   });
 
-  it("remove/forceClear cancels in-flight travel rAF (hang guard)", async () => {
+  it("remove/forceClear cancels in-flight Motion travel (hang guard)", async () => {
     const btn = mountButton();
     const travel = moveDemoCursorTo(btn, {
       applyHover: true,
       syncPageScroll: false,
     });
-    // Mid-travel teardown — must not leave orphan rAF ticking.
+    // Mid-travel teardown — must stop Motion controls (no orphan tween).
     cancelDemoCursorTravel();
     removeDemoCursor({ immediate: true });
     await vi.runAllTimersAsync();
     const result = await travel;
     expect(result).toBeNull();
     expect(document.querySelector(".proto-chat-demo-cursor")).toBeNull();
+  });
+
+  it("travel stays within start→end bounds (no bounce/overshoot)", async () => {
+    const btn = mountButton();
+    const leftSamples: number[] = [];
+    const topSamples: number[] = [];
+
+    const travel = moveDemoCursorTo(btn, {
+      applyHover: false,
+      syncPageScroll: false,
+    });
+
+    for (let i = 0; i < 12; i++) {
+      await vi.advanceTimersByTimeAsync(80);
+      const el = document.querySelector<HTMLElement>(".proto-chat-demo-cursor");
+      if (!el) break;
+      const left = Number.parseFloat(el.style.left);
+      const top = Number.parseFloat(el.style.top);
+      if (Number.isFinite(left)) leftSamples.push(left);
+      if (Number.isFinite(top)) topSamples.push(top);
+    }
+    await vi.runAllTimersAsync();
+    const cursor = await travel;
+    expect(cursor).not.toBeNull();
+
+    const endLeft = Number.parseFloat(cursor!.style.left);
+    const endTop = Number.parseFloat(cursor!.style.top);
+    const startLeft = leftSamples[0] ?? endLeft;
+    const startTop = topSamples[0] ?? endTop;
+    const minL = Math.min(startLeft, endLeft);
+    const maxL = Math.max(startLeft, endLeft);
+    const minT = Math.min(startTop, endTop);
+    const maxT = Math.max(startTop, endTop);
+    // Ease-in-out lerp must never overshoot the endpoint box (1px float slack).
+    for (const left of leftSamples) {
+      expect(left).toBeGreaterThanOrEqual(minL - 1);
+      expect(left).toBeLessThanOrEqual(maxL + 1);
+    }
+    for (const top of topSamples) {
+      expect(top).toBeGreaterThanOrEqual(minT - 1);
+      expect(top).toBeLessThanOrEqual(maxT + 1);
+    }
   });
 
   it("does not re-flood enter/move when hover already active", async () => {

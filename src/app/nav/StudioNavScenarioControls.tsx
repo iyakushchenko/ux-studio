@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "@/uxds/motion";
 import { StudioJourneySwitch } from "@/app/nav/StudioJourneySwitch";
 import { StudioPlaybackRecSwitch } from "@/app/nav/StudioPlaybackRecSwitch";
 import {

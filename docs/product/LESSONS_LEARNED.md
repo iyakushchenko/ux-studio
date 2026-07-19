@@ -15,6 +15,11 @@ Agents **must read** this file before claiming a UI or Studio-chrome slice done.
 - **Symptom / class:** Motion library listed but unused; dual `motion` + `framer-motion` deps; Accordion stutter when driven by Framer `height: auto`; callsigns unsure CSS vs Motion.
 - **Gate:** [MOTION.md](./MOTION.md) — import `@/uxds/motion` only; one package (`framer-motion`); CSS for trivial hover + Accordion `0fr/1fr`; Motion for enter/exit, panels, menus, layout. No React Spring. Shell-only Motion pilots do **not** demote PDP PAGE FINAL PASS.
 
+### Robo-cursor travel — ease-in-out only, no bounce (PO / Finn)
+
+- **Symptom / class:** Robo cursor “bouncy” arrival (back-ease overshoot + path/end jitter felt like spring).
+- **Gate:** Travel driven by Motion `animate(0,1,{ ease:"easeInOut" })` via `@/uxds/motion`; straight-line lerp; **no** spring / back / overshoot / arc variance. `cancelDemoCursorTravel()` → `controls.stop()` on forceClear (keep hang guards from v0.0.31). See [MOTION.md](./MOTION.md).
+
 ### PAGE FINAL PASS — no next migrated page until previous hard-green (PO / Arch)
 
 - **Symptom / class:** Team starts PDP (or next erase-Make page) while PLP (previous) still has open Final Pass gaps — PROVEN/tests green used as a false “open next page” signal.
@@ -120,7 +125,7 @@ Agents **must read** this file before claiming a UI or Studio-chrome slice done.
   4. Accordion permanent `will-change` + rapid open/close amplified layout thrash.
 - **Gate (GLOBAL HARD FAIL — Finn + Ben + Quinn):**
   1. Cap bridged CSS rules (`DEMO_PSEUDO_BRIDGE_MAX_RULES`); skip vendor sheets.
-  2. `cancelDemoCursorTravel()` on remove/forceClear; travel rAF checks generation.
+  2. `cancelDemoCursorTravel()` on remove/forceClear; Motion travel `.stop()` + generation bump (no orphan tween).
   3. Rate-limit synthetic move; no re-flood when hover class already active.
   4. Accordion: no permanent `will-change`; `contain: layout style`; toggle min-interval.
 - **PO recovery:** refresh once → `__studioAgentTestingOverlay?.forceClear()` → `__studioWaitAgentTeardownClean()`.

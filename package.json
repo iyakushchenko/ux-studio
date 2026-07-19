@@ -1,7 +1,7 @@
 {
   "name": "ux-studio",
   "private": true,
-  "version": "0.0.31",
+  "version": "0.0.32",
   "type": "module",
   "engines": {
     "node": ">=22"
@@ -70,7 +70,6 @@
     "framer-motion": "12.42.2",
     "input-otp": "1.4.2",
     "lucide-react": "0.487.0",
-    "motion": "12.23.24",
     "next-themes": "0.4.6",
     "react-day-picker": "8.10.1",
     "react-dnd": "16.0.1",

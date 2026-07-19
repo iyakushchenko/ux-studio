@@ -132,7 +132,7 @@ Use `nowrap` for short CTAs, chips, crumb current labels, and tertiary pills unl
 
 ## 9. UI motion — `framer-motion` (NON-NEGOTIABLE)
 
-**Default library:** [`framer-motion`](https://www.npmjs.com/package/framer-motion) (direct `package.json` dependency). Import from `framer-motion`.
+**Default library:** [`framer-motion`](https://www.npmjs.com/package/framer-motion) (direct `package.json` dependency). Import from `@/uxds/motion` (see [MOTION.md](./MOTION.md)).
 
 | Do | Do not |
 |----|--------|

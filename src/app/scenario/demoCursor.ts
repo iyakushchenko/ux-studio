@@ -23,6 +23,11 @@ import {
   DEMO_PRESSED_CLASS,
   ensureDemoPseudoBridge,
 } from "@/app/scenario/demoCursorPseudoBridge";
+import {
+  animate,
+  MOTION_EASE_IN_OUT,
+  type AnimationPlaybackControls,
+} from "@/uxds/motion";
 
 const CURSOR_ARROW_SVG = `<img class="proto-chat-demo-cursor__graphic proto-chat-demo-cursor__graphic--arrow" src="${defaultCursorUrl}" width="22" height="26" alt="" aria-hidden="true" draggable="false" />`;
 
@@ -68,9 +73,9 @@ let journeyEndFadeTimer: ReturnType<typeof setTimeout> | null = null;
 let journeyEndFadeGeneration = 0;
 let journeyEndCursorFaded = false;
 let cursorFadeGeneration = 0;
-/** Bumped on forceClear / remove — cancels in-flight travel rAF (Chrome hang guard). */
+/** Bumped on forceClear / remove — cancels in-flight Motion travel (Chrome hang guard). */
 let travelGeneration = 0;
-let activeTravelRaf: number | null = null;
+let activeTravelControls: AnimationPlaybackControls | null = null;
 /** Rate-limit synthetic pointer flood from hover bridge path. */
 const SYNTHETIC_MOVE_MIN_MS = 48;
 let lastSyntheticMoveAt = 0;
@@ -214,12 +219,12 @@ function cancelDemoCursorParkInFlight(): void {
   parkPromise = null;
 }
 
-/** Abort in-flight cursor travel rAF — call from forceClear / remove / teardown. */
+/** Abort in-flight Motion cursor travel — call from forceClear / remove / teardown. */
 export function cancelDemoCursorTravel(): void {
   travelGeneration += 1;
-  if (activeTravelRaf != null) {
-    cancelAnimationFrame(activeTravelRaf);
-    activeTravelRaf = null;
+  if (activeTravelControls) {
+    activeTravelControls.stop();
+    activeTravelControls = null;
   }
 }
 
@@ -407,13 +412,6 @@ function easeOutCubic(t: number): number {
   return 1 - (1 - t) ** 3;
 }
 
-/** Mild overshoot — human agility without cartoon bounce (c1 ≪ classic back). */
-function easeOutBackSubtle(t: number): number {
-  const c1 = 1.18;
-  const c3 = c1 + 1;
-  return 1 + c3 * (t - 1) ** 3 + c1 * (t - 1) ** 2;
-}
-
 export function resetDemoCursorTravelOrigin(): void {
   if (journeyModePinned) {
     const current = readCursorPosition();
@@ -474,20 +472,7 @@ async function animateCursorTravel(
     return { x: endX, y: endY };
   };
 
-  const initialEnd = resolveEnd();
-  const dx = initialEnd.x - startX;
-  const dy = initialEnd.y - startY;
-  const dist = Math.hypot(dx, dy) || 1;
-  // Path variance — two control points for a gentle S / arc (not a single stiff curve).
-  const arcMag = Math.min(48, dist * 0.12) * (Math.random() > 0.5 ? 1 : -1);
-  const midJitter = randomInRange(-10, 10);
-  const ctrl1X = startX + dx * 0.28 + (-dy / dist) * arcMag + midJitter * 0.35;
-  const ctrl1Y = startY + dy * 0.28 + (dx / dist) * arcMag - midJitter * 0.25;
-  const ctrl2X = startX + dx * 0.68 + (-dy / dist) * (arcMag * -0.55);
-  const ctrl2Y = startY + dy * 0.68 + (dx / dist) * (arcMag * -0.55);
-
   cursor.style.transition = "none";
-  const start = performance.now();
   let approached = false;
 
   const tryApproach = (left: number, top: number) => {
@@ -503,51 +488,39 @@ async function animateCursorTravel(
   };
 
   tryApproach(startX, startY);
+  if (aborted()) return false;
 
-  let completed = false;
-  await new Promise<void>((resolve) => {
-    const tick = (now: number) => {
-      activeTravelRaf = null;
+  // Motion tween — ease-in-out only (light touch). No spring / back / overshoot.
+  let controls!: AnimationPlaybackControls;
+  controls = animate(0, 1, {
+    duration: Math.max(0.001, durationMs / 1000),
+    ease: MOTION_EASE_IN_OUT,
+    onUpdate: (progress) => {
       if (aborted()) {
-        resolve();
+        controls.stop();
         return;
       }
-      const t = Math.min(1, (now - start) / durationMs);
-      // Mild back-ease overshoot (human agility); t=1 lands exactly on end.
-      const e = easeOutBackSubtle(t);
       const end = resolveEnd();
-      const u = 1 - e;
-      // Cubic Bezier: start → ctrl1 → ctrl2 → end
-      let x =
-        u * u * u * startX +
-        3 * u * u * e * ctrl1X +
-        3 * u * e * e * ctrl2X +
-        e * e * e * end.x;
-      let y =
-        u * u * u * startY +
-        3 * u * u * e * ctrl1Y +
-        3 * u * e * e * ctrl2Y +
-        e * e * e * end.y;
-      if (!options?.trackTarget && t > 0.82 && t < 0.97) {
-        x += randomInRange(-0.9, 0.9);
-        y += randomInRange(-0.6, 0.6);
-      }
+      const x = startX + (end.x - startX) * progress;
+      const y = startY + (end.y - startY) * progress;
       if (cursor.isConnected) {
         cursor.style.left = `${x}px`;
         cursor.style.top = `${y}px`;
       }
       tryApproach(x, y);
-      if (t < 1) {
-        activeTravelRaf = requestAnimationFrame(tick);
-      } else {
-        completed = true;
-        resolve();
-      }
-    };
-    activeTravelRaf = requestAnimationFrame(tick);
+    },
   });
+  activeTravelControls = controls;
 
-  if (!completed || aborted()) {
+  try {
+    await controls;
+  } finally {
+    if (activeTravelControls === controls) {
+      activeTravelControls = null;
+    }
+  }
+
+  if (aborted()) {
     return false;
   }
 
