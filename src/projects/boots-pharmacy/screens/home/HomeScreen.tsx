@@ -1,9 +1,7 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   HOME_CHIP_LABELS,
   HOME_QUERY_DEFAULT,
-  HOME_QUERY_LINE_PX,
-  HOME_QUERY_MAX_LINES,
   HOME_REACT_SCREEN_ID,
   HOME_SUGGESTED_LABEL,
   HOME_SUGGESTED_LABEL_ID,
@@ -12,6 +10,7 @@ import {
   resolveHomeHeading,
   type HomeChipLabel,
 } from "./homeContract";
+import { SitePilotComposer } from "../shared/SitePilotComposer";
 import "./home.css";
 
 export type HomeScreenProps = {
@@ -45,14 +44,6 @@ const HOME_LOGO_MARK_D =
 const HOME_LOGO_OUTLINE_D =
   "M218.562 0V54H0V45.7039H1.40204V52.5954H217.16V1.40463H1.40204V8.69114H0V0H218.562Z";
 
-/** Make `component.input.button` mic glyph (Frame — 48×48, white/outline). */
-const HOME_MIC_D =
-  "M4.57152 12.5714H4.28581C1.91872 12.5714 0 10.6522 0 8.28562V7.42848C0 7.11347 0.255707 6.85705 0.571429 6.85705C0.88715 6.85705 1.14286 7.11347 1.14286 7.42848V8.28562C1.14286 10.0213 2.55 11.4286 4.28581 11.4286H6.00009C7.73581 11.4286 9.14304 10.0214 9.14304 8.28562V7.42848C9.14304 7.11347 9.39875 6.85705 9.71447 6.85705C10.0302 6.85705 10.2859 7.11347 10.2859 7.42848V8.28562C10.2859 10.652 8.36736 12.5714 6.00009 12.5714H5.71438V14.8571H6.85723C7.17296 14.8571 7.42866 15.1129 7.42866 15.4286C7.42866 15.7436 7.17296 16 6.85723 16H3.42866C3.11294 16 2.85723 15.7436 2.85723 15.4286C2.85723 15.1129 3.11294 14.8571 3.42866 14.8571H4.57152V12.5714ZM5.71438 0C6.47223 0 7.19867 0.301422 7.73513 0.836425C8.27014 1.37285 8.57156 2.09927 8.57156 2.85718V8.00004C8.57156 8.75789 8.27014 9.48432 7.73513 10.0208C7.1987 10.5558 6.47228 10.8572 5.71438 10.8572H4.57152C3.81367 10.8572 3.08723 10.5558 2.55077 10.0208C2.01576 9.48436 1.71434 8.75794 1.71434 8.00004V2.85718C1.71434 2.09933 2.01582 1.37281 2.55077 0.836425C3.08717 0.301476 3.81361 0 4.57152 0H5.71438Z";
-
-/** Make `icon / input / arrows` send glyph (48×48 navy circular button). */
-const HOME_SEND_D =
-  "M0 6.73833H7.92269L4.5891 10.6167L5.90955 11.7433L10.4554 6.435C10.7368 6.11 10.7368 5.63333 10.4554 5.30833L5.90955 0L4.5891 1.12667L7.92269 5.005H0.0216466L0.0216465 6.73833H0Z";
-
 function HomeLogo() {
   return (
     <div className="home__logo" data-name="boots.ai assistant 3" aria-hidden>
@@ -82,27 +73,6 @@ function HomeLogo() {
   );
 }
 
-function MicGlyph() {
-  return (
-    <svg width="10.286" height="16" viewBox="0 0 10.2859 16" fill="none" aria-hidden>
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d={HOME_MIC_D}
-        fill="#3A3A3A"
-      />
-    </svg>
-  );
-}
-
-function SendGlyph() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 10.6664 11.7433" fill="none" aria-hidden>
-      <path d={HOME_SEND_D} fill="white" />
-    </svg>
-  );
-}
-
 export function HomeScreen({
   loggedIn,
   initialQuery,
@@ -113,26 +83,21 @@ export function HomeScreen({
   const [query, setQuery] = useState(
     () => initialQuery ?? HOME_QUERY_DEFAULT
   );
-  const taRef = useRef<HTMLTextAreaElement>(null);
 
-  useLayoutEffect(() => {
-    const ta = taRef.current;
-    if (!ta) return;
-    const max = HOME_QUERY_LINE_PX * HOME_QUERY_MAX_LINES;
-    ta.style.height = "0px";
-    const next = Math.min(Math.max(ta.scrollHeight, HOME_QUERY_LINE_PX), max);
-    ta.style.height = `${next}px`;
-    ta.style.overflowY = next >= max ? "auto" : "hidden";
-  }, [query]);
+  const chips = useMemo(
+    () =>
+      HOME_CHIP_LABELS.map((label) => ({
+        label,
+        slug: homeChipSlug(label),
+        actionId: homeChipActionId(label),
+      })),
+    []
+  );
 
   useEffect(() => {
     const dirty = query.trim() !== HOME_QUERY_DEFAULT.trim();
     onQueryDirtyChange?.(dirty);
   }, [query, onQueryDirtyChange]);
-
-  const handleSend = () => {
-    onSend(query);
-  };
 
   return (
     <main
@@ -156,76 +121,17 @@ export function HomeScreen({
           data-name="component.co.order.summary"
           aria-label="Ask Site Pilot"
         >
-          <form
-            className="home__query-row"
-            data-name="Subtotal"
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleSend();
-            }}
-          >
-            <textarea
-              ref={taRef}
-              className="home__query"
-              name="home-query"
-              rows={1}
-              spellCheck
-              aria-label="Ask Site Pilot"
-              placeholder="Ask about health services…"
-              data-studio-action="agentic-home-query"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-            <button
-              type="button"
-              className="home__mic"
-              data-name="component.input.button"
-              data-studio-action="agentic-home-mic"
-              aria-label="Voice input"
-            >
-              <MicGlyph />
-            </button>
-            <button
-              type="submit"
-              className="home__send"
-              data-name="component.input.button"
-              aria-label="Send message"
-              data-studio-action="agentic-home-send"
-            >
-              <SendGlyph />
-            </button>
-          </form>
-
-          <section
-            className="home__suggested"
-            aria-labelledby={HOME_SUGGESTED_LABEL_ID}
-          >
-            <p
-              id={HOME_SUGGESTED_LABEL_ID}
-              className="home__suggested-label"
-            >
-              {HOME_SUGGESTED_LABEL}
-            </p>
-            <div
-              className="home__chips"
-              role="group"
-              aria-label={HOME_SUGGESTED_LABEL}
-            >
-              {HOME_CHIP_LABELS.map((label) => (
-                <button
-                  key={label}
-                  type="button"
-                  className="home__chip"
-                  data-name="component.gse.system.message"
-                  data-studio-home-chip={homeChipSlug(label)}
-                  data-studio-action={homeChipActionId(label)}
-                  onClick={() => onChip(label)}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          </section>
+          <SitePilotComposer
+            surface="home"
+            query={query}
+            onQueryChange={setQuery}
+            onSend={() => onSend(query)}
+            showSuggested
+            suggestedLabel={HOME_SUGGESTED_LABEL}
+            suggestedLabelId={HOME_SUGGESTED_LABEL_ID}
+            chips={chips}
+            onChip={(label) => onChip(label as HomeChipLabel)}
+          />
         </section>
       </div>
     </main>

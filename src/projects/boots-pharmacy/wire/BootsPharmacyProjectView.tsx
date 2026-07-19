@@ -138,6 +138,10 @@ import {
   unmountHomeScreen,
 } from "@/projects/boots-pharmacy/screens/home/mountHomeScreen";
 import {
+  isChatReactMounted,
+  useChatScreenMount,
+} from "@/projects/boots-pharmacy/screens/chat/mountChatScreen";
+import {
   HOME_CHILD_INDEX,
   type HomeChipLabel,
 } from "@/projects/boots-pharmacy/screens/home/homeContract";
@@ -1651,6 +1655,8 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     return () => unmountHomeScreen();
   }, []);
 
+  useChatScreenMount(SCREENS[current]?.childIndex);
+
   // Book – Step 1 (child 7): breadcrumb rewrite — Make path only
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 7) return;
@@ -1841,6 +1847,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   // Agentic chat (child 10): composer matches home — textarea, mic/send, chip dynamics
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 10) return;
+    if (isChatReactMounted()) return;
 
     let disposed = false;
     let cleanup: (() => void) | undefined;
@@ -2045,6 +2052,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   // Agentic chat — product links → PDP; “Go to vaccines catalog” → PLP
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 10) return;
+    if (isChatReactMounted()) return;
     const screen = document.querySelector(
       ".studio-viewport > div > div:nth-child(10)"
     ) as HTMLElement | null;

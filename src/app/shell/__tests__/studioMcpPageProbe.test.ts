@@ -139,6 +139,35 @@ describe("runMcpPageProbe", () => {
     expect(result.checks.find((c) => c.id === "url-screen")?.pass).toBe(true);
   });
 
+  it("chat stub recipe fails until React host mounts", async () => {
+    vi.stubGlobal("window", {
+      location: {
+        href: "http://localhost:5173/?project=boots-pharmacy&screen=chat",
+        search: "?project=boots-pharmacy&screen=chat",
+        pathname: "/",
+        hash: "",
+      },
+      history: { state: null, replaceState: vi.fn(), pushState: vi.fn() },
+      dispatchEvent: vi.fn(() => true),
+    });
+    vi.stubGlobal("document", {
+      querySelector: () => null,
+      querySelectorAll: () => [],
+      styleSheets: [],
+    });
+
+    const result = await runProbe({
+      screenId: "chat",
+      reload: false,
+    });
+
+    expect(result.pass).toBe(false);
+    expect(result.screenId).toBe("chat");
+    expect(result.checks.some((c) => c.id === "probe-recipe")).toBe(false);
+    expect(result.checks.find((c) => c.id === "chat-host")?.pass).toBe(false);
+    expect(result.checks.find((c) => c.id === "url-screen")?.pass).toBe(true);
+  });
+
   it("fails clearly when screen has no probe recipe", async () => {
     vi.stubGlobal("window", {
       location: {

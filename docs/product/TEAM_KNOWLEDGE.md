@@ -142,6 +142,15 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 - Pax (PO sim): <accept bar / bump call> — applied: <decision>
 ```
 
+**Knowledge improved** (2026-07-19 · stream: Chat React kickoff · PO override · R12 batch):
+- Arch (Director): Chat kickoff under PAGE_FINAL_PASS discipline while Site Pilot NOT hard-green (PO override); PDP HARD-GREEN preserved; Chat NOT-GREEN — applied: NEXT_STEPS §6 · team check
+- Bea (BA): 69-band Chat Make register + CJM/playback contracts + shared composer SK rows — applied: CHAT_MAKE_PARITY_REGISTER · CHAT_REACT
+- Finn (FE): shared `SitePilotComposer` (Home+Chat); Chat scaffold gated `CHAT_REACT_MOUNT_ENABLED=false` so Make playback stays live — applied: screens/shared · screens/chat · isChatReactMounted
+- Uma (UI/UX): Chat fidelity IN PROGRESS; Motion owns chat animated transitions via `@/uxds/motion` — applied: UMA_FIDELITY_CHAT · MOTION.md
+- Quinn (QA): chat stub + mandatory playback smoke P1–P10; no false PROVEN — applied: QUINN_CHAT_PROBE_CRITERIA
+- Ben (BE): `chat-host` probe stub + `site-pilot-chat`→`chat` alias test; PAGE_FINAL_PASS/PARITY untouched — applied: studioMcpPageProbe · studioUrl.test
+- Pax (PO sim): one coherent wave push, no await CI — applied: R12
+
 **Knowledge improved** (2026-07-19 · stream: Site Pilot screenId rename · v0.0.40):
 - Arch (Director): public Boots Site Pilot id is `site-pilot`; `home` reserved — applied: screens.ts · URL.md · register
 - Bea (BA): register documents public `screenId=site-pilot` + reserved `home` — applied: HOME_MAKE_PARITY_REGISTER

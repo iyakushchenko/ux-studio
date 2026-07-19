@@ -3,6 +3,7 @@
  */
 
 import { playbackScrollMonitor } from "@/app/shell/playbackScrollMonitor";
+import { isChatReactMounted } from "@/projects/boots-pharmacy/screens/chat/mountChatScreen";
 
 const LEGACY_THREAD_CLASS = "proto-chat-thread";
 const DOCK_CLASS = "proto-chat-composer-dock";
@@ -271,6 +272,7 @@ export function setSitePilotChatComposerDockSuppressed(suppressed: boolean): voi
 
 /** Mount / sync the fixed composer dock — same path for CJM on and browse. */
 export function mountSitePilotChatComposerDock(screen: HTMLElement): void {
+  if (isChatReactMounted()) return;
   ensureSitePilotChatComposerDock(screen);
   syncSitePilotChatComposerDock(screen);
   applyComposerDockSuppressed(screen);
@@ -282,6 +284,7 @@ export function mountSitePilotChatComposerDock(screen: HTMLElement): void {
 
 /** Idempotent — safe before scenario frame collection. */
 export function ensureSitePilotChatComposerDock(screen: HTMLElement): void {
+  if (isChatReactMounted()) return;
   const summary = getChatSummary(screen);
   const paddingDiv = summary?.parentElement ?? null;
   const composer = summary ? findInPlaceComposer(screen) : null;

@@ -6,6 +6,7 @@
  *   await window.__studioRunMcpPageProbe?.({ screenId: "plp" })
  *   await window.__studioRunMcpPageProbe?.({ screenId: "pdp", reload: false })
  *   await window.__studioRunMcpPageProbe?.({ screenId: "site-pilot", reload: false })
+ *   await window.__studioRunMcpPageProbe?.({ screenId: "chat", reload: false })
  */
 
 import {
@@ -1028,6 +1029,31 @@ function sitePilotProbeSteps(): ProbeStep[] {
   ];
 }
 
+/**
+ * Chat (Agentic) probe stub — mirrors site-pilot kickoff mount.
+ * Full matrix (composer / frames / persona heading) not stubbed yet — no false PROVEN.
+ * Logged-in heading / persona copy: `isStudioLoggedIn` / `__studioIsLoggedIn` only
+ * (`src/app/shell/studioAuthSession.ts`) — no new auth store.
+ */
+function chatProbeSteps(): ProbeStep[] {
+  return [
+    {
+      id: "chat-host",
+      selector: '[data-studio-react-screen="chat"]',
+      action: "assert",
+      assert: () => {
+        const host = document.querySelector(
+          '[data-studio-react-screen="chat"]'
+        );
+        if (host == null) {
+          return 'missing React Chat host — expected [data-studio-react-screen="chat"]';
+        }
+        return true;
+      },
+    },
+  ];
+}
+
 function bookStepProbeSteps(screenId: string): ProbeStep[] {
   return [
     {
@@ -1045,6 +1071,7 @@ function stepsForScreen(screenId: string): ProbeStep[] | null {
   if (screenId === "plp") return plpProbeSteps();
   if (screenId === "pdp") return pdpProbeSteps();
   if (screenId === "site-pilot") return sitePilotProbeSteps();
+  if (screenId === "chat") return chatProbeSteps();
   if (
     screenId === "book-step-1" ||
     screenId === "book-step-2" ||

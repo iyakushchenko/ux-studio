@@ -49,5 +49,7 @@ export const HOME_SUGGESTED_LABEL = "Suggested dialog options:";
 export const HOME_SUGGESTED_LABEL_ID = "home-suggested-label";
 
 /** Textarea autosize — hug 1 line, grow to 5, then scroll (matches wire agentic query). */
-export const HOME_QUERY_LINE_PX = 24;
-export const HOME_QUERY_MAX_LINES = 5;
+export {
+  SITE_PILOT_QUERY_LINE_PX as HOME_QUERY_LINE_PX,
+  SITE_PILOT_QUERY_MAX_LINES as HOME_QUERY_MAX_LINES,
+} from "../shared/sitePilotComposerContract";
