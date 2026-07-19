@@ -125,17 +125,17 @@
       "stampedAt": {
         "sha": "57775a3",
         "date": "2026-07-19",
-        "note": "Finn structure/naming + UXDS Accordion kit + ButtonPrimary Book now; header crumbs + main RTB/below; BEM pdp; data-studio-react-screen + make-retired; FAQ 6/6 + TertiaryCta soft + muted chevrons. Restored HARD-GREEN after Quinn 23/23 re-prove on tip 57775a3 / v0.0.36 (playback panel + on-target cursor lock)."
+        "note": "Finn structure/naming + UXDS Accordion kit + ButtonPrimary Book now; header crumbs + main RTB/below; BEM pdp; data-studio-react-screen + make-retired; FAQ 6/6 + TertiaryCta soft + muted chevrons. Structure retained. Quinn MCP PASS @ 5c1d90f / v0.0.37 (Accordion Motion). hardGreen false until Arch restore."
       },
       "mcpFinalPass": {
-        "status": "NEEDS-REPROVE",
-        "pass": false,
+        "status": "PASS",
+        "pass": true,
         "stampedAt": {
-          "sha": "5d42df1",
+          "sha": "5c1d90f",
           "date": "2026-07-19",
           "version": "0.0.37",
-          "auditor": "Arch (Director) — Accordion Motion demote",
-          "note": "Honest demote: PDP FAQ Accordion moved CSS grid→Motion height (user-visible). Prior HARD-GREEN @ 57775a3 / v0.0.36. Quinn must re-prove MCP matrix + accordion height tween before HARD-GREEN restore. Root cause of invisible CSS anim: prefers-reduced-motion zeroed transitions. Ship tip 5d42df1 / v0.0.37."
+          "auditor": "Quinn (QA)",
+          "note": "MCP __studioRunMcpPageProbe({ screenId:\"pdp\", reload:false }) 23/23 PASS @ code tip 5c1d90f / v0.0.37 (~28686ms); Accordion Motion height spot PASS (6× data-studio-accordion-motion=height; mid-tween 0→~111→144); teardown forceClear + __studioAssertAgentTeardownClean PASS; canonical localhost:5173 reuse tab. Uma §0a PROVEN @ 76e2433. hardGreen false until Arch restore. Audit: FE_AUDIT_PDP_MCP_2026-07-19.md"
         },
         "url": "http://localhost:5173/?project=boots-pharmacy&screen=pdp",
         "auditPath": "docs/projects/boots-pharmacy/audits/FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md",
@@ -158,8 +158,8 @@
           { "id": "pdp-crumb-plp", "pass": true },
           { "id": "plp-to-pdp", "pass": true },
           { "id": "pdp-below-fold-scroll", "pass": true, "detail": "already in view + overlay visible" },
-          { "id": "pdp-faq-accordion-toggle", "pass": true },
-          { "id": "pdp-faq-accordion-reopen", "pass": true },
+          { "id": "pdp-faq-accordion-toggle", "pass": true, "detail": "Motion height contract" },
+          { "id": "pdp-faq-accordion-reopen", "pass": true, "detail": "Motion mid-tween assertable" },
           { "id": "pdp-faq-help-body", "pass": true },
           { "id": "pdp-download-cta-hover", "pass": true, "detail": "same tertiary .pdp__pill; no --bordered" },
           { "id": "url-screen", "pass": true }
