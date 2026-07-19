@@ -68,6 +68,8 @@ export type JourneyRuntime = {
   closeAvailability: () => void;
   closeAllPopups: () => void;
   applyDemoLocation: () => void;
+  /** Open/close registered studio modal from URL / recording (`&modal=`). */
+  applyStudioModal: (modalId: string | undefined) => void;
 };
 
 export type OrchestraModeOption = {

@@ -137,6 +137,17 @@ export type ProjectWireApi = {
   resetWireInteractionState: () => void;
   openAvailabilityTool: (intent?: AvailOpenIntent) => void;
   closeAvailabilityTool: () => void;
+  /** Registered modal openers — must update URL via shell sync (`&modal=`). */
+  openQuickView: () => void;
+  closeQuickView: () => void;
+  openLoginPopup: (tab?: "signin" | "create") => void;
+  closeLoginPopup: () => void;
+  openVaccinePicker: () => void;
+  closeVaccinePicker: () => void;
+  openRecipientPicker: () => void;
+  closeRecipientPicker: () => void;
+  /** Deep-link / popstate / replay — open registered modal or clear all. */
+  applyStudioModal: (modalId: string | undefined) => void;
   handleAvailabilityBookNow: (
     store: { id: string; name: string; address: string },
     slot: ChosenBookingSlot

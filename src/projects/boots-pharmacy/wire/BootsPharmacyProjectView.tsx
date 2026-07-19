@@ -101,6 +101,7 @@ import {
   wireAppointmentDetailsBreadcrumbs,
 } from "@/projects/boots-pharmacy/data/appointments";
 import type { ProjectShellBridge, ProjectWireApi } from "@/projects/types";
+import { applyStudioModalFromUrl } from "@/app/shell/studioModalRegistry";
 import { storeNavIndex } from "@/app/shell/studioNavStorage";
 import {
   isBookStep1ReactMounted,
@@ -966,12 +967,20 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   openAvailabilityToolRef.current = openAvailabilityTool;
   const closeAvailabilityTool = () => setAvailabilityOpen(false);
   closeAvailabilityToolRef.current = closeAvailabilityTool;
-  const openVaccinePicker = () => setVaccinePickerOpen(true);
-  const closeVaccinePicker = () => setVaccinePickerOpen(false);
-  const openRecipientPicker = () => setRecipientPickerOpen(true);
-  const closeRecipientPicker = () => setRecipientPickerOpen(false);
+  const openVaccinePicker = useCallback(() => setVaccinePickerOpen(true), []);
+  const closeVaccinePicker = useCallback(() => setVaccinePickerOpen(false), []);
+  const openRecipientPicker = useCallback(() => setRecipientPickerOpen(true), []);
+  const closeRecipientPicker = useCallback(
+    () => setRecipientPickerOpen(false),
+    []
+  );
   const openQuickView = useCallback(() => setQuickViewOpen(true), []);
   const closeQuickView = useCallback(() => setQuickViewOpen(false), []);
+  const openLoginPopup = useCallback((tab: "signin" | "create" = "signin") => {
+    setLoginPopupTab(tab);
+    setLoginPopupOpen(true);
+  }, []);
+  const closeLoginPopup = useCallback(() => setLoginPopupOpen(false), []);
   const closeAllPopups = useCallback(() => {
     setQuickViewOpen(false);
     setAvailabilityOpen(false);
@@ -979,6 +988,21 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     setRecipientPickerOpen(false);
     setLoginPopupOpen(false);
   }, []);
+  const applyStudioModal = (modalId: string | undefined) => {
+    applyStudioModalFromUrl(modalId, {
+      openAvailabilityTool,
+      closeAvailabilityTool,
+      openQuickView,
+      closeQuickView,
+      openLoginPopup,
+      closeLoginPopup,
+      openVaccinePicker,
+      closeVaccinePicker,
+      openRecipientPicker,
+      closeRecipientPicker,
+      closeAllPopups,
+    });
+  };
 
   const goSitePilotHome = useCallback((query: string) => {
     pendingAgenticHomeQueryRef.current = query;
@@ -991,17 +1015,19 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     setCurrent(0);
   }, [setCurrent, setHubOpen]);
   const onQuickViewBookNow = useCallback(() => {
-    setQuickViewOpen(false);
+    closeQuickView();
     setCurrent(INDEX_BOOK_STEP1);
-  }, [setCurrent, INDEX_BOOK_STEP1]);
+  }, [setCurrent, INDEX_BOOK_STEP1, closeQuickView]);
   const onQuickViewViewDetails = useCallback(() => {
-    setQuickViewOpen(false);
+    closeQuickView();
     setCurrent(3);
-  }, [setCurrent]);
-  const onQuickViewOpenLogin = useCallback((tab: "signin" | "create") => {
-    setLoginPopupTab(tab);
-    setLoginPopupOpen(true);
-  }, []);
+  }, [setCurrent, closeQuickView]);
+  const onQuickViewOpenLogin = useCallback(
+    (tab: "signin" | "create") => {
+      openLoginPopup(tab);
+    },
+    [openLoginPopup]
+  );
 
   const openPickLocations = (
     mode: "list" | "nearMe" | "start" = "list",
@@ -1320,7 +1346,9 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
           syncAgenticHomeHeading(isLoggedIn);
         }
       },
-      onLoginClick: (tab) => { setLoginPopupTab(tab || "signin"); setLoginPopupOpen(true); },
+      onLoginClick: (tab) => {
+        openLoginPopup(tab === "create" ? "create" : "signin");
+      },
       onSignOut: () => {
         setLoggedInFlag(false);
         if (SCREENS[currentRef.current]?.childIndex === 11) {
@@ -1959,8 +1987,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       stop(e);
       const intent: AvailOpenIntent = { step: "list", query: "London" };
       if (isHeaderLoggedIn()) intent.storeId = AVAIL_DEMO_STORE;
-      setAvailIntent(intent);
-      setAvailabilityOpen(true);
+      openAvailabilityTool(intent);
     };
     const openAvailability = (intent: AvailOpenIntent) => (e: Event) => {
       stop(e);
@@ -2214,8 +2241,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     const goBookStep1 = (e: Event) => {
       stop(e);
       if (!isHeaderLoggedIn() && !loggedInFlag) {
-        setLoginPopupTab("signin");
-        setLoginPopupOpen(true);
+        openLoginPopup("signin");
         return;
       }
       setCurrent(INDEX_BOOK_STEP1);
@@ -2300,8 +2326,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       e.preventDefault();
       e.stopPropagation();
       const text = (e.currentTarget as HTMLElement).textContent?.trim() ?? "";
-      setLoginPopupTab(text === "Create Boots Account" ? "create" : "signin");
-      setLoginPopupOpen(true);
+      openLoginPopup(text === "Create Boots Account" ? "create" : "signin");
     };
 
     links.forEach((link) => {
@@ -2417,7 +2442,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
-      if (loginPopupOpen) setLoginPopupOpen(false);
+      if (loginPopupOpen) closeLoginPopup();
       else if (quickViewOpen) closeQuickView();
       else if (recipientPickerOpen) closeRecipientPicker();
       else if (vaccinePickerOpen) closeVaccinePicker();
@@ -2455,6 +2480,10 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     recipientPickerOpen,
     loginPopupOpen,
     quickViewOpen,
+    closeLoginPopup,
+    closeQuickView,
+    closeRecipientPicker,
+    closeVaccinePicker,
     prototypeScrollElRef,
   ]);
 
@@ -4512,6 +4541,15 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       resetWireInteractionState,
       openAvailabilityTool,
       closeAvailabilityTool,
+      openQuickView,
+      closeQuickView,
+      openLoginPopup,
+      closeLoginPopup,
+      openVaccinePicker,
+      closeVaccinePicker,
+      openRecipientPicker,
+      closeRecipientPicker,
+      applyStudioModal,
       applyDemoLocation,
       syncBookStep2RetreatDefault,
       handleAvailabilityBookNow,
@@ -4607,8 +4645,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
         onBookNow={handleAvailabilityBookNow}
         loggedIn={loggedInFlag || isHeaderLoggedIn()}
         onOpenLogin={() => {
-          setLoginPopupTab("signin");
-          setLoginPopupOpen(true);
+          openLoginPopup("signin");
         }}
       />
 
@@ -4631,7 +4668,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       <LoginPopup
         open={loginPopupOpen && activeChildIndex != null}
         initialTab={loginPopupTab}
-        onClose={() => setLoginPopupOpen(false)}
+        onClose={closeLoginPopup}
         onSignIn={() => {
           setHeaderLoggedIn(true);
           setLoggedInFlag(true);

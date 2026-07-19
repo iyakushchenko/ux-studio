@@ -102,7 +102,7 @@ import {
   storeNavIndex,
   studioNavStorageKey,
 } from "@/app/shell/studioNavStorage";
-import { STUDIO_MODAL } from "@/app/shell/studioModalGuard";
+import { resolveStudioModalIdFromFlags } from "@/app/shell/studioModalRegistry";
 import {
   applyStudioScreen,
   HUB_SCREEN_ID,
@@ -113,6 +113,10 @@ import {
   STUDIO_POST_AGENT_RESET_EVENT,
   type StudioPostAgentResetDetail,
 } from "@/app/shell/studioUrl";
+import {
+  studioModalFlagsFromWire,
+  useStudioModalUrlBridge,
+} from "@/app/shell/useStudioModalUrlBridge";
 import { useStudioUrlSync } from "@/app/shell/useStudioUrlSync";
 import { getProjectWire } from "@/projects/registry";
 import { useNavTransition } from "@/app/shell/useNavTransition";
@@ -258,11 +262,13 @@ export default function App() {
     storeHubOpen(studioProjectId, hubOpen);
   }, [current, hubOpen, studioProjectId]);
 
-  // wireTick re-reads the ref when Boots avail open/close lands.
-  const studioModalId =
-    wireTick >= 0 && wireApiRef.current?.availabilityOpen
-      ? STUDIO_MODAL.choosePharmacy
-      : undefined;
+  const { studioModalId, applyModalFromUrl } = useStudioModalUrlBridge({
+    wireTick,
+    wireApiRef,
+    openAvailabilityToolRef,
+    closeAvailabilityToolRef,
+    pickListIntent: AVAIL_INTENT.pickList,
+  });
 
   useStudioUrlSync({
     projectId: studioProjectId,
@@ -277,13 +283,7 @@ export default function App() {
     setModeId: setOrchestraModeId,
     setCurrent,
     setHubOpen,
-    applyModal: (modalId) => {
-      if (modalId === STUDIO_MODAL.choosePharmacy) {
-        openAvailabilityToolRef.current(AVAIL_INTENT.pickList);
-      } else {
-        closeAvailabilityToolRef.current();
-      }
-    },
+    applyModal: applyModalFromUrl,
   });
 
   // Agent overlay stop → dismiss sticky popups; apply stay/hub URL (already written).
@@ -305,13 +305,7 @@ export default function App() {
         setModeId: setOrchestraModeId,
         setCurrent,
         setHubOpen,
-        applyModal: (modalId) => {
-          if (modalId === STUDIO_MODAL.choosePharmacy) {
-            openAvailabilityToolRef.current(AVAIL_INTENT.pickList);
-          } else {
-            closeAvailabilityToolRef.current();
-          }
-        },
+        applyModal: applyModalFromUrl,
         syncUrl: true,
       });
     };
@@ -321,23 +315,12 @@ export default function App() {
     };
   }, [
     SCREENS,
+    applyModalFromUrl,
     setOrchestraModeId,
     setStudioPersonaId,
     setStudioProjectId,
     studioProjectId,
   ]);
-
-  // Deep-link / boot may apply modal before Boots wire mounts — re-open when ready.
-  useEffect(() => {
-    if (!wireApiRef.current) return;
-    const modalId = parseStudioUrl().modalId;
-    if (
-      modalId === STUDIO_MODAL.choosePharmacy &&
-      !wireApiRef.current.availabilityOpen
-    ) {
-      openAvailabilityToolRef.current(AVAIL_INTENT.pickList);
-    }
-  }, [wireTick]);
 
   const journeyRuntime = useMemo<JourneyRuntime>(
     () => ({
@@ -361,8 +344,11 @@ export default function App() {
       applyDemoLocation: () => {
         wireApiRef.current?.applyDemoLocation();
       },
+      applyStudioModal: (modalId) => {
+        applyModalFromUrl(modalId);
+      },
     }),
-    []
+    [applyModalFromUrl]
   );
 
   const activeScreenScenario = useMemo(
@@ -1075,7 +1061,7 @@ export default function App() {
     screenId: snapshotScreenId,
     personaId: studioPersonaId,
     modeId: orchestraModeId,
-    modalId: wire?.availabilityOpen ? STUDIO_MODAL.choosePharmacy : undefined,
+    modalId: resolveStudioModalIdFromFlags(studioModalFlagsFromWire(wire)),
   });
 
   playbackSnapshotRef.current = buildPlaybackStudioSnapshot({

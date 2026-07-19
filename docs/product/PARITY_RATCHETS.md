@@ -35,6 +35,7 @@
 | 2 | **bookmark-copy** | Bookmarked label drift | PLP source must include **"In your Bookmarks"** + **"Remove from Bookmarks"** | PO bookmark copy |
 | 3 | **empty-heart-fuchsia** | Invented fuchsia on **empty** heart hover | PLP CSS empty wishlist hover (`:not(.is-active)`) must use `--uxds-text-link-link`; fuchsia only on `.is-active` | LESSONS invent hover |
 | 4 | **overlay-registry** | MCP/robo click-through | Kept in `check:felonies` (`REGISTERED_OVERLAY_MODAL_IDS`); ratchet asserts felony gate still wired | Overlay eyes |
+| 4b | **modal-url-sync** | Popup opens with **no** `&modal=` URL change | `studioModalRegistry.ts` lists every id with `urlSync` + helpers; App uses `resolveStudioModalIdFromFlags`; wire exposes `openQuickView` / `applyStudioModal`; felonies fail orphan `set*Open(true)` | PO: Quick View URL |
 | 5 | **advantage-bar** | Whole-band miss on PLP | PLP must contain Advantage Card copy + `data-studio-plp-advantage` | LESSONS Advantage miss |
 | 6 | **book-now-primary** | Book now not UXDS primary | PLP **Book now** must render via `<ButtonPrimary>` (`.uxds-btn-primary`) | PLP commerce CTA |
 | 7 | **loader-dup** | Duplicate “Updating results…” | Exactly **one** `"Updating results"` in PLP source; spinner has `data-studio-plp-listing-loader`; not in count block | LESSONS loader dup |
@@ -57,7 +58,7 @@
 | `data-studio-plp-listing-loader="true"` | In-band listing spinner overlay |
 | `data-studio-plp-results-loading="true"` | Results count hidden during listing refresh (no jab totals) |
 | `data-studio-make-retired="<screenId>"` | Make Frame child hidden after React mount |
-| `data-studio-modal="<id>"` | Blocking overlay (felony registry) |
+| `data-studio-modal="<id>"` | Blocking overlay (felony registry + URL `modal=` id) |
 
 ---
 

@@ -8,6 +8,7 @@ Address-bar deep links for UX Studio. **Query params only** — works with Vite 
 ?project=<projectId>&screen=<screenId>
 ?project=boots-pharmacy&screen=book-step-2
 ?project=boots-pharmacy&screen=book-step-1&modal=choose-pharmacy
+?project=boots-pharmacy&screen=plp&modal=quick-view
 ?project=boots-pharmacy&screen=home&persona=sarah-jenkins&mode=agentic-cjm
 ```
 
@@ -23,6 +24,7 @@ Examples (local / Pages):
 
 - `http://localhost:5173/?project=boots-pharmacy&screen=book-step-2`
 - `http://localhost:5173/?project=boots-pharmacy&screen=book-step-1&modal=choose-pharmacy`
+- `http://localhost:5173/?project=boots-pharmacy&screen=plp&modal=quick-view`
 - `https://iyakushchenko.github.io/ux-studio/?project=boots-pharmacy&screen=book-step-1`
 
 ## Boots Pharmacy `screen` ids
@@ -44,23 +46,31 @@ Aliases accepted on parse: `book-step2` → `book-step-2`, `onboarding` → `hub
 
 ## Boots Pharmacy `modal` ids
 
+**Registry:** `src/app/shell/studioModalRegistry.ts` (`STUDIO_MODAL_REGISTRY`) — every blocking dialog must be listed with `urlSync: true` + open/close helpers. Felony if unregistered or open bypasses the helper (no URL change).
+
 | `modal` | Surface | Opened from |
 |---------|---------|-------------|
-| `choose-pharmacy` | Availability / Choose Pharmacy lightbox (`.studio-avail-scrim`, `data-studio-modal`) | Book Step 1 Continue (no location), Search / Near me / Change location, journey beat actions |
+| `choose-pharmacy` | Availability / Choose Pharmacy (`.studio-avail-scrim`, `data-studio-modal`) | Book Step 1 Continue (no location), Search / Near me / Change location, journey beats |
+| `quick-view` | PLP Quick View lightbox | PLP tile Quick View CTA (single-SKU chickenpox RTB today; optional `&jab=` later if multi-SKU) |
+| `login` | Login / Create account | Header Sign in, PDP / Quick View account CTAs, Check availability when logged out |
+| `vaccine-picker` | Vaccine picker | Book Step 1 / 2 Change vaccine |
+| `recipient-picker` | Recipient picker | Book Step 1 / 2 Change recipient |
 
-Aliases on parse: `availability`, `avail` → `choose-pharmacy`.
+Aliases on parse: `availability` / `avail` → `choose-pharmacy`; `quickview` → `quick-view`; `account` → `login`.
+
+When multiple dialogs are open (e.g. Login over Quick View), URL uses the **topmost** id (`STUDIO_MODAL_URL_PRIORITY`).
 
 ## Behavior
 
 1. **Boot** — URL wins over `sessionStorage` when `project` / `screen` / `persona` / `mode` / `modal` present.
 2. **Nav** — tab / hub changes `replaceState` the bar (no history spam).
-3. **Modal** — open/close of Choose Pharmacy syncs `&modal=`; modal transitions use `pushState` so Back closes the lightbox. Deep link re-opens after wire mount.
+3. **Modal** — open/close of **any** registered lightbox syncs `&modal=` via `resolveStudioModalIdFromFlags` + `useStudioUrlSync`; modal transitions use `pushState` so Back closes the lightbox. Deep link re-opens after wire mount (`applyStudioModal` / `applyStudioModalFromUrl`).
 4. **Refresh / deep link** — restores project + screen (+ modal when present).
 5. **Back/forward** — `popstate` re-applies query (screen + modal).
 6. **Ephemeral strip** — `proof`, `mcpDebug`, `agentTest`, `agentOverlay` removed on boot, overlay install, and overlay stop. Never re-written by studio sync.
 7. **Post-agent reset** — after MCP / agent overlay `stop()` (and again immediately before reload): `resetStudioAfterAgentTest()`. **Default:** stay on current `project`+`screen`(+persona/mode/modal); strip ephemeral only. **`resetToHub: true`:** land `screen=hub` (CJM/journey). Quinn proves page probe → still `screen=plp`.
 
-Implementation: `src/app/shell/studioUrl.ts` · `useStudioUrlSync.ts` · `studioModalGuard.ts` · `agentTestingOverlay.ts`.
+Implementation: `src/app/shell/studioUrl.ts` · `useStudioUrlSync.ts` · `studioModalRegistry.ts` · `studioModalGuard.ts` · `agentTestingOverlay.ts`.
 
 ## Recording
 

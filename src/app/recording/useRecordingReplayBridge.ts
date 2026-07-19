@@ -140,6 +140,11 @@ export function useRecordingReplayBridge(options: {
 
   const applyModalFromUrl = useCallback((modalId: string | undefined) => {
     const runtime = journeyRuntimeRef.current;
+    if (runtime.applyStudioModal) {
+      runtime.applyStudioModal(modalId);
+      return;
+    }
+    // Legacy fallback
     if (modalId === STUDIO_MODAL.choosePharmacy) {
       runtime.openAvailability({
         step: "list",
@@ -148,6 +153,7 @@ export function useRecordingReplayBridge(options: {
       });
     } else {
       runtime.closeAvailability();
+      runtime.closeAllPopups();
     }
   }, []);
 

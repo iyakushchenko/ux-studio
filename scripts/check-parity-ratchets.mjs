@@ -262,9 +262,61 @@ const REACT_MOUNT_FILES = [
       "RATCHET overlay-registry: check-agent-felonies.mjs must keep overlay eyes / REGISTERED_OVERLAY_MODAL_IDS gate"
     );
   }
+  if (felonies && !/studioModalRegistry|modal URL sync/.test(felonies)) {
+    fail(
+      "RATCHET overlay-registry: check-agent-felonies.mjs must gate modal URL sync registry"
+    );
+  }
   const pkg = requireFile("package.json");
   if (pkg && !/"check:felonies"/.test(pkg)) {
     fail("RATCHET overlay-registry: package.json missing check:felonies script");
+  }
+}
+
+// ── 4b) Modal URL sync — every registered popup must drive `&modal=` ──────────
+{
+  const reg = requireFile("src/app/shell/studioModalRegistry.ts");
+  if (!reg) {
+    fail("RATCHET modal-url-sync: missing studioModalRegistry.ts");
+  } else {
+    for (const id of [
+      "choose-pharmacy",
+      "quick-view",
+      "login",
+      "vaccine-picker",
+      "recipient-picker",
+    ]) {
+      if (!reg.includes(`"${id}"`) && !reg.includes(`'${id}'`)) {
+        fail(`RATCHET modal-url-sync: registry missing "${id}"`);
+      }
+    }
+    if (!/urlSync:\s*true/.test(reg)) {
+      fail("RATCHET modal-url-sync: registry entries must set urlSync: true");
+    }
+    if (!/resolveStudioModalIdFromFlags/.test(reg) || !/applyStudioModalFromUrl/.test(reg)) {
+      fail(
+        "RATCHET modal-url-sync: registry must export resolve + apply URL helpers"
+      );
+    }
+  }
+  const app = requireFile("src/app/App.tsx") || "";
+  const bridge = requireFile("src/app/shell/useStudioModalUrlBridge.ts") || "";
+  if (!/useStudioModalUrlBridge/.test(app)) {
+    fail("RATCHET modal-url-sync: App.tsx must use useStudioModalUrlBridge");
+  }
+  if (!/resolveStudioModalIdFromFlags/.test(`${app}\n${bridge}`)) {
+    fail(
+      "RATCHET modal-url-sync: App/bridge must sync modalId via resolveStudioModalIdFromFlags"
+    );
+  }
+  const wire = requireFile(
+    "src/projects/boots-pharmacy/wire/BootsPharmacyProjectView.tsx"
+  );
+  if (wire && !/\bopenQuickView\b/.test(wire)) {
+    fail("RATCHET modal-url-sync: wire must expose openQuickView");
+  }
+  if (wire && !/\bapplyStudioModal\b/.test(wire)) {
+    fail("RATCHET modal-url-sync: wire must expose applyStudioModal");
   }
 }
 

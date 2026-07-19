@@ -91,6 +91,16 @@ Agents **must read** this file before claiming a UI or Studio-chrome slice done.
   3. `check:felonies` fails npm test if guard missing or known overlays unregistered.
 - **Quinn prove:** open Quick View → probe cannot click PLP tile underneath → overlay sitrep PASS.
 
+### Modal URL — every popup must change the address bar (PO rage)
+
+- **Symptom:** Quick View (and other Boots dialogs) opened with **no** URL change; only Choose Pharmacy synced `&modal=`.
+- **Root cause:** `useStudioUrlSync` derived `modalId` from `availabilityOpen` only; openers called raw `set*Open(true)` without a central registry.
+- **Gate (GLOBAL HARD FAIL):**
+  1. `STUDIO_MODAL_REGISTRY` lists every dialog (`choose-pharmacy`, `quick-view`, `login`, `vaccine-picker`, `recipient-picker`) with `urlSync: true` + open/close helpers ([URL.md](../shell/URL.md)).
+  2. App derives `modalId` via `resolveStudioModalIdFromFlags`; open/close → `writeStudioUrl`; deep-link / `popstate` → `applyStudioModalFromUrl`.
+  3. `check:felonies` + ratchet **modal-url-sync** fail npm test if registry entry missing, lacks URL helper, or source opens via orphan `set*Open(true)`.
+- **Quinn prove:** open Quick View on PLP → bar shows `modal=quick-view`; close / Back clears `modal`.
+
 ### Stale jab count during Reset / filter refresh = ship fail (PO rage #5)
 
 - **Symptom:** During PLP “Updating results…” loader (Reset filters / filter change), top-left still showed stale totals like **“3 jabs available”** — made-up leftover from prior `displayItems`.

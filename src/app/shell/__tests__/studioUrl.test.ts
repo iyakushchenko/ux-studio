@@ -58,6 +58,17 @@ describe("studioUrl", () => {
     expect(parseStudioUrl("?modal=availability").modalId).toBe(
       "choose-pharmacy"
     );
+    expect(
+      parseStudioUrl("?project=boots-pharmacy&screen=plp&modal=quick-view")
+        .modalId
+    ).toBe("quick-view");
+    expect(
+      serializeStudioUrl({
+        projectId: "boots-pharmacy",
+        screenId: "plp",
+        modalId: "quick-view",
+      })
+    ).toBe("?project=boots-pharmacy&screen=plp&modal=quick-view");
   });
 
   it("normalizes screen aliases", () => {

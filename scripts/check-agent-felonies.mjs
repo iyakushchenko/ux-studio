@@ -316,6 +316,180 @@ for (const { rel, id } of OVERLAY_DOM_EXPECT) {
   }
 }
 
+// --- 8) Modal URL sync registry — every popup must sync `&modal=` on open ---
+const modalRegistryPath = path.join(
+  ROOT,
+  "src",
+  "app",
+  "shell",
+  "studioModalRegistry.ts"
+);
+if (!fs.existsSync(modalRegistryPath)) {
+  fail("missing src/app/shell/studioModalRegistry.ts (modal URL registry)");
+} else {
+  const regSrc = fs.readFileSync(modalRegistryPath, "utf8");
+  if (!/export const STUDIO_MODAL_REGISTRY/.test(regSrc)) {
+    fail("studioModalRegistry must export STUDIO_MODAL_REGISTRY");
+  }
+  if (!/resolveStudioModalIdFromFlags/.test(regSrc)) {
+    fail("studioModalRegistry must export resolveStudioModalIdFromFlags");
+  }
+  if (!/applyStudioModalFromUrl/.test(regSrc)) {
+    fail("studioModalRegistry must export applyStudioModalFromUrl");
+  }
+  if (!/STUDIO_MODAL_REGISTRY_IDS/.test(regSrc)) {
+    fail("studioModalRegistry must export STUDIO_MODAL_REGISTRY_IDS (literal id list)");
+  }
+  for (const id of REQUIRED_OVERLAY_IDS) {
+    if (!regSrc.includes(`"${id}"`) && !regSrc.includes(`'${id}'`)) {
+      fail(
+        `FELONY: STUDIO_MODAL_REGISTRY / STUDIO_MODAL_REGISTRY_IDS missing modal id "${id}"`
+      );
+    }
+  }
+  // Each registry entry must declare urlSync + open/close helpers.
+  const entryBlocks = [
+    ...regSrc.matchAll(
+      /\{\s*id:\s*STUDIO_MODAL\.\w+[\s\S]*?mountRel:\s*"[^"]+"/g
+    ),
+  ];
+  if (entryBlocks.length < REQUIRED_OVERLAY_IDS.length) {
+    fail(
+      `FELONY: STUDIO_MODAL_REGISTRY must list ≥${REQUIRED_OVERLAY_IDS.length} entries with id+mountRel (found ${entryBlocks.length})`
+    );
+  }
+  for (const m of entryBlocks) {
+    const block = m[0];
+    if (!/urlSync:\s*true/.test(block)) {
+      fail("FELONY: every STUDIO_MODAL_REGISTRY entry must set urlSync: true");
+    }
+    if (!/openHelper:\s*"[A-Za-z0-9_]+"/.test(block)) {
+      fail("FELONY: registry entry missing openHelper string");
+    }
+    if (!/closeHelper:\s*"[A-Za-z0-9_]+"/.test(block)) {
+      fail("FELONY: registry entry missing closeHelper string");
+    }
+  }
+}
+
+const appPath = path.join(ROOT, "src", "app", "App.tsx");
+const modalBridgePath = path.join(
+  ROOT,
+  "src",
+  "app",
+  "shell",
+  "useStudioModalUrlBridge.ts"
+);
+if (!fs.existsSync(appPath)) {
+  fail("missing src/app/App.tsx");
+} else {
+  const appSrc = fs.readFileSync(appPath, "utf8");
+  const bridgeSrc = fs.existsSync(modalBridgePath)
+    ? fs.readFileSync(modalBridgePath, "utf8")
+    : "";
+  const modalSyncSrc = `${appSrc}\n${bridgeSrc}`;
+  if (!/resolveStudioModalIdFromFlags/.test(modalSyncSrc)) {
+    fail(
+      "FELONY: App / useStudioModalUrlBridge must derive modalId via resolveStudioModalIdFromFlags"
+    );
+  }
+  if (!/useStudioModalUrlBridge/.test(appSrc)) {
+    fail("FELONY: App.tsx must use useStudioModalUrlBridge for modal URL sync");
+  }
+  if (!/applyStudioModalFromUrl|applyStudioModal/.test(modalSyncSrc)) {
+    fail(
+      "FELONY: App / bridge must apply modals via applyStudioModal / applyStudioModalFromUrl"
+    );
+  }
+  // Must not hard-wire only choose-pharmacy into modalId.
+  if (
+    /modalId:\s*wire\?\.availabilityOpen\s*\?\s*STUDIO_MODAL\.choosePharmacy/.test(
+      modalSyncSrc
+    )
+  ) {
+    fail(
+      "FELONY: still syncs only choose-pharmacy — use resolveStudioModalIdFromFlags"
+    );
+  }
+}
+
+const wirePath = path.join(
+  ROOT,
+  "src",
+  "projects",
+  "boots-pharmacy",
+  "wire",
+  "BootsPharmacyProjectView.tsx"
+);
+if (!fs.existsSync(wirePath)) {
+  fail("missing BootsPharmacyProjectView.tsx");
+} else {
+  const wireSrc = fs.readFileSync(wirePath, "utf8");
+  const OPEN_HELPERS = [
+    "openAvailabilityTool",
+    "openQuickView",
+    "openLoginPopup",
+    "openVaccinePicker",
+    "openRecipientPicker",
+  ];
+  for (const helper of OPEN_HELPERS) {
+    if (!new RegExp(`\\b${helper}\\b`).test(wireSrc)) {
+      fail(`FELONY: wire missing registered open helper ${helper}`);
+    }
+  }
+  if (!/\bapplyStudioModal\b/.test(wireSrc)) {
+    fail("FELONY: wire must expose applyStudioModal for URL / popstate / replay");
+  }
+  // Direct open setters must live only inside registered helpers (no orphan opens).
+  const OPEN_SETTERS = [
+    { setter: "setQuickViewOpen(true)", helper: "openQuickView" },
+    { setter: "setLoginPopupOpen(true)", helper: "openLoginPopup" },
+    { setter: "setVaccinePickerOpen(true)", helper: "openVaccinePicker" },
+    { setter: "setRecipientPickerOpen(true)", helper: "openRecipientPicker" },
+  ];
+  for (const { setter, helper } of OPEN_SETTERS) {
+    let from = 0;
+    let count = 0;
+    while (true) {
+      const idx = wireSrc.indexOf(setter, from);
+      if (idx < 0) break;
+      count++;
+      const before = wireSrc.slice(Math.max(0, idx - 220), idx);
+      if (!new RegExp(`${helper}\\s*=`).test(before)) {
+        fail(
+          `FELONY: ${setter} outside registered helper ${helper} — open must go through helper (URL sync)`
+        );
+      }
+      from = idx + setter.length;
+    }
+    if (count < 1) {
+      fail(`FELONY: expected ${setter} inside ${helper}`);
+    }
+  }
+  // Availability open setter must be reached only via openAvailabilityTool.
+  {
+    let from = 0;
+    let orphan = 0;
+    let viaHelper = 0;
+    while (true) {
+      const idx = wireSrc.indexOf("setAvailabilityOpen(true)", from);
+      if (idx < 0) break;
+      const before = wireSrc.slice(Math.max(0, idx - 400), idx);
+      if (/openAvailabilityTool\s*=/.test(before)) viaHelper++;
+      else orphan++;
+      from = idx + "setAvailabilityOpen(true)".length;
+    }
+    if (viaHelper < 1) {
+      fail("FELONY: openAvailabilityTool must call setAvailabilityOpen(true)");
+    }
+    if (orphan > 0) {
+      fail(
+        "FELONY: setAvailabilityOpen(true) outside openAvailabilityTool — modal URL would desync"
+      );
+    }
+  }
+}
+
 if (errors.length) {
   console.error("[check:felonies] FAIL — agent felony gate:\n");
   for (const e of errors) console.error(`  • ${e}`);
@@ -326,5 +500,5 @@ if (errors.length) {
 }
 
 console.log(
-  "[check:felonies] OK — filenames, PANEL CSS, data-proto, BOOTS stubs, channel, version chip, overlay eyes"
+  "[check:felonies] OK — filenames, PANEL CSS, data-proto, BOOTS stubs, channel, version chip, overlay eyes, modal URL sync"
 );
