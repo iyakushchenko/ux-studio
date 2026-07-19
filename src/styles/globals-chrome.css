@@ -856,36 +856,37 @@
   box-shadow: none !important;
 }
 
-/* PLP tile compact actions — Add to Bookmarks, Quick View (no filled primary bg). */
+/* PLP tile compact actions — Add to Bookmarks, Quick View (Make tiles only).
+ * Exclude UXDS `.uxds-btn-primary` + React `.plp__tertiary` so commerce / page CSS hover tokens win. */
 .studio-viewport [data-name="boots-pharmacy.service.tile"]
-  [data-name="component.input.button"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]) {
+  [data-name="component.input.button"]:not(.uxds-btn-primary):not(.plp__tertiary):not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]) {
   cursor: pointer !important;
   transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.12s ease !important;
 }
 .studio-viewport [data-name="boots-pharmacy.service.tile"]
-  [data-name="component.input.button"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]):hover,
+  [data-name="component.input.button"]:not(.uxds-btn-primary):not(.plp__tertiary):not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]):hover,
 .studio-viewport [data-name="boots-pharmacy.service.tile"]
-  [data-name="component.input.button"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]).proto-chat-cta--hover {
+  [data-name="component.input.button"]:not(.uxds-btn-primary):not(.plp__tertiary):not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]).proto-chat-cta--hover {
   background: #c6e5e1 !important;
   box-shadow: 0 4px 12px rgba(175, 204, 202, 0.4) !important;
   transform: translateY(-1px) !important;
 }
 .studio-viewport [data-name="boots-pharmacy.service.tile"]
-  [data-name="component.input.button"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]):hover svg path,
+  [data-name="component.input.button"]:not(.uxds-btn-primary):not(.plp__tertiary):not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]):hover svg path,
 .studio-viewport [data-name="boots-pharmacy.service.tile"]
-  [data-name="component.input.button"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]).proto-chat-cta--hover svg path {
+  [data-name="component.input.button"]:not(.uxds-btn-primary):not(.plp__tertiary):not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]).proto-chat-cta--hover svg path {
   fill: #01318f !important;
 }
 .studio-viewport [data-name="boots-pharmacy.service.tile"]
-  [data-name="component.input.button"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]):hover *,
+  [data-name="component.input.button"]:not(.uxds-btn-primary):not(.plp__tertiary):not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]):hover *,
 .studio-viewport [data-name="boots-pharmacy.service.tile"]
-  [data-name="component.input.button"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]).proto-chat-cta--hover * {
+  [data-name="component.input.button"]:not(.uxds-btn-primary):not(.plp__tertiary):not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]).proto-chat-cta--hover * {
   color: #01318f !important;
 }
 .studio-viewport [data-name="boots-pharmacy.service.tile"]
-  [data-name="component.input.button"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]):active,
+  [data-name="component.input.button"]:not(.uxds-btn-primary):not(.plp__tertiary):not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]):active,
 .studio-viewport [data-name="boots-pharmacy.service.tile"]
-  [data-name="component.input.button"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]).proto-chat-cta--pressed {
+  [data-name="component.input.button"]:not(.uxds-btn-primary):not(.plp__tertiary):not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]).proto-chat-cta--pressed {
   background: #afccca !important;
   transform: translateY(0) !important;
   box-shadow: none !important;

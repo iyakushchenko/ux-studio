@@ -42,9 +42,9 @@ Trivial one-line docs may skip; **do not** skip for user-visible or REC/URL work
 | Command | When | What |
 |---------|------|------|
 | **`team report`** | PO says it (or clear equivalent) | Arch facilitates lean sitrep: every callsign 1–3 sentences; Pax status + decisions pending; Arch closes with NOW/NEXT so PO can answer only `+` / `ok` / `go` / `do`. No essays. |
-| **`team check`** | PO says it **or Arch auto-triggers after each big task completion** (do not wait for PO) | Whole-team workstream review; cross-check; surface blockers + instruct owning callsign; Quinn CI/Pages if relevant; Ben `gh` sitrep; Arch assigns concrete tasks until green. Short per-role results + Arch assignments. |
+| **`team check`** | PO says it **or Arch auto-triggers after each big task completion** (do not wait for PO) | Whole-team workstream review; cross-check; surface blockers + instruct owning callsign; Quinn CI/Pages if relevant; Ben `gh` sitrep; Arch assigns concrete tasks until green. Short per-role results + Arch assignments. **Each callsign must report:** Uma (UI/UX) fidelity checklist PASS/FAIL; Bea (BA) register complete? / Missing P0?; Quinn (QA) interaction matrix (hover/click) PASS/FAIL; Finn (FE) gaps fixed or blocked. Arch steers until Uma checklist + Bea register + Quinn matrix are green. |
 
-**Hard rule:** After a big ship, Arch runs **team check** before declaring done — tests green alone do not skip it.
+**Hard rules:** After a big ship, Arch runs **team check** before declaring done — tests green alone do not skip it. Ship **cannot** be “done” if **Uma (UI/UX)** or **Quinn (QA)** reports **FAIL**. Quinn **cannot PASS** if the Make-parity register still has unchecked P0s.
 
 ### Proactive forecasting (mandatory on every task)
 

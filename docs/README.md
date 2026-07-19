@@ -22,6 +22,7 @@ Agents **do not** offer A/B/C tech menus. They decide, document, build, report. 
 1. [product/COMMAND_DOCTRINE.md](./product/COMMAND_DOCTRINE.md) — **composite role + proactive** + who decides + §6–§7 handoff + FE audit (read first every session)
 1b. [product/TEAM.md](./product/TEAM.md) — lean UX team callsigns + serious-work process (Pax bump/push)
 2. [product/LESSONS_LEARNED.md](./product/LESSONS_LEARNED.md) — progressive failure/win capture (read before UI close)
+2b. [product/UMA_FIDELITY_NOTES.md](./product/UMA_FIDELITY_NOTES.md) — Uma Make→React fidelity checklist (mandatory before PROVEN)
 3. [product/NAMING.md](./product/NAMING.md) — file/folder naming + domain CSS/attrs (no new `.proto-*`)
 4. [product/ARCHITECTURE.md](./product/ARCHITECTURE.md) · [product/HYGIENE.md](./product/HYGIENE.md) — engine folder map + LOC ratchet
 5. [product/POST_CHANGE_CHECKLIST.md](./product/POST_CHANGE_CHECKLIST.md) — local gates before “done”

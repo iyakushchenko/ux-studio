@@ -204,10 +204,42 @@
   z-index: 1;
 }
 
+/* Make ModuleLaptopSpecs stack: Advantage banner → filters+listing @ 56px */
+.plp__body-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+  width: 100%;
+}
+
+/* Make component.gse.system.message — mint Advantage Card promo bar */
+.plp__advantage {
+  width: 100%;
+  box-sizing: border-box;
+  background: #c4dde3;
+  border-radius: 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+}
+
+.plp__advantage-text {
+  margin: 0;
+  width: 100%;
+  font-size: 13px;
+  line-height: 24px;
+  color: #3a3a3a;
+  text-align: center;
+  white-space: nowrap;
+}
+
 .plp__layout {
   display: flex;
   gap: 32px;
   align-items: flex-start;
+  width: 100%;
 }
 
 /* Make Body8 — white listing card standing out from page fill */
@@ -406,11 +438,6 @@
 .plp__reset {
   align-self: flex-start;
   margin-top: 8px;
-  border: none;
-  background: none;
-  padding: 0;
-  cursor: pointer;
-  font: inherit;
 }
 
 .plp__results {
@@ -462,11 +489,7 @@
 
 .plp__reset-inline {
   flex: 0 0 auto;
-  border: none;
-  background: none;
-  padding: 0;
-  cursor: pointer;
-  font: inherit;
+  margin-left: auto;
   white-space: nowrap;
 }
 
@@ -617,11 +640,11 @@
   }
 }
 
-/* Make tile pad 16px */
+/* Make tile pad 16px — no border (Make Frame167 tiles are borderless white) */
 .plp__tile {
   width: 100%;
   padding: 16px;
-  border: 1px solid #e5e5e5;
+  border: none;
   border-radius: 8px;
   background: #fff;
   box-sizing: border-box;
@@ -708,22 +731,29 @@
   transition: color 0.18s ease;
 }
 
-.plp__tertiary-icon {
-  display: inline-flex;
-  color: #afccca;
-  transition: color 0.18s ease;
-}
-
-.plp__tertiary-icon.is-active {
-  color: #e91e8c;
-}
-
-.plp__tertiary:hover {
+.plp__tertiary:hover,
+.plp__tertiary:active {
+  background: transparent;
+  box-shadow: none;
+  transform: none;
   color: #000;
 }
 
-.plp__tertiary:hover .plp__tertiary-icon:not(.is-active) {
-  color: #012169;
+.plp__tertiary-icon {
+  display: inline-flex;
+  color: #afccca;
+  transition: color 0.12s ease;
+}
+
+/* Heart / bookmark — immediate filled fuchsia on hover + active (optimistic) */
+.plp__tertiary-icon.is-active,
+.plp__tertiary:hover
+  .plp__tertiary-icon[data-name="icon=add to wishlist"] {
+  color: #e91e8c;
+}
+
+.plp__tertiary:hover .plp__tertiary-icon[data-name="icon=view"] {
+  color: var(--uxds-text-link-link);
 }
 
 .plp__tertiary:focus-visible {
@@ -768,7 +798,8 @@
   color: #459827;
 }
 
-.plp__book {
+/* Size only — hover/active from UXDS ButtonPrimary commerce tokens */
+.plp__book.uxds-btn-primary {
   min-height: 48px;
   padding: 12px 24px;
   font-size: 16px;

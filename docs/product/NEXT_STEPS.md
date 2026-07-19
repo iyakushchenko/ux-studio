@@ -25,6 +25,7 @@ A screen is **DONE** only when **all** are true:
 
 1. [x] **PLP React migration** — DONE by erase-Make definition. Brief: [PLP_REACT.md](../projects/boots-pharmacy/features/PLP_REACT.md) · audit [FE_AUDIT_PLP_2026-07-19.md](../projects/boots-pharmacy/audits/FE_AUDIT_PLP_2026-07-19.md).
 2. [x] **PLP Make parity restore** — register [PLP_MAKE_PARITY_REGISTER.md](../projects/boots-pharmacy/features/PLP_MAKE_PARITY_REGISTER.md); P0 gaps fixed (bg fill, hero shadow, listing wrapper, preloader, filter chips); audit PROVEN; patch `0.0.5`.
+2b. [x] **PLP fidelity rage fix** — Advantage bar, heart optimistic hover/click, Book now commerce hover, tile border removed, Reset Filters icon+text; Uma checklist + team-check harden; patch bump.
 3. [ ] **PDP React migration** — same DONE definition; retire Make child 8. Order lock continues: **PDP → Home → Chat → History/Details**, then delete Book 1–3 Make children. **Await PO +.**
 4. [ ] **Versioning habit** — append notes on every user-visible ship; Pax decides patch; Ben executes ([VERSIONING.md](./VERSIONING.md)).
 
@@ -39,7 +40,7 @@ A screen is **DONE** only when **all** are true:
 9. [ ] **LEGACY retirement (by screen)** — shrink Make wire + `globals-screens` as React pages land. Concept `.proto-*` classes retire with their screen.
 10. [ ] **Engine monster splits** — on next touch of `App.tsx` / `useJourneyPlayback.ts`, extract by domain — not micro-files.
 11. [ ] **Grow UXDS by page** — extract only on second use ([COMPONENT_LIBRARY.md](./COMPONENT_LIBRARY.md)).
-12. [ ] **Residual fidelity (low)** — Book Steps 1–3 Make-only hexes with no bridge token yet. Do **not** invent aliases. PLP residuals: Advantage banner, AI promo strip, View all, catalog depth (see register).
+12. [ ] **Residual fidelity (low)** — Book Steps 1–3 Make-only hexes with no bridge token yet. Do **not** invent aliases. PLP residuals: AI promo strip, View all, catalog depth (see register). Advantage bar restored.
 
 ---
 

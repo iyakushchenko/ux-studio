@@ -5,7 +5,10 @@ type TertiaryCtaProps = {
   icon?: ReactNode;
   compact?: boolean;
   className?: string;
-} & Pick<ButtonHTMLAttributes<HTMLButtonElement>, "onClick" | "type" | "aria-label">;
+} & Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  "children" | "className"
+>;
 
 /**
  * Tertiary icon + text CTA — transparent, no hover wash; icon→navy, label→black.
@@ -16,9 +19,8 @@ export function TertiaryCta({
   icon,
   compact = false,
   className,
-  onClick,
   type = "button",
-  "aria-label": ariaLabel,
+  ...rest
 }: TertiaryCtaProps) {
   const sizeClass = compact ? " studio-tertiary-cta--compact" : "";
 
@@ -26,8 +28,7 @@ export function TertiaryCta({
     <button
       type={type}
       className={`studio-tertiary-cta${sizeClass}${className ? ` ${className}` : ""}`}
-      aria-label={ariaLabel}
-      onClick={onClick}
+      {...rest}
     >
       {icon ? <span className="studio-tertiary-cta__icon">{icon}</span> : null}
       <span className="studio-tertiary-cta__label">{children}</span>

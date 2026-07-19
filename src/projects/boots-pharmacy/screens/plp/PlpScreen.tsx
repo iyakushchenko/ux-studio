@@ -4,6 +4,7 @@ import {
   useState,
   type CSSProperties,
 } from "react";
+import { TertiaryCta } from "@/app/chrome/TertiaryCta";
 import plpHeroImage from "@/projects/boots-pharmacy/frame/5b75d20d7a0df34031ca23477a68cf97cac4938d.png";
 import plpBodyFill from "@/projects/boots-pharmacy/frame/dbcd84d6da292330c6f57adefa32dd4b969ac8bd.png";
 import {
@@ -74,6 +75,33 @@ function BookmarkGlyph() {
         fill="currentColor"
         d="M8.97666 0.739019C8.65666 0.958352 8.3648 1.22079 8.1094 1.51851L7.9994 1.65068C7.7186 1.29817 7.38906 0.990592 7.023 0.739545C6.16554 0.151519 5.10788 -0.126355 4.00824 0.0548652C3.46077 0.146165 2.92962 0.331285 2.43333 0.607132C1.93684 0.881965 1.49417 1.23659 1.12197 1.65503C-0.520466 3.50007 -0.32604 6.37247 1.48489 7.99807L1.61087 8.10693C1.8692 8.3232 2.1194 8.54207 2.35995 8.76253L8 14L13.642 8.7614C13.8817 8.54007 14.1302 8.32287 14.3873 8.10947C16.3162 6.50553 16.5585 3.54285 14.8775 1.65471C14.5067 1.23784 14.0648 0.884092 13.5664 0.607105C13.1395 0.369819 12.6875 0.199439 12.2241 0.0991519L11.9915 0.0548652C10.8915 -0.126435 9.83333 0.151765 8.97666 0.739019Z"
       />
+    </svg>
+  );
+}
+
+/** Make Reset Filters trash glyph — stroke tertiary (studio-tertiary-cta). */
+function TrashGlyph() {
+  return (
+    <svg
+      className="studio-tertiary-cta__svg--stroke"
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      aria-hidden
+    >
+      <path d="M2.5 4h11" strokeLinecap="round" />
+      <path
+        d="M5.25 4V3.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75V4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M4.25 4l.65 8.25a1.25 1.25 0 0 0 1.25 1.25h3.7a1.25 1.25 0 0 0 1.25-1.25L11.75 4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path d="M6.5 6.75v4.5M9.5 6.75v4.5" strokeLinecap="round" />
     </svg>
   );
 }
@@ -203,6 +231,16 @@ function ServiceTile({
   onBookNow: () => void;
   onQuickView: () => void;
 }) {
+  // Optimistic heart: hover preview + click flip with no laggy feedback.
+  const [heartHover, setHeartHover] = useState(false);
+  const [optimisticOn, setOptimisticOn] = useState<boolean | null>(null);
+  const heartActive = optimisticOn ?? wishlisted;
+  const heartPreview = heartActive || heartHover;
+
+  useEffect(() => {
+    setOptimisticOn(null);
+  }, [wishlisted]);
+
   return (
     <article
       className={`plp__tile${reveal ? " plp__tile--in" : ""}`}
@@ -238,13 +276,16 @@ function ServiceTile({
               className="plp__tertiary"
               data-name="component.input.button"
               data-studio-wishlist-id={plpTileWishlistId(tileIndex)}
-              aria-pressed={wishlisted}
+              aria-pressed={heartActive}
+              onMouseEnter={() => setHeartHover(true)}
+              onMouseLeave={() => setHeartHover(false)}
+              onPointerDown={() => setOptimisticOn(!heartActive)}
               onClick={onToggleWishlist}
             >
               <span
-                className={`plp__tertiary-icon${wishlisted ? " is-active" : ""}`}
+                className={`plp__tertiary-icon${heartPreview ? " is-active" : ""}`}
                 data-name="icon=add to wishlist"
-                data-fav-active={String(wishlisted)}
+                data-fav-active={String(heartActive)}
               >
                 <BookmarkGlyph />
               </span>
@@ -433,7 +474,20 @@ export function PlpScreen({
         </div>
 
         <div className="plp__shell plp__body-shell">
-          <div className="plp__shell-inner plp__layout">
+          <div className="plp__shell-inner plp__body-stack">
+            {/* Make ModuleLaptopSpecs — Advantage Card system message above filters/listing */}
+            <div
+              className="plp__advantage"
+              data-name="component.gse.system.message"
+              data-studio-plp-advantage="true"
+            >
+              <p className="plp__advantage-text">
+                Collect 3 points for every £1 you spend with Boots Advantage
+                Card‡
+              </p>
+            </div>
+
+            <div className="plp__layout">
             <aside
               className="plp__filters"
               data-name="module.plp.filters"
@@ -592,14 +646,16 @@ export function PlpScreen({
               </Accordion>
 
               {dirty ? (
-                <button
-                  type="button"
-                  className="plp__reset uxds-link"
+                <TertiaryCta
+                  compact
+                  className="plp__reset"
                   data-name="component.plp.reset-filters"
+                  aria-label="Reset filters"
+                  icon={<TrashGlyph />}
                   onClick={() => setFilters(DEFAULT_PLP_FILTERS)}
                 >
                   Reset filters
-                </button>
+                </TertiaryCta>
               ) : null}
             </aside>
 
@@ -651,15 +707,17 @@ export function PlpScreen({
                       )}
                     </p>
                     {dirty ? (
-                      <button
-                        type="button"
-                        className="plp__reset-inline uxds-link"
+                      <TertiaryCta
+                        compact
+                        className="plp__reset-inline"
                         data-name="component.plp.reset-filters"
                         data-studio-plp-reset-filters="true"
+                        aria-label="Reset Filters"
+                        icon={<TrashGlyph />}
                         onClick={() => setFilters(DEFAULT_PLP_FILTERS)}
                       >
                         Reset Filters
-                      </button>
+                      </TertiaryCta>
                     ) : null}
                   </div>
                 </div>
@@ -738,6 +796,7 @@ export function PlpScreen({
                   ) : null}
                 </div>
               </div>
+            </div>
             </div>
           </div>
         </div>

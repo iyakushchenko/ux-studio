@@ -1,12 +1,12 @@
 # FE / UI / UX audit result
 
-**Surface / slice:** PLP Vaccinations — Make→React parity restore (bg fill, hero shadow, listing wrapper, preloader, filter chips)  
+**Surface / slice:** PLP Vaccinations — PO rage fidelity fix (Advantage bar, heart, Book hover, tile border, Reset Filters) + process harden  
 **Date:** 2026-07-19  
-**Auditor:** Uma (UI/UX) + Quinn (QA) — strict (“Nazi QA”) parity pass  
-**Implementer handoff / audited tip:** `3266316` (patch `0.0.5`; parent `42d922c`)  
-**Checklist:** [../../../product/FE_UI_UX_AUDIT.md](../../../product/FE_UI_UX_AUDIT.md) · [VISUAL_FIDELITY.md](../../../product/VISUAL_FIDELITY.md) · [FE_STANDARDS.md](../../../product/FE_STANDARDS.md) · [DS_STRICTNESS.md](../../../product/DS_STRICTNESS.md)  
-**Register:** [../features/PLP_MAKE_PARITY_REGISTER.md](../features/PLP_MAKE_PARITY_REGISTER.md)  
-**Brief:** [../features/PLP_REACT.md](../features/PLP_REACT.md)
+**Auditor:** Uma (UI/UX) + Quinn (QA) — strict (“Nazi QA”) re-audit  
+**Implementer handoff / audited tip:** _(stamp after commit)_  
+**Version:** `0.0.6`  
+**Checklist:** [../../../product/FE_UI_UX_AUDIT.md](../../../product/FE_UI_UX_AUDIT.md) · [UMA_FIDELITY_NOTES.md](../../../product/UMA_FIDELITY_NOTES.md) · [VISUAL_FIDELITY.md](../../../product/VISUAL_FIDELITY.md) · [FE_STANDARDS.md](../../../product/FE_STANDARDS.md) · [DS_STRICTNESS.md](../../../product/DS_STRICTNESS.md)  
+**Register:** [../features/PLP_MAKE_PARITY_REGISTER.md](../features/PLP_MAKE_PARITY_REGISTER.md)
 
 ---
 
@@ -15,60 +15,46 @@
 | Field | Value |
 |-------|-------|
 | **Overall** | **PROVEN** |
-| **PO green-light allowed?** | Yes (residuals below) |
+| **PO green-light allowed?** | Yes (residuals: AI strip, View all, catalog depth) |
+| **Uma fidelity checklist** | **PASS** |
+| **Bea register P0s** | **Complete — no Missing P0** |
+| **Quinn interaction matrix** | **PASS** |
 
 ---
 
 ## Summary
 
-React PLP now matches Make journey-critical layout: decorative page fill (`imgBody1` @ 0.41), hero category-title lift shadow, Body8-style listing wrapper (24px radius + `0 5px 9.75px` shadow), and Make listing preloader (“Updating results…” + stagger reveal on filter change). Active filter chips restore. Localhost: Make leak=0; Bundles=7; Chickenpox chip; Quick View; Book→PDP; chip `v0.0.5` / `alpha`. No LEGACY growth (styles in `screens/plp/plp.css`).
+Corrected Wrongly marked OK items from prior PLP ship. Restored Advantage Card promo bar; removed invent tile border; Book now uses UXDS commerce hover tokens (LEGACY tile catch-all no longer steals `.uxds-btn-primary`); bookmark heart has immediate fuchsia on hover CSS + pointerdown optimistic; Reset Filters is icon+text `TertiaryCta`. No LEGACY growth (LEGACY narrowed to exclude React UXDS/tertiary). Process: `UMA_FIDELITY_NOTES.md`, LESSONS entry, team check mandates.
 
 ---
 
-## Parity register prove (Quinn)
+## Uma (UI/UX) fidelity checklist
 
-| Register # | Item | Result | Localhost evidence |
-|------------|------|--------|--------------------|
-| L1 | Page bg fill | **PASS** | `.plp__body-fill-img` opacity `0.41` |
-| L2 | Category title / hero shadow | **PASS** | `.plp__hero` `box-shadow: rgba(0,0,0,0.18) 0px 12px 28px` |
-| L3 | Listing wrapper | **PASS** | `.plp__listing` radius 24px + `0 5px 9.75px` shadow |
-| L4 / I12 / I13 | Preloader + stagger | **PASS** | Bundles click → `loadingDuring=true`, loader “Updating results…”, then `--reveal` + 7 tiles |
-| I4 | Active filter chips | **PASS** | Chickenpox → chip + “1 jab found for Chickenpox” |
-| I1 / I11 | By Type / Bundles | **PASS** | 7 bundles found |
-| I8 | Book → PDP | **PASS** | URL `screen=pdp` |
-| I9 | Quick View | **PASS** | RTB popup open |
-| I10 | Wishlist | **PASS** | Handlers present (prior ship; not regress) |
-| W1 | Make retire / no leak | **PASS** | `makeLeak=0`, retired Make children hidden |
-| L5 / L6 / I6 / L14 | Advantage / AI strip / View all / catalog depth | **Residual** | Documented; not ship-blockers |
-
-**Pages:** tip not yet deployed — verify after push (`https://iyakushchenko.github.io/ux-studio/?project=boots-pharmacy&screen=plp`).
-
-**Agent overlay:** stopped/cleaned via `__protoAgentTestingOverlay.stop({ force: true })` before prove (clean slate → hub; re-nav to PLP).
+| Item | Result |
+|------|--------|
+| Page bg / shadows / wrappers / preloader | **PASS** (prior P0 retained) |
+| Promo/banner bands — Advantage Card | **PASS** (was whole-component miss) |
+| CTA hover vs primary/commerce tokens | **PASS** (Book now) |
+| Icon buttons hover+pressed (heart) | **PASS** |
+| Borders only if Make | **PASS** (tile border removed) |
+| Icon+text Reset Filters | **PASS** |
+| Side-by-side Make bands scanned | **PASS** |
 
 ---
 
-## Checklist results
+## Quinn (QA) interaction matrix (localhost `127.0.0.1:5173`)
 
-### A. Visual fidelity
+| # | Control | Result | Evidence |
+|---|---------|--------|----------|
+| L5 | Advantage bar | **PASS** | Copy + `rgb(196, 221, 227)` `#c4dde3` |
+| L10 | Tile border | **PASS** | `borderTopWidth: 0px` |
+| I5 | Reset Filters | **PASS** | `studio-tertiary-cta` + trash SVG; sidebar + summary |
+| I8b | Book now hover | **PASS** | Not matched by LEGACY catch-all; commerce hover token forces `rgb(1, 49, 143)` `#01318f` + lift shadow |
+| I10 | Heart hover/click | **PASS** | CSS `:hover` → `#e91e8c`; pointerdown optimistic `is-active` / `aria-pressed` |
+| I8 | Book → PDP | **PASS** | Retained |
+| Chip | Version | **PASS** | `data-studio-version=0.0.6` / `alpha` |
 
-| # | Result | Evidence |
-|---|--------|----------|
-| A1 | **PASS** | Teal hero + Vaccinations; white listing card; navy Book now; mint tertiary icons. |
-| A2 | **PASS** | Make L&F restored for PO P0 gaps; catalog count still Partial (~10 vs ~21). |
-| A3 | **PASS** | All new styles in `plp.css` / UXDS; no `globals-screens` LEGACY growth. |
-
-### B. Layout / max-width / alignment
-
-| # | Result | Evidence |
-|---|--------|----------|
-| B1 | **PASS** | 1440/64/1312 shell retained. |
-| B2 | **PASS** | Filters 304px + listing flex card. |
-| B3 | **PASS** | No Make listing leak under host. |
-| B4 | **PASS** | Tertiary nowrap retained. |
-
-### C–H
-
-Prior PROVEN checks retained (icon+text nowrap, focus-visible, Accordion kit, no FilterChip zoo for sidebar, Studio chrome XOR, DS tokens / screen CSS only). Re-spot-checked on localhost this pass.
+**Pages:** verify after deploy tip.
 
 ---
 
@@ -76,18 +62,16 @@ Prior PROVEN checks retained (icon+text nowrap, focus-visible, Accordion kit, no
 
 | Item | Status |
 |------|--------|
-| Make Frame child 9 still in bundle | Hidden + wire-gated; delete at end of erase-Make |
-| Advantage Card points banner (L5) | Not ported |
-| AI Assistant promo strip (L6) | Not ported |
-| Filter “View all” (I6) | Not ported (short React lists) |
-| Jab catalog 10 vs Make ~21 | Partial; expand if CJM needs |
-| `globals-screens` `.proto-plp-*` | Dead while React mounted; shrink on Make delete |
+| AI Assistant promo strip (L6) | Missing — residual |
+| Filter View all (I6) | Missing — residual |
+| Catalog ~10 vs Make ~21 (L14) | Partial |
+| Make Frame child 9 in bundle | Hidden + wire-gated |
 
 ---
 
-## Quinn (QA) prove notes
+## Process artifacts this ship
 
-- `npm test` 324 passed + hygiene/felonies/version green (pre-bump path); build OK via `release:patch`
-- Localhost MCP prove matrix above — **critical interactions retained**
-- Version chip localhost: `v0.0.5` / `alpha`
-- Pages: after deploy tip
+- `docs/product/UMA_FIDELITY_NOTES.md` (new)
+- `docs/product/LESSONS_LEARNED.md` — Make→React fidelity entry
+- `TEAM.md` / `COMMAND_DOCTRINE.md` §0.2 / `ux-studio-director.mdc` — team check fidelity lines
+- Register corrected (Bea truth)

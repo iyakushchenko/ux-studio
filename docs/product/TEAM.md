@@ -47,15 +47,27 @@ Never bare callsign alone in team output — always `Name (Role)` as above. One 
 
 **Owner:** Arch (Director) runs the room; whole team reviews the current workstream.
 
-**Output (short):**
+**Output (short) — EACH callsign reports explicitly (roles next to names):**
 
 1. Cross-check each others’ work; surface blockers; instruct the owning callsign.  
-2. Per-role check result (same `Name (Role)` format).  
-3. **Quinn (QA):** verify CI / Pages if relevant.  
+2. Per-role check result (same `Name (Role)` format) — **mandatory fidelity lines below**.  
+3. **Quinn (QA):** verify CI / Pages if relevant + **interaction matrix** (hover/click feedback) PASS/FAIL.  
 4. **Ben (BE):** `gh` sitrep when push/CI touched.  
-5. **Arch (Director):** concrete task assignments until blockers cleared / stream green.
+5. **Arch (Director):** concrete task assignments until blockers cleared / stream green. Steer: Uma checklist + Bea register completeness + Quinn interaction matrix must all be green.
 
-**Hard rule:** After big ships, Arch auto-runs **team check** before “done” — green tests alone do not skip it.
+**Mandatory per-role fidelity lines (UI / Make→React / chrome ships):**
+
+| Callsign | Must report |
+|----------|-------------|
+| **Uma (UI/UX)** | Fidelity checklist status — PASS or FAIL + failed items ([UMA_FIDELITY_NOTES.md](./UMA_FIDELITY_NOTES.md)) |
+| **Bea (BA)** | Register complete? Any Missing P0? (every Make band listed before Finn coded) |
+| **Quinn (QA)** | Interaction matrix (hover/click on every control) PASS/FAIL — **cannot PASS** if register has unchecked P0s |
+| **Finn (FE)** | Gaps fixed or blocked |
+
+**Hard rules:**
+
+- After big ships, Arch auto-runs **team check** before “done” — green tests alone do not skip it.  
+- Ship **cannot** be “done” if **Uma (UI/UX)** or **Quinn (QA)** reports **FAIL**.
 
 ---
 
