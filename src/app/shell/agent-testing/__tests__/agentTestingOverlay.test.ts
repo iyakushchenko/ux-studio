@@ -299,6 +299,41 @@ describe("agentTestingOverlay", () => {
     );
   });
 
+  it("stop({ resetToJourneyStart: true }) lands site-pilot not hub", () => {
+    vi.useFakeTimers();
+    const reload = vi.fn();
+    const replaceState = vi.fn();
+    vi.stubGlobal("window", {
+      setTimeout: (fn: TimerHandler, ms?: number) =>
+        globalThis.setTimeout(fn as () => void, ms),
+      clearTimeout: (id: ReturnType<typeof setTimeout>) =>
+        globalThis.clearTimeout(id),
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: vi.fn(),
+      location: {
+        reload,
+        href: "http://localhost:5173/?project=boots-pharmacy&screen=chat&cjm=on&experience=agentic&persona=sarah-jenkins",
+        pathname: "/",
+        search:
+          "?project=boots-pharmacy&screen=chat&cjm=on&experience=agentic&persona=sarah-jenkins",
+        hash: "",
+      },
+      history: { state: null, replaceState, pushState: vi.fn() },
+    });
+
+    startAgentTestingOverlay("journey-start-reset");
+    stopAgentTestingOverlay({ reload: true, resetToJourneyStart: true });
+    const afterStop = String(replaceState.mock.calls.at(-1)?.[2]);
+    expect(afterStop).toContain("screen=site-pilot");
+    expect(afterStop).not.toContain("screen=hub");
+    vi.advanceTimersByTime(DEFAULT_SETTLE_MS + 120);
+    expect(reload).toHaveBeenCalledTimes(1);
+    const afterReload = String(replaceState.mock.calls.at(-1)?.[2]);
+    expect(afterReload).toContain("screen=site-pilot");
+    expect(afterReload).not.toContain("screen=hub");
+  });
+
   it("sitrep hint copy is Auto-closes countdown with PASS/FAIL flag", () => {
     expect(formatSitrepHint(9, false)).toBe("Auto-closes in 9s");
     expect(formatSitrepHint(9, true)).toBe(

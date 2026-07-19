@@ -2,12 +2,14 @@
 
 > _Append a bullet on coherent commits via `npm run notes:append -- --lane="<lane>" --intent="<text>"`. Preview with `npm run notes:preview`. On `npm run release:patch` this section is promoted to `## v<X.Y.Z> - DDMMYY` and a fresh empty `## Current` is re-inserted. Policy: `docs/product/VERSIONING.md`._
 
+## v0.0.44 - 200726
 - **engine:** Chat scrollIntoView uses .chat__column host; hide scrollbar arrow buttons
 - **project:** Chat sticky composer: overlay dock + dynamic --studio-chat-composer-h pad/scroll-pad; transparent scrollbar track; probe chat-composer-scroll-pad
 - **shell:** Thin-track overflow-y:scroll when overflowing (+ chat always-scroll); lock pads --studio-scrollbar-size — no classic scrollbar-gutter white bar; no X jump
 - **project:** Chat: restore Site Pilot bar (Frame337); UXDS .uxds-link bubble links; overflow-sync thin track + left pad so center X stable
 - **shell:** PLAYBACK_DIAG R13: type-in/step/retreat console contract; journey-lock overflow fix
 - **project:** Chat top+composer fade restore; Site Pilot CJM type-in; history visible View Details
+- **shell:** Journey smoke teardown uses resetToJourneyStart (site-pilot/plp) — never hub after Alarm abort/smoke end; PLAYBACK_DIAG hub-nav logs reason+stack
 
 ## v0.0.43 - 190726
 - **project:** Traditional pdp-book-now prefers React PDP host (skip make-retired); Chat MCP recipe expanded; Uma §0a PARTIAL composer identity — no Chat Final Pass

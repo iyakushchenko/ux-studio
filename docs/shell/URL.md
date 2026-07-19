@@ -194,7 +194,7 @@ When multiple dialogs are open (e.g. Login over Quick View), URL uses the **topm
 
 6. **Ephemeral strip** — `proof`, `mcpDebug`, `agentTest`, `agentOverlay` removed on boot, overlay install, and overlay stop. Never re-written by studio sync.
 
-7. **Post-agent reset** — after MCP / agent overlay `stop()` (and again immediately before reload): `resetStudioAfterAgentTest()`. **Default:** stay on current `project`+`screen`(+persona/cjm/experience); **always strip `&modal=`** + ephemeral; close live dialogs via `studio-post-agent-reset` (never re-apply modal). **`resetToHub: true`:** land `screen=hub` (CJM/journey). Quinn proves page probe → still `screen=plp` with no sticky modal.
+7. **Post-agent reset** — after MCP / agent overlay `stop()` (and again immediately before reload): `resetStudioAfterAgentTest()`. **Default:** stay on current `project`+`screen`(+persona/cjm/experience); **always strip `&modal=`** + ephemeral; close live dialogs via `studio-post-agent-reset` (never re-apply modal). **`resetToJourneyStart: true`:** land journey key 1 (`site-pilot` / `plp`, `cjm=on`) — CJM/journey smokes. **`resetToHub: true`:** forbidden for product/smoke (Hub nav click only; emits `hub-nav` diag). Quinn proves page probe → still `screen=plp` with no sticky modal.
 
 
 

@@ -20,6 +20,7 @@ import {
   type StudioExperienceId,
 } from "@/app/orchestra/orchestraModes";
 import type { OrchestraModeId } from "@/app/orchestra/types";
+import { playbackDiagHubNav } from "@/app/shell/playbackDiag";
 import {
   normalizeStudioModalId,
   type StudioModalId,
@@ -50,17 +51,27 @@ export const HUB_SCREEN_ID = "hub";
 export const DEFAULT_STUDIO_PROJECT_ID = "boots-pharmacy";
 
 /**
- * Hub screen id used when `resetToHub: true` (labeled smoke harness teardown only).
- * Default post-agent path stays on the current screen — see
- * {@link resetStudioAfterAgentTest}.
+ * Legacy hub id for intentional Hub deep-links / unit tests only.
+ * Journey smokes must use {@link ResetStudioAfterAgentTestOptions.resetToJourneyStart}
+ * — never `resetToHub` (PO: hub only via Hub nav click).
  */
 export const STUDIO_POST_AGENT_HOME_SCREEN_ID = HUB_SCREEN_ID;
 
+/** Agentic CJM key-1 screen (never hub). */
+export const AGENTIC_JOURNEY_START_SCREEN_ID = "site-pilot";
+
+/** Traditional CJM key-1 screen (never hub). */
+export const TRADITIONAL_JOURNEY_START_SCREEN_ID = "plp";
+
 export type ResetStudioAfterAgentTestOptions = {
   /**
-   * When true: land hub (legacy CJM/journey clean slate).
-   * Default false: keep current project + screen (+ persona/experience/cjm);
-   * always strip `&modal=` + ephemeral agent params; dismiss live lightboxes via event.
+   * When true: land selected journey key 1 (`site-pilot` / `plp`) with CJM on.
+   * Preferred smoke / Alarm-abort / Play-stop teardown — never hub.
+   */
+  resetToJourneyStart?: boolean;
+  /**
+   * When true: land hub. **Forbidden for product + journey smokes** — Hub nav
+   * click only. Kept for deep-link unit tests; always emits PLAYBACK_DIAG hub-nav.
    */
   resetToHub?: boolean;
 };
@@ -247,8 +258,9 @@ export function stripEphemeralStudioQuery(
 }
 
 /**
- * Build hub landing URL state (smoke harness `resetToHub` only — not product Play/end/reset).
+ * Build hub landing URL state — intentional Hub deep-link / unit tests only.
  * Preserves project when present; always hub; never modal / persona / experience / cjm.
+ * @deprecated Prefer {@link buildStudioPostAgentJourneyStartState} for smokes.
  */
 export function buildStudioPostAgentHomeState(
   search: string = typeof window !== "undefined" ? window.location.search : ""
@@ -258,6 +270,31 @@ export function buildStudioPostAgentHomeState(
     projectId: current.projectId ?? DEFAULT_STUDIO_PROJECT_ID,
     screenId: STUDIO_POST_AGENT_HOME_SCREEN_ID,
   };
+}
+
+/**
+ * Journey smoke / Alarm-abort / Play-stop teardown → selected journey key 1.
+ * Agentic → `site-pilot`; traditional → `plp`. Preserves project + persona;
+ * forces `cjm=on` + experience; never hub / modal.
+ */
+export function buildStudioPostAgentJourneyStartState(
+  search: string = typeof window !== "undefined" ? window.location.search : ""
+): StudioUrlState {
+  const current = parseStudioUrl(search);
+  const experienceId =
+    current.experienceId ??
+    (current.modeId ? orchestraModeToExperienceId(current.modeId) : "agentic");
+  const screenId =
+    experienceId === "traditional"
+      ? TRADITIONAL_JOURNEY_START_SCREEN_ID
+      : AGENTIC_JOURNEY_START_SCREEN_ID;
+  return finalizeUrlState({
+    projectId: current.projectId ?? DEFAULT_STUDIO_PROJECT_ID,
+    screenId,
+    personaId: current.personaId,
+    experienceId,
+    cjm: true,
+  });
 }
 
 /**
@@ -294,9 +331,23 @@ export function isStudioPostAgentResetSyncLocked(
 }
 
 /**
- * After agent / MCP tests: strip ephemeral + `&modal=`, optionally land hub.
+ * App post-agent apply: never default missing/hub screenId to hub overlay.
+ * Prefer event state → address bar → agentic key 1.
+ */
+export function resolvePostAgentApplyScreenId(
+  stateScreenId?: string | null,
+  search: string = typeof window !== "undefined" ? window.location.search : ""
+): string {
+  const fromBar = parseStudioUrl(search).screenId;
+  const stay = stateScreenId || fromBar || AGENTIC_JOURNEY_START_SCREEN_ID;
+  return stay === HUB_SCREEN_ID ? AGENTIC_JOURNEY_START_SCREEN_ID : stay;
+}
+
+/**
+ * After agent / MCP tests: strip ephemeral + `&modal=`.
  * Default: stay on current project + screen (+ persona/experience/cjm); never keep modal.
- * Pass `{ resetToHub: true }` only for labeled smoke harness teardown (never product UX).
+ * Prefer `{ resetToJourneyStart: true }` for CJM/journey smoke teardown (key 1, never hub).
+ * `{ resetToHub: true }` is forbidden for product/smoke — Hub nav click only (logged).
  * Writes the address bar, then dispatches {@link STUDIO_POST_AGENT_RESET_EVENT}
  * so App can dismiss sticky lightboxes / popups and apply nav (no-reload path).
  * Call again immediately before `location.reload()` so a settle-window race
@@ -305,11 +356,25 @@ export function isStudioPostAgentResetSyncLocked(
 export function resetStudioAfterAgentTest(
   options?: ResetStudioAfterAgentTestOptions
 ): StudioUrlState {
-  const state = options?.resetToHub
-    ? buildStudioPostAgentHomeState()
-    : buildStudioPostAgentStayState();
+  const toJourneyStart = options?.resetToJourneyStart === true;
+  const toHub = !toJourneyStart && options?.resetToHub === true;
+  const state = toJourneyStart
+    ? buildStudioPostAgentJourneyStartState()
+    : toHub
+      ? buildStudioPostAgentHomeState()
+      : buildStudioPostAgentStayState();
   // Never re-stamp modal from a stale caller detail — stay/hub builders omit it.
   const cleanState: StudioUrlState = { ...state, modalId: undefined };
+  if (toHub) {
+    try {
+      playbackDiagHubNav({
+        reason: "resetStudioAfterAgentTest(resetToHub) — forbidden for smoke/product",
+        source: "studioUrl.resetStudioAfterAgentTest",
+      });
+    } catch {
+      /* hang-safe */
+    }
+  }
   postAgentResetSyncLockUntil = Date.now() + POST_AGENT_RESET_SYNC_LOCK_MS;
   stripEphemeralStudioQuery();
   writeStudioUrl(cleanState);
@@ -452,6 +517,16 @@ export function applyStudioScreen(
     input.setJourneyMode(state.cjm);
   }
   if (nav) {
+    if (nav.hubOpen) {
+      try {
+        playbackDiagHubNav({
+          reason: `applyStudioScreen(screen=${state.screenId ?? "hub"})`,
+          source: "studioUrl.applyStudioScreen",
+        });
+      } catch {
+        /* hang-safe */
+      }
+    }
     input.setHubOpen(nav.hubOpen);
     if (!nav.hubOpen) {
       input.setCurrent(nav.current);

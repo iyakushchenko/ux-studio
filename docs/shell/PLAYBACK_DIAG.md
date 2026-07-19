@@ -69,6 +69,7 @@ Filter DevTools console: `[PLAYBACK_DIAG]`.
 | `skip` | `skipReason` | Skipped beat / missing CTA / dwell-only |
 | `step-forward` / `step-back` / `retreat-sync` / `transport` | `beatId`, `detail` | Nav transport |
 | `play-end` / `journey-reset` | `startBeatId`, `startScreenId` | **Never silent hub** — destination = selected journey start |
+| `hub-nav` | `hubReason`, `hubStack`, `screenBefore`/`After` | **Every** hub open — reason + stack (PO leak forensics). Product = user Hub click only |
 
 ### Sample console line
 
@@ -133,7 +134,7 @@ On `type:'alarm'`: pause Play (toggle transport) → **fail** result with `reaso
 
 **Note:** `__protoTriggerTransport` requires an active MCP session (`__protoRun*` / recording). UI Step buttons always work; for console step use a smoke runner or click the nav button. Helper arm coalesces identical transport rows on the overlay (no monotonous spam).
 
-Harness `resetToHub` after smokes is **labeled harness-only** — product Play/end/reset/Jump-to-start/Stop-at-end/CJM-on must stay on journey start (`startBeatId` + `startScreenId`, never `screen=hub`). Matching-tab `goToTab` skip is a FAIL class (hub overlay can sit on the same tab).
+Harness journey smokes use **`resetToJourneyStart`** (key 1: `site-pilot` / `plp`) — **never** `resetToHub`. Product Play/end/reset/Jump-to-start/Stop-at-end/Alarm-abort/CJM-on must stay on journey start (`startBeatId` + `startScreenId`, never `screen=hub`). Hub only via Hub nav click. Matching-tab `goToTab` skip is a FAIL class. Every hub open logs `hub-nav` with stack.
 
 ---
 
@@ -157,7 +158,7 @@ window.__studioPlaybackDiag?.()
 
 **Traditional settle (2026-07-19):** After each Step, wait until transport is idle (`!isOnAir && !isPlaying`). Login chains into `book-location-pick` — early Step aborts mid-picker → stray Availability on `book-step2`.
 
-**Play end → CJM start (2026-07-20):** Product Play finish returns to the first journey beat (not hub, not stuck on last). Diag: `play-end` + `journey-reset` + `__studioAssertPlayEndedAtStart({ startBeatId, startScreenId })`. Smokes: `__protoRunTraditionalPlaySmoke` / `__protoRunAgenticPlaySmoke` (harness may still `resetToHub` after assert).
+**Play end → CJM start (2026-07-20):** Product Play finish returns to the first journey beat (not hub, not stuck on last). Diag: `play-end` + `journey-reset` + `__studioAssertPlayEndedAtStart({ startBeatId, startScreenId })`. Smokes: `__protoRunTraditionalPlaySmoke` / `__protoRunAgenticPlaySmoke` (harness `resetToJourneyStart` after assert — never hub).
 
 **PO Alarm mid-Play prove (R11 `:5173`):**
 

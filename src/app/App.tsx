@@ -68,6 +68,7 @@ import {
   type PlaybackStudioSnapshot,
 } from "@/app/shell/playbackStudioSnapshot";
 import { notePlaybackTransport } from "@/app/shell/playbackInteractionContext";
+import { playbackDiagHubNav } from "@/app/shell/playbackDiag";
 import {
   disableCursorQaEyes,
   resetPlaybackCursorDiagnosticContext,
@@ -109,9 +110,9 @@ import {
 import { resolveStudioModalIdFromFlags } from "@/app/shell/studioModalRegistry";
 import {
   applyStudioScreen,
-  HUB_SCREEN_ID,
   parseStudioUrl,
   resolveNavFromScreenId,
+  resolvePostAgentApplyScreenId,
   resolveScreenIdFromNav,
   serializeStudioUrl,
   STUDIO_POST_AGENT_RESET_EVENT,
@@ -309,7 +310,7 @@ export default function App() {
       wireApiRef.current?.closeAllPopups();
       applyStudioScreen({
         projectId: state?.projectId ?? studioProjectId,
-        screenId: state?.screenId ?? HUB_SCREEN_ID,
+        screenId: resolvePostAgentApplyScreenId(state?.screenId),
         personaId: state?.personaId,
         modeId: state?.modeId,
         experienceId: state?.experienceId,
@@ -1375,6 +1376,7 @@ export default function App() {
 
       wireApiRef.current?.closeAllPopups();
       wireApiRef.current?.savePrototypeScroll();
+      playbackDiagHubNav({ reason: "user-nav-hub", source: "App.openHub" });
       setHubOpen(true);
     });
   }, [hubOpen]);

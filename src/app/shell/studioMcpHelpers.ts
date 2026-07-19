@@ -881,7 +881,7 @@ export function registerStudioMcpHelpers(options: {
     withMcpTestSession(
       "retreat-smoke",
       () => runRetreatSmokeBody(smokeOptions),
-      { resetToHub: true }
+      { resetToJourneyStart: true }
     );
 
   async function runRetreatSmokeBody(
@@ -1075,21 +1075,21 @@ export function registerStudioMcpHelpers(options: {
       state: window.__protoStudioState?.(),
     };
       },
-      { resetToHub: true }
+      { resetToJourneyStart: true }
     );
 
   window.__protoRunAgenticStepForwardSmoke = (smokeOptions) =>
     withMcpTestSession(
       "agentic-step-forward",
       () => runStepForwardSmokeForMode("agentic-cjm", smokeOptions),
-      { resetToHub: true }
+      { resetToJourneyStart: true }
     );
 
   window.__protoRunTraditionalStepForwardSmoke = (smokeOptions) =>
     withMcpTestSession(
       "traditional-step-forward",
       () => runStepForwardSmokeForMode("traditional-cjm", smokeOptions),
-      { resetToHub: true }
+      { resetToJourneyStart: true }
     );
 
   const runPlayToStartForMode = (
@@ -1128,7 +1128,7 @@ export function registerStudioMcpHelpers(options: {
           "plp",
           smokeOptions
         ),
-      { resetToHub: true }
+      { resetToJourneyStart: true }
     );
 
   window.__protoRunAgenticPlaySmoke = (smokeOptions) =>
@@ -1141,7 +1141,7 @@ export function registerStudioMcpHelpers(options: {
           "site-pilot",
           smokeOptions
         ),
-      { resetToHub: true }
+      { resetToJourneyStart: true }
     );
 
   window.__protoRunTraditionalRetreatSmoke = (smokeOptions) =>
@@ -1263,12 +1263,12 @@ export function registerStudioMcpHelpers(options: {
       checks,
     };
       },
-      { resetToHub: true }
+      { resetToJourneyStart: true }
     );
 
   window.__protoRunTraditionalControlRoomRobotQa = () =>
     withMcpTestSession("robot-qa", runTraditionalControlRoomRobotQa, {
-      resetToHub: true,
+      resetToJourneyStart: true,
     });
 
   armOverlayOnStudioHelpers();

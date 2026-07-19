@@ -31,17 +31,27 @@ export function mcpDelay(ms: number): Promise<void> {
   });
 }
 
+export type McpTestSessionOptions = {
+  /**
+   * Journey smoke teardown → key 1 (`site-pilot` / `plp`), never hub.
+   * Preferred for CJM / Play / step-forward / retreat smokes.
+   */
+  resetToJourneyStart?: boolean;
+  /**
+   * @deprecated Forbidden for product/smoke — Hub nav click only.
+   */
+  resetToHub?: boolean;
+  preArmMs?: number;
+  settleMs?: number;
+  result?: "pass" | "fail" | "neutral";
+  /** Default true for journey/CJM sessions. Pass false to skip reload. */
+  reload?: boolean;
+};
+
 export async function withMcpTestSession<T>(
   label: string,
   run: () => Promise<T>,
-  sessionOptions?: {
-    resetToHub?: boolean;
-    preArmMs?: number;
-    settleMs?: number;
-    result?: "pass" | "fail" | "neutral";
-    /** Default true for journey/CJM sessions. Pass false to skip reload. */
-    reload?: boolean;
-  }
+  sessionOptions?: McpTestSessionOptions
 ): Promise<T> {
   const prior = getMcpTestSession();
   if (prior) {
@@ -53,6 +63,10 @@ export async function withMcpTestSession<T>(
   const settleMs = sessionOptions?.settleMs ?? DEFAULT_SETTLE_MS;
   let sessionResult: "pass" | "fail" | "neutral" =
     sessionOptions?.result ?? "neutral";
+  // Journey smokes: key 1, never hub (PO rage — Alarm abort / smoke end).
+  const resetToJourneyStart = sessionOptions?.resetToJourneyStart === true;
+  const resetToHub =
+    !resetToJourneyStart && sessionOptions?.resetToHub === true;
   startAgentTestingOverlay("AGENT TESTING — preparing…");
   try {
     await preArmAgentTestingOverlay({
@@ -76,10 +90,10 @@ export async function withMcpTestSession<T>(
     return out;
   } finally {
     try {
-      // Smoke harness teardown may pass resetToHub (not product Play/end/reset).
       stopAgentTestingOverlay({
         reload: sessionOptions?.reload !== false,
-        resetToHub: sessionOptions?.resetToHub === true,
+        resetToJourneyStart,
+        resetToHub,
         settleMs,
         result: sessionResult,
       });
@@ -88,7 +102,8 @@ export async function withMcpTestSession<T>(
     }
     try {
       resetStudioAfterAgentTest({
-        resetToHub: sessionOptions?.resetToHub === true,
+        resetToJourneyStart,
+        resetToHub,
       });
     } catch {
       /* never leave sticky &modal= after session end */

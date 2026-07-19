@@ -23,10 +23,11 @@ While an agent drives localhost, Studio shows a **compact bottom-right status pa
 | Mode | Behavior |
 |------|----------|
 | **Default (page / sanity / probe)** | Stay on current `project` + `screen` (+ persona/mode). **Always strip `&modal=`** + ephemeral (`proof`, …). Close sticky popups via `studio-post-agent-reset` (never re-apply modal). **Do not** bounce to hub/onboarding. |
-| **`resetToHub: true`** (CJM / journey smokes) | `?project=<current\|boots-pharmacy>&screen=hub` — no modal |
+| **`resetToJourneyStart: true`** (CJM / journey smokes) | Journey key 1: agentic → `site-pilot`, traditional → `plp`; `cjm=on`; no modal — **never hub** |
+| **`resetToHub: true`** (forbidden for smokes) | `screen=hub` — Hub nav / deep-link tests only; logs `hub-nav` |
 
 Quinn proves stay-on-page: open PLP → `__studioRunMcpPageProbe()` → stop/reload → still `screen=plp`.  
-Journey proves hub: retreat/robot-qa sessions pass `resetToHub: true`.
+Journey smokes pass `resetToJourneyStart: true` (never hub after Alarm abort / smoke end).
 
 ### Visible page probe (Quinn + Ben — screen ships)
 
@@ -83,7 +84,7 @@ window.__studioAgentTestingOverlay?.isActive() // false during settle
 | Event | Behavior |
 |-------|----------|
 | `__studioRunMcpPageProbe` / sanity `finally` | Pre-arm → steps → `stop({ reload, result, settleMs })` — green/red sitrep **Auto-closes in Xs**, then hard-remove + optional reload; `scheduleEnsureClear(settle+1s)` failsafe |
-| CJM/journey `__protoRun*` session `finally` | Pre-arm → `stop({ reload: true, resetToHub: true, result })` — sitrep countdown, hub URL, hard-clear, then reload |
+| CJM/journey `__protoRun*` session `finally` | Pre-arm → `stop({ reload: true, resetToJourneyStart: true, result })` — sitrep countdown, journey key 1 URL, hard-clear, then reload |
 | Mutating `__proto*` / `__studio*` helpers | Auto-`touch()` + coalesced helper step with sitrep context (read-only getters + `EnsureCleanStudio` / `AbortAll` skipped) |
 | DevTools MCP clicks only | Agent **must** call `touch()` at session start (or rely on idle auto-stop) |
 | `stop()` nest → 0 | Enter DONE settle (default **9s**); PASS/FAIL badge when `result` set; release click guard; stay-on-page reset (or hub if `resetToHub`); keep log visible |

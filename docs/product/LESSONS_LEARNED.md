@@ -10,6 +10,12 @@ Agents **must read** this file before claiming a UI or Studio-chrome slice done.
 
 ## 2026-07-20
 
+### Smoke / Alarm abort still dumped PO to hub — `resetToHub: true` harness (PO / Finn + Quinn)
+
+- **Symptom / class:** Tip claimed journey-start never hub (`53f1348` goToTab) but PO eyes still landed `screen=hub` after Alarm abort / agentic step-forward smoke end.
+- **Root cause:** CJM smokes passed `withMcpTestSession(..., { resetToHub: true })` → overlay sitrep + `resetStudioAfterAgentTest({ resetToHub: true })` rewrote URL to hub. Product `goToTab` fix never touched harness teardown.
+- **Gate:** Journey smokes use `resetToJourneyStart` → `site-pilot` / `plp` + `cjm=on`. `resetToHub` forbidden for smoke/product (Hub nav click only). Every hub open logs PLAYBACK_DIAG `hub-nav` with reason + stack. Prove R11: Alarm abort / step-forward finally → `screen≠hub`.
+
 ### CJM on leaves robo-cursor DOM-null after restart / re-apply (PO / Finn)
 
 - **Symptom / class:** CJM switch ON (or `cjm=on` re-apply) — parked robo-cursor missing (`display` removed / not mounted) even at home park pose.

@@ -82,8 +82,13 @@ export type StopAgentTestingOverlayOptions = {
   /** After settle (or force teardown), reload once. MCP helpers: true. Manual: false. */
   reload?: boolean;
   /**
-   * When true: force hub after stop/reload (CJM/journey).
-   * Default false: stay on current project + screen.
+   * When true: land journey key 1 after stop/reload (CJM/journey smokes).
+   * Preferred over `resetToHub` — never dumps PO to hub.
+   */
+  resetToJourneyStart?: boolean;
+  /**
+   * When true: force hub after stop/reload.
+   * @deprecated Forbidden for product/smoke — Hub nav click only.
    */
   resetToHub?: boolean;
   /**
@@ -148,6 +153,8 @@ let reloadPending = false;
 let settleReload = false;
 /** Latched for settle + deferred reload (default stay-on-page). */
 let settleResetToHub = false;
+/** Journey smoke teardown → key 1 (preferred; never hub). */
+let settleResetToJourneyStart = false;
 let settleResult: AgentTestingOverlayResult = "neutral";
 let timelineKeys: AgentTestingTimelineKey[] = [];
 let lastUnexpectedDwellCount = 0;
@@ -1043,6 +1050,7 @@ function scheduleReload(delayMs = 120): void {
   reloadPending = true;
   lastReloadScheduledAt = now;
   const resetToHub = settleResetToHub;
+  const resetToJourneyStart = settleResetToJourneyStart;
   // Defer so MCP evaluate_script can return the run result before navigation.
   // forceClear / mid-settle re-arm must cancel this — never leave a stray reload.
   reloadTimer = window.setTimeout(() => {
@@ -1050,7 +1058,7 @@ function scheduleReload(delayMs = 120): void {
     if (!reloadPending) return;
     reloadPending = false;
     try {
-      resetStudioAfterAgentTest({ resetToHub });
+      resetStudioAfterAgentTest({ resetToJourneyStart, resetToHub });
     } catch {
       /* ignore */
     }
@@ -1058,9 +1066,12 @@ function scheduleReload(delayMs = 120): void {
   }, delayMs);
 }
 
-function safeResetStudio(resetToHub = settleResetToHub): void {
+function safeResetStudio(
+  resetToHub = settleResetToHub,
+  resetToJourneyStart = settleResetToJourneyStart
+): void {
   try {
-    resetStudioAfterAgentTest({ resetToHub });
+    resetStudioAfterAgentTest({ resetToJourneyStart, resetToHub });
   } catch {
     /* never leave overlay stuck because URL reset threw */
   }
@@ -1082,6 +1093,7 @@ function finishSettle(): void {
     scheduleReload(120);
   } else {
     settleResetToHub = false;
+    settleResetToJourneyStart = false;
   }
 }
 
@@ -1098,6 +1110,7 @@ function cancelSettle(instantReload?: boolean): void {
   else {
     safeResetStudio();
     settleResetToHub = false;
+    settleResetToJourneyStart = false;
   }
 }
 
@@ -1109,6 +1122,7 @@ function cancelSettle(instantReload?: boolean): void {
 function abandonSettleForRearch(): void {
   settleReload = false;
   settleResetToHub = false;
+  settleResetToJourneyStart = false;
   settling = false;
   settleResult = "neutral";
   clearSettleTimer();
@@ -1119,10 +1133,16 @@ function abandonSettleForRearch(): void {
   teardownDom(false);
 }
 
+function latchSettleResetFlags(options?: StopAgentTestingOverlayOptions): void {
+  settleResetToJourneyStart = !!options?.resetToJourneyStart;
+  settleResetToHub =
+    !settleResetToJourneyStart && !!options?.resetToHub;
+}
+
 function enterSettle(options?: StopAgentTestingOverlayOptions): void {
   const settleMs = clampSettleMs(options?.settleMs);
   settleReload = !!options?.reload;
-  settleResetToHub = !!options?.resetToHub;
+  latchSettleResetFlags(options);
   settleResult =
     options?.result === "pass" || options?.result === "fail"
       ? options.result
@@ -1298,7 +1318,7 @@ export function stopAgentTestingOverlay(
   try {
     if (options?.force) {
       nest = 0;
-      settleResetToHub = !!options.resetToHub;
+      latchSettleResetFlags(options);
       settleReload = !!options.reload;
       if (active) logAgentTestingOverlay("overlay stop");
       active = false;
@@ -1318,7 +1338,10 @@ export function stopAgentTestingOverlay(
       dismissRoboCursor();
       teardownDom(true);
       if (options.reload) scheduleReload(120);
-      else settleResetToHub = false;
+      else {
+        settleResetToHub = false;
+        settleResetToJourneyStart = false;
+      }
       return;
     }
     nest = Math.max(0, nest - 1);

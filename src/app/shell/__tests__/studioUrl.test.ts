@@ -272,7 +272,7 @@ describe("studioUrl", () => {
     expect(isStudioPostAgentResetSyncLocked()).toBe(true);
   });
 
-  it("resetStudioAfterAgentTest({ resetToHub: true }) lands hub", () => {
+  it("resetStudioAfterAgentTest({ resetToHub: true }) lands hub (legacy API)", () => {
     const replaceState = vi.fn();
     vi.stubGlobal("window", {
       location: {
@@ -292,6 +292,57 @@ describe("studioUrl", () => {
     });
     expect(String(replaceState.mock.calls.at(-1)?.[2])).toBe(
       "/?project=boots-pharmacy&screen=hub"
+    );
+  });
+
+  it("resetStudioAfterAgentTest({ resetToJourneyStart: true }) lands agentic key 1", () => {
+    const replaceState = vi.fn();
+    vi.stubGlobal("window", {
+      location: {
+        href: "http://localhost:5173/?project=boots-pharmacy&screen=chat&persona=sarah-jenkins&cjm=on&experience=agentic&modal=choose-pharmacy",
+        pathname: "/",
+        search:
+          "?project=boots-pharmacy&screen=chat&persona=sarah-jenkins&cjm=on&experience=agentic&modal=choose-pharmacy",
+        hash: "",
+      },
+      history: { state: null, replaceState, pushState: vi.fn() },
+      dispatchEvent: vi.fn(),
+    });
+
+    const state = resetStudioAfterAgentTest({ resetToJourneyStart: true });
+    expect(state.screenId).toBe("site-pilot");
+    expect(state.cjm).toBe(true);
+    expect(state.experienceId).toBe("agentic");
+    expect(state.personaId).toBe("sarah-jenkins");
+    expect(state.modalId).toBeUndefined();
+    const next = String(replaceState.mock.calls.at(-1)?.[2]);
+    expect(next).toContain("screen=site-pilot");
+    expect(next).toContain("cjm=on");
+    expect(next).not.toContain("screen=hub");
+    expect(next).not.toContain("modal=");
+  });
+
+  it("resetToJourneyStart wins over resetToHub (never hub for smokes)", () => {
+    const replaceState = vi.fn();
+    vi.stubGlobal("window", {
+      location: {
+        href: "http://localhost:5173/?project=boots-pharmacy&screen=chat&experience=traditional&cjm=on",
+        pathname: "/",
+        search:
+          "?project=boots-pharmacy&screen=chat&experience=traditional&cjm=on",
+        hash: "",
+      },
+      history: { state: null, replaceState, pushState: vi.fn() },
+      dispatchEvent: vi.fn(),
+    });
+
+    const state = resetStudioAfterAgentTest({
+      resetToJourneyStart: true,
+      resetToHub: true,
+    });
+    expect(state.screenId).toBe("plp");
+    expect(String(replaceState.mock.calls.at(-1)?.[2])).not.toContain(
+      "screen=hub"
     );
   });
 

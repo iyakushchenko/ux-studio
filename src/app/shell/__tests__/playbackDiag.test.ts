@@ -7,6 +7,7 @@ import {
   playbackDiagClear,
   playbackDiagClick,
   playbackDiagCursor,
+  playbackDiagHubNav,
   playbackDiagJourneyReset,
   playbackDiagLog,
   playbackDiagPlayEnd,
@@ -169,5 +170,21 @@ describe("playbackDiag", () => {
     expect(assert.pass).toBe(true);
     expect(getPlaybackDiagBundle().playEnd.count).toBe(1);
     expect(getPlaybackDiagBundle().journeyReset.count).toBe(1);
+  });
+
+  it("hub-nav records reason + stack for PO forensics", () => {
+    const info = vi.spyOn(console, "info").mockImplementation(() => {});
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    playbackDiagHubNav({
+      reason: "user-nav-hub",
+      source: "App.openHub",
+    });
+    const bundle = getPlaybackDiagBundle();
+    expect(bundle.hubNav.count).toBe(1);
+    expect(bundle.hubNav.last?.hubReason).toBe("user-nav-hub");
+    expect(bundle.hubNav.last?.hubStack).toMatch(/hub-nav:user-nav-hub/);
+    expect(bundle.hubNav.last?.screenAfter).toBe("hub");
+    expect(warn).toHaveBeenCalled();
+    expect(info).toHaveBeenCalled();
   });
 });

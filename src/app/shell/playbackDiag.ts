@@ -22,6 +22,7 @@ export type PlaybackDiagKind =
   | "transport"
   | "play-end"
   | "journey-reset"
+  | "hub-nav"
   | "beat"
   | "target"
   | "cursor"
@@ -81,6 +82,9 @@ export type PlaybackDiagEvent = {
   skipReason?: string | null;
   startBeatId?: string | null;
   startScreenId?: string | null;
+  /** Hub navigation reason + stack (PO leak forensics). */
+  hubReason?: string | null;
+  hubStack?: string | null;
 };
 
 const MAX_EVENTS = 400;
@@ -123,6 +127,8 @@ function consolePayload(full: PlaybackDiagEvent): Record<string, unknown> {
     counter: full.counter,
     startBeatId: full.startBeatId,
     startScreenId: full.startScreenId,
+    hubReason: full.hubReason,
+    hubStack: full.hubStack,
   };
 }
 
@@ -452,6 +458,10 @@ export type PlaybackDiagBundle = {
     count: number;
     last?: PlaybackDiagEvent;
   };
+  hubNav: {
+    count: number;
+    last?: PlaybackDiagEvent;
+  };
 };
 
 export function getPlaybackDiagBundle(): PlaybackDiagBundle {
@@ -460,6 +470,7 @@ export function getPlaybackDiagBundle(): PlaybackDiagBundle {
   const typeSkips = events.filter((e) => e.kind === "type-in-skip");
   const playEnds = events.filter((e) => e.kind === "play-end");
   const resets = events.filter((e) => e.kind === "journey-reset");
+  const hubNavs = events.filter((e) => e.kind === "hub-nav");
   const cursorEvents = events.filter((e) => e.kind === "cursor");
   const parks = cursorEvents.filter((e) => e.cursor?.parked);
   const scrollEvents = events.filter((e) => e.kind === "scroll");
@@ -514,10 +525,58 @@ export function getPlaybackDiagBundle(): PlaybackDiagBundle {
       count: resets.length,
       last: resets[resets.length - 1],
     },
+    hubNav: {
+      count: hubNavs.length,
+      last: hubNavs[hubNavs.length - 1],
+    },
   };
 }
 
 /** Play finished → CJM start (not hub / not stuck on last beat). */
+/**
+ * Every navigation to hub must log reason + stack so the next PO leak is obvious.
+ * Product paths must never call this except user Hub nav.
+ */
+export function playbackDiagHubNav(options: {
+  reason: string;
+  source?: string;
+}): void {
+  let stack: string | null = null;
+  try {
+    stack =
+      new Error(`hub-nav:${options.reason}`).stack
+        ?.split("\n")
+        .slice(0, 14)
+        .join("\n") ?? null;
+  } catch {
+    stack = null;
+  }
+  const screenBefore = readScreenId();
+  push({
+    kind: "hub-nav",
+    detail: options.reason,
+    hubReason: options.reason,
+    hubStack: stack,
+    screenBefore,
+    screenAfter: "hub",
+    surface: options.source,
+    mode: resolvePlaybackDiagMode(),
+  });
+  try {
+    console.warn(
+      "[PLAYBACK_DIAG] hub-nav",
+      options.reason,
+      {
+        source: options.source,
+        screenBefore,
+        stack,
+      }
+    );
+  } catch {
+    /* hang-safe */
+  }
+}
+
 export function playbackDiagPlayEnd(options: {
   fromBeatId?: string | null;
   toBeatId?: string | null;
