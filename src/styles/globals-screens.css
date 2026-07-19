@@ -1313,20 +1313,12 @@
   overflow: hidden !important;
 }
 
-/* Decorative Figma layers — agentic home only (do not hide global image 52) */
+/* Decorative Figma PNGs removed from Body10 — keep hide rules as belt for residual Make. */
 .studio-viewport > div > div:nth-child(11) > [data-name="body"] [data-name="image 52"],
 .studio-viewport > div > div:nth-child(11)
   > [data-name="body"]
   [data-name="light-neutral-olive-shiny-glowing-effects-abstract-background-design 1"] {
   display: none !important;
-}
-
-/* Agentic body decorative images — never selectable / draggable */
-.studio-viewport > div > div:nth-child(11) > [data-name="body"] img {
-  user-select: none !important;
-  -webkit-user-select: none !important;
-  -webkit-user-drag: none !important;
-  pointer-events: none !important;
 }
 
 /* ── Availability Checker Tool (Figma multi-step lightbox) ───────────────── */

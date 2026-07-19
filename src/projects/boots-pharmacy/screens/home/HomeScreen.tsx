@@ -1,6 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react";
-import homeBgBlur from "@/projects/boots-pharmacy/frame/8bf3e3fa5bdf7ac646a356ac31ebc77c42146c62.png";
-import homeBgGlow from "@/projects/boots-pharmacy/frame/ff02f67665f26feb9f6046697a46bbd1f2d1bcb1.png";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   HOME_CHIP_LABELS,
   HOME_QUERY_DEFAULT,
@@ -15,8 +13,12 @@ import "./home.css";
 
 export type HomeScreenProps = {
   loggedIn: boolean;
+  /** Pending query from session / goSitePilotHome — restores once on mount. */
+  initialQuery?: string;
   onSend: (query: string) => void;
   onChip: (label: HomeChipLabel) => void;
+  /** Wire Reset visibility — dirty when query ≠ Make default demo intent. */
+  onQueryDirtyChange?: (dirty: boolean) => void;
 };
 
 /** Make `SITE PILOT` wordmark (Body10 — 258×54, larger than header's 112×29). */
@@ -98,8 +100,16 @@ function SendGlyph() {
   );
 }
 
-export function HomeScreen({ loggedIn, onSend, onChip }: HomeScreenProps) {
-  const [query, setQuery] = useState(HOME_QUERY_DEFAULT);
+export function HomeScreen({
+  loggedIn,
+  initialQuery,
+  onSend,
+  onChip,
+  onQueryDirtyChange,
+}: HomeScreenProps) {
+  const [query, setQuery] = useState(
+    () => initialQuery ?? HOME_QUERY_DEFAULT
+  );
   const taRef = useRef<HTMLTextAreaElement>(null);
 
   useLayoutEffect(() => {
@@ -112,6 +122,11 @@ export function HomeScreen({ loggedIn, onSend, onChip }: HomeScreenProps) {
     ta.style.overflowY = next >= max ? "auto" : "hidden";
   }, [query]);
 
+  useEffect(() => {
+    const dirty = query.trim() !== HOME_QUERY_DEFAULT.trim();
+    onQueryDirtyChange?.(dirty);
+  }, [query, onQueryDirtyChange]);
+
   const handleSend = () => {
     onSend(query);
   };
@@ -123,11 +138,6 @@ export function HomeScreen({ loggedIn, onSend, onChip }: HomeScreenProps) {
       data-name="body"
       aria-label="Agentic Site Pilot home"
     >
-      <div className="home__bg" aria-hidden>
-        <img className="home__bg-blur" src={homeBgBlur} alt="" />
-        <img className="home__bg-glow" src={homeBgGlow} alt="" />
-      </div>
-
       <div className="home__content">
         <HomeLogo />
 
@@ -155,6 +165,7 @@ export function HomeScreen({ loggedIn, onSend, onChip }: HomeScreenProps) {
               type="button"
               className="home__mic"
               data-name="component.input.button"
+              data-studio-action="agentic-home-mic"
               aria-label="Voice input"
             >
               <MicGlyph />

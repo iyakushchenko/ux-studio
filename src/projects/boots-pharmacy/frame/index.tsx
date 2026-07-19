@@ -7,9 +7,6 @@ import imgComponentProductImageBasic from "./ac6ed7db66adf30dd80e0290b6a431d7de9
 import imgImage60 from "./9d46d8f7966cc26795f1d8689d9132bdf6e13c15.png";
 import imgImage59 from "./61d74a3c817f3bb72471ea03403b2077aa2da40a.png";
 import imgImage from "./5b75d20d7a0df34031ca23477a68cf97cac4938d.png";
-import imgImage53 from "./8bf3e3fa5bdf7ac646a356ac31ebc77c42146c62.png";
-import imgLightNeutralOliveShinyGlowingEffectsAbstractBackgroundDesign1 from "./ff02f67665f26feb9f6046697a46bbd1f2d1bcb1.png";
-
 function Group() {
   return (
     <div className="absolute inset-[0_0.02%_0_0]" data-name="Group">
@@ -13346,12 +13343,7 @@ function Body10() {
     <div className="bg-[#f5f5f5] flex-[1_0_0] min-h-px relative w-full" data-name="body">
       <div className="flex flex-col items-center justify-center overflow-clip rounded-[inherit] size-full">
         <div className="content-stretch flex flex-col gap-[72px] items-center justify-center p-[64px] relative size-full">
-          <div className="absolute blur-[12.4px] h-[1464.672px] left-[-16.48px] top-[-263.34px] w-[1472.969px]" data-name="image 52">
-            <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src={imgImage53} />
-          </div>
-          <div className="-translate-x-1/2 -translate-y-1/2 absolute h-[796px] left-1/2 top-1/2 w-[1440px]" data-name="light-neutral-olive-shiny-glowing-effects-abstract-background-design 1">
-            <img alt="" className="absolute inset-0 max-w-none object-bottom pointer-events-none size-full" src={imgLightNeutralOliveShinyGlowingEffectsAbstractBackgroundDesign1} />
-          </div>
+          {/* Atmosphere = CSS gradient only (globals-screens). Dark photo + glow PNGs removed — not needed. */}
           <div className="h-[54px] relative shrink-0 w-[258px]" data-name="boots.ai assistant 3">
             <div className="absolute inset-[40.13%_11.13%_36.3%_33.46%]" data-name="SITE PILOT">
               <svg className="absolute block inset-0 size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 142.979 12.7273">
