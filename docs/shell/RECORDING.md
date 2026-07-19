@@ -55,13 +55,13 @@ Cassette deck mode toggles (labels match STEPS type; pipe bars match zoom delimi
 
 | Control | Chrome | Behavior |
 |---------|--------|----------|
-| **REC** | Always-on `REC` mode label + muted/red switch; `REC: N` event count only in Rec mode | Playback XOR recording panel; count live from `protoRecordingSession` |
+| **REC** | Always-on `REC` mode label + muted/red switch; `STEPS: N` event count only in Rec mode | Playback XOR recording panel; count live from `protoRecordingSession` |
 | **CJM** | `\| CJM [switch] \|` pipes + amber when on | Journey mode (browse vs cassette transport) |
 
 **Playback | Rec** (mutually exclusive panels):
 
-- **Left (muted, browse-off weight) / REC off** — playback mode: `REC [switch]` (no event counter) + `\| CJM \|` / journey `STEPS: N` / seek / play. Recording event counter and REC transport are unmounted.
-- **Right (red) / REC on** — rec mode: `REC [switch] REC: N` (captured events) + recording transport only. Journey STEPS / cassette transport are unmounted.
+- **Left (muted, browse-off weight) / REC off** — playback mode: `REC [switch] | CJM [switch] | STEPS: N` (journey) — no recording counter. Recording event counter and REC transport are unmounted.
+- **Right (red) / REC on** — rec mode: `REC [switch] STEPS: N` (recording events) + REC deck. Journey STEPS / cassette transport are unmounted.
 
 Leaving Rec while a capture is live **pauses** the session (does not stop/destroy it).
 
