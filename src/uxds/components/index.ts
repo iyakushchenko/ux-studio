@@ -13,3 +13,8 @@ export {
   type BookProgressStep,
   type BookProgressStepState,
 } from "./BookAppointmentProgress";
+export {
+  SearchField,
+  type SearchFieldIconPosition,
+  type SearchFieldProps,
+} from "./SearchField";

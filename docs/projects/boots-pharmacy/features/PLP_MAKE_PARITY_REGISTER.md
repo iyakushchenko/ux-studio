@@ -2,7 +2,7 @@
 
 **Project:** `boots-pharmacy`  
 **Callsigns:** Bea (BA) owns register truth · Quinn (QA) owns prove · Finn/Uma restore gaps  
-**Updated:** 2026-07-19 (PO rage #2 — real Make preloader + checkbox hover)  
+**Updated:** 2026-07-19 (PO rage #4 — filter search Make+wire parity)  
 **Make source:** Frame child **9** (`Product - Vaccination Listing Page`) + `globals-screens` `.proto-plp-*` + `data/plpListing.ts` wire  
 **React target:** `src/projects/boots-pharmacy/screens/plp/*`  
 **Refs:** [PLP_REACT.md](./PLP_REACT.md) · audit [../audits/FE_AUDIT_PLP_2026-07-19.md](../audits/FE_AUDIT_PLP_2026-07-19.md)  
@@ -25,7 +25,7 @@
 | L5 | **Advantage Card points banner** — mint `#c4dde3` system message above filters/listing: “Collect 3 points for every £1 you spend with Boots Advantage Card‡” | **Was Missing (Wrongly left residual) → Fixed** | Make `ModuleLaptopSpecs` L11375–11384. Restored `.plp__advantage` / `component.gse.system.message`. **Example of whole-component miss.** |
 | L6 | **AI Assistant promo strip** below listing | **Missing** | Marketing residual (not CJM) |
 | L7 | **Filters column** 304px accordion | **Present** | UXDS Accordion |
-| L8 | **Filter search** (disease / country) + clear | **Present** | `FilterSearch` |
+| L8 | **Filter search** (disease / country) — magnifier **RIGHT**, one clear, UXDS `SearchField` | **Was Wrong (icon left + type=search double X + bespoke) → Fixed** | UXDS `SearchField` `iconPosition="end"` |
 | L9 | **Results summary** count + chips + Reset Filters; during load count = “Updating results…” + pulse | **Fixed** | Chips + icon+text Reset + `--loading` pulse |
 | L10 | **Service tiles** — title, subtitle, desc, price, Book now, Bookmarks, Quick View; **no tile border** (Make borderless) | **Was Partial (border invent) → Fixed** | Removed `.plp__tile` `1px` border; pad 16px retained |
 | L11 | **Empty state (P0)** — zero-match copy in listing host | **Present** | `.plp__empty` |
@@ -62,7 +62,9 @@
 | I3 | Disease / region / country | **Present** | |
 | I4 | Active filter chips | **Fixed** | Removable chips |
 | I5 | **Reset filters** — icon+text tertiary (trash + label), not text-only link | **Was Wrong (text-only) → Fixed** | `TertiaryCta` + trash glyph; sidebar + summary |
-| I6 | View all on long lists | **Missing** | Residual |
+| I6 | **View all** + **10-item cap** — filled View all resets field (wire) | **Was Missing → Fixed** | `PLP_FILTER_LIST_MAX` + `data-studio-plp-view-all` |
+| I6b | **Filter option counters** next to options | **Was Missing → Fixed** | `countPlpFacetOption` / `data-studio-plp-option-count` |
+| I6c | **No invented filter separator** (hr / border between accordion bands) | **Was Wrong → Fixed** | Removed `.plp__filter-section` border-bottom |
 | I7 | Sort control | **N/A** | Not in Make |
 | I8 | Tile title / Book now → PDP | **Present** | |
 | I8b | **Book now hover** — same as UXDS `ButtonPrimary` commerce / primary CTA tokens (navy → hover lift), not mint secondary one-off | **Was Wrong (LEGACY tile catch-all) → Fixed** | LEGACY excludes `.uxds-btn-primary`; commerce hover tokens win |
@@ -97,8 +99,11 @@
 | P0 | I5 Reset filters icon+text | **Fixed** (prior) |
 | P0 | I8b Book now CTA hover tokens | **Fixed** (prior) |
 | P0 | I10 heart empty hover navy / filled fuchsia (no invent) | **Re-fixed** (PO rage #3) |
+| P0 | L8 Filter search icon end + single clear + UXDS | **Fixed** (PO rage #4) |
+| P0 | I6 View all + 10-cap + filled reset | **Fixed** (PO rage #4) |
+| P0 | I6b Filter option counters | **Fixed** (PO rage #4) |
+| P0 | I6c No invented filter separator | **Fixed** (PO rage #4) |
 | P2 | L6 AI promo strip | Residual |
-| P2 | I6 View all | Residual |
 | P2 | L14 catalog count | Residual |
 
 ---

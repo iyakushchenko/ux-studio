@@ -125,6 +125,12 @@ function plpProbeSteps(): ProbeStep[] {
           if (!r || r.width < 8 || r.height < 8) {
             return "search icon not visible / not laid out";
           }
+          const pos = (el as HTMLElement).getAttribute(
+            "data-studio-search-icon-pos"
+          );
+          if (pos !== "end") {
+            return `search icon must be data-studio-search-icon-pos="end" (found ${pos ?? "missing"})`;
+          }
         }
         const disease = document.querySelector(
           '[data-studio-react-screen="plp"] input[placeholder="Search diseases"]'
@@ -134,9 +140,61 @@ function plpProbeSteps(): ProbeStep[] {
         );
         for (const input of [disease, country]) {
           if (!input) return "filter search input missing";
+          if ((input as HTMLInputElement).type === "search") {
+            return "filter search must use type=text (native search X duplicates clear)";
+          }
           const field = input.closest('[data-name="component.input.field"]');
           if (!field?.querySelector('[data-studio-search-icon="true"]')) {
             return "search input missing [data-studio-search-icon] sibling";
+          }
+          const clears = field.querySelectorAll(
+            '[data-studio-search-clear="true"]'
+          );
+          // Empty field → 0 clears; filled would be 1. Never >1.
+          if (clears.length > 1) {
+            return `duplicate clear controls (${clears.length})`;
+          }
+        }
+        return true;
+      },
+    },
+    {
+      id: "plp-filter-view-all",
+      selector:
+        '[data-studio-react-screen="plp"] [data-studio-plp-view-all="true"]',
+      action: "assert",
+      assert: () => {
+        const links = document.querySelectorAll(
+          '[data-studio-react-screen="plp"] [data-studio-plp-view-all="true"]'
+        );
+        if (links.length < 2) {
+          return `expected ≥2 View all links (disease+country), found ${links.length}`;
+        }
+        return true;
+      },
+    },
+    {
+      id: "plp-filter-option-counters",
+      selector:
+        '[data-studio-react-screen="plp"] [data-studio-plp-option-count]',
+      action: "assert",
+      assert: () => {
+        const rows = document.querySelectorAll(
+          '[data-studio-react-screen="plp"] [data-studio-plp-option-count]'
+        );
+        if (rows.length < 4) {
+          return `expected filter option counters, found ${rows.length}`;
+        }
+        for (const row of rows) {
+          const n = (row as HTMLElement).getAttribute(
+            "data-studio-plp-option-count"
+          );
+          if (n == null || !/^\d+$/.test(n)) {
+            return "filter option missing numeric data-studio-plp-option-count";
+          }
+          const countEl = row.querySelector(".plp__option-count");
+          if (!countEl || (countEl.textContent ?? "").trim() !== n) {
+            return "filter option count label mismatch";
           }
         }
         return true;

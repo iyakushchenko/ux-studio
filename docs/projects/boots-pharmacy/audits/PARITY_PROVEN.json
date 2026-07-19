@@ -43,13 +43,12 @@
     {
       "screenId": "plp",
       "status": "proven",
-      "auditPath": "docs/projects/boots-pharmacy/audits/FE_AUDIT_PLP_2026-07-19_RAGE3.md",
+      "auditPath": "docs/projects/boots-pharmacy/audits/FE_AUDIT_PLP_2026-07-19_RAGE4.md",
       "mcpMatrixAt": {
-        "sha": "f366c06",
+        "sha": "pending",
         "date": "2026-07-19",
-        "note": "overlay eyes refuse-click + bookmark label copy (v0.0.10)"
+        "note": "filter search Make+wire: icon end, single clear, View all, counters, no hr; sitrep countdown (v0.0.12)"
       },
-
       "requireMcp": true
     }
   ]

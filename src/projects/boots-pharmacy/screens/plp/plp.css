@@ -261,9 +261,9 @@
   gap: 8px;
 }
 
+/* No invented horizontal separator between filter accordion bands (Make has none). */
 .plp__filter-section {
   width: 100%;
-  border-bottom: 1px solid #e5e5e5;
 }
 
 .plp__filter-trigger {
@@ -413,61 +413,18 @@
   transform: rotate(45deg);
 }
 
+/* PLP filter search — UXDS SearchField (icon end / single clear). */
 .plp__search {
-  display: flex;
-  align-items: center;
-  gap: 8px;
   width: 100%;
-  min-height: 40px;
-  padding: 0 12px;
-  border: 1px solid #c3c3c3;
-  border-radius: 360px;
-  box-sizing: border-box;
-  background: #fff;
 }
 
-.plp__search:focus-within {
-  box-shadow: inset 0 0 0 1px #012169;
-  border-color: #012169;
-}
-
-/* Make filter search magnifier — left affordance (asset fill #AFCCCA) */
-.plp__search-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 24px;
-  height: 24px;
-  pointer-events: none;
-}
-
-.plp__search-icon img {
+.plp__view-all {
   display: block;
-  width: 24px;
-  height: 24px;
-}
-
-.plp__search-input {
-  flex: 1 1 auto;
-  min-width: 0;
-  border: none;
-  background: none;
-  font: inherit;
+  width: 100%;
+  min-height: 32px;
   font-size: 13px;
   line-height: 24px;
-  color: #3a3a3a;
-  outline: none;
-}
-
-.plp__search-clear {
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-size: 18px;
-  line-height: 1;
-  color: #5c5c5c;
-  padding: 0 4px;
+  text-decoration: none;
 }
 
 .plp__reset {

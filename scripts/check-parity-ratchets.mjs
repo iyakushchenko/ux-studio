@@ -83,12 +83,16 @@ const REACT_MOUNT_FILES = [
   for (const { rel, minIcons, label } of SEARCH_FILES) {
     const src = requireFile(rel);
     if (!src) continue;
+    // PLP uses UXDS SearchField which stamps the marker in the kit source.
     const iconCount = (
       src.match(/data-studio-search-icon\s*=\s*["']true["']/g) || []
     ).length;
-    if (iconCount < minIcons) {
+    const usesUxdsSearch =
+      /<SearchField[\s\S]{0,200}iconPosition\s*=\s*["']end["']/.test(src) ||
+      /from ["']@\/uxds\/components["']/.test(src) && /SearchField/.test(src);
+    if (iconCount < minIcons && !usesUxdsSearch) {
       fail(
-        `RATCHET search-icon: ${label} (${rel}) needs ≥${minIcons} data-studio-search-icon="true" (found ${iconCount})`
+        `RATCHET search-icon: ${label} (${rel}) needs ≥${minIcons} data-studio-search-icon="true" or UXDS SearchField (found ${iconCount})`
       );
     }
   }
@@ -106,9 +110,91 @@ const REACT_MOUNT_FILES = [
         src
       );
     if (!hasSearchInput) continue;
-    if (!/data-studio-search-icon\s*=\s*["']true["']/.test(src)) {
+    const usesUxdsSearch = /<SearchField[\s>]/.test(src);
+    if (
+      !/data-studio-search-icon\s*=\s*["']true["']/.test(src) &&
+      !usesUxdsSearch
+    ) {
       fail(
         `RATCHET search-icon: ${rel} has search input/placeholder but no data-studio-search-icon="true"`
+      );
+    }
+  }
+
+  // UXDS kit must stamp icon marker + icon-pos.
+  const searchKit = requireFile("src/uxds/components/SearchField.tsx");
+  if (searchKit) {
+    if (!/data-studio-search-icon\s*=\s*["']true["']/.test(searchKit)) {
+      fail(
+        'RATCHET search-icon: SearchField.tsx must stamp data-studio-search-icon="true"'
+      );
+    }
+    if (
+      !/data-studio-search-icon-pos\s*=\s*\{?iconPosition\}?/.test(searchKit) &&
+      !/data-studio-search-icon-pos=/.test(searchKit)
+    ) {
+      fail(
+        "RATCHET search-icon-pos: SearchField.tsx must stamp data-studio-search-icon-pos"
+      );
+    }
+  }
+}
+
+// ── 1b) PLP search icon on the RIGHT (end) + single clear + no type=search ──
+{
+  const src = requireFile(PLP_TSX);
+  if (src) {
+    if (!/iconPosition\s*=\s*["']end["']/.test(src)) {
+      fail(
+        `RATCHET search-icon-pos: ${PLP_TSX} FilterSearch must use iconPosition="end" (magnifier RIGHT)`
+      );
+    }
+    if (/type\s*=\s*["']search["']/.test(src)) {
+      fail(
+        `RATCHET single-clear: ${PLP_TSX} must not use type="search" (native X duplicates clear)`
+      );
+    }
+    if (!/data-studio-plp-view-all\s*=\s*["']true["']/.test(src)) {
+      fail(
+        `RATCHET view-all: ${PLP_TSX} missing data-studio-plp-view-all="true"`
+      );
+    }
+    if (!/PLP_FILTER_LIST_MAX|capPlpFilterOptionList/.test(src)) {
+      fail(
+        `RATCHET view-all: ${PLP_TSX} must cap filter lists via PLP_FILTER_LIST_MAX / capPlpFilterOptionList`
+      );
+    }
+    if (!/data-studio-plp-option-count/.test(src)) {
+      fail(
+        `RATCHET filter-counters: ${PLP_TSX} missing data-studio-plp-option-count on filter options`
+      );
+    }
+    if (!/countPlpFacetOption|countPlpTypeOption/.test(src)) {
+      fail(
+        `RATCHET filter-counters: ${PLP_TSX} must call countPlpFacetOption / countPlpTypeOption`
+      );
+    }
+  }
+}
+
+// ── 1c) No invented filter horizontal separator ─────────────────────────────
+{
+  const css = requireFile(PLP_CSS);
+  if (css) {
+    const compact = css.replace(/\s+/g, " ");
+    const sectionRule = /\.plp__filter-section\s*\{[^}]*\}/;
+    const match = compact.match(sectionRule);
+    if (match && /border-bottom|border-top/.test(match[0])) {
+      fail(
+        `RATCHET no-filter-hr: ${PLP_CSS} .plp__filter-section must not invent border separator (Make has none)`
+      );
+    }
+    if (
+      /\.plp__filter-(separator|divider|hr)\b/.test(css) ||
+      /plp__filter-hr/.test(css)
+    ) {
+      fail(
+        `RATCHET no-filter-hr: ${PLP_CSS} must not define invented filter separator classes`
       );
     }
   }
@@ -289,4 +375,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("parity-ratchets OK (8 contracts)");
+console.log("parity-ratchets OK (11 contracts)");

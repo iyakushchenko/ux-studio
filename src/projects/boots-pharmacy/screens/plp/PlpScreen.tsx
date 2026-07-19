@@ -5,7 +5,6 @@ import {
   type CSSProperties,
 } from "react";
 import { TertiaryCta } from "@/app/chrome/TertiaryCta";
-import iconSearch from "@/assets/avail/search.svg";
 import plpHeroImage from "@/projects/boots-pharmacy/frame/5b75d20d7a0df34031ca23477a68cf97cac4938d.png";
 import plpBodyFill from "@/projects/boots-pharmacy/frame/dbcd84d6da292330c6f57adefa32dd4b969ac8bd.png";
 import {
@@ -13,7 +12,7 @@ import {
   plpTileWishlistId,
   toggleWishlist,
 } from "@/projects/boots-pharmacy/chrome/headerMount";
-import { ButtonPrimary } from "@/uxds/components";
+import { ButtonPrimary, SearchField } from "@/uxds/components";
 import {
   Accordion,
   AccordionContent,
@@ -23,13 +22,15 @@ import {
 import {
   DEFAULT_PLP_FILTERS,
   PLP_AGE_OPTIONS,
-  PLP_BUNDLE_CATALOG,
   PLP_COUNTRY_OPTIONS,
   PLP_DISEASE_OPTIONS,
-  PLP_JAB_ITEMS,
+  PLP_FILTER_LIST_MAX,
   PLP_LISTING_LOAD_MS,
   PLP_REGION_OPTIONS,
+  capPlpFilterOptionList,
   collectPlpActiveFilterChips,
+  countPlpFacetOption,
+  countPlpTypeOption,
   filterOptionList,
   filterPlpCatalog,
   isPlpFiltersDirty,
@@ -135,6 +136,7 @@ function RadioRow({
       className="plp__option-row"
       data-name="component.input.radio"
       data-radio-checked={String(checked)}
+      data-studio-plp-option-count={String(count)}
       aria-checked={checked}
       role="radio"
       onClick={onSelect}
@@ -149,10 +151,12 @@ function RadioRow({
 function CheckboxRow({
   checked,
   label,
+  count,
   onToggle,
 }: {
   checked: boolean;
   label: string;
+  count: number;
   onToggle: () => void;
 }) {
   return (
@@ -160,6 +164,7 @@ function CheckboxRow({
       type="button"
       className="plp__option-row"
       data-name="component.plp.filter.checkbox.item"
+      data-studio-plp-option-count={String(count)}
       onClick={onToggle}
     >
       <span
@@ -172,10 +177,15 @@ function CheckboxRow({
       <span className="plp__option-label" data-name="Label">
         <span>{label}</span>
       </span>
+      <span className="plp__option-count">{count}</span>
     </button>
   );
 }
 
+/**
+ * Make PLP filter search — UXDS SearchField, magnifier END (right), one clear.
+ * Filled + View all → reset field (wire `handlePlpFilterViewAllClick` / clear).
+ */
 function FilterSearch({
   value,
   onChange,
@@ -186,39 +196,33 @@ function FilterSearch({
   placeholder: string;
 }) {
   return (
-    <label
+    <SearchField
       className="plp__search"
-      data-name="component.input.field"
-      data-studio-react-owned="true"
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      iconPosition="end"
+      clearable
+      aria-label={placeholder}
+    />
+  );
+}
+
+/** Make `component.plp.filter.view-all` — always under disease/country lists. */
+function FilterViewAll({ onActivate }: { onActivate: () => void }) {
+  return (
+    <a
+      href="#"
+      className="plp__view-all uxds-link"
+      data-name="component.plp.filter.view-all"
+      data-studio-plp-view-all="true"
+      onClick={(e) => {
+        e.preventDefault();
+        onActivate();
+      }}
     >
-      {/* Make TextField5: magnifier LEFT of placeholder (mint #AFCCCA asset), then clear */}
-      <span
-        className="plp__search-icon"
-        data-name="icon=search"
-        data-studio-search-icon="true"
-        aria-hidden
-      >
-        <img src={iconSearch} alt="" width={24} height={24} />
-      </span>
-      <input
-        className="plp__search-input proto-search-input"
-        type="search"
-        value={value}
-        placeholder={placeholder}
-        onChange={(e) => onChange(e.target.value)}
-        aria-label={placeholder}
-      />
-      {value ? (
-        <button
-          type="button"
-          className="plp__search-clear"
-          aria-label="Clear search"
-          onClick={() => onChange("")}
-        >
-          ×
-        </button>
-      ) : null}
-    </label>
+      View all
+    </a>
   );
 }
 
@@ -374,6 +378,9 @@ export function PlpScreen({
   const [loadHostMinHeight, setLoadHostMinHeight] = useState<number | null>(
     null
   );
+  /** View all expand (uncap beyond Make `PLP_FILTER_LIST_MAX`). */
+  const [diseaseExpanded, setDiseaseExpanded] = useState(false);
+  const [countryExpanded, setCountryExpanded] = useState(false);
   const syncPassRef = useRef(0);
   const loadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const tilesHostRef = useRef<HTMLDivElement | null>(null);
@@ -428,14 +435,32 @@ export function PlpScreen({
     };
   }, [filters]);
 
-  const diseaseOptions = filterOptionList(
+  const diseaseFiltered = filterOptionList(
     PLP_DISEASE_OPTIONS,
     filters.diseaseQuery
   );
-  const countryOptions = filterOptionList(
+  const countryFiltered = filterOptionList(
     PLP_COUNTRY_OPTIONS,
     filters.countryQuery
   );
+  const diseaseQuerying = filters.diseaseQuery.trim().length > 0;
+  const countryQuerying = filters.countryQuery.trim().length > 0;
+  const diseaseOptions = capPlpFilterOptionList(diseaseFiltered, {
+    expanded: diseaseExpanded,
+    querying: diseaseQuerying,
+  });
+  const countryOptions = capPlpFilterOptionList(countryFiltered, {
+    expanded: countryExpanded,
+    querying: countryQuerying,
+  });
+  const diseaseCanExpand =
+    !diseaseQuerying &&
+    !diseaseExpanded &&
+    diseaseFiltered.length > PLP_FILTER_LIST_MAX;
+  const countryCanExpand =
+    !countryQuerying &&
+    !countryExpanded &&
+    countryFiltered.length > PLP_FILTER_LIST_MAX;
 
   // Count keeps prior results during load (displayItems not swapped yet).
   // ONE “Updating results…” lives under the spinner — never duplicate in count.
@@ -552,7 +577,7 @@ export function PlpScreen({
                       <RadioRow
                         checked={!filters.showBundles}
                         label="Individual jabs"
-                        count={PLP_JAB_ITEMS.length}
+                        count={countPlpTypeOption(filters, false)}
                         onSelect={() =>
                           setFilters({ ...filters, showBundles: false })
                         }
@@ -560,7 +585,7 @@ export function PlpScreen({
                       <RadioRow
                         checked={filters.showBundles}
                         label="Bundles"
-                        count={PLP_BUNDLE_CATALOG.length}
+                        count={countPlpTypeOption(filters, true)}
                         onSelect={() =>
                           setFilters({ ...filters, showBundles: true })
                         }
@@ -579,7 +604,10 @@ export function PlpScreen({
                       <RadioRow
                         checked={filters.allAges}
                         label="All age groups"
-                        count={PLP_JAB_ITEMS.length}
+                        count={countPlpTypeOption(
+                          { ...filters, allAges: true, ages: [] },
+                          filters.showBundles
+                        )}
                         onSelect={() =>
                           setFilters({
                             ...filters,
@@ -593,6 +621,7 @@ export function PlpScreen({
                           key={label}
                           checked={filters.ages.includes(label)}
                           label={label}
+                          count={countPlpFacetOption(filters, "ages", label)}
                           onToggle={() =>
                             setFilters(
                               togglePlpFilterValue(filters, "ages", label)
@@ -612,9 +641,10 @@ export function PlpScreen({
                   <AccordionContent id="disease" className="plp__filter-content">
                     <FilterSearch
                       value={filters.diseaseQuery}
-                      onChange={(diseaseQuery) =>
-                        setFilters({ ...filters, diseaseQuery })
-                      }
+                      onChange={(diseaseQuery) => {
+                        setDiseaseExpanded(false);
+                        setFilters({ ...filters, diseaseQuery });
+                      }}
                       placeholder="Search diseases"
                     />
                     <div className="plp__option-list" data-name="list">
@@ -623,6 +653,11 @@ export function PlpScreen({
                           key={label}
                           checked={filters.diseases.includes(label)}
                           label={label}
+                          count={countPlpFacetOption(
+                            filters,
+                            "diseases",
+                            label
+                          )}
                           onToggle={() =>
                             setFilters(
                               togglePlpFilterValue(filters, "diseases", label)
@@ -631,6 +666,17 @@ export function PlpScreen({
                         />
                       ))}
                     </div>
+                    <FilterViewAll
+                      onActivate={() => {
+                        // Filled → reset field (Make wire clear / PO restore).
+                        if (diseaseQuerying) {
+                          setFilters({ ...filters, diseaseQuery: "" });
+                          setDiseaseExpanded(false);
+                          return;
+                        }
+                        if (diseaseCanExpand) setDiseaseExpanded(true);
+                      }}
+                    />
                   </AccordionContent>
                 </AccordionItem>
 
@@ -646,6 +692,7 @@ export function PlpScreen({
                           key={label}
                           checked={filters.regions.includes(label)}
                           label={label}
+                          count={countPlpFacetOption(filters, "regions", label)}
                           onToggle={() =>
                             setFilters(
                               togglePlpFilterValue(filters, "regions", label)
@@ -665,9 +712,10 @@ export function PlpScreen({
                   <AccordionContent id="country" className="plp__filter-content">
                     <FilterSearch
                       value={filters.countryQuery}
-                      onChange={(countryQuery) =>
-                        setFilters({ ...filters, countryQuery })
-                      }
+                      onChange={(countryQuery) => {
+                        setCountryExpanded(false);
+                        setFilters({ ...filters, countryQuery });
+                      }}
                       placeholder="Search countries"
                     />
                     <div className="plp__option-list" data-name="list">
@@ -676,6 +724,11 @@ export function PlpScreen({
                           key={label}
                           checked={filters.countries.includes(label)}
                           label={label}
+                          count={countPlpFacetOption(
+                            filters,
+                            "countries",
+                            label
+                          )}
                           onToggle={() =>
                             setFilters(
                               togglePlpFilterValue(filters, "countries", label)
@@ -684,6 +737,16 @@ export function PlpScreen({
                         />
                       ))}
                     </div>
+                    <FilterViewAll
+                      onActivate={() => {
+                        if (countryQuerying) {
+                          setFilters({ ...filters, countryQuery: "" });
+                          setCountryExpanded(false);
+                          return;
+                        }
+                        if (countryCanExpand) setCountryExpanded(true);
+                      }}
+                    />
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>

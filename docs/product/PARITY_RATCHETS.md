@@ -24,7 +24,12 @@
 
 | # | Id | Catches | How (lean) | Seed |
 |---|-----|---------|------------|------|
-| 1 | **search-icon** | React search fields missing magnifier | React screens with `type="search"` / known search placeholders + Availability / Book Step 1 must stamp `data-studio-search-icon="true"` | PO: Search countries lost icon |
+| 1 | **search-icon** | React search fields missing magnifier | React screens / UXDS `SearchField` must stamp `data-studio-search-icon="true"` | PO: Search countries lost icon |
+| 1b | **search-icon-pos** | Magnifier on wrong side | PLP FilterSearch must use `iconPosition="end"`; kit stamps `data-studio-search-icon-pos` | PO rage: icon was RIGHT, we put LEFT |
+| 1c | **single-clear** | Two X icons (native + custom) | PLP must not use `type="search"`; kit uses `type="text"` + one `data-studio-search-clear` | PO: two X icons |
+| 1d | **view-all** | Missing View all / uncapped list | PLP stamps `data-studio-plp-view-all` + uses `PLP_FILTER_LIST_MAX` / `capPlpFilterOptionList` | PO: 10-cap + View all |
+| 1e | **filter-counters** | Missing option counts | PLP stamps `data-studio-plp-option-count` + calls `countPlpFacetOption` / `countPlpTypeOption` | PO: restore Make counters |
+| 1f | **no-filter-hr** | Invented filter separator | `.plp__filter-section` must not set `border-bottom` / invented hr classes | PO: remove invented separator |
 | 2 | **bookmark-copy** | Bookmarked label drift | PLP source must include **"In your Bookmarks"** + **"Remove from Bookmarks"** | PO bookmark copy |
 | 3 | **empty-heart-fuchsia** | Invented fuchsia on **empty** heart hover | PLP CSS empty wishlist hover (`:not(.is-active)`) must use `--uxds-text-link-link`; fuchsia only on `.is-active` | LESSONS invent hover |
 | 4 | **overlay-registry** | MCP/robo click-through | Kept in `check:felonies` (`REGISTERED_OVERLAY_MODAL_IDS`); ratchet asserts felony gate still wired | Overlay eyes |
@@ -40,6 +45,10 @@
 | Marker | Meaning |
 |--------|---------|
 | `data-studio-search-icon="true"` | Visible search magnifier affordance sibling/control |
+| `data-studio-search-icon-pos="end\|start"` | Magnifier side (PLP/Availability/Book = `end`) |
+| `data-studio-search-clear="true"` | Single in-field clear control |
+| `data-studio-plp-view-all="true"` | Filter View all link |
+| `data-studio-plp-option-count="<n>"` | Filter option counter (Make sidebar) |
 | `data-studio-plp-advantage="true"` | Advantage / promo system-message band |
 | `data-studio-plp-listing-loader="true"` | In-band listing spinner overlay |
 | `data-studio-make-retired="<screenId>"` | Make Frame child hidden after React mount |
@@ -51,7 +60,7 @@
 
 | Prove | Owner |
 |-------|--------|
-| `__studioRunMcpPageProbe({ screenId: "plp" })` includes **plp-search-icons** step | Quinn (QA) |
+| `__studioRunMcpPageProbe({ screenId: "plp" })` includes **plp-search-icons**, **plp-filter-view-all**, **plp-filter-option-counters** | Quinn (QA) |
 | Uma fidelity checklist points here for automated contracts | Uma (UI/UX) |
 | `PARITY_PROVEN.json` + MCP matrix | Ben + Quinn |
 

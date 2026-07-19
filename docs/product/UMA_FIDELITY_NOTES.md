@@ -83,9 +83,18 @@ Run against Make (or Make frame export) **side-by-side** with React localhost.
 
 ### 7b. Search fields (magnifier affordance)
 
-- [ ] Every search input shows Make’s magnifier (left or right per Make) — not a bare placeholder
+- [ ] Every search input uses UXDS `SearchField` (or stamps same markers) — not a bespoke bare input
+- [ ] Magnifier side matches PO/Make wire — PLP / Availability / Book Step 1 = **RIGHT** (`data-studio-search-icon-pos="end"`)
+- [ ] **One** clear control only (`data-studio-search-clear`) — never `type="search"` native X + custom X
 - [ ] Marker `data-studio-search-icon="true"` present (ratchet #1)
 - [ ] Quinn MCP `plp-search-icons` (or screen equivalent) PASS
+
+### 7c. Filter lists (View all + counters)
+
+- [ ] Disease/country lists cap at **10** (`PLP_FILTER_LIST_MAX`) + **View all** link
+- [ ] Filled field → View all **resets** the search (wire port)
+- [ ] Filter options show Make-like **counters** (`data-studio-plp-option-count`)
+- [ ] No invented filter accordion horizontal separators
 
 ### 8. Side-by-side screenshot pass
 

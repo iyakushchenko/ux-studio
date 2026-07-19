@@ -18,6 +18,7 @@
 @import '../uxds/components/text-link.css';
 @import '../uxds/components/book-appointment-progress.css';
 @import '../uxds/components/appointment-summary-pill.css';
+@import '../uxds/components/search-field.css';
 
 /* ── THEME — optional project remaps (`src/projects/<id>/styleguide/theme.css`) */
 @import '../projects/boots-pharmacy/styleguide/theme.css';

@@ -1553,16 +1553,10 @@ export function clearPlpFilterSectionSearch(section: HTMLElement): void {
   input.focus();
 }
 
-function plpFilterSectionHasVisibleItems(section: HTMLElement): boolean {
-  const list = section.querySelector<HTMLElement>('[data-name="list"]');
-  if (!list) return true;
-
-  return Array.from(
-    list.querySelectorAll<HTMLElement>('[data-name="component.plp.filter.checkbox.item"]')
-  ).some((item) => item.style.display !== "none");
-}
-
-/** View All — when search has no matches, clear the field like the in-field X. */
+/**
+ * View All — filled search resets the field (clear), matching PO / React PLP.
+ * (Prior wire only cleared when zero visible matches — that cut the filled reset.)
+ */
 export function handlePlpFilterViewAllClick(link: HTMLElement): void {
   const section = link.closest<HTMLElement>(
     '[data-name="component.plp.filter.custom"], [data-name="component.plp.filter.brands"]'
@@ -1570,8 +1564,6 @@ export function handlePlpFilterViewAllClick(link: HTMLElement): void {
   if (!section) return;
 
   if (!readSearchQuery(section)) return;
-  if (plpFilterSectionHasVisibleItems(section)) return;
-
   clearPlpFilterSectionSearch(section);
 }
 

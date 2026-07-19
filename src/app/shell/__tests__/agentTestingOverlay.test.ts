@@ -1,7 +1,13 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+
+vi.mock("@/app/scenario/demoCursor", () => ({
+  removeDemoCursor: vi.fn(),
+}));
+
 import {
   DEFAULT_SETTLE_MS,
   forceClearAgentTestingOverlay,
+  formatSitrepHint,
   IDLE_MS,
   isAgentTestingOverlayActive,
   isAgentTestingOverlaySettling,
@@ -93,6 +99,10 @@ describe("agentTestingOverlay", () => {
         globalThis.setTimeout(fn as () => void, ms),
       clearTimeout: (id: ReturnType<typeof setTimeout>) =>
         globalThis.clearTimeout(id),
+      setInterval: (fn: TimerHandler, ms?: number) =>
+        globalThis.setInterval(fn as () => void, ms),
+      clearInterval: (id: ReturnType<typeof setInterval>) =>
+        globalThis.clearInterval(id),
       addEventListener: () => {},
       removeEventListener: () => {},
       dispatchEvent,
@@ -181,6 +191,14 @@ describe("agentTestingOverlay", () => {
     );
   });
 
+  it("sitrep hint copy is Done — auto-closes countdown (not stale silent)", () => {
+    expect(formatSitrepHint(5, false)).toBe("Done — auto-closes in 5s");
+    expect(formatSitrepHint(5, true)).toBe(
+      "Done — auto-closes in 5s (then reload)"
+    );
+    expect(formatSitrepHint(0, false)).toBe("Done — auto-closes in 0s");
+  });
+
   it("manual stop defaults to settle without reload and stays on screen", () => {
     vi.useFakeTimers();
     const reload = vi.fn();
@@ -191,6 +209,10 @@ describe("agentTestingOverlay", () => {
         globalThis.setTimeout(fn as () => void, ms),
       clearTimeout: (id: ReturnType<typeof setTimeout>) =>
         globalThis.clearTimeout(id),
+      setInterval: (fn: TimerHandler, ms?: number) =>
+        globalThis.setInterval(fn as () => void, ms),
+      clearInterval: (id: ReturnType<typeof setInterval>) =>
+        globalThis.clearInterval(id),
       addEventListener: () => {},
       removeEventListener: () => {},
       dispatchEvent,

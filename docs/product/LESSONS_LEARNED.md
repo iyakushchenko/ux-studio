@@ -10,15 +10,31 @@ Agents **must read** this file before claiming a UI or Studio-chrome slice done.
 
 ## 2026-07-19
 
+### Filter search parity — icon side, double X, View all, counters (PO rage)
+
+- **Symptom:** PLP filter search had **two X** clears; magnifier on the **LEFT** (PO: original RIGHT); no **10-cap / View all**; no option **counters**; invented filter `border-bottom` separator; bespoke input instead of UXDS.
+- **Root cause:** Prior “PROVEN” trusted Make static DOM order + `type="search"` (native cancel) without wire scripts (`PLP_FILTER_LIST_MAX`, `handlePlpFilterViewAllClick`, `setFilterRowCount`) or Availability/Book icon-end pattern.
+- **Gate (GLOBAL):**
+  1. UXDS `SearchField` — `iconPosition` start\|end, single `data-studio-search-clear`, `type="text"`, stamps `data-studio-search-icon-pos`.
+  2. PLP: icon **end**, View all + 10-cap, facet counters, **no** `.plp__filter-section` border separator.
+  3. Ratchets 1b–1f + MCP `plp-search-icons` / `plp-filter-view-all` / `plp-filter-option-counters`.
+  4. Distrust prior PROVEN on filter/search until re-proved.
+- **Process:** Every new PO miss → ratchet same ship ([PARITY_RATCHETS.md](./PARITY_RATCHETS.md)).
+
 ### Missing search icon = classic Make→React parity fail
 
-- **Symptom:** React PLP filter fields (“Search countries” / “Search diseases”) shipped with no magnifying glass; Make TextField5 has mint `#AFCCCA` icon **left** of the input.
-- **Root cause:** `FilterSearch` rebuilt as bare `<input type="search">` without the Make `icon=search` sibling; no CI contract for icon affordances.
+- **Symptom:** React PLP filter fields (“Search countries” / “Search diseases”) shipped with no magnifying glass.
+- **Root cause:** `FilterSearch` rebuilt as bare input without `icon=search` sibling; no CI contract for icon affordances.
 - **Gate (GLOBAL):**
-  1. Stamp `data-studio-search-icon="true"` on every React search magnifier (PLP, Book Step 1, Availability).
+  1. Stamp `data-studio-search-icon="true"` on every React search magnifier (prefer UXDS `SearchField`).
   2. `npm run check:parity-ratchets` fails if search inputs/placeholders lack the marker ([PARITY_RATCHETS.md](./PARITY_RATCHETS.md) #1).
   3. Quinn MCP page probe step `plp-search-icons` asserts ≥2 visible icons + sibling on disease/country fields.
 - **Process:** Every new typical fail class → add a ratchet (Arch/Ben). Ratchets regain trust; green Vitest alone does not.
+
+### Agent DONE sitrep must countdown; clear dismisses robo-cursor
+
+- **Symptom:** Sitrep sat silent/stale; robo-cursor lingered after overlay cleared.
+- **Gate:** Hint = `Done — auto-closes in Xs` (live tick); `finishSettle` / `forceClear` call `removeDemoCursor({ immediate: true })`; idle → sitrep still honest.
 
 ### Overlay eyes — MCP/robo must not click through open dialogs (PO rage)
 

@@ -344,6 +344,9 @@ export function filterPlpCatalog(
   });
 }
 
+/** Make wire `PLP_FILTER_LIST_MAX` — disease/country typeahead cap before View all. */
+export const PLP_FILTER_LIST_MAX = 10;
+
 export function filterOptionList(
   options: readonly string[],
   query: string
@@ -351,6 +354,102 @@ export function filterOptionList(
   const q = query.trim().toLowerCase();
   if (!q) return [...options];
   return options.filter((label) => label.toLowerCase().includes(q));
+}
+
+/**
+ * Cap filter option rows like Make wire (`slice(0, PLP_FILTER_LIST_MAX)`).
+ * When `expanded` (View all) or searching, show the full filtered set.
+ */
+export function capPlpFilterOptionList(
+  labels: readonly string[],
+  opts: { expanded?: boolean; querying?: boolean } = {}
+): string[] {
+  if (opts.expanded || opts.querying) return [...labels];
+  return labels.slice(0, PLP_FILTER_LIST_MAX);
+}
+
+type PlpCountFacet = "ages" | "diseases" | "regions" | "countries";
+
+function filtersWithoutFacet(
+  state: PlpFilterState,
+  facet: PlpCountFacet | "type"
+): PlpFilterState {
+  switch (facet) {
+    case "type":
+      return { ...state, showBundles: false };
+    case "ages":
+      return { ...state, allAges: true, ages: [] };
+    case "diseases":
+      return { ...state, diseases: [] };
+    case "regions":
+      return { ...state, regions: [] };
+    case "countries":
+      return { ...state, countries: [] };
+  }
+}
+
+function itemMatchesFacet(
+  item: PlpCatalogItem,
+  facet: PlpCountFacet,
+  value: string
+): boolean {
+  const haystack = [
+    item.title,
+    item.subtitle,
+    item.description,
+    ...item.searchTerms,
+    ...item.diseases,
+    ...item.regions,
+    ...item.countries,
+  ]
+    .join(" ")
+    .toLowerCase();
+  const key = value.toLowerCase();
+
+  switch (facet) {
+    case "ages":
+      return item.ages.some((a) => a.toLowerCase() === key);
+    case "diseases":
+      return (
+        item.diseases.some((d) => d.toLowerCase() === key) ||
+        haystack.includes(key)
+      );
+    case "regions":
+      return item.regions.some((r) => r.toLowerCase() === key);
+    case "countries":
+      return item.countries.some((c) => c.toLowerCase() === key);
+  }
+}
+
+/**
+ * Make filter option counters — how many listing results would match if this
+ * facet value alone were applied (other facets kept; this facet cleared first).
+ */
+export function countPlpFacetOption(
+  state: PlpFilterState,
+  facet: PlpCountFacet,
+  value: string,
+  jabs: PlpCatalogItem[] = PLP_JAB_ITEMS,
+  bundles: PlpCatalogItem[] = PLP_BUNDLE_CATALOG
+): number {
+  const base = filtersWithoutFacet(state, facet);
+  const pool = filterPlpCatalog(base, jabs, bundles);
+  return pool.filter((item) => itemMatchesFacet(item, facet, value)).length;
+}
+
+/** By Type radio counters (Individual jabs / Bundles). */
+export function countPlpTypeOption(
+  state: PlpFilterState,
+  showBundles: boolean,
+  jabs: PlpCatalogItem[] = PLP_JAB_ITEMS,
+  bundles: PlpCatalogItem[] = PLP_BUNDLE_CATALOG
+): number {
+  const base = filtersWithoutFacet(state, "type");
+  return filterPlpCatalog(
+    { ...base, showBundles },
+    jabs,
+    bundles
+  ).length;
 }
 
 /** Active facet chips shown in Make PLP results summary (removable). */

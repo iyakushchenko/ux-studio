@@ -22,6 +22,7 @@ import {
   resetStudioAfterAgentTest,
   stripEphemeralStudioQuery,
 } from "@/app/shell/studioUrl";
+import { removeDemoCursor } from "@/app/scenario/demoCursor";
 const ROOT_ID = "agent-testing-overlay";
 const LOG_LIMIT = 80;
 /** Safety: never leave the overlay up longer than this (force clear). */
@@ -32,6 +33,7 @@ export const IDLE_MS = 45_000;
 export const DEFAULT_SETTLE_MS = 5000;
 const SETTLE_MS_MIN = 4000;
 const SETTLE_MS_MAX = 6000;
+const SITREP_COUNTDOWN_TICK_MS = 250;
 /** Stale persist key — cleared on stop; never restored on load by default. */
 const PERSIST_KEY = "agentTestingOverlay";
 const CONTINUE_KEY = "protoAgentTestingOverlayContinue";
@@ -78,6 +80,7 @@ let nest = 0;
 let safetyTimer: ReturnType<typeof setTimeout> | null = null;
 let idleTimer: ReturnType<typeof setTimeout> | null = null;
 let settleTimer: ReturnType<typeof setTimeout> | null = null;
+let settleCountdownTimer: ReturnType<typeof setInterval> | null = null;
 let beforeUnloadBound = false;
 let visibilityBound = false;
 let reloadPending = false;
@@ -168,6 +171,27 @@ function clearSettleTimer(): void {
     clearTimeout(settleTimer);
     settleTimer = null;
   }
+  if (settleCountdownTimer != null) {
+    clearInterval(settleCountdownTimer);
+    settleCountdownTimer = null;
+  }
+}
+
+/** Hide/dismiss robo-cursor when sitrep clears or forceClear. */
+function dismissRoboCursor(): void {
+  try {
+    removeDemoCursor({ immediate: true });
+  } catch {
+    /* never block overlay teardown */
+  }
+}
+
+/** Exported for unit tests — live sitrep countdown copy. */
+export function formatSitrepHint(secondsLeft: number, reload: boolean): string {
+  const s = Math.max(0, secondsLeft);
+  return reload
+    ? `Done — auto-closes in ${s}s (then reload)`
+    : `Done — auto-closes in ${s}s`;
 }
 function armSafetyTimer(): void {
   clearSafetyTimer();
@@ -389,6 +413,7 @@ function safeResetStudio(resetToHub = settleResetToHub): void {
 function finishSettle(): void {
   settling = false;
   clearSettleTimer();
+  dismissRoboCursor();
   teardownDom();
   safeResetStudio();
   unbindBeforeUnload();
@@ -406,6 +431,7 @@ function cancelSettle(instantReload?: boolean): void {
   settleReload = false;
   settling = false;
   clearSettleTimer();
+  dismissRoboCursor();
   teardownDom();
   if (wantReload) scheduleReload(120);
   else {
@@ -433,11 +459,12 @@ function enterSettle(options?: StopAgentTestingOverlayOptions): void {
   // Strip ephemeral; stay on page unless resetToHub (reload re-asserts URL).
   safeResetStudio();
   setTitle(SITREP_TITLE);
-  setHint(
-    settleReload
-      ? `Sitrep — page usable. Reload in ~${Math.round(settleMs / 1000)}s.`
-      : `Sitrep — page usable. Clears in ~${Math.round(settleMs / 1000)}s.`
-  );
+  const endsAt = Date.now() + settleMs;
+  const tickHint = () => {
+    const left = Math.max(0, Math.ceil((endsAt - Date.now()) / 1000));
+    setHint(formatSitrepHint(left, settleReload));
+  };
+  tickHint();
   renderLog();
   const history = pushHistory({
     title: sessionTitle,
@@ -446,6 +473,7 @@ function enterSettle(options?: StopAgentTestingOverlayOptions): void {
   });
   renderHistory(history);
   clearSettleTimer();
+  settleCountdownTimer = setInterval(tickHint, SITREP_COUNTDOWN_TICK_MS);
   settleTimer = setTimeout(() => {
     finishSettle();
   }, settleMs);
@@ -566,11 +594,13 @@ export function forceClearAgentTestingOverlay(): void {
     clearPersist();
     unbindBeforeUnload();
     unbindVisibility();
+    dismissRoboCursor();
     teardownDom();
     releaseClickGuard();
     safeResetStudio();
   } catch {
     try {
+      dismissRoboCursor();
       teardownDom();
       releaseClickGuard();
     } catch {

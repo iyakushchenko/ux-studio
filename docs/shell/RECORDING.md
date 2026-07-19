@@ -34,7 +34,7 @@ await window.__studioRunMcpPageProbe?.({ screenId: "plp" })
 
 Drives the shared CJM/AIR **robo-cursor** (`simulateDemoPointerClick`) to each recipe target and logs **PASS** / **FAIL** on the AGENT TESTING panel. Prefer this over silent `evaluate_script` clicks for every React screen ship.
 
-**PLP recipe includes** `plp-search-icons` — asserts ≥2 visible `[data-studio-search-icon]` on filter search fields (disease/country). Source contracts: [PARITY_RATCHETS.md](../product/PARITY_RATCHETS.md).
+**PLP recipe includes** `plp-search-icons` (icon end + single clear), `plp-filter-view-all`, `plp-filter-option-counters`. Source contracts: [PARITY_RATCHETS.md](../product/PARITY_RATCHETS.md).
 
 ```js
 window.__studioAgentTestingOverlay?.start("optional title") // prefer __studio*; __proto* alias OK
@@ -52,8 +52,8 @@ window.__studioAgentTestingOverlay?.isActive() // false during settle
 
 | Event | Behavior |
 |-------|----------|
-| `__studioRunMcpPageProbe` / sanity `finally` | `stop({ reload: true })` — sitrep ~5s, **stay on screen**, then reload |
-| CJM/journey `__protoRun*` session `finally` | `stop({ reload: true, resetToHub: true })` — sitrep ~5s, hub URL, then reload |
+| `__studioRunMcpPageProbe` / sanity `finally` | `stop({ reload: true })` — sitrep **Done — auto-closes in Xs**, then reload; clears robo-cursor |
+| CJM/journey `__protoRun*` session `finally` | `stop({ reload: true, resetToHub: true })` — sitrep countdown, hub URL, then reload; clears robo-cursor |
 | Mutating `__proto*` / `__studio*` helpers | Auto-`touch()` + log helper name (read-only getters + `EnsureCleanStudio` / `AbortAll` skipped) |
 | DevTools MCP clicks only | Agent **must** call `touch()` at session start (or rely on idle auto-stop) |
 | `stop()` nest → 0 | Enter DONE/SITREP settle (default **5s**); release click guard; stay-on-page reset (or hub if `resetToHub`); keep log visible |

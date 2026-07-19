@@ -80,26 +80,47 @@ describe("runMcpPageProbe", () => {
     const searchIcon = {
       tagName: "SPAN",
       getBoundingClientRect: () => ({ width: 24, height: 24 }),
+      getAttribute: (name: string) =>
+        name === "data-studio-search-icon-pos" ? "end" : null,
     };
     const searchIcon2 = {
       tagName: "SPAN",
       getBoundingClientRect: () => ({ width: 24, height: 24 }),
+      getAttribute: (name: string) =>
+        name === "data-studio-search-icon-pos" ? "end" : null,
     };
     const diseaseField = {
       querySelector: (sel: string) =>
         sel.includes("data-studio-search-icon") ? searchIcon : null,
+      querySelectorAll: (sel: string) =>
+        sel.includes("data-studio-search-clear") ? [] : [],
     };
     const countryField = {
       querySelector: (sel: string) =>
         sel.includes("data-studio-search-icon") ? searchIcon2 : null,
+      querySelectorAll: (sel: string) =>
+        sel.includes("data-studio-search-clear") ? [] : [],
     };
     const diseaseInput = {
+      type: "text",
       closest: (sel: string) =>
         sel.includes("component.input.field") ? diseaseField : null,
     };
     const countryInput = {
+      type: "text",
       closest: (sel: string) =>
         sel.includes("component.input.field") ? countryField : null,
+    };
+    const viewAll = { tagName: "A" };
+    const viewAll2 = { tagName: "A" };
+    const optionRow = {
+      tagName: "BUTTON",
+      getAttribute: (name: string) =>
+        name === "data-studio-plp-option-count" ? "3" : null,
+      querySelector: (sel: string) =>
+        sel.includes("plp__option-count")
+          ? { textContent: "3" }
+          : null,
     };
     let modalOpen = false;
 
@@ -133,6 +154,8 @@ describe("runMcpPageProbe", () => {
         if (sel.includes('[data-studio-search-icon="true"]')) return searchIcon;
         if (sel.includes('placeholder="Search diseases"')) return diseaseInput;
         if (sel.includes('placeholder="Search countries"')) return countryInput;
+        if (sel.includes("data-studio-plp-view-all")) return viewAll;
+        if (sel.includes("data-studio-plp-option-count")) return optionRow;
         if (sel.includes('button[data-name="component.plp.filter.checkbox.item"]'))
           return checkbox;
         if (sel.includes("button[data-studio-plp-reset-filters")) return reset;
@@ -145,6 +168,12 @@ describe("runMcpPageProbe", () => {
       querySelectorAll: (sel: string) => {
         if (sel.includes('[data-studio-search-icon="true"]')) {
           return [searchIcon, searchIcon2];
+        }
+        if (sel.includes("data-studio-plp-view-all")) {
+          return [viewAll, viewAll2];
+        }
+        if (sel.includes("data-studio-plp-option-count")) {
+          return [optionRow, optionRow, optionRow, optionRow];
         }
         return [];
       },
@@ -159,6 +188,12 @@ describe("runMcpPageProbe", () => {
     expect(result.checks.find((c) => c.id === "plp-search-icons")?.pass).toBe(
       true
     );
+    expect(result.checks.find((c) => c.id === "plp-filter-view-all")?.pass).toBe(
+      true
+    );
+    expect(
+      result.checks.find((c) => c.id === "plp-filter-option-counters")?.pass
+    ).toBe(true);
     expect(result.checks.find((c) => c.id === "plp-quick-view-ready")?.pass).toBe(
       true
     );
@@ -182,26 +217,40 @@ describe("runMcpPageProbe", () => {
     const searchIcon = {
       tagName: "SPAN",
       getBoundingClientRect: () => ({ width: 24, height: 24 }),
+      getAttribute: (name: string) =>
+        name === "data-studio-search-icon-pos" ? "end" : null,
     };
     const searchIcon2 = {
       tagName: "SPAN",
       getBoundingClientRect: () => ({ width: 24, height: 24 }),
+      getAttribute: (name: string) =>
+        name === "data-studio-search-icon-pos" ? "end" : null,
     };
     const diseaseField = {
       querySelector: (sel: string) =>
         sel.includes("data-studio-search-icon") ? searchIcon : null,
+      querySelectorAll: () => [],
     };
     const countryField = {
       querySelector: (sel: string) =>
         sel.includes("data-studio-search-icon") ? searchIcon2 : null,
+      querySelectorAll: () => [],
     };
     const diseaseInput = {
+      type: "text",
       closest: (sel: string) =>
         sel.includes("component.input.field") ? diseaseField : null,
     };
     const countryInput = {
+      type: "text",
       closest: (sel: string) =>
         sel.includes("component.input.field") ? countryField : null,
+    };
+    const viewAll = { tagName: "A" };
+    const optionRow = {
+      tagName: "BUTTON",
+      getAttribute: () => "1",
+      querySelector: () => ({ textContent: "1" }),
     };
 
     isBlockingModalOpen.mockReturnValue(true);
@@ -221,6 +270,8 @@ describe("runMcpPageProbe", () => {
         if (sel.includes('[data-studio-search-icon="true"]')) return searchIcon;
         if (sel.includes('placeholder="Search diseases"')) return diseaseInput;
         if (sel.includes('placeholder="Search countries"')) return countryInput;
+        if (sel.includes("data-studio-plp-view-all")) return viewAll;
+        if (sel.includes("data-studio-plp-option-count")) return optionRow;
         if (sel.includes('button[data-name="component.plp.filter.checkbox.item"]'))
           return checkbox;
         if (sel.includes("button[data-studio-plp-reset-filters")) return reset;
@@ -233,6 +284,12 @@ describe("runMcpPageProbe", () => {
       querySelectorAll: (sel: string) => {
         if (sel.includes('[data-studio-search-icon="true"]')) {
           return [searchIcon, searchIcon2];
+        }
+        if (sel.includes("data-studio-plp-view-all")) {
+          return [viewAll, viewAll];
+        }
+        if (sel.includes("data-studio-plp-option-count")) {
+          return [optionRow, optionRow, optionRow, optionRow];
         }
         return [];
       },

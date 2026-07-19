@@ -5,8 +5,13 @@ import {
 } from "@/projects/boots-pharmacy/screens/screens";
 import {
   DEFAULT_PLP_FILTERS,
+  PLP_COUNTRY_OPTIONS,
+  PLP_FILTER_LIST_MAX,
   PLP_LISTING_LOAD_MS,
+  capPlpFilterOptionList,
   collectPlpActiveFilterChips,
+  countPlpFacetOption,
+  filterOptionList,
   filterPlpCatalog,
   isPlpFiltersDirty,
   plpResultsNoun,
@@ -84,5 +89,34 @@ describe("plpCatalog filters", () => {
     );
     expect(collectPlpActiveFilterChips(cleared)).toEqual([]);
     expect(isPlpFiltersDirty(cleared)).toBe(false);
+  });
+
+  it("caps filter option lists at Make PLP_FILTER_LIST_MAX with View all expand", () => {
+    expect(PLP_FILTER_LIST_MAX).toBe(10);
+    expect(PLP_COUNTRY_OPTIONS.length).toBeGreaterThan(PLP_FILTER_LIST_MAX);
+    const capped = capPlpFilterOptionList(PLP_COUNTRY_OPTIONS);
+    expect(capped).toHaveLength(PLP_FILTER_LIST_MAX);
+    expect(
+      capPlpFilterOptionList(PLP_COUNTRY_OPTIONS, { expanded: true })
+    ).toHaveLength(PLP_COUNTRY_OPTIONS.length);
+    const filtered = filterOptionList(PLP_COUNTRY_OPTIONS, "th");
+    expect(
+      capPlpFilterOptionList(filtered, { querying: true }).length
+    ).toBe(filtered.length);
+  });
+
+  it("counts filter facet options like Make sidebar counters", () => {
+    const chicken = countPlpFacetOption(
+      DEFAULT_PLP_FILTERS,
+      "diseases",
+      "Chickenpox"
+    );
+    expect(chicken).toBeGreaterThan(0);
+    const thai = countPlpFacetOption(
+      DEFAULT_PLP_FILTERS,
+      "countries",
+      "Thailand"
+    );
+    expect(thai).toBeGreaterThan(0);
   });
 });

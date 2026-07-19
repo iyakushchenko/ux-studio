@@ -73,7 +73,8 @@ Never bare callsign alone in team output — always `Name (Role)` as above. One 
 - **Forbidden to invent** hover/loading chrome not in Make.  
 - **MCP real-user matrix mandatory for every screen ship** (Quinn + Ben). Prefer `__studioRunMcpPageProbe` so the PO sees the robo-cursor + overlay PASS/FAIL. Arch **rejects** audit **PROVEN** without MCP evidence log.  
 - **No merge** without `npm run check:parity-proven` green (`PARITY_PROVEN.json` + audit PROVEN + MCP section).  
-- **Parity ratchets (GLOBAL HARD FAIL):** `npm run check:parity-ratchets` — typical Make→React misses (search icon, bookmark copy, empty-heart fuchsia, Advantage bar, Book now primary, loader dup, make-retired). Every new typical fail class → Arch/Ben add a ratchet ([PARITY_RATCHETS.md](./PARITY_RATCHETS.md)). Overlay registry stays in `check:felonies`.  
+- **Parity ratchets (GLOBAL HARD FAIL):** `npm run check:parity-ratchets` — typical Make→React misses (search icon + **icon-pos end**, single clear, View all / 10-cap, filter counters, no filter hr, bookmark copy, empty-heart fuchsia, Advantage bar, Book now primary, loader dup, make-retired). Every new typical fail class → Arch/Ben add a ratchet ([PARITY_RATCHETS.md](./PARITY_RATCHETS.md)). Overlay registry stays in `check:felonies`.  
+
 - **Overlay eyes (GLOBAL HARD FAIL):** every blocking popup (Quick View, Choose Pharmacy, Login, pickers, …) must be in `studioModalGuard` registry + `data-studio-modal`. `__studioRunMcpPageProbe` / `simulateDemoPointerClick` **must refuse** clicks to targets under the topmost overlay (or only click inside it). Felony: `check:felonies` fails npm test if guard missing or known overlays unregistered. Quinn proves: open Quick View → under-tile refuse PASS.  
 - **Version bump:** patch after user-visible bugfixes is correct ([VERSIONING.md](./VERSIONING.md) §6); skip bump only for docs/process-only.
 
