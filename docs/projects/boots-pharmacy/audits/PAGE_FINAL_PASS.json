@@ -135,7 +135,7 @@
           "date": "2026-07-19",
           "version": "0.0.36",
           "auditor": "Arch (Director) — Quinn MCP + Uma §0a",
-          "note": "HARD-GREEN restored. Quinn MCP 23/23 PASS @ tip 57775a3 / v0.0.36 (reload:false ~27s; teardown clean); playback panel present (.studio-playback-rec-switch); Check availability __studioProveRoboCursorFeedback PASS (hoverClass+onTargetStable); Uma §0a still PROVEN @ 76e2433. Evidence: FE_AUDIT_PDP_MCP + FE_AUDIT_PDP_PAGE_FINAL_PASS."
+          "note": "HARD-GREEN restored. Quinn MCP 23/23 PASS @ tip 57775a3 / v0.0.36 (prove docs 636c4de; reload:false ~27s; teardown clean); playback panel present (.studio-playback-rec-switch); Check availability __studioProveRoboCursorFeedback PASS (hoverClass+onTargetStable); Uma §0a still PROVEN @ 76e2433. Evidence: FE_AUDIT_PDP_MCP + FE_AUDIT_PDP_PAGE_FINAL_PASS."
         },
         "url": "http://localhost:5173/?project=boots-pharmacy&screen=pdp",
         "auditPath": "docs/projects/boots-pharmacy/audits/FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md",
