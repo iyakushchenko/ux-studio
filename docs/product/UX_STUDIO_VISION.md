@@ -4,10 +4,12 @@
 
 This repository **is** the engine. **`src/projects/boots-pharmacy/`** is the first reference project (test rabbit) — not the product name.
 
+**Canonical disk path:** `E:\UX\ux-studio` (abandon all `UXCJM-*` copies).  
+**Roles & A–Z:** [PRODUCT_OWNER_BRIEF.md](./PRODUCT_OWNER_BRIEF.md) · **Intake:** [CONCEPT_INTAKE.md](./CONCEPT_INTAKE.md) · **Page stack:** [PAGE_BUILD_CONTRACT.md](./PAGE_BUILD_CONTRACT.md)
 
-**UX Studio** is a control room for clickable UX concepts. The business goal: ship journey maps (CJMs) and deep scenario exploration fast — not polished production sites.
+**UX Studio** is a control room for clickable UX concepts. Early purpose: **discovery, ideation, solution proofing, hypothesis validation** — plus CJMs/scenarios. Not production polish.
 
-Think **GeoCities for enterprise UX**: anyone can assemble concept pages, wire journeys, record scenarios, and iterate with a Cursor agent — without waiting on a full design-to-code pipeline.
+Think **GeoCities for enterprise UX**: rough concepts in → playable proof out — agent fills the design-system gap.
 
 ---
 
@@ -15,19 +17,22 @@ Think **GeoCities for enterprise UX**: anyone can assemble concept pages, wire j
 
 ### Problem
 
-Pages bootstrapped from **Figma Make** are a starting point only. Layout, HTML, CSS, and JS are throwaway — not production quality.
+PO concepts are often **early and messy** (Make feeds, static strips, partial UXDS). Make HTML is throwaway. Fully structured UXDS pages exist but are **rarely** the Studio feed.
+
+### Locked page stack (2026-07-19)
+
+Studio pages = **React + UXDS** (agent upgrades). Input Figma need **not** already be DS-perfect. Rules: [CONCEPT_INTAKE.md](./CONCEPT_INTAKE.md).
 
 ### Target workflow
 
-1. **Design system** — real concepts are built in Figma using modules, master components, and tokens.
-2. **Concept ready** — one screen or flow is signed off as the UI requirement.
-3. **Cursor agent** — takes the Figma source (or design-system exports) and **recreates the concept inside a Project** in UX Studio.
-4. **Guidelines** — agent always follows internal rules for concept pages: `data-name` wiring, proto tabs, touchpoints, playback scripts, stable selectors for recording.
-5. **CJM layer** — once pages exist in a project, define beats, journeys (agentic / traditional), and scenarios.
-6. **Deep scenarios** — record, replay, branch, and extend journeys with the agent; no cap on scenario count per concept.
+1. **PO feeds a concept** — often a rough strip / Make-class frame (may ignore variables).
+2. **Agent fills the gap** — React pages using UXDS tokens + closest `component.*` / `module.*`, preserving intent.
+3. **Studio wiring** — `data-name`, screens, touchpoints, playback.
+4. **CJM layer** — beats, journeys (agentic / traditional), scenarios.
+5. **Deep scenarios** — record, replay, branch; no cap on scenario count.
 
 ```
-Figma design system  →  Cursor rebuild in Project  →  Journeys + CJMs  →  Record / replay / export
+Early concept (messy OK)  →  Agent upgrades to React+UXDS pages  →  CJMs / record / validate
 ```
 
 ---
@@ -43,13 +48,13 @@ Export both. Compiler (future) turns recordings into journey proposals.
 
 ---
 
-## Agent collaboration model
+## Collaboration model (command doctrine)
 
-- **Human** — picks project, persona, CJM mode, steers concept quality in Figma.
-- **Cursor agent** — builds/refactors project pages, fixes playback, runs MCP smoke, exports journey bundles, records scenarios.
-- **Studio engine** — enforces transport contract, diagnostics, robo-cursor, playlist sync.
+- **Product Owner** — product intent, Figma/UXDS truth, accept/reject, veto. Does not pick tech or sprint order.
+- **Cursor agent (commander)** — decides tech direction and next steps; builds; documents; only asks PO for assets/judgments.
+- **Studio engine** — transport contract, diagnostics, robo-cursor, playlist sync.
 
-The agent is not a one-shot code generator; it is a **standing partner** for each concept lifecycle.
+Full rules: [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md).
 
 ---
 
@@ -70,10 +75,14 @@ See [PROJECTS.md](../shell/PROJECTS.md), [PLAYBACK.md](../shell/PLAYBACK.md), [R
 
 1. ✅ Journey JSON export/import (both Boots CJMs)
 2. ✅ Recording foundation + journey catalog on session
-3. 🔲 Figma → Project scaffold command (design system in, concept pages out)
-4. 🔲 Recording UI (save/load files without MCP)
-5. 🔲 Compiler: recording → journey beat proposals
-6. 🔲 Multi-project / persona packaging for client delivery
+3. ✅ Workspace + product docs (PO brief, page contract, command doctrine, Summarizer direction)
+4. ✅ UXDS Larkin linked + variables inventoried (`docs/uxds/`); X-Suite integration intent documented
+5. 🔲 Recording UI (save/load files without MCP) — engine
+6. 🔲 UXDS CSS token bridge + pilot: one Boots screen in React + UXDS
+7. 🔲 Figma → Project scaffold command
+8. 🔲 X-Suite import seam (persona / IA / CJM baseline → Studio journeys)
+9. 🔲 Compiler: recording → journey beat proposals
+10. 🔲 Multi-project / persona packaging for client delivery
 
 ---
 

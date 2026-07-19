@@ -10,11 +10,17 @@ How to register a new demo project in the Proto Studio shell.
 src/projects/
   <project-id>/
     index.ts              # exports PROJECT constant
+    styleguide/           # brand DELTA — colors, logos, small theme.css
+      README.md
+      theme.css
+      assets/             # logos (optional)
     personas/
       <persona-id>/
         index.ts            # persona definition + hooks
         journeys.ts         # ProtoJourneyDefinition beats
 ```
+
+**Brand delta:** concepts bring their own primaries/logos. Capture them in `styleguide/` so projects do not all share one generic UXDS look. See [../product/PROJECT_STYLEGUIDE.md](../product/PROJECT_STYLEGUIDE.md).
 
 **Project id rules** (use `formatProjectId` from `@/projects/formatProjectId`):
 

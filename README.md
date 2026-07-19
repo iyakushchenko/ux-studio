@@ -2,17 +2,18 @@
 
 Engine for building clickable UX concepts, journey maps (CJMs), and recorded scenarios — with Cursor as the build partner.
 
-**Live demo (Boots Pharmacy — first project):** https://iyakushchenko.github.io/ux-studio/
+**Canonical folder:** `E:\UX\ux-studio`  
+**Live demo (Boots — first project):** https://iyakushchenko.github.io/ux-studio/
 
 ## What this repo is
 
 | Layer | Path | Role |
 |-------|------|------|
 | **Engine** | `src/app/` | Studio shell, orchestra, playback, recording, MCP helpers |
-| **Projects** | `src/projects/` | Concept packages (wire, personas, journeys, scripts) |
-| **First project** | `src/projects/boots-pharmacy/` | Boots Health Vaccine CJM (agentic + traditional) |
+| **Projects** | `src/projects/` | Concept packages — target stack: **React + UXDS** |
+| **First project** | `src/projects/boots-pharmacy/` | Boots Health Vaccine CJM (test rabbit) |
 
-Figma Make exports are bootstrap only. The engine rebuilds concepts from your design system into playable projects.
+Figma Make exports are bootstrap only. Real concept pages are rebuilt from **UXDS** into React projects.
 
 ## Quick start
 
@@ -25,13 +26,17 @@ npm run build
 
 Lean CI smoke: `npm run smoke` (dev server on `:5173`).
 
-## Docs
+## Docs (start here)
 
-- [Product vision](docs/product/UX_STUDIO_VISION.md)
-- [Shell architecture](docs/shell/SHELL.md)
-- [Playback](docs/shell/PLAYBACK.md)
-- [Recording](docs/shell/RECORDING.md)
-- [Agent guide](AGENTS.md)
+| Doc | For |
+|-----|-----|
+| [Command doctrine](docs/product/COMMAND_DOCTRINE.md) | Agent decides all tech direction & next steps |
+| [docs/README.md](docs/README.md) | Catalog + reading order |
+| [Product Owner brief (A–Z)](docs/product/PRODUCT_OWNER_BRIEF.md) | Non-technical product guidance |
+| [Page build contract](docs/product/PAGE_BUILD_CONTRACT.md) | React + UXDS |
+| [UXDS access](docs/product/UXDS_ACCESS.md) | What to share with the agent |
+| [Vision](docs/product/UX_STUDIO_VISION.md) | North star |
+| [Agent guide](AGENTS.md) | Engineers / agents |
 
 ## Adding a project
 
