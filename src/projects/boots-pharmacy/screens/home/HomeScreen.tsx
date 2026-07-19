@@ -117,7 +117,7 @@ export function HomeScreen({
         </h1>
 
         <section
-          className="home__card"
+          className="home__card proto-site-pilot-composer"
           data-name="component.co.order.summary"
           aria-label="Ask Site Pilot"
         >

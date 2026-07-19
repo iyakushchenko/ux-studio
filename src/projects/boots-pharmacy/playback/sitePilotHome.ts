@@ -39,6 +39,8 @@ function shouldAbort(): boolean {
 }
 
 function syncHomeQueryHeight(ta: HTMLTextAreaElement): void {
+  // React SitePilotComposer owns Motion height via controlled query + input.
+  if (ta.classList.contains("site-pilot-composer__query")) return;
   const max = AGENTIC_QUERY_LINE_PX * AGENTIC_QUERY_MAX_LINES;
   ta.style.setProperty("height", "0px", "important");
   ta.style.setProperty("min-height", "0px", "important");

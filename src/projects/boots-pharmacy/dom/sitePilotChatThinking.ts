@@ -110,9 +110,13 @@ function ensureThinkingBubble(
 }
 
 function scrollChatToBottom(): void {
-  const scrollEl = document.querySelector<HTMLElement>(
-    ".studio-scroll--prototype:not(.hidden)"
-  );
+  const scrollEl =
+    document.querySelector<HTMLElement>(
+      '[data-studio-react-screen="chat"] .chat__column, main.chat .chat__column'
+    ) ??
+    document.querySelector<HTMLElement>(
+      ".studio-scroll--prototype:not(.hidden)"
+    );
   if (!scrollEl) return;
   const resolveBottom = () =>
     Math.max(0, scrollEl.scrollHeight - scrollEl.clientHeight);

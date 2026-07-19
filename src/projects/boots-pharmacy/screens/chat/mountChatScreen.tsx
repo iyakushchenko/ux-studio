@@ -9,7 +9,7 @@ import {
   isChatReactMounted,
 } from "./chatContract";
 
-export { isChatReactMounted };
+export { CHAT_REACT_MOUNT_ENABLED, isChatReactMounted };
 
 const HOST_CLASS = "studio-react-screen-host";
 /** Keep Studio chrome mounts; retire every Make Frame child under Chat. */

@@ -53,14 +53,24 @@ function getChatScreen(): HTMLElement | null {
   );
 }
 
-function scrollChatToBottom(instant = false): void {
-  const scrollEl = document.querySelector<HTMLElement>(
+function getChatScrollEl(): HTMLElement | null {
+  const reactCol = document.querySelector<HTMLElement>(
+    '[data-studio-react-screen="chat"] .chat__column, main.chat .chat__column'
+  );
+  if (reactCol) return reactCol;
+  return document.querySelector<HTMLElement>(
     ".studio-scroll--prototype:not(.hidden)"
   );
+}
+
+function scrollChatToBottom(instant = false): void {
+  const scrollEl = getChatScrollEl();
   scrollPrototypeScrollToBottom(scrollEl, instant ? "instant" : "smooth");
 }
 
 function syncComposerHeight(ta: HTMLTextAreaElement): void {
+  // React SitePilotComposer owns Motion height via controlled query + input.
+  if (ta.classList.contains("site-pilot-composer__query")) return;
   const max = AGENTIC_QUERY_LINE_PX * AGENTIC_QUERY_MAX_LINES;
   ta.style.setProperty("height", "0px", "important");
   ta.style.setProperty("min-height", "0px", "important");
@@ -75,6 +85,17 @@ function syncComposerHeight(ta: HTMLTextAreaElement): void {
     next >= max ? "auto" : "hidden",
     "important"
   );
+}
+
+/** Native setter so React controlled textareas receive playback typing. */
+function setReactTextareaValue(ta: HTMLTextAreaElement, value: string): void {
+  const proto = Object.getOwnPropertyDescriptor(
+    HTMLTextAreaElement.prototype,
+    "value"
+  )?.set;
+  if (proto) proto.call(ta, value);
+  else ta.value = value;
+  ta.dispatchEvent(new Event("input", { bubbles: true }));
 }
 
 export function stripSitePilotChatDemoCursors(root: ParentNode = document): void {
@@ -177,33 +198,31 @@ export async function simulateSarahTypingInComposer(text: string): Promise<void>
     return;
   }
 
-  ta.value = "";
+  setReactTextareaValue(ta, "");
   syncComposerHeight(ta);
   ta.focus();
   scrollChatToBottom();
 
   for (let i = 0; i < text.length; i++) {
     if (preludeAborted) {
-      ta.value = "";
+      setReactTextareaValue(ta, "");
       syncComposerHeight(ta);
       return;
     }
-    ta.value = text.slice(0, i + 1);
-    ta.dispatchEvent(new Event("input", { bubbles: true }));
+    setReactTextareaValue(ta, text.slice(0, i + 1));
     syncComposerHeight(ta);
     if (i % 8 === 0) scrollChatToBottom();
     await delay(TYPING_MS_PER_CHAR + Math.random() * TYPING_MS_JITTER);
   }
 
   if (preludeAborted) {
-    ta.value = "";
+    setReactTextareaValue(ta, "");
     syncComposerHeight(ta);
     return;
   }
 
   await pulseComposerSend();
-  ta.value = "";
-  ta.dispatchEvent(new Event("input", { bubbles: true }));
+  setReactTextareaValue(ta, "");
   syncComposerHeight(ta);
 }
 
@@ -216,9 +235,7 @@ export async function runSitePilotChatBeforeReveal(
   if (isSitePilotChatAgentReplyFrame(frame)) {
     removeDemoCursor();
     const screen = getChatScreen();
-    const scrollEl = document.querySelector<HTMLElement>(
-      ".studio-scroll--prototype:not(.hidden)"
-    );
+    const scrollEl = getChatScrollEl();
     if (screen) beginSitePilotChatPlaybackThinking(screen, frame);
     if (scrollEl) {
       scrollChatToBottom(true);

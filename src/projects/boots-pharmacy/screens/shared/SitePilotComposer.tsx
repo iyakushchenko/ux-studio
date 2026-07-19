@@ -1,4 +1,9 @@
-import { useLayoutEffect, useRef, type FormEvent } from "react";
+import { useLayoutEffect, useRef, useState, type FormEvent } from "react";
+import {
+  motion,
+  MOTION_EASE_IN_OUT,
+  useReducedMotion,
+} from "@/uxds/motion";
 import {
   SITE_PILOT_QUERY_LINE_PX,
   SITE_PILOT_QUERY_MAX_LINES,
@@ -34,6 +39,14 @@ export type SitePilotComposerProps = {
   sendThinking?: boolean;
 };
 
+const QUERY_MAX_PX = SITE_PILOT_QUERY_LINE_PX * SITE_PILOT_QUERY_MAX_LINES;
+
+/** Make-like grow/shrink — short ease-in-out; reduced-motion snaps. */
+const QUERY_HEIGHT_TRANSITION = {
+  duration: 0.2,
+  ease: MOTION_EASE_IN_OUT,
+} as const;
+
 function MicGlyph() {
   return (
     <svg width="10.286" height="16" viewBox="0 0 10.2859 16" fill="none" aria-hidden>
@@ -63,6 +76,18 @@ function StopGlyph() {
   );
 }
 
+function measureQueryHeight(ta: HTMLTextAreaElement): number {
+  // Collapse before measure so delete/wrap shrinks (Make syncAgenticQueryHeight).
+  // Must use !important — kit CSS sets height:100% !important vs Make LEGACY.
+  ta.style.setProperty("height", "0px", "important");
+  const next = Math.min(
+    Math.max(ta.scrollHeight, SITE_PILOT_QUERY_LINE_PX),
+    QUERY_MAX_PX
+  );
+  ta.style.setProperty("height", "100%", "important");
+  return next;
+}
+
 export function SitePilotComposer({
   surface,
   query,
@@ -77,18 +102,41 @@ export function SitePilotComposer({
   sendThinking = false,
 }: SitePilotComposerProps) {
   const taRef = useRef<HTMLTextAreaElement>(null);
+  const reduceMotion = useReducedMotion();
+  const [shellHeight, setShellHeight] = useState(SITE_PILOT_QUERY_LINE_PX);
+  const [atMax, setAtMax] = useState(false);
 
   useLayoutEffect(() => {
     const ta = taRef.current;
     if (!ta) return;
-    const max = SITE_PILOT_QUERY_LINE_PX * SITE_PILOT_QUERY_MAX_LINES;
-    ta.style.height = "0px";
-    const next = Math.min(
-      Math.max(ta.scrollHeight, SITE_PILOT_QUERY_LINE_PX),
-      max
-    );
-    ta.style.height = `${next}px`;
-    ta.style.overflowY = next >= max ? "auto" : "hidden";
+
+    let cancelled = false;
+    const run = () => {
+      if (cancelled) return;
+      const next = measureQueryHeight(ta);
+      setShellHeight((prev) => (prev === next ? prev : next));
+      setAtMax(next >= QUERY_MAX_PX);
+      ta.style.overflowY = next >= QUERY_MAX_PX ? "auto" : "hidden";
+    };
+
+    run();
+
+    const ro =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(() => run())
+        : null;
+    ro?.observe(ta);
+    const wrap = ta.parentElement;
+    if (wrap) ro?.observe(wrap);
+
+    void document.fonts?.ready.then(() => {
+      if (!cancelled) run();
+    });
+
+    return () => {
+      cancelled = true;
+      ro?.disconnect();
+    };
   }, [query]);
 
   const handleSubmit = (e: FormEvent) => {
@@ -102,18 +150,29 @@ export function SitePilotComposer({
       data-name="Subtotal"
       onSubmit={handleSubmit}
     >
-      <textarea
-        ref={taRef}
-        className="site-pilot-composer__query proto-agentic-query"
-        name={`${surface}-query`}
-        rows={surface === "chat" ? 5 : 1}
-        spellCheck
-        aria-label={sitePilotQueryAriaLabel(surface)}
-        placeholder={sitePilotQueryPlaceholder(surface)}
-        data-studio-action={sitePilotQueryAction(surface)}
-        value={query}
-        onChange={(e) => onQueryChange(e.target.value)}
-      />
+      <motion.div
+        className="site-pilot-composer__query-shell"
+        data-studio-composer-motion="height"
+        initial={false}
+        animate={{ height: shellHeight }}
+        transition={
+          reduceMotion ? { duration: 0 } : QUERY_HEIGHT_TRANSITION
+        }
+      >
+        <textarea
+          ref={taRef}
+          className="site-pilot-composer__query proto-agentic-query"
+          name={`${surface}-query`}
+          rows={1}
+          spellCheck
+          aria-label={sitePilotQueryAriaLabel(surface)}
+          placeholder={sitePilotQueryPlaceholder(surface)}
+          data-studio-action={sitePilotQueryAction(surface)}
+          value={query}
+          onChange={(e) => onQueryChange(e.target.value)}
+          style={{ overflowY: atMax ? "auto" : "hidden" }}
+        />
+      </motion.div>
       <button
         type="button"
         className="site-pilot-composer__mic"

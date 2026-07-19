@@ -137,7 +137,7 @@ import {
   mountHomeScreen,
   unmountHomeScreen,
 } from "@/projects/boots-pharmacy/screens/home/mountHomeScreen";
-import { isChatReactMounted } from "@/projects/boots-pharmacy/screens/chat/mountChatScreen";
+import { CHAT_REACT_MOUNT_ENABLED, isChatReactMounted } from "@/projects/boots-pharmacy/screens/chat/mountChatScreen";
 import { useBootsChatScreenMount } from "@/projects/boots-pharmacy/screens/chat/useBootsChatScreenMount";
 import {
   HOME_CHILD_INDEX,
@@ -4444,8 +4444,8 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   const { label, childIndex } = SCREENS[current];
   const isScreen1 = childIndex === 11 && !hubOpen;
   const isScreenChat = childIndex === 10 && !hubOpen;
-  // Agentic home only — chat scrolls in the prototype scroller; overflow:hidden breaks sticky Site Pilot bar.
-  const isViewportLocked = isScreen1;
+  // Home + React Chat lock → sole `.chat__column` scroll; Make chat keeps prototype.
+  const isViewportLocked = isScreen1 || (isScreenChat && CHAT_REACT_MOUNT_ENABLED);
   const navLabel = hubOpen ? HUB_LABEL : label;
   const activeChildIndex = hubOpen ? null : childIndex;
   const popupOnScreen = (...allowed: number[]) =>

@@ -15,6 +15,14 @@ const COMPOSER_PAD_VAR = "--proto-chat-composer-h";
 const SCREEN_CHILD = 10;
 
 function getScrollHost(): HTMLElement | null {
+  // React Chat: sole scroll surface is `.chat__column` (viewport locked).
+  if (isChatReactMounted()) {
+    return (
+      document.querySelector<HTMLElement>(
+        '[data-studio-react-screen="chat"] .chat__column, main.chat .chat__column'
+      ) ?? null
+    );
+  }
   return (
     document.querySelector<HTMLElement>(
       ".studio-scroll--prototype:not(.hidden)"

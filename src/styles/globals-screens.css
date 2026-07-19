@@ -728,7 +728,9 @@
 .studio-viewport > div > div:nth-child(11) [data-name="Subtotal"] {
   align-items: flex-start !important;
 }
-.studio-viewport > div > div:nth-child(11) textarea.proto-agentic-query {
+/* Make-only agentic query — React `.site-pilot-composer__query` owns Motion height. */
+.studio-viewport > div > div:nth-child(11)
+  textarea.proto-agentic-query:not(.site-pilot-composer__query) {
   flex: 1 1 0 !important;
   width: 0 !important;
   min-width: 0 !important;
@@ -752,7 +754,8 @@
   scrollbar-width: none !important; /* Firefox */
   -ms-overflow-style: none !important; /* legacy Edge */
 }
-.studio-viewport > div > div:nth-child(11) textarea.proto-agentic-query::-webkit-scrollbar {
+.studio-viewport > div > div:nth-child(11)
+  textarea.proto-agentic-query:not(.site-pilot-composer__query)::-webkit-scrollbar {
   display: none !important;
   width: 0 !important;
   height: 0 !important;
@@ -870,9 +873,11 @@
 /* Agentic chat composer — hug empty line; mic/send vertically centred */
 .proto-site-pilot-composer
   [data-name="Subtotal"] {
-  align-items: center !important;
+  align-items: flex-start !important;
 }
-.proto-site-pilot-composer textarea.proto-agentic-query {
+/* Make-only composer textarea — React kit uses `.site-pilot-composer__query`. */
+.proto-site-pilot-composer
+  textarea.proto-agentic-query:not(.site-pilot-composer__query) {
   flex: 1 1 0 !important;
   width: 0 !important;
   min-width: 0 !important;
@@ -898,7 +903,8 @@
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
 }
-.proto-site-pilot-composer textarea.proto-agentic-query::-webkit-scrollbar {
+.proto-site-pilot-composer
+  textarea.proto-agentic-query:not(.site-pilot-composer__query)::-webkit-scrollbar {
   display: none !important;
   width: 0 !important;
   height: 0 !important;
