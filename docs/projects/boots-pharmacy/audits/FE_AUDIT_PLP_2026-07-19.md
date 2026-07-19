@@ -3,7 +3,7 @@
 **Surface / slice:** PLP Vaccinations (React migration) + Make retire gates + Studio URL/chip  
 **Date:** 2026-07-19  
 **Auditor:** Uma (UI/UX) — strict (“Nazi QA”) pass (same session, hat switch after Finn handoff)  
-**Implementer handoff / audited tip base:** `6c5c911` parent; PLP ship + patch `0.0.4` (stamp exact SHA in prove after push)  
+**Implementer handoff / audited tip:** `929e507` (patch `0.0.4`; parent `6c5c911`)  
 **Checklist:** [../../../product/FE_UI_UX_AUDIT.md](../../../product/FE_UI_UX_AUDIT.md) · [VISUAL_FIDELITY.md](../../../product/VISUAL_FIDELITY.md) · [FE_STANDARDS.md](../../../product/FE_STANDARDS.md) · [DS_STRICTNESS.md](../../../product/DS_STRICTNESS.md)  
 **Brief:** [../features/PLP_REACT.md](../features/PLP_REACT.md)
 
