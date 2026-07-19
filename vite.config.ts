@@ -45,6 +45,10 @@ export default defineConfig({
     __STUDIO_PACKAGE_VERSION__: JSON.stringify(pkg.version),
   },
   server: {
+    // Canonical localhost — agents MUST use this URL only (Auto-Rule fixed-localhost-reuse-tab).
+    // Fail hard if 5173 is taken (never silently bump to 5174+).
+    port: 5173,
+    strictPort: true,
     // Studio shows build/HMR errors via ProtoFatalErrorScreen — avoid duplicate Vite overlay.
     hmr: {
       overlay: false,

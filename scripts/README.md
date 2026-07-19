@@ -14,7 +14,7 @@
 | `check-parity-ratchets.mjs` | `npm run check:parity-ratchets` | Make→React typical-miss contracts (search icon, bookmark copy, Advantage, loader dup, …) |
 | `check-agent-felonies.mjs` | `npm run check:felonies` | proto filenames, PANEL `.proto-*`, channel, version chip, overlay eyes |
 
-Set `PROTO_SMOKE_URL` if dev server is not on `http://localhost:5173`.
+Canonical smoke URL: `http://localhost:5173` (Vite `strictPort`). Override with `PROTO_SMOKE_URL` only for deliberate CI aliases (`http://127.0.0.1:5173`) — never invent other ports.
 
 Output: `playwright-out/smoke-report.json` (gitignored).
 

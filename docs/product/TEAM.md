@@ -145,6 +145,8 @@ For **each** UXDS control used on the screen (at minimum **SearchField**, **Butt
 - **Missing DS hover = fidelity FAIL class** (PO called out) — flat dead SearchField / Button / checkbox / link vs kit+Make blocks **PROVEN**.  
 - **Forbidden to invent** hover/loading chrome not in Make.  
 - **MCP real-user matrix mandatory for every screen ship** (Quinn + Ben). Prefer `__studioRunMcpPageProbe` so the PO sees the robo-cursor + overlay PASS/FAIL. Arch **rejects** audit **PROVEN** without MCP evidence log.  
+- **Fixed localhost + reuse tab (HARD — Auto-Rule `fixed-localhost-reuse-tab`):** prove only at **`http://localhost:5173/`**. One `npm run dev` (`strictPort`). Chrome DevTools MCP: `list_pages` → `select_page` / `navigate_page`; **`new_page` only if zero pages**. Never open a second window/port “for safety.” → [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R11 · [../shell/URL.md](../shell/URL.md)  
+
 - **Parallel callsigns still required** for serious streams — do not skip sibling dispatch because DS checks or PAGE FINAL PASS exist ([§ Parallel dispatch](#parallel-dispatch-arch-must-spawn-siblings)).  
 - **PAGE FINAL PASS (GLOBAL sequencing):** **no new migrated page** until previous is **hard-green** — [PAGE_FINAL_PASS.md](./PAGE_FINAL_PASS.md). Finn/Uma land checklist + `check:page-final-pass`; Arch enforces. Team check still requires **`Knowledge used:`** per role.  
 - **No merge** without `npm run check:parity-proven` green (`PARITY_PROVEN.json` + audit PROVEN + MCP section).  

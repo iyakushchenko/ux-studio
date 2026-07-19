@@ -40,6 +40,7 @@
 | R8 | *(existing)* | PROVEN honesty | `check:parity-proven` | — | Matrix evidence |
 | R9 | *(existing)* | PAGE FINAL PASS | `check:page-final-pass` | — | `mcpFinalPass` stamp |
 | R10 | **`robo-cursor-native-feedback`** | Robo-cursor = **native hover+press everywhere** (buttons/links/DS secondary/outline/popup close — not chat-only); press = down→dwell→up→click; default graphic after click | `vitest` | `demoCursorInteraction` + `demoCursorPseudoBridge` (top-level selector split + insertRule) | MCP: PDP Check availability bg/border change; Book now; popup close press |
+| R11 | **`fixed-localhost-reuse-tab`** | **One** localhost URL forever; agents must **not** open new ports/windows/tabs | `check:felonies` (vite `port`+`strictPort`) | — | Chrome DevTools MCP: `list_pages` → `select_page` / `navigate_page` on existing; **`new_page` only if zero pages** |
 
 **Code catalog:** `src/app/shell/studioAutoRules.ts` (`STUDIO_AUTO_RULES`) — keep ids in sync with this table.
 
@@ -129,6 +130,35 @@ When a project ships `styleguide/theme.css` under `[data-studio-project="…"]`:
 await window.__studioProveRoboCursorFeedback?.(".proto-avail-header .proto-popup-close")
 // → { pass: true, hoverClass, hoverStyleChanged, pressSeen, pointerClearedAfterClick }
 ```
+
+---
+
+## R11 — Fixed localhost + reuse tab (HARD)
+
+**Fail class:** Agents spawn extra `npm run dev` → Vite picks `5182`/`5185`/`5186`…; PO loses the tab. Or Chrome DevTools MCP calls `new_page` / opens a new window every prove.
+
+**Canonical URL (agents MUST use only this):**
+
+```
+http://localhost:5173/
+```
+
+Deep links stay on that origin, e.g. `http://localhost:5173/?project=boots-pharmacy&screen=plp`.  
+`http://127.0.0.1:5173/` is the same server (CI smoke alias) — do **not** invent other ports.
+
+**Config gate:** `vite.config.ts` → `server.port: 5173` + `server.strictPort: true` (fail if busy; never silent bump). Smoke defaults `PROTO_SMOKE_URL=http://localhost:5173` (CI: `http://127.0.0.1:5173`).
+
+**One dev server:** Only **one** `npm run dev` for the Studio workspace. If port 5173 is taken → do **not** start a second Vite; reuse the existing process, or stop the stray Node/Vite holding 5173 (docs only — never kill the PO’s browser). Windows tip: `netstat -ano | findstr :5173` then end the stray `node` PID if it is a duplicate Vite.
+
+**Chrome DevTools MCP / agent practice (felony):**
+
+1. `list_pages`  
+2. If a Studio tab exists → `select_page` then `navigate_page` (or evaluate in place)  
+3. `new_page` **only** when the page list is empty  
+4. Never open a second window “just in case”
+
+**CI:** `check:felonies` asserts vite `port`/`strictPort` + catalog id `fixed-localhost-reuse-tab`.  
+**Docs:** [AGENTS.md](../../AGENTS.md) · [TEAM.md](./TEAM.md) · [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) · [../shell/URL.md](../shell/URL.md) · [../shell/RECORDING.md](../shell/RECORDING.md)
 
 ---
 

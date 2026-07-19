@@ -10,6 +10,16 @@ Agents **must read** this file before claiming a UI or Studio-chrome slice done.
 
 ## 2026-07-19
 
+### Fixed localhost + reuse tab — no port bump / no new Chrome windows (PO / Arch + Finn + Ben)
+
+- **Symptom / class:** Agents start extra `npm run dev` → Vite silently moves to `5182`/`5185`/`5186`…; Chrome DevTools MCP opens `new_page` / new windows; PO loses the Studio tab context.
+- **Gate (GLOBAL HARD FAIL — Auto-Rule `fixed-localhost-reuse-tab`):**
+  1. Canonical URL **only:** `http://localhost:5173/` (`127.0.0.1:5173` = same server).
+  2. `vite.config.ts`: `server.port: 5173` + `server.strictPort: true` — fail if busy; never silent bump. `check:felonies` asserts this.
+  3. **One** `npm run dev` for the workspace; if 5173 busy → reuse or stop stray Vite (docs only — do not kill PO browser).
+  4. Chrome MCP: `list_pages` → `select_page` / `navigate_page`; **`new_page` only if zero pages**.
+- **Refs:** [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R11 · [../shell/URL.md](../shell/URL.md) · [AGENTS.md](../../AGENTS.md)
+
 ### Platform motion — Motion (`framer-motion`) via `@/uxds/motion`; Accordion stays CSS (PO / Arch)
 
 - **Symptom / class:** Motion library listed but unused; dual `motion` + `framer-motion` deps; Accordion stutter when driven by Framer `height: auto`; callsigns unsure CSS vs Motion.

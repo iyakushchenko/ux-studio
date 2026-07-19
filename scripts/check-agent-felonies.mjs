@@ -701,10 +701,52 @@ if (!fs.existsSync(wirePath)) {
       "avail-logged-out-start",
       "pdp-rtb-rhythm",
       "theme-brand-active",
+      "robo-cursor-native-feedback",
+      "fixed-localhost-reuse-tab",
     ]) {
       if (!catalogSrc.includes(`"${id}"`) && !catalogSrc.includes(`'${id}'`)) {
         fail(
           `FELONY ${RULE_ID}: studioAutoRules catalog missing id "${id}" (see STUDIO_AUTO_RULES.md)`
+        );
+      }
+    }
+  }
+
+  // --- 11) Auto-Rule fixed-localhost-reuse-tab — Vite must not silently bump ports ---
+  {
+    const RULE_ID = "fixed-localhost-reuse-tab";
+    const vitePath = path.join(ROOT, "vite.config.ts");
+    if (!fs.existsSync(vitePath)) {
+      fail(`FELONY ${RULE_ID}: missing vite.config.ts`);
+    } else {
+      const viteSrc = fs.readFileSync(vitePath, "utf8");
+      if (!/\bport:\s*5173\b/.test(viteSrc)) {
+        fail(
+          `FELONY ${RULE_ID}: vite.config.ts must set server.port: 5173 (canonical http://localhost:5173)`
+        );
+      }
+      if (!/\bstrictPort:\s*true\b/.test(viteSrc)) {
+        fail(
+          `FELONY ${RULE_ID}: vite.config.ts must set server.strictPort: true (never silent port bump)`
+        );
+      }
+    }
+    const autoRulesDoc = path.join(
+      ROOT,
+      "docs",
+      "product",
+      "STUDIO_AUTO_RULES.md"
+    );
+    if (fs.existsSync(autoRulesDoc)) {
+      const doc = fs.readFileSync(autoRulesDoc, "utf8");
+      if (!doc.includes("fixed-localhost-reuse-tab")) {
+        fail(
+          `FELONY ${RULE_ID}: STUDIO_AUTO_RULES.md must document fixed-localhost-reuse-tab`
+        );
+      }
+      if (!doc.includes("list_pages") || !doc.includes("new_page")) {
+        fail(
+          `FELONY ${RULE_ID}: STUDIO_AUTO_RULES.md must stamp Chrome MCP list_pages / new_page reuse practice`
         );
       }
     }
@@ -798,5 +840,5 @@ if (errors.length) {
 }
 
 console.log(
-  "[check:felonies] OK — filenames, PANEL CSS, data-proto, BOOTS stubs, channel, version chip, overlay eyes, modal URL sync, agent-teardown-clean, auth-ssot"
+  "[check:felonies] OK — filenames, PANEL CSS, data-proto, BOOTS stubs, channel, version chip, overlay eyes, modal URL sync, agent-teardown-clean, auth-ssot, fixed-localhost-reuse-tab"
 );

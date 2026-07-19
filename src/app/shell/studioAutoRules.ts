@@ -67,6 +67,12 @@ export const STUDIO_AUTO_RULES: readonly StudioAutoRule[] = [
       "Robo-cursor = native hover+press everywhere (all interactive targets; not chat-only; default graphic after click)",
     ciGate: "vitest",
   },
+  {
+    id: "fixed-localhost-reuse-tab",
+    title:
+      "Canonical http://localhost:5173 only; one Vite; Chrome MCP reuses tab (list_pages → select/navigate; never new_page unless zero pages)",
+    ciGate: "check:felonies",
+  },
 ] as const;
 
 /** Ids Arch/Ben expect wired — felony scan fails if catalog drops one. */

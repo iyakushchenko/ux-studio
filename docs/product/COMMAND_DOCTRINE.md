@@ -165,6 +165,7 @@ The PO may override with a clear product veto (“wrong priority for the busines
 | **Overlay eyes** | Blocking lightboxes (Quick View, Choose Pharmacy, Login, pickers) **must** be registered (`STUDIO_MODAL` / `data-studio-modal`). MCP/robo **must not** click through. See [RECORDING.md](../shell/RECORDING.md) + `studioModalGuard.ts`. |
 | **Modal URL registry** | **Before any dialog ship:** `modal` id in [URL.md](../shell/URL.md) + code registry + `data-studio-modal` — same change. No “registry later.” |
 | **Reflex** | After each PAGE FINAL PASS HARD-GREEN → Arch micro-retro into [TEAM_KNOWLEDGE.md](./TEAM_KNOWLEDGE.md) before next migrated page — [TEAM.md](./TEAM.md) § Reflex |
+| **Fixed localhost + reuse tab** | Canonical **`http://localhost:5173/`** only (`vite` `port` + `strictPort`); one `npm run dev`; Chrome DevTools MCP reuses tab (`list_pages` → `select_page` / `navigate_page`; `new_page` only if zero pages). Auto-Rule **`fixed-localhost-reuse-tab`** — [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R11 · [../shell/URL.md](../shell/URL.md) |
 
 ---
 

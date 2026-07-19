@@ -23,10 +23,12 @@ GitHub Linguist counts **file languages** (TypeScript, CSS, JavaScript, …). **
 
 ```bash
 npm install
-npm run dev
+npm run dev              # http://localhost:5173/ only (strictPort)
 npm test                 # includes check:links
 npm run build
 ```
+
+**Canonical localhost:** `http://localhost:5173/` — one `npm run dev`; agents reuse the existing browser tab. Auto-Rule: [STUDIO_AUTO_RULES.md](docs/product/STUDIO_AUTO_RULES.md) R11.
 
 Lean CI smoke: `npm run smoke` (dev server on `:5173`). Actions budget: [docs/product/CI_ACTIONS_BUDGET.md](docs/product/CI_ACTIONS_BUDGET.md).
 

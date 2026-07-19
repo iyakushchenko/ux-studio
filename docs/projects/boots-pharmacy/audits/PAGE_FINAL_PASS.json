@@ -123,21 +123,21 @@
       "status": "proven",
       "hardGreen": true,
       "stampedAt": {
-        "sha": "48f2016",
+        "sha": "57775a3",
         "date": "2026-07-19",
-        "note": "Finn structure/naming + UXDS Accordion kit + ButtonPrimary Book now; header crumbs + main RTB/below; BEM pdp; data-studio-react-screen + make-retired; FAQ 6/6 + TertiaryCta soft + muted chevrons. Restored after hang-guard + Motion travel re-prove; retained through shell tip advance."
+        "note": "Finn structure/naming + UXDS Accordion kit + ButtonPrimary Book now; header crumbs + main RTB/below; BEM pdp; data-studio-react-screen + make-retired; FAQ 6/6 + TertiaryCta soft + muted chevrons. Restored HARD-GREEN after Quinn 23/23 re-prove on tip 57775a3 / v0.0.36 (playback panel + on-target cursor lock)."
       },
       "mcpFinalPass": {
         "status": "HARD-GREEN",
         "pass": true,
         "stampedAt": {
-          "sha": "48f2016",
+          "sha": "57775a3",
           "date": "2026-07-19",
-          "version": "0.0.35",
+          "version": "0.0.36",
           "auditor": "Arch (Director) — Quinn MCP + Uma §0a",
-          "note": "HARD-GREEN retained. Quinn MCP 23/23 PASS @ 7c7c9e1 (prove 841ab32; Quinn docs tip ef5af38); Uma §0a PROVEN @ 76e2433 / 331998b; Arch confirm 23/23 @ tip 48f2016 / v0.0.35 after shell-only robo hover+press (042dbaf / v0.0.34) + html/prototype scrollbar-gutter (48f2016 / v0.0.35). Evidence: FE_AUDIT_PDP_MCP + UMA_FIDELITY_PDP + FE_AUDIT_PDP_PAGE_FINAL_PASS."
+          "note": "HARD-GREEN restored. Quinn MCP 23/23 PASS @ tip 57775a3 / v0.0.36 (reload:false ~27s; teardown clean); playback panel present (.studio-playback-rec-switch); Check availability __studioProveRoboCursorFeedback PASS (hoverClass+onTargetStable); Uma §0a still PROVEN @ 76e2433. Evidence: FE_AUDIT_PDP_MCP + FE_AUDIT_PDP_PAGE_FINAL_PASS."
         },
-        "url": "http://127.0.0.1:5198/?project=boots-pharmacy&screen=pdp",
+        "url": "http://localhost:5173/?project=boots-pharmacy&screen=pdp",
         "auditPath": "docs/projects/boots-pharmacy/audits/FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md",
         "matrix": [
           { "id": "overlay-arm", "pass": true, "detail": "BR panel visible" },

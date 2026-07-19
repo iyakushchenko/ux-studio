@@ -2,6 +2,13 @@
 
 Address-bar deep links for UX Studio. **Query params only** — works with Vite base `/` (localhost) and GitHub Pages `/ux-studio/` without SPA path rewrites.
 
+## Canonical localhost (HARD)
+
+**Origin agents MUST use:** `http://localhost:5173/`  
+Vite: `server.port: 5173` + `strictPort: true` (never silent bump). Smoke/CI default the same port (`127.0.0.1:5173` OK).  
+**One** `npm run dev`. Chrome MCP: reuse existing tab (`list_pages` → `select_page` / `navigate_page`; `new_page` only if zero pages).  
+Auto-Rule: [STUDIO_AUTO_RULES.md](../product/STUDIO_AUTO_RULES.md) **`fixed-localhost-reuse-tab`**.
+
 ## Canonical form
 
 ```

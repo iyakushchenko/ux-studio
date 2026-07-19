@@ -50,11 +50,13 @@ Catalog → [docs/README.md](docs/README.md)
 
 ```bash
 npm install
-npm run dev
+npm run dev          # ALWAYS http://localhost:5173/ — strictPort; fails if busy (never 5174+)
 npm test             # check:links + hygiene + felonies + parity-ratchets + parity-proven + page-final-pass + theme-brand + version + vitest
 npm run build
 npm run smoke        # lean profile — local / on-demand CI only; PROTO_SMOKE_PROFILE=full for marathon
 ```
+
+**Canonical localhost (HARD — Auto-Rule `fixed-localhost-reuse-tab`):** agents MUST use **`http://localhost:5173/`** only (`127.0.0.1:5173` = same server). **One** `npm run dev` — if 5173 is busy, reuse that server or stop the stray Vite; do **not** start a second instance. Chrome DevTools MCP: `list_pages` → `select_page` / `navigate_page` on the existing Studio tab; **`new_page` only if zero pages**. → [STUDIO_AUTO_RULES.md](docs/product/STUDIO_AUTO_RULES.md) R11 · [docs/shell/URL.md](docs/shell/URL.md)
 
 **Version chip:** top tabs row shows `v{package.json}` + channel (`alpha` default). Policy: [docs/product/VERSIONING.md](docs/product/VERSIONING.md). **Felony = test fail** — [COMMAND_DOCTRINE.md](docs/product/COMMAND_DOCTRINE.md).
 

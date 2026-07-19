@@ -8,6 +8,8 @@ See also: [PLAYBACK.md](./PLAYBACK.md) (engine), [SHELL.md](./SHELL.md) (shell a
 
 ## Agent testing overlay (MCP / `__protoRun*` / DevTools)
 
+**Canonical host (HARD):** prove only on **`http://localhost:5173/`** (Auto-Rule **`fixed-localhost-reuse-tab`**). Chrome DevTools MCP: `list_pages` → `select_page` / `navigate_page` on the existing Studio tab — **never** `new_page` unless the page list is empty. Do not start a second Vite / invent ports.
+
 While an agent drives localhost, Studio shows a **compact bottom-right status panel** (title + scrolling actions log). The page stays **fully visible** underneath — no lightbox / opaque modal.
 
 **Click guard (active only):** an invisible full-viewport capture layer (`pointer-events: auto`, transparent) plus `#root { pointer-events: none }` blocks PO clicks into the concept UI. The BR panel itself stays interactive (log + **Dismiss**).

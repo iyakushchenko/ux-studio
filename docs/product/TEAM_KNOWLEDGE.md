@@ -91,12 +91,13 @@
 | Must re-read | Focus |
 |--------------|--------|
 | [../shell/RECORDING.md](../shell/RECORDING.md) — MCP / overlay / page probe | `__studioRunMcpPageProbe`, sitrep, stay-on-page |
-| LESSONS: overlay eyes, MCP matrix, **scroll-into-view**, **overlay visible every probe**, false PROVEN | Prove fail classes |
+| LESSONS: overlay eyes, MCP matrix, **scroll-into-view**, **overlay visible every probe**, false PROVEN, **fixed localhost / reuse tab** | Prove fail classes |
 | [PARITY_RATCHETS.md](./PARITY_RATCHETS.md) · `check:parity-proven` | Gate honesty — no PROVEN without MCP log |
 | [VERSIONING.md](./VERSIONING.md) DoD when bump | Chip = package.json |
-| [../shell/URL.md](../shell/URL.md) modal ids | Prove deep-link / overlay registry for every new dialog |
+| [../shell/URL.md](../shell/URL.md) modal ids + **canonical `localhost:5173`** | Prove deep-link / overlay registry; never invent ports |
+| [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R11 | `list_pages` → reuse tab; `new_page` only if empty |
 
-**Knowledge used tip:** RECORDING MCP section + LESSONS overlay/scroll probe rules.
+**Knowledge used tip:** RECORDING MCP section + LESSONS overlay/scroll + fixed-localhost-reuse-tab.
 
 ### Ben (BE)
 
@@ -104,11 +105,12 @@
 |--------------|--------|
 | [VERSIONING.md](./VERSIONING.md) · [CI_ACTIONS_BUDGET.md](./CI_ACTIONS_BUDGET.md) §5 | Bump DoD + `gh` sitrep |
 | [PARITY_RATCHETS.md](./PARITY_RATCHETS.md) · felonies in doctrine §4 | Keep gates honest |
-| LESSONS: version chip, post-push sitrep, overlay hygiene | BE + Quinn session hygiene |
+| LESSONS: version chip, post-push sitrep, overlay hygiene, **fixed localhost** | BE + Quinn session hygiene; one Vite on `:5173` |
 | `PARITY_PROVEN.json` · `PAGE_FINAL_PASS.json` ownership | No chat-only PROVEN / final-pass |
 | [../shell/URL.md](../shell/URL.md) + `check:felonies` overlay registry | **Modal URL registry mandatory** same PR as dialog ship |
+| [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R11 · `vite.config.ts` | `port`/`strictPort` felony; smoke URL default |
 
-**Knowledge used tip:** VERSIONING DoD + CI sitrep lesson + ratchet/final-pass add path + modal URL table.
+**Knowledge used tip:** VERSIONING DoD + CI sitrep + fixed-localhost-reuse-tab + modal URL table.
 
 ### Pax (PO sim)
 
@@ -148,6 +150,7 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 
 | Delta | Hats | LESSONS / artifact |
 |-------|------|--------------------|
+| **Fixed localhost + reuse tab** — canonical `http://localhost:5173/`; Vite `strictPort`; one `npm run dev`; Chrome MCP `list_pages`→reuse (`new_page` only if empty); Auto-Rule R11 + felony | Arch, Finn, Ben, Quinn | [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R11 · `vite.config.ts` · LESSONS |
 | **Platform Motion standard** — `framer-motion` via `@/uxds/motion`; remove unused `motion` twin; Accordion stays CSS `0fr/1fr`; shell pilots: diagnostic overlay + studio select; PDP Final Pass not demoted (shell-only) | Arch, Finn, Uma, Ben, Pax | [MOTION.md](./MOTION.md) · `src/uxds/motion/` |
 | **Robo-cursor travel** — Motion `animate` ease-in-out only (no back/overshoot/bounce); cancel via `.stop()` on forceClear; hang caps retained | Finn, Arch, Quinn | [MOTION.md](./MOTION.md) · `demoCursor.ts` · LESSONS bounce gate |
 | **PDP PAGE FINAL PASS** — **HARD-GREEN** @ `48f2016` / v0.0.35 (Quinn 23/23 @ `7c7c9e1` / prove `841ab32` · Uma §0a @ `76e2433`; Arch confirm after shell `042dbaf`+scrollbar) | Arch, Finn, Uma, Quinn, Ben, Pax | PAGE_FINAL_PASS.json · FE_AUDIT_PDP_MCP · FE_AUDIT_PDP_PAGE_FINAL_PASS · check:page-final-pass |
@@ -171,6 +174,12 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 | **Auto-Rule `agent-teardown-clean`** — overlay gone + `&modal=` stripped + dialog closed after probe/sitrep/forceClear | Finn, Ben, Quinn, Arch | `studioAgentTeardownContract` · felonies §9 · `__studioAssertAgentTeardownClean` |
 | Team knowledge database + mandatory use | Arch, all | This file · TEAM.md § Knowledge use |
 | Page final-pass gate before NEXT screen; landmarks + BEM stamp | Finn, Uma, Ben, Arch | PAGE_FINAL_PASS.md · check:page-final-pass |
+
+**Knowledge improved** (2026-07-19 · stream: fixed localhost + reuse tab · Auto-Rule R11):
+- Arch (Director): locked canonical `http://localhost:5173/` + Chrome MCP reuse-tab felony; no patch bump (docs/config) — applied: STUDIO_AUTO_RULES R11 · doctrine §4 · director #25 · AGENTS/TEAM
+- Finn (FE): Vite `port: 5173` + `strictPort: true` — applied: `vite.config.ts`
+- Ben (BE): `check:felonies` asserts vite port/strictPort + catalog id; smoke already on 5173 — applied: `check-agent-felonies.mjs`
+- Quinn (QA): prove only on `:5173`; `list_pages` → select/navigate; never `new_page` unless empty — applied: RECORDING + TEAM_KNOWLEDGE Quinn hat
 
 **Knowledge improved** (2026-07-19 · stream: robo-cursor native hover everywhere · v0.0.34):
 - Finn (FE): root cause = comma-split inside `:is()` stalled bridge CSSOM so `.pdp__secondary` hover never live; top-level split + insertRule + page-sheet priority + `data-studio-robo-hover` + ~64ms press dwell — applied: `demoCursorPseudoBridge` + `demoCursor`
