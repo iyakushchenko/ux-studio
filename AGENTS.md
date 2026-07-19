@@ -51,10 +51,12 @@ npm install
 npm run dev
 npm test             # check:links + vitest
 npm run build
-npm run smoke        # lean profile; PROTO_SMOKE_PROFILE=full for marathon (local only)
+npm run smoke        # lean profile — local / on-demand CI only; PROTO_SMOKE_PROFILE=full for marathon
 ```
 
 **GitHub Pages:** `https://iyakushchenko.github.io/ux-studio/`
+
+**Living board:** [docs/product/NEXT_STEPS.md](docs/product/NEXT_STEPS.md)
 
 **GitHub Languages bar:** Linguist counts file languages (TypeScript/CSS/JS). React is a **library** in `.tsx` — it will not appear as a Language. We do use React (`package.json` peer + installed 18.x). See [README.md](README.md).
 
@@ -79,13 +81,14 @@ window.__protoApplyJourneyBundle?.(json)      // runtime import
 window.__protoStartRecording?.()              // recording session
 ```
 
-Full transport smokes require `__protoRun*` helpers — use sparingly; prefer sanity + lean CI.
+Full transport smokes require `__protoRun*` helpers — use sparingly. Day-to-day chrome QA = local MCP/agent + unit XOR gates.
 
 ## CI
 
-- **`ci.yml`** — unit tests (incl. `check:links`), build, lean Playwright smoke — Node **22**
+- **`ci.yml` → `test`** — unit tests (incl. `check:links`) + build on every PR/push — Node **22**
+- **`ci.yml` → `smoke`** — Playwright lean profile — **`workflow_dispatch` only** (not every push)
 - **`deploy-pages.yml`** — GitHub Pages (`/ux-studio/` base path) — Node **22**
-- Budget: [docs/product/CI_ACTIONS_BUDGET.md](docs/product/CI_ACTIONS_BUDGET.md) — no marathon smoke on every push
+- Budget: [docs/product/CI_ACTIONS_BUDGET.md](docs/product/CI_ACTIONS_BUDGET.md) — day-to-day = local MCP; merge needs `npm test` + build; no auto smoke burn
 
 ## Conventions
 

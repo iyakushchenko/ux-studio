@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 jobs:
   test:
@@ -24,7 +25,10 @@ jobs:
       - name: Build
         run: npm run build
 
+  # Playwright smoke is on-demand only — day-to-day chrome QA is local MCP/agent.
+  # Auto-running smoke on every push burned Actions minutes and still missed REC⊗CJM.
   smoke:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
