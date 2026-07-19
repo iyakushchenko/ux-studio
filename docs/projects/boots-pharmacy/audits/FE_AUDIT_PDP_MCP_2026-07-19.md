@@ -4,7 +4,7 @@
 **Date:** 2026-07-19  
 **Auditor:** Quinn (QA) — Chrome DevTools MCP localhost  
 **Ship tip (latest prove):** `76e2433` · **v0.0.30** — FAQ 6/6 + Accordion CSS 0fr↔1fr + TertiaryCta soft + muted closed chevrons (+ tip includes robo R10 from `85d7c81`)  
-**Probe stamp:** this commit (`PENDING_COMMIT`) — Full Pass re-prove after Final Pass **NEEDS-REPROVE**  
+**Probe stamp:** this commit (`bacc4d6`) — Full Pass re-prove after Final Pass **NEEDS-REPROVE**  
 **Uma §0a:** **PROVEN** @ tip `76e2433` / v0.0.30 (docs tip `331998b`)  
 **Prior prove (superseded):** `bf59041` · **v0.0.28** (prove `67a5b7c`)  
 **Policy:** [QUINN_PDP_PROBE_CRITERIA_2026-07-19.md](./QUINN_PDP_PROBE_CRITERIA_2026-07-19.md) · [RECORDING.md](../../../shell/RECORDING.md) · recipe `studioMcpPageProbe.ts`  

@@ -31,7 +31,7 @@
 
 **Session:** Chrome DevTools MCP · `http://127.0.0.1:5188/?project=boots-pharmacy&screen=pdp`  
 **Version chip:** `v0.0.30`  
-**Code tip proved:** `76e2433` · Quinn prove: `PENDING_COMMIT`  
+**Code tip proved:** `76e2433` · Quinn prove: `bacc4d6`  
 **Helper:** `await window.__studioRunMcpPageProbe({ screenId: "pdp", reload: false })`  
 **Result:** `{ pass: true, screenId: "pdp" }` · `failed: []` · **23/23** checks  
 **Overlay:** AGENT TESTING armed (`overlay-arm`) and visible through matrix including below-fold reveal + both overlay-eyes steps  
@@ -74,7 +74,7 @@
 |------|--------|
 | Erase-Make DONE (React + Make retired + wire) | **PASS** |
 | Uma FE audit PROVEN + §0a FAQ 6/6 / Accordion / TertiaryCta soft | **PASS** (`76e2433` / `331998b`) |
-| Quinn MCP matrix PASS (23/23) | **PASS** (`76e2433` / prove `PENDING_COMMIT`) |
+| Quinn MCP matrix PASS (23/23) | **PASS** (`76e2433` / prove `bacc4d6`) |
 | `check:page-final-pass` (incl. `<Accordion>` contract) | **PASS** |
 | `check:parity-proven` | **PASS** |
 | Manifest `mcpFinalPass` PASS | **PASS** (Quinn) |
