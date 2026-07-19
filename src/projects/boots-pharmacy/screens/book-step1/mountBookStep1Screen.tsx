@@ -18,9 +18,18 @@ const HIDE_SELECTORS = [
 
 let root: Root | null = null;
 let hostEl: HTMLElement | null = null;
+/** Cancels a deferred unmount when remount wins the race (tab flip / Strict Mode). */
+let unmountTimer: ReturnType<typeof setTimeout> | null = null;
 
 function pageEl(): HTMLElement | null {
   return document.querySelector(BOOK_STEP1_SCREEN_SELECTOR);
+}
+
+function cancelDeferredUnmount(): void {
+  if (unmountTimer != null) {
+    clearTimeout(unmountTimer);
+    unmountTimer = null;
+  }
 }
 
 function ensureHost(page: HTMLElement): HTMLElement {
@@ -68,6 +77,7 @@ export function isBookStep1ReactMounted(): boolean {
 }
 
 export function mountBookStep1Screen(props: BookStep1LocationScreenProps): void {
+  cancelDeferredUnmount();
   const page = pageEl();
   if (!page) return;
 
@@ -77,13 +87,30 @@ export function mountBookStep1Screen(props: BookStep1LocationScreenProps): void 
   root.render(<BookStep1LocationScreen {...props} />);
 }
 
+/**
+ * Tear down the createRoot host. Must not call `root.unmount()` synchronously
+ * during a parent React render/commit (useLayoutEffect) — defer to macrotask.
+ */
 export function unmountBookStep1Screen(): void {
-  const page = pageEl();
-  if (root) {
-    root.unmount();
-    root = null;
+  if (unmountTimer != null) return;
+  if (!root && !hostEl) {
+    const page = pageEl();
+    if (page) restoreMakeChrome(page);
+    return;
   }
-  hostEl?.remove();
-  hostEl = null;
-  if (page) restoreMakeChrome(page);
+
+  const page = pageEl();
+  // Gate Make wire immediately; actual createRoot.unmount runs after commit.
+  if (page) delete page.dataset.protoReactScreen;
+
+  unmountTimer = setTimeout(() => {
+    unmountTimer = null;
+    const r = root;
+    const h = hostEl;
+    root = null;
+    hostEl = null;
+    r?.unmount();
+    h?.remove();
+    if (page) restoreMakeChrome(page);
+  }, 0);
 }
