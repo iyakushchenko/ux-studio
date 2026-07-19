@@ -2,7 +2,7 @@
   "version": 1,
   "projectId": "boots-pharmacy",
   "updatedAt": "2026-07-19",
-  "note": "Hard gate before NEXT page. npm run check:page-final-pass (via npm test) fails unless each required screen has status=proven, full checklist keys true, stampedAt, and source contracts (main/header, BEM=screenId, data-studio-react-screen, make-retired, kits). Policy: docs/product/PAGE_FINAL_PASS.md. Quinn MCP proves after stamp.",
+  "note": "Hard gate before NEXT page. npm run check:page-final-pass (via npm test) fails unless each required screen has status=proven, full checklist keys true, stampedAt, and source contracts (main/header, BEM=screenId, data-studio-react-screen, make-retired, kits). Policy: docs/product/PAGE_FINAL_PASS.md. Quinn MCP proves after stamp → mcpFinalPass HARD-GREEN opens next page.",
   "requiredScreens": [
     "book-step-1",
     "book-step-2",
@@ -64,10 +64,49 @@
     {
       "screenId": "plp",
       "status": "proven",
+      "hardGreen": true,
       "stampedAt": {
         "sha": "d6c3907",
         "date": "2026-07-19",
-        "note": "Uma+Finn structure/naming final pass — header crumbs + main body + section listing + aside filters; BEM plp; SearchField + ButtonPrimary; no filter-section invent seps; DS states via kit ratchets. Board lock: PDP blocked until this stamp. Quinn MCP follow-up."
+        "note": "Uma+Finn structure/naming final pass — header crumbs + main body + section listing + aside filters; BEM plp; SearchField + ButtonPrimary; no filter-section invent seps; DS states via kit ratchets."
+      },
+      "mcpFinalPass": {
+        "status": "HARD-GREEN",
+        "pass": true,
+        "stampedAt": {
+          "sha": "6358184",
+          "date": "2026-07-19",
+          "version": "0.0.17",
+          "auditor": "Quinn (QA)",
+          "note": "MCP __studioRunMcpPageProbe({ screenId:\"plp\", reload:false }) full matrix PASS; overlay-arm + every step overlay visible; plp-below-fold-scroll scroll-into-view; landmarks header+main on host; make-retired. Audit: FE_AUDIT_PLP_PAGE_FINAL_PASS_2026-07-19.md"
+        },
+        "url": "http://localhost:5185/?project=boots-pharmacy&screen=plp",
+        "auditPath": "docs/projects/boots-pharmacy/audits/FE_AUDIT_PLP_PAGE_FINAL_PASS_2026-07-19.md",
+        "matrix": [
+          { "id": "overlay-arm", "pass": true, "detail": "BR panel visible" },
+          { "id": "plp-host", "pass": true },
+          { "id": "plp-book-now", "pass": true },
+          { "id": "plp-search-icons", "pass": true },
+          { "id": "plp-filter-view-all", "pass": true },
+          { "id": "plp-filter-option-counters", "pass": true },
+          { "id": "plp-checkbox-filter", "pass": true },
+          { "id": "plp-reset-visible", "pass": true },
+          { "id": "plp-reset-filters", "pass": true },
+          { "id": "plp-reset-count-ready", "pass": true },
+          { "id": "plp-quick-view-ready", "pass": true },
+          { "id": "plp-below-fold-scroll", "pass": true, "detail": "scroll-into-view + overlay visible" },
+          { "id": "plp-quick-view", "pass": true },
+          { "id": "plp-overlay-eyes", "pass": true, "detail": "overlay eyes refused under-click" },
+          { "id": "plp-quick-view-close", "pass": true },
+          { "id": "url-screen", "pass": true }
+        ],
+        "landmarks": {
+          "header": true,
+          "main": true,
+          "section": true,
+          "aside": true,
+          "makeRetired": true
+        }
       },
       "checklist": {
         "semanticHtml": true,

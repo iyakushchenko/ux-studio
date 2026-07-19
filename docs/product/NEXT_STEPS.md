@@ -29,8 +29,8 @@ A screen is **DONE** only when **all** are true:
 2b. [x] **PLP fidelity rage fix** — Advantage bar, heart optimistic hover/click, Book now commerce hover, tile border removed, Reset Filters icon+text; Uma checklist + team-check harden; patch bump.
 2c. [x] **PLP preloader + checkbox hover (PO rage #2)** — real Make spinner overlay (hide tiles, in-band); mint checkbox hover; Uma loading/checkbox sign-off gates; patch bump.
 2d. [x] **PLP invent/dupe rage #3** — one loader label (no count duplicate), height lock, Make empty-heart navy hover (no fuchsia invent); MCP matrix mandatory; prior PROVEN revoked; `0.0.8`.
-2e. [ ] **PLP PAGE FINAL PASS hard-green** — structure stamp + `check:page-final-pass` green ([PAGE_FINAL_PASS.json](../projects/boots-pharmacy/audits/PAGE_FINAL_PASS.json)); **Quinn MCP team-check still open** → not HARD-GREEN yet. **Blocks PDP.** Policy: [PAGE_FINAL_PASS.md](./PAGE_FINAL_PASS.md).
-3. [ ] **PDP React migration** — **blocked until PLP Final Pass HARD-GREEN** (incl. Quinn MCP). Same DONE definition; retire Make child 8. Order lock: **PDP → Home → Chat → History/Details**, then delete Book 1–3 Make children.
+2e. [x] **PLP PAGE FINAL PASS hard-green** — structure stamp + `check:page-final-pass` green; Quinn MCP `__studioRunMcpPageProbe({ screenId:"plp" })` full matrix PASS (overlay + scroll-into-view + landmarks); `mcpFinalPass: HARD-GREEN` @ tip `6358184` / v0.0.17. Audit: [FE_AUDIT_PLP_PAGE_FINAL_PASS_2026-07-19.md](../projects/boots-pharmacy/audits/FE_AUDIT_PLP_PAGE_FINAL_PASS_2026-07-19.md). **PDP unblocked.**
+3. [ ] **PDP React migration** — **unblocked** (PLP Final Pass HARD-GREEN). Same DONE definition; retire Make child 8. Order lock: **PDP → Home → Chat → History/Details**, then delete Book 1–3 Make children.
 4. [ ] **Versioning habit** — append notes on every user-visible ship; Pax decides patch; Ben executes ([VERSIONING.md](./VERSIONING.md)).
 
 ---

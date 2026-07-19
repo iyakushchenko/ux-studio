@@ -159,6 +159,10 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 - Bea (BA): no next-page brief until previous Final Pass hard-green — applied: TEAM
 - Quinn (QA): MCP team-check still required for PLP HARD-GREEN — applied: board 2e open
 
+**Knowledge improved** (2026-07-19 · stream: PLP PAGE FINAL PASS HARD-GREEN · tip 6358184 · v0.0.17):
+- Quinn (QA): MCP-proved PLP Final Pass — `__studioRunMcpPageProbe` full matrix PASS (overlay-arm, below-fold scroll-into-view, overlay-eyes); landmarks header+main; stamped `mcpFinalPass: HARD-GREEN` — applied: PAGE_FINAL_PASS.json + FE_AUDIT_PLP_PAGE_FINAL_PASS_2026-07-19.md; NEXT_STEPS 2e closed; **PDP unblocked**
+- Arch (Director): sequencing gate satisfied for PLP → PDP may start — applied: NEXT_STEPS 2e/3
+
 ---
 
 ## How to maintain
