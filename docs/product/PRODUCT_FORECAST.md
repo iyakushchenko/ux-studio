@@ -1,7 +1,7 @@
 # UX Studio — product forecast (engine)
 
 **Updated:** 2026-07-19  
-**Owner:** Tech Director (decisive; not a menu for the PO)  
+**Owner:** Arch (decisive; not a menu for the PO) · Team OS: [TEAM.md](./TEAM.md)  
 **Board:** [NEXT_STEPS.md](./NEXT_STEPS.md) · Doctrine: [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md)  
 **Map:** [ARCHITECTURE.md](./ARCHITECTURE.md) · [NAMING.md](./NAMING.md) · [HYGIENE.md](./HYGIENE.md)
 
@@ -43,14 +43,15 @@ Ship the **control room** first: deep-linkable screens, recordable interactions,
 | Broader CSS contracts | More `check-*.mjs`, not more Playwright on every push |
 | Optional `beat` query | Only when CJM-on and non-noisy |
 | X-Suite handshake | Summarizer → Studio journey JSON seam only |
+| **Real-user persona (X-Suite CJM)** | End-user persona from Summarizer/CJM as product-truth input beside **Pax** — **stub only; do not implement now** ([TEAM.md](./TEAM.md), [X_SUITE_INTEGRATION.md](./X_SUITE_INTEGRATION.md)) |
 
 ---
 
 ## Pillars (ordered)
 
-### 1. URL / routing — LANDED
+### 1. URL / routing — LANDED (+ modal)
 
-Shareable `?project=&screen=`; URL wins on refresh; strip `proof` / ephemeral. Optional beat query later.
+Shareable `?project=&screen=` (+ `&modal=` for blocking lightboxes e.g. `choose-pharmacy`); URL wins on refresh; strip `proof` / ephemeral. Optional beat query later.
 
 ### 2. Recording fidelity — v2 MATRIX + COMPILE VERTICAL LANDED
 

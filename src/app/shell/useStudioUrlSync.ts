@@ -15,6 +15,8 @@ export type StudioUrlSyncOptions = {
   projectId: string;
   personaId?: string;
   modeId?: string;
+  /** Blocking lightbox id (e.g. choose-pharmacy) — synced to `&modal=`. */
+  modalId?: string;
   screens: ReadonlyArray<ScreenRow>;
   current: number;
   hubOpen: boolean;
@@ -23,11 +25,13 @@ export type StudioUrlSyncOptions = {
   setModeId?: (id: string) => void;
   setCurrent: (index: number) => void;
   setHubOpen: (open: boolean) => void;
+  /** Open/close concept lightbox from URL / popstate / replay. */
+  applyModal?: (modalId: string | undefined) => void;
 };
 
 /**
- * Keeps the address bar aligned with studio nav + restores deep links.
- * URL wins on first paint when `screen` / `project` present; then replaceState sync.
+ * Keeps the address bar aligned with studio nav + modal + restores deep links.
+ * URL wins on first paint when `screen` / `project` / `modal` present; then replaceState sync.
  * Boot / popstate share `applyStudioScreen` with recording replay.
  */
 export function useStudioUrlSync(options: StudioUrlSyncOptions): void {
@@ -35,6 +39,7 @@ export function useStudioUrlSync(options: StudioUrlSyncOptions): void {
     projectId,
     personaId,
     modeId,
+    modalId,
     screens,
     current,
     hubOpen,
@@ -43,11 +48,15 @@ export function useStudioUrlSync(options: StudioUrlSyncOptions): void {
     setModeId,
     setCurrent,
     setHubOpen,
+    applyModal,
   } = options;
 
   const applyingUrlRef = useRef(false);
   const lastHrefRef = useRef("");
+  const lastModalRef = useRef<string | undefined>(undefined);
   const bootDoneRef = useRef(false);
+  const applyModalRef = useRef(applyModal);
+  applyModalRef.current = applyModal;
 
   // Boot: strip leftovers, apply deep link once.
   useEffect(() => {
@@ -67,8 +76,10 @@ export function useStudioUrlSync(options: StudioUrlSyncOptions): void {
         setModeId,
         setCurrent,
         setHubOpen,
+        applyModal: (id) => applyModalRef.current?.(id),
         syncUrl: false,
       });
+      lastModalRef.current = parsed.modalId;
     } finally {
       // Defer clear so the write effect does not fight the apply.
       queueMicrotask(() => {
@@ -78,7 +89,7 @@ export function useStudioUrlSync(options: StudioUrlSyncOptions): void {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- boot once
   }, []);
 
-  // Reflect nav → address bar + recording screen markers.
+  // Reflect nav + modal → address bar + recording screen markers.
   useEffect(() => {
     if (applyingUrlRef.current) return;
     const screenId = resolveScreenIdFromNav({ hubOpen, current, screens });
@@ -87,8 +98,11 @@ export function useStudioUrlSync(options: StudioUrlSyncOptions): void {
       screenId,
       personaId,
       modeId,
+      modalId,
     };
-    const search = writeStudioUrl(state);
+    const modalChanged = lastModalRef.current !== modalId;
+    lastModalRef.current = modalId;
+    const search = writeStudioUrl(state, { push: modalChanged && Boolean(lastHrefRef.current) });
     const href = search || "?";
     if (href !== lastHrefRef.current) {
       const prev = lastHrefRef.current;
@@ -101,7 +115,7 @@ export function useStudioUrlSync(options: StudioUrlSyncOptions): void {
         });
       }
     }
-  }, [projectId, personaId, modeId, screens, current, hubOpen]);
+  }, [projectId, personaId, modeId, modalId, screens, current, hubOpen]);
 
   // Back/forward.
   useEffect(() => {
@@ -119,8 +133,11 @@ export function useStudioUrlSync(options: StudioUrlSyncOptions): void {
           setModeId,
           setCurrent,
           setHubOpen,
+          applyModal: (id) => applyModalRef.current?.(id),
           syncUrl: false,
         });
+        lastModalRef.current = parsed.modalId;
+        lastHrefRef.current = window.location.search || "?";
       } finally {
         queueMicrotask(() => {
           applyingUrlRef.current = false;

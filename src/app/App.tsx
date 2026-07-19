@@ -102,6 +102,7 @@ import {
   storeNavIndex,
   studioNavStorageKey,
 } from "@/app/shell/studioNavStorage";
+import { STUDIO_MODAL } from "@/app/shell/studioModalGuard";
 import {
   parseStudioUrl,
   resolveNavFromScreenId,
@@ -253,10 +254,15 @@ export default function App() {
     storeHubOpen(studioProjectId, hubOpen);
   }, [current, hubOpen, studioProjectId]);
 
+  const studioModalId = wireApiRef.current?.availabilityOpen
+    ? STUDIO_MODAL.choosePharmacy
+    : undefined;
+
   useStudioUrlSync({
     projectId: studioProjectId,
     personaId: studioPersonaId,
     modeId: orchestraModeId,
+    modalId: studioModalId,
     screens: SCREENS,
     current,
     hubOpen,
@@ -265,7 +271,26 @@ export default function App() {
     setModeId: setOrchestraModeId,
     setCurrent,
     setHubOpen,
+    applyModal: (modalId) => {
+      if (modalId === STUDIO_MODAL.choosePharmacy) {
+        openAvailabilityToolRef.current(AVAIL_INTENT.pickList);
+      } else {
+        closeAvailabilityToolRef.current();
+      }
+    },
   });
+
+  // Deep-link / boot may apply modal before Boots wire mounts — re-open when ready.
+  useEffect(() => {
+    if (!wireApiRef.current) return;
+    const modalId = parseStudioUrl().modalId;
+    if (
+      modalId === STUDIO_MODAL.choosePharmacy &&
+      !wireApiRef.current.availabilityOpen
+    ) {
+      openAvailabilityToolRef.current(AVAIL_INTENT.pickList);
+    }
+  }, [wireTick]);
 
   const journeyRuntime = useMemo<JourneyRuntime>(
     () => ({
@@ -1003,6 +1028,7 @@ export default function App() {
     screenId: snapshotScreenId,
     personaId: studioPersonaId,
     modeId: orchestraModeId,
+    modalId: wire?.availabilityOpen ? STUDIO_MODAL.choosePharmacy : undefined,
   });
 
   playbackSnapshotRef.current = buildPlaybackStudioSnapshot({

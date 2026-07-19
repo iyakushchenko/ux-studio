@@ -247,7 +247,8 @@ function ensureRoot(): HTMLElement | null {
   dismiss?.addEventListener("click", () => {
     stopAgentTestingOverlay({ force: true, reload: false });
   });
-  document.documentElement.appendChild(root);
+  // Last child of body — paint above #root concept lightboxes.
+  (document.body ?? document.documentElement).appendChild(root);
   return root;
 }
 

@@ -10,6 +10,10 @@ import type { RecordingReplayOptions } from "@/app/recording/recordingTypes";
 import type { StartRecordingOptions } from "@/app/recording/recordingSession";
 import type { ManualTransportAction } from "@/app/shell/playbackInteractionContext";
 import { simulateDemoPointerClick } from "@/app/scenario/demoCursor";
+import {
+  resolveClickTargetRespectingModal,
+  STUDIO_MODAL,
+} from "@/app/shell/studioModalGuard";
 import { applyStudioScreen } from "@/app/shell/studioUrl";
 import { retreatScriptOptions } from "@/projects/playbackScriptOptions";
 import type { ProjectPlayback } from "@/projects/types";
@@ -114,6 +118,19 @@ export function useRecordingReplayBridge(options: {
     }
   }, [transportActionsRef]);
 
+  const applyModalFromUrl = useCallback((modalId: string | undefined) => {
+    const runtime = journeyRuntimeRef.current;
+    if (modalId === STUDIO_MODAL.choosePharmacy) {
+      runtime.openAvailability({
+        step: "list",
+        query: "London",
+        pickLocation: true,
+      });
+    } else {
+      runtime.closeAvailability();
+    }
+  }, []);
+
   const applyRecordingScreen = useCallback(
     (event: { screenId: string; projectId?: string; studioUrl?: string }) => {
       const result = applyStudioScreen({
@@ -129,6 +146,7 @@ export function useRecordingReplayBridge(options: {
         setModeId: setModeIdRef.current,
         setCurrent: setCurrentRef.current,
         setHubOpen: setHubOpenRef.current,
+        applyModal: applyModalFromUrl,
         syncUrl: true,
       });
       if (!result.applied) {
@@ -136,7 +154,7 @@ export function useRecordingReplayBridge(options: {
       }
       return true;
     },
-    []
+    [applyModalFromUrl]
   );
 
   const applyRecordingDemoClick = useCallback(
@@ -146,7 +164,14 @@ export function useRecordingReplayBridge(options: {
       beatId?: string;
       touchpointKey?: string;
     }) => {
-      const target = resolvePlaybackSelectorChain(event.selectorChain, document);
+      const resolved = resolvePlaybackSelectorChain(
+        event.selectorChain,
+        document
+      );
+      const target = resolveClickTargetRespectingModal(resolved, {
+        resolveInModal: (modal) =>
+          resolvePlaybackSelectorChain(event.selectorChain, modal),
+      });
       if (!target) return false;
       return simulateDemoPointerClick(target, { scroll: false });
     },

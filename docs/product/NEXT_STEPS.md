@@ -1,8 +1,8 @@
 # UX Studio — next steps (living board)
 
 **Updated:** 2026-07-19  
-**Owner:** Tech Director (agents execute; PO accept/reject + assets only)  
-**Forecast:** [PRODUCT_FORECAST.md](./PRODUCT_FORECAST.md) · [ARCHITECTURE.md](./ARCHITECTURE.md) · [HYGIENE.md](./HYGIENE.md)  
+**Owner:** Arch (agents execute; human PO accept/reject + assets only; **Pax** sim for bump/push)  
+**Team:** [TEAM.md](./TEAM.md) · Forecast: [PRODUCT_FORECAST.md](./PRODUCT_FORECAST.md) · [ARCHITECTURE.md](./ARCHITECTURE.md) · [HYGIENE.md](./HYGIENE.md)  
 **Refs:** [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) · [CI_ACTIONS_BUDGET.md](./CI_ACTIONS_BUDGET.md) · [NAMING.md](./NAMING.md) · [../shell/URL.md](../shell/URL.md)
 
 ---
@@ -10,17 +10,19 @@
 ## NOW
 
 1. [x] **Recording compile→journeys** — Save as journey / `__studioSaveRecordingAsJourney` → ephemeral CJM catalog overlay ([RECORDING.md](../shell/RECORDING.md)). Durable `journeys.ts` write + free journey ids = later.
-2. [ ] **Versioning habit** — append notes on every user-visible ship; consider patch when PO wants a named demo ([VERSIONING.md](./VERSIONING.md)).
+2. [x] **Lean UX team OS** — callsigns Arch/Bea/Finn/Uma/Quinn/Ben/Pax; briefs + cross-check; Pax owns bump/push ([TEAM.md](./TEAM.md)).
+3. [x] **Modal URL + sitrep z-index** — `&modal=choose-pharmacy`; popup eyes for replay/agent; overlay above avail lightbox.
+4. [ ] **Versioning habit** — append notes on every user-visible ship; Pax decides patch; Ben executes ([VERSIONING.md](./VERSIONING.md)).
 
 ---
 
 ## NEXT
 
-3. [ ] **REC capture gaps** — beat-enter / scroll / typed-text replay (capture partial; replay unsupported) unless a trivial win appears.
-4. [ ] **LEGACY retirement (by screen)** — no LEGACY growth; shrink Make wire + `globals-screens` as React pages land. Concept `.proto-*` classes retire with their screen.
-5. [ ] **Engine monster splits** — on next touch of `App.tsx` / `useJourneyPlayback.ts`, extract by domain (recording bridge / beat advance) — not micro-files.
-6. [ ] **Grow UXDS by page** — extract only on second use ([COMPONENT_LIBRARY.md](./COMPONENT_LIBRARY.md)).
-7. [ ] **Residual fidelity (low)** — Book Steps 1–3 Make-only hexes with no bridge token yet. Do **not** invent aliases.
+5. [ ] **REC capture gaps** — beat-enter / scroll / typed-text replay (capture partial; replay unsupported) unless a trivial win appears.
+6. [ ] **LEGACY retirement (by screen)** — no LEGACY growth; shrink Make wire + `globals-screens` as React pages land. Concept `.proto-*` classes retire with their screen.
+7. [ ] **Engine monster splits** — on next touch of `App.tsx` / `useJourneyPlayback.ts`, extract by domain (recording bridge / beat advance) — not micro-files.
+8. [ ] **Grow UXDS by page** — extract only on second use ([COMPONENT_LIBRARY.md](./COMPONENT_LIBRARY.md)).
+9. [ ] **Residual fidelity (low)** — Book Steps 1–3 Make-only hexes with no bridge token yet. Do **not** invent aliases.
 
 ---
 
@@ -35,6 +37,7 @@
 
 ## Done recently (context)
 
+- [x] **Lean UX team OS + modal URL + sitrep z-index** — Arch/Bea/Finn/Uma/Quinn/Ben/Pax; `&modal=choose-pharmacy`; overlay above avail ([TEAM.md](./TEAM.md), [URL.md](../shell/URL.md)).
 - [x] **Recording compile→journeys (vertical)** — `compileRecordingToJourney` + REC **Save as journey** / `__studioSaveRecordingAsJourney` merges into `journeyRuntimeStore`; play via CJM ([RECORDING.md](../shell/RECORDING.md)).
 - [x] **Recording v2 gaps (human + scripts)** — trusted human REC clicks → `demo-click`; `applyDirectorScript` + `retreat-sync` via shared `applyRecordingProjectScript` / `resolvePlaybackScriptKind` ([RECORDING.md](../shell/RECORDING.md)).
 - [x] **Version chip + felony gate** — tabs-row `vX.Y.Z` + channel; `check:felonies` + `check:version` in `npm test`; proto filename leftovers → 0 in src/scripts/docs ([VERSIONING.md](./VERSIONING.md)).

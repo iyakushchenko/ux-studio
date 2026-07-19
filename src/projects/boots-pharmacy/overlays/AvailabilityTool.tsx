@@ -810,6 +810,7 @@ export default function AvailabilityTool({
   return (
     <div
       className={scrimClassName}
+      data-studio-modal="choose-pharmacy"
       role="presentation"
       onClick={onScrim}
       onAnimationEnd={onScrimAnimationEnd}

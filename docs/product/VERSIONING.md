@@ -8,13 +8,16 @@
 
 ## 0. Role ownership (versioning)
 
-| Hat | Owns |
-|-----|------|
-| **BE** | Semver bumps (`npm run release:*`), CHANGELOG promote, `check:version` / `check:felonies` green, post-push `gh run list` |
-| **FE/UI/UX** | Top-bar version chip (tabs row, sticky right, overflow wins); match Studio PANEL aesthetic |
-| **QA** | Prove chip readable when tabs overflow; no tab/version collision; channel label correct |
-| **BA / Director** | When to bump (see §6); default channel for maturity |
-| **PO** | Accepts **channel** (`alpha` \| `beta` \| `rc` \| `stable`) — not the semver digit |
+Callsigns: [TEAM.md](./TEAM.md).
+
+| Callsign | Owns |
+|----------|------|
+| **Ben** (BE) | Semver bumps (`npm run release:*`), CHANGELOG promote, `check:version` / `check:felonies` green, post-push `gh run list` |
+| **Finn / Uma** | Top-bar version chip (tabs row, sticky right, overflow wins); match Studio PANEL aesthetic |
+| **Quinn** (QA) | Prove chip readable when tabs overflow; no tab/version collision; channel label correct |
+| **Pax** (PO sim) | **Whether/when** to bump + push on user-visible ships (human PO overrides) |
+| **Arch / Bea** | Advise bump class (see §6); default channel for maturity |
+| **Human PO** | Accepts **channel** (`alpha` \| `beta` \| `rc` \| `stable`) — not the semver digit; may override Pax |
 
 ---
 

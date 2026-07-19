@@ -44,6 +44,24 @@ Manual console experiments should omit reload (default `false`). Auto-shown for 
 
 **Deep links:** see [URL.md](./URL.md). Do not use `?proof=*` for agent status.
 
+**Z-index:** the overlay root (`.studio-agent-testing-overlay`) paints at `z-index: 2147483646` on `document.body` — **above** Boots Availability / Choose Pharmacy (`.studio-avail-scrim` ~10200). Sitrep must remain readable with the avail tool open.
+
+---
+
+## Blocking popups / lightboxes (popup eyes)
+
+Recording, replay, and agent testing must treat open lightboxes as **navigable blocking UI**:
+
+| Rule | Behavior |
+|------|----------|
+| Detect | Topmost `.studio-avail-scrim` / `[data-studio-modal="choose-pharmacy"]` / `[role=dialog][aria-modal=true]` via `studioModalGuard.ts` |
+| Do not click through | Demo-click / agent targets under the scrim are rejected; prefer a hit **inside** the modal |
+| URL | Open Choose Pharmacy → `&modal=choose-pharmacy` on the current `screen`; close / Back clears `modal` |
+| Capture | Modal open/close updates `studioUrl` → `kind: "screen"` events (same channel as tab changes) |
+| Replay | `applyStudioScreen` + `applyModal` re-opens/closes Availability |
+
+Book Step 1 **Continue** without a pharmacy opens Choose Pharmacy and must appear in the address bar before any under-page CTA replay.
+
 ---
 
 ## Prerequisite: page interactivity first

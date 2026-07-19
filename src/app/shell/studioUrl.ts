@@ -3,16 +3,23 @@
  *
  * Examples:
  *   /?project=boots-pharmacy&screen=book-step-2
+ *   /ux-studio/?project=boots-pharmacy&screen=book-step-1&modal=choose-pharmacy
  *   /ux-studio/?project=boots-pharmacy&screen=home&mode=agentic-cjm
  *
  * Ephemeral agent leftovers (`proof`, …) are stripped on boot / overlay stop.
  */
+
+import {
+  normalizeStudioModalId,
+  type StudioModalId,
+} from "@/app/shell/studioModalGuard";
 
 export const STUDIO_QUERY = {
   project: "project",
   screen: "screen",
   persona: "persona",
   mode: "mode",
+  modal: "modal",
 } as const;
 
 /** Never persist these in the address bar. */
@@ -40,6 +47,8 @@ export type StudioUrlState = {
   screenId?: string;
   personaId?: string;
   modeId?: string;
+  /** Blocking lightbox id (e.g. choose-pharmacy). */
+  modalId?: StudioModalId | string;
 };
 
 export type StudioScreenRef = {
@@ -72,7 +81,8 @@ export function parseStudioUrl(
   const personaId = params.get(STUDIO_QUERY.persona)?.trim() || undefined;
   const modeId = params.get(STUDIO_QUERY.mode)?.trim() || undefined;
   const screenId = normalizeScreenId(params.get(STUDIO_QUERY.screen));
-  return { projectId, screenId, personaId, modeId };
+  const modalId = normalizeStudioModalId(params.get(STUDIO_QUERY.modal));
+  return { projectId, screenId, personaId, modeId, modalId };
 }
 
 export function serializeStudioUrl(state: StudioUrlState): string {
@@ -81,6 +91,7 @@ export function serializeStudioUrl(state: StudioUrlState): string {
   if (state.screenId) params.set(STUDIO_QUERY.screen, state.screenId);
   if (state.personaId) params.set(STUDIO_QUERY.persona, state.personaId);
   if (state.modeId) params.set(STUDIO_QUERY.mode, state.modeId);
+  if (state.modalId) params.set(STUDIO_QUERY.modal, state.modalId);
   const qs = params.toString();
   return qs ? `?${qs}` : "";
 }
@@ -160,6 +171,7 @@ export function resolveStudioScreenTarget(input: {
   projectId?: string;
   personaId?: string;
   modeId?: string;
+  modalId?: string;
 }): StudioUrlState {
   const fromUrl = input.studioUrl ? parseStudioUrl(input.studioUrl) : {};
   return {
@@ -167,6 +179,10 @@ export function resolveStudioScreenTarget(input: {
     screenId: fromUrl.screenId ?? normalizeScreenId(input.screenId),
     personaId: fromUrl.personaId ?? (input.personaId?.trim() || undefined),
     modeId: fromUrl.modeId ?? (input.modeId?.trim() || undefined),
+    modalId:
+      fromUrl.modalId ??
+      normalizeStudioModalId(input.modalId) ??
+      undefined,
   };
 }
 
@@ -176,6 +192,7 @@ export type ApplyStudioScreenInput = {
   projectId?: string;
   personaId?: string;
   modeId?: string;
+  modalId?: string;
   screens: ReadonlyArray<{ screenId?: string; childIndex: number }>;
   /**
    * Write the address bar (default true). Deep-link boot / popstate use false —
@@ -188,6 +205,8 @@ export type ApplyStudioScreenInput = {
   setModeId?: (id: string) => void;
   setCurrent: (index: number) => void;
   setHubOpen: (open: boolean) => void;
+  /** Apply blocking lightbox from URL / replay (open/close). */
+  applyModal?: (modalId: string | undefined) => void;
 };
 
 export type ApplyStudioScreenResult = {
@@ -226,6 +245,7 @@ export function applyStudioScreen(
       input.setCurrent(nav.current);
     }
   }
+  input.applyModal?.(state.modalId);
 
   if (input.syncUrl !== false) {
     writeStudioUrl(state);
@@ -259,6 +279,7 @@ export function writeStudioUrl(
   if (state.screenId) url.searchParams.set(STUDIO_QUERY.screen, state.screenId);
   if (state.personaId) url.searchParams.set(STUDIO_QUERY.persona, state.personaId);
   if (state.modeId) url.searchParams.set(STUDIO_QUERY.mode, state.modeId);
+  if (state.modalId) url.searchParams.set(STUDIO_QUERY.modal, state.modalId);
 
   const next = `${url.pathname}${url.search}${url.hash}`;
   const cur = `${window.location.pathname}${window.location.search}${window.location.hash}`;

@@ -4,11 +4,13 @@
  * Page stays visible; clicks on the concept UI are blocked.
  */
 
+/* Above concept lightboxes (.studio-avail-scrim ~10200). Max safe int32-ish. */
 .studio-agent-testing-overlay {
   display: none;
   position: fixed;
   inset: 0;
-  z-index: 2147483000;
+  z-index: 2147483646 !important;
+  isolation: isolate;
   pointer-events: none;
   font-family: "Open Sans", ui-sans-serif, system-ui, sans-serif;
   color: #f2f2f2;
@@ -23,6 +25,7 @@
 .studio-agent-testing-overlay__capture {
   position: absolute;
   inset: 0;
+  z-index: 1;
   pointer-events: auto;
   background: transparent;
 }
@@ -37,6 +40,7 @@
   position: absolute;
   right: 16px;
   bottom: 16px;
+  z-index: 2;
   width: min(360px, calc(100vw - 32px));
   max-height: min(42vh, 360px);
   padding: 12px 14px;

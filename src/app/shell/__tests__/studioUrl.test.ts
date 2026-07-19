@@ -27,7 +27,7 @@ describe("studioUrl", () => {
     vi.restoreAllMocks();
   });
 
-  it("parses and serializes project + screen (+ optional persona/mode)", () => {
+  it("parses and serializes project + screen (+ optional persona/mode/modal)", () => {
     const parsed = parseStudioUrl(
       "?project=boots-pharmacy&screen=book-step-2&persona=sarah-jenkins&mode=agentic-cjm&proof=junk"
     );
@@ -36,9 +36,21 @@ describe("studioUrl", () => {
       screenId: "book-step-2",
       personaId: "sarah-jenkins",
       modeId: "agentic-cjm",
+      modalId: undefined,
     });
     expect(serializeStudioUrl(parsed)).toBe(
       "?project=boots-pharmacy&screen=book-step-2&persona=sarah-jenkins&mode=agentic-cjm"
+    );
+
+    const withModal = parseStudioUrl(
+      "?project=boots-pharmacy&screen=book-step-1&modal=choose-pharmacy"
+    );
+    expect(withModal.modalId).toBe("choose-pharmacy");
+    expect(serializeStudioUrl(withModal)).toBe(
+      "?project=boots-pharmacy&screen=book-step-1&modal=choose-pharmacy"
+    );
+    expect(parseStudioUrl("?modal=availability").modalId).toBe(
+      "choose-pharmacy"
     );
   });
 
@@ -129,6 +141,7 @@ describe("studioUrl", () => {
       screenId: "book-step-2",
       personaId: undefined,
       modeId: undefined,
+      modalId: undefined,
     });
 
     expect(
@@ -141,7 +154,29 @@ describe("studioUrl", () => {
       screenId: "book-step-2",
       personaId: undefined,
       modeId: undefined,
+      modalId: undefined,
     });
+
+    expect(
+      resolveStudioScreenTarget({
+        studioUrl:
+          "?project=boots-pharmacy&screen=book-step-1&modal=choose-pharmacy",
+      }).modalId
+    ).toBe("choose-pharmacy");
+  });
+
+  it("applyStudioScreen invokes applyModal from URL", () => {
+    const applyModal = vi.fn();
+    applyStudioScreen({
+      studioUrl:
+        "?project=boots-pharmacy&screen=book-step-1&modal=choose-pharmacy",
+      screens: SCREENS,
+      setCurrent: vi.fn(),
+      setHubOpen: vi.fn(),
+      applyModal,
+      syncUrl: false,
+    });
+    expect(applyModal).toHaveBeenCalledWith("choose-pharmacy");
   });
 
   it("applyStudioScreen maps book steps + hub (shared deep-link / replay path)", () => {

@@ -8,10 +8,10 @@
 
 | Role | Who | Owns |
 |------|-----|------|
-| **Tech Director + Architect + BA + UX + FE/UI** | Cursor agent | **All** tech direction, next steps, architecture, implementation, proactive risk spotting — see [product/COMMAND_DOCTRINE.md](./product/COMMAND_DOCTRINE.md) §0–§2 |
-| **Product Owner** | Human | Product intent, Figma/UXDS truth, accept/reject, explicit product veto — **does not re-argue** role/tech/gates |
+| **Lean UX team** (Arch / Bea / Finn / Uma / Quinn / Ben / Pax) | Cursor agent | Tech direction, briefs, build, visual audit, prove, version mechanics, **Pax** bump/push call — see [product/TEAM.md](./product/TEAM.md) · [product/COMMAND_DOCTRINE.md](./product/COMMAND_DOCTRINE.md) §0–§2 |
+| **Product Owner** | Human | Product intent, Figma/UXDS truth, accept/reject, explicit product veto — **does not re-argue** role/tech/gates; may override Pax |
 
-Agents **do not** offer A/B/C tech menus. They decide, document, build, report. **Proactive forecasting** on every task is mandatory (layout drift, style zoo, CSS layers, bad handoffs, REC bugs, CI).
+Agents **do not** offer A/B/C tech menus. They decide, document, build, report. **Serious work = team process** (briefs + cross-checks). **Proactive forecasting** on every task is mandatory.
 
 **Always-on Cursor rule:** [`.cursor/rules/ux-studio-director.mdc`](../.cursor/rules/ux-studio-director.mdc) · agent entry [AGENTS.md](../AGENTS.md)
 
@@ -20,6 +20,7 @@ Agents **do not** offer A/B/C tech menus. They decide, document, build, report. 
 ## Start here (reading order)
 
 1. [product/COMMAND_DOCTRINE.md](./product/COMMAND_DOCTRINE.md) — **composite role + proactive** + who decides + §6–§7 handoff + FE audit (read first every session)
+1b. [product/TEAM.md](./product/TEAM.md) — lean UX team callsigns + serious-work process (Pax bump/push)
 2. [product/LESSONS_LEARNED.md](./product/LESSONS_LEARNED.md) — progressive failure/win capture (read before UI close)
 3. [product/NAMING.md](./product/NAMING.md) — file/folder naming + domain CSS/attrs (no new `.proto-*`)
 4. [product/ARCHITECTURE.md](./product/ARCHITECTURE.md) · [product/HYGIENE.md](./product/HYGIENE.md) — engine folder map + LOC ratchet

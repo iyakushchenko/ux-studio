@@ -211,5 +211,7 @@ Avoid:
 | 2026-07-19 | **REC ⊗ CJM:** when CJM is ON, REC must be `disabled` (cannot enter Rec); when REC is ON, CJM off/disabled. AIR still locks both. Gate: `studioModeXor.ts` + MCP sanity + FE audit G6. Prior “REC-off ≡ CJM-off / REC disabled during AIR only” was insufficient. |
 | 2026-07-19 | **Slim CI:** default PR/push = `npm test` + build only; Playwright smoke = `workflow_dispatch` / local. Day-to-day chrome QA = local MCP/agent. See CI_ACTIONS_BUDGET.md. |
 | 2026-07-19 | **Versioning habit now, Release CI later:** local `CHANGELOG.md` + `notes:*` + `release:*` skeleton (Summarizer-inspired); no tag→GitHub Release workflow until maturity/cadence/multi-project + Actions headroom. See VERSIONING.md, POST_CHANGE_CHECKLIST.md |
+| 2026-07-19 | **Lean UX team OS:** agents = self-organizing team with callsigns Arch/Bea/Finn/Uma/Quinn/Ben/**Pax** (PO sim). Serious work = lean briefs + cross-checks; Pax decides bump/changelog/push (human PO overrides). Real-user persona from X-Suite CJM = LATER stub only. See TEAM.md, COMMAND_DOCTRINE §0.1 |
+| 2026-07-19 | **Modal navigable URL + sitrep stacking:** blocking lightboxes (Choose Pharmacy) use `&modal=`; recording/replay must not click through; agent sitrep above concept modals. See shell/URL.md, RECORDING.md |
 
 New durable decisions get a row here in the same session they are made.
