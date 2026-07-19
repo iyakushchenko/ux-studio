@@ -84,7 +84,8 @@ export function formatRecordingEventCounter(eventCount: number): string {
 
 /**
  * Session event counter for the Playback|Rec mode-control slot.
- * Parent must mount only when Rec mode is on — never beside journey STEPS.
+ * Parent must mount only when Rec mode is on — never replace the REC mode label,
+ * and never mount beside journey STEPS in playback.
  */
 export function ProtoNavRecordingEventCounter() {
   const ui = useRecordingUiSnapshot();
@@ -207,7 +208,9 @@ export function ProtoNavRecordingModeSlot({
   return (
     <div className="proto-nav-scenario__deck">
       <span className="proto-nav-scenario__mode-control">
-        {recMode ? <ProtoNavRecordingEventCounter /> : null}
+        <span className="proto-nav-scenario__mode-label" aria-hidden>
+          REC
+        </span>
         <ProtoStudioPlaybackRecSwitch
           checked={recMode}
           onChange={(enabled) => {
@@ -223,6 +226,7 @@ export function ProtoNavRecordingModeSlot({
             setRecMode(enabled);
           }}
         />
+        {recMode ? <ProtoNavRecordingEventCounter /> : null}
       </span>
       {recMode ? (
         <ProtoNavRecordingControls

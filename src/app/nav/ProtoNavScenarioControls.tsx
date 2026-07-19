@@ -429,11 +429,14 @@ export function ProtoNavScenarioControls({
       <div className="proto-nav-scenario__deck">
         {recordingControls ? (
           <span className="proto-nav-scenario__mode-control">
-            {recMode ? <ProtoNavRecordingEventCounter /> : null}
+            <span className="proto-nav-scenario__mode-label" aria-hidden>
+              REC
+            </span>
             <ProtoStudioPlaybackRecSwitch
               checked={recMode}
               onChange={handlePlaybackRecModeChange}
             />
+            {recMode ? <ProtoNavRecordingEventCounter /> : null}
           </span>
         ) : null}
         {recordingControls && recMode ? (

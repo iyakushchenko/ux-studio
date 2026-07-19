@@ -1,6 +1,6 @@
-/* Isolated prototype nav panel — imported only by ProtoNavPanel.tsx */
+/* Isolated prototype nav panel вЂ” imported only by ProtoNavPanel.tsx */
 /*
- * ⚠️ NAV PANEL — DO NOT “IMPROVE” LAYOUT HERE WITHOUT EXPLICIT OWNER REQUEST.
+ * вљ пёЏ NAV PANEL вЂ” DO NOT вЂњIMPROVEвЂќ LAYOUT HERE WITHOUT EXPLICIT OWNER REQUEST.
  * position:fixed, content padding-top, ResizeObserver height vars, host height/zoom
  * tweaks, and scrim top-offsets all broke counter-zoom (protoNavZoom.ts) in practice.
  * Only z-index below may be changed for lightbox stacking (not zoom behavior).
@@ -10,12 +10,12 @@
   flex-shrink: 0;
   width: 100%;
   position: relative;
-  /* Above .proto-avail-scrim (10000) — lightboxes must not cover prototype nav */
+  /* Above .proto-avail-scrim (10000) вЂ” lightboxes must not cover prototype nav */
   z-index: 10001;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* No hand cursor anywhere in studio nav chrome — buttons default to pointer in UA styles. */
+/* No hand cursor anywhere in studio nav chrome вЂ” buttons default to pointer in UA styles. */
 .proto-nav-panel-host :is(button, a, [role="button"], [role="switch"], [role="option"]) {
   cursor: default;
 }
@@ -40,7 +40,7 @@
   grid-template-columns: 1fr minmax(0, auto) 1fr;
   align-items: center;
   gap: 8px;
-  /* py-2 (16px) + scenario deck (26px) — keep height stable when controls are absent */
+  /* py-2 (16px) + scenario deck (26px) вЂ” keep height stable when controls are absent */
   min-height: 42px;
   position: relative;
   overflow: visible;
@@ -287,7 +287,7 @@
   white-space: nowrap;
 }
 
-/* Mode labels (CJM) — match STEPS counter type */
+/* Mode labels (CJM) вЂ” match STEPS counter type */
 .proto-nav-scenario__mode-label {
   font-size: 9px;
   font-weight: 600;
@@ -308,11 +308,11 @@
   margin-right: 2px;
 }
 
-/* Rec-mode-only session event counter (REC: N) beside Playback|Rec switch */
+/* Rec-mode-only session event counter (REC: N) after Playback|Rec switch */
 .proto-nav-scenario__mode-control .proto-nav-scenario__counter--recording {
   min-width: 3.5rem;
   margin-right: 0;
-  text-align: right;
+  text-align: left;
 }
 
 .proto-nav-scenario__counter--recording-live {
@@ -323,7 +323,7 @@
   color: #ead9ad;
 }
 
-/* CJM toggle between pipe separators — same bar as zoom delimiters */
+/* CJM toggle between pipe separators вЂ” same bar as zoom delimiters */
 .proto-nav-scenario__cjm-group {
   display: inline-flex;
   align-items: center;
@@ -339,7 +339,7 @@
   color: rgba(255, 220, 160, 0.72);
 }
 
-/* FL-style journey mode toggle — left of step counter in cassette deck */
+/* FL-style journey mode toggle вЂ” left of step counter in cassette deck */
 .proto-studio-journey-switch {
   display: inline-flex;
   align-items: center;
@@ -465,7 +465,7 @@
   color: rgba(255, 220, 160, 0.72);
 }
 
-/* Playback | Rec mode toggle — same footprint as journey switch; blue left / red right */
+/* Playback | Rec mode toggle вЂ” same footprint as journey switch; blue left / red right */
 .proto-studio-playback-rec-switch {
   display: inline-flex;
   align-items: center;
@@ -686,7 +686,7 @@
   color: #f0f4ff;
 }
 
-/* Recording panel — lives inside the shared cassette deck (display:contents keeps row layout) */
+/* Recording panel вЂ” lives inside the shared cassette deck (display:contents keeps row layout) */
 
 .proto-nav-recording-panel {
   display: contents;
@@ -723,7 +723,7 @@
   pointer-events: none;
 }
 
-/* Studio indicator — camera-lens housing; green transport blink while live */
+/* Studio indicator вЂ” camera-lens housing; green transport blink while live */
 
 .proto-nav-scenario__on-air {
   position: relative;
@@ -810,7 +810,7 @@
   animation: none;
 }
 
-/* Playback transport — amber flash on each simulated demo click (300ms). */
+/* Playback transport вЂ” amber flash on each simulated demo click (300ms). */
 .proto-nav-scenario--on-air .proto-nav-scenario__on-air--click .proto-nav-scenario__on-air-dot {
   background: radial-gradient(
     circle at 38% 30%,
@@ -837,7 +837,7 @@
   background: radial-gradient(circle, rgba(255, 154, 18, 0.62) 0%, transparent 72%);
 }
 
-/* CJM journey complete — blue end diode while on the last playlist frame. */
+/* CJM journey complete вЂ” blue end diode while on the last playlist frame. */
 .proto-nav-scenario__on-air--end .proto-nav-scenario__on-air-dot {
   background: radial-gradient(
     circle at 38% 30%,
@@ -865,7 +865,7 @@
   background: radial-gradient(circle, rgba(74, 158, 255, 0.48) 0%, transparent 72%);
 }
 
-/* Playback diagnostic error — red glow; shows while diagnostic overlay is open. */
+/* Playback diagnostic error вЂ” red glow; shows while diagnostic overlay is open. */
 .proto-nav-scenario__on-air--error .proto-nav-scenario__on-air-dot {
   background: radial-gradient(
     circle at 38% 30%,
@@ -892,7 +892,7 @@
   background: radial-gradient(circle, rgba(229, 57, 53, 0.62) 0%, transparent 72%);
 }
 
-/* Manual step — one-shot deep amber blink on |<<, |<, >|, >>| */
+/* Manual step вЂ” one-shot deep amber blink on |<<, |<, >|, >>| */
 .proto-nav-scenario__on-air--step .proto-nav-scenario__on-air-dot {
   animation: proto-studio-on-air-step-dot 0.3s ease-out 1;
 }
@@ -901,7 +901,7 @@
   animation: proto-studio-on-air-step-halo 0.3s ease-out 1;
 }
 
-/* Halogen — play button only; fades in/out while on air. */
+/* Halogen вЂ” play button only; fades in/out while on air. */
 .proto-nav-scenario__play-lamp {
   position: relative;
   display: inline-flex;
@@ -1023,7 +1023,7 @@
   transform: translateY(0.5px);
 }
 
-/* Slow transport LED — short pulse, long lens-off pause: -________ */
+/* Slow transport LED вЂ” short pulse, long lens-off pause: -________ */
 @keyframes proto-studio-on-air-dot-blink {
   0%,
   5% {
@@ -1368,7 +1368,7 @@
   box-shadow: none !important;
 }
 
-/* Studio control panel — no focus ring on chrome buttons or journey dropdown */
+/* Studio control panel вЂ” no focus ring on chrome buttons or journey dropdown */
 .proto-nav-panel-host :is(button, [role="listbox"], [role="option"]):focus,
 .proto-nav-panel-host :is(button, [role="listbox"], [role="option"]):focus-visible,
 .proto-nav-panel-host :is(button, [role="listbox"], [role="option"]):active:focus {
