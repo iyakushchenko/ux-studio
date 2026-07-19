@@ -17,7 +17,7 @@ export function resetTypeInCursorGuard(): void {
   hiddenLatchedForActiveTypeIn = false;
 }
 
-/** Park outside field bbox at type-in start; log visibility. */
+/** Hold journey park rest at type-in start; log visibility. */
 export function beginTypeInCursorGuard(target: HTMLElement): void {
   resetTypeInCursorGuard();
   // Force one park pose for this type-in; ticks must not slide it.

@@ -31,14 +31,39 @@ function getScrollHost(): HTMLElement | null {
 }
 
 /**
- * Prefer React Chat summary. Make body remains under `data-studio-make-retired`
- * and would win first-match `querySelector` after mount flip.
+ * Prefer React Chat summary.
+ *
+ * MISS (React migration): comma `querySelector` is document-order, not
+ * selector-priority — Make dump-all under `page[data-studio-react-screen]`
+ * wins over `.studio-react-screen-host` and poisons progressive CJM.
+ * Always resolve host first; never return Make-retired nodes.
  */
 function getChatSummary(screen: ParentNode): HTMLElement | null {
-  const reactSummary = screen.querySelector<HTMLElement>(
-    '.studio-react-screen-host .chat__summary[data-name="component.appointment.summary"], [data-studio-react-screen="chat"] [data-name="component.appointment.summary"], .chat__summary[data-name="component.appointment.summary"]'
+  const host = screen.querySelector<HTMLElement>(
+    ":scope > .studio-react-screen-host, .studio-react-screen-host"
   );
-  if (reactSummary) return reactSummary;
+  if (host) {
+    const fromHost =
+      host.querySelector<HTMLElement>(
+        '.chat__summary[data-name="component.appointment.summary"]'
+      ) ??
+      host.querySelector<HTMLElement>(
+        '[data-name="component.appointment.summary"]'
+      );
+    if (fromHost && !fromHost.closest("[data-studio-make-retired]")) {
+      return fromHost;
+    }
+  }
+
+  const reactMain = screen.querySelector<HTMLElement>(
+    'main.chat[data-studio-react-screen="chat"], [data-studio-react-screen="chat"].chat'
+  );
+  const fromMain = reactMain?.querySelector<HTMLElement>(
+    '[data-name="component.appointment.summary"]'
+  );
+  if (fromMain && !fromMain.closest("[data-studio-make-retired]")) {
+    return fromMain;
+  }
 
   return (
     Array.from(
@@ -439,12 +464,22 @@ export function collectSitePilotChatScenarioFrames(
   const summary = getChatSummary(screen);
   if (!summary) return [];
 
-  // React Chat: stable markers on direct summary children (q0/r0…).
-  // Never fall through to Make dump-all siblings while host is live.
-  const reactFrames = Array.from(
-    summary.querySelectorAll<HTMLElement>(":scope > [data-studio-chat-frame]")
+  const inReactHost = Boolean(
+    summary.closest(
+      ".studio-react-screen-host, main.chat[data-studio-react-screen='chat'], [data-studio-react-screen='chat'].chat"
+    )
   );
-  if (reactFrames.length > 0) return reactFrames;
+
+  // React Chat only: trust data-studio-chat-frame playlist (full q0…r3).
+  // Make path must NOT use sparsely stamped markers — beforeReveal used to
+  // stamp Make dump-all frames, then this short-circuit returned 2 nodes and
+  // stepScenarioFrameForward advanced the journey (false "reset" after q0/q1).
+  if (inReactHost) {
+    const reactFrames = Array.from(
+      summary.querySelectorAll<HTMLElement>(":scope > [data-studio-chat-frame]")
+    );
+    if (reactFrames.length > 0) return reactFrames;
+  }
 
   return Array.from(summary.children).filter(
     (node): node is HTMLElement =>
@@ -452,7 +487,9 @@ export function collectSitePilotChatScenarioFrames(
       !isSitePilotChatComposerFrame(node) &&
       !node.classList.contains(COMPOSER_CARD_CLASS) &&
       !node.hasAttribute("data-studio-chat-thinking") &&
-      !isSitePilotChatFeedbackFrame(node)
+      !isSitePilotChatFeedbackFrame(node) &&
+      (node.matches('[data-name="query"], [data-name="reply"]') ||
+        Boolean(node.getAttribute("data-studio-chat-frame")))
   );
 }
 

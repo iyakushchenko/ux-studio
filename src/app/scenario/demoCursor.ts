@@ -174,8 +174,8 @@ export function readDemoCursorDomState(): {
 }
 
 /**
- * CJM type-in: keep robo-cursor visible but OUTSIDE the field bbox.
- * Never park on typed glyphs (PO: no cursor-on-text during type-in).
+ * CJM type-in: keep robo-cursor visible at the ORIGINAL journey park rest.
+ * Do not reseed onto the field (PO: not caret-ish, not ta.right+28).
  */
 export function parkDemoCursorForTypeIn(
   target: HTMLElement,
@@ -186,8 +186,7 @@ export function parkDemoCursorForTypeIn(
   journeyEndCursorFaded = false;
   cancelDemoCursorTravel();
   const cursor = ensureDemoCursorElement();
-  // PO: once parked for type-in, hold that pose — no re-seed as the
-  // textarea grows / caret advances (no slide during typed text).
+  // Hold journey park pose — no slide as typed text lands.
   if (
     !options?.force &&
     cursor.classList.contains("proto-chat-demo-cursor--parked") &&
@@ -196,22 +195,9 @@ export function parkDemoCursorForTypeIn(
     applyDemoCursorParkedState(cursor);
     return;
   }
-  const rect = target.getBoundingClientRect();
-  const gap = 28;
-  const midY = Math.round(rect.top + Math.max(rect.height, 1) / 2);
-  // Prefer right of field (toward send); fall back left if viewport-clipped.
-  let x = Math.round(rect.right + gap);
-  const vw =
-    typeof window !== "undefined" && Number.isFinite(window.innerWidth)
-      ? window.innerWidth
-      : x + 80;
-  if (x > vw - 40) {
-    x = Math.round(Math.max(12, rect.left - gap));
-  }
-  const y = midY;
-  seedDemoCursorPosition(cursor, { x, y });
+  const rest = resolveDemoCursorRestPosition();
+  seedDemoCursorPosition(cursor, { x: rest.left, y: rest.top });
   applyDemoCursorParkedState(cursor);
-  parkedRestAnchor = { left: x, top: y };
   notePlaybackCursorEvent("park", {
     detail: "type-in-park",
     target: describeCursorTarget(target),

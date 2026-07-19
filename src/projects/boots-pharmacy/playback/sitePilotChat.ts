@@ -304,7 +304,15 @@ export async function runSitePilotChatBeforeReveal(
       : isSitePilotChatUserQueryFrame(frame)
         ? `q${Math.max(0, Math.floor(zeroIndex / 2))}`
         : "?");
-  if (!frame.getAttribute("data-studio-chat-frame") && scriptedId) {
+  // Only annotate React playlist nodes — stamping Make dump-all lets
+  // collectSitePilotChatScenarioFrames short-circuit to a 2-frame subset.
+  if (
+    !frame.getAttribute("data-studio-chat-frame") &&
+    scriptedId &&
+    frame.closest(
+      ".studio-react-screen-host, main.chat[data-studio-react-screen='chat']"
+    )
+  ) {
     frame.setAttribute("data-studio-chat-frame", scriptedId);
   }
 
