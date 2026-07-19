@@ -82,7 +82,7 @@ Status: **OK** = matches Make; **Partial** = works with known delta; **Gap** = s
 | Near-me | OK | Tertiary: no wash; label → black; pin → navy filter |
 | Change / Change location | OK | Tertiary: no wash; label → black; edit glyph → navy |
 | Booster checkbox | OK | Unchecked hover mint fill; checked stays `#afccca` |
-| Crumb Home / Learn more / help links | OK | Crumb: teal `#305854`. Learn more + help tel: `.uxds-link` (navy underline → hover off) |
+| Crumb Home / Learn more / help links | OK | Crumb: teal `#305854` (own crumb language). Learn more + help tel: `.uxds-link` footer-like (navy, no underline rest → underline hover) |
 | Availability Tool CTAs / chips / List\|Map / fields | OK | Already in `globals-screens.css` `.proto-avail-*` (+ chip hover mint language) |
 
 ### Studio wiring (`data-name` / hooks)

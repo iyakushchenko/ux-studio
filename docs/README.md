@@ -28,13 +28,15 @@ Agents **do not** offer A/B/C tech menus. They decide, document, build, report. 
 7. [product/DS_STRICTNESS.md](./product/DS_STRICTNESS.md) — **no near-duplicates;** UXDS + theme only; deviations registered; no React growth in LEGACY
 8. [product/UX_STUDIO_VISION.md](./product/UX_STUDIO_VISION.md) — product north star
 9. [product/PAGE_BUILD_CONTRACT.md](./product/PAGE_BUILD_CONTRACT.md) — React + UXDS
-10. [product/VISUAL_FIDELITY.md](./product/VISUAL_FIDELITY.md) — **concept L&F mandatory**, no visual zoo, rebuild behavior parity
-11. [product/INTERACTION_FIDELITY.md](./product/INTERACTION_FIDELITY.md) — **recording needs interactive pages** + shared behavior library
-12. [product/FE_UI_UX_AUDIT.md](./product/FE_UI_UX_AUDIT.md) — **post-UI audit checklist** (PROVEN before PO)
-13. [product/FE_STANDARDS.md](./product/FE_STANDARDS.md) — content column, CTA nowrap, layout hygiene
-14. [uxds/README.md](./uxds/README.md) — UXDS Larkin inventory · [uxds/DEVIATIONS.md](./uxds/DEVIATIONS.md) · [uxds/TOKEN_BRIDGE.md](./uxds/TOKEN_BRIDGE.md)
-15. [product/X_SUITE_INTEGRATION.md](./product/X_SUITE_INTEGRATION.md) — Summarizer / X-Suite → Studio seam
-16. [shell/SHELL.md](./shell/SHELL.md) · [shell/PROJECTS.md](./shell/PROJECTS.md) · [shell/PLAYBACK.md](./shell/PLAYBACK.md) · [shell/RECORDING.md](./shell/RECORDING.md)
+10. [product/COMPONENT_LIBRARY.md](./product/COMPONENT_LIBRARY.md) — migrated pages = real React kits; grow by migration
+11. [product/VISUAL_FIDELITY.md](./product/VISUAL_FIDELITY.md) — **concept L&F mandatory**, no visual zoo, rebuild behavior parity
+12. [product/INTERACTION_FIDELITY.md](./product/INTERACTION_FIDELITY.md) — **recording needs interactive pages** + shared behavior library
+13. [product/FE_UI_UX_AUDIT.md](./product/FE_UI_UX_AUDIT.md) — **post-UI audit checklist** (PROVEN before PO; G5 AIR/REC parity)
+14. [product/FE_STANDARDS.md](./product/FE_STANDARDS.md) — content column, CTA nowrap, **one text-link pattern**, layout hygiene
+15. [product/CI_ACTIONS_BUDGET.md](./product/CI_ACTIONS_BUDGET.md) — lean Actions; no marathon smoke on every push
+16. [uxds/README.md](./uxds/README.md) — UXDS Larkin inventory · [uxds/DEVIATIONS.md](./uxds/DEVIATIONS.md) · [uxds/TOKEN_BRIDGE.md](./uxds/TOKEN_BRIDGE.md)
+17. [product/X_SUITE_INTEGRATION.md](./product/X_SUITE_INTEGRATION.md) — Summarizer / X-Suite → Studio seam
+18. [shell/SHELL.md](./shell/SHELL.md) · [shell/PROJECTS.md](./shell/PROJECTS.md) · [shell/PLAYBACK.md](./shell/PLAYBACK.md) · [shell/RECORDING.md](./shell/RECORDING.md)
 
 Agent entry: [../AGENTS.md](../AGENTS.md)
 

@@ -59,7 +59,7 @@ Boots import order (see `src/styles/index.css`): BASE (`src/uxds/`) → THEME (`
 
 | Role | Canonical pattern | Do not |
 |------|-------------------|--------|
-| Regular text link | `.uxds-link` → `--uxds-text-link-link` | Per-screen `#012169` / underline forks |
+| Regular text link | `.uxds-link` → `--uxds-text-link-link` (rest **no** underline, hover underline — footer-like; same contract as `.proto-link`) | Per-screen `#012169` / always-underline Learn more forks; competing rest-underline rules |
 | Crumb / teal link | `--uxds-text-link-link-dark` (or registered crumb class) | Reuse body-link navy for crumbs |
 | Tertiary icon+text CTA | `.proto-tertiary-cta` / `NearMeCta` | FilterChip restyles or pencil one-offs |
 | Filter chip (default) | `.uxds-filter-chip` mint/badge selected | Parallel selected fills on the same family |

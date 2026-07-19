@@ -1614,6 +1614,7 @@ export default function App() {
               <div className="proto-nav-studio-menus">{projectStudioSelect}</div>
               <ProtoNavRecordingModeSlot
                 getStartOptions={getRecordingStartOptions}
+                recModeLocked={navTransportLocked}
                 onReplay={(session) =>
                   replayRecordingSession(session, {
                     triggerTransport: triggerRecordingTransport,

@@ -1,48 +1,34 @@
 /**
- * UXDS regular text link - one pattern for body links.
- * Colors from tokens (UXDS baseline -> project theme remap).
- * @see docs/product/FE_STANDARDS.md · docs/product/DS_STRICTNESS.md
+ * UXDS regular text link — ONE pattern for body + footer-style links.
+ * Rest: no underline. Hover: underline. Color via tokens (theme remaps).
+ * Same visual contract as Make `.proto-link` under `.proto-viewport` / footer.
+ * @see docs/product/FE_STANDARDS.md §2 · docs/product/DS_STRICTNESS.md
+ * @see scripts/check-text-link-contract.mjs
  */
 
-.uxds-link {
-  border: none;
-  background: none;
-  padding: 0;
-  color: var(--uxds-text-link-link);
-  text-decoration: underline;
-  font: inherit;
-  cursor: pointer;
-  transition: color 0.18s ease;
-}
-
-.uxds-link:hover {
-  color: var(--uxds-text-link-link-hover);
-  text-decoration: none;
-}
-
-.uxds-link:focus-visible {
-  outline: 2px solid var(--uxds-text-link-link);
-  outline-offset: 2px;
-}
-
+.uxds-link,
 .proto-avail-link,
 .proto-recipient-picker__link {
   border: none;
   background: none;
   padding: 0;
   color: var(--uxds-text-link-link);
-  text-decoration: underline;
+  text-decoration: none;
+  text-decoration-line: none;
   font: inherit;
   cursor: pointer;
   transition: color 0.18s ease;
 }
 
+.uxds-link:hover,
 .proto-avail-link:hover,
 .proto-recipient-picker__link:hover {
   color: var(--uxds-text-link-link-hover);
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-line: underline;
 }
 
+.uxds-link:focus-visible,
 .proto-avail-link:focus-visible,
 .proto-recipient-picker__link:focus-visible {
   outline: 2px solid var(--uxds-text-link-link);

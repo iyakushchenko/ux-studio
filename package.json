@@ -9,7 +9,8 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite",
-    "test": "vitest run",
+    "check:links": "node scripts/check-text-link-contract.mjs",
+    "test": "npm run check:links && vitest run",
     "test:watch": "vitest",
     "smoke": "node scripts/proto-playwright-smoke.mjs"
   },

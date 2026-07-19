@@ -32,10 +32,23 @@ While doing **anything** the PO asks, the agent must **spot issues or forecast t
 | Bad handoffs | Subagent “done” without verified chrome/mode/panel XOR (§6) |
 | Missing hover / focus | Flat dead controls vs Make parity |
 | Motion unused / wrong | `framer-motion` is default; no keyframe zoos ([FE_STANDARDS.md](./FE_STANDARDS.md) §9) |
-| REC / Studio chrome bugs | Duplicate STEPS, counter leaks, mode XOR broken |
-| CI / smoke gaps | Untested playback or broken lean smoke path |
+| REC / Studio chrome bugs | Duplicate STEPS, counter leaks, mode XOR broken; REC usable during AIR |
+| CI / smoke gaps | Untested playback or broken lean smoke path; Actions minute burn ([CI_ACTIONS_BUDGET.md](./CI_ACTIONS_BUDGET.md)) |
 
 If a risk is real or likely, **fix or flag it in the same turn** — do not leave it for the PO to discover.
+
+### Blast-radius self-check (after ANY UI change)
+
+**Locked (PO rage list, 2026-07-19).** After changing any visible UI (page, kit CSS, Studio chrome), the agent must **proactively scan adjacent chrome** before claiming done — Summarizer post-change checklist spirit:
+
+| Scan | Fail if… |
+|------|----------|
+| **AIR / browse locks** | REC mode / recording controls still usable while AIR; CJM/transport disable parity broken ([FE_UI_UX_AUDIT.md](./FE_UI_UX_AUDIT.md) G5) |
+| **Sibling links / CTAs** | Same role diverged (e.g. Learn more ≠ footer `.proto-link` / `.uxds-link` contract) |
+| **Counters / labels** | Duplicate STEPS, wrong mode label, counter leak |
+| **Panel XOR** | Conflicting panels or mode decks both live |
+
+Do not only verify the control you edited. Fix or flag blast-radius hits in the same turn.
 
 ---
 
@@ -93,7 +106,8 @@ The PO may override with a clear product veto (“wrong priority for the busines
 | Studio purpose (early) | Discovery, ideation, solution proofing, hypothesis validation |
 | Governance style | Summarizer-shaped docs/contracts; not a Figma-plugin clone |
 | Engine vs projects | `src/app/` engine; `src/projects/<id>/` concepts |
-| Quality bar | Lean CI (test + build + lean smoke); grow gates when UXDS lands |
+| Quality bar | Lean CI (test + build + lean smoke); grow gates when UXDS lands — [CI_ACTIONS_BUDGET.md](./CI_ACTIONS_BUDGET.md) |
+| Component library | Grow by page migration; semantic HTML + `data-name`; no Make HTML as reusable unit — [COMPONENT_LIBRARY.md](./COMPONENT_LIBRARY.md) |
 | Done / viewport / fidelity defaults | [SOLUTION_REQUIREMENTS.md](./SOLUTION_REQUIREMENTS.md) §2 |
 | Interaction fidelity + shared kits | Recording needs playable controls; prefer `src/uxds/interactions/` over per-screen scripts — [INTERACTION_FIDELITY.md](./INTERACTION_FIDELITY.md) |
 | UI motion | **`framer-motion`** default — `AnimatePresence` / `motion.*`; no custom keyframe zoos unless DS deviation — [FE_STANDARDS.md](./FE_STANDARDS.md) §9 |

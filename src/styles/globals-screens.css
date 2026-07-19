@@ -375,7 +375,7 @@
 
 /* ── Global text links (Make wire under .proto-viewport) ────────────────────
  * Rest: no underline; navy #012169. Hover: underline + #01318f.
- * Aligns with `.uxds-link` — see FE_STANDARDS §2.
+ * SAME contract as `.uxds-link` (footer-like) — FE_STANDARDS §2.
  * Covers <a>, Figma underline spans/ps, and anything tagged .proto-link.
  */
 .proto-viewport a,

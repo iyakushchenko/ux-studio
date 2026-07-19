@@ -24,6 +24,8 @@ import { logControlPanel } from "@/app/shell/protoControlPanelLog";
 export type ProtoNavRecordingControlsProps = {
   getStartOptions: () => StartRecordingOptions;
   onReplay: (session: ProtoRecordingSession) => void | Promise<void>;
+  /** When true (AIR / play live), REC mode switch is locked — same gate as cassette transport. */
+  recModeLocked?: boolean;
 };
 
 type RecordingUiSnapshot = {
@@ -200,22 +202,53 @@ function downloadRecordingJson(session: ProtoRecordingSession): void {
 /**
  * Standalone deck when orchestra scenario controls are absent.
  * Same exclusive Playback|Rec gate: left = empty playback slot, right = REC only.
+ * AIR lock mirrors ProtoNavScenarioControls — REC disabled while playback is live.
  */
 export function ProtoNavRecordingModeSlot({
   getStartOptions,
   onReplay,
+  recModeLocked = false,
 }: ProtoNavRecordingControlsProps) {
   const [recMode, setRecMode] = useState(false);
 
+  useEffect(() => {
+    if (!recModeLocked || !recMode) return;
+    logControlPanel("studio:playback-rec-mode", {
+      enabled: false,
+      previous: true,
+      forced: true,
+      reason: "air-active",
+      source: "standalone-slot",
+    });
+    if (isRecordingActive()) {
+      pauseRecording();
+    }
+    setRecMode(false);
+  }, [recModeLocked, recMode]);
+
   return (
     <div className="proto-nav-scenario__deck">
-      <span className="proto-nav-scenario__mode-control">
+      <span
+        className="proto-nav-scenario__mode-control"
+        aria-disabled={recModeLocked || undefined}
+      >
         <span className="proto-nav-scenario__mode-label" aria-hidden>
           REC
         </span>
         <ProtoStudioPlaybackRecSwitch
           checked={recMode}
+          disabled={recModeLocked}
           onChange={(enabled) => {
+            if (recModeLocked && enabled) {
+              logControlPanel("studio:playback-rec-mode", {
+                enabled,
+                previous: recMode,
+                blocked: true,
+                blockReason: "air-active",
+                source: "standalone-slot",
+              });
+              return;
+            }
             logControlPanel("studio:playback-rec-mode", {
               enabled,
               previous: recMode,
@@ -229,7 +262,7 @@ export function ProtoNavRecordingModeSlot({
           }}
         />
         <AnimatePresence initial={false} mode="popLayout">
-          {recMode ? (
+          {recMode && !recModeLocked ? (
             <motion.span
               key="rec-event-counter"
               className="proto-nav-scenario__panel-motion-inline"
@@ -245,7 +278,7 @@ export function ProtoNavRecordingModeSlot({
       </span>
       <div className="proto-nav-scenario__panel-swap" aria-live="polite">
         <AnimatePresence initial={false} mode="wait">
-          {recMode ? (
+          {recMode && !recModeLocked ? (
             <motion.div
               key="rec-panel"
               className="proto-nav-scenario__panel-swap-item"

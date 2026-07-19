@@ -223,7 +223,19 @@ export function ProtoNavScenarioControls({
   const stepBlinkTimerRef = useRef<number | null>(null);
   const clickBlinkTimerRef = useRef<number | null>(null);
 
+  /** Same lock as CJM / cassette transport: AIR (browse playback live) freezes mode chrome. */
+  const recModeLocked = isOnAir || isPlaying;
+
   const handlePlaybackRecModeChange = (enabled: boolean) => {
+    if (recModeLocked && enabled) {
+      logControlPanel("studio:playback-rec-mode", {
+        enabled,
+        previous: recMode,
+        blocked: true,
+        blockReason: "air-active",
+      });
+      return;
+    }
     logControlPanel("studio:playback-rec-mode", {
       enabled,
       previous: recMode,
@@ -234,6 +246,21 @@ export function ProtoNavScenarioControls({
     }
     setRecMode(enabled);
   };
+
+  // AIR / play active → force Playback deck (REC switch + recording controls unavailable).
+  useEffect(() => {
+    if (!recModeLocked || !recMode) return;
+    logControlPanel("studio:playback-rec-mode", {
+      enabled: false,
+      previous: true,
+      forced: true,
+      reason: "air-active",
+    });
+    if (isRecordingActive()) {
+      pauseRecording();
+    }
+    setRecMode(false);
+  }, [recModeLocked, recMode]);
 
   useEffect(() => {
     return () => {
@@ -430,16 +457,20 @@ export function ProtoNavScenarioControls({
       ) : null}
       <div className="proto-nav-scenario__deck">
         {recordingControls ? (
-          <span className="proto-nav-scenario__mode-control">
+          <span
+            className="proto-nav-scenario__mode-control"
+            aria-disabled={recModeLocked || undefined}
+          >
             <span className="proto-nav-scenario__mode-label" aria-hidden>
               REC
             </span>
             <ProtoStudioPlaybackRecSwitch
               checked={recMode}
               onChange={handlePlaybackRecModeChange}
+              disabled={recModeLocked}
             />
             <AnimatePresence initial={false} mode="popLayout">
-              {recMode ? (
+              {recMode && !recModeLocked ? (
                 <motion.span
                   key="rec-event-counter"
                   className="proto-nav-scenario__panel-motion-inline"
@@ -456,7 +487,7 @@ export function ProtoNavScenarioControls({
         ) : null}
         <div className="proto-nav-scenario__panel-swap" aria-live="polite">
           <AnimatePresence initial={false} mode="wait">
-            {recordingControls && recMode ? (
+            {recordingControls && recMode && !recModeLocked ? (
               <motion.div
                 key="rec-panel"
                 className="proto-nav-scenario__panel-swap-item"

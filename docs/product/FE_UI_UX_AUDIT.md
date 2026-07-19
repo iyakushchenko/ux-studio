@@ -108,6 +108,7 @@ Refs: [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) §6
 | G2 | Counters: correct label, visibility, no duplicates (e.g. double STEPS) | | |
 | G3 | Panel XOR: at most one conflicting panel open as designed | | |
 | G4 | REC vs play chrome labels/gates match JSX source of truth | | |
+| G5 | **Studio chrome parity when AIR / browse:** while AIR (playback live), REC mode switch + recording controls are disabled/forced off the same way cassette step buttons / CJM switch lock — no REC usable during AIR | | |
 
 ### H. Regressions
 

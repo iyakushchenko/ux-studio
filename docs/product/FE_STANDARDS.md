@@ -50,7 +50,7 @@ Secondary pills (**All locations** / **Slots available**): use **`.uxds-filter-c
 
 ## 2. Regular text links (CRITICAL)
 
-Typical underline body links (**Learn more**, **Show on map**, **See working hours**, help tel, forgot-password style) **must** share one pattern. Do not invent per-screen link colors.
+Body + footer-style text links (**Learn more**, **Show on map**, FAQs, help tel, forgot-password) **must** share **one** pattern. Do not invent per-screen link colors or underline forks.
 
 | Token | Value |
 |-------|--------|
@@ -58,15 +58,17 @@ Typical underline body links (**Learn more**, **Show on map**, **See working hou
 | **Tokens** | `--uxds-text-link-link` / `--uxds-text-link-link-hover` |
 | **UXDS baseline** | Teal Concept (`#305854` / darker hover) |
 | **Boots theme** | Remaps to commerce navy (`#012169` / `#01318f`) |
-| **States** | Rest: underline; hover: underline **off**; focus-visible: 2px outline in link color |
+| **States** | Rest: **no** underline; hover: **underline**; focus-visible: 2px outline in link color |
 
-Legacy aliases (same rules): `.proto-avail-link`, `.proto-recipient-picker__link`.
+Legacy aliases (same rule block — not near-dups): `.proto-avail-link`, `.proto-recipient-picker__link`.  
+Make `.proto-link` / footer links share this **same** underline contract (no underline rest → underline hover). Migrated React surfaces use `.uxds-link` + tokens; do **not** ship a second “always underlined” Learn more.
+
+**Guard:** `npm run check:links` (`scripts/check-text-link-contract.mjs`) — fails if Book Step 1 Learn more / `.uxds-link` diverge from the footer-like contract. Wired into `npm test`.
 
 | Family | Do not force into `.uxds-link` |
 |--------|--------------------------------|
 | Tertiary icon+text CTAs | Change location, near-me — §1 |
-| Breadcrumb Home | Teal `--uxds-text-link-link-dark` crumb chrome (Make) |
-| Make `.proto-link` globals | Still strip underline under `.proto-viewport` — **Make target:** adopt `.uxds-link` when a surface is migrated; do not weaken React parity to match the strip |
+| Breadcrumb Home | Teal `--uxds-text-link-link-dark` crumb chrome (Make; own underline language) |
 
 
 ---
@@ -153,7 +155,7 @@ Use `nowrap` for short CTAs, chips, crumb current labels, and tertiary pills unl
 3. Sibling tertiary CTAs share one icon language (baseline chosen and applied).  
 4. Same CTA string/role → one shared component (near-me → `NearMeCta`).  
 5. Availability secondary filters use `.uxds-filter-chip--strong` (not mint selected).  
-6. Regular text links use `.uxds-link` + link tokens (§2).  
+6. Regular text links use `.uxds-link` + link tokens (§2) — footer-like underline (rest off / hover on); `npm run check:links`.  
 7. Hover/focus/active ported from Make.  
 8. Design-delta table written (fills in scope).  
 9. Behavior parity verified.  

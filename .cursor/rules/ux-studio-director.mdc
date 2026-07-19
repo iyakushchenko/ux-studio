@@ -22,13 +22,25 @@ While doing anything the PO asks, **spot or forecast** issues — do not wait fo
 
 Fix or flag in the same turn.
 
+## Blast-radius self-check (after ANY UI change)
+
+Before calling a UI slice done, **scan adjacent chrome** — do not only test the pixel you touched (Summarizer post-change spirit):
+
+- AIR / browse disable states (REC locked when AIR; transport/CJM parity)
+- Sibling links / CTAs (same role → same pattern; Learn more ≡ footer text-link)
+- Counters / mode labels / panel XOR
+- Shared kits you remapped (theme + BASE)
+
+→ `docs/product/COMMAND_DOCTRINE.md` §0 · `docs/product/FE_UI_UX_AUDIT.md` G5
+
 ## Hard gates
 
 1. **CSS layers:** BASE → THEME → PANEL → LEGACY only. No dump into LEGACY for new React work. → `docs/product/CSS_BASE_THEME.md` · `docs/product/DS_STRICTNESS.md`
 2. **UI motion:** `framer-motion` (`AnimatePresence` / `motion.*`). No keyframe zoos unless DS deviation. → `docs/product/FE_STANDARDS.md` §9
 3. **Handoffs:** Subagent “done” is **BAD until proven** (chrome, modes, counters, panel XOR, page L&F). → doctrine §6
 4. **UI close:** Strict (“Nazi QA”) FE audit **PROVEN** under `docs/product/audits/` before PO green-light. Tests/build/smoke alone **cannot skip**. → doctrine §7 · `docs/product/FE_UI_UX_AUDIT.md`
+5. **Actions budget:** lean CI only — no marathon smoke on every push. → `docs/product/CI_ACTIONS_BUDGET.md`
 
 ## DS / FE
 
-One pattern per role; `var(--uxds-…)`; theme remaps only; concept L&F mandatory; icon+text nowrap; 1440/64/1312 column. Deviations → `docs/uxds/DEVIATIONS.md`.
+One pattern per role; `var(--uxds-…)`; theme remaps only; concept L&F mandatory; icon+text nowrap; 1440/64/1312 column. Text links = footer-like (no underline rest / underline hover). Deviations → `docs/uxds/DEVIATIONS.md`. Component growth by page migration → `docs/product/COMPONENT_LIBRARY.md`.

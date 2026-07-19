@@ -85,6 +85,7 @@ Copy rows from [FE_UI_UX_AUDIT.md](../FE_UI_UX_AUDIT.md); keep PASS/FAIL/N/A + e
 | G2 | | |
 | G3 | | |
 | G4 | | |
+| G5 | | AIR/browse: REC locked when AIR |
 
 ### H. Regressions
 

@@ -33,24 +33,28 @@ Engine repo. **Boots Pharmacy** (`src/projects/boots-pharmacy/`) is the first re
 7. [docs/product/CSS_BASE_THEME.md](docs/product/CSS_BASE_THEME.md) — **BASE → THEME → PANEL → LEGACY**; no CSS dump  
 8. [docs/product/DS_STRICTNESS.md](docs/product/DS_STRICTNESS.md) — **no near-duplicates;** UXDS + theme only; deviations registered; **no new React styles in LEGACY**  
 9. [docs/product/PAGE_BUILD_CONTRACT.md](docs/product/PAGE_BUILD_CONTRACT.md) — React + UXDS  
-10. [docs/product/FE_STANDARDS.md](docs/product/FE_STANDARDS.md) — icon+text nowrap, tertiary icon language, 1440/64/1312 logo grid, scoped CSS  
-11. [docs/product/VISUAL_FIDELITY.md](docs/product/VISUAL_FIDELITY.md) — concept L&F, no visual zoo, behavior parity on rebuilds  
-12. [docs/product/INTERACTION_FIDELITY.md](docs/product/INTERACTION_FIDELITY.md) — recording needs interactive pages + shared kits  
-13. [docs/product/FE_UI_UX_AUDIT.md](docs/product/FE_UI_UX_AUDIT.md) — post-UI audit checklist (PROVEN before PO)  
-14. [docs/uxds/README.md](docs/uxds/README.md) — UXDS Larkin (variables + components) · [DEVIATIONS.md](docs/uxds/DEVIATIONS.md)  
-15. [docs/product/X_SUITE_INTEGRATION.md](docs/product/X_SUITE_INTEGRATION.md) — future Summarizer → Studio seam  
+10. [docs/product/COMPONENT_LIBRARY.md](docs/product/COMPONENT_LIBRARY.md) — migrated pages = real kits; grow by migration  
+11. [docs/product/FE_STANDARDS.md](docs/product/FE_STANDARDS.md) — icon+text nowrap, tertiary icon language, 1440/64/1312 logo grid, scoped CSS  
+12. [docs/product/VISUAL_FIDELITY.md](docs/product/VISUAL_FIDELITY.md) — concept L&F, no visual zoo, behavior parity on rebuilds  
+13. [docs/product/INTERACTION_FIDELITY.md](docs/product/INTERACTION_FIDELITY.md) — recording needs interactive pages + shared kits  
+14. [docs/product/FE_UI_UX_AUDIT.md](docs/product/FE_UI_UX_AUDIT.md) — post-UI audit checklist (PROVEN before PO)  
+15. [docs/product/CI_ACTIONS_BUDGET.md](docs/product/CI_ACTIONS_BUDGET.md) — lean Actions; no marathon on every push  
+16. [docs/uxds/README.md](docs/uxds/README.md) — UXDS Larkin (variables + components) · [DEVIATIONS.md](docs/uxds/DEVIATIONS.md)  
+17. [docs/product/X_SUITE_INTEGRATION.md](docs/product/X_SUITE_INTEGRATION.md) — future Summarizer → Studio seam  
 
 ## Quick start
 
 ```bash
 npm install
 npm run dev
-npm test
+npm test             # check:links + vitest
 npm run build
-npm run smoke        # lean profile; PROTO_SMOKE_PROFILE=full for marathon
+npm run smoke        # lean profile; PROTO_SMOKE_PROFILE=full for marathon (local only)
 ```
 
 **GitHub Pages:** `https://iyakushchenko.github.io/ux-studio/`
+
+**GitHub Languages bar:** Linguist counts file languages (TypeScript/CSS/JS). React is a **library** in `.tsx` — it will not appear as a Language. We do use React (`package.json` peer + installed 18.x). See [README.md](README.md).
 
 ## Repo map
 
@@ -77,8 +81,9 @@ Full transport smokes require `__protoRun*` helpers — use sparingly; prefer sa
 
 ## CI
 
-- **`ci.yml`** — unit tests, build, lean Playwright smoke
-- **`deploy-pages.yml`** — GitHub Pages (`/ux-studio/` base path)
+- **`ci.yml`** — unit tests (incl. `check:links`), build, lean Playwright smoke — Node **22**
+- **`deploy-pages.yml`** — GitHub Pages (`/ux-studio/` base path) — Node **22**
+- Budget: [docs/product/CI_ACTIONS_BUDGET.md](docs/product/CI_ACTIONS_BUDGET.md) — no marathon smoke on every push
 
 ## Conventions
 

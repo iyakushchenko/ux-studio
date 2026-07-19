@@ -20,9 +20,11 @@ export function ProtoStudioPlaybackRecSwitch({
       aria-checked={checked}
       aria-label={checked ? "REC on" : "REC off"}
       title={
-        checked
-          ? "REC on — recording controls (playback transport hidden)"
-          : "REC off — cassette transport (recording controls hidden)"
+        disabled
+          ? "REC unavailable while AIR / playback is live"
+          : checked
+            ? "REC on — recording controls (playback transport hidden)"
+            : "REC off — cassette transport (recording controls hidden)"
       }
       disabled={disabled}
       className={`proto-studio-mode-switch proto-studio-playback-rec-switch${
