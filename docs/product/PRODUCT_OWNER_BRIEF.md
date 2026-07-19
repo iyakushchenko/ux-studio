@@ -214,5 +214,6 @@ Avoid:
 | 2026-07-19 | **Lean UX team OS:** agents = self-organizing team with callsigns Arch/Bea/Finn/Uma/Quinn/Ben/**Pax** (PO sim). Serious work = lean briefs + cross-checks; Pax decides bump/changelog/push (human PO overrides). Real-user persona from X-Suite CJM = LATER stub only. See TEAM.md, COMMAND_DOCTRINE §0.1 |
 | 2026-07-19 | **Modal navigable URL + sitrep stacking:** blocking lightboxes (Choose Pharmacy) use `&modal=`; recording/replay must not click through; agent sitrep above concept modals. See shell/URL.md, RECORDING.md |
 | 2026-07-19 | **Standing PO commands `team report` / `team check`:** lean full-team sitrep on demand; workstream cross-check on demand **or** Arch auto after every big ship before “done”. Always display `Name (Role)`. See TEAM.md, COMMAND_DOCTRINE §0.2 |
+| 2026-07-19 | **Team knowledge database — use, not only write:** living index TEAM_KNOWLEDGE.md; callsigns re-read hat section + LESSONS before serious work; team check `Knowledge used:` one-liner; **Knowledge improved** sitrep after ships; Arch rejects write-only appends. MCP probe: scroll-into-view + overlay visible every step or FAIL. See TEAM.md § Knowledge use, TEAM_KNOWLEDGE.md, LESSONS_LEARNED.md |
 
 New durable decisions get a row here in the same session they are made.

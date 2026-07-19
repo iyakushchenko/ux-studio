@@ -34,6 +34,8 @@ await window.__studioRunMcpPageProbe?.({ screenId: "plp" })
 
 Drives the shared CJM/AIR **robo-cursor** (`simulateDemoPointerClick`) to each recipe target and logs **PASS** / **FAIL** on the AGENT TESTING panel. Prefer this over silent `evaluate_script` clicks for every React screen ship.
 
+**HARD FAIL (Quinn + Finn — LESSONS 2026-07-19):** Before every probe interact, **scroll the target into view**. The agent testing overlay **must be visible on every probe step** — if absent/hidden → that step and the probe **FAIL**. Do not stamp PASS without overlay chrome the PO can see. Code gate: coordinate with Quinn/Finn; do not clobber parallel overlay/scroll ships.
+
 **PLP recipe includes** `plp-search-icons` (icon end + single clear), `plp-filter-view-all`, `plp-filter-option-counters`. Source contracts: [PARITY_RATCHETS.md](../product/PARITY_RATCHETS.md).
 
 ```js

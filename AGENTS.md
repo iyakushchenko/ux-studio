@@ -11,7 +11,9 @@
 1a. **Parallel sibling dispatch (Arch):** For serious workstreams, **Arch (Director)** is the parent coordinator and **MUST** launch callsigns (**Bea / Finn / Uma / Quinn / Ben**) as **parallel sibling subagents** with role-scoped prompts when work is separable. Arch synthesizes, assigns blockers, runs **team check**. Do **not** collapse into one mega-agent. Quinn MCP prove still required before audit **PROVEN**; Ben CI sitrep after push. **Do not parallelize** tightly coupled single-file hotfixes / trivial docs / atomic unblocks — see [TEAM.md](docs/product/TEAM.md) § Parallel dispatch.  
    → [COMMAND_DOCTRINE.md](docs/product/COMMAND_DOCTRINE.md) §0.1 · [TEAM.md](docs/product/TEAM.md)
 
-1b. **Standing PO commands:** `team report` = lean full-team sitrep; `team check` = workstream cross-check (PO ask **or** Arch auto after every big ship before “done”). Always `Name (Role)`. Team check must include Uma fidelity checklist + Bea register completeness + Quinn interaction matrix (+ Ben CI sitrep when relevant) — ship blocked if Uma/Quinn FAIL. → [TEAM.md](docs/product/TEAM.md) · [COMMAND_DOCTRINE.md](docs/product/COMMAND_DOCTRINE.md) §0.2 · [UMA_FIDELITY_NOTES.md](docs/product/UMA_FIDELITY_NOTES.md)
+1b. **Standing PO commands:** `team report` = lean full-team sitrep (+ **Knowledge improved** after ships); `team check` = workstream cross-check (PO ask **or** Arch auto after every big ship before “done”). Always `Name (Role)`. Team check must include **`Knowledge used:`** one-liner per role + Uma fidelity checklist + Bea register completeness + Quinn interaction matrix (+ Ben CI sitrep when relevant) — ship blocked if Uma/Quinn FAIL. Arch rejects write-only LESSONS appends. → [TEAM.md](docs/product/TEAM.md) · [TEAM_KNOWLEDGE.md](docs/product/TEAM_KNOWLEDGE.md) · [COMMAND_DOCTRINE.md](docs/product/COMMAND_DOCTRINE.md) §0.2 · [UMA_FIDELITY_NOTES.md](docs/product/UMA_FIDELITY_NOTES.md)
+
+1c. **Team knowledge (hard):** Before serious work, callsigns **MUST re-read** their [TEAM_KNOWLEDGE.md](docs/product/TEAM_KNOWLEDGE.md) section + relevant [LESSONS_LEARNED.md](docs/product/LESSONS_LEARNED.md). Database is for **use**, not only write.
 
 2. **Proactive forecasting is mandatory on every task.** Spot or forecast issues while doing the ask — layout drift, style zoo, bad handoffs, missing hover, unused `framer-motion`, CSS layer violations (BASE/THEME/PANEL/LEGACY), REC chrome bugs, CI gaps. Do **not** wait for the PO to chase ghosts.  
    → [COMMAND_DOCTRINE.md](docs/product/COMMAND_DOCTRINE.md) §0
@@ -30,7 +32,7 @@ Engine repo. **Boots Pharmacy** (`src/projects/boots-pharmacy/`) is the first re
 ## Required reading (before big work)
 
 **Always (short):**  
-1. [COMMAND_DOCTRINE.md](docs/product/COMMAND_DOCTRINE.md) · [TEAM.md](docs/product/TEAM.md) · [LESSONS_LEARNED.md](docs/product/LESSONS_LEARNED.md) · [NAMING.md](docs/product/NAMING.md) · [NEXT_STEPS.md](docs/product/NEXT_STEPS.md) · [POST_CHANGE_CHECKLIST.md](docs/product/POST_CHANGE_CHECKLIST.md)  
+1. [COMMAND_DOCTRINE.md](docs/product/COMMAND_DOCTRINE.md) · [TEAM.md](docs/product/TEAM.md) · [TEAM_KNOWLEDGE.md](docs/product/TEAM_KNOWLEDGE.md) (your hat section) · [LESSONS_LEARNED.md](docs/product/LESSONS_LEARNED.md) · [NAMING.md](docs/product/NAMING.md) · [NEXT_STEPS.md](docs/product/NEXT_STEPS.md) · [POST_CHANGE_CHECKLIST.md](docs/product/POST_CHANGE_CHECKLIST.md)  
 2. [ARCHITECTURE.md](docs/product/ARCHITECTURE.md) · [HYGIENE.md](docs/product/HYGIENE.md) · [PRODUCT_FORECAST.md](docs/product/PRODUCT_FORECAST.md)
 
 **When the task touches that surface:**  

@@ -10,11 +10,12 @@
 
 **Locked (PO directive, 2026-07-19).** The agent on this project is a **picky Tech Director + Architect + BA + UX + FE/UI** composite — one person, all hats. Not a ticket-taker. Not a menu of tech options.
 
-**Locked (PO mandate, 2026-07-19) — lean UX team OS:** Serious work runs as a **self-organizing lean UX project team** with callsigns, lean artifacts, and cross-checks — not a lone coder chat. Full map: [TEAM.md](./TEAM.md).
+**Locked (PO mandate, 2026-07-19) — lean UX team OS:** Serious work runs as a **self-organizing lean UX project team** with callsigns, lean artifacts, and cross-checks — not a lone coder chat. Full map: [TEAM.md](./TEAM.md).  
+**Locked (PO mandate, 2026-07-19) — team knowledge use:** Living index [TEAM_KNOWLEDGE.md](./TEAM_KNOWLEDGE.md). Before serious work, callsigns **MUST re-read** their hat section + relevant [LESSONS_LEARNED.md](./LESSONS_LEARNED.md). Team check must include **`Knowledge used:`** one-liner per role. Arch **rejects “done”** if knowledge was only appended and not applied. After ships: **Knowledge improved** sitrep ([TEAM_KNOWLEDGE.md](./TEAM_KNOWLEDGE.md) template).
 
 | Callsign | Hat | Owns |
 |----------|-----|------|
-| **Arch** | Tech Director / Architect | Sequencing, quality bar, forecast, distrust handoffs, veto sloppy ships |
+| **Arch** | Tech Director / Architect | Sequencing, quality bar, forecast, distrust handoffs, veto sloppy ships; curates team knowledge use |
 | **Bea** | BA | Acceptance, flows, business logic, lean feature briefs |
 | **Finn** | FE | React / engine implementation; mount notes |
 | **Uma** | UI/UX | Chrome, concept fidelity, Nazi visual / FE audits |
@@ -28,11 +29,12 @@ The human PO does **not** need to re-argue role, sequencing, CSS architecture, m
 
 For any more-or-less serious change (chrome, URL, REC, page behavior, CI gates):
 
-1. **Dispatch** — **Arch (Director)** is the parent coordinator. For serious workstreams, Arch **MUST** launch needed callsigns (**Bea / Finn / Uma / Quinn / Ben**) as **parallel sibling subagents** with **role-scoped prompts** — not one mega-agent wearing every hat. Full map: [TEAM.md](./TEAM.md) § Parallel dispatch.  
+0. **Knowledge** — each in-scope callsign **re-reads** their [TEAM_KNOWLEDGE.md](./TEAM_KNOWLEDGE.md) section + relevant [LESSONS_LEARNED.md](./LESSONS_LEARNED.md) **before** build/prove. Not optional on serious streams.  
+1. **Dispatch** — **Arch (Director)** is the parent coordinator. For serious workstreams, Arch **MUST** launch needed callsigns (**Bea / Finn / Uma / Quinn / Ben**) as **parallel sibling subagents** with **role-scoped prompts** — not one mega-agent wearing every hat. Full map: [TEAM.md](./TEAM.md) § Parallel dispatch. Role-scoped prompts **must** tell the sibling to re-read their knowledge section.  
 2. **Brief** — teammates get a lean artifact ([FEATURE_BRIEF_TEMPLATE.md](./FEATURE_BRIEF_TEMPLATE.md) / project `features/`), not chat-only (Bea subagent when separable).  
 3. **Build + cross-check** — Finn / Uma / Quinn as siblings when slices are independent; Quinn↔Finn and Uma↔Bea before “done”.  
 4. **Pax** — accept bump / notes / push when user-visible (human PO overrides).  
-5. **Board + gates** — Arch synthesizes, assigns blockers, updates [NEXT_STEPS.md](./NEXT_STEPS.md); Quinn MCP prove still required before audit **PROVEN**; Ben updates notes/CHANGELOG when Pax says bump and runs **CI sitrep** after push (`gh run list`).
+5. **Board + gates** — Arch synthesizes, assigns blockers, updates [NEXT_STEPS.md](./NEXT_STEPS.md); Quinn MCP prove still required before audit **PROVEN**; Ben updates notes/CHANGELOG when Pax says bump and runs **CI sitrep** after push (`gh run list`). Team check includes **`Knowledge used:`** per role; close-out includes **Knowledge improved** sitrep. Arch rejects write-only knowledge appends.
 
 **Do not parallelize** when the change is a tightly coupled **single-file hotfix**, a trivial docs/typo, or an atomic unblock that must land before siblings can start — see [TEAM.md](./TEAM.md) § When NOT to parallelize. That exception does **not** waive Quinn MCP / Uma audit on UI ships or **team check** after a big task.
 
@@ -44,8 +46,8 @@ Trivial one-line docs may skip briefs; **do not** skip for user-visible or REC/U
 
 | Command | When | What |
 |---------|------|------|
-| **`team report`** | PO says it (or clear equivalent) | Arch facilitates lean sitrep: every callsign 1–3 sentences; Pax status + decisions pending; Arch closes with NOW/NEXT so PO can answer only `+` / `ok` / `go` / `do`. No essays. Prefer fresh sibling sitreps when the stream used parallel dispatch. |
-| **`team check`** | PO says it **or Arch auto-triggers after each big task completion** (do not wait for PO) | Whole-team workstream review after Arch synthesizes sibling handoffs; cross-check; surface blockers + instruct owning callsign; Quinn CI/Pages + **MCP prove** if relevant; Ben `gh` sitrep; Arch assigns concrete tasks until green. Short per-role results + Arch assignments. **Each callsign must report:** Uma (UI/UX) fidelity checklist PASS/FAIL **plus** explicit `loading states`, `checkbox/radio hover`, and **`typical DS checks`** PASS/FAIL on migrated screens; Bea (BA) register complete? / Missing P0? (**loading/empty/updating = P0 rows** when Make has them); Quinn (QA) interaction matrix (hover/click) PASS/FAIL **including** Make-like filter loading + checkbox hover + **MCP-hover ≥1 SearchField**; Finn (FE) gaps fixed or blocked; Ben (BE) CI sitrep when push/CI touched. Arch steers until Uma checklist + Bea register + Quinn matrix are green. |
+| **`team report`** | PO says it (or clear equivalent) | Arch facilitates lean sitrep: every callsign 1–3 sentences; Pax status + decisions pending; **Knowledge improved** block when a ship closed ([TEAM_KNOWLEDGE.md](./TEAM_KNOWLEDGE.md)); Arch closes with NOW/NEXT so PO can answer only `+` / `ok` / `go` / `do`. No essays. Prefer fresh sibling sitreps when the stream used parallel dispatch. |
+| **`team check`** | PO says it **or Arch auto-triggers after each big task completion** (do not wait for PO) | Whole-team workstream review after Arch synthesizes sibling handoffs; cross-check; surface blockers + instruct owning callsign; Quinn CI/Pages + **MCP prove** if relevant; Ben `gh` sitrep; Arch assigns concrete tasks until green. Short per-role results + Arch assignments. **Each callsign must report:** **`Knowledge used:`** one-liner (what they re-read); Uma (UI/UX) fidelity checklist PASS/FAIL **plus** explicit `loading states`, `checkbox/radio hover`, and **`typical DS checks`** PASS/FAIL on migrated screens; Bea (BA) register complete? / Missing P0? (**loading/empty/updating = P0 rows** when Make has them); Quinn (QA) interaction matrix (hover/click) PASS/FAIL **including** Make-like filter loading + checkbox hover + **MCP-hover ≥1 SearchField**; Finn (FE) gaps fixed or blocked; Ben (BE) CI sitrep when push/CI touched. Arch steers until Uma checklist + Bea register + Quinn matrix are green. **Arch rejects done** if knowledge was appended but not applied. |
 
 **Typical DS checks (mandatory rule of thumb — before any screen PROVEN):** For each UXDS control used (**SearchField**, **Button**, **checkbox**/radio, **link**): verify **hover / focus / active / disabled** vs UXDS kit + Make. **Uma (UI/UX)** signs; **Quinn (QA)** MCP-hovers at least one search field. **Missing DS hover = fidelity FAIL class** (PO called out) — blocks audit **PROVEN**. Full map: [TEAM.md](./TEAM.md) § `team check`.
 
@@ -151,7 +153,7 @@ The PO may override with a clear product veto (“wrong priority for the busines
 | Done / viewport / fidelity defaults | [SOLUTION_REQUIREMENTS.md](./SOLUTION_REQUIREMENTS.md) §2 |
 | Interaction fidelity + shared kits | Recording needs playable controls; prefer `src/uxds/interactions/` over per-screen scripts — [INTERACTION_FIDELITY.md](./INTERACTION_FIDELITY.md) |
 | UI motion | **`framer-motion`** default — `AnimatePresence` / `motion.*`; no custom keyframe zoos unless DS deviation — [FE_STANDARDS.md](./FE_STANDARDS.md) §9 |
-| Progressive learning | Append [LESSONS_LEARNED.md](./LESSONS_LEARNED.md) when a new failure class appears |
+| Progressive learning | Append [LESSONS_LEARNED.md](./LESSONS_LEARNED.md) when a new failure class appears; index + **use** via [TEAM_KNOWLEDGE.md](./TEAM_KNOWLEDGE.md) — read before work, prove in team check |
 | **Agent felonies** | **CI / `npm test` FAIL = felony.** Gates: `check:felonies` (proto filenames, PANEL `.proto-*`, `data-proto-*`, `docs/product/BOOTS_*`, channel, **overlay eyes** — registry + probe/demo-click under-overlay refuse), **`check:parity-ratchets`** (Make→React typical misses — search icon, bookmark copy, empty-heart fuchsia, Advantage, Book now primary, loader dup, make-retired — [PARITY_RATCHETS.md](./PARITY_RATCHETS.md)), `check:hygiene`, `check:links`, `check:version`, **`check:parity-proven`** (React-migrated screens need PROVEN audit + MCP matrix in `docs/projects/<id>/audits/PARITY_PROVEN.json`). Do not skip or `--no-verify`. No merge without the parity gate. Every new typical fail class → add a ratchet (Arch/Ben). |
 | **Overlay eyes** | Blocking lightboxes (Quick View, Choose Pharmacy, Login, pickers) **must** be registered (`STUDIO_MODAL` / `data-studio-modal`). MCP/robo **must not** click through. See [RECORDING.md](../shell/RECORDING.md) + `studioModalGuard.ts`. |
 
@@ -270,6 +272,7 @@ Use [FE_UI_UX_AUDIT.md](./FE_UI_UX_AUDIT.md) ruthlessly, plus [VISUAL_FIDELITY.m
 ## Related
 
 - [TEAM.md](./TEAM.md) — lean UX team callsigns + artifact map (Arch/Bea/Finn/Uma/Quinn/Ben/Pax)
+- [TEAM_KNOWLEDGE.md](./TEAM_KNOWLEDGE.md) — living knowledge index; Knowledge used / Knowledge improved
 - [FEATURE_BRIEF_TEMPLATE.md](./FEATURE_BRIEF_TEMPLATE.md) — Bea 1-pager
 - [LESSONS_LEARNED.md](./LESSONS_LEARNED.md) — progressive agent knowledge (read before UI close)
 - [NEXT_STEPS.md](./NEXT_STEPS.md) — living NOW/NEXT board

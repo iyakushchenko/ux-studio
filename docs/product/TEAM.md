@@ -2,7 +2,21 @@
 
 **Status:** Locked (PO mandate, 2026-07-19)  
 **Why:** Agents operate as a **self-organizing lean UX project team**, not a lone coder. Briefs + cross-checks beat chat-only handoffs.  
-**Hard-wired:** [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) §0.1 · [`.cursor/rules/ux-studio-director.mdc`](../../.cursor/rules/ux-studio-director.mdc) · [AGENTS.md](../../AGENTS.md)
+**Hard-wired:** [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) §0.1 · [`.cursor/rules/ux-studio-director.mdc`](../../.cursor/rules/ux-studio-director.mdc) · [AGENTS.md](../../AGENTS.md)  
+**Team knowledge (read + use):** [TEAM_KNOWLEDGE.md](./TEAM_KNOWLEDGE.md)
+
+---
+
+## Knowledge use (hard — read before work, prove in team check)
+
+**Locked (PO mandate, 2026-07-19).** The knowledge base exists to be **used**, not only written.
+
+1. **Before serious work** — each callsign in scope **MUST re-read** their section in [TEAM_KNOWLEDGE.md](./TEAM_KNOWLEDGE.md) **and** the relevant [LESSONS_LEARNED.md](./LESSONS_LEARNED.md) bullets for the surface (plus linked UMA notes / ratchets / register / brief as listed for that hat).  
+2. **Team check** — every in-scope callsign reports a **`Knowledge used:`** one-liner (what they re-read). Example: `Quinn (QA): Knowledge used: TEAM_KNOWLEDGE Quinn + LESSONS overlay eyes / MCP scroll-into-view.`  
+3. **Arch rejects “done”** if knowledge was only **appended** (LESSONS / index) and **not applied** in the ship (no gate, prove step, ratchet, or code/process change that shows use). Write-only = process FAIL.  
+4. **After ships** — include a **Knowledge improved** sitrep block ([TEAM_KNOWLEDGE.md](./TEAM_KNOWLEDGE.md) § Sitrep template) so the PO sees team knowledge status-rep style.
+
+Trivial docs/typos may skip the full re-read; **do not** skip for chrome, URL, REC, MCP prove, Make→React, or CI gates.
 
 ---
 
@@ -69,7 +83,8 @@ Do **not** use the exception to skip Quinn MCP / Uma audit on UI ships, or to sk
 
 1. Every callsign in mandatory display format — **1–3 sentences** status each.  
 2. **Pax (PO sim):** short status + **decisions pending**.  
-3. **Arch (Director)** closes with **Next steps** (NOW / NEXT) phrased so the human PO can reply only `+` / `ok` / `go` / `do`.
+3. **Knowledge improved** sitrep block when a ship closed this period ([TEAM_KNOWLEDGE.md](./TEAM_KNOWLEDGE.md) template) — status-rep style, one line per role that learned/applied.  
+4. **Arch (Director)** closes with **Next steps** (NOW / NEXT) phrased so the human PO can reply only `+` / `ok` / `go` / `do`.
 
 ### `team check`
 
@@ -84,9 +99,10 @@ Do **not** use the exception to skip Quinn MCP / Uma audit on UI ships, or to sk
 
 1. Cross-check each others’ work; surface blockers; instruct the owning callsign.  
 2. Per-role check result (same `Name (Role)` format) — **mandatory fidelity lines below**.  
-3. **Quinn (QA):** verify CI / Pages if relevant + **interaction matrix** (hover/click feedback) PASS/FAIL.  
-4. **Ben (BE):** `gh` sitrep when push/CI touched.  
-5. **Arch (Director):** concrete task assignments until blockers cleared / stream green. Steer: Uma checklist + Bea register completeness + Quinn interaction matrix must all be green.
+3. **`Knowledge used:`** one-liner **per in-scope callsign** (what they re-read from [TEAM_KNOWLEDGE.md](./TEAM_KNOWLEDGE.md) / LESSONS / UMA / ratchets / register). Missing = Arch **FAIL** for that role.  
+4. **Quinn (QA):** verify CI / Pages if relevant + **interaction matrix** (hover/click feedback) PASS/FAIL.  
+5. **Ben (BE):** `gh` sitrep when push/CI touched.  
+6. **Arch (Director):** concrete task assignments until blockers cleared / stream green. Steer: Uma checklist + Bea register completeness + Quinn interaction matrix must all be green. **Reject done** if knowledge was write-only (appended but not applied).
 
 **Mandatory per-role fidelity lines (UI / Make→React / chrome ships):**
 
@@ -120,7 +136,8 @@ For **each** UXDS control used on the screen (at minimum **SearchField**, **Butt
 - **Parity ratchets (GLOBAL HARD FAIL):** `npm run check:parity-ratchets` — typical Make→React misses (search icon + **icon-pos end**, single clear, View all / 10-cap, filter counters, no filter hr, bookmark copy, empty-heart fuchsia, Advantage bar, Book now primary, loader dup, make-retired). Every new typical fail class → Arch/Ben add a ratchet ([PARITY_RATCHETS.md](./PARITY_RATCHETS.md)). Overlay registry stays in `check:felonies`.  
 
 - **Overlay eyes (GLOBAL HARD FAIL):** every blocking popup (Quick View, Choose Pharmacy, Login, pickers, …) must be in `studioModalGuard` registry + `data-studio-modal`. `__studioRunMcpPageProbe` / `simulateDemoPointerClick` **must refuse** clicks to targets under the topmost overlay (or only click inside it). Felony: `check:felonies` fails npm test if guard missing or known overlays unregistered. Quinn proves: open Quick View → under-tile refuse PASS.  
-- **Version bump:** patch after user-visible bugfixes is correct ([VERSIONING.md](./VERSIONING.md) §6); skip bump only for docs/process-only.
+- **Version bump:** patch after user-visible bugfixes is correct ([VERSIONING.md](./VERSIONING.md) §6); skip bump only for docs/process-only.  
+- **Knowledge used mandatory** on team check for serious ships — see [§ Knowledge use](#knowledge-use-hard--read-before-work-prove-in-team-check). Arch rejects write-only LESSONS appends.
 
 ---
 
@@ -141,8 +158,11 @@ Serious work = this loop **with parallel sibling subagents** (§ Parallel dispat
 | Artifact | Path | Owner |
 |----------|------|-------|
 | Team OS (this file) | `docs/product/TEAM.md` | Arch |
+| **Team knowledge index** | `docs/product/TEAM_KNOWLEDGE.md` | Arch (all hats feed) |
+| Lessons (append-only) | `docs/product/LESSONS_LEARNED.md` | All (Arch curates) |
 | Feature brief template | `docs/product/FEATURE_BRIEF_TEMPLATE.md` | Bea |
 | Project feature briefs | `docs/projects/<id>/features/*.md` | Bea |
+| PLP Make parity register | `docs/projects/boots-pharmacy/features/PLP_MAKE_PARITY_REGISTER.md` | Bea |
 | Living board | `docs/product/NEXT_STEPS.md` | Arch |
 | Forecast | `docs/product/PRODUCT_FORECAST.md` | Arch |
 | FE audit | `docs/projects/<id>/audits/` | Uma |
@@ -178,7 +198,9 @@ Arch spawns siblings → Bea brief → Finn (+ Uma) build → Quinn prove + Uma 
 
 ## Related
 
+- [TEAM_KNOWLEDGE.md](./TEAM_KNOWLEDGE.md) — living index + Knowledge improved sitrep  
 - [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md)  
+- [LESSONS_LEARNED.md](./LESSONS_LEARNED.md)  
 - [FEATURE_BRIEF_TEMPLATE.md](./FEATURE_BRIEF_TEMPLATE.md)  
 - [VERSIONING.md](./VERSIONING.md)  
 - [FE_UI_UX_AUDIT.md](./FE_UI_UX_AUDIT.md)  

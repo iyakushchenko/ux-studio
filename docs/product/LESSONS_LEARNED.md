@@ -10,6 +10,22 @@ Agents **must read** this file before claiming a UI or Studio-chrome slice done.
 
 ## 2026-07-19
 
+### MCP page probe — scroll-into-view + overlay visible every probe (PO / Quinn)
+
+- **Symptom / class:** MCP / robo page probe interacted with off-screen or partially scrolled targets; or ran steps while the agent testing overlay was missing/hidden — prove looked “green” without visible PASS/FAIL chrome the PO can trust.
+- **Root cause:** Probe assumed targets were in viewport and that overlay start was optional/ambient; scroll + overlay visibility were not hard FAIL gates on every step.
+- **Gate (GLOBAL HARD FAIL — Quinn + Finn + Ben):**
+  1. Before every probe interact (hover/click/type): **`scrollIntoView`** (or equivalent) so the target is in the prototype viewport — note `scroll-into-view` in cursor/probe diagnostics when used.
+  2. **Agent testing overlay must be visible** for the **entire** probe run (start → each step PASS/FAIL → sitrep/stop). If overlay is absent/hidden at any probe step → that step and the probe **FAIL** (do not continue as PASS).
+  3. Prefer `__studioRunMcpPageProbe` so robo-cursor + overlay sitrep are mandatory; Quinn cites overlay-visible + scroll in the MCP evidence log.
+  4. Coordinate Quinn/Finn on implementation — do not clobber parallel overlay/scroll ships; lesson lands in docs first; code gate follows same ship when they land.
+- **Process:** Index in [TEAM_KNOWLEDGE.md](./TEAM_KNOWLEDGE.md); Quinn re-reads this before every MCP prove. Arch rejects PROVEN without overlay-visible evidence.
+
+### Team knowledge must be used, not only written (PO)
+
+- **Symptom:** LESSONS / notes grow but agents re-ship the same fail class — knowledge was append-only.
+- **Gate:** [TEAM_KNOWLEDGE.md](./TEAM_KNOWLEDGE.md) living index; before serious work re-read hat section + LESSONS; team check **`Knowledge used:`** one-liner per role; **Knowledge improved** sitrep after ships; Arch rejects write-only “done.”
+
 ### Typical DS checks mandatory before screen PROVEN (PO)
 
 - **Symptom / class:** Screens stamped **PROVEN** while UXDS controls (SearchField, Button, checkbox, link) were flat at rest — missing kit/Make **hover / focus / active / disabled**. Concrete miss: PLP filter SearchField had **focus-only** kit (no `:hover`); Make / Availability / Book Step 1 use inset navy ring on hover+focus.
