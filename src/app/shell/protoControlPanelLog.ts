@@ -16,6 +16,7 @@ export type ControlPanelAction =
   | "nav:next-screen"
   | "nav:reset-page"
   | "studio:journey-mode"
+  | "studio:playback-rec-mode"
   | "studio:project"
   | "studio:persona"
   | "studio:orchestra-mode"

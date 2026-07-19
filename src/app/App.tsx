@@ -8,7 +8,10 @@ import {
 } from "react";
 import ProtoNavPanel from "@/app/nav/ProtoNavPanel";
 import { ProtoNavScenarioControls } from "@/app/nav/ProtoNavScenarioControls";
-import { ProtoNavRecordingControls } from "@/app/nav/ProtoNavRecordingControls";
+import {
+  ProtoNavRecordingControls,
+  ProtoNavRecordingModeSlot,
+} from "@/app/nav/ProtoNavRecordingControls";
 import { ProtoNavJourneyMenu } from "@/app/nav/ProtoNavJourneyMenu";
 import { ProtoNavStudioSelect } from "@/app/nav/ProtoNavStudioSelect";
 import {
@@ -1608,7 +1611,7 @@ export default function App() {
           ) : (
             <div className="proto-nav-scenario">
               <div className="proto-nav-studio-menus">{projectStudioSelect}</div>
-              <ProtoNavRecordingControls
+              <ProtoNavRecordingModeSlot
                 getStartOptions={getRecordingStartOptions}
                 onReplay={(session) =>
                   replayRecordingSession(session, {

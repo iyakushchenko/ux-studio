@@ -51,7 +51,12 @@ compileRecordingToBeatTimeline    (future journeys.ts compiler input)
 
 ## Studio UI
 
-In the nav status bar (next to the cassette transport), use the **REC** deck:
+Use the **Playback | Rec** toggle in the cassette deck (same footprint as the CJM journey switch):
+
+- **Left (blue)** — playback mode: cassette transport only (STEPS / seek / play). Recording controls are unmounted.
+- **Right (red)** — rec mode: recording controls only, reusing the same `proto-nav-scenario__btn` transport chrome. Playback transport is unmounted.
+
+Leaving Rec while a capture is live **pauses** the session (does not stop/destroy it).
 
 | Control | Action |
 |---------|--------|

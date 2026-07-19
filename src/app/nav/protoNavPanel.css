@@ -413,6 +413,124 @@
   color: rgba(255, 220, 160, 0.72);
 }
 
+/* Playback | Rec mode toggle — same footprint as journey switch; blue left / red right */
+.proto-studio-playback-rec-switch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 22px;
+  height: 20px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: default;
+  border-radius: 2px;
+  outline: none;
+  box-shadow: none;
+}
+
+.proto-studio-playback-rec-switch:focus,
+.proto-studio-playback-rec-switch:focus-visible,
+.proto-studio-playback-rec-switch:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.proto-studio-playback-rec-switch:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.proto-studio-playback-rec-switch__track {
+  position: relative;
+  display: block;
+  width: 20px;
+  height: 10px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #0e2438 0%, #1a3a58 45%, #24507a 100%);
+  border: 1px solid rgba(120, 180, 230, 0.35);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.45),
+    0 0 5px rgba(80, 150, 220, 0.28);
+  transition:
+    border-color 0.12s ease,
+    box-shadow 0.12s ease,
+    background 0.12s ease;
+}
+
+.proto-studio-playback-rec-switch:not(.proto-studio-playback-rec-switch--on):hover:not(:disabled):not(.proto-studio-playback-rec-switch--tap) .proto-studio-playback-rec-switch__track {
+  border-color: rgba(150, 200, 245, 0.5);
+  background: linear-gradient(180deg, #14304a 0%, #224868 45%, #2c5f8c 100%);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.4),
+    0 0 7px rgba(100, 170, 240, 0.4);
+}
+
+.proto-studio-playback-rec-switch--tap:not(:disabled) .proto-studio-playback-rec-switch__track,
+.proto-studio-playback-rec-switch--tap:not(:disabled):hover .proto-studio-playback-rec-switch__track {
+  border-color: rgba(230, 120, 120, 0.55);
+  background: linear-gradient(180deg, #3d1414 0%, #5c2020 40%, #7a2a2a 100%);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.28),
+    0 0 7px rgba(220, 80, 80, 0.38);
+}
+
+.proto-studio-playback-rec-switch__thumb {
+  position: absolute;
+  top: 50%;
+  left: 1px;
+  width: 7px;
+  height: 7px;
+  border-radius: 1px;
+  transform: translateY(-50%);
+  background: linear-gradient(180deg, #b8d8f5 0%, #6aa8e0 35%, #3a7ab8 100%);
+  border: 1px solid rgba(200, 230, 255, 0.45);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 0 5px rgba(100, 170, 240, 0.55);
+  transition:
+    left 0.12s ease,
+    background 0.12s ease,
+    box-shadow 0.12s ease,
+    border-color 0.12s ease;
+}
+
+.proto-studio-playback-rec-switch--tap:not(:disabled) .proto-studio-playback-rec-switch__thumb,
+.proto-studio-playback-rec-switch--tap:not(:disabled):hover .proto-studio-playback-rec-switch__thumb {
+  background: linear-gradient(180deg, #ffd0d0 0%, #f08080 35%, #d04040 100%);
+  border-color: rgba(255, 180, 180, 0.45);
+}
+
+.proto-studio-playback-rec-switch--on .proto-studio-playback-rec-switch__track {
+  background: linear-gradient(180deg, #3d1414 0%, #5c2020 40%, #7a2a2a 100%);
+  border-color: rgba(230, 120, 120, 0.55);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.28),
+    0 0 7px rgba(220, 80, 80, 0.38);
+}
+
+.proto-studio-playback-rec-switch--on .proto-studio-playback-rec-switch__thumb {
+  left: 10px;
+  background: linear-gradient(180deg, #ffd0d0 0%, #f08080 35%, #d04040 100%);
+  border-color: rgba(255, 180, 180, 0.45);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 0 5px rgba(230, 90, 90, 0.65);
+}
+
+.proto-studio-playback-rec-switch--on:hover:not(:disabled) .proto-studio-playback-rec-switch__thumb {
+  background: linear-gradient(180deg, #fff0f0 0%, #ff9a9a 45%, #e85858 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    0 0 8px rgba(240, 100, 100, 0.85);
+}
+
+.proto-studio-playback-rec-switch:active:not(:disabled) .proto-studio-playback-rec-switch__thumb {
+  transform: translateY(-50%) scale(0.94);
+}
+
 .proto-nav-scenario__deck-led {
   display: inline-flex;
   align-items: center;
@@ -511,10 +629,10 @@
   color: #f0f4ff;
 }
 
-/* Recording deck — sibling cassette strip for record / export / replay */
+/* Recording panel — lives inside the shared cassette deck (display:contents keeps row layout) */
 
-.proto-nav-recording {
-  margin-left: 4px;
+.proto-nav-recording-panel {
+  display: contents;
 }
 
 .proto-nav-recording__label {
@@ -531,25 +649,13 @@
   color: rgba(255, 255, 255, 0.42);
 }
 
-.proto-nav-recording--live .proto-nav-recording__label {
+.proto-nav-recording-panel--live .proto-nav-recording__label {
   color: #ffb4b4;
   text-shadow: 0 0 6px rgba(255, 80, 80, 0.45);
 }
 
-.proto-nav-recording--paused .proto-nav-recording__label {
+.proto-nav-recording-panel--paused .proto-nav-recording__label {
   color: #ead9ad;
-}
-
-.proto-nav-recording__btn--rec:not(:disabled) {
-  color: #ffb4b4;
-}
-
-.proto-nav-recording--live .proto-nav-recording__btn--rec:not(:disabled) {
-  color: #fff0f0;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
-    0 0 8px rgba(220, 70, 70, 0.35);
 }
 
 .proto-nav-recording__file {

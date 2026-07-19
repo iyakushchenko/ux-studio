@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { flashControlRoomButton } from "@/app/nav/protoControlRoomTap";
+import { ProtoStudioPlaybackRecSwitch } from "@/app/nav/ProtoStudioPlaybackRecSwitch";
 import {
   getActiveRecordingSession,
   getLastRecordingSession,
@@ -156,7 +157,48 @@ function downloadRecordingJson(session: ProtoRecordingSession): void {
   URL.revokeObjectURL(url);
 }
 
-/** Compact recording deck — same session APIs as MCP helpers. */
+/**
+ * Standalone deck when orchestra scenario controls are absent.
+ * Same exclusive Playback|Rec gate: left = empty playback slot, right = REC only.
+ */
+export function ProtoNavRecordingModeSlot({
+  getStartOptions,
+  onReplay,
+}: ProtoNavRecordingControlsProps) {
+  const [recMode, setRecMode] = useState(false);
+
+  return (
+    <div className="proto-nav-scenario__deck">
+      <ProtoStudioPlaybackRecSwitch
+        checked={recMode}
+        onChange={(enabled) => {
+          logControlPanel("studio:playback-rec-mode", {
+            enabled,
+            previous: recMode,
+            source: "standalone-slot",
+          });
+          // Leaving Rec → Playback: pause a live capture; do not stop/destroy the session.
+          if (!enabled && isRecordingActive()) {
+            pauseRecording();
+          }
+          setRecMode(enabled);
+        }}
+      />
+      {recMode ? (
+        <ProtoNavRecordingControls
+          getStartOptions={getStartOptions}
+          onReplay={onReplay}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+/**
+ * Recording transport buttons for the shared cassette deck slot.
+ * Parent (ProtoNavScenarioControls) mounts this XOR the playback transport.
+ * Uses the same `proto-nav-scenario__btn` chrome as cassette controls.
+ */
 export function ProtoNavRecordingControls({
   getStartOptions,
   onReplay,
@@ -266,15 +308,16 @@ export function ProtoNavRecordingControls({
     }
   };
 
-  const deckClass = [
-    "proto-nav-scenario__deck",
-    "proto-nav-recording",
-    ui.isRecording ? " proto-nav-recording--live" : "",
-    ui.isPaused ? " proto-nav-recording--paused" : "",
-  ].join("");
+  const panelClass = [
+    "proto-nav-recording-panel",
+    ui.isRecording ? "proto-nav-recording-panel--live" : "",
+    ui.isPaused ? "proto-nav-recording-panel--paused" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
-    <div className={deckClass} role="group" aria-label="Journey recording">
+    <span className={panelClass} role="group" aria-label="Journey recording">
       <span
         className="proto-nav-recording__label"
         aria-live="polite"
@@ -299,7 +342,7 @@ export function ProtoNavRecordingControls({
       </span>
       <button
         type="button"
-        className="proto-nav-step-btn proto-nav-scenario__btn proto-nav-recording__btn--rec"
+        className="proto-nav-step-btn proto-nav-scenario__btn"
         aria-label="Start recording"
         title="Start recording"
         disabled={ui.hasLive || replaying}
@@ -364,6 +407,6 @@ export function ProtoNavRecordingControls({
         className="proto-nav-recording__file"
         onChange={handleImportFile}
       />
-    </div>
+    </span>
   );
 }
