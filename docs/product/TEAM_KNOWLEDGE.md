@@ -26,6 +26,7 @@
 | **PLP team retro** | [TEAM_RETRO_2026-07-19_PLP.md](./TEAM_RETRO_2026-07-19_PLP.md) | Pain / Worked / Keep — apply on PDP+ |
 | Studio URL (modal ids) | [../shell/URL.md](../shell/URL.md) | **Modal URL registry** before any dialog ship |
 | Doctrine | [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) | Locked tech + process |
+| **Motion standard** | [MOTION.md](./MOTION.md) | `framer-motion` via `@/uxds/motion`; CSS for trivial + Accordion |
 | Director rule | [../../.cursor/rules/ux-studio-director.mdc](../../.cursor/rules/ux-studio-director.mdc) | Always-on hard checklist |
 
 ---
@@ -62,7 +63,7 @@
 
 | Must re-read | Focus |
 |--------------|--------|
-| [PAGE_BUILD_CONTRACT.md](./PAGE_BUILD_CONTRACT.md) · [FE_STANDARDS.md](./FE_STANDARDS.md) | React + UXDS, column, nowrap |
+| [PAGE_BUILD_CONTRACT.md](./PAGE_BUILD_CONTRACT.md) · [FE_STANDARDS.md](./FE_STANDARDS.md) · [MOTION.md](./MOTION.md) | React + UXDS, column, nowrap; Motion via `@/uxds/motion` |
 | [DS_STRICTNESS.md](./DS_STRICTNESS.md) · [CSS_BASE_THEME.md](./CSS_BASE_THEME.md) | No near-dups; BASE→THEME→PANEL→LEGACY |
 | [NAMING.md](./NAMING.md) · [ARCHITECTURE.md](./ARCHITECTURE.md) | `data-studio-*`, domain folders |
 | [PAGE_FINAL_PASS.md](./PAGE_FINAL_PASS.md) | Co-own checklist + `check:page-final-pass` with Uma; no next mount until previous hard-green |
@@ -147,7 +148,8 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 
 | Delta | Hats | LESSONS / artifact |
 |-------|------|--------------------|
-| **PDP FAQ 6/6 + Accordion motion + TertiaryCta soft** — Uma §0a PROVEN @ `76e2433` / v0.0.30; Arch Final Pass waits Quinn MCP | Uma, Quinn, Arch, Finn | UMA_FIDELITY_PDP · PAGE_FINAL_PASS NEEDS-REPROVE · DEV-20260719-tertiary-soft |
+| **Platform Motion standard** — `framer-motion` via `@/uxds/motion`; remove unused `motion` twin; Accordion stays CSS `0fr/1fr`; shell pilots: diagnostic overlay + studio select; PDP Final Pass not demoted (shell-only) | Arch, Finn, Uma, Ben, Pax | [MOTION.md](./MOTION.md) · `src/uxds/motion/` |
+| **PDP FAQ 6/6 + Accordion motion + TertiaryCta soft** — Uma §0a PROVEN + Quinn MCP **PASS** 23/23 @ `76e2433` / v0.0.30; Arch HARD-GREEN pending | Uma, Quinn, Arch, Finn | UMA_FIDELITY_PDP · FE_AUDIT_PDP_MCP · PAGE_FINAL_PASS mcpFinalPass PASS · DEV-20260719-tertiary-soft |
 | **PDP FAQ/CTA/focus polish (PO)** — Make-sourced FAQ bodies 3/6; download tertiary unify (no leaflet stub); accordion focus-none; v0.0.28 | Bea, Uma, Finn, Quinn, Arch | PDP_MAKE_PARITY_REGISTER · UMA_FIDELITY_PDP · PAGE_FINAL_PASS.json |
 | **PDP PAGE FINAL PASS** — **HARD-GREEN** @ `c6e8931` (Quinn 23/23 @ `bf59041` · Uma §0a @ `8d80d5f`; prior `828ab2b` demoted then re-proved) | Arch, Finn, Uma, Quinn, Ben, Pax | PAGE_FINAL_PASS.json · FE_AUDIT_PDP_MCP · FE_AUDIT_PDP_PAGE_FINAL_PASS · check:page-final-pass |
 | **PDP RTB vertical rhythm** — LEGACY Make `module.pdp.rtb > div > div` stole React column gap (48≠32) + forced title-block 1:1; Uma must MCP-measure section gaps before fidelity IN PROGRESS; Quinn PASS ≠ rhythm done | Uma, Finn, Arch | UMA_FIDELITY_NOTES §0b · UMA_FIDELITY_PDP · globals-screens `:not(.pdp__rtb-card)` |
@@ -165,10 +167,22 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 | Team knowledge database + mandatory use | Arch, all | This file · TEAM.md § Knowledge use |
 | Page final-pass gate before NEXT screen; landmarks + BEM stamp | Finn, Uma, Ben, Arch | PAGE_FINAL_PASS.md · check:page-final-pass |
 
+**Knowledge improved** (2026-07-19 · stream: PDP v0.0.30 Quinn MCP re-prove · tip 76e2433):
+- Quinn (QA): full `__studioRunMcpPageProbe` 23/23 PASS + Accordion 0fr↔1fr / muted chevron token spot + robo R10 avail-close PASS — applied: FE_AUDIT_PDP_MCP + PAGE_FINAL_PASS mcpFinalPass PASS; Arch unblocked for HARD-GREEN
+- Uma (UI/UX): §0a already PROVEN on same tip — applied: no re-open
+- Arch (Director): restore HARD-GREEN only after this Quinn PASS — applied: hardGreen false until Arch stamp
+
 **Knowledge improved** (2026-07-19 · stream: PDP v0.0.30 Uma §0a re-prove · tip 76e2433):
 - Uma (UI/UX): §0a PROVEN — FAQ 6/6 bodies, Accordion CSS grid-template-rows motion, muted closed chevrons, Find out more = TertiaryCta soft (no `.pdp__pill--mint`) — applied: UMA_FIDELITY_PDP + PARITY_PROVEN note
-- Arch (Director): Final Pass only after Quinn MCP PASS on polish tip — applied: PAGE_FINAL_PASS stays NEEDS-REPROVE; no false HARD-GREEN
-- Quinn (QA): must re-run `__studioRunMcpPageProbe({ screenId:"pdp" })` on `76e2433` before Arch stamp — applied: NEXT_STEPS 3e
+- Arch (Director): Final Pass only after Quinn MCP PASS on polish tip — applied: PAGE_FINAL_PASS was NEEDS-REPROVE until Quinn
+- Quinn (QA): must re-run `__studioRunMcpPageProbe({ screenId:"pdp" })` on `76e2433` before Arch stamp — applied: done (PASS)
+
+**Knowledge improved** (2026-07-19 · stream: platform Motion standard · `@/uxds/motion`):
+- Arch (Director): locked Motion (`framer-motion`) over React Spring; Accordion CSS policy; shell pilots only — applied: MOTION.md + COMMAND_DOCTRINE §4 + no Final Pass demote
+- Finn (FE): UXDS motion entry + presets; diagnostic overlay + studio select presence; nav imports via `@/uxds/motion` — applied: `src/uxds/motion/` + shell pilots
+- Uma (UI/UX): Accordion stays `0fr/1fr` (stutter class); Motion for overlay/menu presence — applied: MOTION.md §3 + Accordion comment
+- Ben (BE): remove unused `motion` twin; single `framer-motion` dep — applied: package.json + lockfile
+- Pax (PO sim): user-visible shell motion → patch bump + push — applied: release when ship
 
 **Knowledge improved** (2026-07-19 · stream: robo-cursor native feedback · Auto-Rule R10):
 - Finn (FE): global agent/robo click path — full pointer enter/move/down/up + CSS `:hover`/`:active` bridge; settle clears hand → default; mild travel overshoot — applied: `demoCursor` + `demoCursorPseudoBridge` + popup-close pressed wash

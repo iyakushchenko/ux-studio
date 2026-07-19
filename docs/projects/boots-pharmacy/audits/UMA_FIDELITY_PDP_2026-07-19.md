@@ -25,9 +25,9 @@
 | **§0a Find out more (GP promo)** | **PASS** — `TertiaryCta` `soft` → `.studio-tertiary-cta--soft`; **no** `.pdp__pill--mint` (CSSOM + DOM) |
 | **§0b RTB vertical rhythm** | **PASS** — carried from v0.0.24 measure (`32px` stack; title-block `72px`) |
 | **P2 share glyph Make flip** | **PASS** — carried from v0.0.24 MCP matrix |
-| **PO green-light allowed?** | **No** — wait Quinn MCP re-prove + Arch Final Pass; then PO `+` before Home |
-| **PAGE FINAL PASS** | **NEEDS-REPROVE** — Arch stamps only after Quinn PASS on tip `76e2433` |
-| **Arch Final Pass after Quinn?** | **Blocked** — Uma §0a PROVEN; Quinn MCP matrix not yet re-run on v0.0.30 |
+| **PO green-light allowed?** | **No** — wait Arch Final Pass HARD-GREEN; then PO `+` before Home |
+| **PAGE FINAL PASS** | Quinn `mcpFinalPass: PASS` — Arch HARD-GREEN pending |
+| **Arch Final Pass after Quinn?** | **Unblocked** — Uma §0a PROVEN + Quinn 23/23 PASS @ `76e2433` |
 
 **Honest residuals:**  
 1. **Download URLs** — Guide / Leaflet are `<button>` with no `href` / download asset (Make parity).  
@@ -178,7 +178,7 @@
 | Residual | Severity | Owner |
 |----------|----------|-------|
 | Download CTAs have no file URLs | **Accepted Make parity** — buttons only until assets exist | PO / Pax |
-| PAGE FINAL PASS / `mcpFinalPass` | **NEEDS-REPROVE** — Quinn MCP on `76e2433` then Arch | Quinn → Arch |
+| PAGE FINAL PASS / `mcpFinalPass` | Quinn **PASS** — Arch HARD-GREEN pending | Arch |
 | FAQ Bea-sourced bodies (3 panels) | **Accepted** — PO ask; register documents Make header-only gap | Bea / PO |
 
 ---
@@ -223,7 +223,7 @@ Uma (UI/UX): FAQ Accordion UXDS — PASS (6/6 bodies; grid-template-rows motion 
 Uma (UI/UX): Find out more — PASS (TertiaryCta soft; no .pdp__pill--mint; DEV-20260719-tertiary-soft)
 Uma (UI/UX): download CTA tertiary unify — PASS (carried v0.0.28)
 Uma (UI/UX): share glyph Make flip — PASS (carried v0.0.24)
-Uma (UI/UX): Arch Final Pass — BLOCKED until Quinn MCP PASS on 76e2433 (PAGE FINAL PASS NEEDS-REPROVE)
+Uma (UI/UX): Arch Final Pass — unblocked (Quinn MCP PASS on 76e2433); HARD-GREEN pending Arch
 ```
 
 **Knowledge used:** UMA_FIDELITY_NOTES §0/§0a/**§0b** · VISUAL_FIDELITY · DS_STRICTNESS · PDP_MAKE_PARITY_REGISTER L18–L20 · UXDS Accordion kit (`accordion.css` grid rows) · `TertiaryCta soft` · DEVIATIONS `DEV-20260719-tertiary-soft` · PAGE_FINAL_PASS.md (Arch after Quinn).

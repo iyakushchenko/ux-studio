@@ -3,12 +3,12 @@
 **Surface:** PDP Vaccine Details (`screenId: pdp`)  
 **Date:** 2026-07-19  
 **Auditor:** Quinn (QA) — Chrome DevTools MCP localhost  
-**Ship tip (latest prove):** `bf59041` · **v0.0.28** — FAQ Make bodies + download CTA unify + accordion focus-none  
-**Probe tip (CTA assert fix):** this stamp commit — ignore `proto-chat-cta--hover` on download class compare  
-**Uma §0a:** **PROVEN** @ `8d80d5f` (code tip `bf59041`)  
-**Prior prove (superseded):** `d6e4951` · **v0.0.27**  
+**Ship tip (latest prove):** `76e2433` · **v0.0.30** — FAQ 6/6 + Accordion CSS 0fr↔1fr + TertiaryCta soft + muted closed chevrons (+ tip includes robo R10 from `85d7c81`)  
+**Probe stamp:** this commit (`PENDING_COMMIT`) — Full Pass re-prove after Final Pass **NEEDS-REPROVE**  
+**Uma §0a:** **PROVEN** @ tip `76e2433` / v0.0.30 (docs tip `331998b`)  
+**Prior prove (superseded):** `bf59041` · **v0.0.28** (prove `67a5b7c`)  
 **Policy:** [QUINN_PDP_PROBE_CRITERIA_2026-07-19.md](./QUINN_PDP_PROBE_CRITERIA_2026-07-19.md) · [RECORDING.md](../../../shell/RECORDING.md) · recipe `studioMcpPageProbe.ts`  
-**Final Pass audit:** [FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md](./FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md) — **HARD-GREEN** @ `c6e8931`
+**Final Pass audit:** [FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md](./FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md) — Quinn MCP **PASS**; Arch HARD-GREEN still pending
 
 ---
 
@@ -17,25 +17,27 @@
 | Field | Value |
 |-------|-------|
 | **Quinn MCP matrix** | **PASS** — **23/23** |
-| **v0.0.28 steps** | `pdp-faq-help-body` + download CTA tertiary unify / no `--bordered` + accordion focus-none CSS |
-| **Uma fidelity §0a** | **PROVEN** — [UMA_FIDELITY_PDP_2026-07-19.md](./UMA_FIDELITY_PDP_2026-07-19.md) @ `8d80d5f` |
-| **PAGE FINAL PASS HARD-GREEN?** | **YES** (`hardGreen: true` @ tip `c6e8931`) |
-| **PO green-light / Home?** | **Blocked** — wait PO `+` (sequencing unblocked) |
+| **v0.0.30 steps** | FAQ 6/6 (0 residual) + Accordion grid motion CSS + TertiaryCta soft Find out more + muted closed chevron tokens |
+| **Spot: accordion / chevron** | **PASS** — `.uxds-accordion-content` `grid-template-rows: 0fr` ↔ `1fr` + `__clip` span; soft/strong icon tokens differ (`rgb(175,204,202)` vs `rgb(70,118,114)`) |
+| **Spot: robo cursor R10** | **PASS** — `__studioProveRoboCursorFeedback(".proto-avail-header .proto-popup-close")` |
+| **Uma fidelity §0a** | **PROVEN** — [UMA_FIDELITY_PDP_2026-07-19.md](./UMA_FIDELITY_PDP_2026-07-19.md) @ `76e2433` |
+| **PAGE FINAL PASS HARD-GREEN?** | **No yet** — `mcpFinalPass: PASS`; `hardGreen: false` until Arch restore |
+| **PO green-light / Home?** | **Blocked** — wait Arch HARD-GREEN then PO `+` |
 
-**Team check line:** `Quinn MCP — pdp — PASS` · `PAGE FINAL PASS — pdp — HARD-GREEN`
+**Team check line:** `Quinn MCP — pdp — PASS` · `PAGE FINAL PASS — pdp — NOT-GREEN` (Arch stamp pending)
 
-**Knowledge used:** QUINN_PDP_PROBE_CRITERIA · RECORDING.md (overlay + scroll-into-view + overlay-eyes + teardown) · PAGE_FINAL_PASS.md (Quinn matrix PASS; Arch HARD-GREEN) · TEAM_KNOWLEDGE Quinn § · demo-cursor `proto-chat-cta--hover` false-fail lesson
+**Knowledge used:** QUINN_PDP_PROBE_CRITERIA · RECORDING.md (overlay + scroll-into-view + overlay-eyes + teardown) · PAGE_FINAL_PASS.md · TEAM_KNOWLEDGE Quinn § · STUDIO_AUTO_RULES R10 robo-cursor · Uma §0a PROVEN @ 76e2433
 
 ---
 
-## MCP evidence (v0.0.28 re-prove · `bf59041` + probe CTA fix)
+## MCP evidence (v0.0.30 re-prove · `76e2433`)
 
 **Session:** Chrome DevTools MCP · `http://127.0.0.1:5188/?project=boots-pharmacy&screen=pdp`  
-**Version chip:** `v0.0.28`  
+**Version chip:** `v0.0.30` (UI `v0.0.30alpha`)  
 **Helper:** `await window.__studioRunMcpPageProbe({ screenId: "pdp", reload: false })`  
 **Result:** `{ pass: true, screenId: "pdp" }` · `failed: []` · **23/23** checks  
 **Overlay:** AGENT TESTING armed (`overlay-arm`) and visible through matrix including below-fold reveal  
-**Prep (mandatory for honest logged-out / empty-heart):** `__studioSetLoggedIn(false)`; wishlist `["probe-dummy"]` so chickenpox empty; Book now **£150** (booster default on) before probe  
+**Prep:** `__studioSetLoggedIn(false)`; chickenpox heart empty (`Add to wishlist`); Book now **£150** (booster default on) before probe  
 **Teardown:** login + choose-pharmacy closes clear `modal`; end `screen=pdp`
 
 ### Landmarks / host (spot-check)
@@ -44,9 +46,13 @@
 |-------|--------|
 | `.pdp[data-studio-react-screen=pdp]` + `header`/`main` | **PASS** |
 | `data-studio-make-retired=pdp` | **PASS** |
-| FAQ “Who is at risk?” Accordion | **PASS** (toggle/reopen + Make body) |
+| FAQ Accordion 6/6 (0 residual) | **PASS** (toggle/reopen + NHS expandable) |
 | FAQ “How can Boots help?” body | **PASS** (Make RTB blurb + focus-none CSS) |
-| Download CTAs both `.pdp__pill` (no `--bordered`) | **PASS** |
+| Find out more `TertiaryCta soft` | **PASS** — `.studio-tertiary-cta--soft`; no `.pdp__pill--mint` |
+| Accordion CSS 0fr↔1fr + clip | **PASS** — kit CSSOM + `.uxds-accordion-content__clip` |
+| Muted closed chevrons | **PASS** — closed `--uxds-icon-icon-accent-soft` ≠ open `--uxds-icon-icon-accent-strong` |
+| Download CTAs both `.pdp__pill` | **PASS** |
+| Robo cursor R10 (avail close) | **PASS** |
 
 ### Full matrix
 
@@ -70,10 +76,10 @@
 | pdp-crumb-plp | **PASS** | Vaccination → `screen=plp` |
 | plp-to-pdp | **PASS** | PLP Book now → React PDP |
 | pdp-below-fold-scroll | **PASS** | already in view + overlay visible |
-| pdp-faq-accordion-toggle | **PASS** | Who is at risk? → `aria-expanded=false`; body unmounted |
-| pdp-faq-accordion-reopen | **PASS** | click again → `aria-expanded=true` + Make body copy |
+| pdp-faq-accordion-toggle | **PASS** | Who is at risk? → `aria-expanded=false`; content `data-state=closed` |
+| pdp-faq-accordion-reopen | **PASS** | reopen + Make body; **0** residual; NHS trigger present |
 | pdp-faq-help-body | **PASS** | How can Boots help? Make RTB blurb + accordion focus-none CSS |
-| pdp-download-cta-hover | **PASS** | both tertiary `.pdp__pill`; no `--bordered` stub/CSS; hover rules present |
+| pdp-download-cta-hover | **PASS** | both tertiary `.pdp__pill`; no `--bordered` / mint |
 | url-screen | **PASS** | ends `screen=pdp` |
 
 ---
@@ -82,10 +88,9 @@
 
 | Tip | Version | Matrix | Note |
 |-----|---------|--------|------|
+| `bf59041` | v0.0.28 | **PASS** 23/23 | superseded by v0.0.30 FAQ 6/6 + Accordion motion |
 | `d6e4951` | v0.0.27 | **PASS** 22/22 | stale after v0.0.28 polish |
 | `d7ce01c` | v0.0.24 | **PASS** | Final Pass then demoted — **superseded** |
-| `cbbd97d` / `87c0fc8` | v0.0.24 | **PASS** | RTB rhythm — superseded |
-| `eaf9aa3` / `03687d3` | v0.0.22 | **PASS** | compact below-fold stamp |
 
 ---
 
@@ -93,10 +98,10 @@
 
 | Gate | Status |
 |------|--------|
-| Quinn MCP interaction matrix | **PASS** (this re-prove · 23/23 · `bf59041` / v0.0.28) |
-| Uma §0a (FAQ/CTA/focus) | **PROVEN** (`8d80d5f`) |
-| `PAGE_FINAL_PASS.json` `mcpFinalPass` HARD-GREEN | **HARD-GREEN** @ `c6e8931` |
-| `hardGreen` | **true** |
+| Quinn MCP interaction matrix | **PASS** (this re-prove · 23/23 · `76e2433` / v0.0.30) |
+| Uma §0a (FAQ 6/6 + Accordion motion + TertiaryCta soft) | **PROVEN** (`76e2433` / docs `331998b`) |
+| `PAGE_FINAL_PASS.json` `mcpFinalPass` | **PASS** (this stamp) |
+| `hardGreen` | **false** — Arch restore next |
 
 ---
 
@@ -107,4 +112,5 @@
 3. Confirm booster default checked + £150 **before** `__studioRunMcpPageProbe`.  
 4. Re-prove after any tip that lands after the last MCP stamp.  
 5. Download CTA assert compares **product** `pdp__*` classes only (demo hover adds `proto-chat-cta--hover`).  
-6. Do not stamp `hardGreen: true` from Quinn — Arch stamps after PASS + Uma §0a (done @ `c6e8931`).
+6. Do not stamp `hardGreen: true` from Quinn — Arch stamps after PASS + Uma §0a.  
+7. Robo R10: prefer `__studioProveRoboCursorFeedback(".proto-avail-header .proto-popup-close")` (soft TertiaryCta may not change bg/color).

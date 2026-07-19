@@ -1,8 +1,8 @@
 # Quinn (QA) — PDP MCP prove criteria
 
-**Status:** MCP matrix **PASS** @ tip `bf59041` / v0.0.28 — evidence [FE_AUDIT_PDP_MCP_2026-07-19.md](./FE_AUDIT_PDP_MCP_2026-07-19.md).  
-**PAGE FINAL PASS:** **HARD-GREEN** (`hardGreen: true` @ tip `c6e8931`) — Uma §0a PROVEN @ `8d80d5f`; Quinn 23/23 PASS @ `bf59041` / prove `67a5b7c`.  
-**Updated:** 2026-07-19 (FAQ Make bodies + download tertiary unify + accordion focus-none)  
+**Status:** MCP matrix **PASS** @ tip `76e2433` / v0.0.30 — evidence [FE_AUDIT_PDP_MCP_2026-07-19.md](./FE_AUDIT_PDP_MCP_2026-07-19.md).  
+**PAGE FINAL PASS:** Quinn `mcpFinalPass: PASS` — Arch HARD-GREEN pending (`hardGreen: false`). Uma §0a PROVEN @ `76e2433`.  
+**Updated:** 2026-07-19 (FAQ 6/6 + Accordion grid motion + TertiaryCta soft + muted chevrons)  
 **Screen:** `pdp` (Frame child 8)  
 **Register:** [../features/PDP_MAKE_PARITY_REGISTER.md](../features/PDP_MAKE_PARITY_REGISTER.md)  
 **Refs:** [RECORDING.md](../../../shell/RECORDING.md) · LESSONS overlay/scroll · PLP probe pattern in `studioMcpPageProbe.ts`
@@ -57,22 +57,24 @@ await window.__studioRunMcpPageProbe?.({ screenId: "pdp", reload: false })
 | 13 | `pdp-crumb-plp` | click Vaccination crumb | `screen=plp` (React PLP) | |
 | 14 | `plp-to-pdp` | Book now from PLP | returns `screen=pdp` React host | |
 | 15 | `pdp-below-fold-scroll` | `reveal` | Scroll-into-view + overlay visible | **HARD** — compact below-fold stamp required |
-| 16 | `pdp-faq-accordion-toggle` | click Who is at risk? | `aria-expanded=false`; body unmounted | UXDS Accordion |
-| 17 | `pdp-faq-accordion-reopen` | click again | `aria-expanded=true` + Make body; 3 residual headers | |
+| 16 | `pdp-faq-accordion-toggle` | click Who is at risk? | `aria-expanded=false`; body unmounted / content closed | UXDS Accordion |
+| 17 | `pdp-faq-accordion-reopen` | click again | `aria-expanded=true` + Make body; **0** residual headers (FAQ 6/6) | |
 | 18 | `pdp-faq-help-body` | click How can Boots help? | Make RTB service blurb body; focus-none CSS | |
 | 19 | `pdp-download-cta-hover` | hover Chickenpox Guide | both CTAs same product `.pdp__pill` classes; no `--bordered` / mint; ignore demo `proto-chat-cta--hover` | |
 | — | `url-screen` | assert | ends on `screen=pdp` | auto after recipe |
 
 Logged-in Book now → `screen=book-step-1` — prove in a second session or after login helper (document in evidence log).
 
+**Optional spot (v0.0.30):** Accordion CSSOM `0fr`↔`1fr` + `__clip`; Find out more `.studio-tertiary-cta--soft`; `__studioProveRoboCursorFeedback(".proto-avail-header .proto-popup-close")` for R10.
+
 ---
 
 ## Evidence required for PROVEN / Final Pass later
 
-1. Localhost tip SHA + version chip match `package.json`. ✅ `bf59041` / v0.0.28  
+1. Localhost tip SHA + version chip match `package.json`. ✅ `76e2433` / v0.0.30  
 2. MCP panel step log (PASS/FAIL) or probe JSON with overlay-arm + overlay-eyes — **done:** [FE_AUDIT_PDP_MCP_2026-07-19.md](./FE_AUDIT_PDP_MCP_2026-07-19.md) (**23/23**).  
 3. Register scaffold P0 rows marked Fixed/Present.  
-4. Uma fidelity §0a DS matrix **PASS** for FAQ Accordion + download CTA hover — **done** @ `8d80d5f`.  
-5. Arch team check with **Knowledge used** per role + PAGE FINAL PASS HARD-GREEN stamp — **done** @ `c6e8931`.
+4. Uma fidelity §0a DS matrix **PASS** for FAQ Accordion + download CTA hover — **done** @ `76e2433`.  
+5. Arch team check with **Knowledge used** per role + PAGE FINAL PASS HARD-GREEN stamp — **pending** (Quinn PASS unblocks Arch).
 
-**Final Pass:** `PAGE FINAL PASS — pdp — HARD-GREEN` (Home still waits PO `+`).
+**Final Pass:** Arch stamps `PAGE FINAL PASS — pdp — HARD-GREEN` (Home still waits PO `+`).

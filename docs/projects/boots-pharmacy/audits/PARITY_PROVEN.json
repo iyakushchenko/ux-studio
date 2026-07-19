@@ -57,9 +57,9 @@
       "status": "proven",
       "auditPath": "docs/projects/boots-pharmacy/audits/UMA_FIDELITY_PDP_2026-07-19.md",
       "mcpMatrixAt": {
-        "sha": "76e2433",
+        "sha": "PENDING_COMMIT",
         "date": "2026-07-19",
-        "note": "Uma §0a PROVEN @ 76e2433 / v0.0.30 (FAQ 6/6 + Accordion grid motion + muted closed chevrons + TertiaryCta soft Find out more). Quinn MCP full matrix + Arch Final Pass still NEEDS-REPROVE after PO polish."
+        "note": "Quinn MCP 23/23 PASS @ tip 76e2433 / v0.0.30 (prove PENDING_COMMIT); Uma §0a PROVEN same tip (docs 331998b). Arch Final Pass HARD-GREEN still pending."
       },
       "requireMcp": true
     }

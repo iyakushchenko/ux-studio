@@ -125,17 +125,17 @@
       "stampedAt": {
         "sha": "c6e8931",
         "date": "2026-07-19",
-        "note": "Structure stamp retained. PO polish after HARD-GREEN — full FAQ bodies + TertiaryCta soft Find out more + Accordion kit motion/muted chevrons. Quinn must re-prove MCP + Uma §0a before hardGreen again."
+        "note": "Structure stamp retained. Quinn MCP PASS @ 76e2433 / v0.0.30 (Uma §0a PROVEN @ 331998b). hardGreen false until Arch restore."
       },
       "mcpFinalPass": {
-        "status": "NEEDS-REPROVE",
-        "pass": false,
+        "status": "PASS",
+        "pass": true,
         "stampedAt": {
-          "sha": "c6e8931",
+          "sha": "PENDING_COMMIT",
           "date": "2026-07-19",
-          "version": "0.0.28",
-          "auditor": "Arch (Director) — demote after PO FAQ/CTA/Accordion polish",
-          "note": "Prior HARD-GREEN @ c6e8931 invalidated by full FAQ bodies (incl. Bea NHS/already-have/personal-data), TertiaryCta soft Find out more (strip .pdp__pill--mint), UXDS Accordion CSS grid-template-rows motion (no height:auto stutter) + muted closed chevrons. Do not false-PROVEN — re-run __studioRunMcpPageProbe({ screenId:\"pdp\", reload:false })."
+          "version": "0.0.30",
+          "auditor": "Quinn (QA)",
+          "note": "MCP __studioRunMcpPageProbe({ screenId:\"pdp\", reload:false }) 23/23 PASS @ code tip 76e2433 / v0.0.30; FAQ 6/6 + Accordion 0fr↔1fr CSS + TertiaryCta soft + muted chevron tokens; robo R10 avail-close PASS. Uma §0a PROVEN @ 76e2433. hardGreen false until Arch restore. Audit: FE_AUDIT_PDP_MCP_2026-07-19.md"
         },
         "url": "http://127.0.0.1:5188/?project=boots-pharmacy&screen=pdp",
         "auditPath": "docs/projects/boots-pharmacy/audits/FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md",

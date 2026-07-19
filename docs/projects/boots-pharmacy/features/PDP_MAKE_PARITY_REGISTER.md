@@ -2,7 +2,7 @@
 
 **Project:** `boots-pharmacy`  
 **Callsigns:** Bea (BA) owns register truth · Quinn (QA) owns prove · Finn/Uma restore gaps  
-**Updated:** 2026-07-19 (PO polish: full FAQ bodies + TertiaryCta soft Find out more + Accordion kit motion/muted chevrons; Final Pass **NEEDS-REPROVE**)  
+**Updated:** 2026-07-19 (PO polish: full FAQ bodies + TertiaryCta soft Find out more + Accordion kit motion/muted chevrons; Quinn MCP **PASS** @ `76e2433` / v0.0.30; Arch HARD-GREEN pending)  
 **Make source:** Frame child **8** (`PDP. Vaccine Details Page` / `BTS-PHRM.Product - Deal Details Page`, `screenId: "pdp"`) + `globals-screens` child-8 rules + `BootsPharmacyProjectView` wire + `frame/index.tsx`  
 **React target:** `src/projects/boots-pharmacy/screens/pdp/*`  
 **Refs:** [PDP_REACT.md](./PDP_REACT.md) · [PLP_MAKE_PARITY_REGISTER.md](./PLP_MAKE_PARITY_REGISTER.md) (format) · [URL.md](../../../shell/URL.md) (modal ids)  
@@ -11,7 +11,7 @@
 **Status legend:** Present · Partial · Missing · Fixed · N/A
 
 **Make column:** inventory truth from Frame + wire + LEGACY CSS (2026-07-19).  
-**React column:** L1–L20 mounted; FAQ = UXDS Accordion **6/6 bodies** (Make + Bea-sourced); GP CTA = `TertiaryCta soft` (no `.pdp__pill--mint`); Accordion kit owns expand/collapse motion + muted closed chevrons. Final Pass **NEEDS-REPROVE** after this polish.
+**React column:** L1–L20 mounted; FAQ = UXDS Accordion **6/6 bodies** (Make + Bea-sourced); GP CTA = `TertiaryCta soft` (no `.pdp__pill--mint`); Accordion kit owns expand/collapse motion + muted closed chevrons. Quinn MCP **PASS**; Arch Final Pass HARD-GREEN pending.
 
 **Bea rule:** Every band before Finn codes — including loading/empty/updating as **P0** when Make has them. No invented bands.
 
