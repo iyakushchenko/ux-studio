@@ -4,7 +4,12 @@ import { AGENTIC_HOME_DEMO_QUERY } from "@/projects/boots-pharmacy/playback/site
 
 export const HOME_CHILD_INDEX = 11;
 
-export const HOME_REACT_SCREEN_ID = "home";
+/**
+ * Public URL / registry screen id — Make “Agentic. Site Pilot. Home”.
+ * `home` is reserved for a future real Home page; do not reuse here.
+ * Package folder may remain `screens/home/` until a cheap rename.
+ */
+export const HOME_REACT_SCREEN_ID = "site-pilot";
 
 export const HOME_SCREEN_SELECTOR = `.studio-viewport > div > div:nth-child(${HOME_CHILD_INDEX})`;
 

@@ -24,7 +24,7 @@ describe("homeContract", () => {
     expect(screen?.childIndex).toBe(HOME_CHILD_INDEX);
     expect(screen?.screenId).toBe(HOME_REACT_SCREEN_ID);
     expect(HOME_SCREEN_SELECTOR).toContain(`nth-child(${HOME_CHILD_INDEX})`);
-    expect(HOME_REACT_SCREEN_ID).toBe("home");
+    expect(HOME_REACT_SCREEN_ID).toBe("site-pilot");
   });
 
   it("locks Make Body10 heading / chips / default query", () => {

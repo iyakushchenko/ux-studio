@@ -5,7 +5,7 @@
  *   await window.__studioRunMcpPageProbe?.()
  *   await window.__studioRunMcpPageProbe?.({ screenId: "plp" })
  *   await window.__studioRunMcpPageProbe?.({ screenId: "pdp", reload: false })
- *   await window.__studioRunMcpPageProbe?.({ screenId: "home", reload: false })
+ *   await window.__studioRunMcpPageProbe?.({ screenId: "site-pilot", reload: false })
  */
 
 import {
@@ -977,25 +977,25 @@ function pdpProbeSteps(): ProbeStep[] {
 }
 
 /**
- * Home probe stub (Quinn criteria 2026-07-19).
- * Minimal recipe — asserts `[data-studio-react-screen="home"]` (kickoff mount).
+ * Site Pilot (Agentic Home) probe stub (Quinn criteria 2026-07-19).
+ * Minimal recipe — asserts `[data-studio-react-screen="site-pilot"]` (kickoff mount).
  * Overlay-arm + url-screen are injected by runMcpPageProbe.
  * Full matrix (heading auth / send / chips / DS hover) not stubbed yet — no false PROVEN.
  * Auth heading personalization: `isStudioLoggedIn` / `__studioIsLoggedIn` only
  * (see docs/projects/boots-pharmacy/audits/QUINN_HOME_PROBE_CRITERIA_2026-07-19.md).
  */
-function homeProbeSteps(): ProbeStep[] {
+function sitePilotProbeSteps(): ProbeStep[] {
   return [
     {
-      id: "home-host",
-      selector: '[data-studio-react-screen="home"]',
+      id: "site-pilot-host",
+      selector: '[data-studio-react-screen="site-pilot"]',
       action: "assert",
       assert: () => {
         const host = document.querySelector(
-          '[data-studio-react-screen="home"]'
+          '[data-studio-react-screen="site-pilot"]'
         );
         if (host == null) {
-          return 'missing React Home host — expected [data-studio-react-screen="home"]';
+          return 'missing React Site Pilot host — expected [data-studio-react-screen="site-pilot"]';
         }
         return true;
       },
@@ -1019,7 +1019,7 @@ function bookStepProbeSteps(screenId: string): ProbeStep[] {
 function stepsForScreen(screenId: string): ProbeStep[] | null {
   if (screenId === "plp") return plpProbeSteps();
   if (screenId === "pdp") return pdpProbeSteps();
-  if (screenId === "home") return homeProbeSteps();
+  if (screenId === "site-pilot") return sitePilotProbeSteps();
   if (
     screenId === "book-step-1" ||
     screenId === "book-step-2" ||

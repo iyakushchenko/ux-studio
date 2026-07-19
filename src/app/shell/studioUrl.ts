@@ -4,7 +4,7 @@
  * Examples:
  *   /?project=boots-pharmacy&screen=book-step-2
  *   /ux-studio/?project=boots-pharmacy&screen=book-step-1&modal=choose-pharmacy
- *   /ux-studio/?project=boots-pharmacy&screen=home&mode=agentic-cjm
+ *   /ux-studio/?project=boots-pharmacy&screen=site-pilot&mode=agentic-cjm
  *
  * Ephemeral agent leftovers (`proof`, …) are stripped on boot / overlay stop.
  */
@@ -60,8 +60,8 @@ const SCREEN_ALIASES: Record<string, string> = {
   "book-step1": "book-step-1",
   "book-step2": "book-step-2",
   "book-step3": "book-step-3",
-  "agentic-home": "home",
-  "site-pilot-home": "home",
+  "agentic-home": "site-pilot",
+  "site-pilot-home": "site-pilot",
   "site-pilot-chat": "chat",
 };
 

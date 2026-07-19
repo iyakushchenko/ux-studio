@@ -4,7 +4,7 @@
  * `screenId` is the address-bar deep-link id (`?screen=book-step-2`).
  */
 export const PROJECT_SCREENS = [
-  { label: "Agentic. Site Pilot. Home", childIndex: 11, screenId: "home" },
+  { label: "Agentic. Site Pilot. Home", childIndex: 11, screenId: "site-pilot" },
   { label: "Agentic. Site Pilot. Chat", childIndex: 10, screenId: "chat" },
   { label: "PLP. Vaccinations", childIndex: 9, screenId: "plp" },
   { label: "PDP. Vaccine Details Page", childIndex: 8, screenId: "pdp" },

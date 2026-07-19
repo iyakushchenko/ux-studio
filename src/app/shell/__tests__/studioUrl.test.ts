@@ -20,7 +20,7 @@ import {
 } from "@/app/shell/studioUrl";
 
 const SCREENS = [
-  { screenId: "home", childIndex: 11 },
+  { screenId: "site-pilot", childIndex: 11 },
   { screenId: "chat", childIndex: 10 },
   { screenId: "book-step-1", childIndex: 7 },
   { screenId: "book-step-2", childIndex: 4 },
@@ -74,7 +74,10 @@ describe("studioUrl", () => {
   it("normalizes screen aliases", () => {
     expect(parseStudioUrl("?screen=book-step2").screenId).toBe("book-step-2");
     expect(parseStudioUrl("?screen=onboarding").screenId).toBe(HUB_SCREEN_ID);
-    expect(parseStudioUrl("?screen=Agentic-Home").screenId).toBe("home");
+    expect(parseStudioUrl("?screen=Agentic-Home").screenId).toBe("site-pilot");
+    expect(parseStudioUrl("?screen=site-pilot-home").screenId).toBe(
+      "site-pilot"
+    );
   });
 
   it("normalizes orchestra mode aliases (bare traditional must not blank playback)", () => {
@@ -115,9 +118,9 @@ describe("studioUrl", () => {
     const replaceState = vi.fn();
     vi.stubGlobal("window", {
       location: {
-        href: "http://localhost:5173/?proof=unmount-race&project=boots-pharmacy&screen=home",
+        href: "http://localhost:5173/?proof=unmount-race&project=boots-pharmacy&screen=site-pilot",
         pathname: "/",
-        search: "?proof=unmount-race&project=boots-pharmacy&screen=home",
+        search: "?proof=unmount-race&project=boots-pharmacy&screen=site-pilot",
         hash: "",
       },
       history: { state: null, replaceState },
@@ -126,7 +129,7 @@ describe("studioUrl", () => {
     expect(stripEphemeralStudioQuery()).toBe(true);
     expect(replaceState).toHaveBeenCalledTimes(1);
     const next = replaceState.mock.calls[0][2] as string;
-    expect(next).toBe("/?project=boots-pharmacy&screen=home");
+    expect(next).toBe("/?project=boots-pharmacy&screen=site-pilot");
     expect(next).not.toContain("proof");
   });
 
@@ -218,9 +221,9 @@ describe("studioUrl", () => {
     const replaceState = vi.fn();
     vi.stubGlobal("window", {
       location: {
-        href: "http://localhost:5173/?proof=stale&screen=home",
+        href: "http://localhost:5173/?proof=stale&screen=site-pilot",
         pathname: "/",
-        search: "?proof=stale&screen=home",
+        search: "?proof=stale&screen=site-pilot",
         hash: "",
       },
       history: { state: null, replaceState, pushState: vi.fn() },
@@ -241,7 +244,7 @@ describe("studioUrl", () => {
     expect(
       resolveStudioScreenTarget({
         studioUrl: "?project=boots-pharmacy&screen=book-step-2",
-        screenId: "home",
+        screenId: "site-pilot",
         projectId: "puma",
       })
     ).toEqual({
@@ -291,9 +294,9 @@ describe("studioUrl", () => {
     const replaceState = vi.fn();
     vi.stubGlobal("window", {
       location: {
-        href: "http://localhost:5173/?project=boots-pharmacy&screen=home",
+        href: "http://localhost:5173/?project=boots-pharmacy&screen=site-pilot",
         pathname: "/",
-        search: "?project=boots-pharmacy&screen=home",
+        search: "?project=boots-pharmacy&screen=site-pilot",
         hash: "",
       },
       history: { state: null, replaceState, pushState: vi.fn() },

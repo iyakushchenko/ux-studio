@@ -1,6 +1,6 @@
 # Uma fidelity stamp — Home (Agentic Site Pilot)
 
-**Surface:** Boots Pharmacy Home (`screenId: home`, Frame child **11**, Make `Body10`)  
+**Surface:** Boots Pharmacy Site Pilot (`screenId: site-pilot`, Frame child **11**, Make `Body10`)  
 **Date:** 2026-07-19  
 **Owner:** Uma (UI/UX)  
 **Status:** **IN PROGRESS** — first React mount visible; **NOT PROVEN**  

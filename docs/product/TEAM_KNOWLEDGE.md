@@ -142,6 +142,13 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 - Pax (PO sim): <accept bar / bump call> — applied: <decision>
 ```
 
+**Knowledge improved** (2026-07-19 · stream: Site Pilot screenId rename · v0.0.40):
+- Arch (Director): public Boots Site Pilot id is `site-pilot`; `home` reserved — applied: screens.ts · URL.md · register
+- Bea (BA): register documents public `screenId=site-pilot` + reserved `home` — applied: HOME_MAKE_PARITY_REGISTER
+- Finn (FE): `HOME_REACT_SCREEN_ID` + host attrs + probe recipe → `site-pilot` (folder/BEM lag OK) — applied: homeContract · mount · studioMcpPageProbe
+- Ben (BE): URL aliases + tests + patch bump + R12 batch push — applied: studioUrl · v0.0.40
+- Pax (PO sim): user-visible URL seam → patch bump — applied: release:patch
+
 **Knowledge improved** (2026-07-19 · stream: Home naming + lean CI + batch-push R12 · tip post-`fd3241c`):
 - Arch (Director): R12 batch-ship-push locked; CI wall target ~35–45s warm — applied: doctrine §2.14 · TEAM · STUDIO_AUTO_RULES R12 · director #26
 - Bea (BA): Home chip/query naming contract in register — applied: HOME_MAKE_PARITY_REGISTER L7
@@ -165,7 +172,7 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 |-------|------|--------------------|
 | **Batch ship / push (R12)** — no push after every tiny fix; land local until coherent ship / PO ask / HARD-GREEN / end of wave | Arch, Pax, Ben | [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R12 · TEAM § Batch ship · doctrine §2.14 |
 | **Leaner CI** — `npm ci` + npm cache; parallel `test`∥`build`; parallel `test:gates`; smoke still dispatch-only; expect ~35–45s warm wall | Ben, Arch | [CI_ACTIONS_BUDGET.md](./CI_ACTIONS_BUDGET.md) §2.1 · `ci.yml` · `run-static-gates.mjs` |
-| **Home naming PASS** — BEM=`home`; landmarks/form; kebab chip actions; audit stamp (not Final Pass) | Finn, Bea, Arch | [FE_AUDIT_HOME_NAMING_2026-07-19.md](../projects/boots-pharmacy/audits/FE_AUDIT_HOME_NAMING_2026-07-19.md) |
+| **Site Pilot public id** — URL/`screenId`=`site-pilot` (`home` reserved); folder/BEM may lag; naming audit updated | Bea, Finn, Arch | [HOME_MAKE_PARITY_REGISTER.md](../projects/boots-pharmacy/features/HOME_MAKE_PARITY_REGISTER.md) · [URL.md](../shell/URL.md) |
 | **Fixed localhost + reuse tab** — canonical `http://localhost:5173/`; Vite `strictPort`; one `npm run dev`; Chrome MCP `list_pages`→reuse (`new_page` only if empty); Auto-Rule R11 + felony | Arch, Finn, Ben, Quinn | [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R11 · `vite.config.ts` · LESSONS |
 | **Platform Motion standard** — `framer-motion` via `@/uxds/motion`; Accordion height = Motion (not CSS `0fr/1fr`); chevron CSS; shell pilots: diagnostic overlay + studio select presence | Arch, Finn, Uma, Ben, Pax | [MOTION.md](./MOTION.md) · `src/uxds/motion/` · Accordion.tsx |
 | **Accordion invisible expand** — `prefers-reduced-motion` zeroed CSS grid transitions; root cause + Motion height fix | Uma, Finn, Arch, Quinn | LESSONS · accordion.css · MOTION.md |

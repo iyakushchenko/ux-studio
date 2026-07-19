@@ -46,7 +46,7 @@ describe("PROJECT_SCREENS", () => {
     const byId = Object.fromEntries(
       PROJECT_SCREENS.map((s) => [s.screenId, s.childIndex])
     );
-    expect(byId.home).toBe(11);
+    expect(byId["site-pilot"]).toBe(11);
     expect(byId.plp).toBe(9);
     expect(byId.pdp).toBe(8);
     expect(byId["book-step-1"]).toBe(7);

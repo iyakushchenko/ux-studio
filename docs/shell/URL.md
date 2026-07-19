@@ -16,7 +16,7 @@ Auto-Rule: [STUDIO_AUTO_RULES.md](../product/STUDIO_AUTO_RULES.md) **`fixed-loca
 ?project=boots-pharmacy&screen=book-step-2
 ?project=boots-pharmacy&screen=book-step-1&modal=choose-pharmacy
 ?project=boots-pharmacy&screen=plp&modal=quick-view
-?project=boots-pharmacy&screen=home&persona=sarah-jenkins&mode=agentic-cjm
+?project=boots-pharmacy&screen=site-pilot&persona=sarah-jenkins&mode=agentic-cjm
 ```
 
 | Param | Required | Values |
@@ -32,6 +32,7 @@ Examples (local / Pages):
 - `http://localhost:5173/?project=boots-pharmacy&screen=book-step-2`
 - `http://localhost:5173/?project=boots-pharmacy&screen=book-step-1&modal=choose-pharmacy`
 - `http://localhost:5173/?project=boots-pharmacy&screen=plp&modal=quick-view`
+- `http://localhost:5173/?project=boots-pharmacy&screen=site-pilot`
 - `https://iyakushchenko.github.io/ux-studio/?project=boots-pharmacy&screen=book-step-1`
 
 ## Boots Pharmacy `screen` ids
@@ -39,7 +40,7 @@ Examples (local / Pages):
 | `screen` | Make child | Nav |
 |----------|------------|-----|
 | `hub` | (onboarding wiki) | Hub tab |
-| `home` | 11 | Agentic Site Pilot Home |
+| `site-pilot` | 11 | Agentic Site Pilot Home (Make “Agentic. Site Pilot. Home”) |
 | `chat` | 10 | Agentic chat |
 | `plp` | 9 | Vaccinations PLP |
 | `pdp` | 8 | Vaccine PDP |
@@ -49,7 +50,8 @@ Examples (local / Pages):
 | `appointment-history` | 2 | Appointment History |
 | `appointment-details` | 1 | Appointment Details |
 
-Aliases accepted on parse: `book-step2` → `book-step-2`, `onboarding` → `hub`, `agentic-home` → `home`.
+**Reserved:** `home` is **not** the Site Pilot screen — kept free for a future real Home page.  
+Aliases accepted on parse: `book-step2` → `book-step-2`, `onboarding` → `hub`, `agentic-home` / `site-pilot-home` → `site-pilot`.
 
 ## Boots Pharmacy `modal` ids
 

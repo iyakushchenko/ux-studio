@@ -3,8 +3,9 @@
 **Project:** `boots-pharmacy`  
 **Callsigns:** Bea (BA) owns register truth · Quinn (QA) owns prove · Finn/Uma restore gaps  
 **Updated:** 2026-07-19 (PO `+` kickoff — scaffold mount live; fidelity Partial)  
-**Make source:** Frame child **11** (`Agentic. Site Pilot. Home`, `screenId: "home"`) — `Body10` + shell at `left-0` in `frame/index.tsx` · wire `BootsPharmacyProjectView` child-11 effects · `playback/sitePilotHome.ts`  
-**React target:** `src/projects/boots-pharmacy/screens/home/*`  
+**Make source:** Frame child **11** (`Agentic. Site Pilot. Home`) — `Body10` + shell at `left-0` in `frame/index.tsx` · wire `BootsPharmacyProjectView` child-11 effects · `playback/sitePilotHome.ts`  
+**Public `screenId`:** `site-pilot` (URL `?screen=site-pilot`) — **not** `home` (`home` reserved for a future real Home page)  
+**React target:** `src/projects/boots-pharmacy/screens/home/*` (folder may lag public id until cheap rename)  
 **Refs:** [HOME_REACT.md](./HOME_REACT.md) · [PLP_MAKE_PARITY_REGISTER.md](./PLP_MAKE_PARITY_REGISTER.md) (format) · [URL.md](../../../shell/URL.md)  
 **Uma checklist:** [../../../product/UMA_FIDELITY_NOTES.md](../../../product/UMA_FIDELITY_NOTES.md) · **Uma stamp:** [../audits/UMA_FIDELITY_HOME_2026-07-19.md](../audits/UMA_FIDELITY_HOME_2026-07-19.md) (**IN PROGRESS**)
 
@@ -68,8 +69,8 @@
 | # | Behavior | Make | React status | Evidence |
 |---|----------|------|--------------|----------|
 | W1 | React host child 11 | — | **Present** | `mountHomeScreen` |
-| W2 | `data-studio-make-retired=home` | — | **Present** | hideMakeChrome |
-| W3 | URL `?project=boots-pharmacy&screen=home` | **Present** | **Present** | registry already |
+| W2 | `data-studio-make-retired=site-pilot` | — | **Present** | hideMakeChrome |
+| W3 | URL `?project=boots-pharmacy&screen=site-pilot` | **Present** | **Present** | registry `HOME_REACT_SCREEN_ID` |
 | W4 | Make wire early-return when React mounted | — | **Present** | `isHomeReactMounted()` on heading + textarea effects |
 | W5 | No LEGACY growth for React path | — | **Present** | `home.css` only |
 | W6 | PAGE FINAL PASS stamp | — | **Missing** | Do **not** add to requiredScreens until PROVEN |
@@ -91,11 +92,11 @@
 ## Prove URL (R11)
 
 ```
-http://localhost:5173/?project=boots-pharmacy&screen=home
+http://localhost:5173/?project=boots-pharmacy&screen=site-pilot
 ```
 
 ```js
-await window.__studioRunMcpPageProbe?.({ screenId: "home", reload: false })
+await window.__studioRunMcpPageProbe?.({ screenId: "site-pilot", reload: false })
 ```
 
 Criteria: [../audits/QUINN_HOME_PROBE_CRITERIA_2026-07-19.md](../audits/QUINN_HOME_PROBE_CRITERIA_2026-07-19.md)

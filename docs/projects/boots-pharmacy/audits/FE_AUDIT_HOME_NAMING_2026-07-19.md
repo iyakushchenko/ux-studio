@@ -1,7 +1,8 @@
 # FE audit — Home HTML / BEM / `data-studio-*` naming
 
 **Date:** 2026-07-19  
-**Screen:** `home` (Agentic Site Pilot Home, child 11)  
+**Screen:** `site-pilot` (Agentic Site Pilot Home, child 11) — public id; folder/BEM may still say `home` interim  
+
 **Tip baseline:** ≥ `fd3241c`  
 **Callsigns:** Arch + Bea + Finn  
 **Verdict:** **PASS** (naming contract) — not PAGE FINAL PASS / fidelity PROVEN
@@ -18,8 +19,8 @@ Confirm Pilot Home React markup is **semantically named** vs [COMPONENT_LIBRARY.
 
 | Check | Result | Notes |
 |-------|--------|-------|
-| Folder / CSS = `screenId` `home` | PASS | `screens/home/`, `home.css`, BEM block `.home` / `.home__*` |
-| `data-studio-react-screen="home"` | PASS | `<main>` + host mount / make-retired |
+| Folder / CSS vs public `screenId` | PARTIAL | Public id `site-pilot`; folder/BEM still `home` / `.home__*` (cheap rename later) |
+| `data-studio-react-screen="site-pilot"` | PASS | `<main>` + host mount / make-retired |
 | Landmarks | PASS | `<main>` page · `<section class="home__card">` ask surface · suggested `<section aria-labelledby>` · query `<form>` |
 | Semantic controls | PASS | `<textarea>` · mic `type="button"` · send `type="submit"` · chip `<button>` |
 | Stable `data-name` (Make) | PASS | `body`, logo, card, Subtotal, input buttons, GSE chips |

@@ -71,11 +71,11 @@ describe("runMcpPageProbe", () => {
     isElementBlockedByModal.mockReturnValue(false);
   });
 
-  it("home stub recipe fails until React host mounts", async () => {
+  it("site-pilot stub recipe fails until React host mounts", async () => {
     vi.stubGlobal("window", {
       location: {
-        href: "http://localhost:5173/?project=boots-pharmacy&screen=home",
-        search: "?project=boots-pharmacy&screen=home",
+        href: "http://localhost:5173/?project=boots-pharmacy&screen=site-pilot",
+        search: "?project=boots-pharmacy&screen=site-pilot",
         pathname: "/",
         hash: "",
       },
@@ -89,15 +89,17 @@ describe("runMcpPageProbe", () => {
     });
 
     const result = await runMcpPageProbe({
-      screenId: "home",
+      screenId: "site-pilot",
       reload: false,
       settleMs: 0,
     });
 
     expect(result.pass).toBe(false);
-    expect(result.screenId).toBe("home");
+    expect(result.screenId).toBe("site-pilot");
     expect(result.checks.some((c) => c.id === "probe-recipe")).toBe(false);
-    expect(result.checks.find((c) => c.id === "home-host")?.pass).toBe(false);
+    expect(result.checks.find((c) => c.id === "site-pilot-host")?.pass).toBe(
+      false
+    );
     expect(result.checks.find((c) => c.id === "url-screen")?.pass).toBe(true);
   });
 

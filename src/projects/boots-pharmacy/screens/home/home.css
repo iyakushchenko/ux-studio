@@ -3,7 +3,7 @@
  * No invent — under-match beats pretty upgrades.
  */
 
-.studio-react-screen-host[data-studio-react-screen="home"] {
+.studio-react-screen-host[data-studio-react-screen="site-pilot"] {
   display: flex;
   flex-direction: column;
   flex: 1 1 auto;

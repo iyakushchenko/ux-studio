@@ -10,7 +10,7 @@
 
 ## Context
 
-Erase-Make sequence: PLP → PDP (**PAGE FINAL PASS HARD-GREEN**) → **Home** (PO `+` 2026-07-19). Agentic Site Pilot Home (`screenId: home`, Frame child **11**) is the NL entry before Chat. Mount pattern matches PLP/PDP: React + UXDS, Make retired from view, no LEGACY growth, URL + recording.
+Erase-Make sequence: PLP → PDP (**PAGE FINAL PASS HARD-GREEN**) → **Site Pilot / Home** (PO `+` 2026-07-19). Agentic Site Pilot Home (`screenId: site-pilot`, Frame child **11**) is the NL entry before Chat. Mount pattern matches PLP/PDP: React + UXDS, Make retired from view, no LEGACY growth, URL + recording. **`home` is reserved** for a future real Home page — do not reuse as this screen’s public id.
 
 ## Business logic
 
@@ -25,9 +25,9 @@ Erase-Make sequence: PLP → PDP (**PAGE FINAL PASS HARD-GREEN**) → **Home** (
 
 ## Acceptance (Bea → Quinn)
 
-- [x] React host mounts at child 11; Make retired (`data-studio-make-retired=home`)
+- [x] React host mounts at child 11; Make retired (`data-studio-make-retired=site-pilot`)
 - [x] Make wire effects early-return when React mounted
-- [x] URL `?project=boots-pharmacy&screen=home`
+- [x] URL `?project=boots-pharmacy&screen=site-pilot`
 - [x] No LEGACY growth for React path
 - [ ] Uma audit **PROVEN** (currently IN PROGRESS)
 - [ ] Quinn MCP full matrix PASS (stub `home-host` only for now)
@@ -43,15 +43,15 @@ Erase-Make sequence: PLP → PDP (**PAGE FINAL PASS HARD-GREEN**) → **Home** (
 
 ## Mount / FE notes (Finn)
 
-- Folder = `screenId`: `src/projects/boots-pharmacy/screens/home/`
-- Contract: `HOME_CHILD_INDEX = 11`, `HOME_REACT_SCREEN_ID = "home"`
+- Folder (interim): `src/projects/boots-pharmacy/screens/home/` — public id is `site-pilot` (folder rename optional)
+- Contract: `HOME_CHILD_INDEX = 11`, `HOME_REACT_SCREEN_ID = "site-pilot"`
 - Mount: `mountHomeScreen` / deferred unmount — hide Make children; keep header mount
 - Auth: `loggedIn: resolveAgenticHomeLoggedIn(loggedInFlag)` → `isStudioLoggedIn`
 - Reuse: Accordion / PromoMessageStrip / TertiaryCta = **N/A** on Home Make
 
 ## Prove notes (Quinn)
 
-- Stub: `__studioRunMcpPageProbe({ screenId:"home", reload:false })` — `home-host` + overlay-arm + url-screen
+- Stub: `__studioRunMcpPageProbe({ screenId:"site-pilot", reload:false })` — `site-pilot-host` + overlay-arm + url-screen
 - R11: `http://localhost:5173/` reuse tab only
 - Criteria: [../audits/QUINN_HOME_PROBE_CRITERIA_2026-07-19.md](../audits/QUINN_HOME_PROBE_CRITERIA_2026-07-19.md)
 

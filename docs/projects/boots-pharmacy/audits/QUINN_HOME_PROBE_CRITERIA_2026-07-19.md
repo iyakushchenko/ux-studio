@@ -2,7 +2,7 @@
 
 **Status:** **STUB** — React host mounted; probe recipe minimal (`home-host` only). **NOT PROVEN.**  
 **Updated:** 2026-07-19 (Ben BE + Arch kickoff)  
-**Screen:** `home` (Agentic Site Pilot Home, Make child 11 → React `screens/home/*`)  
+**Screen:** `site-pilot` (Agentic Site Pilot Home, Make child 11 → React `screens/home/*`)  
 **Refs:** [STUDIO_AUTO_RULES.md](../../../product/STUDIO_AUTO_RULES.md) R11 · [URL.md](../../../shell/URL.md) · `studioMcpPageProbe.ts` · [HOME_MAKE_PARITY_REGISTER.md](../features/HOME_MAKE_PARITY_REGISTER.md)
 
 ---
@@ -19,7 +19,7 @@
 ## Prove URL (R11 — fixed localhost, reuse tab)
 
 ```
-http://localhost:5173/?project=boots-pharmacy&screen=home
+http://localhost:5173/?project=boots-pharmacy&screen=site-pilot
 ```
 
 **R11:** One origin only (`http://localhost:5173/`). Chrome DevTools MCP → `list_pages` → reuse existing tab → `navigate_page`; `new_page` only if zero pages. Do **not** spawn extra Vite ports (`5182`/`5185`…).
@@ -29,7 +29,7 @@ http://localhost:5173/?project=boots-pharmacy&screen=home
 ## Probe entry
 
 ```js
-await window.__studioRunMcpPageProbe?.({ screenId: "home", reload: false })
+await window.__studioRunMcpPageProbe?.({ screenId: "site-pilot", reload: false })
 ```
 
 **Prep (when matrix grows):** `__studioSetLoggedIn(false)` before logged-out heading checks; strip `mode=traditional-cjm` if it interferes.
@@ -41,8 +41,8 @@ await window.__studioRunMcpPageProbe?.({ screenId: "home", reload: false })
 | Step | Id | Expect |
 |------|-----|--------|
 | auto | `overlay-arm` | BR agent-testing panel visible |
-| 1 | `home-host` | `[data-studio-react-screen="home"]` present (React host) |
-| auto | `url-screen` | Address bar `screen=home` |
+| 1 | `site-pilot-host` | `[data-studio-react-screen="site-pilot"]` present (React host) |
+| auto | `url-screen` | Address bar `screen=site-pilot` |
 
 **Expected after kickoff mount (live localhost):** `home-host` **PASS**; unit test without DOM host still expects FAIL (guards false PROVEN).
 
@@ -60,7 +60,7 @@ await window.__studioRunMcpPageProbe?.({ screenId: "home", reload: false })
 
 **Selectors:**
 
-- Host: `[data-studio-react-screen="home"]`
+- Host: `[data-studio-react-screen="site-pilot"]`
 - BEM root: `.home`
 - Hero heading: `[data-studio-agentic-home-heading]`
 - Query: `textarea[data-studio-action="agentic-home-query"]`
