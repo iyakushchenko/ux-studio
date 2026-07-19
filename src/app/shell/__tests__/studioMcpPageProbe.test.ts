@@ -179,6 +179,10 @@ describe("runMcpPageProbe", () => {
       if (el === quick) {
         modalOpen = true;
         isBlockingModalOpen.mockReturnValue(true);
+        locationState.search =
+          "?project=boots-pharmacy&screen=plp&modal=quick-view";
+        locationState.href =
+          "http://localhost:5173/?project=boots-pharmacy&screen=plp&modal=quick-view";
         return true;
       }
       if (el === book && modalOpen) {
@@ -187,17 +191,21 @@ describe("runMcpPageProbe", () => {
       if (el === close) {
         modalOpen = false;
         isBlockingModalOpen.mockReturnValue(false);
+        locationState.search = "?project=boots-pharmacy&screen=plp";
+        locationState.href =
+          "http://localhost:5173/?project=boots-pharmacy&screen=plp";
         return true;
       }
       return true;
     });
     isElementBlockedByModal.mockImplementation((el) => el === book && modalOpen);
 
+    const locationState = {
+      href: "http://localhost:5173/?project=boots-pharmacy&screen=plp",
+      search: "?project=boots-pharmacy&screen=plp",
+    };
     vi.stubGlobal("window", {
-      location: {
-        href: "http://localhost:5173/?project=boots-pharmacy&screen=plp",
-        search: "?project=boots-pharmacy&screen=plp",
-      },
+      location: locationState,
     });
     vi.stubGlobal("document", {
       querySelector: (sel: string) => {
@@ -262,7 +270,13 @@ describe("runMcpPageProbe", () => {
     expect(
       result.checks.find((c) => c.id === "plp-below-fold-scroll")?.pass
     ).toBe(true);
+    expect(result.checks.find((c) => c.id === "plp-quick-view")?.pass).toBe(
+      true
+    );
     expect(result.checks.find((c) => c.id === "plp-overlay-eyes")?.pass).toBe(
+      true
+    );
+    expect(result.checks.find((c) => c.id === "plp-quick-view-close")?.pass).toBe(
       true
     );
     expect(result.checks.find((c) => c.id === "url-screen")?.pass).toBe(true);
