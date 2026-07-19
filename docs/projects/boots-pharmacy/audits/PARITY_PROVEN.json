@@ -45,7 +45,7 @@
       "status": "proven",
       "auditPath": "docs/projects/boots-pharmacy/audits/FE_AUDIT_PLP_2026-07-19_RAGE4.md",
       "mcpMatrixAt": {
-        "sha": "pending",
+        "sha": "f909b97",
         "date": "2026-07-19",
         "note": "filter search Make+wire: icon end, single clear, View all, counters, no hr; sitrep countdown (v0.0.12)"
       },

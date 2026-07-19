@@ -4,7 +4,7 @@
 **Date:** 2026-07-19  
 **Auditor:** Uma (UI/UX) + Quinn (QA) + Finn (FE) + Bea (BA) — MCP localhost  
 **Prior tip (distrusted):** `1ca5cba` / prior PROVEN on filter search **INVALID**  
-**Ship tip:** _(fill after commit)_  
+**Ship tip:** `f909b97`  
 **Version:** `0.0.12`
 
 **Checklist:** [../../../product/FE_UI_UX_AUDIT.md](../../../product/FE_UI_UX_AUDIT.md) · [UMA_FIDELITY_NOTES.md](../../../product/UMA_FIDELITY_NOTES.md)  
