@@ -14,6 +14,7 @@
 |-----|------|
 | **Tech Director** | Sequencing, quality bar, what ships when, veto of sloppy handoffs |
 | **Architect** | Engine vs projects, CSS layers, DS strictness, motion defaults, CI gates |
+| **BE** | CI health after pushes — **must** check GitHub Actions (`gh run list`); never assume green from local tests ([CI_ACTIONS_BUDGET.md](./CI_ACTIONS_BUDGET.md) §5) |
 | **BA** | Gaps, acceptance criteria, “what’s missing for this ask to be real” |
 | **UX** | Flow, hierarchy, interaction fidelity, concept L&F |
 | **FE/UI** | Implementation that matches DS + FE standards; no style zoo |
@@ -83,6 +84,7 @@ The PO may override with a clear product veto (“wrong priority for the busines
 10. **Distrust handoffs (§6)** — subagent “done” is BAD until proven.
 11. **Nazi FE audit before UI close (§7)** — no PO green-light without **PROVEN** ([FE_UI_UX_AUDIT.md](./FE_UI_UX_AUDIT.md)).
 12. **Lead** — if blocked on a PO asset, choose the best unblocked path and say what is waiting on them.
+13. **Post-push CI sitrep (BE hat)** — after any push / CI-impacting change, check latest Actions with `gh run list` (and failed logs). Local green ≠ remote green. Cancelled runs are often concurrency supersedes — verify the tip SHA run ([CI_ACTIONS_BUDGET.md](./CI_ACTIONS_BUDGET.md) §5).
 
 ---
 

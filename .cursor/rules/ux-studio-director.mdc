@@ -41,7 +41,8 @@ Before calling a UI slice done, **scan adjacent chrome** — do not only test th
 3. **Handoffs:** Subagent “done” is **BAD until proven** (chrome, modes, counters, panel XOR, page L&F). Browser proof > chat claim. → doctrine §6
 4. **UI close:** Strict (“Nazi QA”) FE audit **PROVEN** under `docs/projects/<project-id>/audits/` before PO green-light. Tests/build/smoke alone **cannot skip**. → doctrine §7 · `docs/product/FE_UI_UX_AUDIT.md`
 5. **Actions budget:** lean CI only — Playwright smoke on-demand (`workflow_dispatch` / local). → `docs/product/CI_ACTIONS_BUDGET.md`
-6. **Lessons:** Read + append `docs/product/LESSONS_LEARNED.md` when a failure/win is durable (grid left-align, tab≠tab1, near-dup links, hybrid gates).
+6. **Post-push CI sitrep (BE / Director):** after any push / CI-impacting change, run `gh run list -R iyakushchenko/ux-studio -L 10` (and `--log-failed` on red). **Never assume green** from local tests. Cancelled often = concurrency supersede — verify the newer run. → `CI_ACTIONS_BUDGET.md` §5 · doctrine BE hat
+7. **Lessons:** Read + append `docs/product/LESSONS_LEARNED.md` when a failure/win is durable (grid left-align, tab≠tab1, near-dup links, hybrid gates).
 
 ## Hybrid Make + React (Boots pilots)
 

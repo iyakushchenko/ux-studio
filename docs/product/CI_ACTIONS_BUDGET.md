@@ -59,9 +59,30 @@ If the account hits Actions billing limits (Summarizer precedent): keep `workflo
 
 ---
 
+## 5. Post-push sitrep (mandatory — BE / Director)
+
+**Do not assume green.** After any `git push` (or merge) that can trigger Actions, the agent **must** check the latest GitHub Actions status before telling the PO CI is fine.
+
+```bash
+gh run list -R iyakushchenko/ux-studio -L 10
+# on failure / cancelled:
+gh run view <id> --log-failed
+```
+
+| Outcome | Report as… |
+|---------|------------|
+| `failure` on `CI` | **Broken** — diagnose + fix; do not claim green |
+| `cancelled` on Deploy / CI while a newer run exists | Usually **concurrency supersede** — say so; check the newer run |
+| `success` on latest `CI` for the pushed SHA | Green for that SHA |
+| `in_progress` | Wait / re-check; do not invent a result |
+
+**Owner:** BE-hat / Tech Director owns CI health sitrep (lean budget + real status). Local `npm test` / build green ≠ Actions green until `gh run list` proves it.
+
+---
+
 ## Related
 
-- [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) — quality bar = lean CI  
+- [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) — quality bar = lean CI; BE owns post-push sitrep  
 - [SOLUTION_REQUIREMENTS.md](./SOLUTION_REQUIREMENTS.md)  
 - [VERSIONING.md](./VERSIONING.md) — local changelog/semver only; **no** tag→Release CI yet  
 - [POST_CHANGE_CHECKLIST.md](./POST_CHANGE_CHECKLIST.md) — local gates before “done”  

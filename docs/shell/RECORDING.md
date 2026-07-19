@@ -10,34 +10,37 @@ See also: [PLAYBACK.md](./PLAYBACK.md) (engine), [SHELL.md](./SHELL.md) (shell a
 
 While an agent drives localhost, Studio shows a **compact bottom-right status panel** (title + scrolling actions log). The page stays **fully visible** underneath — no lightbox / opaque modal.
 
-**Click guard:** an invisible full-viewport capture layer (`pointer-events: auto`, transparent) plus `#root { pointer-events: none }` blocks PO clicks into the concept UI. The BR panel itself stays interactive (log + **Dismiss**).
+**Click guard (active only):** an invisible full-viewport capture layer (`pointer-events: auto`, transparent) plus `#root { pointer-events: none }` blocks PO clicks into the concept UI. The BR panel itself stays interactive (log + **Dismiss**).
+
+**Sitrep settle (DONE):** on `stop()` (nest → 0), the panel does **not** vanish instantly. It enters a short **AGENT DONE — SITREP** state (~5s, configurable `settleMs` clamped 4–6s): final status + last log lines stay readable; click guard is **released** so the PO can use the page while reading. After the settle delay the panel clears; if `reload: true`, reload runs **after** settle (not during). Manual **Dismiss** / `stop({ force: true })` still clears **instantly**. A tiny recent-session stack (max 5, `sessionStorage`) may show under the log during settle — keep it simple, not a notification center product.
 
 ```js
 window.__protoAgentTestingOverlay?.start("optional title")
 window.__protoAgentTestingOverlay?.touch("optional title") // arm if inactive; no nest bump
 window.__protoAgentTestingOverlay?.log("clicked Book Step 2")
-window.__protoAgentTestingOverlay?.stop() // nest-aware; no reload (manual / console)
-window.__protoAgentTestingOverlay?.stop({ force: true }) // clear immediately
-window.__protoAgentTestingOverlay?.stop({ reload: true }) // teardown + deferred location.reload()
-window.__protoAgentTestingOverlay?.isActive()
+window.__protoAgentTestingOverlay?.stop() // nest-aware → DONE settle ~5s; no reload
+window.__protoAgentTestingOverlay?.stop({ force: true }) // clear immediately (Dismiss)
+window.__protoAgentTestingOverlay?.stop({ reload: true }) // settle ~5s, then location.reload()
+window.__protoAgentTestingOverlay?.stop({ settleMs: 5000, reload: true })
+window.__protoAgentTestingOverlay?.isActive() // false during settle
 ```
 
 ### Lifecycle (must not stick)
 
 | Event | Behavior |
 |-------|----------|
-| `__protoRunMcpSanityCheck` / `__protoRun*` session `finally` | Always `stop({ reload: true })` — clean tab for PO after verify |
+| `__protoRunMcpSanityCheck` / `__protoRun*` session `finally` | Always `stop({ reload: true })` — sitrep ~5s, then clean-tab reload |
 | Mutating `__proto*` helpers | Auto-`touch()` on first/each call (read-only getters skipped) |
 | DevTools MCP clicks only | Agent **must** call `touch()` at session start |
-| Safety timeout | Auto `stop({ force: true })` after **3 min** |
-| `beforeunload` | Clears active state + sessionStorage persist |
+| `stop()` nest → 0 | Enter DONE/SITREP settle (default **5s**); release click guard; keep log visible |
+| Settle timer fires | Hide panel; if `reload: true`, then deferred `location.reload()` (~120ms) |
+| Safety timeout | Auto `stop({ force: true })` after **3 min** (skips settle) |
+| `beforeunload` | Clears active/settle state + sessionStorage persist |
 | Page load / overlay install / stop | Strip ephemeral query (`proof`, …) — never leave `?proof=unmount-race` |
 | Page load | **Never** restores stale "testing" unless `sessionStorage.protoAgentTestingOverlayContinue=1` (default: never) |
-| Dismiss button / `stop({ force: true })` | Immediate clear; no reload unless `reload: true` |
+| Dismiss button / `stop({ force: true })` | Immediate clear (no settle); no reload unless `reload: true` |
 
-`reload: true` defers `location.reload()` (~120ms) so MCP `evaluate_script` can still return the run result. Manual console experiments should omit reload (default `false`).
-
-Auto-shown for `__protoRun*` MCP sessions and any mutating `__proto*` helper. `__protoAbortAll` force-clears it. Shell-only (`src/app/shell/protoAgentTestingOverlay.ts` + PANEL CSS) — not Boots page CSS.
+Manual console experiments should omit reload (default `false`). Auto-shown for `__protoRun*` MCP sessions and any mutating `__proto*` helper. `__protoAbortAll` force-clears it. Shell-only (`src/app/shell/protoAgentTestingOverlay.ts` + PANEL CSS) — not Boots page CSS.
 
 **Deep links:** see [URL.md](./URL.md). Do not use `?proof=*` for agent status.
 

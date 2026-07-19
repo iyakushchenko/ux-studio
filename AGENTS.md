@@ -94,6 +94,7 @@ Full transport smokes require `__protoRun*` helpers — use sparingly. Day-to-da
 - **`ci.yml` → `smoke`** — Playwright lean profile — **`workflow_dispatch` only** (not every push)
 - **`deploy-pages.yml`** — GitHub Pages (`/ux-studio/` base path) — Node **22**
 - Budget: [docs/product/CI_ACTIONS_BUDGET.md](docs/product/CI_ACTIONS_BUDGET.md) — day-to-day = local MCP; merge needs `npm test` + build; no auto smoke burn
+- **Post-push sitrep (BE / Director):** after push, `gh run list -R iyakushchenko/ux-studio -L 10` — never assume green from local tests ([CI_ACTIONS_BUDGET.md](docs/product/CI_ACTIONS_BUDGET.md) §5)
 
 ## Conventions
 

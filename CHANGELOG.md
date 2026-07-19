@@ -15,6 +15,7 @@
 - **uxds:** Book Steps 1-3 + book kits: safe hex to UXDS/theme tokens (Make-only hex left); light audit PROVEN
 - **shell:** Studio URL deep links (`?project=&screen=`); strip ephemeral `proof`; overlay touch/auto-arm; recording `screen` events; PRODUCT_FORECAST
 - **engine:** Recording replay restores screen/URL via shared applyStudioScreen (deep-link path)
+- **shell:** Agent overlay DONE/SITREP settle (~5s) after stop; click guard released; reload after settle; BE post-push CI sitrep doctrine
 
 ## v0.0.1 - 190726
 
