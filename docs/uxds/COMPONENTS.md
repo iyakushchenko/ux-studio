@@ -15,6 +15,8 @@
 
 Masters on this page carry **variable bindings**. Detach on a master → every screen instance follows. That is why React rebuilds must preserve the same **semantic slots** (and eventually the same content keys from `setup` / `IA/*`).
 
+**Components carry behavior, not just visuals.** In Studio, a mapped React module should open, select, filter, expand, or submit as the pattern implies — via shared kits under `src/uxds/interactions/` — so pages are recordable. See [../product/INTERACTION_FIDELITY.md](../product/INTERACTION_FIDELITY.md).
+
 Canonical naming rules (Summarizer): `E:\UX\Summarizer\docs\AGENT_UXDS_NAMING.md`.
 
 ---
@@ -33,11 +35,12 @@ Variants often encode viewport: `screen=small` / `screen=large`, or boolean prop
 
 ## React mapping rule (commander)
 
-1. One Figma `component.*` / `module.*` → one React module under `src/projects/<id>/ui/` (or shared `src/uxds/` when reusable across projects).  
+1. One Figma `component.*` / `module.*` → one React module under `src/uxds/components/` (or project `ui/` only when truly project-specific).  
 2. Keep the **dot-path name** in code identifiers where practical (`ModuleCartProductListing`).  
-3. Wire Studio playback hooks (`data-name`, touchpoints) on the React root of the module — not on anonymous wrappers.  
-4. Prefer composing modules over cloning Make HTML.  
-5. **Reuse first** — when PO asks for a page “from what we already have,” assemble from existing UXDS + internal React modules; extend the shared library instead of copy-paste ([../product/CONCEPT_INTAKE.md](../product/CONCEPT_INTAKE.md) §5 mode B).
+3. Pair visuals with **shared interaction kits** (`src/uxds/interactions/`) for typical patterns — accordion, select, filters, tabs, modals, fields — not per-screen imperative scripts.  
+4. Wire Studio playback hooks (`data-name`, touchpoints) on the React root of the module — not on anonymous wrappers.  
+5. Prefer composing modules over cloning Make HTML.  
+6. **Reuse first** — when PO asks for a page “from what we already have,” assemble from existing UXDS + internal React modules; extend the shared library instead of copy-paste ([../product/CONCEPT_INTAKE.md](../product/CONCEPT_INTAKE.md) §5 mode B).
 
 ---
 

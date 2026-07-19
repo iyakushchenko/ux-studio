@@ -17,8 +17,9 @@ Engine repo. **Boots Pharmacy** (`src/projects/boots-pharmacy/`) is the first re
 5. [docs/product/CONCEPT_INTAKE.md](docs/product/CONCEPT_INTAKE.md) — messy concepts in; agent fills UXDS gap  
 6. [docs/product/PROJECT_STYLEGUIDE.md](docs/product/PROJECT_STYLEGUIDE.md) — brand delta → project theme.css  
 7. [docs/product/PAGE_BUILD_CONTRACT.md](docs/product/PAGE_BUILD_CONTRACT.md) — React + UXDS  
-8. [docs/uxds/README.md](docs/uxds/README.md) — UXDS Larkin (variables + components)  
-9. [docs/product/X_SUITE_INTEGRATION.md](docs/product/X_SUITE_INTEGRATION.md) — future Summarizer → Studio seam  
+8. [docs/product/INTERACTION_FIDELITY.md](docs/product/INTERACTION_FIDELITY.md) — recording needs interactive pages + shared kits  
+9. [docs/uxds/README.md](docs/uxds/README.md) — UXDS Larkin (variables + components)  
+10. [docs/product/X_SUITE_INTEGRATION.md](docs/product/X_SUITE_INTEGRATION.md) — future Summarizer → Studio seam  
 
 ## Quick start
 
@@ -65,5 +66,6 @@ Full transport smokes require `__protoRun*` helpers — use sparingly; prefer sa
 - Engine code in `src/app/` — project-agnostic
 - Boots-specific DOM/scripts in `src/projects/boots-pharmacy/` only until React+UXDS rebuild
 - Concept pages target: React + UXDS ([PAGE_BUILD_CONTRACT.md](docs/product/PAGE_BUILD_CONTRACT.md))
+- Interaction fidelity before record — shared kits `src/uxds/interactions/` ([INTERACTION_FIDELITY.md](docs/product/INTERACTION_FIDELITY.md))
 - Minimize scope; match existing patterns; test playback changes
 - Durable PO decisions → update `docs/product/PRODUCT_OWNER_BRIEF.md` decisions log

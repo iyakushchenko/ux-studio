@@ -11,7 +11,7 @@
 
 **Deep organism model (IA + modules):** mirrored from Summarizer — see `E:\UX\Summarizer\docs\UXDS_ORGANISM_OVERVIEW.md` and [X_SUITE_INTEGRATION.md](../product/X_SUITE_INTEGRATION.md).
 
-**Studio contracts:** [VARIABLES.md](./VARIABLES.md) · [COMPONENTS.md](./COMPONENTS.md) · [TOKEN_BRIDGE.md](./TOKEN_BRIDGE.md)
+**Studio contracts:** [VARIABLES.md](./VARIABLES.md) · [COMPONENTS.md](./COMPONENTS.md) · [TOKEN_BRIDGE.md](./TOKEN_BRIDGE.md) · [../product/INTERACTION_FIDELITY.md](../product/INTERACTION_FIDELITY.md) (behavior kits)
 
 ---
 

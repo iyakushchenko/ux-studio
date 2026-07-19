@@ -6,6 +6,22 @@ See also: [PLAYBACK.md](./PLAYBACK.md) (engine), [SHELL.md](./SHELL.md) (shell a
 
 ---
 
+## Prerequisite: page interactivity first
+
+**Recording depends on page fidelity.** The REC deck and MCP helpers only capture what the user can actually do on the concept page.
+
+| Ready to record when… | Not ready when… |
+|----------------------|-----------------|
+| Links/CTAs lead somewhere (or are honestly inert) | Buttons look live but do nothing |
+| On-page controls work (filters, accordions, forms, modals, steppers) | Scenario needs a control that is static mock only |
+| Happy path for the hypothesis is playable | Page is visual-only strip with no interaction |
+
+**Agent obligation:** build anticipated interactivity from page context (and later CJM deck) **before** expecting the Product Owner to record. Prefer shared React + UXDS behavior kits (`src/uxds/interactions/`) — do not grow one-off imperative scripts per screen.
+
+Full doctrine: [../product/INTERACTION_FIDELITY.md](../product/INTERACTION_FIDELITY.md).
+
+---
+
 ## Architecture
 
 ```

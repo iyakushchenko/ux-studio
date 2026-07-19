@@ -129,18 +129,23 @@ See [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) §5. Current order:
 
 1. ✅ Workspace + doctrine + page contract.  
 2. ✅ UXDS Larkin delivered + inventoried (`docs/uxds/`); X-Suite seam noted.  
-3. **Recording UI** (engine) — next build.  
-4. Token bridge + one Boots React pilot.  
-5. Scale rebuild; later X-Suite import + compiler.
+3. ✅ Interaction fidelity doctrine — record only after pages are interactive; shared behavior library ([INTERACTION_FIDELITY.md](./INTERACTION_FIDELITY.md)).  
+4. **Recording UI** (engine) — next build (pages still need fidelity before useful record).  
+5. Token bridge + one Boots React pilot (with shared interaction kits).  
+6. Scale rebuild; later X-Suite import + compiler.
 
 ---
 
 ## I. What “success” looks like for you
 
 - Open Studio → pick project / persona / CJM → play a journey that feels real.
-- Record a walkthrough → save a file → replay it.
+- Pages feel interactive enough to use (filters, CTAs, forms) — then record a walkthrough → save a file → replay it.
 - Ask the agent to add a scenario without rewriting the whole prototype.
 - New concepts start from **UXDS in Figma**, not from throwaway Make HTML.
+
+### Recording needs interactive pages (PO note)
+
+You cannot usefully record on a screen that does not respond. Before recording, the agent should build the on-page logic your scenario needs (where buttons go, working filters, etc.) using a **shared library** of common website behaviors — not one-off scripts that explode over time. You may later point the agent at a **CJM deck** so it can derive those requirements. Doctrine: [INTERACTION_FIDELITY.md](./INTERACTION_FIDELITY.md).
 
 ---
 
@@ -183,5 +188,6 @@ Avoid:
 | 2026-07-19 | Concept URLs on demand — when PO asks for more pages, agent asks for the Figma concept URL if not provided |
 | 2026-07-19 | Page-from-existing: no URL required; compose from UXDS + internal ready components; maximize reuse (key) |
 | 2026-07-19 | Internal FE DS code: yes, thin & incremental under `src/uxds/` + project theme — not a second Figma; grows with pages (SOLUTION_REQUIREMENTS §2.7) |
+| 2026-07-19 | **Interaction fidelity:** recording depends on playable page controls; agent builds anticipated interactivity (from page context / later CJM deck) before record; shared React+UXDS behavior kits at `src/uxds/interactions/` — anti-sprawl vs one-off scripts. See INTERACTION_FIDELITY.md |
 
 New durable decisions get a row here in the same session they are made.

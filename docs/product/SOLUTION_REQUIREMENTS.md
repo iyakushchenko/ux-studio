@@ -19,6 +19,7 @@
 | UXDS source + variables map | [../uxds/](../uxds/) | ✅ Larkin inventoried |
 | X-Suite future seam | [X_SUITE_INTEGRATION.md](./X_SUITE_INTEGRATION.md) | ✅ intent only |
 | Journey + recording data model | journey JSON + RECORDING.md | ✅ foundation exists |
+| Interaction fidelity before record | [INTERACTION_FIDELITY.md](./INTERACTION_FIDELITY.md) | ✅ shared kits doctrine |
 | CI bar | lean smoke | ✅ |
 
 **Verdict:** Strategy for *how we build pages* is enough to proceed. Remaining items below are **defaults I am locking now**, plus **assets only you can give per concept**.
@@ -47,11 +48,16 @@ Not required for v1 page done: production a11y audit, every viewport, real backe
 - **Add small/medium** only when the hypothesis needs it (e.g. mobile booking).  
 - UXDS `screen & fonts` modes stay available; we do not block on full responsive parity.
 
-### 2.3 Interaction fidelity
+### 2.3 Interaction fidelity (locked — recording prerequisite)
 
-- Prefer **realistic UI state** in React (open popup, select store, step wizard).  
+**Recording depends on page fidelity.** Dead or non-interactive UI is not record-ready.
+
+- Prefer **realistic UI state** in React (open popup, select store, step wizard, working filters).  
 - **Fake data / in-memory** is fine; no real APIs unless the hypothesis requires it.  
-- Login / guest: simulate with Studio or project flags (UXDS `auth` modes as inspiration later).
+- Login / guest: simulate with Studio or project flags (UXDS `auth` modes as inspiration later).  
+- **Shared library first** — common patterns (accordion, select, filters, tabs, modals, fields, sticky bars) live under `src/uxds/interactions/` + UXDS React modules; do **not** grow gigantic one-off imperative scripts per screen.  
+- Agent builds anticipated interactivity from page context (and later CJM deck) **before** expecting the PO to record.  
+- Full doctrine: [INTERACTION_FIDELITY.md](./INTERACTION_FIDELITY.md).
 
 ### 2.4 Content strategy (copy & IA)
 
@@ -80,7 +86,8 @@ Not required for v1 page done: production a11y audit, every viewport, real backe
 | What | Why |
 |------|-----|
 | `src/uxds/` CSS tokens (from UXDS names) | Shared structure/roles in code |
-| Reusable React modules (`component.*` / `module.*`) | Reuse mandate — pages don’t copy-paste |
+| Reusable React modules (`src/uxds/components/`) | Visual map to `component.*` / `module.*` |
+| Shared interaction kits (`src/uxds/interactions/`) | Typical website behaviors — anti-sprawl ([INTERACTION_FIDELITY.md](./INTERACTION_FIDELITY.md)) |
 | `src/projects/<id>/styleguide/theme.css` | Brand delta only |
 
 | What we do **not** build day one | |
@@ -142,8 +149,10 @@ UXDS file access: **already have**.
 
 **I am comfortable proceeding** on:
 
-- Recording UI (engine)  
-- First React + UXDS + project-styleguide page when you point at a frame  
+- Recording UI (engine) — once target pages have the interactive fidelity the scenario needs  
+- First React + UXDS + project-styleguide page when you point at a frame (with shared interaction kits as needed)  
+
+**Readiness for record:** page interactivity first ([INTERACTION_FIDELITY.md](./INTERACTION_FIDELITY.md)); engine REC alone is not enough if the screen cannot be used.
 
 **I do not need more strategic workshops** before that. Further alignment should be **vetoes** against §2 defaults or **concrete concept URLs**, not blank-slate debates.
 
@@ -154,4 +163,5 @@ UXDS file access: **already have**.
 - [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md)  
 - [CONCEPT_INTAKE.md](./CONCEPT_INTAKE.md)  
 - [PROJECT_STYLEGUIDE.md](./PROJECT_STYLEGUIDE.md)  
-- [PAGE_BUILD_CONTRACT.md](./PAGE_BUILD_CONTRACT.md)
+- [PAGE_BUILD_CONTRACT.md](./PAGE_BUILD_CONTRACT.md)  
+- [INTERACTION_FIDELITY.md](./INTERACTION_FIDELITY.md)

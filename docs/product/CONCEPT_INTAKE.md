@@ -55,7 +55,7 @@ Playable · recordable · CJM-ready · looks like THAT brand
 - React composition (not another Make dump)
 - Map structure to **UXDS** + closest `component.*` / `module.*`; brand via project theme CSS
 - Stable Studio wiring (`data-name`, screens, touchpoints)
-- Interactive behaviour needed for proofing (not full production backend)
+- **Interactive fidelity** needed for proofing and recording — shared kits under `src/uxds/interactions/`, not one-off scripts ([INTERACTION_FIDELITY.md](./INTERACTION_FIDELITY.md)). Fake data OK; dead UI is not record-ready.
 
 Do **not** refuse a concept because it is “not on the design system.”  
 Do **not** slavishly copy broken structure.  
@@ -89,9 +89,11 @@ Two valid modes:
 ### Reuse mandate (key — both modes, especially B)
 
 - Prefer existing `component.*` / `module.*` (Figma UXDS) and existing React modules under `src/uxds/` / `src/projects/<id>/` over new one-offs.
+- Prefer shared **interaction kits** (`src/uxds/interactions/`) for accordions, selects, filters, tabs, modals, fields — do not reinvent per page ([INTERACTION_FIDELITY.md](./INTERACTION_FIDELITY.md)).
 - Repetitive chrome (header, footer, breadcrumbs, product tile, CTAs, form fields) **must** reuse shared pieces — never clone markup per page.
 - Only invent a new module when nothing suitable exists; then add it to the shared library so the next page can reuse it.
 - Mode B is composition + wiring + journey hooks, not a greenfield visual redesign, unless the PO explicitly asks to diverge.
+- **Enrichment before record:** when PO will record (or when enriching pages already in place), raise interactivity to the fidelity the scenario needs — including Boots Make wire when those screens are touched.
 
 ## 6. Intake checklist (agent)
 
@@ -102,8 +104,10 @@ When PO pastes a concept URL (or after agent requested and received it):
 3. Create/update project `styleguide/` theme CSS.  
 4. Map each region → nearest UXDS module/component + tokens.  
 5. Build React pages under `src/projects/<id>/`.  
-6. Register in Studio; smoke browse + one playback path.  
-7. Note gaps briefly (“no token; used UXDS role X; brand primary from concept swatch”).
+6. Build anticipated interactivity (shared kits); wire CTAs/links. Later: derive requirements from CJM deck when PO points at one.  
+7. Register in Studio; smoke browse + happy-path controls + one playback path.  
+8. Confirm **record-ready** only after controls respond ([INTERACTION_FIDELITY.md](./INTERACTION_FIDELITY.md)).  
+9. Note gaps briefly (“no token; used UXDS role X; brand primary from concept swatch; used interaction kit Y”).
 
 ---
 
@@ -111,6 +115,7 @@ When PO pastes a concept URL (or after agent requested and received it):
 
 - [PROJECT_STYLEGUIDE.md](./PROJECT_STYLEGUIDE.md)  
 - [PAGE_BUILD_CONTRACT.md](./PAGE_BUILD_CONTRACT.md)  
+- [INTERACTION_FIDELITY.md](./INTERACTION_FIDELITY.md)  
 - [UX_STUDIO_VISION.md](./UX_STUDIO_VISION.md)  
 - [../uxds/README.md](../uxds/README.md)  
 - [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md)

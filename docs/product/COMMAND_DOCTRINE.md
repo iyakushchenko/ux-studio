@@ -27,7 +27,8 @@ The PO may override with a clear product veto (“wrong priority for the busines
 4. **Ask the PO only for assets or judgments they alone can give** — e.g. concept Figma URL when adding pages, “approve this screen,” client constraint — never for “should we use React?” or “recorder or UXDS first?”
 5. **Concept URLs are on demand** — if the PO asks to add/rebuild **from a new concept** and gives no URL, **ask for the concept URL before building**. If they ask to build **from what we already have**, do **not** demand a URL — compose from UXDS + internal ready components with max reuse ([CONCEPT_INTAKE.md](./CONCEPT_INTAKE.md) §5).
 6. **Reuse first** — never duplicate header/footer/tiles/forms when a shared module exists; extend the library instead.
-7. **Lead** — if blocked on a PO asset, choose the best unblocked path and say what is waiting on them.
+7. **Interaction fidelity before record** — anticipate and build playable controls (shared kits under `src/uxds/interactions/`); do not expect the PO to record on dead UI ([INTERACTION_FIDELITY.md](./INTERACTION_FIDELITY.md)).
+8. **Lead** — if blocked on a PO asset, choose the best unblocked path and say what is waiting on them.
 
 ---
 
@@ -52,6 +53,7 @@ The PO may override with a clear product veto (“wrong priority for the busines
 | Engine vs projects | `src/app/` engine; `src/projects/<id>/` concepts |
 | Quality bar | Lean CI (test + build + lean smoke); grow gates when UXDS lands |
 | Done / viewport / fidelity defaults | [SOLUTION_REQUIREMENTS.md](./SOLUTION_REQUIREMENTS.md) §2 |
+| Interaction fidelity + shared kits | Recording needs playable controls; prefer `src/uxds/interactions/` over per-screen scripts — [INTERACTION_FIDELITY.md](./INTERACTION_FIDELITY.md) |
 
 ---
 
@@ -60,9 +62,10 @@ The PO may override with a clear product veto (“wrong priority for the busines
 1. ✅ Lock doctrine + product docs.  
 2. ✅ PO delivered UXDS (Larkin) + X-Suite integration intent — inventoried under `docs/uxds/` + [X_SUITE_INTEGRATION.md](./X_SUITE_INTEGRATION.md).  
 3. ✅ Recording UI on the existing recording foundation (Studio REC deck + MCP).  
-4. **Next:** Implement UXDS CSS token bridge (`docs/uxds/TOKEN_BRIDGE.md`) as part of first React screen.  
-5. Pilot: one Boots screen rebuilt React + UXDS.  
-6. Scaffold command + broader rebuild; keep journey format open for X-Suite import; compiler recording → journey proposals later.
+4. ✅ Interaction fidelity doctrine locked — shared React/UXDS behavior library; build interactivity before expecting record ([INTERACTION_FIDELITY.md](./INTERACTION_FIDELITY.md)).  
+5. **Next:** Implement UXDS CSS token bridge (`docs/uxds/TOKEN_BRIDGE.md`) as part of first React screen.  
+6. Pilot: one Boots screen rebuilt React + UXDS (include anticipated interactivity from shared kits).  
+7. Scaffold command + broader rebuild; keep journey format open for X-Suite import; compiler recording → journey proposals later.
 
 If the PO issues a product override, update §5 and the decisions log the same turn.
 
@@ -72,5 +75,6 @@ If the PO issues a product override, update §5 and the decisions log the same t
 
 - [PRODUCT_OWNER_BRIEF.md](./PRODUCT_OWNER_BRIEF.md)
 - [PAGE_BUILD_CONTRACT.md](./PAGE_BUILD_CONTRACT.md)
+- [INTERACTION_FIDELITY.md](./INTERACTION_FIDELITY.md)
 - [UXDS_ACCESS.md](./UXDS_ACCESS.md)
 - [../README.md](../README.md)
