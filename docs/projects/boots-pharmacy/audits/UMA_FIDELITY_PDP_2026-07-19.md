@@ -127,7 +127,7 @@
 
 | Residual | Severity | Owner |
 |----------|----------|-------|
-| Quinn MCP functional matrix | **PASS** (`03687d3` / `FE_AUDIT_PDP_MCP_2026-07-19.md`) — does **not** clear §0a / Final Pass | Quinn |
+| Quinn MCP functional matrix | **PASS** (`cbbd97d` / v0.0.24 re-prove · `FE_AUDIT_PDP_MCP_2026-07-19.md`) — does **not** clear §0a / Final Pass | Quinn |
 | Uma §0a typical DS / hover pointer prove | **P0** — blocks PROVEN + PAGE FINAL PASS | Uma + Quinn |
 | PAGE FINAL PASS / `check:page-final-pass` | P0 — blocked on Uma §0a | Quinn + Arch |
 | Share glyph Make flip (`rotate-180 -scale-x-100`) — React uses same path without mirror | P2 visual | Uma / Finn |
