@@ -3,6 +3,7 @@
 **Surface / slice:** Page-tabs row version chip (`StudioNavVersionChip`)  
 **Date:** 2026-07-19  
 **Auditor:** implementer light + Director check (chrome-only)  
+**Implementer handoff:** `b0e9df5`  
 **Checklist:** [../FE_UI_UX_AUDIT.md](../FE_UI_UX_AUDIT.md)
 
 ---
