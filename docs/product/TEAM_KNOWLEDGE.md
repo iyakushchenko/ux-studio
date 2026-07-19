@@ -159,9 +159,16 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 | MCP page probe: **scroll-into-view** before interact; **overlay must be visible on every probe** — FAIL if absent | Quinn, Finn, Ben | LESSONS 2026-07-19 (MCP probe visibility) |
 | Agent overlay: **pre-arm** before steps; sitrep **PASS/FAIL** green/red; **forceClear** hard-remove (no stale popup) | Uma, Finn, Quinn | RECORDING.md · LESSONS · `agentTestingOverlay` |
 | **Studio Auto-Rules framework** — dismiss/modal, auth SSoT, avail start, §0b rhythm, brand-active pills → CI; PO must not re-ask | Arch, Ben, Quinn, Finn, Uma | [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) · `studioAutoRules.ts` · `check:theme-brand` · felonies §9–10 |
+| **Auto-Rule `robo-cursor-native-feedback`** — robo/agent cursor fires hover+press like native; default graphic after click; CSS `:hover`/`:active` bridged | Finn, Ben, Quinn | `demoCursor` · `demoCursorPseudoBridge` · STUDIO_AUTO_RULES R10 |
 | **Auto-Rule `agent-teardown-clean`** — overlay gone + `&modal=` stripped + dialog closed after probe/sitrep/forceClear | Finn, Ben, Quinn, Arch | `studioAgentTeardownContract` · felonies §9 · `__studioAssertAgentTeardownClean` |
 | Team knowledge database + mandatory use | Arch, all | This file · TEAM.md § Knowledge use |
 | Page final-pass gate before NEXT screen; landmarks + BEM stamp | Finn, Uma, Ben, Arch | PAGE_FINAL_PASS.md · check:page-final-pass |
+
+**Knowledge improved** (2026-07-19 · stream: robo-cursor native feedback · Auto-Rule R10):
+- Finn (FE): global agent/robo click path — full pointer enter/move/down/up + CSS `:hover`/`:active` bridge; settle clears hand → default; mild travel overshoot — applied: `demoCursor` + `demoCursorPseudoBridge` + popup-close pressed wash
+- Ben (BE): R10 catalog + Vitest contract (happy-dom) — applied: `studioAutoRules` + STUDIO_AUTO_RULES.md + interaction/bridge tests
+- Quinn (QA): MCP prove hover styles under robo + close press — applied: chrome DevTools probe on tip
+- Arch (Director): shell-only; PDP Final Pass untouched — applied: TEAM_KNOWLEDGE + no demote
 
 **Knowledge improved** (2026-07-19 · stream: PDP PAGE FINAL PASS HARD-GREEN restored · tip c6e8931 · v0.0.28):
 - Arch (Director): restore HARD-GREEN only after Quinn 23/23 (faq-help-body + download unify) + Uma §0a PROVEN; veto Home until PO `+` — applied: PAGE_FINAL_PASS.json mcpFinalPass HARD-GREEN + FE_AUDIT_PDP_PAGE_FINAL_PASS + NEXT_STEPS 3e

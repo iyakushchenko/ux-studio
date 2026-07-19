@@ -39,6 +39,7 @@
 | R7 | *(existing)* | Parity typical misses | `check:parity-ratchets` | — | PLP/PDP recipe steps |
 | R8 | *(existing)* | PROVEN honesty | `check:parity-proven` | — | Matrix evidence |
 | R9 | *(existing)* | PAGE FINAL PASS | `check:page-final-pass` | — | `mcpFinalPass` stamp |
+| R10 | **`robo-cursor-native-feedback`** | Agent/robo cursor must feel native: hover + press feedback, default graphic after click | `vitest` | `demoCursorInteraction` + `demoCursorPseudoBridge` | MCP: hover class/styles under robo; close `:active`/pressed visible |
 
 **Code catalog:** `src/app/shell/studioAutoRules.ts` (`STUDIO_AUTO_RULES`) — keep ids in sync with this table.
 
@@ -106,6 +107,28 @@ When a project ships `styleguide/theme.css` under `[data-studio-project="…"]`:
 4. Boots Availability store filters must use `.uxds-filter-chip--strong` (theme-bound active).
 
 **Sibling hook:** Uma/Finn brand-primary pill fixes plug into this check — extend the script, do not add a second brand gate.
+
+---
+
+## R10 — Robo-cursor native feedback (HARD)
+
+**Fail class:** Agent testing / MCP probe cursor looks dead — no hover wash, no press/active, hand graphic stuck after click.
+
+**Behavior contract (global — `demoCursor` click/hover path):**
+
+1. **Hover** — On approach/dwell: dispatch `pointerover` / `pointerenter` / `mouseover` / `mouseenter` / `pointermove` / `mousemove`, add `.proto-chat-cta--hover`, show hand graphic. CSS `:hover` rules are bridged onto that class via `demoCursorPseudoBridge` (synthetic events alone do not flip `:hover`).
+2. **Press** — Keep hover class; add `.proto-chat-cta--pressed`; dispatch `pointerdown`/`mousedown` then `pointerup`/`mouseup` before `click` so `:active` / pressed styles show (e.g. `.proto-popup-close`).
+3. **After click / unfocus** — Clear hover+pressed; **cursor graphic returns to default arrow immediately** (never leave hand/pointer stuck).
+4. **Motion** — Mild path variance + subtle back-ease overshoot (human agility, not cartoon).
+
+**CI:** Vitest `demoCursorInteraction` + `demoCursorPseudoBridge`.  
+**MCP prove:**
+
+```js
+// Open Availability (or any surface with .proto-popup-close / tertiary)
+await window.__studioProveRoboCursorFeedback?.(".proto-avail-header .proto-popup-close")
+// → { pass: true, hoverClass, hoverStyleChanged, pressSeen, pointerClearedAfterClick }
+```
 
 ---
 

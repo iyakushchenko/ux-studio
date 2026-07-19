@@ -61,6 +61,12 @@ export const STUDIO_AUTO_RULES: readonly StudioAutoRule[] = [
     title: "Brand theme wins on interactive active pills/tabs",
     ciGate: "check:theme-brand",
   },
+  {
+    id: "robo-cursor-native-feedback",
+    title:
+      "Robo-cursor fires hover/press like native (events + CSS bridge; default graphic after click)",
+    ciGate: "vitest",
+  },
 ] as const;
 
 /** Ids Arch/Ben expect wired — felony scan fails if catalog drops one. */

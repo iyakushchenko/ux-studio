@@ -1638,7 +1638,8 @@
   color: #afafaf;
   transition: background 0.15s ease, color 0.15s ease;
 }
-.proto-popup-close:hover {
+.proto-popup-close:hover,
+.proto-popup-close.proto-chat-cta--hover {
   background: rgba(1, 33, 105, 0.06);
   color: #012169;
 }
@@ -1646,9 +1647,12 @@
   outline: none !important;
   box-shadow: none !important;
 }
-.proto-popup-close:active:not(:focus-visible) {
+.proto-popup-close:active:not(:focus-visible),
+.proto-popup-close.proto-chat-cta--pressed:not(:focus-visible) {
   outline: none !important;
   box-shadow: none !important;
+  background: rgba(1, 33, 105, 0.12);
+  color: #012169;
 }
 .proto-popup-close:focus-visible {
   outline: 2px solid #012169;

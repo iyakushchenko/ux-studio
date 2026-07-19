@@ -7,6 +7,9 @@
  *   await window.__studioRunMcpPageProbe?.() // current screen
  *   await window.__studioRunMcpPageProbe?.({ screenId: "plp" })
  *
+ * Robo-cursor native feedback (R10):
+ *   await window.__studioProveRoboCursorFeedback?.(".proto-avail-header .proto-popup-close")
+ *
  * STOP everything:
  *   window.__protoAbortAll?.()
  *
@@ -46,6 +49,11 @@ import {
   uninstallAgentTestingOverlayApi,
 } from "@/app/shell/agentTestingOverlay";
 import { armOverlayOnStudioHelpers } from "@/app/shell/helperOverlayArm";
+import {
+  isDemoCursorPointerMode,
+  simulateDemoPointerClick,
+  simulateDemoPointerHover,
+} from "@/app/scenario/demoCursor";
 import {
   mcpDelay as delay,
   withMcpTestSession,
@@ -224,8 +232,88 @@ declare global {
     __studioRunMcpPageProbe?: (
       options?: McpPageProbeOptions
     ) => Promise<McpPageProbeResult>;
+    /**
+     * Prove robo-cursor native feedback (R10): hover styles + press + default after click.
+     *   await window.__studioProveRoboCursorFeedback?.(".proto-popup-close")
+     */
+    __studioProveRoboCursorFeedback?: (selector?: string) => Promise<{
+      pass: boolean;
+      hoverClass: boolean;
+      hoverStyleChanged: boolean;
+      pressSeen: boolean;
+      pointerClearedAfterClick: boolean;
+      detail: string;
+    }>;
     __protoDiagnosticFlashes?: () => import("@/app/shell/playbackDiagnosticFlash").DiagnosticFlashRecord[];
   }
+}
+
+async function proveRoboCursorFeedback(selector?: string): Promise<{
+  pass: boolean;
+  hoverClass: boolean;
+  hoverStyleChanged: boolean;
+  pressSeen: boolean;
+  pointerClearedAfterClick: boolean;
+  detail: string;
+}> {
+  const el = document.querySelector<HTMLElement>(
+    selector ||
+      ".proto-avail-header .proto-popup-close, .studio-tertiary-cta, .pdp__pill, [data-name='component.input.button'], button"
+  );
+  if (!el) {
+    return {
+      pass: false,
+      hoverClass: false,
+      hoverStyleChanged: false,
+      pressSeen: false,
+      pointerClearedAfterClick: false,
+      detail: "no target",
+    };
+  }
+
+  const beforeBg = getComputedStyle(el).backgroundColor;
+  const beforeColor = getComputedStyle(el).color;
+  let hoverClass = false;
+  let hoverStyleChanged = false;
+
+  const hovered = await simulateDemoPointerHover(el, 480, {
+    scroll: true,
+    onHoverStart: (root) => {
+      hoverClass = root.classList.contains("proto-chat-cta--hover");
+      const bg = getComputedStyle(root).backgroundColor;
+      const color = getComputedStyle(root).color;
+      hoverStyleChanged = bg !== beforeBg || color !== beforeColor;
+    },
+  });
+
+  let pressSeen = false;
+  const onDown = () => {
+    pressSeen =
+      el.classList.contains("proto-chat-cta--pressed") &&
+      el.classList.contains("proto-chat-cta--hover");
+  };
+  el.addEventListener("pointerdown", onDown, { once: true });
+
+  const clicked = await simulateDemoPointerClick(el, { scroll: true });
+  const pointerClearedAfterClick = !isDemoCursorPointerMode();
+  const pass =
+    hovered &&
+    clicked &&
+    hoverClass &&
+    hoverStyleChanged &&
+    pressSeen &&
+    pointerClearedAfterClick;
+
+  return {
+    pass,
+    hoverClass,
+    hoverStyleChanged,
+    pressSeen,
+    pointerClearedAfterClick,
+    detail: pass
+      ? "robo-cursor native feedback OK"
+      : `hover=${hovered}/${hoverClass}/${hoverStyleChanged} click=${clicked} press=${pressSeen} pointerCleared=${pointerClearedAfterClick}`,
+  };
 }
 
 export function parseStudioStepCounter(counter: string | null): {
@@ -810,6 +898,7 @@ export function registerStudioMcpHelpers(options: {
 
   window.__protoRunMcpPageProbe = (options) => runMcpPageProbe(options);
   window.__studioRunMcpPageProbe = window.__protoRunMcpPageProbe;
+  window.__studioProveRoboCursorFeedback = proveRoboCursorFeedback;
 
   window.__protoSetOrchestraMode = (modeId) => {
     if (!ORCHESTRA_MODE_IDS.includes(modeId)) return false;
@@ -1248,6 +1337,7 @@ export function registerStudioMcpHelpers(options: {
     delete window.__protoRunMcpSanityCheck;
     delete window.__protoRunMcpPageProbe;
     delete window.__studioRunMcpPageProbe;
+    delete window.__studioProveRoboCursorFeedback;
     delete window.__protoCursorDiagnostics;
     delete window.__protoMcpEyes;
     delete window.__protoDiagnosticFlashes;

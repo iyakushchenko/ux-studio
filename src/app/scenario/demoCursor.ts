@@ -18,6 +18,11 @@ import {
   isElementBlockedByModal,
   resolveClickTargetRespectingModal,
 } from "@/app/shell/studioModalGuard";
+import {
+  DEMO_HOVER_CLASS,
+  DEMO_PRESSED_CLASS,
+  ensureDemoPseudoBridge,
+} from "@/app/scenario/demoCursorPseudoBridge";
 
 const CURSOR_ARROW_SVG = `<img class="proto-chat-demo-cursor__graphic proto-chat-demo-cursor__graphic--arrow" src="${defaultCursorUrl}" width="22" height="26" alt="" aria-hidden="true" draggable="false" />`;
 
@@ -25,8 +30,8 @@ const CURSOR_HAND_SVG = `<img class="proto-chat-demo-cursor__graphic proto-chat-
 
 const DEMO_CURSOR_MARKUP = `${CURSOR_ARROW_SVG}${CURSOR_HAND_SVG}`;
 
-const CTA_TRAVEL_MS = 820;
-const CTA_PRESS_MS = 380;
+const CTA_TRAVEL_MS = 780;
+const CTA_PRESS_MS = 420;
 const CTA_HOVER_DWELL_MS = 220;
 const CURSOR_EXIT_MS = 1600;
 const CURSOR_EXIT_DRIFT_PX = 10;
@@ -386,6 +391,13 @@ function easeOutCubic(t: number): number {
   return 1 - (1 - t) ** 3;
 }
 
+/** Mild overshoot — human agility without cartoon bounce (c1 ≪ classic back). */
+function easeOutBackSubtle(t: number): number {
+  const c1 = 1.18;
+  const c3 = c1 + 1;
+  return 1 + c3 * (t - 1) ** 3 + c1 * (t - 1) ** 2;
+}
+
 export function resetDemoCursorTravelOrigin(): void {
   if (journeyModePinned) {
     const current = readCursorPosition();
@@ -446,9 +458,13 @@ async function animateCursorTravel(
   const dx = initialEnd.x - startX;
   const dy = initialEnd.y - startY;
   const dist = Math.hypot(dx, dy) || 1;
-  const arcMag = Math.min(56, dist * 0.14) * (Math.random() > 0.5 ? 1 : -1);
-  const ctrlX = startX + dx * 0.42 + (-dy / dist) * arcMag;
-  const ctrlY = startY + dy * 0.42 + (dx / dist) * arcMag;
+  // Path variance — two control points for a gentle S / arc (not a single stiff curve).
+  const arcMag = Math.min(48, dist * 0.12) * (Math.random() > 0.5 ? 1 : -1);
+  const midJitter = randomInRange(-10, 10);
+  const ctrl1X = startX + dx * 0.28 + (-dy / dist) * arcMag + midJitter * 0.35;
+  const ctrl1Y = startY + dy * 0.28 + (dx / dist) * arcMag - midJitter * 0.25;
+  const ctrl2X = startX + dx * 0.68 + (-dy / dist) * (arcMag * -0.55);
+  const ctrl2Y = startY + dy * 0.68 + (dx / dist) * (arcMag * -0.55);
 
   cursor.style.transition = "none";
   const start = performance.now();
@@ -476,14 +492,24 @@ async function animateCursorTravel(
         return;
       }
       const t = Math.min(1, (now - start) / durationMs);
-      const e = easeOutCubic(t);
+      // Mild back-ease overshoot (human agility); t=1 lands exactly on end.
+      const e = easeOutBackSubtle(t);
       const end = resolveEnd();
       const u = 1 - e;
-      let x = u * u * startX + 2 * u * e * ctrlX + e * e * end.x;
-      let y = u * u * startY + 2 * u * e * ctrlY + e * e * end.y;
-      if (!options?.trackTarget && t > 0.9) {
-        x += randomInRange(-1.2, 1.2);
-        y += randomInRange(-0.8, 0.8);
+      // Cubic Bezier: start → ctrl1 → ctrl2 → end
+      let x =
+        u * u * u * startX +
+        3 * u * u * e * ctrl1X +
+        3 * u * e * e * ctrl2X +
+        e * e * e * end.x;
+      let y =
+        u * u * u * startY +
+        3 * u * u * e * ctrl1Y +
+        3 * u * e * e * ctrl2Y +
+        e * e * e * end.y;
+      if (!options?.trackTarget && t > 0.82 && t < 0.97) {
+        x += randomInRange(-0.9, 0.9);
+        y += randomInRange(-0.6, 0.6);
       }
       cursor.style.left = `${x}px`;
       cursor.style.top = `${y}px`;
@@ -647,6 +673,7 @@ const FIELD_INTERACTION_SELECTORS = [
 const BUTTON_INTERACTION_SELECTORS = [
   '[data-name="component.input.button"]',
   "button",
+  ".proto-popup-close",
   ".studio-tertiary-cta",
   ".proto-avail-tertiary",
   ".proto-avail-btn-primary",
@@ -664,14 +691,15 @@ export function delay(ms: number): Promise<void> {
 
 export function clearDemoCtaStates(): void {
   document
-    .querySelectorAll<HTMLElement>(".proto-chat-cta--hover, .proto-chat-cta--pressed")
+    .querySelectorAll<HTMLElement>(`.${DEMO_HOVER_CLASS}, .${DEMO_PRESSED_CLASS}`)
     .forEach((el) => {
-      el.classList.remove("proto-chat-cta--hover", "proto-chat-cta--pressed");
+      el.classList.remove(DEMO_HOVER_CLASS, DEMO_PRESSED_CLASS);
     });
   document
     .querySelectorAll<HTMLElement>(".proto-demo-avatar-hover")
     .forEach((el) => el.classList.remove("proto-demo-avatar-hover"));
   activeHoverRoot = null;
+  setDemoCursorPointerMode(false);
 }
 
 function setDemoCursorPointerMode(active: boolean): void {
@@ -680,17 +708,60 @@ function setDemoCursorPointerMode(active: boolean): void {
   });
 }
 
-function setDemoInteractionHover(root: HTMLElement | null, active: boolean): void {
-  if (activeHoverRoot && activeHoverRoot !== root) {
-    activeHoverRoot.classList.remove("proto-chat-cta--hover", "proto-chat-cta--pressed");
+/** QA / MCP — true when robo-cursor shows hand/pointer graphic. */
+export function isDemoCursorPointerMode(): boolean {
+  const cursor = document.querySelector<HTMLElement>(".proto-chat-demo-cursor");
+  return cursor?.classList.contains("proto-chat-demo-cursor--pointer") ?? false;
+}
+
+function leaveDemoInteractionRoot(
+  root: HTMLElement,
+  coords?: { x: number; y: number }
+): void {
+  root.classList.remove(DEMO_HOVER_CLASS, DEMO_PRESSED_CLASS);
+  if (!root.isConnected) return;
+  const c = coords ?? targetCenter(root);
+  dispatchDemoPointerLeave(root, c.x, c.y);
+}
+
+function setDemoInteractionHover(
+  root: HTMLElement | null,
+  active: boolean,
+  coords?: { x: number; y: number }
+): void {
+  ensureDemoPseudoBridge();
+
+  if (!active) {
+    if (activeHoverRoot) {
+      leaveDemoInteractionRoot(activeHoverRoot, coords);
+    } else if (root) {
+      leaveDemoInteractionRoot(root, coords);
+    }
+    activeHoverRoot = null;
+    setDemoCursorPointerMode(false);
+    return;
   }
-  activeHoverRoot = active ? root : null;
-  setDemoCursorPointerMode(active);
-  if (!root) return;
-  if (active) {
-    root.classList.add("proto-chat-cta--hover");
+
+  if (!root) {
+    if (activeHoverRoot) leaveDemoInteractionRoot(activeHoverRoot, coords);
+    activeHoverRoot = null;
+    setDemoCursorPointerMode(false);
+    return;
+  }
+
+  if (activeHoverRoot && activeHoverRoot !== root) {
+    leaveDemoInteractionRoot(activeHoverRoot, coords);
+  }
+
+  const c = coords ?? targetCenter(root);
+  const already = activeHoverRoot === root && root.classList.contains(DEMO_HOVER_CLASS);
+  activeHoverRoot = root;
+  setDemoCursorPointerMode(true);
+  root.classList.add(DEMO_HOVER_CLASS);
+  if (already) {
+    dispatchDemoPointerMove(root, c.x, c.y);
   } else {
-    root.classList.remove("proto-chat-cta--hover", "proto-chat-cta--pressed");
+    dispatchDemoPointerEnter(root, c.x, c.y);
   }
 }
 
@@ -772,7 +843,10 @@ export async function releaseDemoCursorAfterScript(): Promise<void> {
   retainDemoCursorInPlace();
 }
 
-/** After a scripted click — keep cursor on target; clear press/tap visuals only. */
+/**
+ * After a scripted click — clear press/tap + return cursor graphic to default
+ * immediately (native unfocus / leave-clickable feel). Do not keep hand/pointer.
+ */
 export function settleDemoCursorAfterClick(
   cursor: HTMLElement,
   interactionRoot?: HTMLElement | null
@@ -780,10 +854,10 @@ export function settleDemoCursorAfterClick(
   cursor.classList.remove("proto-chat-demo-cursor--tap");
   cursor.classList.remove(DEMO_CURSOR_PARKED_CLASS);
   if (interactionRoot) {
-    interactionRoot.classList.remove("proto-chat-cta--pressed");
-    setDemoInteractionHover(interactionRoot, true);
+    interactionRoot.classList.remove(DEMO_PRESSED_CLASS);
+    setDemoInteractionHover(interactionRoot, false);
   } else {
-    setDemoCursorPointerMode(true);
+    setDemoCursorPointerMode(false);
   }
   const left = Number.parseFloat(cursor.style.left);
   const top = Number.parseFloat(cursor.style.top);
@@ -833,36 +907,97 @@ export function findDemoInteractionRoot(target: HTMLElement): HTMLElement {
   return target;
 }
 
-function dispatchDemoPointerEvent(
-  target: HTMLElement,
-  type: "pointerenter" | "pointerdown" | "pointerup",
+function demoPointerInit(
   x: number,
-  y: number
-): void {
-  const init: PointerEventInit = {
-    bubbles: true,
+  y: number,
+  options?: { buttons?: number; button?: number; bubbles?: boolean }
+): PointerEventInit {
+  return {
+    bubbles: options?.bubbles !== false,
     cancelable: true,
+    view: window,
     clientX: x,
     clientY: y,
+    screenX: x,
+    screenY: y,
     pointerId: 1,
     pointerType: "mouse",
     isPrimary: true,
+    button: options?.button ?? 0,
+    buttons: options?.buttons ?? 0,
   };
-  target.dispatchEvent(new PointerEvent(type, init));
+}
 
-  const mouseType =
-    type === "pointerenter"
-      ? "mouseenter"
-      : type === "pointerdown"
-        ? "mousedown"
-        : "mouseup";
+function demoMouseInit(
+  x: number,
+  y: number,
+  options?: { buttons?: number; button?: number; bubbles?: boolean }
+): MouseEventInit {
+  return {
+    bubbles: options?.bubbles !== false,
+    cancelable: true,
+    view: window,
+    clientX: x,
+    clientY: y,
+    screenX: x,
+    screenY: y,
+    button: options?.button ?? 0,
+    buttons: options?.buttons ?? 0,
+  };
+}
+
+/** Enter + over + move — drives React hover handlers; classes bridge CSS :hover. */
+function dispatchDemoPointerEnter(target: HTMLElement, x: number, y: number): void {
+  const move = demoPointerInit(x, y, { buttons: 0, button: -1 });
+  const mouseMove = demoMouseInit(x, y, { buttons: 0, button: -1 });
+  target.dispatchEvent(new PointerEvent("pointerover", move));
   target.dispatchEvent(
-    new MouseEvent(mouseType, {
-      bubbles: mouseType !== "mouseenter",
-      cancelable: true,
-      clientX: x,
-      clientY: y,
-    })
+    new PointerEvent("pointerenter", { ...move, bubbles: false })
+  );
+  target.dispatchEvent(new MouseEvent("mouseover", mouseMove));
+  target.dispatchEvent(
+    new MouseEvent("mouseenter", { ...mouseMove, bubbles: false })
+  );
+  dispatchDemoPointerMove(target, x, y);
+}
+
+function dispatchDemoPointerMove(target: HTMLElement, x: number, y: number): void {
+  target.dispatchEvent(
+    new PointerEvent("pointermove", demoPointerInit(x, y, { buttons: 0, button: -1 }))
+  );
+  target.dispatchEvent(
+    new MouseEvent("mousemove", demoMouseInit(x, y, { buttons: 0, button: -1 }))
+  );
+}
+
+function dispatchDemoPointerDown(target: HTMLElement, x: number, y: number): void {
+  target.dispatchEvent(
+    new PointerEvent("pointerdown", demoPointerInit(x, y, { buttons: 1, button: 0 }))
+  );
+  target.dispatchEvent(
+    new MouseEvent("mousedown", demoMouseInit(x, y, { buttons: 1, button: 0 }))
+  );
+}
+
+function dispatchDemoPointerUp(target: HTMLElement, x: number, y: number): void {
+  target.dispatchEvent(
+    new PointerEvent("pointerup", demoPointerInit(x, y, { buttons: 0, button: 0 }))
+  );
+  target.dispatchEvent(
+    new MouseEvent("mouseup", demoMouseInit(x, y, { buttons: 0, button: 0 }))
+  );
+}
+
+function dispatchDemoPointerLeave(target: HTMLElement, x: number, y: number): void {
+  const init = demoPointerInit(x, y, { buttons: 0, button: -1 });
+  const mouse = demoMouseInit(x, y, { buttons: 0, button: -1 });
+  target.dispatchEvent(new PointerEvent("pointerout", init));
+  target.dispatchEvent(
+    new PointerEvent("pointerleave", { ...init, bubbles: false })
+  );
+  target.dispatchEvent(new MouseEvent("mouseout", mouse));
+  target.dispatchEvent(
+    new MouseEvent("mouseleave", { ...mouse, bubbles: false })
   );
 }
 
@@ -878,7 +1013,12 @@ export function isClickableTarget(target: HTMLElement): boolean {
   if (rect.width < 2 || rect.height < 2) return false;
   const style = window.getComputedStyle(target);
   if (style.display === "none" || style.visibility === "hidden") return false;
-  if (Number(style.opacity) === 0) return false;
+  // Empty opacity string → Number("") === 0 in JS; treat as fully visible.
+  const opacity =
+    style.opacity === "" || style.opacity == null
+      ? 1
+      : Number(style.opacity);
+  if (Number.isFinite(opacity) && opacity === 0) return false;
   return true;
 }
 
@@ -1111,13 +1251,11 @@ export async function simulateDemoPointerClick(
   const { x, y } = targetCenter(target);
   const dispatchEvents = options?.dispatchPointerEvents !== false;
 
-  setDemoInteractionHover(interactionRoot, true);
-  if (dispatchEvents) {
-    dispatchDemoPointerEvent(interactionRoot, "pointerenter", x, y);
-  }
+  // Hover class + enter/over/move events (CSS bridged via ensureDemoPseudoBridge).
+  setDemoInteractionHover(interactionRoot, true, { x, y });
   await delay(CTA_HOVER_DWELL_MS);
   if (options?.shouldAbort?.()) {
-    setDemoInteractionHover(interactionRoot, false);
+    setDemoInteractionHover(interactionRoot, false, { x, y });
     notePlaybackCursorEvent("abort", {
       target: describeCursorTarget(target),
       abortReason: "click-aborted",
@@ -1132,22 +1270,24 @@ export async function simulateDemoPointerClick(
     animated: true,
   });
 
-  interactionRoot.classList.remove("proto-chat-cta--hover");
-  interactionRoot.classList.add("proto-chat-cta--pressed");
+  // Native parity: :hover stays while :active — keep hover class during press.
+  interactionRoot.classList.add(DEMO_HOVER_CLASS, DEMO_PRESSED_CLASS);
   if (dispatchEvents) {
-    dispatchDemoPointerEvent(interactionRoot, "pointerdown", x, y);
+    dispatchDemoPointerDown(interactionRoot, x, y);
     notifyStudioDemoClick();
   }
   await delay(CTA_PRESS_MS);
   if (options?.shouldAbort?.()) {
-    setDemoInteractionHover(interactionRoot, false);
+    interactionRoot.classList.remove(DEMO_PRESSED_CLASS);
+    setDemoInteractionHover(interactionRoot, false, { x, y });
     await releaseDemoCursorAfterScript();
     return false;
   }
 
   if (dispatchEvents) {
-    dispatchDemoPointerEvent(interactionRoot, "pointerup", x, y);
+    dispatchDemoPointerUp(interactionRoot, x, y);
   }
+  interactionRoot.classList.remove(DEMO_PRESSED_CLASS);
   notePlaybackDemoClick(interactionRoot);
   target.click();
   notePlaybackCursorEvent("click", {
@@ -1155,6 +1295,7 @@ export async function simulateDemoPointerClick(
     animated: true,
     detail: options?.scroll === false ? "scroll-disabled" : "scroll-enabled",
   });
+  // Default arrow immediately after click / unfocus — not stuck on hand.
   settleDemoCursorAfterClick(cursor, interactionRoot);
   await delay(160);
   return true;
