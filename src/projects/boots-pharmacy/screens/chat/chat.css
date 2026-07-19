@@ -427,7 +427,9 @@
   border: 0;
 }
 
-/* Overlay dock — content scrolls underneath; height → --studio-chat-composer-h */
+/* Overlay dock — content scrolls underneath; height → --studio-chat-composer-h.
+ * PO: no fade gradient (under-bar / above-thread / composer-edge). Sticky card
+ * + column scroll-pad only — do not invent a replacement wash. */
 .chat__composer-dock {
   position: absolute;
   left: 0;
@@ -440,7 +442,7 @@
   gap: 8px;
   padding: 12px 64px 24px;
   box-sizing: border-box;
-  background: linear-gradient(180deg, transparent 0%, #dbebf5 24%);
+  background: transparent;
   pointer-events: none;
 }
 

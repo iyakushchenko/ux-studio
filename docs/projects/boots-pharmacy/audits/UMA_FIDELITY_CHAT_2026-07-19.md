@@ -43,7 +43,7 @@
 | # | Make band / component | Make truth (computed / DOM) | Uma stamp | Notes |
 |---|------------------------|----------------------------|-----------|-------|
 | **C1** | **Shell / column** — 1440, **64px** pad on body stack | `Body9` inner `p-[64px]`; summary **864px** centered | **PENDING** | Sticky bar uses **1312px** inner max ([globals-chrome.css](../../../../src/styles/globals-chrome.css) child-10) |
-| **C2** | **Page bg / atmosphere** | `#dbebf5` on `[data-name="body"]` | **PENDING** | Composer fade gradient must match wire (`::after` on `.proto-chat-screen`) |
+| **C2** | **Page bg / atmosphere** | `#dbebf5` on `[data-name="body"]` | **PASS (PO)** | Solid `#dbebf5` only — **no** composer / under-bar fade wash (PO 2026-07-19) |
 | **C3** | **Sticky Site Pilot bar** | `data-studio-sticky-group` — white bar, logo cluster + Contact Support | **PENDING** | JS-injected sticky; Nazi QA on scroll lock frame 1 |
 | **C4** | **Thread column** — `component.appointment.summary` | `flex-col gap-[40px]` · **864px** · children: query/reply pairs + feedback + composer card | **PENDING** | `padding-bottom: var(--proto-chat-composer-h)` when dock mounted |
 | **C5** | **User query bubble** | `data-name="query"` · `component.co.order.summary` · `bg-[rgba(245,255,254,0.35)]` · **rounded 16** · **p 16** · **w 438** · right-aligned | **PENDING** | Send flash: outline keyframes — port or Motion equivalent per § Motion |
@@ -133,7 +133,7 @@
 
 | Gate | Status | Notes |
 |------|--------|-------|
-| Page bg + composer fade | **PENDING** | C2 + `::after` gradient |
+| Page bg (no fade wash) | **PASS (PO)** | C2 — fade removed |
 | Promo / Advantage | **N/A** | Not on chat frame |
 | Primary / pill CTAs | **PENDING** | C7 — Nazi-hover every frame |
 | Icon mic/send | **PENDING** | Shared with Home |

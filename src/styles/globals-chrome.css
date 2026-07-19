@@ -1586,7 +1586,7 @@
   transform: scale(0.94) !important;
   box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.28) !important;
 }
-/* In-place fixed composer — white card + fade; disclaimer pinned below. */
+/* In-place fixed composer — white card; disclaimer pinned below (no fade). */
 .proto-site-pilot-composer.proto-chat-composer-dock--in-place {
   position: fixed !important;
   z-index: 10101 !important;
@@ -1599,22 +1599,11 @@
   box-shadow: 0 4px 4.45px rgba(1, 33, 105, 0.1) !important;
   overflow: visible !important;
 }
-/* Fade above the fixed composer stack (matches portal dock). */
+/* PO 2026-07-19: Chat fade gradient removed entirely (no ::after wash).
+ * Sticky SitePilot bar + overlay composer + scroll-pad remain. */
 .proto-chat-screen::after {
-  content: "";
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: min(220px, 38vh);
-  z-index: 10100;
-  pointer-events: none;
-  background: linear-gradient(
-    180deg,
-    rgba(219, 235, 245, 0) 0%,
-    rgba(219, 235, 245, 0.92) 18%,
-    #dbebf5 32%
-  );
+  content: none;
+  display: none;
 }
 .proto-chat-composer-disclaimer {
   position: fixed !important;
@@ -1632,7 +1621,7 @@
   font-size: 10px !important;
   line-height: 12px !important;
 }
-/* Portal dock — legacy fallback */
+/* Portal dock — legacy fallback (no fade wash; PO removed Chat gradient). */
 .proto-chat-composer-dock--portal {
   position: fixed !important;
   bottom: 0 !important;
@@ -1640,12 +1629,7 @@
   box-sizing: border-box !important;
   padding: 12px 0 24px !important;
   pointer-events: none !important;
-  background: linear-gradient(
-    180deg,
-    rgba(219, 235, 245, 0) 0%,
-    rgba(219, 235, 245, 0.92) 18%,
-    #dbebf5 32%
-  ) !important;
+  background: transparent !important;
 }
 .proto-chat-composer-dock--portal > * {
   pointer-events: auto !important;
