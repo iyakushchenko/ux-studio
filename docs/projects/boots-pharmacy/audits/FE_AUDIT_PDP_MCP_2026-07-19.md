@@ -87,7 +87,7 @@
 |------|--------|
 | Quinn MCP interaction matrix | **PASS** (this re-prove · 23/23 · `f5f004f` / v0.0.38) |
 | Uma §0a | **PROVEN** (`76e2433`) |
-| `PAGE_FINAL_PASS.json` `mcpFinalPass` | **HARD-GREEN** @ `f5f004f` (Arch restore) |
+| `PAGE_FINAL_PASS.json` `mcpFinalPass` | **HARD-GREEN** @ `53da33f` (Arch restore; prove `f5f004f`) |
 | `hardGreen` | **true** |
 
 ---

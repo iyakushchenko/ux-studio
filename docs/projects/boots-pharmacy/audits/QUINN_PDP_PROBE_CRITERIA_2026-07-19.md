@@ -1,8 +1,8 @@
 # Quinn (QA) — PDP MCP prove criteria
 
 **Status:** MCP matrix **PASS** @ tip `f5f004f` / v0.0.38 — evidence [FE_AUDIT_PDP_MCP_2026-07-19.md](./FE_AUDIT_PDP_MCP_2026-07-19.md).  
-**PAGE FINAL PASS:** **HARD-GREEN** (`hardGreen: true` @ tip `f5f004f`) — Uma §0a PROVEN @ `76e2433`; Quinn 23/23 PASS @ `f5f004f` / v0.0.38 (PromoMessageStrip + tip-stable cursor re-prove after NEEDS-REPROVE).  
-**Updated:** 2026-07-19 (Arch HARD-GREEN restore after v0.0.38 Quinn re-prove)  
+**PAGE FINAL PASS:** **HARD-GREEN** (`hardGreen: true` @ tip `53da33f`) — Uma §0a PROVEN @ `76e2433`; Quinn 23/23 PASS @ `f5f004f` / v0.0.38 (PromoMessageStrip + tip-stable cursor re-prove after NEEDS-REPROVE).  
+**Updated:** 2026-07-19 (Arch HARD-GREEN restore tip `53da33f` after v0.0.38 Quinn re-prove)  
 **Screen:** `pdp` (Frame child 8)  
 **Register:** [../features/PDP_MAKE_PARITY_REGISTER.md](../features/PDP_MAKE_PARITY_REGISTER.md)  
 **Refs:** [RECORDING.md](../../../shell/RECORDING.md) · LESSONS overlay/scroll · `studioMcpPageProbe.ts`

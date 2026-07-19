@@ -4,6 +4,7 @@
 **Date:** 2026-07-19  
 **Auditor:** Quinn (QA) MCP matrix · Uma (UI/UX) §0a · Arch (Director) HARD-GREEN restore  
 **Ship tip proved:** `f5f004f` · **v0.0.38** — PromoMessageStrip + tip-stable robo-cursor (re-prove after NEEDS-REPROVE)  
+**HARD-GREEN restore tip:** `53da33f`  
 **Prior HARD-GREEN (demoted then restored):** `5c1d90f` · **v0.0.37** — Accordion Motion height  
 **Uma §0a tip:** `76e2433` · **v0.0.30** — FAQ 6/6 + TertiaryCta soft + muted chevrons  
 **Policy:** [PAGE_FINAL_PASS.md](../../../product/PAGE_FINAL_PASS.md) · manifest [PAGE_FINAL_PASS.json](./PAGE_FINAL_PASS.json) · criteria [QUINN_PDP_PROBE_CRITERIA_2026-07-19.md](./QUINN_PDP_PROBE_CRITERIA_2026-07-19.md)

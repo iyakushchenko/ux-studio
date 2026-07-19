@@ -123,19 +123,19 @@
       "status": "proven",
       "hardGreen": true,
       "stampedAt": {
-        "sha": "f5f004f",
+        "sha": "53da33f",
         "date": "2026-07-19",
-        "note": "Finn structure/naming + UXDS Accordion kit + ButtonPrimary Book now; header crumbs + main RTB/below; BEM pdp; data-studio-react-screen + make-retired; FAQ 6/6 + TertiaryCta soft + muted chevrons. PromoMessageStrip kit + tip-stable cursor retained under HARD-GREEN after Quinn 23/23 re-prove @ f5f004f / v0.0.38."
+        "note": "Finn structure/naming + UXDS Accordion kit + ButtonPrimary Book now; header crumbs + main RTB/below; BEM pdp; data-studio-react-screen + make-retired; FAQ 6/6 + TertiaryCta soft + muted chevrons. PromoMessageStrip kit + tip-stable cursor retained under HARD-GREEN after Quinn 23/23 re-prove @ f5f004f / v0.0.38; Arch restore tip 53da33f."
       },
       "mcpFinalPass": {
         "status": "HARD-GREEN",
         "pass": true,
         "stampedAt": {
-          "sha": "f5f004f",
+          "sha": "53da33f",
           "date": "2026-07-19",
           "version": "0.0.38",
           "auditor": "Quinn (QA) MCP + Arch (Director) HARD-GREEN restore",
-          "note": "Quinn __studioRunMcpPageProbe({ screenId:\"pdp\", reload:false }) 23/23 PASS ~27242ms on tip f5f004f / v0.0.38 (PromoMessageStrip + tip-stable cursor). Overlay-arm + overlay-eyes + teardown clean stay screen=pdp. Arch restores hardGreen after demote NEEDS-REPROVE @ bd01c07. Home waits PO +."
+          "note": "Quinn __studioRunMcpPageProbe({ screenId:\"pdp\", reload:false }) 23/23 PASS ~27242ms on tip f5f004f / v0.0.38 (PromoMessageStrip + tip-stable cursor). Overlay-arm + overlay-eyes + teardown clean stay screen=pdp. Arch restores hardGreen @ 53da33f after demote NEEDS-REPROVE. Home waits PO +."
         },
         "url": "http://localhost:5173/?project=boots-pharmacy&screen=pdp",
         "auditPath": "docs/projects/boots-pharmacy/audits/FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md",
