@@ -58,7 +58,7 @@ await window.__studioRunMcpPageProbe?.({ screenId: "chat", reload: false })
 | 6 | `chat-composer-send` | dual-class send + `:hover` CSS |
 | 7 | `chat-composer-mic-hover` | MCP hover + shared mic `:hover` |
 | 8 | `chat-chip-hover` | MCP hover + **Next dialog options:** label |
-| 9 | `chat-cta-hover` | MCP hover + `.chat__cta:hover` |
+| 9 | `chat-cta-hover` | MCP hover + UXDS `.uxds-btn-primary--commerce:hover` |
 | 10 | `chat-motion-owner` | ≥2 `[data-studio-chat-frame]` |
 | auto | `url-screen` | `screen=chat` in address bar |
 

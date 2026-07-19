@@ -2,11 +2,9 @@
 
 import React, { type ReactNode } from "react";
 
-export type ChatCtaTone = "navy" | "bright";
-
+/** Bubble CTA — always UXDS ButtonPrimary commerce (Make navy primary). */
 export type ChatAgentCta = {
   label: string;
-  tone?: ChatCtaTone;
 };
 
 export type ChatThreadFrame =
@@ -113,7 +111,7 @@ export const CHAT_THREAD_FRAMES: readonly ChatThreadFrame[] = [
     kind: "reply",
     ctas: [
       { label: "Open Availability Checker Tool" },
-      { label: "Check availability slot for me", tone: "bright" },
+      { label: "Check availability slot for me" },
     ],
     body: (
       <>
@@ -148,7 +146,7 @@ export const CHAT_THREAD_FRAMES: readonly ChatThreadFrame[] = [
     id: "r2",
     kind: "reply",
     ctas: [
-      { label: "Find available slots for today", tone: "bright" },
+      { label: "Find available slots for today" },
       { label: "Find available slots this week" },
       { label: "Find available slots this weekend" },
     ],

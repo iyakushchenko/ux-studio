@@ -48,7 +48,7 @@
 | **C4** | **Thread column** — `component.appointment.summary` | `flex-col gap-[40px]` · **864px** · children: query/reply pairs + feedback + composer card | **PENDING** | `padding-bottom: var(--proto-chat-composer-h)` when dock mounted |
 | **C5** | **User query bubble** | `data-name="query"` · `component.co.order.summary` · `bg-[rgba(245,255,254,0.35)]` · **rounded 16** · **p 16** · **w 438** · right-aligned | **PENDING** | Send flash: outline keyframes — port or Motion equivalent per § Motion |
 | **C6** | **Agent reply bubble** | `data-name="reply"` · white card · **p 16** · **gap 16** inside · full width | **PENDING** | Long-form copy + **Next Steps:** + pill CTA rows |
-| **C7** | **Reply inline CTAs** | `component.input.button` pills **32px** h · **rounded 360** · navy `#012169` / highlight `#003fcb` where Make shows | **PENDING** | §0a hover/active on every pill in scenario |
+| **C7** | **Reply inline CTAs** | `component.input.button` → UXDS `ButtonPrimary` commerce · **32px** size-only · all navy (Make globals forced Figma `#003fcb` → `#012169`) | **PARTIAL** | Kit hover/active; full frame sweep still open |
 | **C8** | **Feedback strip** | `component.gse.system.message` · `rgba(215,233,248,0.57)` · Yes/No micro-controls | **PENDING** | Per-reply vs end-of-thread copy differs — stamp both |
 | **C9** | **Thinking / agent pending** | Wire: `proto-chat-thinking-bubble` · dots animation · **not** a Make static layer | **PENDING (P0)** | Must match send + CJM playback timing (`SITE_PILOT_CHAT_PLAYBACK_THINK_MS`); no invent alternate loader |
 | **C10** | **Composer card** — `ComponentCoOrderSummary8` | White · **rounded 16** · shadow `0 4px 4.45px rgba(1,33,105,0.1)` · **p 32** · internal **gap 32** (list + chips) | **PENDING** | **Must pixel-match Home H5** — shared kit required ([UMA_FIDELITY_HOME_2026-07-19.md](./UMA_FIDELITY_HOME_2026-07-19.md) H5–H11) |
@@ -86,7 +86,7 @@
 | **Mic** (48px circle) | default · **hover** · **active** · focus-visible | **PARTIAL** | Shared CSS `:hover` `#eef8f7` / border `#afccca` — MCP `chat-composer-mic-hover` |
 | **Send / stop** (primary pill) | default **`#012169`** · stop glyph when thinking · hover/active | **PARTIAL** | Shared send hover + `sendThinking` → stop glyph; probe `chat-composer-send` |
 | **Next dialog chips** | default · **hover** · **active** · keyboard focus | **PARTIAL** | Label **Next dialog options:**; chip `:hover` in shared CSS — MCP `chat-chip-hover` |
-| **Reply pill CTAs** (per frame) | default · hover · active · pressed | **PARTIAL** | `.chat__cta:hover` — MCP `chat-cta-hover`; full frame sweep still open |
+| **Reply pill CTAs** (per frame) | default · hover · active · pressed | **PARTIAL** | UXDS commerce `:hover` — MCP `chat-cta-hover`; full frame sweep still open |
 | **Feedback Yes/No** | default · hover · active | **PARTIAL** | Make thumbs + `chat__helpful-choice:hover` — MCP hover prove still open |
 | **SearchField** | **N/A** | **N/A** | |
 | **Quinn MCP hover prove** | Composer mic + ≥1 chip + ≥1 reply CTA | **PASS when recipe green** | Expanded `chatProbeSteps()` — **≠** whole-page PROVEN |

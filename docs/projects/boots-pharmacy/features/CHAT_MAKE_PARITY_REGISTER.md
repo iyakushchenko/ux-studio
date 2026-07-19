@@ -68,7 +68,7 @@
 | I7 | **Next dialog chips ×3** — NHS / Show available slots for today / Elaborate on previous reply | **Present** | **Missing** | `Frame350` |
 | I8 | **Chip fill textarea** — chip click fills composer (not navigate) | **Present** | **Missing** | wire `onCardClick` |
 | I9 | **Chip “Show available slots for today”** — opens Availability Tool (`dateToday`) | **Present** | **Missing** | wire allowlist |
-| I10 | **Agent inline CTAs** — navy pills (Book bundle, Book YF, Go to catalog, Check slot, Choose time/date/pharmacy, etc.) | **Present** | **Missing** | `Frame341`, `Frame346`, … |
+| I10 | **Agent inline CTAs** — navy pills via UXDS `ButtonPrimary` + `--commerce` (Make `component.input.button`; Figma `#003fcb` rest forced navy like Make globals) | **Present** | **Partial** | `ChatScreen` `AgentCta` · size-only `.chat__cta` |
 | I11 | **Underlined product links** → PDP tab | **Present** | **Missing** | wire `PRODUCT_LINK_RE` |
 | I12 | **“Go to vaccines catalog”** CTA → PLP | **Present** | **Missing** | wire `goPlp` |
 | I13 | **Availability Checker Tool** underline → overlay | **Present** | **Missing** | wire `AVAIL_BTN_INTENT` |

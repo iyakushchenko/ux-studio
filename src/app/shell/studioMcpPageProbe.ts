@@ -1185,15 +1185,16 @@ function chatProbeSteps(): ProbeStep[] {
     },
     {
       id: "chat-cta-hover",
-      selector: `${hostSel} .chat__cta`,
+      selector: `${hostSel} .chat__cta.uxds-btn-primary--commerce`,
       action: "hover",
       settleMs: 420,
       assert: () => {
-        if (
-          !stylesheetHasRule(".chat__cta:hover") &&
-          !stylesheetHasRule(".chat__cta.proto-chat-cta--hover")
-        ) {
-          return "missing reply CTA :hover CSS";
+        if (!document.querySelector(`${hostSel} .chat__cta.uxds-btn-primary--commerce`)) {
+          return "missing UXDS commerce reply CTA";
+        }
+        // Kit owns hover (bridged to .proto-chat-cta--hover for demo cursor).
+        if (!stylesheetHasRule(".uxds-btn-primary--commerce:hover:not(:disabled)")) {
+          return "missing UXDS ButtonPrimary commerce :hover CSS";
         }
         return true;
       },

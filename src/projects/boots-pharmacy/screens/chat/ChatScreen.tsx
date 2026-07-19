@@ -10,6 +10,7 @@ import {
   type RefObject,
 } from "react";
 import { AnimatePresence, motion, MOTION_EASE_IN_OUT } from "@/uxds/motion";
+import { ButtonPrimary } from "@/uxds/components";
 import {
   beginSitePilotChatThinking,
   endSitePilotChatThinking,
@@ -114,24 +115,19 @@ function HelpfulStrip({ conversation }: { conversation?: boolean }) {
   );
 }
 
-function AgentCta({
-  label,
-  tone = "navy",
-  onClick,
-}: {
-  label: string;
-  tone?: "navy" | "bright";
-  onClick?: () => void;
-}) {
+/**
+ * Make `component.input.button` bubble pills — UXDS ButtonPrimary commerce
+ * (same navy primary as PLP/PDP). Make runtime forced Figma `#003fcb` rest
+ * fills back to `#012169`; no page-local CTA color/hover CSS.
+ */
+function AgentCta({ label, onClick }: { label: string; onClick?: () => void }) {
   return (
-    <button
-      type="button"
-      className={`chat__cta${tone === "bright" ? " chat__cta--bright" : ""}`}
-      data-name="component.input.button"
+    <ButtonPrimary
+      className="chat__cta uxds-btn-primary--commerce"
       onClick={onClick}
     >
       {label}
-    </button>
+    </ButtonPrimary>
   );
 }
 
@@ -207,7 +203,6 @@ function ReplyFrame({
               <AgentCta
                 key={cta.label}
                 label={cta.label}
-                tone={cta.tone}
                 onClick={() => onAgentCta?.(cta.label)}
               />
             ))}

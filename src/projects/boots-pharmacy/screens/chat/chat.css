@@ -115,52 +115,15 @@
   align-items: flex-start;
 }
 
-.chat__cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+/* Size only — Make Frame341 h-32 pills; hover/active from UXDS ButtonPrimary commerce */
+.chat__cta.uxds-btn-primary {
+  min-height: 32px;
   height: 32px;
   padding: 8px 12px;
-  border: none;
-  border-radius: 360px;
-  background: #012169;
-  color: #fff;
-  font-family: inherit;
   font-size: 12px;
-  font-weight: 600;
   line-height: 16px;
   letter-spacing: -0.36px;
   white-space: nowrap;
-  cursor: pointer;
-  transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.12s ease;
-}
-
-.chat__cta--bright {
-  background: #003fcb;
-}
-
-.chat__cta:hover,
-.chat__cta.proto-chat-cta--hover {
-  background: #01318f;
-  box-shadow: 0 2px 8px rgba(1, 33, 105, 0.2);
-  transform: translateY(-1px);
-}
-
-.chat__cta--bright:hover,
-.chat__cta--bright.proto-chat-cta--hover {
-  background: #0048e0;
-}
-
-.chat__cta:active,
-.chat__cta.proto-chat-cta--pressed {
-  background: #011a5c;
-  transform: translateY(0);
-  box-shadow: none;
-}
-
-.chat__cta:focus-visible {
-  outline: 2px solid var(--uxds-border-border-focus, #012169);
-  outline-offset: 2px;
 }
 
 /* Make `component.gse.system.message` — centered under reply (PO / register L11). */
