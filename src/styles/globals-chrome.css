@@ -38,6 +38,17 @@
   scrollbar-gutter: stable;
 }
 
+/*
+ * Mini-scroll aesthetic — hide classic top/bottom scrollbar arrow buttons
+ * (WebKit/Blink). Applies to prototype pane + React Chat column host.
+ */
+.studio-scroll--prototype::-webkit-scrollbar-button,
+.chat__column::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .proto-scroll {
     scroll-behavior: auto;

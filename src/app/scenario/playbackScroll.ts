@@ -304,26 +304,86 @@ export async function beginDemoTargetPageScroll(
   };
 }
 
+/** React Chat sole scroll surface after single-scrollbar mount (viewport locked). */
+const CHAT_COLUMN_SCROLL_SELECTOR =
+  '[data-studio-react-screen="chat"] .chat__column, main.chat .chat__column';
+
+function queryPrototypeScrollPane(): HTMLElement | null {
+  return (
+    document.querySelector<HTMLElement>(
+      ".studio-scroll--prototype:not(.hidden)"
+    ) ?? document.querySelector<HTMLElement>(".studio-scroll--prototype")
+  );
+}
+
+function isScrollPanePopupLocked(el: HTMLElement | null | undefined): boolean {
+  return Boolean(
+    el?.classList?.contains("studio-scroll--locked") ||
+      el?.dataset.studioScrollLocked === "true"
+  );
+}
+
+/** True when Chat column is on the active (displayed) screen — not a hidden sibling. */
+function isActiveChatColumnScrollHost(el: HTMLElement | null): el is HTMLElement {
+  if (!el?.isConnected) return false;
+  // Inactive Boots screens use display:none — zero client rects.
+  if (el.getClientRects().length === 0) return false;
+  return el.scrollHeight - el.clientHeight > 1 || el.clientHeight > 0;
+}
+
+function queryActiveChatColumnScrollRoot(
+  scope?: ParentNode | null
+): HTMLElement | null {
+  const root = scope ?? document;
+  const candidates = root.querySelectorAll<HTMLElement>(CHAT_COLUMN_SCROLL_SELECTOR);
+  for (const el of candidates) {
+    if (isActiveChatColumnScrollHost(el)) return el;
+  }
+  return null;
+}
+
+/**
+ * Active prototype scroll host.
+ * Prefer `.chat__column` when React Chat owns overflow (outer pane is
+ * non-scrolling); otherwise `.studio-scroll--prototype`.
+ */
 export function getPrototypeScrollRoot(from?: HTMLElement | null): HTMLElement | null {
   if (from) {
-    const nested = from.closest<HTMLElement>(".studio-scroll--prototype");
-    if (nested) return nested;
+    const chatColumn = from.closest<HTMLElement>(".chat__column");
+    if (chatColumn && isActiveChatColumnScrollHost(chatColumn)) {
+      return chatColumn;
+    }
   }
-  return (
-    document.querySelector<HTMLElement>(".studio-scroll--prototype:not(.hidden)") ??
-    document.querySelector<HTMLElement>(".studio-scroll--prototype")
-  );
+
+  const proto = from
+    ? from.closest<HTMLElement>(".studio-scroll--prototype")
+    : queryPrototypeScrollPane();
+
+  // Viewport-bound Chat: overflow lives on `.chat__column`, not proto.
+  if (proto) {
+    const chatUnder = queryActiveChatColumnScrollRoot(proto);
+    if (chatUnder) {
+      const protoMax = Math.max(0, proto.scrollHeight - proto.clientHeight);
+      if (protoMax < 2) return chatUnder;
+    }
+    return proto;
+  }
+
+  return queryActiveChatColumnScrollRoot() ?? queryPrototypeScrollPane();
 }
 
 /** True when a modal/popup is open — prototype page scroll must stay put. */
 export function isPrototypePageScrollLocked(
   scrollEl?: HTMLElement | null
 ): boolean {
-  const root = scrollEl ?? getPrototypeScrollRoot();
-  return (
-    root?.classList?.contains("studio-scroll--locked") ||
-    root?.dataset.studioScrollLocked === "true"
-  );
+  const root =
+    scrollEl ??
+    (typeof document !== "undefined" ? getPrototypeScrollRoot() : null);
+  if (isScrollPanePopupLocked(root)) return true;
+  // Nested chat column: popup lock still lives on the outer prototype pane.
+  if (!root?.classList?.contains?.("chat__column")) return false;
+  const proto = root.closest?.(".studio-scroll--prototype") ?? null;
+  return isScrollPanePopupLocked(proto);
 }
 
 /** Demo targets inside overlay scrims must not pull the page behind them. */

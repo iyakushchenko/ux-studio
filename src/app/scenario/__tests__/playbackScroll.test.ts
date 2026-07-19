@@ -1,9 +1,11 @@
+/** @vitest-environment happy-dom */
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   animateScrollTo,
   beginDemoTargetPageScroll,
   computeScrollTopForElement,
   easeInOutCubic,
+  getPrototypeScrollRoot,
   isPrototypePageScrollLocked,
 } from "@/app/scenario/playbackScroll";
 
@@ -202,6 +204,54 @@ describe("animateScrollTo", () => {
     rafCallback!(300);
     await promise;
     expect(scrollEl.scrollTop).toBe(500);
+  });
+});
+
+describe("getPrototypeScrollRoot", () => {
+  afterEach(() => {
+    document.body.innerHTML = "";
+  });
+
+  it("prefers active .chat__column when outer prototype cannot scroll", () => {
+    document.body.innerHTML = `
+      <div class="studio-scroll--prototype" style="height:400px;overflow:hidden">
+        <div data-studio-react-screen="chat">
+          <div class="chat__column" style="height:400px;overflow:auto">
+            <button id="bubble">CTA</button>
+            <div style="height:1200px"></div>
+          </div>
+        </div>
+      </div>
+    `;
+    const proto = document.querySelector<HTMLElement>(".studio-scroll--prototype")!;
+    Object.defineProperty(proto, "scrollHeight", { value: 400, configurable: true });
+    Object.defineProperty(proto, "clientHeight", { value: 400, configurable: true });
+    const column = document.querySelector<HTMLElement>(".chat__column")!;
+    Object.defineProperty(column, "scrollHeight", { value: 1600, configurable: true });
+    Object.defineProperty(column, "clientHeight", { value: 400, configurable: true });
+    // jsdom getClientRects is empty — stub active host check
+    column.getClientRects = () =>
+      [{ width: 400, height: 400 }] as unknown as DOMRectList;
+
+    const bubble = document.getElementById("bubble")!;
+    expect(getPrototypeScrollRoot(bubble)).toBe(column);
+    expect(getPrototypeScrollRoot()).toBe(column);
+  });
+
+  it("keeps .studio-scroll--prototype when chat column is not active", () => {
+    document.body.innerHTML = `
+      <div class="studio-scroll--prototype" style="height:400px;overflow:auto">
+        <div data-studio-react-screen="chat" style="display:none">
+          <div class="chat__column"></div>
+        </div>
+        <div id="plp">PLP</div>
+      </div>
+    `;
+    const proto = document.querySelector<HTMLElement>(".studio-scroll--prototype")!;
+    Object.defineProperty(proto, "scrollHeight", { value: 2000, configurable: true });
+    Object.defineProperty(proto, "clientHeight", { value: 400, configurable: true });
+    const plp = document.getElementById("plp")!;
+    expect(getPrototypeScrollRoot(plp)).toBe(proto);
   });
 });
 

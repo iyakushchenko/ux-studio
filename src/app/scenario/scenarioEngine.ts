@@ -182,10 +182,7 @@ export function scrollPrototypeScrollToTop(
   scrollEl?: HTMLElement | null,
   behavior: ScrollBehavior = "instant"
 ): void {
-  const el =
-    scrollEl ??
-    document.querySelector<HTMLElement>(".studio-scroll--prototype:not(.hidden)") ??
-    document.querySelector<HTMLElement>(".studio-scroll--prototype");
+  const el = scrollEl ?? getPrototypeScrollRoot();
   if (!el) return;
 
   if (behavior === "smooth") {
@@ -219,10 +216,7 @@ export function scrollPrototypeScrollToBottom(
   scrollEl?: HTMLElement | null,
   behavior: ScrollBehavior = "instant"
 ): void {
-  const el =
-    scrollEl ??
-    document.querySelector<HTMLElement>(".studio-scroll--prototype:not(.hidden)") ??
-    document.querySelector<HTMLElement>(".studio-scroll--prototype");
+  const el = scrollEl ?? getPrototypeScrollRoot();
   if (!el) return;
 
   const top = Math.max(0, el.scrollHeight - el.clientHeight);
@@ -339,11 +333,7 @@ export function   bumpScenarioScrollGeneration(): void {
 }
 
 function resolveScrollEl(scrollEl?: HTMLElement | null): HTMLElement | null {
-  return (
-    scrollEl ??
-    document.querySelector<HTMLElement>(".studio-scroll--prototype:not(.hidden)") ??
-    document.querySelector<HTMLElement>(".studio-scroll--prototype")
-  );
+  return scrollEl ?? getPrototypeScrollRoot();
 }
 
 function startScrollPin(

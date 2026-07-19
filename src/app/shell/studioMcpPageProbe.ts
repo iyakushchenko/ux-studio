@@ -1036,20 +1036,15 @@ function sitePilotProbeSteps(): ProbeStep[] {
  * Logged-in heading / persona: `isStudioLoggedIn` / `__studioIsLoggedIn` only.
  */
 function chatProbeSteps(): ProbeStep[] {
-  // Prefer <main.chat> — viewport page also stamps data-studio-react-screen=chat.
   const hostSel = 'main.chat[data-studio-react-screen="chat"]';
   return [
     {
       id: "chat-host",
       selector: hostSel,
       action: "assert",
-      assert: () => {
-        const host = document.querySelector(hostSel);
-        if (host == null) {
-          return 'missing React Chat host — expected main.chat[data-studio-react-screen="chat"]';
-        }
-        return true;
-      },
+      assert: () =>
+        document.querySelector(hostSel) != null ||
+        'missing React Chat host — expected main.chat[data-studio-react-screen="chat"]',
     },
     {
       id: "chat-make-retired",
@@ -1200,12 +1195,16 @@ function chatProbeSteps(): ProbeStep[] {
       },
     },
     {
+      // r1 CTA below-fold at scrollTop=0 — proves `.chat__column` scroll host.
+      id: "chat-below-fold-reveal",
+      selector: `${hostSel} [data-studio-chat-frame="r1"] .chat__cta.uxds-btn-primary--commerce`,
+      action: "reveal",
+    },
+    {
       id: "chat-motion-owner",
       selector: hostSel,
       action: "assert",
       assert: () => {
-        // Presence of Motion-driven frames (data-studio-chat-frame) — Uma owns pixel;
-        // probe only gates that React thread frames are mounted (not Make-only).
         const frames = document.querySelectorAll(
           `${hostSel} [data-studio-chat-frame]`
         );

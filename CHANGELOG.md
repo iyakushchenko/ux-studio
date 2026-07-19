@@ -2,6 +2,8 @@
 
 > _Append a bullet on coherent commits via `npm run notes:append -- --lane="<lane>" --intent="<text>"`. Preview with `npm run notes:preview`. On `npm run release:patch` this section is promoted to `## v<X.Y.Z> - DDMMYY` and a fresh empty `## Current` is re-inserted. Policy: `docs/product/VERSIONING.md`._
 
+- **engine:** Chat scrollIntoView uses .chat__column host; hide scrollbar arrow buttons
+
 ## v0.0.43 - 190726
 - **project:** Traditional pdp-book-now prefers React PDP host (skip make-retired); Chat MCP recipe expanded; Uma §0a PARTIAL composer identity — no Chat Final Pass
 

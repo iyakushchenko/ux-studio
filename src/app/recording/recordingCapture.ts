@@ -9,6 +9,7 @@ import type {
   RecordedEvent,
   RecordingSnapshot,
 } from "@/app/recording/recordingTypes";
+import { getPrototypeScrollRoot } from "@/app/scenario/playbackScroll";
 import type {
   ManualTransportAction,
   PlaybackInteractionRecord,
@@ -381,12 +382,8 @@ function onRecordingHumanClick(event: Event): void {
 
 function resolvePrototypeScrollRoot(): HTMLElement | null {
   if (typeof document === "undefined") return null;
-  return (
-    document.querySelector<HTMLElement>(
-      ".studio-scroll--prototype:not(.hidden)"
-    ) ??
-    document.querySelector<HTMLElement>(".studio-scroll--prototype")
-  );
+  // Prefer React Chat `.chat__column` when it owns overflow (same as playback).
+  return getPrototypeScrollRoot();
 }
 
 function flushRecordingScrollCapture(): void {

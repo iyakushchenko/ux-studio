@@ -205,7 +205,7 @@ UI and MCP share `recordingSession` + `replayRecordingSession` — no second ses
 | `beat-enter` | Beat onEnter via `notePlaybackBeatEnter` | Yes — known `JourneyBeatActionId` → `runBeatAction`; `sync-<bookScript>` → book script with `syncState` |
 | `wire-intent` | Retreat sync / `captureWireIntent` / beat actions | Yes — known `JourneyBeatActionId` via `runBeatAction`; `retreat-sync` → script runner with `syncState` when `scriptId` resolves |
 | `studio` | Journey/orchestra mode changes (manual API) | No |
-| `scroll` | Debounced prototype root scroll while REC active (`captureScroll`) | Yes — restore `scrollTop` on `.studio-scroll--prototype` (or `anchorSelector` → `scrollIntoView`) |
+| `scroll` | Debounced active scroll host while REC (`captureScroll` via `getPrototypeScrollRoot`) | Yes — restore `scrollTop` on host (React Chat = `.chat__column`; else `.studio-scroll--prototype`) or `anchorSelector` → `scrollIntoView` |
 | `typed-text` | Debounced trusted `input`/`change` on text-like fields with selector chain | Yes — set value + dispatch `input`/`change` (modal eyes) |
 | `dwell` | Manual API or compiled pauses | Yes (delay) |
 

@@ -84,6 +84,12 @@ Agents **must read** this file before claiming a UI or Studio-chrome slice done.
   4. **Code gate shipped:** `revealDemoTargetForAgent` + probe `overlay-arm` / `plp-below-fold-scroll`; mid-sitrep re-arm must not fire deferred reload; `RunMcpPageProbe` excluded from helper nest-arm. See [RECORDING.md](../shell/RECORDING.md).
 - **Process:** Index in [TEAM_KNOWLEDGE.md](./TEAM_KNOWLEDGE.md); Quinn re-reads this before every MCP prove. Arch rejects PROVEN without overlay-visible evidence.
 
+### Nested scroll host after single-scrollbar Chat (Finn / Quinn)
+
+- **Symptom / class:** Chat beat/CTA `scrollIntoView` / `revealDemoTargetForAgent` no-ops after React Chat moves overflow to `.chat__column` (outer `.studio-scroll--prototype` `protoMax≈0`).
+- **Root cause:** Engine `getPrototypeScrollRoot` still resolved the outer prototype pane; scenario/REC helpers hardcoded the same host.
+- **Gate:** Prefer active `.chat__column` when it owns overflow (`getPrototypeScrollRoot`); scenario `resolveScrollEl` + REC `captureScroll` must use that helper. Quinn proves with probe `chat-below-fold-reveal` (r1 CTA) — not finale CTAs that cannot clear agent-testing bottom pad at max scroll.
+
 ### Team knowledge must be used, not only written (PO)
 
 - **Symptom:** LESSONS / notes grow but agents re-ship the same fail class — knowledge was append-only.

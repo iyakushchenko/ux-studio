@@ -45,7 +45,10 @@ import {
   scheduleDemoCursorJourneyEndFade,
   setDemoCursorJourneyMode,
 } from "@/app/scenario/demoCursor";
-import { cancelPlaybackScroll } from "@/app/scenario/playbackScroll";
+import {
+  cancelPlaybackScroll,
+  getPrototypeScrollRoot,
+} from "@/app/scenario/playbackScroll";
 import { useJourneyPlayback } from "@/app/orchestra/useJourneyPlayback";
 import {
   createShouldSkipBeat,
@@ -1280,9 +1283,13 @@ export default function App() {
       );
     setSitePilotChatComposerDockSuppressed(overlayOpen);
 
-    if (atFrameStart && scrollEl) {
-      scrollEl.scrollTop = 0;
-      scrollEl.scrollLeft = 0;
+    if (atFrameStart) {
+      // React Chat scrolls `.chat__column`; Make still uses prototype pane.
+      const chatHost = getPrototypeScrollRoot(screen) ?? scrollEl;
+      if (chatHost) {
+        chatHost.scrollTop = 0;
+        chatHost.scrollLeft = 0;
+      }
     }
 
     return () => {
