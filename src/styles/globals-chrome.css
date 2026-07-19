@@ -6,6 +6,8 @@
 .studio-scroll--prototype:not(.hidden) {
   display: flex;
   flex-direction: column;
+  /* Reserve classic scrollbar track so modal/journey lock doesn't shift content on X */
+  scrollbar-gutter: stable;
 }
 
 .studio-scroll--prototype > .studio-viewport {
@@ -17,7 +19,9 @@
 
 .studio-scroll--prototype.studio-scroll--locked,
 .studio-scroll--prototype.studio-scroll--journey-locked {
+  /* Disable scroll without collapsing the reserved gutter (see scrollbar-gutter above) */
   overflow: hidden !important;
+  scrollbar-gutter: stable;
   overscroll-behavior: contain;
   touch-action: none;
 }
