@@ -90,10 +90,8 @@ export function isDemoTargetInPrototypeView(
   if (!scrollEl || !target.isConnected) return false;
   const padTop = options?.paddingTop ?? DEMO_TARGET_SCROLL_PADDING;
   const padBottom =
-    options?.paddingBottom ??
-    (isAgentTestingScrollPadActive()
-      ? AGENT_TESTING_SCROLL_BOTTOM_PAD
-      : DEMO_TARGET_SCROLL_PADDING);
+    (options?.paddingBottom ?? demoScrollPadding()) +
+    readScrollPaddingBottom(scrollEl);
   const rootRect = scrollEl.getBoundingClientRect();
   const targetRect = target.getBoundingClientRect();
   if (targetRect.width < 2 || targetRect.height < 2) return false;
@@ -112,6 +110,21 @@ function isAgentTestingScrollPadActive(): boolean {
   return root?.dataset.active === "true" || root?.dataset.settling === "true";
 }
 
+/** CSS `scroll-padding-bottom` on the scroll host (Chat composer dock pad). */
+export function readScrollPaddingBottom(scrollEl: HTMLElement): number {
+  if (typeof getComputedStyle === "undefined") return 0;
+  try {
+    const raw = getComputedStyle(scrollEl).scrollPaddingBottom;
+    if (!raw || raw === "auto") return 0;
+    const n = parseFloat(raw);
+    return Number.isFinite(n) ? n : 0;
+  } catch {
+    // Unit mocks may not be real Elements — treat as no CSS pad.
+    return 0;
+  }
+}
+
+/** Agent-testing / default inset only — Chat composer pad is CSS scroll-padding-bottom. */
 function demoScrollPadding(): number {
   return isAgentTestingScrollPadActive()
     ? AGENT_TESTING_SCROLL_BOTTOM_PAD
@@ -411,13 +424,18 @@ export function computeScrollTopForElement(
   const rootRect = scrollEl.getBoundingClientRect();
   const targetRect = target.getBoundingClientRect();
 
+  // Caller padding (agent-testing / demo) + host CSS scroll-padding-bottom
+  // (Chat sticky composer) so below-fold bubbles clear the dock.
+  const padTop = padding;
+  const padBottom = padding + readScrollPaddingBottom(scrollEl);
+
   const targetTopInScroll = currentScroll + (targetRect.top - rootRect.top);
   const targetBottomInScroll = targetTopInScroll + targetRect.height;
-  const viewTop = currentScroll + padding;
-  const viewBottom = currentScroll + scrollEl.clientHeight - padding;
+  const viewTop = currentScroll + padTop;
+  const viewBottom = currentScroll + scrollEl.clientHeight - padBottom;
 
   if (align === "start") {
-    return clamp(targetTopInScroll - padding, 0, maxScroll);
+    return clamp(targetTopInScroll - padTop, 0, maxScroll);
   }
   if (align === "center") {
     const centered =
@@ -426,7 +444,7 @@ export function computeScrollTopForElement(
   }
   if (align === "end") {
     return clamp(
-      targetBottomInScroll - scrollEl.clientHeight + padding,
+      targetBottomInScroll - scrollEl.clientHeight + padBottom,
       0,
       maxScroll
     );
@@ -436,10 +454,10 @@ export function computeScrollTopForElement(
     return currentScroll;
   }
   if (targetTopInScroll < viewTop) {
-    return clamp(targetTopInScroll - padding, 0, maxScroll);
+    return clamp(targetTopInScroll - padTop, 0, maxScroll);
   }
   return clamp(
-    targetBottomInScroll - scrollEl.clientHeight + padding,
+    targetBottomInScroll - scrollEl.clientHeight + padBottom,
     0,
     maxScroll
   );

@@ -7,6 +7,7 @@ import {
   easeInOutCubic,
   getPrototypeScrollRoot,
   isPrototypePageScrollLocked,
+  readScrollPaddingBottom,
 } from "@/app/scenario/playbackScroll";
 
 function mockRect(top: number, height: number) {
@@ -122,6 +123,27 @@ describe("computeScrollTopForElement", () => {
 
     const top = computeScrollTopForElement(scrollEl, target, "end");
     expect(top).toBe(100);
+  });
+
+  it("honors CSS scroll-padding-bottom (Chat composer dock) on end align", () => {
+    const scrollEl = mockScrollEl({
+      scrollTop: 0,
+      clientHeight: 400,
+      scrollHeight: 2000,
+      top: 0,
+    });
+    const target = mockTarget(450, 80);
+    const spy = vi.spyOn(window, "getComputedStyle").mockReturnValue({
+      scrollPaddingBottom: "220px",
+    } as CSSStyleDeclaration);
+
+    try {
+      // end: targetBottom(530) - clientHeight(400) + padBottom(220) = 350
+      expect(computeScrollTopForElement(scrollEl, target, "end")).toBe(350);
+      expect(readScrollPaddingBottom(scrollEl)).toBe(220);
+    } finally {
+      spy.mockRestore();
+    }
   });
 });
 

@@ -90,6 +90,12 @@ Agents **must read** this file before claiming a UI or Studio-chrome slice done.
 - **Root cause:** Engine `getPrototypeScrollRoot` still resolved the outer prototype pane; scenario/REC helpers hardcoded the same host.
 - **Gate:** Prefer active `.chat__column` when it owns overflow (`getPrototypeScrollRoot`); scenario `resolveScrollEl` + REC `captureScroll` must use that helper. Quinn proves with probe `chat-below-fold-reveal` (r1 CTA) — not finale CTAs that cannot clear agent-testing bottom pad at max scroll.
 
+### Sticky Chat composer scroll pad (Finn / Uma)
+
+- **Symptom / class:** Flex-sibling composer (outside `.chat__column`) regresses Make under-composer scroll — below-fold bubbles clip at the dock; Motion wrap height changes leave last CTAs under the overlay.
+- **Contract:** Overlay dock (`position: absolute` bottom) + dynamic `--studio-chat-composer-h` (ResizeObserver) → `.chat__column` `padding-bottom` / `scroll-padding-bottom` ≥ dock height; reveal/scrollIntoView reads `scroll-padding-bottom`. Single scroll host only (viewport locked). Transparent scrollbar track.
+- **Gate:** Probe `chat-composer-scroll-pad` — pad var ≥120, last CTA above dock at max scroll, prototype `protoMax≈0`.
+
 ### Team knowledge must be used, not only written (PO)
 
 - **Symptom:** LESSONS / notes grow but agents re-ship the same fail class — knowledge was append-only.

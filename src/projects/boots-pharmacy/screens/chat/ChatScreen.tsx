@@ -234,6 +234,59 @@ function useComposerSuppressed(): boolean {
   return suppressed;
 }
 
+const CHAT_COMPOSER_PAD_VAR = "--studio-chat-composer-h";
+
+/**
+ * Measure overlay composer dock → CSS var on `.chat__column` so
+ * padding-bottom / scroll-padding-bottom track Motion wrap height.
+ * Near-bottom scroll adjusts when pad grows (Make syncInPlaceGeometry).
+ */
+function useChatComposerScrollPad(
+  columnRef: RefObject<HTMLDivElement | null>,
+  dockRef: RefObject<HTMLFooterElement | null>,
+  suppressed: boolean
+): void {
+  useLayoutEffect(() => {
+    const column = columnRef.current;
+    const dock = dockRef.current;
+    if (!column) return;
+
+    const apply = () => {
+      const nextPad =
+        suppressed || !dock || dock.hidden
+          ? 0
+          : Math.ceil(dock.getBoundingClientRect().height);
+      const prevPad = parseFloat(
+        column.style.getPropertyValue(CHAT_COMPOSER_PAD_VAR) || "0"
+      );
+      const prevMax = Math.max(0, column.scrollHeight - column.clientHeight);
+      const prevTop = column.scrollTop;
+      const nearBottom = prevMax - prevTop < 120;
+
+      column.style.setProperty(CHAT_COMPOSER_PAD_VAR, `${nextPad}px`);
+
+      if (prevPad === nextPad || !nearBottom) return;
+      requestAnimationFrame(() => {
+        const newMax = Math.max(0, column.scrollHeight - column.clientHeight);
+        const maxDelta = newMax - prevMax;
+        if (maxDelta !== 0) {
+          column.scrollTop = Math.max(0, prevTop + maxDelta);
+        }
+      });
+    };
+
+    apply();
+    if (!dock) return;
+
+    const ro = new ResizeObserver(apply);
+    ro.observe(dock);
+    return () => {
+      ro.disconnect();
+      column.style.removeProperty(CHAT_COMPOSER_PAD_VAR);
+    };
+  }, [columnRef, dockRef, suppressed]);
+}
+
 export function ChatScreen({
   onSend,
   onChip,
@@ -243,6 +296,9 @@ export function ChatScreen({
   const [query, setQuery] = useState("");
   const [sendThinking, setSendThinking] = useState(false);
   const composerSuppressed = useComposerSuppressed();
+  const columnRef = useRef<HTMLDivElement | null>(null);
+  const dockRef = useRef<HTMLFooterElement | null>(null);
+  useChatComposerScrollPad(columnRef, dockRef, composerSuppressed);
   const thinking = useSyncExternalStore(
     subscribeChatThinkingBridge,
     getChatThinkingBridgeState,
@@ -367,7 +423,7 @@ export function ChatScreen({
       data-name="body"
       aria-label="Agentic Site Pilot chat"
     >
-      <div className="chat__column">
+      <div className="chat__column" ref={columnRef}>
         <div
           className="chat__summary"
           data-name="component.appointment.summary"
@@ -379,6 +435,7 @@ export function ChatScreen({
       </div>
 
       <footer
+        ref={dockRef}
         className="chat__composer-dock"
         aria-label="Message composer"
         hidden={composerSuppressed}

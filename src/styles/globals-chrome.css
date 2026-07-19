@@ -39,9 +39,42 @@
 }
 
 /*
- * Mini-scroll aesthetic — hide classic top/bottom scrollbar arrow buttons
- * (WebKit/Blink). Applies to prototype pane + React Chat column host.
+ * Mini-scroll aesthetic — thin thumb, transparent track (no opaque gutter),
+ * hide classic top/bottom scrollbar arrow buttons (WebKit/Blink).
+ * Applies to prototype pane + React Chat column host.
  */
+.studio-scroll--prototype,
+.chat__column {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(122, 125, 135, 0.32) transparent;
+}
+
+.studio-scroll--prototype::-webkit-scrollbar,
+.chat__column::-webkit-scrollbar {
+  width: 4px;
+}
+
+.studio-scroll--prototype::-webkit-scrollbar-track,
+.chat__column::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.studio-scroll--prototype::-webkit-scrollbar-thumb,
+.chat__column::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(122, 125, 135, 0.32);
+}
+
+.studio-scroll--prototype::-webkit-scrollbar-thumb:hover,
+.chat__column::-webkit-scrollbar-thumb:hover {
+  background: rgba(122, 125, 135, 0.48);
+}
+
+.studio-scroll--prototype::-webkit-scrollbar-corner,
+.chat__column::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
 .studio-scroll--prototype::-webkit-scrollbar-button,
 .chat__column::-webkit-scrollbar-button {
   display: none;

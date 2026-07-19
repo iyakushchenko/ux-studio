@@ -142,6 +142,12 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 - Pax (PO sim): <accept bar / bump call> — applied: <decision>
 ```
 
+**Knowledge improved** (2026-07-19 · stream: Chat sticky composer scroll pad · R12):
+- Finn (FE): Overlay `.chat__composer-dock` + ResizeObserver `--studio-chat-composer-h` → column `padding-bottom`/`scroll-padding-bottom`; playback honors CSS scroll-pad — applied: ChatScreen · chat.css · playbackScroll
+- Uma (UI/UX): Bubbles scroll under sticky dock; last CTA clears above composer; thin thumb / transparent track — applied: chat.css · globals-chrome
+- Quinn (QA): Probe `chat-composer-scroll-pad` (pad≥120, CTA above dock, no dual scroll) — applied: studioMcpPageProbe
+- Ben (BE): R12 one push no CI await — applied: peek only
+
 **Knowledge improved** (2026-07-19 · stream: traditional pdp-book-now + Chat recipe · R12):
 - Finn (FE): Prefer React PDP `data-studio-action=pdp-book-now`; skip make-retired — applied: findPdpBookNowBtn · traditional.ts
 - Uma (UI/UX): §0a PARTIAL — composer identity PASS vs Site Pilot + Motion ownership; no whole-page PROVEN — applied: UMA_FIDELITY_CHAT
