@@ -14,7 +14,13 @@ Agents **must read** this file before claiming a UI or Studio-chrome slice done.
 
 - **Symptom / class:** Home Site Pilot shows a white bar / fake scrollbar track with nothing to scroll; tall pages / modal lock still X-jump when classic `scrollbar-gutter: stable` width ≠ thin 4px thumb.
 - **Root cause:** `scrollbar-gutter: stable` reserves **classic** track width (~12–17px), not our `::-webkit-scrollbar { width: 4px }` — empty white strip on short panes; mismatch on tall panes.
-- **Gate:** Never `scrollbar-gutter: stable` for Studio hosts. Short panes stay `overflow-y: auto` (no track). Tall prototype: `studio-scroll--overflow` → `overflow-y: scroll` (thin track) via `syncStudioScrollOverflowGutter` / `useScrollFill`; lock → `padding-inline-end: var(--studio-scrollbar-size)`. Always-scroll hosts (`.chat__column`) use `overflow-y: scroll` from the start. Prove: Home no bar; Chat/PLP no X jump on scroll/lock.
+- **Gate:** Never `scrollbar-gutter: stable` for Studio hosts. Short panes stay `overflow-y: auto` (no track). Tall prototype / `.chat__column`: `studio-scroll--overflow` → `overflow-y: scroll` (thin track) via `syncStudioScrollOverflowGutter`; lock → `padding-inline-end: var(--studio-scrollbar-size)`. Chat mirrors thin-track inset with `padding-left: calc(64px + var(--studio-scrollbar-size))` so the centered 864 column X does not jump. Prove: Home no empty white bar; Chat center X stable with/without thumb.
+
+### Chat sticky / scroll / Site Pilot bar — don't regress (PO / Finn + Uma + Bea)
+
+- **Symptom / class:** React Chat retired Make Frame337 → Site Pilot white microheader gone; bubble links invent always-underline / browser-blue; scrollbar track shifts centered column left (jagged UI).
+- **Root cause:** `hideMakeChrome` retired Frame337 without a React port; `.chat__link` rest-underline fought UXDS `.uxds-link`; always-on `overflow-y: scroll` / uncompensated thin track stole right inset from the flex-centered column.
+- **Gate:** Keep `ChatSitePilotBar` (`data-studio-chat-site-pilot-bar`) above `.chat__column`. Bubble/disclaimer links = `.uxds-link` (+ optional `.chat__link` hook). Scroll = auto → overflow sync thin-track + left pad compensate — never classic `scrollbar-gutter: stable` on Studio hosts.
 
 ### Robo-cursor hand↔arrow tip jump — CSS-align hotspots (PO / Finn + Uma)
 

@@ -45,11 +45,11 @@ Erase-Make sequence: PLP → PDP (**HARD-GREEN**) → Site Pilot Home → **Chat
 
 ## Chrome / fidelity (Uma)
 
-- [ ] Microheader (Frame337) — logo, Contact Support, Rate/More
+- [x] Microheader (Frame337) — logo, Contact Support, Rate/More (`ChatSitePilotBar`)
 - [ ] Thread bubbles — user mint tint vs agent white cards + CTA pills
 - [ ] Thinking bubble — dots, placement before reply, hint variant
 - [ ] Composer dock — fixed bottom, pad var, disclaimer
-- [ ] Typical DS checks: mic · send/stop · chips · agent CTAs · underlined links
+- [x] Typical DS checks: mic · send/stop · chips · agent CTAs · **`.uxds-link` bubble links** (rest none / hover underline)
 - [ ] No invent footer / accordion / page spinner
 - [ ] PDP Final Pass not regressed
 
@@ -59,8 +59,9 @@ Erase-Make sequence: PLP → PDP (**HARD-GREEN**) → Site Pilot Home → **Chat
 - Contract: `CHAT_CHILD_INDEX = 10`, scenario id `site-pilot-chat`
 - Reuse: extract **Site Pilot composer** from `screens/home/HomeScreen.tsx` (chat label + chip set via props)
 - Keep: `dom/sitePilotChatScenario.ts` / thinking / playback until React owns equivalent hooks or wire gates cleanly
-- Hybrid: engine header + microheader until scoped; body + thread + dock in React
+- Hybrid: engine header + **React `ChatSitePilotBar`** (Make Frame337 retired with body); thread + dock in React
 - Auth: same `isStudioLoggedIn` SSoT where copy depends on login (if any)
+- **Don’t regress:** Site Pilot bar · chat sticky/scroll center-X · `.uxds-link` bubble links ([LESSONS_LEARNED.md](../../../product/LESSONS_LEARNED.md))
 
 ## Prove notes (Quinn)
 

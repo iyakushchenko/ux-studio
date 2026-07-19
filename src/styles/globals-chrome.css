@@ -46,9 +46,15 @@
   box-sizing: border-box;
 }
 
-/* Chat sole scroll host — always scrolls; force thin track (no appear/disappear jump) */
+/* Chat sole scroll host — auto when short; thin-track scroll only when overflowing
+ * (`.studio-scroll--overflow` / data attr from syncStudioScrollOverflowGutter). */
 .chat__column {
   overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.chat__column.studio-scroll--overflow,
+.chat__column[data-studio-scroll-overflow="true"] {
   overflow-y: scroll;
 }
 

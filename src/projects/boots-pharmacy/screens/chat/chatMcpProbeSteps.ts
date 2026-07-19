@@ -72,6 +72,28 @@ export function chatMcpProbeSteps(): ChatMcpProbeStep[] {
       },
     },
     {
+      id: "chat-site-pilot-bar",
+      selector: `${hostSel} [data-studio-chat-site-pilot-bar="true"]`,
+      action: "assert",
+      assert: () => {
+        const bar = document.querySelector(
+          `${hostSel} [data-studio-chat-site-pilot-bar="true"]`
+        );
+        if (!bar) return "missing Site Pilot bar (Make Frame337)";
+        if (!bar.querySelector('[data-name="boots.ai assistant 3"]')) {
+          return "Site Pilot bar missing compact logo (boots.ai assistant 3)";
+        }
+        const text = normalizeText(bar);
+        if (!/Contact Support/i.test(text)) {
+          return "Site Pilot bar missing Contact Support";
+        }
+        if (!/Rate your experience/i.test(text)) {
+          return "Site Pilot bar missing Rate your experience";
+        }
+        return true;
+      },
+    },
+    {
       id: "chat-landmarks",
       selector: `${hostSel} .chat__summary`,
       action: "assert",
@@ -88,6 +110,16 @@ export function chatMcpProbeSteps(): ChatMcpProbeStep[] {
         );
         if (queries.length < 1) return "expected ≥1 query frame";
         if (replies.length < 1) return "expected ≥1 reply frame";
+        const bubbleLink = document.querySelector(
+          `${hostSel} .chat__bubble .uxds-link.chat__link`
+        );
+        if (!bubbleLink) {
+          return "missing bubble UXDS link (.uxds-link.chat__link)";
+        }
+        const linkCs = getComputedStyle(bubbleLink);
+        if (linkCs.textDecorationLine === "underline") {
+          return "bubble link rest must not underline (uxds-link contract)";
+        }
         return true;
       },
     },

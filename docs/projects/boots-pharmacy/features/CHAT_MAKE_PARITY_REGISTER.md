@@ -25,10 +25,10 @@
 |---|---------------|------|--------------|----------|
 | L1 | **1440 shell** — child-10 frame `w-[1440px]`, UX column | **Present** | **Missing** | `frame/index.tsx` child 10 wrapper |
 | L2 | **Engine header** — `boots-pharmacy.module.header` (shared navy) | **Present** | **N/A** (engine) | GhBsBrandSwitcher8 |
-| L3 | **Chat microheader (Frame337)** — white bar, sticky below header (`--sticky-top` wire) | **Present** | **Missing** | `Frame337` / `Frame338` 1312px row |
-| L4 | **Microheader logo** — `boots.ai assistant 3` compact (112×29) | **Present** | **Missing** | `Frame339` |
-| L5 | **Contact Support** — tertiary pill + question icon | **Present** | **Missing** | `Frame339` |
-| L6 | **Rate your experience** + **More** — header aux actions | **Present** | **Missing** | `Frame340` |
+| L3 | **Chat microheader (Frame337)** — white bar above thread (structural sticky; outside `.chat__column`) | **Present** | **Present** | `ChatSitePilotBar` · `data-studio-chat-site-pilot-bar` |
+| L4 | **Microheader logo** — `boots.ai assistant 3` compact (112×29) | **Present** | **Present** | `ChatSitePilotBar` SitePilotCompactLogo |
+| L5 | **Contact Support** — tertiary pill + question icon | **Present** | **Present** | `chat__site-pilot-action` |
+| L6 | **Rate your experience** + **More** — header aux actions | **Present** | **Present** | `chat__site-pilot-action` |
 | L7 | **Body fill** — `#dbebf5` full-width `data-name="body"` | **Present** | **Missing** | `Body9` |
 | L8 | **Thread host** — `component.appointment.summary` 864px, `gap-[40px]`, centered in `p-[64px]` | **Present** | **Missing** | `ComponentAppointmentSummary2` |
 | L9 | **User bubbles (`query`)** — mint-tint card `bg-[rgba(245,255,254,0.35)]`, 438px, right-aligned column | **Present** | **Partial** | React live — Uma pixel PROVEN still PENDING |
@@ -69,7 +69,7 @@
 | I8 | **Chip fill textarea** — chip click fills composer (not navigate) | **Present** | **Missing** | wire `onCardClick` |
 | I9 | **Chip “Show available slots for today”** — opens Availability Tool (`dateToday`) | **Present** | **Missing** | wire allowlist |
 | I10 | **Agent inline CTAs** — navy pills via UXDS `ButtonPrimary` + `--commerce` (Make `component.input.button`; Figma `#003fcb` rest forced navy like Make globals) | **Present** | **Partial** | `ChatScreen` `AgentCta` · size-only `.chat__cta` |
-| I11 | **Underlined product links** → PDP tab | **Present** | **Missing** | wire `PRODUCT_LINK_RE` |
+| I11 | **Product links** → PDP (UXDS `.uxds-link` rest/hover — not invent always-underline) | **Present** | **Partial** | `chat__link uxds-link` · wire `PRODUCT_LINK_RE` |
 | I12 | **“Go to vaccines catalog”** CTA → PLP | **Present** | **Missing** | wire `goPlp` |
 | I13 | **Availability Checker Tool** underline → overlay | **Present** | **Missing** | wire `AVAIL_BTN_INTENT` |
 | I14 | **Reply helpful Yes/No** (+ thumbs, DS hover) | **Present** | **Partial** | React buttons + Make SVG thumbs — wire no-op |

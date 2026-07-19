@@ -18,7 +18,13 @@ import {
   setSitePilotChatSendThinkingMode,
 } from "@/projects/boots-pharmacy/dom/sitePilotChatThinking";
 import { SitePilotComposer } from "../shared/SitePilotComposer";
+import {
+  STUDIO_SCROLL_OVERFLOW_ATTR,
+  STUDIO_SCROLL_OVERFLOW_CLASS,
+  syncStudioScrollOverflowGutter,
+} from "@/app/scenario/studioScrollOverflow";
 import { CHAT_REACT_SCREEN_ID } from "./chatContract";
+import { ChatSitePilotBar } from "./ChatSitePilotBar";
 import {
   getChatThinkingBridgeState,
   subscribeChatThinkingBridge,
@@ -171,7 +177,7 @@ function ReplyFrame({
   const ref = useStaticFrameClasses(REPLY_FRAME_CLASSES);
   const onBodyClick = (e: MouseEvent<HTMLDivElement>) => {
     const t = e.target as HTMLElement | null;
-    const link = t?.closest?.(".chat__link");
+    const link = t?.closest?.(".uxds-link, .chat__link");
     if (!link) return;
     const label = (link.textContent ?? "").replace(/\s+/g, " ").trim();
     if (label) onProductLink?.(label);
@@ -299,6 +305,26 @@ export function ChatScreen({
   const columnRef = useRef<HTMLDivElement | null>(null);
   const dockRef = useRef<HTMLFooterElement | null>(null);
   useChatComposerScrollPad(columnRef, dockRef, composerSuppressed);
+
+  /** Thin-track reserve only when overflowing — center X stays put; no empty Home-like gutter. */
+  useLayoutEffect(() => {
+    const column = columnRef.current;
+    if (!column) return;
+    const apply = () => syncStudioScrollOverflowGutter(column);
+    apply();
+    const ro = new ResizeObserver(apply);
+    ro.observe(column);
+    const mo = new MutationObserver(apply);
+    mo.observe(column, { childList: true, subtree: true });
+    return () => {
+      ro.disconnect();
+      mo.disconnect();
+      column.classList.remove(STUDIO_SCROLL_OVERFLOW_CLASS);
+      column.removeAttribute(STUDIO_SCROLL_OVERFLOW_ATTR);
+      column.style.removeProperty("--studio-scrollbar-size");
+    };
+  }, []);
+
   const thinking = useSyncExternalStore(
     subscribeChatThinkingBridge,
     getChatThinkingBridgeState,
@@ -423,6 +449,7 @@ export function ChatScreen({
       data-name="body"
       aria-label="Agentic Site Pilot chat"
     >
+      <ChatSitePilotBar />
       <div className="chat__column" ref={columnRef}>
         <div
           className="chat__summary"
@@ -460,7 +487,9 @@ export function ChatScreen({
         </div>
         <p className="chat__disclaimer">
           SitePilot can make mistakes.{" "}
-          <span className="chat__disclaimer-link">Contact our support team</span>{" "}
+          <span className="uxds-link chat__disclaimer-link">
+            Contact our support team
+          </span>{" "}
           if you need further advice or fact-checking.
         </p>
       </footer>

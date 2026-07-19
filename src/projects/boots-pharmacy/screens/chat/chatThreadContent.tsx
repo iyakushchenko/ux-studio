@@ -23,7 +23,7 @@ export type ChatThreadFrame =
     };
 
 function Link({ children }: { children: ReactNode }) {
-  return <span className="chat__link">{children}</span>;
+  return <span className="uxds-link chat__link">{children}</span>;
 }
 
 function Strong({ children }: { children: ReactNode }) {

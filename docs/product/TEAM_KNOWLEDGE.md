@@ -148,6 +148,14 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 - Quinn (QA): Probe `chat-composer-scroll-pad` (pad≥120, CTA above dock, no dual scroll) — applied: studioMcpPageProbe
 - Ben (BE): R12 one push no CI await — applied: peek only
 
+**Knowledge improved** (2026-07-19 · stream: Chat sticky/scroll/bar — don’t regress · R12):
+- Bea (BA): Register L3–L6 Frame337 microheader → Present; I11 links = UXDS `.uxds-link` — applied: CHAT_MAKE_PARITY_REGISTER
+- Finn (FE): Port Make Frame337 → `ChatSitePilotBar`; bubble links `.uxds-link`; chat column overflow-sync + left pad compensate — applied: ChatSitePilotBar · ChatScreen · chat.css · globals-chrome
+- Uma (UI/UX): Site Pilot bar + DS link rest/hover; no invent blue underline; center X stable — applied: chat.css · LESSONS Chat sticky/scroll/bar
+- Quinn (QA): probe `chat-site-pilot-bar` + bubble link rest assert — applied: chatMcpProbeSteps
+- Ben (BE): R12 one push no CI await — applied: peek only
+- Pax (PO sim): jagged Chat regression user-visible → patch notes — applied: notes:append
+
 **Knowledge improved** (2026-07-19 · stream: traditional pdp-book-now + Chat recipe · R12):
 - Finn (FE): Prefer React PDP `data-studio-action=pdp-book-now`; skip make-retired — applied: findPdpBookNowBtn · traditional.ts
 - Uma (UI/UX): §0a PARTIAL — composer identity PASS vs Site Pilot + Motion ownership; no whole-page PROVEN — applied: UMA_FIDELITY_CHAT
