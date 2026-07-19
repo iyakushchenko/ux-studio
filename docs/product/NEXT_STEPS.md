@@ -29,7 +29,7 @@
 
 ## Done recently (context)
 
-- [x] **UXDS book kits** — `BookAppointmentProgress` + `AppointmentSummaryPill` extracted; Steps 1–3 wired; light audit [FE_AUDIT_UXDS_BOOK_KITS_2026-07-19.md](../projects/boots-pharmacy/audits/FE_AUDIT_UXDS_BOOK_KITS_2026-07-19.md) **PROVEN**.
+- [x] **UXDS book kits** — `BookAppointmentProgress` + `AppointmentSummaryPill` extracted; Steps 1–3 wired; light audit [FE_AUDIT_UXDS_BOOK_KITS_2026-07-19.md](../projects/boots-pharmacy/audits/FE_AUDIT_UXDS_BOOK_KITS_2026-07-19.md) **PROVEN** tip `d56fab1`.
 - [x] **Agent testing overlay (PO rage)** — BR corner status + invisible click capture; MCP `stop({ reload: true })`; tip `4f0e12a`.
 - [x] **Docs layout** — Boots product docs + FE audits under `docs/projects/boots-pharmacy/`; engine doctrine stays in `docs/product/`; old paths keep stubs.
 - [x] **createRoot unmount race** — defer `root.unmount()` so book-step hosts never tear down during parent commit (tip `49e6397`).

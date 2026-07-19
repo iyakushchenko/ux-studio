@@ -3,7 +3,7 @@
 **Surface / slice:** UXDS extract — `BookAppointmentProgress` + `AppointmentSummaryPill` (Book Steps 1–3)  
 **Date:** 2026-07-19  
 **Auditor:** Tech Director (master self — light Nazi QA after kit extraction)  
-**Implementer handoff:** tip after extract commit (see git)  
+**Implementer handoff:** `d56fab1`  
 **Checklist:** [../../../product/FE_UI_UX_AUDIT.md](../../../product/FE_UI_UX_AUDIT.md)
 
 ---
