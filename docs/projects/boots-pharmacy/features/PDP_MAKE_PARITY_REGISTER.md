@@ -2,7 +2,7 @@
 
 **Project:** `boots-pharmacy`  
 **Callsigns:** Bea (BA) owns register truth · Quinn (QA) owns prove · Finn/Uma restore gaps  
-**Updated:** 2026-07-19 (Finn L14–L20 below-fold mounted — Quinn MCP + Uma PROVEN still open)  
+**Updated:** 2026-07-19 (Quinn MCP matrix **PASS** — [FE_AUDIT_PDP_MCP_2026-07-19.md](../audits/FE_AUDIT_PDP_MCP_2026-07-19.md); Uma §0a / PAGE FINAL PASS still open)  
 **Make source:** Frame child **8** (`PDP. Vaccine Details Page` / `BTS-PHRM.Product - Deal Details Page`, `screenId: "pdp"`) + `globals-screens` child-8 rules + `BootsPharmacyProjectView` wire + `frame/index.tsx`  
 **React target:** `src/projects/boots-pharmacy/screens/pdp/*`  
 **Refs:** [PDP_REACT.md](./PDP_REACT.md) · [PLP_MAKE_PARITY_REGISTER.md](./PLP_MAKE_PARITY_REGISTER.md) (format) · [URL.md](../../../shell/URL.md) (modal ids)  
@@ -11,7 +11,7 @@
 **Status legend:** Present · Partial · Missing · Fixed · N/A
 
 **Make column:** inventory truth from Frame + wire + LEGACY CSS (2026-07-19).  
-**React column:** L1–L20 mounted (RTB + below-fold static accordion); Quinn MCP prove + Uma PROVEN still open.
+**React column:** L1–L20 mounted (RTB + below-fold static accordion); Quinn MCP interaction matrix **PASS**; Uma PROVEN / PAGE FINAL PASS still open.
 
 **Bea rule:** Every band before Finn codes — including loading/empty/updating as **P0** when Make has them. No invented bands.
 

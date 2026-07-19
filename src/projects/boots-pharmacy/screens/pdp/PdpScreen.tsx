@@ -160,12 +160,16 @@ function PdpBelowFold() {
       className="pdp__below"
       data-name="body"
       aria-label="Product information"
-      data-studio-probe-below-fold="true"
     >
       <div className="pdp__shell pdp__below-inner">
         <div className="pdp__content-stack">
           <div className="pdp__content-hero">
-            <h2 className="pdp__content-title">Chickenpox</h2>
+            <h2
+              className="pdp__content-title"
+              data-studio-probe-below-fold="true"
+            >
+              Chickenpox
+            </h2>
             <div
               className="pdp__content-accent"
               data-name="component.content.heading.accent"

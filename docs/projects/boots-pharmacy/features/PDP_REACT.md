@@ -64,9 +64,10 @@ Erase-Make **next page after PLP HARD-GREEN**. Vaccine PDP (`screenId: pdp`, Fra
 
 ## Prove notes (Quinn)
 
-- Localhost: mount + Make leak=0; PLP→PDP; Book now login gate; Check availability modal URL
-- Booster price swap; heart hover matrix; scroll-into-view for below-fold bands
-- MCP page probe recipe TBD after scaffold — overlay-arm + overlay-eyes mandatory
+- **MCP matrix PASS** 2026-07-19 — [FE_AUDIT_PDP_MCP_2026-07-19.md](../audits/FE_AUDIT_PDP_MCP_2026-07-19.md) (`__studioRunMcpPageProbe({ screenId:"pdp", reload:false })`)
+- Localhost: mount + Make leak=0; PLP→PDP; Book now login gate; Check availability modal URL; overlay-arm + overlay-eyes
+- Booster £150↔£75; empty-heart hover; below-fold reveal (compact title stamp)
+- **Not** PAGE FINAL PASS HARD-GREEN until Uma §0a PROVEN + manifest stamp
 - Register prove matrix: [PDP_MAKE_PARITY_REGISTER.md](./PDP_MAKE_PARITY_REGISTER.md)
 
 ## Pax
