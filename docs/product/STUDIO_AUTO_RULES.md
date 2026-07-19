@@ -41,8 +41,9 @@
 | R9 | *(existing)* | PAGE FINAL PASS | `check:page-final-pass` | — | `mcpFinalPass` stamp |
 | R10 | **`robo-cursor-native-feedback`** | Robo-cursor = **native hover+press everywhere** (buttons/links/DS secondary/outline/popup close — not chat-only); press = down→dwell→up→click; default graphic after click | `vitest` | `demoCursorInteraction` + `demoCursorPseudoBridge` (top-level selector split + insertRule) | MCP: PDP Check availability bg/border change; Book now; popup close press |
 | R11 | **`fixed-localhost-reuse-tab`** | **One** localhost URL forever; agents must **not** open new ports/windows/tabs | `check:felonies` (vite `port`+`strictPort`) | — | Chrome DevTools MCP: `list_pages` → `select_page` / `navigate_page` on existing; **`new_page` only if zero pages** |
+| R12 | **`batch-ship-push`** | **No push after every tiny fix** — land local until coherent ship / PO ask / HARD-GREEN / end of wave | Process (Pax/Ben) — no static CI gate | — | — |
 
-**Code catalog:** `src/app/shell/studioAutoRules.ts` (`STUDIO_AUTO_RULES`) — keep ids in sync with this table.
+**Code catalog:** `src/app/shell/studioAutoRules.ts` (`STUDIO_AUTO_RULES`) — keep ids in sync with this table for **CI-gated** rules (R1–R11). **R12** is process-only (docs + director); do not invent a fake CI assert.
 
 ---
 
@@ -159,6 +160,21 @@ Deep links stay on that origin, e.g. `http://localhost:5173/?project=boots-pharm
 
 **CI:** `check:felonies` asserts vite `port`/`strictPort` + catalog id `fixed-localhost-reuse-tab`.  
 **Docs:** [AGENTS.md](../../AGENTS.md) · [TEAM.md](./TEAM.md) · [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) · [../shell/URL.md](../shell/URL.md) · [../shell/RECORDING.md](../shell/RECORDING.md)
+
+---
+
+## R12 — Batch ship / push (HARD process)
+
+**Fail class:** Agents `git push` after every tiny fix → CI/Pages thrash, tip noise, PO loses coherent ships.
+
+**Contract:**
+
+1. **Land local** — commit locally when coherent; keep working on the wave without pushing each micro-fix.
+2. **One push per coherent ship** — push when Pax (or human PO) says so, or at: coherent feature close · PO explicit ask · PAGE FINAL PASS HARD-GREEN · **end of wave**.
+3. **Ben** executes push + `gh` sitrep **once** for that ship — not per file.
+4. Hotfix that unblocks the human PO **may** push early — still batch remaining work after.
+
+**Docs:** [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) · [TEAM.md](./TEAM.md) · [TEAM_KNOWLEDGE.md](./TEAM_KNOWLEDGE.md) · [AGENTS.md](../../AGENTS.md) · director rule.
 
 ---
 

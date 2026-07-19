@@ -27,7 +27,7 @@
 | L4 | **Site Pilot logo** — `boots.ai assistant 3` (258×54 mark + wordmark) | **Present** | **Present** | `home__logo` SVG paths from Make |
 | L5 | **Hero heading** — “What health services are you focusing on today?”; logged-in → “Sarah, what…” | **Present** | **Present** | `data-studio-agentic-home-heading` + `resolveHomeHeading(isStudioLoggedIn)` |
 | L6 | **Query card** — `component.co.order.summary` white, 640px, `p-[32px]`, `gap-[32px]`, radius 16, shadow `0 4px 4.45px rgba(1,33,105,0.1)` | **Present** | **Partial** | `home__card` — Uma measure pending |
-| L7 | **Query row** — prompt → wire textarea (`proto-agentic-query` / `data-studio-action=agentic-home-query`) + mic + navy send | **Present** | **Present** | `home__query` textarea + buttons |
+| L7 | **Query row** — prompt → wire textarea (`proto-agentic-query` / `data-studio-action=agentic-home-query`) + mic + navy send | **Present** | **Present** | `home__query` in `<form class="home__query-row">`; send `type="submit"`; chips kebab `data-studio-action` + `data-studio-home-chip` |
 | L8 | **Default query copy** — Sarah SE Asia travel intent (`AGENTIC_HOME_DEMO_QUERY`) | **Present** | **Present** | `HOME_QUERY_DEFAULT` |
 | L9 | **Suggested label** — “Suggested dialog options:” 10px grey | **Present** | **Present** | `HOME_SUGGESTED_LABEL` |
 | L10 | **Suggested chips ×3** — Vaccine / Skin health / Other Health services (`component.gse.system.message`) | **Present** | **Present** | `HOME_CHIP_LABELS` |

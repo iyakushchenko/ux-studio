@@ -19,7 +19,7 @@ Complete before calling the task **done** (including late in a long session):
 7. **URL / hybrid / mounts** — navigable `?project=&screen=`; React host mounted; Make retired (`data-studio-make-retired`); createRoot unmount **deferred**; short grids left-aligned; Step tabs → `INDEX_BOOK_STEP*`. See [LESSONS_LEARNED.md](./LESSONS_LEARNED.md).
 8. **CSS layers + domain CSS** — no new React styles in LEGACY; no new `.proto-*` / `data-proto-*` ([NAMING.md](./NAMING.md), [HYGIENE.md](./HYGIENE.md)).
 9. **Changelog + lessons** — user-visible / durable seams: `npm run notes:append -- --lane=<lane> --intent="…"`. Append new failure classes to [LESSONS_LEARNED.md](./LESSONS_LEARNED.md).
-10. **Commit** when coherent and allowed. After **push**: BE sitrep `gh run list -R iyakushchenko/ux-studio -L 10` ([CI_ACTIONS_BUDGET.md](./CI_ACTIONS_BUDGET.md) §5).
+10. **Commit** when coherent and allowed. **Batch push (R12):** do **not** push after every tiny fix — one push per coherent ship / PO ask / HARD-GREEN / end of wave ([STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R12). After **push**: BE sitrep `gh run list -R iyakushchenko/ux-studio -L 10` ([CI_ACTIONS_BUDGET.md](./CI_ACTIONS_BUDGET.md) §5).
 
 ---
 

@@ -166,8 +166,8 @@ For **each** UXDS control used on the screen (at minimum **SearchField**, **Butt
 1. **Brief first** — Arch spawns **Bea (BA)** (or writes the brief as Bea) → lean 1-pager before serious build.  
 2. **Implement** — Arch spawns **Finn (FE)** (+ **Uma (UI/UX)** when chrome/L&F is in play) as sibling subagents when separable.  
 3. **Cross-check before “done”** — Arch spawns **Quinn (QA)** ↔ Finn prove and **Uma** ↔ Bea fidelity as siblings; Quinn MCP matrix required before PROVEN.  
-4. **Pax accept** — for user-visible ships: bump? changelog? push? Pax decides; human PO can override.  
-5. **Close the board** — Arch updates NEXT_STEPS; **Ben (BE)** executes notes/release/push + CI sitrep when Pax says yes.
+4. **Pax accept** — for user-visible ships: bump? changelog? push? Pax decides; human PO can override. **Batch (R12):** push is for a **coherent ship**, not each micro-fix — land local until ship / PO ask / HARD-GREEN / end of wave.  
+5. **Close the board** — Arch updates NEXT_STEPS; **Ben (BE)** executes notes/release/**one batched push** + CI sitrep when Pax says yes.
 
 Serious work = this loop **with parallel sibling subagents** (§ Parallel dispatch). Trivial typos / one-line docs may skip briefs; **do not** skip for chrome, URL, REC, or page behavior.
 
@@ -207,9 +207,24 @@ Arch spawns siblings → Bea brief → Finn (+ Uma) build → Quinn prove + Uma 
 | Cross-check | Finn “done” with no Quinn MCP evidence; Uma skipped on UI; Arch stamps PROVEN without MCP |
 | PAGE FINAL PASS | Next migrated page started while previous not hard-green ([PAGE_FINAL_PASS.md](./PAGE_FINAL_PASS.md)) |
 | Pax | Version/push on user-visible ship without Pax (or human PO) call |
+| Batch ship (R12) | Push after every tiny fix / mid-wave thrash — land local; one push per coherent ship ([STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R12) |
 | Version bump | Ben bumps `package.json` but Quinn did not prove UI chip matches (chip lie = felony) |
 | CI | Push without Ben `gh` sitrep when CI was touched |
 | Board | NEXT_STEPS / notes stale after Pax said bump |
+
+---
+
+## Batch ship / push (R12 — HARD)
+
+**PO pain:** CI/Pages thrash when agents push every one-liner.
+
+| Do | Do not |
+|----|--------|
+| Land commits locally through the wave | `git push` after each micro-fix |
+| One push when: coherent ship · PO ask · HARD-GREEN · end of wave | Mid-wave “just to sync” pushes |
+| Pax calls push; Ben executes + `gh` sitrep once | Ben auto-pushes on green tests alone |
+
+Hotfix that unblocks the human PO may push early; batch the rest after. Full Auto-Rule: [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R12.
 
 ---
 

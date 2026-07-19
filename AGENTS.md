@@ -13,6 +13,8 @@
 
 1b. **Standing PO commands:** `team report` = lean full-team sitrep (+ **Knowledge improved** after ships); `team check` = workstream cross-check (PO ask **or** Arch auto after every big ship before “done”). Always `Name (Role)`. Team check must include **`Knowledge used:`** one-liner per role + Uma fidelity checklist + Bea register completeness + Quinn interaction matrix (+ Ben CI sitrep when relevant) — ship blocked if Uma/Quinn FAIL. Arch rejects write-only LESSONS appends. → [TEAM.md](docs/product/TEAM.md) · [TEAM_KNOWLEDGE.md](docs/product/TEAM_KNOWLEDGE.md) · [COMMAND_DOCTRINE.md](docs/product/COMMAND_DOCTRINE.md) §0.2 · [UMA_FIDELITY_NOTES.md](docs/product/UMA_FIDELITY_NOTES.md)
 
+1f. **Batch ship / push (R12):** Do **not** `git push` after every tiny fix. Land local until a coherent ship, PO ask, PAGE FINAL PASS HARD-GREEN, or end of wave. Pax calls push; Ben executes **once** + `gh` sitrep. → [STUDIO_AUTO_RULES.md](docs/product/STUDIO_AUTO_RULES.md) R12 · [TEAM.md](docs/product/TEAM.md) § Batch ship
+
 1c. **Team knowledge (hard):** Before serious work, callsigns **MUST re-read** their [TEAM_KNOWLEDGE.md](docs/product/TEAM_KNOWLEDGE.md) section + relevant [LESSONS_LEARNED.md](docs/product/LESSONS_LEARNED.md). Database is for **use**, not only write. Team check must include **`Knowledge used:`** per role.
 
 1d. **PAGE FINAL PASS (hard sequencing):** **No new migrated page** until the **previous** page is **PAGE FINAL PASS hard-green**. Contract: [PAGE_FINAL_PASS.md](docs/product/PAGE_FINAL_PASS.md). Finn/Uma own checklist + `check:page-final-pass` (do not duplicate). Arch enforces; parallel callsigns still required; Knowledge used still mandatory on team check.  
@@ -96,11 +98,13 @@ Full transport smokes require `__studioRun*` / `__protoRun*` helpers — use spa
 
 ## CI
 
-- **`ci.yml` → `test`** — unit tests (incl. `check:links` + `check:hygiene`) + build on every PR/push — Node **22**
+- **`ci.yml` → `test`** — `npm ci` (cached) → parallel `test:gates` (all hard checks) → `vitest run` — Node **22**
+- **`ci.yml` → `build`** — **parallel** Vite build (same push/PR; not sequential after unit)
 - **`ci.yml` → `smoke`** — Playwright lean profile — **`workflow_dispatch` only** (not every push)
-- **`deploy-pages.yml`** — GitHub Pages (`/ux-studio/` base path) — Node **22**
-- Budget: [docs/product/CI_ACTIONS_BUDGET.md](docs/product/CI_ACTIONS_BUDGET.md) — day-to-day = local MCP; merge needs `npm test` + build; no auto smoke burn
+- **`deploy-pages.yml`** — GitHub Pages (`/ux-studio/` base path) — Node **22** + npm cache
+- Budget: [docs/product/CI_ACTIONS_BUDGET.md](docs/product/CI_ACTIONS_BUDGET.md) — day-to-day = local MCP; merge needs gates + vitest + build; no auto smoke burn; expect ~35–45s warm CI wall
 - **Post-push sitrep (BE / Director):** after push, `gh run list -R iyakushchenko/ux-studio -L 10` — never assume green from local tests ([CI_ACTIONS_BUDGET.md](docs/product/CI_ACTIONS_BUDGET.md) §5)
+- **Batch push (R12):** one push per coherent ship — see [STUDIO_AUTO_RULES.md](docs/product/STUDIO_AUTO_RULES.md) R12
 
 ## Conventions
 

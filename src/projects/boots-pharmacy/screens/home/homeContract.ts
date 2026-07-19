@@ -30,7 +30,18 @@ export const HOME_CHIP_LABELS = [
 
 export type HomeChipLabel = (typeof HOME_CHIP_LABELS)[number];
 
+/** Kebab slug for `data-studio-*` / `data-studio-action` (no spaces). */
+export function homeChipSlug(label: HomeChipLabel): string {
+  return label.toLowerCase().replace(/\s+/g, "-");
+}
+
+/** Stable Studio action id — `agentic-home-chip-vaccine-services` etc. */
+export function homeChipActionId(label: HomeChipLabel): string {
+  return `agentic-home-chip-${homeChipSlug(label)}`;
+}
+
 export const HOME_SUGGESTED_LABEL = "Suggested dialog options:";
+export const HOME_SUGGESTED_LABEL_ID = "home-suggested-label";
 
 /** Textarea autosize — hug 1 line, grow to 5, then scroll (matches wire agentic query). */
 export const HOME_QUERY_LINE_PX = 24;

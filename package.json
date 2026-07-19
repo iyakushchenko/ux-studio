@@ -25,7 +25,8 @@
     "release:patch": "node scripts/release.mjs patch",
     "release:minor": "node scripts/release.mjs minor",
     "release:major": "node scripts/release.mjs major",
-    "test": "npm run check:links && npm run check:hygiene && npm run check:felonies && npm run check:parity-ratchets && npm run check:parity-proven && npm run check:page-final-pass && npm run check:theme-brand && npm run check:version && vitest run",
+    "test:gates": "node scripts/run-static-gates.mjs",
+    "test": "npm run test:gates && vitest run",
     "test:watch": "vitest",
     "smoke": "node scripts/playwright-smoke.mjs"
   },

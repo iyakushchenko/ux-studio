@@ -11,6 +11,8 @@ import {
   HOME_REACT_SCREEN_ID,
   HOME_SCREEN_SELECTOR,
   HOME_SUGGESTED_LABEL,
+  homeChipActionId,
+  homeChipSlug,
   resolveHomeHeading,
 } from "../homeContract";
 
@@ -37,6 +39,13 @@ describe("homeContract", () => {
       "Other Health services",
     ]);
     expect(HOME_SUGGESTED_LABEL).toBe("Suggested dialog options:");
+    expect(homeChipSlug("Vaccine services")).toBe("vaccine-services");
+    expect(homeChipActionId("Vaccine services")).toBe(
+      "agentic-home-chip-vaccine-services"
+    );
+    expect(homeChipActionId("Other Health services")).toBe(
+      "agentic-home-chip-other-health-services"
+    );
 
     expect(HOME_QUERY_DEFAULT).toBe(AGENTIC_HOME_DEMO_QUERY);
   });

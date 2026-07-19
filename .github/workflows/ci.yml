@@ -6,21 +6,49 @@ on:
   pull_request:
   workflow_dispatch:
 
+# Supersede in-flight runs on the same ref — faster tip feedback, less minute burn.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
+  # Hard static gates + Vitest (fail-fast via parallel gates script).
+  # Smoke stays workflow_dispatch-only (see smoke job).
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v5
 
       - uses: actions/setup-node@v5
         with:
           node-version: 22
+          cache: npm
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
+
+      - name: Static gates (parallel)
+        run: npm run test:gates
 
       - name: Unit tests
-        run: npm test
+        run: npx vitest run
+
+  # Build parallel to test — avoids sequential full install+test+build wall clock.
+  # Hard gates stay in `test`; this job only proves Vite production build.
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Build
         run: npm run build
@@ -37,9 +65,16 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 22
+          cache: npm
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install Playwright Chromium
         run: npx playwright install chromium --with-deps

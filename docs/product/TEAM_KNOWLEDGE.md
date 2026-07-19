@@ -109,19 +109,21 @@
 | `PARITY_PROVEN.json` · `PAGE_FINAL_PASS.json` ownership | No chat-only PROVEN / final-pass |
 | [../shell/URL.md](../shell/URL.md) + `check:felonies` overlay registry | **Modal URL registry mandatory** same PR as dialog ship |
 | [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R11 · `vite.config.ts` | `port`/`strictPort` felony; smoke URL default |
+| [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) **R12** · [TEAM.md](./TEAM.md) § Batch ship | **One batched push** per coherent ship — no push-after-every-fix; lean CI (`npm ci` + cache + parallel test∥build) |
 
-**Knowledge used tip:** VERSIONING DoD + CI sitrep + fixed-localhost-reuse-tab + modal URL table.
+**Knowledge used tip:** VERSIONING DoD + CI sitrep + fixed-localhost-reuse-tab + **batch-ship-push (R12)** + modal URL table.
 
 ### Pax (PO sim)
 
 | Must re-read | Focus |
 |--------------|--------|
 | [PRODUCT_OWNER_BRIEF.md](./PRODUCT_OWNER_BRIEF.md) §K | Decisions log |
-| [TEAM.md](./TEAM.md) Pax owns | Bump / notes / push call |
+| [TEAM.md](./TEAM.md) Pax owns · **§ Batch ship (R12)** | Bump / notes / **batched** push call |
 | [NEXT_STEPS.md](./NEXT_STEPS.md) | What human PO can `+` / `ok` |
 | LESSONS that changed product bar (fidelity zero-tolerance) | Accept only when gates match PO rage list |
+| [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R12 | Do not green-light mid-wave tip thrash |
 
-**Knowledge used tip:** brief §K + board NOW + latest PO-rage LESSONS.
+**Knowledge used tip:** brief §K + board NOW + latest PO-rage LESSONS + **R12 batch push**.
 
 ---
 
@@ -140,6 +142,13 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 - Pax (PO sim): <accept bar / bump call> — applied: <decision>
 ```
 
+**Knowledge improved** (2026-07-19 · stream: Home naming + lean CI + batch-push R12 · tip post-`fd3241c`):
+- Arch (Director): R12 batch-ship-push locked; CI wall target ~35–45s warm — applied: doctrine §2.14 · TEAM · STUDIO_AUTO_RULES R12 · director #26
+- Bea (BA): Home chip/query naming contract in register — applied: HOME_MAKE_PARITY_REGISTER L7
+- Finn (FE): Home landmarks/form + kebab chip `data-studio-*` — applied: `HomeScreen.tsx` · naming audit PASS
+- Ben (BE): `npm ci` + cache + parallel `test`∥`build` + `test:gates` — applied: `ci.yml` · `run-static-gates.mjs` · CI_ACTIONS_BUDGET §2.1
+- Pax (PO sim): one batched push per coherent ship (this wave) — applied: R12 process
+
 **Knowledge improved** (2026-07-19 · stream: overflow-only scrollbar gutter · v0.0.39):
 - Finn (FE): never always-on `scrollbar-gutter: stable` — toggle `studio-scroll--overflow` via `syncStudioScrollOverflowGutter` / `useScrollFill`; keep gutter only while overflowing (+ locked) — applied: `studioScrollOverflow.ts` + `globals-chrome.css`
 - Pax (PO sim): user-visible shell fix → patch bump — applied: v0.0.39
@@ -154,6 +163,9 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 
 | Delta | Hats | LESSONS / artifact |
 |-------|------|--------------------|
+| **Batch ship / push (R12)** — no push after every tiny fix; land local until coherent ship / PO ask / HARD-GREEN / end of wave | Arch, Pax, Ben | [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R12 · TEAM § Batch ship · doctrine §2.14 |
+| **Leaner CI** — `npm ci` + npm cache; parallel `test`∥`build`; parallel `test:gates`; smoke still dispatch-only; expect ~35–45s warm wall | Ben, Arch | [CI_ACTIONS_BUDGET.md](./CI_ACTIONS_BUDGET.md) §2.1 · `ci.yml` · `run-static-gates.mjs` |
+| **Home naming PASS** — BEM=`home`; landmarks/form; kebab chip actions; audit stamp (not Final Pass) | Finn, Bea, Arch | [FE_AUDIT_HOME_NAMING_2026-07-19.md](../projects/boots-pharmacy/audits/FE_AUDIT_HOME_NAMING_2026-07-19.md) |
 | **Fixed localhost + reuse tab** — canonical `http://localhost:5173/`; Vite `strictPort`; one `npm run dev`; Chrome MCP `list_pages`→reuse (`new_page` only if empty); Auto-Rule R11 + felony | Arch, Finn, Ben, Quinn | [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R11 · `vite.config.ts` · LESSONS |
 | **Platform Motion standard** — `framer-motion` via `@/uxds/motion`; Accordion height = Motion (not CSS `0fr/1fr`); chevron CSS; shell pilots: diagnostic overlay + studio select presence | Arch, Finn, Uma, Ben, Pax | [MOTION.md](./MOTION.md) · `src/uxds/motion/` · Accordion.tsx |
 | **Accordion invisible expand** — `prefers-reduced-motion` zeroed CSS grid transitions; root cause + Motion height fix | Uma, Finn, Arch, Quinn | LESSONS · accordion.css · MOTION.md |

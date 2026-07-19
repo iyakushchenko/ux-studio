@@ -61,6 +61,7 @@ Spot or forecast: layout/L&F drift; style zoo; bad handoffs; missing hover/focus
 23. **No invent vs Make** — forbidden to invent hover colors, loader copy placement, or attention chrome not in Make CSS/behavior (e.g. fuchsia-on-empty heart, duplicate “Updating results…”). Prefer under-match over invent.
 24. **MCP real-user matrix** — every screen ship: Quinn + Ben prove on localhost via `__studioRunMcpPageProbe` (visible robo-cursor + overlay PASS/FAIL) + cite in audit. Arch **rejects** FE audit **PROVEN** without that evidence log. Prior PROVEN is BAD when PO disputes pixels. `check:parity-proven` enforces this in CI. **Probe HARD FAIL:** scroll-into-view before interact; agent testing overlay **must be visible on every probe step** — absent overlay = FAIL (LESSONS 2026-07-19).
 25. **Fixed localhost + reuse tab** — prove only at **`http://localhost:5173/`** (`vite` `strictPort`; never invent 5174+). One `npm run dev`. Chrome DevTools MCP: `list_pages` → `select_page` / `navigate_page`; **`new_page` only if zero pages**. Auto-Rule **`fixed-localhost-reuse-tab`** — [STUDIO_AUTO_RULES.md](../../docs/product/STUDIO_AUTO_RULES.md) R11.
+26. **Batch ship / push (R12)** — **no push after every tiny fix.** Land local until coherent ship / PO ask / HARD-GREEN / end of wave. Pax calls; Ben one push + `gh` sitrep. → [STUDIO_AUTO_RULES.md](../../docs/product/STUDIO_AUTO_RULES.md) R12 · [TEAM.md](../../docs/product/TEAM.md) § Batch ship.
 
 ## Hybrid Make + React (Boots)
 

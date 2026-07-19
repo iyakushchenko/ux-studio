@@ -6,6 +6,9 @@ import {
   HOME_QUERY_MAX_LINES,
   HOME_REACT_SCREEN_ID,
   HOME_SUGGESTED_LABEL,
+  HOME_SUGGESTED_LABEL_ID,
+  homeChipActionId,
+  homeChipSlug,
   resolveHomeHeading,
   type HomeChipLabel,
 } from "./homeContract";
@@ -148,11 +151,23 @@ export function HomeScreen({
           {resolveHomeHeading(loggedIn)}
         </h1>
 
-        <div className="home__card" data-name="component.co.order.summary">
-          <div className="home__query-row" data-name="Subtotal">
+        <section
+          className="home__card"
+          data-name="component.co.order.summary"
+          aria-label="Ask Site Pilot"
+        >
+          <form
+            className="home__query-row"
+            data-name="Subtotal"
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSend();
+            }}
+          >
             <textarea
               ref={taRef}
               className="home__query"
+              name="home-query"
               rows={1}
               spellCheck
               aria-label="Ask Site Pilot"
@@ -171,35 +186,47 @@ export function HomeScreen({
               <MicGlyph />
             </button>
             <button
-              type="button"
+              type="submit"
               className="home__send"
               data-name="component.input.button"
               aria-label="Send message"
               data-studio-action="agentic-home-send"
-              onClick={handleSend}
             >
               <SendGlyph />
             </button>
-          </div>
+          </form>
 
-          <div className="home__suggested">
-            <p className="home__suggested-label">{HOME_SUGGESTED_LABEL}</p>
-            <div className="home__chips">
+          <section
+            className="home__suggested"
+            aria-labelledby={HOME_SUGGESTED_LABEL_ID}
+          >
+            <p
+              id={HOME_SUGGESTED_LABEL_ID}
+              className="home__suggested-label"
+            >
+              {HOME_SUGGESTED_LABEL}
+            </p>
+            <div
+              className="home__chips"
+              role="group"
+              aria-label={HOME_SUGGESTED_LABEL}
+            >
               {HOME_CHIP_LABELS.map((label) => (
                 <button
                   key={label}
                   type="button"
                   className="home__chip"
                   data-name="component.gse.system.message"
-                  data-studio-action={`agentic-home-chip-${label}`}
+                  data-studio-home-chip={homeChipSlug(label)}
+                  data-studio-action={homeChipActionId(label)}
                   onClick={() => onChip(label)}
                 >
                   {label}
                 </button>
               ))}
             </div>
-          </div>
-        </div>
+          </section>
+        </section>
       </div>
     </main>
   );

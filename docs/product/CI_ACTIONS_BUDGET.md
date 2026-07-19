@@ -26,14 +26,33 @@
 
 | Job | When | Cost intent |
 |-----|------|-------------|
-| `ci.yml` → `test` | push `main` + PRs | `npm test` (includes `check:links`) + `npm run build` |
-| `ci.yml` → `smoke` | **`workflow_dispatch` only** | Playwright Chromium, `PROTO_SMOKE_PROFILE=ci`, 15m cap — run when investigating, not every commit |
-| `deploy-pages.yml` | push `main` (+ manual) | Production build → Pages |
+| `ci.yml` → `test` | push `main` + PRs | `npm ci` (cached) → `npm run test:gates` (parallel hard gates) → `vitest run` |
+| `ci.yml` → `build` | push `main` + PRs | **Parallel** Vite build (`npm ci` cached) — not sequential after unit |
+| `ci.yml` → `smoke` | **`workflow_dispatch` only** | Playwright Chromium + browser cache, `PROTO_SMOKE_PROFILE=ci`, 15m cap — never on push |
+| `deploy-pages.yml` | push `main` (+ manual) | `npm ci` + cache → production build → Pages |
+
+**Hard gates unchanged** (still fail CI): `check:links` · `hygiene` · `felonies` · `parity-ratchets` · `parity-proven` · `page-final-pass` · `theme-brand` · `version`. Only **parallelized** via `scripts/run-static-gates.mjs`.
 
 Local lean smoke: `npm run smoke` against `npm run dev`.  
 Full smoke: **manual / local** — `PROTO_SMOKE_PROFILE=full npm run smoke` when investigating.
 
-**Merge bar:** `npm test` + `npm run build` green. Chrome XOR / REC⊗CJM proven locally (unit + MCP sanity / FE audit), not by auto CI smoke.
+**Merge bar:** `test` + `build` jobs green (`npm test` locally = gates + vitest; also run `npm run build`). Chrome XOR / REC⊗CJM proven locally (unit + MCP sanity / FE audit), not by auto CI smoke.
+
+### 2.1 Speed (2026-07-19)
+
+| Lever | Change |
+|-------|--------|
+| npm | `npm ci` + `actions/setup-node` `cache: npm` (CI + Pages + smoke) |
+| Parallel jobs | `test` ∥ `build` (same ref concurrency group; cancel in-progress) |
+| Gates | Parallel `test:gates` — fail-fast report, no sequential `&&` chain |
+| Smoke | Remains dispatch-only; Playwright browser dir cached |
+| Not done | Vitest shard (suite ~10s local — shard would **cost** extra installs) |
+
+| Metric | Before (tip `fd3241c` era) | After (this ship) |
+|--------|----------------------------|-------------------|
+| CI wall (push, warm cache expected) | ~60–70s sequential install → `npm test` → build | **~35–45s** wall (`test` ∥ `build`; install cached) |
+| Cold cache | ~60–90s | ~45–60s (still parallel build) |
+| Smoke on push | already off | still off |
 
 ---
 

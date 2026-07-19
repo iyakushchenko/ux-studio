@@ -13,6 +13,7 @@
 | `check-page-final-pass.mjs` | `npm run check:page-final-pass` | Structure/naming final pass stamp + source contracts before NEXT page |
 | `check-parity-ratchets.mjs` | `npm run check:parity-ratchets` | Make→React typical-miss contracts (search icon, bookmark copy, Advantage, loader dup, …) |
 | `check-agent-felonies.mjs` | `npm run check:felonies` | proto filenames, PANEL `.proto-*`, channel, version chip, overlay eyes |
+| `run-static-gates.mjs` | `npm run test:gates` | Parallel hard static gates (links…version) — used by `npm test` + CI `test` job |
 
 Canonical smoke URL: `http://localhost:5173` (Vite `strictPort`). Override with `PROTO_SMOKE_URL` only for deliberate CI aliases (`http://127.0.0.1:5173`) — never invent other ports.
 
