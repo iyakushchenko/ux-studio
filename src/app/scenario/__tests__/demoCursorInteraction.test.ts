@@ -3,9 +3,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   cancelDemoCursorTravel,
   clearDemoCtaStates,
+  DEMO_CURSOR_PARKED_CLASS,
+  isDemoCursorParked,
   isDemoCursorPointerMode,
   moveDemoCursorTo,
+  readDemoCursorDomState,
   removeDemoCursor,
+  setDemoCursorJourneyMode,
   settleDemoCursorAfterClick,
   simulateDemoPointerClick,
   simulateDemoPointerHover,
@@ -233,6 +237,31 @@ describe("demoCursor interaction contract", () => {
     );
     expect(btn.classList.contains("proto-chat-cta--hover")).toBe(false);
     expect(btn.classList.contains("proto-chat-cta--pressed")).toBe(false);
+  });
+
+  it("CJM on remounts parked cursor after immediate wipe (restart race)", async () => {
+    setDemoCursorJourneyMode(true, { parkAfterInteraction: true });
+    await vi.runAllTimersAsync();
+    expect(isDemoCursorParked()).toBe(true);
+
+    // Mimic restartStudioJourney / setJourneyMode(true) while already-on.
+    removeDemoCursor({ immediate: true });
+    expect(document.querySelector(".proto-chat-demo-cursor")).toBeNull();
+
+    setDemoCursorJourneyMode(true, { parkAfterInteraction: true });
+    await vi.runAllTimersAsync();
+    const el = document.querySelector<HTMLElement>(".proto-chat-demo-cursor");
+    expect(el).not.toBeNull();
+    expect(el!.classList.contains(DEMO_CURSOR_PARKED_CLASS)).toBe(true);
+    expect(el!.style.opacity === "" || Number(el!.style.opacity) > 0).toBe(true);
+    expect(readDemoCursorDomState()).toMatchObject({
+      visible: true,
+      parked: true,
+      faded: false,
+    });
+
+    setDemoCursorJourneyMode(false);
+    removeDemoCursor({ immediate: true });
   });
 
   it("remove/forceClear cancels in-flight Motion travel (hang guard)", async () => {

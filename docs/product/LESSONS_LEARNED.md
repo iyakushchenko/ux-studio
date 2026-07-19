@@ -10,6 +10,24 @@ Agents **must read** this file before claiming a UI or Studio-chrome slice done.
 
 ## 2026-07-20
 
+### CJM on leaves robo-cursor DOM-null after restart / re-apply (PO / Finn)
+
+- **Symptom / class:** CJM switch ON (or `cjm=on` re-apply) — parked robo-cursor missing (`display` removed / not mounted) even at home park pose.
+- **Root cause:** `handleStudioJourneyModeChange(true)` always calls `restartStudioJourney` → `removeDemoCursor({ immediate: true })`. When `studioJourneyMode` was **already** true, React effect is a no-op so park never remounts. First-on also raced wipe before `journeyModePinned`.
+- **Gate:** Pin + `setDemoCursorJourneyMode(true)` before restart; restart remounts `parkDemoCursorAtRest` when CJM stays on; `setDemoCursorJourneyMode` idempotently remounts if DOM node missing. Prove R11: toggle/`setJourneyMode(true)` while already-on → `.proto-chat-demo-cursor--parked` visible; Play still travels.
+
+### Agentic chat full-thread dump on enter — React paint ignored engine visibleCount (PO / Finn + Quinn)
+
+- **Symptom / class:** CJM enter chat / Play shows **all bubbles at once** (not Make step-by-step progressive disclosure). Counter may say `2/9` while DOM paints 8 frames.
+- **Root cause:** React Chat mounted the full `CHAT_THREAD_FRAMES` list; scenario hide used delayed `display:none` + CSS opacity that lost to paint. Engine `visibleCount` was not a React control point.
+- **Gate:** `chatScenarioRevealBridge` + `usePublishChatScenarioReveal` — paint only `index < visibleCount` (`data-studio-chat-revealed` / `hidden`). Engine still collects all mounted frames. Never-shown frames: immediate `display:none` in `applyScenarioFrameVisibility`. Prove: first chat land → visible content frames === 1; step → sequential reveal.
+
+### Journey reset / Jump-to-start still lands hub — matching-tab `goToTab` skip (PO / Finn + Ben)
+
+- **Symptom / class:** CJM Jump to start / Play end / Stop-at-end still shows **hub** (PO again). Expected: key 1 of selected journey (`agentic-home`/`site-pilot` or `traditional-plp`/`plp`).
+- **Root cause:** `navigateBeatTab` skipped `runtime.goToTab` when `currentTabIndex === target`. Hub overlay can sit on that same underlying tab — skip left `hubOpen=true`. Smoke `resetToHub` is harness-only and must not define product reset.
+- **Gate:** `navigateToBeatTab` **always** calls `goToTab` (closes hub). Stop-at-end → `jumpToStart`. Diag: `[PLAYBACK_DIAG] journey-reset` with `startBeatId` + `startScreenId` ≠ hub. Prove R11: CJM on → jump-to-start / play-end → `screen≠hub`, beat `1/N`.
+
 ### Agentic SF `touchpoint-ahead-of-beat` — chat finale opens Availability before beat advances (PO / Finn + Quinn)
 
 - **Symptom / class:** `__protoRunAgenticStepForwardSmoke` FAIL `diagnostic-on-step-8` / `touchpoint-ahead-of-beat` — counter jumps to “Choose date” while `beatId` still `agentic-chat`.

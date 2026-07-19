@@ -39,6 +39,7 @@ import type {
 import type { PersonaId, ProjectId, ProjectWireApi } from "@/projects/types";
 import {
   cancelDemoCursorJourneyEndFade,
+  parkDemoCursorAtRest,
   removeDemoCursor,
   resetDemoCursorTravelOrigin,
   reviveDemoCursorAfterJourneyEndRetreat,
@@ -775,25 +776,31 @@ export default function App() {
   const restartStudioJourney = useCallback(() => {
     journeyPlayback.stopJourneyPlay();
     scenarioPlayback.cancelPreRevealPause();
-    scenarioPlayback.jumpToStart();
-    journeyPlayback.resetJourney();
     wireApiRef.current?.closeAllPopups();
     wireApiRef.current?.resetWireInteractionState();
     removeDemoCursor({ immediate: true });
     resetDemoCursorTravelOrigin();
-    applyJourneyStartTab(activeJourney);
-  }, [
-    activeJourney,
-    applyJourneyStartTab,
-    journeyPlayback,
-    scenarioPlayback,
-  ]);
+    // Product CJM restart → first playable beat + leave hub (never hub landing).
+    journeyPlayback.jumpToStart();
+    // CJM can stay on across restart (URL re-apply / setJourneyMode(true) while
+    // already-on). Immediate wipe must remount the parked robo-cursor — React
+    // effect is a no-op when studioJourneyMode does not change.
+    if (studioJourneyModeRef.current) {
+      setDemoCursorJourneyMode(true, {
+        parkAfterInteraction: !journeyPlayback.isPlaying,
+      });
+      void parkDemoCursorAtRest({ animate: false });
+    }
+  }, [journeyPlayback, scenarioPlayback]);
 
   const handleStudioJourneyModeChange = useCallback(
     (enabled: boolean) => {
       if (enabled) {
         setHubOpen(false);
         setStudioJourneyMode(true);
+        // Pin before restart so park during wipe/restore is not a no-op.
+        studioJourneyModeRef.current = true;
+        setDemoCursorJourneyMode(true, { parkAfterInteraction: true });
         restartStudioJourney();
         return;
       }
@@ -1707,6 +1714,7 @@ export default function App() {
                 notePlaybackTransport("jump-to-start");
                 playbackCursorMonitor.noteManualTransport("jump-to-start");
                 playbackViewportMonitor.noteManualTransport("jump-to-start");
+                // Product: first playable beat of active journey (never hub).
                 transport.jumpToStart();
                 if (SCREENS[current]?.childIndex !== 10) {
                   wireApiRef.current?.resetPrototypeScroll();

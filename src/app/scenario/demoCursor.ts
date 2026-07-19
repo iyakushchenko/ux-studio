@@ -424,6 +424,20 @@ export function setDemoCursorJourneyMode(
   } else if (!wasParkAfterInteraction && parkAfterInteraction) {
     // Manual CJM idle — park visibly at rest; do not fade out (that removed the cursor).
     void parkDemoCursorAtRest({ animate: true });
+  } else if (parkAfterInteraction && !journeyEndCursorFaded) {
+    // Idempotent remount: restart / setJourneyMode(true) while already-on can wipe the
+    // DOM node without flipping React state — CJM on = robo time, park must stay visible.
+    const existing = document.querySelector<HTMLElement>(".proto-chat-demo-cursor");
+    if (!existing) {
+      void parkDemoCursorAtRest({ animate: false });
+    } else {
+      existing.classList.remove("proto-chat-demo-cursor--exit");
+      applyDemoCursorParkedState(existing);
+      if (!Number.isFinite(Number.parseFloat(existing.style.left))) {
+        const rest = resolveDemoCursorRestPosition();
+        seedDemoCursorPosition(existing, { x: rest.left, y: rest.top });
+      }
+    }
   }
 
   resizeParkListener = () => {
