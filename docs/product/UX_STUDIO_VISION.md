@@ -77,10 +77,11 @@ See [PROJECTS.md](../shell/PROJECTS.md), [PLAYBACK.md](../shell/PLAYBACK.md), [R
 2. ✅ Recording foundation + journey catalog on session
 3. ✅ Workspace + product docs (PO brief, page contract, command doctrine, Summarizer direction)
 4. ✅ UXDS Larkin linked + variables inventoried (`docs/uxds/`); X-Suite integration intent documented
-5. 🔲 Recording UI (save/load files without MCP) — engine
-6. 🔲 UXDS CSS token bridge + pilot: one Boots screen in React + UXDS
-7. 🔲 Figma → Project scaffold command
-8. 🔲 X-Suite import seam (persona / IA / CJM baseline → Studio journeys)
+5. ✅ Recording UI (save/load files without MCP) — engine
+6. ✅ Thin UXDS CSS token bridge + interaction kits + Boots styleguide (Availability Tool enrichment)
+7. 🔲 Pilot: one Boots **screen** rebuilt React + UXDS
+8. 🔲 Figma → Project scaffold command
+9. 🔲 X-Suite import seam (persona / IA / CJM baseline → Studio journeys)
 9. 🔲 Compiler: recording → journey beat proposals
 10. 🔲 Multi-project / persona packaging for client delivery
 

@@ -1,0 +1,43 @@
+/**
+ * UXDS `design` collection — Concept mode samples (hand-mapped).
+ * Names preserve Figma paths: slash → kebab (`uxds-text/text-primary` → `--uxds-text-text-primary`).
+ * @see docs/uxds/VARIABLES.md · docs/uxds/TOKEN_BRIDGE.md
+ */
+
+:root {
+  /* uxds-text */
+  --uxds-text-text-primary: #3a3a3a;
+  --uxds-text-text-secondary: #5c5c5c;
+  --uxds-text-text-inverse: #ffffff;
+  --uxds-text-link-link-dark: #305854;
+
+  /* uxds-surface */
+  --uxds-surface-neutral: #ffffff;
+  --uxds-surface-subtle: #f5f5f5;
+  --uxds-surface-success: #e8f5e9;
+  --uxds-surface-error: #fdecea;
+
+  /* uxds-border */
+  --uxds-border-border-default: #d6d6d6;
+  --uxds-border-border-strong: #afafaf;
+  --uxds-border-border-focus: #305854;
+
+  /* uxds-icon */
+  --uxds-icon-icon-primary: #5c5c5c;
+  --uxds-icon-icon-accent-strong: #467672;
+  --uxds-icon-icon-inverse: #ffffff;
+
+  /* uxds-input / button */
+  --uxds-input-button-surface-surface-primary-solid: #305854;
+  --uxds-input-button-surface-surface-secondary-solid: #ffffff;
+  --uxds-input-button-border-border-secondary: #afccca;
+  --uxds-input-field-surface-surface-default: #ffffff;
+  --uxds-input-field-border-border-default: #afafaf;
+
+  /* uxds-badge */
+  --uxds-badge-surface-variant-1: #afccca;
+  --uxds-badge-text-on-variant-1: #305854;
+
+  /* uxds-logo */
+  --uxds-logo-logo-accent: #467672;
+}

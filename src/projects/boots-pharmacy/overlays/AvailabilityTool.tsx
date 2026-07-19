@@ -3,6 +3,14 @@ import { ProtoCloseIcon } from "@/app/chrome/ProtoCloseIcon";
 import { useProtoOverlayDismiss } from "@/app/chrome/useProtoOverlayDismiss";
 import { ProtoTertiaryCta } from "@/app/chrome/ProtoTertiaryCta";
 import { ProtoWishlistHeart } from "@/projects/boots-pharmacy/chrome/ProtoWishlistHeart";
+import {
+  DisclosureContent,
+  DisclosureTrigger,
+  FilterChip,
+  FilterChipGroup,
+  FilterChipRow,
+  useAccordion,
+} from "@/uxds/interactions";
 import iconSearch from "@/assets/avail/search.svg";
 import iconMapPin from "@/assets/avail/map-pin.svg";
 import iconCheckChosen from "@/assets/avail/check-chosen.svg";
@@ -334,23 +342,30 @@ function StoreCard({
           </div>
         </div>
         <div className="proto-avail-store__links">
-          <button type="button" className="proto-avail-link" onClick={onToggleHours}>
+          <DisclosureTrigger
+            open={hoursOpen}
+            onToggle={onToggleHours}
+            className="proto-avail-link"
+            data-proto-avail-hours-trigger={store.id}
+          >
             {hoursOpen ? "Hide working hours" : "See working hours"}
-          </button>
+          </DisclosureTrigger>
           <button type="button" className="proto-avail-link" onClick={onShowMap}>
             Show on map
           </button>
         </div>
-        {hoursOpen && (
-          <div className="proto-avail-hours">
-            {HOURS.map(([day, hours]) => (
-              <div key={day} className="proto-avail-store__row">
-                <span>{day}</span>
-                <span>{hours}</span>
-              </div>
-            ))}
-          </div>
-        )}
+        <DisclosureContent
+          open={hoursOpen}
+          className="proto-avail-hours"
+          data-proto-avail-hours={store.id}
+        >
+          {HOURS.map(([day, hours]) => (
+            <div key={day} className="proto-avail-store__row">
+              <span>{day}</span>
+              <span>{hours}</span>
+            </div>
+          ))}
+        </DisclosureContent>
       </div>
       <div className="proto-avail-store__aside">
         <div className="proto-avail-store__meta">
@@ -526,7 +541,14 @@ export default function AvailabilityTool({
   const [locationRequiredHint, setLocationRequiredHint] = useState(false);
   const [showFoundDot, setShowFoundDot] = useState(false);
   const [store, setStore] = useState<AvailStore | null>(null);
-  const [hoursId, setHoursId] = useState<string | null>(null);
+  const [hoursOpenIds, setHoursOpenIds] = useState<string[]>([]);
+  const hoursAccordion = useAccordion({
+    type: "single",
+    value: hoursOpenIds,
+    onValueChange: setHoursOpenIds,
+  });
+  /** List filter: `all` | `slots` (UXDS FilterChipToggle, single mode). */
+  const [storeFilter, setStoreFilter] = useState<string[]>(["all"]);
   const [notifyEmail, setNotifyEmail] = useState("");
   const [notifySent, setNotifySent] = useState(false);
   const [selectedDate, setSelectedDate] = useState<{
@@ -595,7 +617,8 @@ export default function AvailabilityTool({
     );
     setNearMe(intent.nearMe ?? false);
     setShowFoundDot(false);
-    setHoursId(null);
+    setHoursOpenIds([]);
+    setStoreFilter(["all"]);
     setNotifyEmail("");
     setNotifySent(false);
     setStore(resolvedStore);
@@ -968,17 +991,45 @@ export default function AvailabilityTool({
 
               {step === "list" ? (
                 <div ref={storeListRef} className="proto-avail-store-list">
-                  {STORES.map((s) => (
+                  <FilterChipGroup
+                    mode="single"
+                    value={storeFilter}
+                    onValueChange={(next) =>
+                      setStoreFilter(next.length ? next : ["all"])
+                    }
+                    className="proto-avail-store-filters"
+                    data-name="uxds.interaction.filter-chip-group"
+                  >
+                    {({ selected, toggle, isSelected }) => (
+                      <FilterChipRow className="uxds-filter-chip-row proto-avail-store-filters__row">
+                        <FilterChip
+                          id="all"
+                          selected={isSelected("all") || selected.length === 0}
+                          onToggle={() => toggle("all")}
+                        >
+                          All locations
+                        </FilterChip>
+                        <FilterChip
+                          id="slots"
+                          selected={isSelected("slots")}
+                          onToggle={() => toggle("slots")}
+                        >
+                          Slots available
+                        </FilterChip>
+                      </FilterChipRow>
+                    )}
+                  </FilterChipGroup>
+                  {STORES.filter((s) =>
+                    storeFilter.includes("slots") ? s.hasSlots : true
+                  ).map((s) => (
                     <StoreCard
                       key={s.id}
                       store={s}
                       chosen={store?.id === s.id}
-                      hoursOpen={hoursId === s.id}
+                      hoursOpen={hoursAccordion.isOpen(s.id)}
                       loggedIn={loggedIn}
                       isSaved={isInSavedLocations(s.id)}
-                      onToggleHours={() =>
-                        setHoursId((id) => (id === s.id ? null : s.id))
-                      }
+                      onToggleHours={() => hoursAccordion.toggle(s.id)}
                       onChoose={() => chooseStore(s)}
                       onShowMap={() => {
                         setStore(s);

@@ -13,6 +13,8 @@
 
 **Studio contracts:** [VARIABLES.md](./VARIABLES.md) · [COMPONENTS.md](./COMPONENTS.md) · [TOKEN_BRIDGE.md](./TOKEN_BRIDGE.md) · [../product/INTERACTION_FIDELITY.md](../product/INTERACTION_FIDELITY.md) (behavior kits)
 
+**Code home:** `src/uxds/` (tokens + `interactions/` kits + thin `components/`). Project brand delta: `src/projects/<id>/styleguide/`.
+
 ---
 
 ## What UXDS is (for Studio)

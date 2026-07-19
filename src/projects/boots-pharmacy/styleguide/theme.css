@@ -1,0 +1,26 @@
+/**
+ * Boots Pharmacy brand delta — remaps UXDS semantic roles.
+ * Scoped so brands never leak across projects.
+ * @see docs/product/PROJECT_STYLEGUIDE.md
+ */
+
+[data-proto-project="boots-pharmacy"] {
+  --project-brand-primary: #467672;
+  --project-brand-primary-darkest: #305854;
+  --project-brand-primary-light: #afccca;
+  --project-brand-cta-navy: #012169;
+
+  /* Remap shared UXDS roles used by kits / ButtonPrimary */
+  --uxds-input-button-surface-surface-primary-solid: var(
+    --project-brand-primary-darkest
+  );
+  --uxds-input-button-border-border-secondary: var(
+    --project-brand-primary-light
+  );
+  --uxds-icon-icon-accent-strong: var(--project-brand-primary);
+  --uxds-text-link-link-dark: var(--project-brand-primary-darkest);
+  --uxds-border-border-focus: var(--project-brand-primary-darkest);
+  --uxds-badge-surface-variant-1: var(--project-brand-primary-light);
+  --uxds-badge-text-on-variant-1: var(--project-brand-primary-darkest);
+  --uxds-logo-logo-accent: var(--project-brand-primary);
+}

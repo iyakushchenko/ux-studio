@@ -1,6 +1,6 @@
 # UXDS → CSS token bridge (plan)
 
-**Status:** Contract defined; implementation deferred until first React+UXDS screen pilot.  
+**Status:** Thin hand-mapped bridge landed under `src/uxds/tokens/` (Concept + medium samples). Full dump/regenerate later.  
 **Default Figma modes for v1:** `design` = **Concept** · `screen & fonts` = **medium**
 
 ---

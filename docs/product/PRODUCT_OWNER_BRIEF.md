@@ -130,9 +130,10 @@ See [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) §5. Current order:
 1. ✅ Workspace + doctrine + page contract.  
 2. ✅ UXDS Larkin delivered + inventoried (`docs/uxds/`); X-Suite seam noted.  
 3. ✅ Interaction fidelity doctrine — record only after pages are interactive; shared behavior library ([INTERACTION_FIDELITY.md](./INTERACTION_FIDELITY.md)).  
-4. **Recording UI** (engine) — next build (pages still need fidelity before useful record).  
-5. Token bridge + one Boots React pilot (with shared interaction kits).  
-6. Scale rebuild; later X-Suite import + compiler.
+4. ✅ Recording UI (engine).  
+5. ✅ Thin UXDS foundation + Boots theme + Availability Tool kit enrichment.  
+6. **Next:** one Boots screen rebuilt React + UXDS (full page pilot).  
+7. Scale rebuild; later X-Suite import + compiler.
 
 ---
 

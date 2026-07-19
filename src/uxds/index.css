@@ -1,0 +1,8 @@
+/**
+ * UXDS CSS layers — import before project styleguide/theme.css.
+ * @see docs/uxds/TOKEN_BRIDGE.md
+ */
+
+@import "./tokens/primitives.css";
+@import "./tokens/design.css";
+@import "./tokens/screen.css";

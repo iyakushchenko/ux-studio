@@ -1987,6 +1987,12 @@
   scrollbar-width: thin;
   scrollbar-color: rgba(122, 125, 135, 0.32) transparent;
 }
+.proto-avail-store-filters {
+  flex-shrink: 0;
+}
+.proto-avail-store-filters__row {
+  margin-bottom: 0;
+}
 .proto-avail-store-list::-webkit-scrollbar {
   width: 4px;
 }

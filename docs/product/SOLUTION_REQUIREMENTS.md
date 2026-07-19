@@ -102,9 +102,10 @@ Not required for v1 page done: production a11y audit, every viewport, real backe
 
 Standing order remains:
 
-1. Finish product docs commit hygiene.  
-2. **Recording UI** (engine — already foundationed).  
-3. On first page request (or after recorder slice): **token bridge + Boots styleguide + one React screen** (starts the thin internal DS).  
+1. ✅ Finish product docs commit hygiene.  
+2. ✅ **Recording UI** (engine).  
+3. ✅ Thin **token bridge + Boots styleguide + interaction kits** (`src/uxds/`, Availability Tool mode-B enrichment).  
+4. **Next:** one Boots **screen** rebuilt React + UXDS (full page pilot).  
 
 If PO pastes “build this frame now,” that **overrides** and page pilot jumps the queue.
 
@@ -149,8 +150,9 @@ UXDS file access: **already have**.
 
 **I am comfortable proceeding** on:
 
-- Recording UI (engine) — once target pages have the interactive fidelity the scenario needs  
-- First React + UXDS + project-styleguide page when you point at a frame (with shared interaction kits as needed)  
+- ✅ Recording UI (engine) — still needs page interactivity for useful record  
+- ✅ Thin UXDS FE foundation (tokens, kits, Boots theme) — landed; grow by use  
+- First **full** React + UXDS Boots **screen** pilot when you point at a frame (or mode B from what we have)  
 
 **Readiness for record:** page interactivity first ([INTERACTION_FIDELITY.md](./INTERACTION_FIDELITY.md)); engine REC alone is not enough if the screen cannot be used.
 

@@ -1,0 +1,36 @@
+/**
+ * UXDS `screen & fonts` — medium mode samples (hand-mapped).
+ * @see docs/uxds/VARIABLES.md · docs/uxds/TOKEN_BRIDGE.md
+ */
+
+:root {
+  /* gap */
+  --gap-space-xs: 4px;
+  --gap-space-s: 8px;
+  --gap-space-m: 16px;
+  --gap-space-l: 24px;
+  --gap-space-xl: 32px;
+  --gap-space-2xl: 48px;
+  --gap-space-3xl: 64px;
+
+  /* radius — `m (base)` → `--radius-m-base` */
+  --radius-none: 0;
+  --radius-xs: 2px;
+  --radius-s: 4px;
+  --radius-m-base: 8px;
+  --radius-lg: 16px;
+  --radius-full: 360px;
+  --radius-input: 4px;
+  --radius-checkbox: 2px;
+
+  /* space (content rhythm) */
+  --space-content-padding-m: 24px;
+  --space-section-gap-m: 32px;
+
+  /* font (roles used by early kits) */
+  --font-btn-size-m: 13px;
+  --font-btn-line-height-m: 24px;
+  --font-btn-weight-m: 600;
+  --font-body-size-m: 13px;
+  --font-body-line-height-m: 24px;
+}

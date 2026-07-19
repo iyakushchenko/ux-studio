@@ -1,0 +1,16 @@
+/**
+ * UXDS primitives (color) — hand-mapped samples (Primitive A).
+ * Prefer semantic `design` tokens in UI; primitives are alias targets only.
+ * @see docs/uxds/VARIABLES.md · docs/uxds/TOKEN_BRIDGE.md
+ */
+
+:root {
+  --color-neutral-white: #ffffff;
+  --color-neutral-100: #f5f5f5;
+  --color-neutral-200: #d6d6d6;
+  --color-neutral-500: #5c5c5c;
+  --color-neutral-800: #3a3a3a;
+  --color-accent-turquoise-600: #467672;
+  --color-accent-turquoise-700: #305854;
+  --color-accent-turquoise-300: #afccca;
+}

@@ -1,0 +1,48 @@
+.uxds-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap-space-s);
+  min-height: 40px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--uxds-input-button-surface-surface-primary-solid);
+  color: var(--uxds-text-text-inverse);
+  font-size: var(--font-btn-size-m);
+  font-weight: var(--font-btn-weight-m);
+  line-height: var(--font-btn-line-height-m);
+  cursor: pointer;
+}
+
+.uxds-btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.uxds-filter-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-space-s);
+}
+
+.uxds-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 4px 12px;
+  border: 1px solid var(--uxds-border-border-default);
+  border-radius: var(--radius-full);
+  background: var(--uxds-surface-neutral);
+  color: var(--uxds-text-text-primary);
+  font-size: var(--font-body-size-m);
+  line-height: var(--font-body-line-height-m);
+  cursor: pointer;
+}
+
+.uxds-filter-chip.is-selected,
+.uxds-filter-chip[data-state="on"] {
+  border-color: var(--uxds-input-button-border-border-secondary);
+  background: var(--uxds-badge-surface-variant-1);
+  color: var(--uxds-badge-text-on-variant-1);
+}

@@ -1487,6 +1487,7 @@ export default function App() {
   return (
     <div
       className="proto-app-root flex flex-col h-full max-h-[100dvh] overflow-hidden"
+      data-proto-project={studioProjectId}
       style={{ fontFamily: "'Open Sans', sans-serif" }}
     >
       <ProtoPlaybackDiagnosticOverlay

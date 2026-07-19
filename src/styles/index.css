@@ -1,4 +1,7 @@
 @import './fonts.css';
 @import './tailwind.css';
 @import './theme.css';
+@import '../uxds/index.css';
+@import '../uxds/components/button-primary.css';
+@import '../projects/boots-pharmacy/styleguide/theme.css';
 @import './globals.css';

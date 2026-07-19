@@ -13,7 +13,7 @@
 | Rebuild / new concept **pages** in React | **Yes** |
 | Multi-project packaging with brand-faithful UI | **Yes** |
 
-**Commander sequence (2026-07-19):** UXDS Larkin **received and inventoried** (`docs/uxds/`). Recording UI remains the next engine build; React page pilots use the UXDS bridge next. See [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md).
+**Commander sequence (2026-07-19):** UXDS Larkin inventoried; thin CSS bridge + kits live under `src/uxds/`. Next: full Boots screen React pilot. See [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md).
 
 ### Delivered sources
 

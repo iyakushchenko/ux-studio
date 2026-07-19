@@ -118,7 +118,7 @@ Shared modules still expose stable hooks for recording/playback:
 | **`src/uxds/components/`** | Visual React modules mapped 1:1 to UXDS `component.*` / `module.*` as screens need them |
 | `src/projects/<id>/` | Page composition, project-only glue, brand `styleguide/` — **not** a dumping ground for duplicate DS behavior |
 
-**Stub:** `src/uxds/interactions/README.md` marks the home until the first real kit lands with a page pilot.
+**Landed (thin):** accordion, disclosure, filter-chip kits under `src/uxds/interactions/` — first consumer: Boots Availability Tool (hours disclosure + list filter chips). Grow as pages need more patterns.
 
 Engine-only bridges (`src/app/`) remain for playback/recording — not for reinventing site UI patterns.
 
