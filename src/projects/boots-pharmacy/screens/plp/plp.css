@@ -748,6 +748,28 @@
   color: #000;
 }
 
+/* Bookmarked: default "In your Bookmarks" → hover "Remove from Bookmarks". */
+.plp__bookmark-label {
+  display: inline-flex;
+  align-items: center;
+}
+
+.plp__bookmark-label[data-bookmarked="true"] .plp__bookmark-label--hover {
+  display: none;
+}
+
+.plp__tertiary:hover
+  .plp__bookmark-label[data-bookmarked="true"]
+  .plp__bookmark-label--default {
+  display: none;
+}
+
+.plp__tertiary:hover
+  .plp__bookmark-label[data-bookmarked="true"]
+  .plp__bookmark-label--hover {
+  display: inline;
+}
+
 .plp__tertiary-icon {
   display: inline-flex;
   color: #afccca;

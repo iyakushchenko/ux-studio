@@ -11,6 +11,10 @@ import {
   describeCursorTarget,
   notePlaybackCursorEvent,
 } from "@/app/shell/playbackCursorDiagnostic";
+import {
+  isElementBlockedByModal,
+  resolveClickTargetRespectingModal,
+} from "@/app/shell/studioModalGuard";
 
 const CURSOR_ARROW_SVG = `<img class="proto-chat-demo-cursor__graphic proto-chat-demo-cursor__graphic--arrow" src="${defaultCursorUrl}" width="22" height="26" alt="" aria-hidden="true" draggable="false" />`;
 
@@ -1052,6 +1056,16 @@ export async function simulateDemoPointerClick(
 ): Promise<boolean> {
   if (options?.shouldAbort?.()) return false;
   if (!isClickableTarget(target)) return false;
+
+  // Overlay eyes — never click through an open blocking dialog/scrim.
+  const guarded = resolveClickTargetRespectingModal(target);
+  if (!guarded || isElementBlockedByModal(target)) {
+    notePlaybackCursorEvent("abort", {
+      target: describeCursorTarget(target),
+      abortReason: "blocked-by-modal",
+    });
+    return false;
+  }
 
   const cursor = await moveDemoCursorTo(target, {
     shouldAbort: options?.shouldAbort,

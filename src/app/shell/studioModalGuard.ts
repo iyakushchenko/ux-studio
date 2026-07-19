@@ -1,29 +1,53 @@
 /**
  * Popup / lightbox "eyes" for recording replay + agent testing.
  * Never click CTAs under a blocking dialog — resolve topmost modal first.
+ *
+ * GLOBAL HARD RULE: every studio/concept blocking overlay MUST be registered
+ * here (STUDIO_MODAL + BLOCKING_MODAL_SELECTOR). Probe / demo-click / MCP must
+ * refuse targets under the topmost open overlay. Felony gate enforces this.
  */
 
 export const STUDIO_MODAL = {
   choosePharmacy: "choose-pharmacy",
+  quickView: "quick-view",
+  login: "login",
+  vaccinePicker: "vaccine-picker",
+  recipientPicker: "recipient-picker",
 } as const;
 
 export type StudioModalId = (typeof STUDIO_MODAL)[keyof typeof STUDIO_MODAL];
+
+/** Canonical registry — felony check scans this list. Keep in sync with DOM. */
+export const REGISTERED_OVERLAY_MODAL_IDS: readonly StudioModalId[] = [
+  STUDIO_MODAL.choosePharmacy,
+  STUDIO_MODAL.quickView,
+  STUDIO_MODAL.login,
+  STUDIO_MODAL.vaccinePicker,
+  STUDIO_MODAL.recipientPicker,
+];
 
 const MODAL_ALIASES: Record<string, StudioModalId> = {
   "choose-pharmacy": STUDIO_MODAL.choosePharmacy,
   choosepharmacy: STUDIO_MODAL.choosePharmacy,
   availability: STUDIO_MODAL.choosePharmacy,
   avail: STUDIO_MODAL.choosePharmacy,
+  "quick-view": STUDIO_MODAL.quickView,
+  quickview: STUDIO_MODAL.quickView,
+  login: STUDIO_MODAL.login,
+  account: STUDIO_MODAL.login,
+  "vaccine-picker": STUDIO_MODAL.vaccinePicker,
+  vaccinepicker: STUDIO_MODAL.vaccinePicker,
+  "recipient-picker": STUDIO_MODAL.recipientPicker,
+  recipientpicker: STUDIO_MODAL.recipientPicker,
 };
 
 /** Known Boots / Studio blocking surfaces (outermost first preference). */
 export const BLOCKING_MODAL_SELECTOR = [
-  '[data-studio-modal="choose-pharmacy"]',
+  ...REGISTERED_OVERLAY_MODAL_IDS.map((id) => `[data-studio-modal="${id}"]`),
   ".studio-avail-scrim:not(.studio-avail-scrim--closing)",
   '[role="dialog"][aria-modal="true"]',
   '[aria-modal="true"]',
 ].join(", ");
-
 export function normalizeStudioModalId(
   raw: string | null | undefined
 ): StudioModalId | undefined {

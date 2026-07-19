@@ -71,6 +71,20 @@
 | Bundles / chips / Make leak | **PASS** | `7 bundles found`; chips; `makeRetired=plp` |
 | Version chip | **PASS** | MCP: `v0.0.7` at prove; ship bumped to `0.0.8` |
 
+### Follow-up MCP — overlay eyes + bookmark copy (v0.0.10)
+
+**Session:** `__studioRunMcpPageProbe({ screenId: "plp", reload: false })` · stay on `screen=plp`  
+**FINAL:** **PASS**
+
+| Step | Result | Evidence |
+|------|--------|----------|
+| Filters / reset | **PASS** | recipe steps green |
+| Quick View open | **PASS** | `plp-quick-view` + `data-studio-modal="quick-view"` |
+| Overlay eyes under-click | **PASS** | `plp-overlay-eyes` — refuse Book now under QV (`overlay eyes refused under-click`) |
+| Quick View close | **PASS** | close inside modal |
+| Stay on page | **PASS** | still `screen=plp` after probe |
+| Bookmark labels | **PASS** | bookmarked: default **In your Bookmarks** / hover **Remove from Bookmarks**; empty: **Add to Bookmarks** |
+
 ---
 
 ## Honest residual

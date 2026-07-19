@@ -55,6 +55,7 @@ Run against Make (or Make frame export) **side-by-side** with React localhost.
 ### 4. Icon buttons — hover + pressed feedback
 
 - [ ] Hearts / bookmarks / wishlist: **exact Make empty vs filled** — do **not** invent fuchsia on **empty** hover if Make uses tertiary navy
+- [ ] **Bookmark label states (PO copy):** not bookmarked → **"Add to Bookmarks"** (empty heart hover = Make tertiary navy, not invented fuchsia); bookmarked → default **"In your Bookmarks"**, hover **"Remove from Bookmarks"**
 - [ ] Filled/active + click-optimistic only where Make does; empty hover follows Make tertiary/icon rules
 - [ ] Share / eye / other icon-only hits: circular wash or tertiary rules per FE standards
 - [ ] No laggy click feedback; **FAIL** if invented hover chrome not in Make CSS

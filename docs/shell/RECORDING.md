@@ -78,11 +78,12 @@ Recording, replay, and agent testing must treat open lightboxes as **navigable b
 
 | Rule | Behavior |
 |------|----------|
-| Detect | Topmost `.studio-avail-scrim` / `[data-studio-modal="choose-pharmacy"]` / `[role=dialog][aria-modal=true]` via `studioModalGuard.ts` |
-| Do not click through | Demo-click / agent targets under the scrim are rejected; prefer a hit **inside** the modal |
+| Detect | Topmost registered overlay via `studioModalGuard.ts` — `REGISTERED_OVERLAY_MODAL_IDS` (`choose-pharmacy`, `quick-view`, `login`, `vaccine-picker`, `recipient-picker`) + `.studio-avail-scrim` + `[role=dialog][aria-modal=true]` |
+| Do not click through | **GLOBAL HARD FAIL:** `simulateDemoPointerClick` / `__studioRunMcpPageProbe` / REC demo-click **refuse** targets under the topmost scrim (prefer a hit **inside** the modal). Felony gate enforces registry + guard wiring. |
 | URL | Open Choose Pharmacy → `&modal=choose-pharmacy` on the current `screen`; close / Back clears `modal` |
 | Capture | Modal open/close updates `studioUrl` → `kind: "screen"` events (same channel as tab changes) |
 | Replay | `applyStudioScreen` + `applyModal` re-opens/closes Availability |
+| Quinn prove | Open Quick View → probe step `plp-overlay-eyes` PASS only when under-tile click is refused |
 
 Book Step 1 **Continue** without a pharmacy opens Choose Pharmacy and must appear in the address bar before any under-page CTA replay.
 

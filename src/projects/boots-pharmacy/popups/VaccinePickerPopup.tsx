@@ -110,6 +110,7 @@ export default function VaccinePickerPopup({
     <div
       className={scrimClassName}
       role="presentation"
+      data-studio-modal="vaccine-picker"
       onClick={onScrim}
       onAnimationEnd={onScrimAnimationEnd}
     >

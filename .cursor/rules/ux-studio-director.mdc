@@ -31,7 +31,8 @@ Spot or forecast: layout/L&F drift; style zoo; bad handoffs; missing hover/focus
 5. **No LEGACY growth** on new React pages — page CSS / UXDS / theme only (BASE → THEME → PANEL → LEGACY).
 6. **Domain identity** — no new `.proto-*` / `data-proto-*`; PANEL = `.studio-*` / `data-studio-*`; prefer `__studio*` (`__proto*` aliases OK).
 7. **Hygiene** — `npm run check:hygiene` green; no silent monster growth (`HYGIENE.md`).
-7b. **Felonies** — `npm run check:felonies` (+ `check:version` + **`check:parity-proven`**) in `npm test`; CI/test fail = agent law break (no proto filenames, no PANEL `.proto-*` / engine `data-proto-*`, no new `docs/product/BOOTS_*`, no React screen ship without PROVEN+MCP in `PARITY_PROVEN.json`).
+7b. **Felonies** — `npm run check:felonies` (+ `check:version` + **`check:parity-proven`**) in `npm test`; CI/test fail = agent law break (no proto filenames, no PANEL `.proto-*` / engine `data-proto-*`, no new `docs/product/BOOTS_*`, **overlay eyes** — registry + probe/demo-click must refuse under-overlay clicks, no React screen ship without PROVEN+MCP in `PARITY_PROVEN.json`).
+7c. **Overlay eyes (GLOBAL HARD FAIL)** — register every blocking popup (`data-studio-modal` + `studioModalGuard`); `__studioRunMcpPageProbe` / `simulateDemoPointerClick` refuse targets under open overlay. Quinn proves Quick View → cannot click PLP tile underneath.
 8. **Project docs** under `docs/projects/<id>/` — engine doctrine stays in `docs/product/`.
 9. **Post-push CI sitrep (BE)** — `gh run list -R iyakushchenko/ux-studio -L 10`; never assume green from local tests. → `ci-sitrep.mdc`
 10. **Agent overlay** — `__studioAgentTestingOverlay` / `__protoAgentTestingOverlay` touch + sitrep settle; strip ephemeral URL params (`proof`, etc.). Default post-test **stays on current screen**; `resetToHub: true` only for CJM/journey.

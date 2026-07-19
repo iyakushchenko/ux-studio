@@ -1,8 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { runMcpPageProbe } from "@/app/shell/studioMcpPageProbe";
 
+const simulateDemoPointerClick = vi.fn(async () => true);
+
 vi.mock("@/app/scenario/demoCursor", () => ({
-  simulateDemoPointerClick: vi.fn(async () => true),
+  simulateDemoPointerClick: (...args: unknown[]) =>
+    simulateDemoPointerClick(...args),
 }));
 
 vi.mock("@/app/shell/agentTestingOverlay", () => ({
@@ -16,10 +19,31 @@ vi.mock("@/app/shell/playbackCursorDiagnostic", () => ({
   disableCursorQaEyes: vi.fn(),
 }));
 
+const isBlockingModalOpen = vi.fn(() => false);
+const isElementBlockedByModal = vi.fn(() => false);
+
+vi.mock("@/app/shell/studioModalGuard", async () => {
+  const actual = await vi.importActual<
+    typeof import("@/app/shell/studioModalGuard")
+  >("@/app/shell/studioModalGuard");
+  return {
+    ...actual,
+    isBlockingModalOpen: (...args: unknown[]) => isBlockingModalOpen(...args),
+    isElementBlockedByModal: (...args: unknown[]) =>
+      isElementBlockedByModal(...args),
+  };
+});
+
 describe("runMcpPageProbe", () => {
   afterEach(() => {
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
+    simulateDemoPointerClick.mockReset();
+    simulateDemoPointerClick.mockResolvedValue(true);
+    isBlockingModalOpen.mockReset();
+    isBlockingModalOpen.mockReturnValue(false);
+    isElementBlockedByModal.mockReset();
+    isElementBlockedByModal.mockReturnValue(false);
   });
 
   it("fails clearly when screen has no probe recipe", async () => {
@@ -49,6 +73,26 @@ describe("runMcpPageProbe", () => {
     const reset = { tagName: "BUTTON" };
     const quick = { tagName: "BUTTON" };
     const book = { tagName: "BUTTON" };
+    const close = { tagName: "BUTTON" };
+    let modalOpen = false;
+
+    simulateDemoPointerClick.mockImplementation(async (el: { tagName?: string }) => {
+      if (el === quick) {
+        modalOpen = true;
+        isBlockingModalOpen.mockReturnValue(true);
+        return true;
+      }
+      if (el === book && modalOpen) {
+        return false;
+      }
+      if (el === close) {
+        modalOpen = false;
+        isBlockingModalOpen.mockReturnValue(false);
+        return true;
+      }
+      return true;
+    });
+    isElementBlockedByModal.mockImplementation((el) => el === book && modalOpen);
 
     vi.stubGlobal("window", {
       location: {
@@ -59,12 +103,13 @@ describe("runMcpPageProbe", () => {
     vi.stubGlobal("document", {
       querySelector: (sel: string) => {
         if (sel === '[data-studio-react-screen="plp"]') return host;
-        if (sel.includes("button[data-name=\"component.plp.filter.checkbox.item\"]"))
+        if (sel.includes('button[data-name="component.plp.filter.checkbox.item"]'))
           return checkbox;
         if (sel.includes("button[data-studio-plp-reset-filters")) return reset;
         if (sel.includes("button[data-studio-quick-view")) return quick;
-        if (sel.includes("button[data-studio-action=\"plp-book-now\"]"))
+        if (sel.includes('button[data-studio-action="plp-book-now"]'))
           return book;
+        if (sel.includes('data-studio-modal="quick-view"')) return close;
         return null;
       },
     });
@@ -75,7 +120,56 @@ describe("runMcpPageProbe", () => {
     });
     expect(result.screenId).toBe("plp");
     expect(result.checks.find((c) => c.id === "plp-host")?.pass).toBe(true);
+    expect(result.checks.find((c) => c.id === "plp-quick-view-ready")?.pass).toBe(
+      true
+    );
+    expect(result.checks.find((c) => c.id === "plp-overlay-eyes")?.pass).toBe(
+      true
+    );
     expect(result.checks.find((c) => c.id === "url-screen")?.pass).toBe(true);
     expect(result.pass).toBe(true);
+  });
+
+  it("fails overlay-eyes when probe can click through", async () => {
+    const host = { tagName: "DIV" };
+    const checkbox = { tagName: "BUTTON" };
+    const reset = { tagName: "BUTTON" };
+    const quick = { tagName: "BUTTON" };
+    const book = { tagName: "BUTTON" };
+    const close = { tagName: "BUTTON" };
+
+    isBlockingModalOpen.mockReturnValue(true);
+    isElementBlockedByModal.mockReturnValue(true);
+    // Felony path: under-click still "succeeds"
+    simulateDemoPointerClick.mockResolvedValue(true);
+
+    vi.stubGlobal("window", {
+      location: {
+        href: "http://localhost:5173/?project=boots-pharmacy&screen=plp",
+        search: "?project=boots-pharmacy&screen=plp",
+      },
+    });
+    vi.stubGlobal("document", {
+      querySelector: (sel: string) => {
+        if (sel === '[data-studio-react-screen="plp"]') return host;
+        if (sel.includes('button[data-name="component.plp.filter.checkbox.item"]'))
+          return checkbox;
+        if (sel.includes("button[data-studio-plp-reset-filters")) return reset;
+        if (sel.includes("button[data-studio-quick-view")) return quick;
+        if (sel.includes('button[data-studio-action="plp-book-now"]'))
+          return book;
+        if (sel.includes('data-studio-modal="quick-view"')) return close;
+        return null;
+      },
+    });
+
+    const result = await runMcpPageProbe({
+      screenId: "plp",
+      reload: false,
+    });
+    expect(result.checks.find((c) => c.id === "plp-overlay-eyes")?.pass).toBe(
+      false
+    );
+    expect(result.pass).toBe(false);
   });
 });

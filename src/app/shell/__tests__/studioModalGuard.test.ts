@@ -80,8 +80,9 @@ function matches(n: FakeNode, sel: string): boolean {
   if (sel.includes("studio-agent-testing-overlay")) {
     return n.classList.contains("studio-agent-testing-overlay");
   }
-  if (sel.includes('data-studio-modal="choose-pharmacy"')) {
-    return n.getAttribute("data-studio-modal") === "choose-pharmacy";
+  if (sel.includes("data-studio-modal=")) {
+    const m = sel.match(/data-studio-modal="([^"]+)"/);
+    return m != null && n.getAttribute("data-studio-modal") === m[1];
   }
   if (sel.includes("studio-avail-scrim")) {
     if (!n.classList.contains("studio-avail-scrim")) return false;
@@ -172,5 +173,34 @@ describe("studioModalGuard", () => {
           ) as unknown as HTMLElement,
       })
     ).toBe(inside);
+  });
+
+  it("blocks PLP tile under Quick View overlay", () => {
+    const tile = fakeEl({ id: "plp-book-now" });
+    const close = fakeEl({ id: "qv-close" });
+    const scrim = fakeEl(
+      { "data-studio-modal": "quick-view" },
+      [close],
+      ["studio-avail-scrim"]
+    );
+    const root = fakeEl({}, [tile, scrim]);
+
+    expect(
+      isElementBlockedByModal(
+        tile as unknown as Element,
+        root as unknown as ParentNode
+      )
+    ).toBe(true);
+    expect(
+      resolveClickTargetRespectingModal(tile as unknown as HTMLElement, {
+        root: root as unknown as ParentNode,
+      })
+    ).toBeNull();
+    expect(
+      isElementBlockedByModal(
+        close as unknown as Element,
+        root as unknown as ParentNode
+      )
+    ).toBe(false);
   });
 });

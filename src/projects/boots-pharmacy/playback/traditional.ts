@@ -156,11 +156,17 @@ function findFirstVisiblePlpTile(scope: ParentNode): HTMLElement | null {
 }
 
 function findPlpBookmarkBtn(tile: HTMLElement): HTMLElement | null {
+  const byAttr = tile.querySelector<HTMLElement>(
+    "[data-studio-wishlist-id]"
+  );
+  if (byAttr) return byAttr;
   return (
     Array.from(
       tile.querySelectorAll<HTMLElement>('[data-name="component.input.button"]')
     ).find((btn) =>
-      /add to bookmarks/i.test((btn.textContent ?? "").replace(/\s+/g, " ").trim())
+      /(add to bookmarks|in your bookmarks|remove from bookmarks)/i.test(
+        (btn.textContent ?? "").replace(/\s+/g, " ").trim()
+      )
     ) ?? null
   );
 }

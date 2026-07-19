@@ -67,6 +67,7 @@ export default function RecipientPickerPopup({
     <div
       className={scrimClassName}
       role="presentation"
+      data-studio-modal="recipient-picker"
       onClick={onScrim}
       onAnimationEnd={onScrimAnimationEnd}
     >

@@ -10,6 +10,7 @@
  *  4. New docs/product/BOOTS_* files (thin Moved stubs allowlisted)
  *  5. studioRelease channel must be alpha|beta|rc|stable
  *  6. version chip must track package.json (no hardcoded UI semver; JSON import present)
+ *  7. Overlay eyes — probe/demo-click must guard under-overlay clicks; known modals registered
  *
  * Companion gates (also in npm test):
  *  - check:hygiene · check:links · check:version · check:parity-proven
@@ -191,6 +192,130 @@ if (fs.existsSync(versionChipPath)) {
   }
 }
 
+// --- 7) Overlay eyes — registry + probe/demo-click guard (PO rage hard fail) ---
+const REQUIRED_OVERLAY_IDS = [
+  "choose-pharmacy",
+  "quick-view",
+  "login",
+  "vaccine-picker",
+  "recipient-picker",
+];
+const modalGuardPath = path.join(
+  ROOT,
+  "src",
+  "app",
+  "shell",
+  "studioModalGuard.ts"
+);
+if (!fs.existsSync(modalGuardPath)) {
+  fail("missing src/app/shell/studioModalGuard.ts (overlay registry)");
+} else {
+  const guardSrc = fs.readFileSync(modalGuardPath, "utf8");
+  if (!/REGISTERED_OVERLAY_MODAL_IDS/.test(guardSrc)) {
+    fail("studioModalGuard must export REGISTERED_OVERLAY_MODAL_IDS");
+  }
+  for (const id of REQUIRED_OVERLAY_IDS) {
+    if (!guardSrc.includes(`"${id}"`) && !guardSrc.includes(`'${id}'`)) {
+      fail(`overlay registry missing modal id "${id}" in studioModalGuard.ts`);
+    }
+    if (!guardSrc.includes(`[data-studio-modal="${id}"]`)) {
+      // BLOCKING_MODAL_SELECTOR may build from REGISTERED_OVERLAY_MODAL_IDS map
+      if (!/REGISTERED_OVERLAY_MODAL_IDS\.map/.test(guardSrc)) {
+        fail(
+          `BLOCKING_MODAL_SELECTOR must include [data-studio-modal="${id}"] or map REGISTERED_OVERLAY_MODAL_IDS`
+        );
+      }
+    }
+  }
+}
+
+const demoCursorPath = path.join(
+  ROOT,
+  "src",
+  "app",
+  "scenario",
+  "demoCursor.ts"
+);
+if (!fs.existsSync(demoCursorPath)) {
+  fail("missing src/app/scenario/demoCursor.ts");
+} else {
+  const demoSrc = fs.readFileSync(demoCursorPath, "utf8");
+  if (
+    !/resolveClickTargetRespectingModal|isElementBlockedByModal/.test(demoSrc)
+  ) {
+    fail(
+      "FELONY: simulateDemoPointerClick path must import overlay guard (resolveClickTargetRespectingModal / isElementBlockedByModal)"
+    );
+  }
+  // Guard must appear inside simulateDemoPointerClick body (not only unused import).
+  const fnIdx = demoSrc.indexOf("export async function simulateDemoPointerClick");
+  if (fnIdx < 0) {
+    fail("simulateDemoPointerClick export missing");
+  } else {
+    const body = demoSrc.slice(fnIdx, fnIdx + 1200);
+    if (
+      !/resolveClickTargetRespectingModal|isElementBlockedByModal/.test(body)
+    ) {
+      fail(
+        "FELONY: simulateDemoPointerClick must call overlay guard before clicking"
+      );
+    }
+  }
+}
+
+const pageProbePath = path.join(
+  ROOT,
+  "src",
+  "app",
+  "shell",
+  "studioMcpPageProbe.ts"
+);
+if (!fs.existsSync(pageProbePath)) {
+  fail("missing src/app/shell/studioMcpPageProbe.ts");
+} else {
+  const probeSrc = fs.readFileSync(pageProbePath, "utf8");
+  if (!/isElementBlockedByModal|isBlockingModalOpen|refuse-click/.test(probeSrc)) {
+    fail(
+      "FELONY: __studioRunMcpPageProbe must refuse under-overlay clicks (refuse-click / modal guard)"
+    );
+  }
+}
+
+/** DOM mounts must stamp data-studio-modal for registered overlays. */
+const OVERLAY_DOM_EXPECT = [
+  {
+    rel: "src/projects/boots-pharmacy/overlays/AvailabilityTool.tsx",
+    id: "choose-pharmacy",
+  },
+  {
+    rel: "src/projects/boots-pharmacy/popups/QuickViewPopup.tsx",
+    id: "quick-view",
+  },
+  {
+    rel: "src/projects/boots-pharmacy/popups/LoginPopup.tsx",
+    id: "login",
+  },
+  {
+    rel: "src/projects/boots-pharmacy/popups/VaccinePickerPopup.tsx",
+    id: "vaccine-picker",
+  },
+  {
+    rel: "src/projects/boots-pharmacy/popups/RecipientPickerPopup.tsx",
+    id: "recipient-picker",
+  },
+];
+for (const { rel, id } of OVERLAY_DOM_EXPECT) {
+  const full = path.join(ROOT, ...rel.split("/"));
+  if (!fs.existsSync(full)) {
+    fail(`overlay mount missing: ${rel}`);
+    continue;
+  }
+  const src = fs.readFileSync(full, "utf8");
+  if (!src.includes(`data-studio-modal="${id}"`)) {
+    fail(`FELONY: ${rel} must set data-studio-modal="${id}"`);
+  }
+}
+
 if (errors.length) {
   console.error("[check:felonies] FAIL — agent felony gate:\n");
   for (const e of errors) console.error(`  • ${e}`);
@@ -201,5 +326,5 @@ if (errors.length) {
 }
 
 console.log(
-  "[check:felonies] OK — filenames, PANEL CSS, data-proto, BOOTS stubs, channel, version chip"
+  "[check:felonies] OK — filenames, PANEL CSS, data-proto, BOOTS stubs, channel, version chip, overlay eyes"
 );

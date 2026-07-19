@@ -68,6 +68,7 @@
 | I8b | **Book now hover** — same as UXDS `ButtonPrimary` commerce / primary CTA tokens (navy → hover lift), not mint secondary one-off | **Was Wrong (LEGACY tile catch-all) → Fixed** | LEGACY excludes `.uxds-btn-primary`; commerce hover tokens win |
 | I9 | Quick View → RTB | **Present** | |
 | I10 | **Wishlist / Bookmarks heart** — Make tertiary: empty rest `#afccca`, empty hover **navy link**, filled `#c8247e`, favourited hover deepen; click-optimistic fill only | **Was Wrong (invented fuchsia-on-empty hover) → Fixed** | CSS empty≠fuchsia; `is-active` only when favourited |
+| I10b | **Bookmark link copy (PO)** — not bookmarked: **"Add to Bookmarks"**; bookmarked default **"In your Bookmarks"** / hover **"Remove from Bookmarks"** (PLP tiles; QV heart is icon-only PDP clone) | **Fixed** | `PlpScreen` label swap + `aria-label` |
 | I11 | Bundles mode | **Present** | |
 | I12–I13 | Listing load + stagger — real Make overlay (see L4), not text-only | **Was Wrong → Fixed** | `data-studio-plp-listing-phase` / loader |
 | I14 | Scroll | **Present** | |

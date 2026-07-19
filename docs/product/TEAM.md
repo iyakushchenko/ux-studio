@@ -72,7 +72,9 @@ Never bare callsign alone in team output — always `Name (Role)` as above. One 
 - Blank listing + lone “Updating results…” (or equivalent) **without** Make’s spinner/overlay/skeleton = automatic Uma + Quinn **FAIL**.  
 - **Forbidden to invent** hover/loading chrome not in Make.  
 - **MCP real-user matrix mandatory for every screen ship** (Quinn + Ben). Prefer `__studioRunMcpPageProbe` so the PO sees the robo-cursor + overlay PASS/FAIL. Arch **rejects** audit **PROVEN** without MCP evidence log.  
-- **No merge** without `npm run check:parity-proven` green (`PARITY_PROVEN.json` + audit PROVEN + MCP section).
+- **No merge** without `npm run check:parity-proven` green (`PARITY_PROVEN.json` + audit PROVEN + MCP section).  
+- **Overlay eyes (GLOBAL HARD FAIL):** every blocking popup (Quick View, Choose Pharmacy, Login, pickers, …) must be in `studioModalGuard` registry + `data-studio-modal`. `__studioRunMcpPageProbe` / `simulateDemoPointerClick` **must refuse** clicks to targets under the topmost overlay (or only click inside it). Felony: `check:felonies` fails npm test if guard missing or known overlays unregistered. Quinn proves: open Quick View → under-tile refuse PASS.  
+- **Version bump:** patch after user-visible bugfixes is correct ([VERSIONING.md](./VERSIONING.md) §6); skip bump only for docs/process-only.
 
 ---
 

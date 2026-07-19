@@ -23,6 +23,10 @@ import {
   disableCursorQaEyes,
   enableCursorQaEyes,
 } from "@/app/shell/playbackCursorDiagnostic";
+import {
+  isBlockingModalOpen,
+  isElementBlockedByModal,
+} from "@/app/shell/studioModalGuard";
 import { parseStudioUrl } from "@/app/shell/studioUrl";
 
 export type McpPageProbeStepResult = {
@@ -51,7 +55,12 @@ type ProbeStep = {
   id: string;
   /** CSS selector relative to document. */
   selector: string;
-  action?: "click" | "assert";
+  /**
+   * click — robo-click (refuses if under overlay).
+   * assert — presence / custom assert.
+   * refuse-click — PASS only when overlay is open AND click is refused.
+   */
+  action?: "click" | "assert" | "refuse-click";
   /** Optional assert after click / for assert-only steps. */
   assert?: () => boolean | string;
   /** Extra wait after click (ms) for loaders / reveal. */
@@ -79,7 +88,7 @@ function resolveScreenId(options?: McpPageProbeOptions): string {
 
 function plpProbeSteps(): ProbeStep[] {
   // Prefer button/React-owned nodes — Make leftovers can still match data-name.
-  // Order: tile CTAs before filter (filter loading can hide tiles briefly).
+  // Filters before Quick View (QV blocks under-page clicks — overlay eyes).
   return [
     {
       id: "plp-host",
@@ -98,12 +107,6 @@ function plpProbeSteps(): ProbeStep[] {
         document.querySelector(
           '[data-studio-react-screen="plp"] button[data-studio-action="plp-book-now"]'
         ) != null || "Book Now CTA missing",
-    },
-    {
-      id: "plp-quick-view",
-      selector:
-        '[data-studio-react-screen="plp"] button[data-studio-quick-view="true"]',
-      action: "click",
     },
     {
       id: "plp-checkbox-filter",
@@ -127,6 +130,49 @@ function plpProbeSteps(): ProbeStep[] {
       id: "plp-reset-filters",
       selector:
         '[data-studio-react-screen="plp"] button[data-studio-plp-reset-filters="true"]',
+      action: "click",
+      settleMs: 900,
+    },
+    {
+      id: "plp-quick-view-ready",
+      selector:
+        '[data-studio-react-screen="plp"] button[data-studio-quick-view="true"]',
+      action: "assert",
+      waitMs: 4000,
+      assert: () => {
+        const btn = document.querySelector<HTMLElement>(
+          '[data-studio-react-screen="plp"] button[data-studio-quick-view="true"]'
+        );
+        if (!btn) return "Quick View button missing after reset";
+        if (typeof btn.getBoundingClientRect === "function") {
+          const r = btn.getBoundingClientRect();
+          if (r.width < 2 || r.height < 2) {
+            return "Quick View button not laid out";
+          }
+        }
+        return true;
+      },
+    },
+    {
+      id: "plp-quick-view",
+      selector:
+        '[data-studio-react-screen="plp"] button[data-studio-quick-view="true"]',
+      action: "click",
+      settleMs: 450,
+      assert: () =>
+        isBlockingModalOpen() ||
+        "Quick View overlay did not open (registry / scrim miss)",
+    },
+    {
+      id: "plp-overlay-eyes",
+      selector:
+        '[data-studio-react-screen="plp"] button[data-studio-action="plp-book-now"]',
+      action: "refuse-click",
+    },
+    {
+      id: "plp-quick-view-close",
+      selector:
+        '[data-studio-modal="quick-view"] button[aria-label="Close quick view"]',
       action: "click",
     },
   ];
@@ -198,9 +244,32 @@ async function runProbeStep(step: ProbeStep): Promise<McpPageProbeStepResult> {
     return { id: step.id, pass: false, detail };
   }
 
+  if (step.action === "refuse-click") {
+    if (!isBlockingModalOpen()) {
+      const detail = "expected blocking overlay open before refuse-click";
+      logStep(step.id, false, detail);
+      return { id: step.id, pass: false, detail };
+    }
+    if (!isElementBlockedByModal(el)) {
+      const detail = "target not under overlay — registry miss?";
+      logStep(step.id, false, detail);
+      return { id: step.id, pass: false, detail };
+    }
+    const clicked = await simulateDemoPointerClick(el, { scroll: true });
+    if (clicked) {
+      const detail = "FELONY: clicked through open overlay";
+      logStep(step.id, false, detail);
+      return { id: step.id, pass: false, detail };
+    }
+    logStep(step.id, true, "overlay eyes refused under-click");
+    return { id: step.id, pass: true, detail: "overlay eyes refused under-click" };
+  }
+
   const clicked = await simulateDemoPointerClick(el, { scroll: true });
   if (!clicked) {
-    const detail = "robo-cursor click failed";
+    const detail = isElementBlockedByModal(el)
+      ? "robo-cursor refused — target under open overlay"
+      : "robo-cursor click failed";
     logStep(step.id, false, detail);
     return { id: step.id, pass: false, detail };
   }

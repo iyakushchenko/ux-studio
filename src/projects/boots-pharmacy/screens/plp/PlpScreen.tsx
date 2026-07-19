@@ -274,7 +274,11 @@ function ServiceTile({
               className="plp__tertiary"
               data-name="component.input.button"
               data-studio-wishlist-id={plpTileWishlistId(tileIndex)}
+              data-studio-bookmarked={heartActive ? "true" : "false"}
               aria-pressed={heartActive}
+              aria-label={
+                heartActive ? "Remove from Bookmarks" : "Add to Bookmarks"
+              }
               onPointerDown={() => setOptimisticOn(!heartActive)}
               onClick={onToggleWishlist}
             >
@@ -285,7 +289,20 @@ function ServiceTile({
               >
                 <BookmarkGlyph />
               </span>
-              <span>Add to Bookmarks</span>
+              {heartActive ? (
+                <span className="plp__bookmark-label" data-bookmarked="true">
+                  <span className="plp__bookmark-label--default">
+                    In your Bookmarks
+                  </span>
+                  <span className="plp__bookmark-label--hover">
+                    Remove from Bookmarks
+                  </span>
+                </span>
+              ) : (
+                <span className="plp__bookmark-label" data-bookmarked="false">
+                  Add to Bookmarks
+                </span>
+              )}
             </button>
             <button
               type="button"

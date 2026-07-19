@@ -10,6 +10,16 @@ Agents **must read** this file before claiming a UI or Studio-chrome slice done.
 
 ## 2026-07-19
 
+### Overlay eyes — MCP/robo must not click through open dialogs (PO rage)
+
+- **Symptom:** MCP page probe / robo-cursor still clicked PLP tiles **under** open Quick View (and other lightboxes).
+- **Root cause:** Modal guard existed for REC replay but was **not** wired into `simulateDemoPointerClick` / probe; Quick View (+ other PLP dialogs) not fully registered with `data-studio-modal`.
+- **Gate (GLOBAL HARD FAIL):**
+  1. Every blocking overlay in `STUDIO_MODAL` / `REGISTERED_OVERLAY_MODAL_IDS` + DOM `data-studio-modal="…"`.
+  2. `simulateDemoPointerClick` + `__studioRunMcpPageProbe` refuse under-overlay targets (`refuse-click` prove step).
+  3. `check:felonies` fails npm test if guard missing or known overlays unregistered.
+- **Quinn prove:** open Quick View → probe cannot click PLP tile underneath → overlay sitrep PASS.
+
 ### Invented hover / loading chrome not in Make = ship fail (PO rage #3)
 
 - **Symptom:** React PLP showed **duplicate** “Updating results…” (count line + spinner label) + listing **jump**; empty bookmark heart went **fuchsia on hover** (Make tertiary empty hover is navy link; fuchsia only when filled/active).

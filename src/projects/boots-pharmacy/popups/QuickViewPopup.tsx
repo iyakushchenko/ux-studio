@@ -105,6 +105,7 @@ export default function QuickViewPopup({
     <div
       className={scrimClassName}
       role="presentation"
+      data-studio-modal="quick-view"
       onClick={onScrim}
       onAnimationEnd={onScrimAnimationEnd}
     >

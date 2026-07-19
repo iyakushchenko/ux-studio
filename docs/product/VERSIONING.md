@@ -128,10 +128,12 @@ Do **not** invent a GitHub Release workflow “to be helpful.”
 
 | Change | Bump | Notes |
 |--------|------|-------|
-| User-visible ship (chrome, page, REC behavior PO can see) | Consider **patch** after notes habit; or keep notes in `## Current` until a named demo | Chip updates when `package.json` bumps |
+| User-visible ship (chrome, page, REC behavior PO can see) | **patch** (semver) — default after typical bugfix / copy / fidelity ship | Chip updates when `package.json` bumps |
 | Engine-breaking API / journey schema / URL contract break | **minor** (still 0.x) | Document in CHANGELOG |
 | Impossible without PO / public promise break | **major** | Rare at 0.x |
-| Docs-only / felony gate / rename with no user delta | Usually **no bump** — notes optional |
+| Docs-only / process / felony-gate text with no user delta | Usually **no bump** — notes optional |
+
+**Pax / Arch answer (PO):** Yes — bumping a **patch** after a typical user-visible bugfix is correct semver practice. Skip the bump only for docs-only / process-only work. Keep current habit: Pax calls bump on user-visible ships; Ben runs `npm run release:patch`.
 
 ### Channel policy
 

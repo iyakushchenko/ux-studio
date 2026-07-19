@@ -98,6 +98,7 @@ export default function LoginPopup({ open, initialTab, onClose, onSignIn }: Prop
     <div
       className={scrimClassName}
       role="presentation"
+      data-studio-modal="login"
       onClick={onScrim}
       onAnimationEnd={onScrimAnimationEnd}
     >
