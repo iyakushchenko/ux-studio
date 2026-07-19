@@ -45,7 +45,7 @@
       "status": "proven",
       "auditPath": "docs/projects/boots-pharmacy/audits/FE_AUDIT_PLP_2026-07-19_RAGE5.md",
       "mcpMatrixAt": {
-        "sha": "PENDING",
+        "sha": "bc14a94",
         "date": "2026-07-19",
         "note": "hide results count during Reset/filter refresh; count-hide-load ratchet; MCP plp-reset-filters + plp-reset-count-ready (v0.0.13)"
       },

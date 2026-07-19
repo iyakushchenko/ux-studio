@@ -4,7 +4,7 @@
 **Date:** 2026-07-19  
 **Auditor:** Quinn (QA) + Finn (FE) + Uma (UI/UX) — MCP localhost  
 **Prior tip (distrusted for this class):** `f909b97` / rage#4 PROVEN did **not** cover count-hide-during-load  
-**Ship tip:** _(filled after commit)_  
+**Ship tip:** `bc14a94`  
 **Version:** `0.0.13`
 
 **Checklist:** [../../../product/FE_UI_UX_AUDIT.md](../../../product/FE_UI_UX_AUDIT.md) · [UMA_FIDELITY_NOTES.md](../../../product/UMA_FIDELITY_NOTES.md)  
