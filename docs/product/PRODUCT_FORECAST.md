@@ -28,12 +28,12 @@ Ship the **control room** first: deep-linkable screens, recordable interactions,
 
 **Next:** optional `beat` / `touchpoint` query only when CJM-on and non-noisy; never encode popup/ephemeral UI.
 
-### 2. Recording fidelity — NEXT
+### 2. Recording fidelity — PARTIAL (screen replay landed)
 
 | Need | Decision |
 |------|----------|
 | Ordered page transitions | `kind: "screen"` + existing touchpoint/transport |
-| Replay deep links | Restore via `studioUrl` / `screenId` before transport replay |
+| Replay deep links | **Landed** — `applyStudioScreen` shared with refresh/popstate |
 | Demo-click / wire-intent | v2 — selector chain already stored |
 | Compile → journeys | Only after screen + transport replay is boringly reliable |
 
@@ -104,8 +104,8 @@ Summarizer → Studio import stays a documented seam ([X_SUITE_INTEGRATION.md](.
 
 ## Sequencing (Director lock)
 
-1. **URL + overlay + clean bar** — this forecast’s NOW slice  
-2. **Recording screen markers → replay restore**  
+1. **URL + overlay + clean bar** — landed  
+2. **Recording screen markers → replay restore** — landed (`applyStudioScreen`)  
 3. **Finish Boots book React migration + fidelity debt** (parallel, non-blocking for engine)  
 4. **UXDS extract-on-second-use**  
 5. **Second project rabbit**  

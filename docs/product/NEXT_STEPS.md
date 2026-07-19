@@ -9,29 +9,29 @@
 
 ## NOW
 
-1. [ ] **Recording replay from `screen` events** — restore deep link (`studioUrl` / `screenId`) before transport replay ([PRODUCT_FORECAST.md](./PRODUCT_FORECAST.md) §2).
-2. [ ] **Versioning habit** — append notes on every user-visible ship (`npm run notes:append`). Release/tag CI stays **later**.
+1. [ ] **Versioning habit** — append notes on every user-visible ship (`npm run notes:append`). Release/tag CI stays **later**.
 
 ---
 
 ## NEXT
 
-3. [ ] **Grow UXDS by page (ongoing)** — extract only when a second screen needs it; no speculative catalog ([COMPONENT_LIBRARY.md](./COMPONENT_LIBRARY.md)). Tertiary CTA layer only when next shared use forces it (summary Change already in UXDS).
-4. [ ] **Residual fidelity (low priority)** — Book Steps 1–3 Make-only hexes with no bridge token yet (`#c3c3c3`, `#7a7d87`/`#7c7c7c`, `#f2f2f2`/`#f1f1f1`, `#c4dde3`, `#ffe351`, Change hover `#000`). Do **not** invent aliases. Dead LEGACY cleanup only when next touching Make child-7/4/3 CSS paths.
+2. [ ] **Grow UXDS by page (ongoing)** — extract only when a second screen needs it; no speculative catalog ([COMPONENT_LIBRARY.md](./COMPONENT_LIBRARY.md)). Tertiary CTA layer only when next shared use forces it (summary Change already in UXDS).
+3. [ ] **Residual fidelity (low priority)** — Book Steps 1–3 Make-only hexes with no bridge token yet (`#c3c3c3`, `#7a7d87`/`#7c7c7c`, `#f2f2f2`/`#f1f1f1`, `#c4dde3`, `#ffe351`, Change hover `#000`). Do **not** invent aliases. Dead LEGACY cleanup only when next touching Make child-7/4/3 CSS paths.
 
 ---
 
 ## LATER
 
-5. [ ] **Release / tag CI** — only when versioning habit is stable and Actions budget allows.
-6. [ ] **Broader CSS check ratchets** — more `scripts/check-*.mjs` contracts (Summarizer-style), not more Playwright on every push.
-7. [ ] **On-demand lean smoke** — keep `workflow_dispatch` / local `npm run smoke`; do **not** return auto smoke to default CI without a Director rewrite of this board.
-8. [ ] **Second project rabbit** — only after Boots book + URL + REC proven on Pages ([PRODUCT_FORECAST.md](./PRODUCT_FORECAST.md) §4).
+4. [ ] **Release / tag CI** — only when versioning habit is stable and Actions budget allows.
+5. [ ] **Broader CSS check ratchets** — more `scripts/check-*.mjs` contracts (Summarizer-style), not more Playwright on every push.
+6. [ ] **On-demand lean smoke** — keep `workflow_dispatch` / local `npm run smoke`; do **not** return auto smoke to default CI without a Director rewrite of this board.
+7. [ ] **Second project rabbit** — only after Boots book + URL + REC proven on Pages ([PRODUCT_FORECAST.md](./PRODUCT_FORECAST.md) §4).
 
 ---
 
 ## Done recently (context)
 
+- [x] **Recording replay from `screen` events** — `applyStudioScreen` shared with deep-link/popstate; ↺ / `__protoReplayRecording` restores `screenId` / `studioUrl` in order ([../shell/RECORDING.md](../shell/RECORDING.md)).
 - [x] **Studio URL scheme + agent overlay policy** — `?project=&screen=` deep links; strip `proof`; overlay `touch()` + auto-arm mutating `__proto*`; recording `kind: "screen"`; [PRODUCT_FORECAST.md](./PRODUCT_FORECAST.md); [../shell/URL.md](../shell/URL.md).
 - [x] **Fidelity debt (high-ROI)** — kits + Steps 1–3 safe hex→UXDS/theme tokens; localhost color parity; light audit [FE_AUDIT_BOOK_HEX_TOKENS_2026-07-19.md](../projects/boots-pharmacy/audits/FE_AUDIT_BOOK_HEX_TOKENS_2026-07-19.md) **PROVEN** tip `0f112dd`. Residual Make-only hex → NEXT #4.
 - [x] **UXDS book kits** — `BookAppointmentProgress` + `AppointmentSummaryPill` extracted; Steps 1–3 wired; light audit [FE_AUDIT_UXDS_BOOK_KITS_2026-07-19.md](../projects/boots-pharmacy/audits/FE_AUDIT_UXDS_BOOK_KITS_2026-07-19.md) **PROVEN** tip `d56fab1`.

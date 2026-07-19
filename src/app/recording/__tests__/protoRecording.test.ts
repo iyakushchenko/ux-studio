@@ -227,4 +227,84 @@ describe("replayRecordingSession", () => {
 
     vi.useRealTimers();
   });
+
+  it("replays screen events via applyScreen in order", async () => {
+    vi.useFakeTimers();
+    const applyScreen = vi.fn(() => true);
+    const transport = vi.fn();
+
+    const session: ProtoRecordingSession = {
+      id: "screen-replay-test",
+      version: 1,
+      startedAt: "2026-07-19T00:00:00.000Z",
+      projectId: "boots-pharmacy",
+      events: [
+        {
+          kind: "screen",
+          screenId: "book-step-1",
+          projectId: "boots-pharmacy",
+          studioUrl: "?project=boots-pharmacy&screen=book-step-1",
+          atMs: 10,
+        },
+        {
+          kind: "screen",
+          screenId: "book-step-2",
+          projectId: "boots-pharmacy",
+          studioUrl: "?project=boots-pharmacy&screen=book-step-2",
+          atMs: 20,
+        },
+        {
+          kind: "screen",
+          screenId: "book-step-3",
+          projectId: "boots-pharmacy",
+          studioUrl: "?project=boots-pharmacy&screen=book-step-3",
+          atMs: 30,
+        },
+        { kind: "demo-click", element: "btn", atMs: 40 },
+      ],
+    };
+
+    const promise = replayRecordingSession(session, {
+      triggerTransport: transport,
+      applyScreen,
+      stepDelayMs: 0,
+    });
+
+    await vi.runAllTimersAsync();
+    const result = await promise;
+
+    expect(applyScreen).toHaveBeenCalledTimes(3);
+    expect(applyScreen.mock.calls.map((c) => c[0].screenId)).toEqual([
+      "book-step-1",
+      "book-step-2",
+      "book-step-3",
+    ]);
+    expect(transport).not.toHaveBeenCalled();
+    expect(result.replayed).toBe(3);
+    expect(result.unsupported).toBe(1);
+    expect(result.errors).toHaveLength(0);
+
+    vi.useRealTimers();
+  });
+
+  it("counts screen as unsupported when applyScreen is missing", async () => {
+    const result = await replayRecordingSession(
+      {
+        id: "no-apply",
+        version: 1,
+        startedAt: "2026-07-19T00:00:00.000Z",
+        events: [
+          { kind: "screen", screenId: "book-step-1", atMs: 1 },
+          { kind: "transport", action: "step-forward", atMs: 2 },
+        ],
+      },
+      {
+        triggerTransport: vi.fn(),
+        stepDelayMs: 0,
+      }
+    );
+
+    expect(result.replayed).toBe(1);
+    expect(result.unsupported).toBe(1);
+  });
 });

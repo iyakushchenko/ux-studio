@@ -151,6 +151,94 @@ export function resolveNavFromScreenId(
 }
 
 /**
+ * Resolve a screen target from a recording `studioUrl` and/or explicit ids.
+ * `studioUrl` wins when it carries a field; otherwise fall back to discrete ids.
+ */
+export function resolveStudioScreenTarget(input: {
+  studioUrl?: string;
+  screenId?: string;
+  projectId?: string;
+  personaId?: string;
+  modeId?: string;
+}): StudioUrlState {
+  const fromUrl = input.studioUrl ? parseStudioUrl(input.studioUrl) : {};
+  return {
+    projectId: fromUrl.projectId ?? (input.projectId?.trim() || undefined),
+    screenId: fromUrl.screenId ?? normalizeScreenId(input.screenId),
+    personaId: fromUrl.personaId ?? (input.personaId?.trim() || undefined),
+    modeId: fromUrl.modeId ?? (input.modeId?.trim() || undefined),
+  };
+}
+
+export type ApplyStudioScreenInput = {
+  studioUrl?: string;
+  screenId?: string;
+  projectId?: string;
+  personaId?: string;
+  modeId?: string;
+  screens: ReadonlyArray<{ screenId?: string; childIndex: number }>;
+  /**
+   * Write the address bar (default true). Deep-link boot / popstate use false —
+   * the bar already holds the target.
+   */
+  syncUrl?: boolean;
+  currentProjectId?: string;
+  setProjectId?: (id: string) => void;
+  setPersonaId?: (id: string) => void;
+  setModeId?: (id: string) => void;
+  setCurrent: (index: number) => void;
+  setHubOpen: (open: boolean) => void;
+};
+
+export type ApplyStudioScreenResult = {
+  /** True when nav (and/or project) was applied from a known screen id. */
+  applied: boolean;
+  state: StudioUrlState;
+  nav: StudioNavFromUrl | null;
+};
+
+/**
+ * Shared apply path for refresh deep-links, popstate, and recording replay.
+ * Maps `screenId` / `studioUrl` → hub/tab setters (+ optional replaceState).
+ */
+export function applyStudioScreen(
+  input: ApplyStudioScreenInput
+): ApplyStudioScreenResult {
+  const state = resolveStudioScreenTarget(input);
+  const nav = resolveNavFromScreenId(state.screenId, input.screens);
+
+  if (
+    state.projectId &&
+    input.setProjectId &&
+    state.projectId !== input.currentProjectId
+  ) {
+    input.setProjectId(state.projectId);
+  }
+  if (state.personaId && input.setPersonaId) {
+    input.setPersonaId(state.personaId);
+  }
+  if (state.modeId && input.setModeId) {
+    input.setModeId(state.modeId);
+  }
+  if (nav) {
+    input.setHubOpen(nav.hubOpen);
+    if (!nav.hubOpen) {
+      input.setCurrent(nav.current);
+    }
+  }
+
+  if (input.syncUrl !== false) {
+    writeStudioUrl(state);
+  }
+
+  return {
+    applied: nav != null,
+    state,
+    nav,
+  };
+}
+
+/**
  * Write canonical studio query (and strip ephemeral). Uses replaceState by default
  * so tab navigation does not spam history.
  */

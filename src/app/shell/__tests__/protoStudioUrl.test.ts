@@ -2,10 +2,12 @@ import { describe, expect, it, vi, afterEach } from "vitest";
 import {
   EPHEMERAL_QUERY_KEYS,
   PROTO_HUB_SCREEN_ID,
+  applyStudioScreen,
   hasEphemeralStudioQuery,
   parseStudioUrl,
   resolveNavFromScreenId,
   resolveScreenIdFromNav,
+  resolveStudioScreenTarget,
   serializeStudioUrl,
   stripEphemeralStudioQuery,
   writeStudioUrl,
@@ -113,5 +115,92 @@ describe("protoStudioUrl", () => {
     const next = replaceState.mock.calls[0][2] as string;
     expect(next).toBe("/?project=boots-pharmacy&screen=book-step-2");
     expect(next).not.toContain("proof");
+  });
+
+  it("resolveStudioScreenTarget prefers studioUrl fields over discrete ids", () => {
+    expect(
+      resolveStudioScreenTarget({
+        studioUrl: "?project=boots-pharmacy&screen=book-step-2",
+        screenId: "home",
+        projectId: "puma",
+      })
+    ).toEqual({
+      projectId: "boots-pharmacy",
+      screenId: "book-step-2",
+      personaId: undefined,
+      modeId: undefined,
+    });
+
+    expect(
+      resolveStudioScreenTarget({
+        screenId: "book-step2",
+        projectId: "boots-pharmacy",
+      })
+    ).toEqual({
+      projectId: "boots-pharmacy",
+      screenId: "book-step-2",
+      personaId: undefined,
+      modeId: undefined,
+    });
+  });
+
+  it("applyStudioScreen maps book steps + hub (shared deep-link / replay path)", () => {
+    const replaceState = vi.fn();
+    vi.stubGlobal("window", {
+      location: {
+        href: "http://localhost:5173/?project=boots-pharmacy&screen=home",
+        pathname: "/",
+        search: "?project=boots-pharmacy&screen=home",
+        hash: "",
+      },
+      history: { state: null, replaceState, pushState: vi.fn() },
+    });
+
+    const setCurrent = vi.fn();
+    const setHubOpen = vi.fn();
+    const setProjectId = vi.fn();
+
+    const step2 = applyStudioScreen({
+      studioUrl: "?project=boots-pharmacy&screen=book-step-2",
+      screens: SCREENS,
+      currentProjectId: "boots-pharmacy",
+      setProjectId,
+      setCurrent,
+      setHubOpen,
+      syncUrl: true,
+    });
+    expect(step2.applied).toBe(true);
+    expect(step2.nav).toEqual({
+      hubOpen: false,
+      current: 3,
+      screenId: "book-step-2",
+    });
+    expect(setHubOpen).toHaveBeenCalledWith(false);
+    expect(setCurrent).toHaveBeenCalledWith(3);
+    expect(setProjectId).not.toHaveBeenCalled();
+    expect(replaceState).toHaveBeenCalled();
+
+    setCurrent.mockClear();
+    setHubOpen.mockClear();
+    const hub = applyStudioScreen({
+      screenId: "hub",
+      projectId: "boots-pharmacy",
+      screens: SCREENS,
+      setCurrent,
+      setHubOpen,
+      syncUrl: false,
+    });
+    expect(hub.applied).toBe(true);
+    expect(setHubOpen).toHaveBeenCalledWith(true);
+    expect(setCurrent).not.toHaveBeenCalled();
+
+    const unknown = applyStudioScreen({
+      screenId: "nope",
+      screens: SCREENS,
+      setCurrent,
+      setHubOpen,
+      syncUrl: false,
+    });
+    expect(unknown.applied).toBe(false);
   });
 });

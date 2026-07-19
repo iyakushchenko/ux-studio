@@ -49,6 +49,7 @@ declare global {
 export function registerProtoRecordingMcpHelpers(options?: {
   getDefaultStartOptions?: () => StartRecordingOptions;
   triggerTransport?: (action: import("@/app/shell/protoPlaybackInteractionContext").ManualTransportAction) => void;
+  applyScreen?: import("@/app/recording/protoRecordingTypes").ProtoRecordingReplayOptions["applyScreen"];
 }): () => void {
   if (typeof window === "undefined") return () => {};
 
@@ -92,11 +93,12 @@ export function registerProtoRecordingMcpHelpers(options?: {
     if (!target) {
       throw new Error("No recording session to replay");
     }
-    if (!options?.triggerTransport) {
-      throw new Error("triggerTransport not available");
+    if (!options?.triggerTransport && !options?.applyScreen) {
+      throw new Error("triggerTransport or applyScreen not available");
     }
     return replayRecordingSession(target, {
       triggerTransport: options.triggerTransport,
+      applyScreen: options.applyScreen,
       stepDelayMs: 200,
     });
   };

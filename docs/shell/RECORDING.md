@@ -123,7 +123,7 @@ UI and MCP share `protoRecordingSession` + `replayRecordingSession` — no secon
 |------|---------------|-----------|
 | `transport` | Step/Play/Jump via `notePlaybackTransport` | Yes |
 | `touchpoint` | Touchpoint key change in `App.tsx` | Boundary marker only |
-| `screen` | Address-bar / tab screen change (`useProtoStudioUrlSync`) | Restore via `screenId` / `studioUrl` (v1.1+) |
+| `screen` | Address-bar / tab screen change (`useProtoStudioUrlSync`) | Yes — `applyStudioScreen` via `screenId` / `studioUrl` |
 | `demo-click` | Robo-cursor via `notePlaybackDemoClick` | No (selector chain stored) |
 | `director-script` | Journey director via `notePlaybackDirectorScript` | No |
 | `beat-enter` | Beat onEnter via `notePlaybackBeatEnter` | No |
@@ -133,6 +133,16 @@ UI and MCP share `protoRecordingSession` + `replayRecordingSession` — no secon
 | `dwell` | Manual API or compiled pauses | Yes (delay) |
 
 Each event may include a `snapshot` (`PlaybackStudioSnapshot` + journey/orchestra fields), including `screenId` and `studioUrl` when the bar is synced.
+
+### Screen replay restore (v1.1)
+
+Capture already appends `kind: "screen"` when the address bar / tab changes. On **↺ Replay** (UI or `__protoReplayRecording`):
+
+1. Each `screen` event calls `applyScreen` → shared `applyStudioScreen` (`src/app/shell/protoStudioUrl.ts`).
+2. That helper is the **same path** as refresh deep-link + `popstate` (`useProtoStudioUrlSync`).
+3. Prefer `studioUrl` when present; else `screenId` (+ `projectId`). Unknown ids error; missing `applyScreen` → unsupported.
+
+Boots book steps (`book-step-1` … `book-step-3`) and mapped screens (`home`, `chat`, …, `hub`) restore in event order before/alongside transport.
 
 ---
 
@@ -160,11 +170,11 @@ Export / replay / compile fall back to the **last stopped or imported** session 
 
 ## v1 vs future
 
-| v1 (now) | v2+ |
+| v1.1 (now) | v2+ |
 |----------|-----|
 | In-memory session + JSON export | Demo-click replay via `simulateDemoPointerClick` |
 | Studio REC deck + MCP helpers | Full compile to `journeys.ts` beats |
-| Transport + dwell replay | Wire-intent replay via `runBeatAction` |
+| Transport + **screen** + dwell replay | Wire-intent replay via `runBeatAction` |
 | Capture via existing hooks | Retreat-aware replay matrix |
 
 ---

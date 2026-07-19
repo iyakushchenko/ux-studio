@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import {
+  applyStudioScreen,
   parseStudioUrl,
-  resolveNavFromScreenId,
   resolveScreenIdFromNav,
   stripEphemeralStudioQuery,
   writeStudioUrl,
@@ -28,6 +28,7 @@ export type ProtoStudioUrlSyncOptions = {
 /**
  * Keeps the address bar aligned with studio nav + restores deep links.
  * URL wins on first paint when `screen` / `project` present; then replaceState sync.
+ * Boot / popstate share `applyStudioScreen` with recording replay.
  */
 export function useProtoStudioUrlSync(options: ProtoStudioUrlSyncOptions): void {
   const {
@@ -57,20 +58,17 @@ export function useProtoStudioUrlSync(options: ProtoStudioUrlSyncOptions): void 
     const parsed = parseStudioUrl();
     applyingUrlRef.current = true;
     try {
-      if (parsed.projectId && parsed.projectId !== projectId) {
-        setProjectId(parsed.projectId);
-      }
-      if (parsed.personaId && setPersonaId) {
-        setPersonaId(parsed.personaId);
-      }
-      if (parsed.modeId && setModeId) {
-        setModeId(parsed.modeId);
-      }
-      const nav = resolveNavFromScreenId(parsed.screenId, screens);
-      if (nav) {
-        setHubOpen(nav.hubOpen);
-        if (!nav.hubOpen) setCurrent(nav.current);
-      }
+      applyStudioScreen({
+        ...parsed,
+        screens,
+        currentProjectId: projectId,
+        setProjectId,
+        setPersonaId,
+        setModeId,
+        setCurrent,
+        setHubOpen,
+        syncUrl: false,
+      });
     } finally {
       // Defer clear so the write effect does not fight the apply.
       queueMicrotask(() => {
@@ -112,16 +110,17 @@ export function useProtoStudioUrlSync(options: ProtoStudioUrlSyncOptions): void 
       const parsed = parseStudioUrl();
       applyingUrlRef.current = true;
       try {
-        if (parsed.projectId && parsed.projectId !== projectId) {
-          setProjectId(parsed.projectId);
-        }
-        if (parsed.personaId && setPersonaId) setPersonaId(parsed.personaId);
-        if (parsed.modeId && setModeId) setModeId(parsed.modeId);
-        const nav = resolveNavFromScreenId(parsed.screenId, screens);
-        if (nav) {
-          setHubOpen(nav.hubOpen);
-          if (!nav.hubOpen) setCurrent(nav.current);
-        }
+        applyStudioScreen({
+          ...parsed,
+          screens,
+          currentProjectId: projectId,
+          setProjectId,
+          setPersonaId,
+          setModeId,
+          setCurrent,
+          setHubOpen,
+          syncUrl: false,
+        });
       } finally {
         queueMicrotask(() => {
           applyingUrlRef.current = false;

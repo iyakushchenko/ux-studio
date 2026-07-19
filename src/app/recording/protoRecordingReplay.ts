@@ -8,6 +8,7 @@ import type {
 } from "@/app/recording/protoRecordingTypes";
 
 const TRANSPORT_KIND = "transport" as const;
+const SCREEN_KIND = "screen" as const;
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => {
@@ -63,7 +64,7 @@ export function compileRecordingToBeatTimeline(
 }
 
 /**
- * v1 replays transport events only via triggerTransport.
+ * v1.1 replays transport + screen (deep-link restore) + dwell.
  * demo-click, wire-intent, scroll, director-script — counted as unsupported.
  */
 export async function replayRecordingSession(
@@ -78,8 +79,9 @@ export async function replayRecordingSession(
   };
 
   const trigger = options.triggerTransport;
-  if (!trigger) {
-    result.errors.push("triggerTransport is required for replay");
+  const applyScreen = options.applyScreen;
+  if (!trigger && !applyScreen) {
+    result.errors.push("triggerTransport or applyScreen is required for replay");
     return result;
   }
 
@@ -93,6 +95,10 @@ export async function replayRecordingSession(
     }
 
     if (event.kind === TRANSPORT_KIND) {
+      if (!trigger) {
+        result.errors.push(`transport ${event.action}: triggerTransport missing`);
+        continue;
+      }
       try {
         await trigger(event.action);
         result.replayed += 1;
@@ -102,6 +108,34 @@ export async function replayRecordingSession(
       } catch (err) {
         result.errors.push(
           `transport ${event.action}: ${err instanceof Error ? err.message : String(err)}`
+        );
+      }
+      continue;
+    }
+
+    if (event.kind === SCREEN_KIND) {
+      if (!applyScreen) {
+        result.unsupported += 1;
+        continue;
+      }
+      try {
+        const applied = await applyScreen({
+          screenId: event.screenId,
+          projectId: event.projectId,
+          studioUrl: event.studioUrl,
+        });
+        if (applied === false) {
+          result.skipped += 1;
+          result.errors.push(`screen ${event.screenId}: apply returned false`);
+          continue;
+        }
+        result.replayed += 1;
+        if (stepDelayMs > 0) {
+          await delay(stepDelayMs);
+        }
+      } catch (err) {
+        result.errors.push(
+          `screen ${event.screenId}: ${err instanceof Error ? err.message : String(err)}`
         );
       }
       continue;
@@ -144,6 +178,7 @@ export function summarizeRecordingSession(session: ProtoRecordingSession): {
   byKind: Record<string, number>;
   touchpointCount: number;
   transportCount: number;
+  screenCount: number;
   durationMs: number | null;
 } {
   const byKind: Record<string, number> = {};
@@ -161,6 +196,7 @@ export function summarizeRecordingSession(session: ProtoRecordingSession): {
     byKind,
     touchpointCount: byKind.touchpoint ?? 0,
     transportCount: byKind.transport ?? 0,
+    screenCount: byKind.screen ?? 0,
     durationMs,
   };
 }

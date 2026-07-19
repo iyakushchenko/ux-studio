@@ -158,9 +158,22 @@ export type CompiledRecordingTimeline = {
   preamble: ProtoRecordedEvent[];
 };
 
+export type ProtoRecordingScreenApplyInput = {
+  screenId: string;
+  projectId?: string;
+  studioUrl?: string;
+};
+
 export type ProtoRecordingReplayOptions = {
   triggerTransport?: (action: ManualTransportAction) => void | Promise<void>;
-  /** Delay between transport events (ms). Default 400. */
+  /**
+   * Restore nav from `kind: "screen"` via shared `applyStudioScreen`
+   * (same helper as refresh deep-link / popstate).
+   */
+  applyScreen?: (
+    event: ProtoRecordingScreenApplyInput
+  ) => boolean | void | Promise<boolean | void>;
+  /** Delay between transport / screen events (ms). Default 400. */
   stepDelayMs?: number;
   /** v2 — replay demo clicks via simulateDemoPointerClick. */
   replayDemoClicks?: boolean;

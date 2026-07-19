@@ -99,6 +99,7 @@ import {
   protoNavStorageKey,
 } from "@/app/shell/protoNavStorage";
 import {
+  applyStudioScreen,
   parseStudioUrl,
   resolveNavFromScreenId,
   resolveScreenIdFromNav,
@@ -1347,6 +1348,40 @@ export default function App() {
     []
   );
 
+  const screensRef = useRef(SCREENS);
+  const studioProjectIdRef = useRef(studioProjectId);
+  const studioPersonaIdRef = useRef(studioPersonaId);
+  const orchestraModeIdRef = useRef(orchestraModeId);
+  screensRef.current = SCREENS;
+  studioProjectIdRef.current = studioProjectId;
+  studioPersonaIdRef.current = studioPersonaId;
+  orchestraModeIdRef.current = orchestraModeId;
+
+  const applyRecordingScreen = useCallback(
+    (event: { screenId: string; projectId?: string; studioUrl?: string }) => {
+      const result = applyStudioScreen({
+        studioUrl: event.studioUrl,
+        screenId: event.screenId,
+        projectId: event.projectId ?? studioProjectIdRef.current,
+        personaId: studioPersonaIdRef.current,
+        modeId: orchestraModeIdRef.current,
+        screens: screensRef.current,
+        currentProjectId: studioProjectIdRef.current,
+        setProjectId: setStudioProjectId,
+        setPersonaId: setStudioPersonaId,
+        setModeId: setOrchestraModeId,
+        setCurrent,
+        setHubOpen,
+        syncUrl: true,
+      });
+      if (!result.applied) {
+        throw new Error(`Unknown screen: ${event.screenId}`);
+      }
+      return true;
+    },
+    [setOrchestraModeId, setStudioPersonaId, setStudioProjectId]
+  );
+
   useEffect(() => {
     return registerProtoRecordingMcpHelpers({
       getDefaultStartOptions: () => ({
@@ -1354,8 +1389,9 @@ export default function App() {
         metadata: { recordedFrom: "mcp" },
       }),
       triggerTransport: triggerRecordingTransport,
+      applyScreen: applyRecordingScreen,
     });
-  }, [getRecordingStartOptions, triggerRecordingTransport]);
+  }, [applyRecordingScreen, getRecordingStartOptions, triggerRecordingTransport]);
 
   useEffect(() => {
     return registerProtoJourneyMcpHelpers({
@@ -1651,6 +1687,7 @@ export default function App() {
                   onReplay={(session) =>
                     replayRecordingSession(session, {
                       triggerTransport: triggerRecordingTransport,
+                      applyScreen: applyRecordingScreen,
                       stepDelayMs: 200,
                     })
                   }
@@ -1666,6 +1703,7 @@ export default function App() {
                 onReplay={(session) =>
                   replayRecordingSession(session, {
                     triggerTransport: triggerRecordingTransport,
+                    applyScreen: applyRecordingScreen,
                     stepDelayMs: 200,
                   })
                 }

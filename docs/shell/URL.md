@@ -51,7 +51,9 @@ Implementation: `src/app/shell/protoStudioUrl.ts` · `useProtoStudioUrlSync.ts`.
 
 ## Recording
 
-While REC is live, screen transitions append `kind: "screen"` events (`screenId`, `projectId`, `studioUrl`). Snapshots also carry `screenId` + `studioUrl` for ordered page/URL replay context. See [RECORDING.md](./RECORDING.md).
+While REC is live, screen transitions append `kind: "screen"` events (`screenId`, `projectId`, `studioUrl`). Snapshots also carry `screenId` + `studioUrl` for ordered page/URL replay context.
+
+**Replay** restores those events through `applyStudioScreen` — the same helper used for refresh deep-link and `popstate`. See [RECORDING.md](./RECORDING.md).
 
 ## Agent note
 

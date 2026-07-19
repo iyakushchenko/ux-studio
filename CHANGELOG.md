@@ -14,6 +14,7 @@
 - **uxds:** Extract BookAppointmentProgress + AppointmentSummaryPill; wire Book Steps 1-3; retire triplicated screen CSS
 - **uxds:** Book Steps 1-3 + book kits: safe hex to UXDS/theme tokens (Make-only hex left); light audit PROVEN
 - **shell:** Studio URL deep links (`?project=&screen=`); strip ephemeral `proof`; overlay touch/auto-arm; recording `screen` events; PRODUCT_FORECAST
+- **engine:** Recording replay restores screen/URL via shared applyStudioScreen (deep-link path)
 
 ## v0.0.1 - 190726
 
