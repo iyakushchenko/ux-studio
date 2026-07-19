@@ -8,28 +8,28 @@
 
 ## NOW
 
-1. [ ] **GitHub Pages verify (Step 3)** — after deploy of Book Step 3 + overlay ship: `data-proto-react-screen=book-step-3` on Confirmation; MCP sanity on Pages (chrome + overlay present).
+1. [ ] **Grow UXDS by page** — extract kits only when a second screen needs them; retire LEGACY screen-by-screen ([COMPONENT_LIBRARY.md](./COMPONENT_LIBRARY.md)).
 
 ---
 
 ## NEXT
 
-2. [ ] **Grow UXDS by page** — extract kits only when a second screen needs them; retire LEGACY screen-by-screen ([COMPONENT_LIBRARY.md](./COMPONENT_LIBRARY.md)).
-3. [ ] **Fidelity debt (non-blocking)** — Step 1/2/3 hex→tokens harden; dead child-7 / child-4 / child-3 LEGACY CSS cleanup when touching those files; tertiary CTA layer extraction when next shared use forces it.
-4. [ ] **Versioning habit** — append notes on every user-visible ship (`npm run notes:append`). Release/tag CI stays **later**.
+2. [ ] **Fidelity debt (non-blocking)** — Step 1/2/3 hex→tokens harden; dead child-7 / child-4 / child-3 LEGACY CSS cleanup when touching those files; tertiary CTA layer extraction when next shared use forces it.
+3. [ ] **Versioning habit** — append notes on every user-visible ship (`npm run notes:append`). Release/tag CI stays **later**.
 
 ---
 
 ## LATER
 
-6. [ ] **Release / tag CI** — only when versioning habit is stable and Actions budget allows.
-7. [ ] **Broader CSS check ratchets** — more `scripts/check-*.mjs` contracts (Summarizer-style), not more Playwright on every push.
-8. [ ] **On-demand lean smoke** — keep `workflow_dispatch` / local `npm run smoke`; do **not** return auto smoke to default CI without a Director rewrite of this board.
+4. [ ] **Release / tag CI** — only when versioning habit is stable and Actions budget allows.
+5. [ ] **Broader CSS check ratchets** — more `scripts/check-*.mjs` contracts (Summarizer-style), not more Playwright on every push.
+6. [ ] **On-demand lean smoke** — keep `workflow_dispatch` / local `npm run smoke`; do **not** return auto smoke to default CI without a Director rewrite of this board.
 
 ---
 
 ## Done recently (context)
 
+- [x] **GitHub Pages verify (Step 3)** — deploy `1a567be` green; Pages `data-proto-react-screen=book-step-3`; Step 2 short time rows left-aligned; Step 1 under agentic-cjm browse stays (no Home/tab1 snap); REC⊗CJM (CJM on → REC disabled); `__protoAgentTestingOverlay` start/log/stop on Pages.
 - [x] **Lessons + agent testing overlay** — [LESSONS_LEARNED.md](./LESSONS_LEARNED.md); director/checklist gates; `__protoAgentTestingOverlay` for MCP runs ([../shell/RECORDING.md](../shell/RECORDING.md)); tip `e35bf41`.
 - [x] **Book Step 3 React migration** — Confirmation Frame child **3**; Make chrome hidden; AIR `data-proto-open-appointment`; audit [FE_AUDIT_BOOK_STEP3_2026-07-19.md](./audits/FE_AUDIT_BOOK_STEP3_2026-07-19.md) **PROVEN** tip `e35bf41`.
 - [x] **Book Step 2 hotfix** — time-slot last-row left-align (CSS grid); agentic-cjm browse no longer snaps Book Step 1 → Home (`shouldNavigateBeatTabOnEnter`); tip `66e7fe0`; audit note on [FE_AUDIT_BOOK_STEP2_2026-07-19.md](./audits/FE_AUDIT_BOOK_STEP2_2026-07-19.md).
