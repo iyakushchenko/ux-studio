@@ -26,6 +26,7 @@ A screen is **DONE** only when **all** are true:
 1. [x] **PLP React migration** — DONE by erase-Make definition. Brief: [PLP_REACT.md](../projects/boots-pharmacy/features/PLP_REACT.md) · audit [FE_AUDIT_PLP_2026-07-19.md](../projects/boots-pharmacy/audits/FE_AUDIT_PLP_2026-07-19.md).
 2. [x] **PLP Make parity restore** — register [PLP_MAKE_PARITY_REGISTER.md](../projects/boots-pharmacy/features/PLP_MAKE_PARITY_REGISTER.md); P0 gaps fixed (bg fill, hero shadow, listing wrapper, preloader, filter chips); audit PROVEN; patch `0.0.5`.
 2b. [x] **PLP fidelity rage fix** — Advantage bar, heart optimistic hover/click, Book now commerce hover, tile border removed, Reset Filters icon+text; Uma checklist + team-check harden; patch bump.
+2c. [x] **PLP preloader + checkbox hover (PO rage #2)** — real Make spinner overlay (hide tiles, in-band); mint checkbox hover; Uma loading/checkbox sign-off gates; patch bump.
 3. [ ] **PDP React migration** — same DONE definition; retire Make child 8. Order lock continues: **PDP → Home → Chat → History/Details**, then delete Book 1–3 Make children. **Await PO +.**
 4. [ ] **Versioning habit** — append notes on every user-visible ship; Pax decides patch; Ben executes ([VERSIONING.md](./VERSIONING.md)).
 
@@ -56,6 +57,7 @@ A screen is **DONE** only when **all** are true:
 ## Done recently (context)
 
 - [x] **PLP Make parity restore** — register + P0 fidelity; audit PROVEN; `v0.0.5`.
+- [x] **PLP preloader + checkbox hover** — Make overlay scenario + mint hover; team loading gates; `v0.0.7`.
 - [x] **PLP React migration** — erase-Make DONE; audit PROVEN; Make child 9 retired (delete deferred).
 - [x] **Honest version chip + unstick agent overlay** — tip `6c5c911`.
 - [x] **REC capture gaps (v3)** — beat-enter / scroll / typed-text capture+replay; compile still gaps scroll/typed.

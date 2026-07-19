@@ -2,6 +2,9 @@
 
 > _Append a bullet on coherent commits via `npm run notes:append -- --lane="<lane>" --intent="<text>"`. Preview with `npm run notes:preview`. On `npm run release:patch` this section is promoted to `## v<X.Y.Z> - DDMMYY` and a fresh empty `## Current` is re-inserted. Policy: `docs/product/VERSIONING.md`._
 
+## v0.0.7 - 190726
+- PLP Make preloader + checkbox hover parity; team loading-state gates
+
 ## v0.0.6 - 190726
 - **project:** Fix PLP Make parity gaps: Advantage Card bar, optimistic bookmark heart, Book now commerce hover, remove invent tile border, Reset Filters icon+text; harden Uma fidelity checklist + team check
 

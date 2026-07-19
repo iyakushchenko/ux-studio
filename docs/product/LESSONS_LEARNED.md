@@ -10,6 +10,22 @@ Agents **must read** this file before claiming a UI or Studio-chrome slice done.
 
 ## 2026-07-19
 
+### Wrong preloader / loading scenario = fidelity fail (PO called out twice)
+
+- **Symptom:** React PLP filter-change showed a blank listing band with only “Updating results…” (results-count text) — PO rage again; not the Make scenario.
+- **Make truth (PLP child 9 / `plpListing.ts` / `globals-screens`):** ~450ms load → **hide tiles** (`display: none` / `hideAllPlpTiles`) → **centered spinner overlay** (44px arc `#012169` on track `#c4dde3` + copy “Updating results…”) on `min-height: 220px` tiles host with `rgba(255,255,255,0.82)` wash → pulsed count text → stagger reveal. **Not** opacity-0 tiles (that centers the overlay below the fold) and **not** text-only.
+- **Root cause:** Loading/empty/updating treated as copy polish, not a first-class Make scenario; register marked “preloader Fixed” without mechanism prove; Uma did not sign off loading states.
+- **Gate:**
+  1. Uma + Bea capture Make loading mechanism **before** Finn codes ([UMA_FIDELITY_NOTES.md](./UMA_FIDELITY_NOTES.md) §0).
+  2. Bea register P0 rows for loading/empty/updating with layout notes + screenshot notes.
+  3. Quinn proves filter-change: spinner/overlay **in-band**, then results return — blank+text alone = FAIL.
+  4. **team check:** Uma must explicitly report `loading states — PASS|FAIL` and `checkbox/radio hover — PASS|FAIL`.
+
+### Checkbox / radio hover miss on migrated PLP
+
+- **Symptom:** React filter checkboxes had no Make mint hover (`#c6e5e1`); Make `globals-chrome` targets `[data-name="box"]` which React rows do not use.
+- **Gate:** Page CSS must port unchecked hover wash; Uma + Quinn prove hover visible on every migrated checkbox/radio.
+
 ### Make → React fidelity (PO rage — not first time)
 
 - **Symptom:** PLP shipped “PROVEN” while Advantage Card promo bar was entirely missing, tile had invent border, Book now hover was mint secondary (LEGACY catch-all), heart had weak/laggy feedback, Reset Filters was text-only — register Wrongly marked OK / residual.

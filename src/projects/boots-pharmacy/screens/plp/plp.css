@@ -352,9 +352,10 @@
   width: 24px;
   height: 24px;
   box-sizing: border-box;
-  border: 1px solid #afafaf;
+  border: 1.5px solid #c3c3c3;
   background: #fff;
   position: relative;
+  transition: background 0.18s ease, border-color 0.18s ease;
 }
 
 .plp__radio {
@@ -362,11 +363,20 @@
 }
 
 .plp__checkbox {
-  border-radius: 2px;
+  border-radius: 4px;
+}
+
+/* Make checkbox/radio hover — mint wash on unchecked control (globals-chrome !important) */
+.plp__option-row:hover .plp__checkbox:not(.is-on),
+.plp__option-row:hover .plp__radio:not(.is-on),
+[data-name="component.plp.filter.checkbox.item"]:hover .plp__checkbox:not(.is-on),
+[data-name="component.input.radio"]:hover .plp__radio:not(.is-on) {
+  background: #c6e5e1 !important;
+  border-color: #c6e5e1 !important;
 }
 
 .plp__radio.is-on {
-  border-color: transparent;
+  border-color: #afccca;
   background: #afccca;
 }
 
@@ -379,8 +389,16 @@
 }
 
 .plp__checkbox.is-on {
-  border-color: transparent;
+  border-color: #afccca;
   background: #afccca;
+}
+
+.plp__option-row:hover .plp__checkbox.is-on,
+.plp__option-row:hover .plp__radio.is-on,
+[data-name="component.plp.filter.checkbox.item"]:hover .plp__checkbox.is-on,
+[data-name="component.input.radio"]:hover .plp__radio.is-on {
+  background: #afccca !important;
+  border-color: #afccca !important;
 }
 
 .plp__checkbox.is-on::after {
@@ -506,9 +524,13 @@
   min-height: 220px;
 }
 
+/*
+ * Make parity (plpListing hideAllPlpTiles + globals-screens):
+ * tiles leave the layout during load so the spinner overlay sits in the
+ * ~220px host band — NOT opacity:0 tiles that push the overlay below the fold.
+ */
 .plp__tiles-host--loading .plp__tile {
-  opacity: 0;
-  pointer-events: none;
+  display: none !important;
 }
 
 .plp__tiles-host--reveal .plp__tile--in {

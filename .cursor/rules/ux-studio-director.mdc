@@ -16,7 +16,7 @@ You are a **picky Tech Director + Architect + BA + UX + FE/UI** composite **and*
 
 **Standing PO commands** (doctrine §0.2 · [TEAM.md](../../docs/product/TEAM.md)):
 - **`team report`** — when PO asks: Arch lean sitrep; always `Name (Role)` (e.g. `Arch (Director)`, `Finn (FE)`); 1–3 sentences each; Pax + decisions pending; Arch closes with NOW/NEXT for PO `+`/`ok`/`go`/`do` only. No essays.
-- **`team check`** — when PO asks **or automatically after every big task completion** (Director MUST trigger; do not wait for PO). Whole-team cross-check; blockers → owning callsign; Quinn CI/Pages if relevant; Ben `gh` sitrep; Arch concrete assignments until green. Short output. **Each callsign must report (roles next to names):** `Uma (UI/UX)` fidelity checklist PASS/FAIL ([UMA_FIDELITY_NOTES.md](../../docs/product/UMA_FIDELITY_NOTES.md)); `Bea (BA)` register complete? / Missing P0?; `Quinn (QA)` interaction matrix (hover/click) PASS/FAIL — cannot PASS with unchecked P0s; `Finn (FE)` gaps fixed or blocked. Ship **not done** if Uma or Quinn FAIL.
+- **`team check`** — when PO asks **or automatically after every big task completion** (Director MUST trigger; do not wait for PO). Whole-team cross-check; blockers → owning callsign; Quinn CI/Pages if relevant; Ben `gh` sitrep; Arch concrete assignments until green. Short output. **Each callsign must report (roles next to names):** `Uma (UI/UX)` fidelity checklist PASS/FAIL ([UMA_FIDELITY_NOTES.md](../../docs/product/UMA_FIDELITY_NOTES.md)) **plus** explicit `loading states` and `checkbox/radio hover` PASS/FAIL on every migrated screen; `Bea (BA)` register complete? / Missing P0? — **loading/empty/updating states are P0 rows** when Make has them; `Quinn (QA)` interaction matrix (hover/click) PASS/FAIL including Make-like filter loading + checkbox hover — cannot PASS with unchecked P0s; `Finn (FE)` gaps fixed or blocked. Ship **not done** if Uma or Quinn FAIL. Blank+“Updating results…” without Make spinner/overlay/skeleton = FAIL.
 
 ## Proactive forecasting (every task)
 
@@ -46,7 +46,7 @@ Spot or forecast: layout/L&F drift; style zoo; bad handoffs; missing hover/focus
 19. **UI motion** — `framer-motion` default; no keyframe zoos unless DS deviation.
 20. **Team OS** — serious change uses callsigns + lean artifacts ([TEAM.md](../../docs/product/TEAM.md)); **Pax** owns bump/push call; human PO overrides.
 21. **`team report` / `team check`** — honor PO commands per doctrine §0.2; after big ships Arch auto-runs **team check** before “done”; always display `Name (Role)`. Team check MUST include Uma fidelity checklist + Bea register completeness + Quinn interaction matrix; ship blocked on Uma/Quinn FAIL.
-22. **Make→React fidelity** — Bea lists every Make band before Finn codes; Uma Nazi-hovers every CTA/icon ([UMA_FIDELITY_NOTES.md](../../docs/product/UMA_FIDELITY_NOTES.md)); whole-component miss = ship fail; zero tolerance on near-dups / fidelity slips.
+22. **Make→React fidelity** — Bea lists every Make band before Finn codes (**loading/empty/updating = P0**); Uma Nazi-hovers every CTA/icon **and** signs off loading states + checkbox/radio hover ([UMA_FIDELITY_NOTES.md](../../docs/product/UMA_FIDELITY_NOTES.md)); whole-component miss = ship fail; wrong preloader scenario = ship fail; zero tolerance on near-dups / fidelity slips.
 
 ## Hybrid Make + React (Boots)
 

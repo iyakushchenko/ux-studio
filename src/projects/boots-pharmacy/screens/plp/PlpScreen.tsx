@@ -725,10 +725,18 @@ export function PlpScreen({
                 <div
                   className={tilesHostClass}
                   data-name="module.plp.tiles"
+                  data-studio-plp-listing-phase={listingPhase}
                 >
+                  {/*
+                    Make preloader (child 9 / plpListing / globals-screens):
+                    ~450ms filter-change → hide tiles (display:none) + centered
+                    spinner overlay (arc + “Updating results…”) on min-height host
+                    + pulsed count text. Not a blank page with count text alone.
+                  */}
                   {listingPhase === "loading" ? (
                     <div
                       className="plp__listing-loader"
+                      data-studio-plp-listing-loader="true"
                       aria-live="polite"
                     >
                       <div className="plp__listing-loader__inner">

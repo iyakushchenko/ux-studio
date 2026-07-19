@@ -59,15 +59,16 @@ Never bare callsign alone in team output — always `Name (Role)` as above. One 
 
 | Callsign | Must report |
 |----------|-------------|
-| **Uma (UI/UX)** | Fidelity checklist status — PASS or FAIL + failed items ([UMA_FIDELITY_NOTES.md](./UMA_FIDELITY_NOTES.md)) |
-| **Bea (BA)** | Register complete? Any Missing P0? (every Make band listed before Finn coded) |
-| **Quinn (QA)** | Interaction matrix (hover/click on every control) PASS/FAIL — **cannot PASS** if register has unchecked P0s |
+| **Uma (UI/UX)** | Fidelity checklist PASS/FAIL + failed items ([UMA_FIDELITY_NOTES.md](./UMA_FIDELITY_NOTES.md)). **Also mandatory on every migrated screen:** `loading states — PASS\|FAIL` and `checkbox/radio hover — PASS\|FAIL` |
+| **Bea (BA)** | Register complete? Any Missing P0? (every Make band listed before Finn coded). **Loading / empty / updating states must be P0 rows** when Make has them — mechanism + layout, not copy-only |
+| **Quinn (QA)** | Interaction matrix (hover/click on every control) PASS/FAIL — **cannot PASS** if register has unchecked P0s. **Must prove** Make-like loading on filter/search change + checkbox/radio hover visible |
 | **Finn (FE)** | Gaps fixed or blocked |
 
 **Hard rules:**
 
 - After big ships, Arch auto-runs **team check** before “done” — green tests alone do not skip it.  
-- Ship **cannot** be “done” if **Uma (UI/UX)** or **Quinn (QA)** reports **FAIL**.
+- Ship **cannot** be “done” if **Uma (UI/UX)** or **Quinn (QA)** reports **FAIL**.  
+- Blank listing + lone “Updating results…” (or equivalent) **without** Make’s spinner/overlay/skeleton = automatic Uma + Quinn **FAIL**.
 
 ---
 
