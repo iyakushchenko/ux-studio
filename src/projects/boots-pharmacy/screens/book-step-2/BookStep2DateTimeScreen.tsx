@@ -92,14 +92,14 @@ function MonthCalendar({
                       .filter(Boolean)
                       .join(" ")}
                     data-name="calendar. date. cell"
-                    data-proto-react-owned="true"
-                    data-proto-cal-kind={inMonth ? "date" : undefined}
-                    data-proto-cal-month={inMonth ? label : undefined}
-                    data-proto-cal-value={inMonth ? String(cell.day) : undefined}
-                    data-proto-cal-available={available ? "true" : undefined}
-                    data-proto-cal-unavailable={!available ? "true" : undefined}
-                    data-proto-cal-today={isToday ? "true" : undefined}
-                    data-proto-cal-selected={isSelected ? "true" : undefined}
+                    data-studio-react-owned="true"
+                    data-studio-cal-kind={inMonth ? "date" : undefined}
+                    data-studio-cal-month={inMonth ? label : undefined}
+                    data-studio-cal-value={inMonth ? String(cell.day) : undefined}
+                    data-studio-cal-available={available ? "true" : undefined}
+                    data-studio-cal-unavailable={!available ? "true" : undefined}
+                    data-studio-cal-today={isToday ? "true" : undefined}
+                    data-studio-cal-selected={isSelected ? "true" : undefined}
                     disabled={!available}
                     title={isToday ? TODAY_TOOLTIP : undefined}
                     aria-label={
@@ -159,12 +159,12 @@ function TimeSection({
                     .filter(Boolean)
                     .join(" ")}
                   data-name="calendar. date. cell"
-                  data-proto-react-owned="true"
-                  data-proto-cal-kind="time"
-                  data-proto-cal-value={t}
-                  data-proto-cal-available={ok ? "true" : undefined}
-                  data-proto-cal-unavailable={!ok ? "true" : undefined}
-                  data-proto-cal-selected={isSelected ? "true" : undefined}
+                  data-studio-react-owned="true"
+                  data-studio-cal-kind="time"
+                  data-studio-cal-value={t}
+                  data-studio-cal-available={ok ? "true" : undefined}
+                  data-studio-cal-unavailable={!ok ? "true" : undefined}
+                  data-studio-cal-selected={isSelected ? "true" : undefined}
                   disabled={!ok}
                   aria-label={ok ? t : undefined}
                   onClick={() => {
@@ -184,7 +184,7 @@ function TimeSection({
 
 /**
  * React + UXDS pilot for Book — Step 2 (Date and Time).
- * Retires Make HTML for Frame child 4; Studio hooks via data-name / data-proto-cal-*.
+ * Retires Make HTML for Frame child 4; Studio hooks via data-name / data-studio-cal-*.
  */
 export function BookStep2DateTimeScreen({
   chosenLocation,
@@ -212,7 +212,7 @@ export function BookStep2DateTimeScreen({
     <div
       className="book-step-2"
       data-name="body"
-      data-proto-react-screen={BOOK_STEP2_REACT_SCREEN_ID}
+      data-studio-react-screen={BOOK_STEP2_REACT_SCREEN_ID}
     >
       <div className="book-step-2__crumbs" data-name="module.breadcrumbs">
         <div className="book-step-2__shell">

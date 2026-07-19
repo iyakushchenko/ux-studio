@@ -86,7 +86,7 @@ async function waitForSelector(
 }
 
 function screenSelector(childIndex: number): string {
-  return `.proto-viewport > div > div:nth-child(${childIndex})`;
+  return `.studio-viewport > div > div:nth-child(${childIndex})`;
 }
 
 async function waitForActiveScreen(childIndex: number): Promise<HTMLElement | null> {
@@ -111,7 +111,7 @@ function isAppointmentHistoryReady(): boolean {
     '[data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]'
   );
   const viewBtn = firstCard?.querySelector<HTMLElement>(
-    '[data-proto-appointment-view-details="true"]'
+    '[data-studio-appointment-view-details="true"]'
   );
   return Boolean(viewBtn && isClickableTarget(viewBtn));
 }
@@ -544,7 +544,7 @@ async function runConfirmationOpenAppointments(
   await delay(SETTLE_MS);
 
   const openBtn = await waitForVisibleTarget(screen, (scope) =>
-    scope.querySelector<HTMLElement>('[data-proto-open-appointment="true"]')
+    scope.querySelector<HTMLElement>('[data-studio-open-appointment="true"]')
   );
   if (!openBtn || shouldAbort()) return false;
 
@@ -570,7 +570,7 @@ async function waitForFirstHistoryViewDetails(
       '[data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]'
     );
     const viewBtn = firstCard?.querySelector<HTMLElement>(
-      '[data-proto-appointment-view-details="true"]'
+      '[data-studio-appointment-view-details="true"]'
     );
     if (viewBtn && isClickableTarget(viewBtn)) return viewBtn;
     await delay(50);

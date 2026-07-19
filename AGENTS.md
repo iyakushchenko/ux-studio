@@ -24,36 +24,23 @@ Engine repo. **Boots Pharmacy** (`src/projects/boots-pharmacy/`) is the first re
 
 ## Required reading (before big work)
 
-1. [docs/product/COMMAND_DOCTRINE.md](docs/product/COMMAND_DOCTRINE.md) — composite role + proactive + who decides + §6–§7  
-2. [docs/product/LESSONS_LEARNED.md](docs/product/LESSONS_LEARNED.md) — progressive failure/win capture (read before UI close)  
-3. [docs/product/NAMING.md](docs/product/NAMING.md) — file/folder naming for **new** files (forward-looking; no mass rename)  
-4. [docs/product/POST_CHANGE_CHECKLIST.md](docs/product/POST_CHANGE_CHECKLIST.md) — local gates before “done”  
-5. [docs/product/NEXT_STEPS.md](docs/product/NEXT_STEPS.md) — living NOW/NEXT board  
-6. [docs/product/SOLUTION_REQUIREMENTS.md](docs/product/SOLUTION_REQUIREMENTS.md) — readiness + locked defaults  
-7. [docs/README.md](docs/README.md) — catalog  
-8. [docs/product/PRODUCT_OWNER_BRIEF.md](docs/product/PRODUCT_OWNER_BRIEF.md) — PO A–Z + decisions log  
-9. [docs/product/CONCEPT_INTAKE.md](docs/product/CONCEPT_INTAKE.md) — messy concepts in; agent fills UXDS gap  
-10. [docs/product/PROJECT_STYLEGUIDE.md](docs/product/PROJECT_STYLEGUIDE.md) — brand delta → project theme.css (remaps only; theme optional)  
-11. [docs/product/CSS_BASE_THEME.md](docs/product/CSS_BASE_THEME.md) — **BASE → THEME → PANEL → LEGACY**; no CSS dump  
-12. [docs/product/DS_STRICTNESS.md](docs/product/DS_STRICTNESS.md) — **no near-duplicates;** UXDS + theme only; deviations registered; **no new React styles in LEGACY**  
-13. [docs/product/PAGE_BUILD_CONTRACT.md](docs/product/PAGE_BUILD_CONTRACT.md) — React + UXDS  
-14. [docs/product/COMPONENT_LIBRARY.md](docs/product/COMPONENT_LIBRARY.md) — migrated pages = real kits; grow by migration  
-15. [docs/product/FE_STANDARDS.md](docs/product/FE_STANDARDS.md) — icon+text nowrap, tertiary icon language, 1440/64/1312 logo grid, scoped CSS  
-16. [docs/product/VISUAL_FIDELITY.md](docs/product/VISUAL_FIDELITY.md) — concept L&F, no visual zoo, behavior parity on rebuilds  
-17. [docs/product/INTERACTION_FIDELITY.md](docs/product/INTERACTION_FIDELITY.md) — recording needs interactive pages + shared kits  
-18. [docs/product/FE_UI_UX_AUDIT.md](docs/product/FE_UI_UX_AUDIT.md) — post-UI audit checklist (PROVEN before PO)  
-19. [docs/product/CI_ACTIONS_BUDGET.md](docs/product/CI_ACTIONS_BUDGET.md) — lean Actions; post-push `gh run list` sitrep  
-20. [docs/product/VERSIONING.md](docs/product/VERSIONING.md) — local semver + CHANGELOG; no Release CI yet  
-21. [docs/uxds/README.md](docs/uxds/README.md) — UXDS Larkin (variables + components) · [DEVIATIONS.md](docs/uxds/DEVIATIONS.md)  
-22. [docs/product/X_SUITE_INTEGRATION.md](docs/product/X_SUITE_INTEGRATION.md) — future Summarizer → Studio seam  
-23. [docs/shell/URL.md](docs/shell/URL.md) · [docs/shell/RECORDING.md](docs/shell/RECORDING.md) — `?project=&screen=` + overlay policy
+**Always (short):**  
+1. [COMMAND_DOCTRINE.md](docs/product/COMMAND_DOCTRINE.md) · [LESSONS_LEARNED.md](docs/product/LESSONS_LEARNED.md) · [NAMING.md](docs/product/NAMING.md) · [NEXT_STEPS.md](docs/product/NEXT_STEPS.md) · [POST_CHANGE_CHECKLIST.md](docs/product/POST_CHANGE_CHECKLIST.md)  
+2. [ARCHITECTURE.md](docs/product/ARCHITECTURE.md) · [HYGIENE.md](docs/product/HYGIENE.md) · [PRODUCT_FORECAST.md](docs/product/PRODUCT_FORECAST.md)
+
+**When the task touches that surface:**  
+CSS layers / DS → [CSS_BASE_THEME.md](docs/product/CSS_BASE_THEME.md) · [DS_STRICTNESS.md](docs/product/DS_STRICTNESS.md) · [FE_STANDARDS.md](docs/product/FE_STANDARDS.md) · [VISUAL_FIDELITY.md](docs/product/VISUAL_FIDELITY.md) · [FE_UI_UX_AUDIT.md](docs/product/FE_UI_UX_AUDIT.md)  
+Pages / kits → [PAGE_BUILD_CONTRACT.md](docs/product/PAGE_BUILD_CONTRACT.md) · [COMPONENT_LIBRARY.md](docs/product/COMPONENT_LIBRARY.md) · [INTERACTION_FIDELITY.md](docs/product/INTERACTION_FIDELITY.md) · [docs/uxds/README.md](docs/uxds/README.md)  
+URL / REC / CI → [docs/shell/URL.md](docs/shell/URL.md) · [docs/shell/RECORDING.md](docs/shell/RECORDING.md) · [CI_ACTIONS_BUDGET.md](docs/product/CI_ACTIONS_BUDGET.md)  
+PO / intake → [PRODUCT_OWNER_BRIEF.md](docs/product/PRODUCT_OWNER_BRIEF.md) · [CONCEPT_INTAKE.md](docs/product/CONCEPT_INTAKE.md) · [SOLUTION_REQUIREMENTS.md](docs/product/SOLUTION_REQUIREMENTS.md)  
+Catalog → [docs/README.md](docs/README.md)
 
 ## Quick start
 
 ```bash
 npm install
 npm run dev
-npm test             # check:links + vitest
+npm test             # check:links + check:hygiene + vitest
 npm run build
 npm run smoke        # lean profile — local / on-demand CI only; PROTO_SMOKE_PROFILE=full for marathon
 ```
@@ -68,7 +55,7 @@ npm run smoke        # lean profile — local / on-demand CI only; PROTO_SMOKE_P
 
 | Area | Path | Purpose |
 |------|------|---------|
-| **Engine / shell** | `src/app/` | App, nav, orchestra, playback guards, recording |
+| **Engine** | `src/app/` | Domain verbs: nav, recording, scenario, orchestra, journey, shell, chrome ([ARCHITECTURE.md](docs/product/ARCHITECTURE.md)) |
 | **Projects** | `src/projects/` | Per-concept packages (React + UXDS target) |
 | **Boots (reference)** | `src/projects/boots-pharmacy/` | First rabbit — Make bootstrap today; UXDS React rebuild target |
 | **Journey data** | `data/journeys/` | Exported `journey.json` bundles |
@@ -93,7 +80,7 @@ Full transport smokes require `__studioRun*` / `__protoRun*` helpers — use spa
 
 ## CI
 
-- **`ci.yml` → `test`** — unit tests (incl. `check:links`) + build on every PR/push — Node **22**
+- **`ci.yml` → `test`** — unit tests (incl. `check:links` + `check:hygiene`) + build on every PR/push — Node **22**
 - **`ci.yml` → `smoke`** — Playwright lean profile — **`workflow_dispatch` only** (not every push)
 - **`deploy-pages.yml`** — GitHub Pages (`/ux-studio/` base path) — Node **22**
 - Budget: [docs/product/CI_ACTIONS_BUDGET.md](docs/product/CI_ACTIONS_BUDGET.md) — day-to-day = local MCP; merge needs `npm test` + build; no auto smoke burn
@@ -101,7 +88,7 @@ Full transport smokes require `__studioRun*` / `__protoRun*` helpers — use spa
 
 ## Conventions
 
-- **Naming (new files):** [NAMING.md](docs/product/NAMING.md) — PascalCase components; camelCase modules/hooks; kebab CSS + screen folders **= `screenId`**; SCREAMING product docs; `*.test.ts` in `__tests__/`. **No new `proto*` filenames** — use `studio*` / domain names; `__proto*` window APIs stay as aliases.
+- **Naming (new files):** [NAMING.md](docs/product/NAMING.md) — PascalCase components; camelCase modules; kebab CSS + screen folders **= `screenId`**. **No new `proto*` filenames / `.proto-*` / `data-proto-*`** — use `studio*` / `data-studio-*`; `__proto*` window aliases OK. Hygiene: [HYGIENE.md](docs/product/HYGIENE.md).
 - Engine code in `src/app/` — project-agnostic
 - Boots-specific DOM/scripts in `src/projects/boots-pharmacy/` only until React+UXDS rebuild
 - Concept pages target: React + UXDS ([PAGE_BUILD_CONTRACT.md](docs/product/PAGE_BUILD_CONTRACT.md))

@@ -187,8 +187,8 @@ ok("no competing .uxds-link rest-underline in screen/kit CSS");
 if (fs.existsSync(GLOBALS_SCREENS_CSS)) {
   const screens = stripCssComments(fs.readFileSync(GLOBALS_SCREENS_CSS, "utf8"));
   const excludesKit =
-    /\.proto-viewport\s+a:not\(\.uxds-link\)/.test(screens) &&
-    /\.proto-viewport\s+a:not\(\.uxds-link\):hover/.test(screens);
+    /\.studio-viewport\s+a:not\(\.uxds-link\)/.test(screens) &&
+    /\.studio-viewport\s+a:not\(\.uxds-link\):hover/.test(screens);
   if (!excludesKit) {
     fail(
       "globals-screens.css must scope Make link chrome as `a:not(.uxds-link)` so kit tokens own migrated links"
@@ -198,7 +198,7 @@ if (fs.existsSync(GLOBALS_SCREENS_CSS)) {
   }
   // Footer-like contract still present for `.proto-link` (may share a multi-selector block)
   const protoLinkRest =
-    /\.proto-viewport\s+\.proto-link[\s\S]{0,400}?\{[^}]*text-decoration(?:-line)?\s*:\s*none/.test(
+    /\.studio-viewport\s+\.proto-link[\s\S]{0,400}?\{[^}]*text-decoration(?:-line)?\s*:\s*none/.test(
       screens
     );
   if (!protoLinkRest) {

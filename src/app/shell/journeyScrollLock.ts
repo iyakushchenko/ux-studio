@@ -1,6 +1,6 @@
 /** Blocks user-initiated prototype scroll during CJM/journey mode; playback scroll still runs. */
 
-export const JOURNEY_SCROLL_LOCK_CLASS = "proto-scroll--journey-locked";
+export const JOURNEY_SCROLL_LOCK_CLASS = "studio-scroll--journey-locked";
 
 const SCROLL_NAV_KEYS = new Set([
   "ArrowUp",

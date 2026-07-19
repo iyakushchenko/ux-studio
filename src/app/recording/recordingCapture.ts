@@ -33,13 +33,13 @@ export function buildPlaybackSelectorChain(el: HTMLElement): string[] {
   while (node && chain.length < 6) {
     const tag = node.tagName.toLowerCase();
     const dataName = node.getAttribute("data-name");
-    const protoAvail = node.getAttribute("data-proto-avail-store");
-    const protoBeat = node.getAttribute("data-proto-beat");
-    const protoAction = node.getAttribute("data-proto-action");
+    const protoAvail = node.getAttribute("data-studio-avail-store");
+    const protoBeat = node.getAttribute("data-studio-beat");
+    const protoAction = node.getAttribute("data-studio-action");
 
-    if (protoAction) chain.unshift(`[data-proto-action="${protoAction}"]`);
-    if (protoBeat) chain.unshift(`[data-proto-beat="${protoBeat}"]`);
-    if (protoAvail) chain.unshift(`[data-proto-avail-store="${protoAvail}"]`);
+    if (protoAction) chain.unshift(`[data-studio-action="${protoAction}"]`);
+    if (protoBeat) chain.unshift(`[data-studio-beat="${protoBeat}"]`);
+    if (protoAvail) chain.unshift(`[data-studio-avail-store="${protoAvail}"]`);
     if (dataName) chain.unshift(`[data-name="${dataName}"]`);
 
     if (chain.length === 0 && tag) {

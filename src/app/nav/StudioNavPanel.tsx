@@ -62,7 +62,7 @@ export default function StudioNavPanel({
   useStudioNavZoom(hostRef, shellRef, contentRef, zoomLabelRef);
 
   useLayoutEffect(() => {
-    document.getElementById("proto-nav-panel-root")?.remove();
+    document.getElementById("studio-nav-panel-root")?.remove();
   }, []);
 
   const screenCount = screens.length;
@@ -168,13 +168,13 @@ export default function StudioNavPanel({
   return (
     <div
       ref={hostRef}
-      className={`proto-nav-panel-host${
-        navBrowseLocked ? " proto-nav-panel-host--playback-locked" : ""
-      }${journeyMode ? " proto-nav-panel-host--journey-mode" : ""}`}
+      className={`studio-nav-panel-host${
+        navBrowseLocked ? " studio-nav-panel-host--playback-locked" : ""
+      }${journeyMode ? " studio-nav-panel-host--journey-mode" : ""}`}
     >
-      <div ref={shellRef} className="proto-nav-panel">
-        <div className="proto-nav-chrome">
-          <div ref={tabsScrollRef} className="proto-nav-tabs">
+      <div ref={shellRef} className="studio-nav-panel">
+        <div className="studio-nav-chrome">
+          <div ref={tabsScrollRef} className="studio-nav-tabs">
             <button
               type="button"
               onClick={handleOpenHub}
@@ -183,8 +183,8 @@ export default function StudioNavPanel({
               aria-current={hubOpen ? "page" : undefined}
               className={
                 hubOpen
-                  ? "proto-nav-logo-btn proto-nav-logo-btn--active"
-                  : "proto-nav-logo-btn"
+                  ? "studio-nav-logo-btn studio-nav-logo-btn--active"
+                  : "studio-nav-logo-btn"
               }
             >
               <StudioNavLogo />
@@ -199,20 +199,20 @@ export default function StudioNavPanel({
                 disabled={navBrowseLocked}
                 className={
                   !hubOpen && i === current
-                    ? "proto-nav-tab proto-nav-tab--active"
-                    : "proto-nav-tab"
+                    ? "studio-nav-tab studio-nav-tab--active"
+                    : "studio-nav-tab"
                 }
               >
-                <span className="proto-nav-tab__badge">{i + 1}</span>
+                <span className="studio-nav-tab__badge">{i + 1}</span>
                 {screen.label}
               </button>
             ))}
           </div>
 
-          <div className="proto-nav-status-bar px-4 py-2 bg-black/20 border-t border-white/10">
-            <div className="proto-nav-status-bar__start">
+          <div className="studio-nav-status-bar px-4 py-2 bg-black/20 border-t border-white/10">
+            <div className="studio-nav-status-bar__start">
               <div
-                className="proto-nav-dots flex gap-1"
+                className="studio-nav-dots flex gap-1"
                 role="group"
                 aria-label="Screen position"
               >
@@ -223,8 +223,8 @@ export default function StudioNavPanel({
                   aria-current={hubOpen ? "true" : undefined}
                   className={
                     hubOpen
-                      ? "proto-nav-dot proto-nav-dot--hub proto-nav-dot--active"
-                      : "proto-nav-dot proto-nav-dot--hub"
+                      ? "studio-nav-dot studio-nav-dot--hub studio-nav-dot--active"
+                      : "studio-nav-dot studio-nav-dot--hub"
                   }
                 />
                 {screens.map((_, i) => (
@@ -237,8 +237,8 @@ export default function StudioNavPanel({
                     aria-current={!hubOpen && i === current ? "true" : undefined}
                     className={
                       !hubOpen && i === current
-                        ? "proto-nav-dot proto-nav-dot--active"
-                        : "proto-nav-dot"
+                        ? "studio-nav-dot studio-nav-dot--active"
+                        : "studio-nav-dot"
                     }
                   />
                 ))}
@@ -252,25 +252,25 @@ export default function StudioNavPanel({
                   onClick={handleReset}
                   disabled={navResetLocked}
                   title="Reset prototype to defaults"
-                  className="proto-nav-reset-state"
+                  className="studio-nav-reset-state"
                 >
                   Reset
                 </button>
               ) : null}
             </div>
 
-            <p className="proto-nav-status-bar__title">{navLabel}</p>
+            <p className="studio-nav-status-bar__title">{navLabel}</p>
 
-            <div className="proto-nav-stepper">
+            <div className="studio-nav-stepper">
               <div
-                className="proto-nav-stepper__scenario-slot"
+                className="studio-nav-stepper__scenario-slot"
                 aria-hidden={!scenarioControls}
               >
                 {scenarioControls}
               </div>
               <span
                 ref={zoomLabelRef}
-                className="proto-nav-zoom-label"
+                className="studio-nav-zoom-label"
                 title="Current Page Zoom"
               >
                 100%
@@ -279,7 +279,7 @@ export default function StudioNavPanel({
                 type="button"
                 onClick={onPrevious}
                 disabled={navBrowseLocked || hubOpen}
-                className="proto-nav-step-btn proto-nav-step-btn--icon-only"
+                className="studio-nav-step-btn studio-nav-step-btn--icon-only"
                 aria-label="Previous screen"
                 title="Previous screen"
               >
@@ -299,7 +299,7 @@ export default function StudioNavPanel({
                 disabled={
                   navBrowseLocked || (!hubOpen && current === screenCount - 1)
                 }
-                className="proto-nav-step-btn proto-nav-step-btn--icon-only"
+                className="studio-nav-step-btn studio-nav-step-btn--icon-only"
                 aria-label="Next screen"
                 title="Next screen"
               >

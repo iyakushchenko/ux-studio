@@ -32,7 +32,7 @@ export type RecordedDemoClickEvent = {
   kind: "demo-click";
   /** Human-readable descriptor from describePlaybackElement. */
   element: string;
-  /** Nearest data-proto-* / data-name chain for replay targeting. */
+  /** Nearest data-studio-* / data-name chain for replay targeting. */
   selectorChain?: string[];
   beatId?: string;
   touchpointKey?: string;

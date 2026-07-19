@@ -80,7 +80,7 @@ async function main() {
     }
 
     const diagnosticOpen = await page.evaluate(
-      () => document.querySelector(".proto-playback-diagnostic") != null
+      () => document.querySelector(".studio-playback-diagnostic") != null
     );
 
     const report = {

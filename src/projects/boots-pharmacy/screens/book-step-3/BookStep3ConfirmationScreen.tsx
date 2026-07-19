@@ -97,7 +97,7 @@ function Price({ amount, large }: { amount: number; large?: boolean }) {
 
 /**
  * React + UXDS pilot for Book — Step 3 (Confirmation).
- * Retires Make HTML for Frame child 3; AIR hook `data-proto-open-appointment`.
+ * Retires Make HTML for Frame child 3; AIR hook `data-studio-open-appointment`.
  */
 export function BookStep3ConfirmationScreen({
   chosenLocation,
@@ -121,7 +121,7 @@ export function BookStep3ConfirmationScreen({
     <div
       className="book-step-3"
       data-name="body"
-      data-proto-react-screen={BOOK_STEP3_REACT_SCREEN_ID}
+      data-studio-react-screen={BOOK_STEP3_REACT_SCREEN_ID}
     >
       <div className="book-step-3__crumbs" data-name="module.breadcrumbs">
         <div className="book-step-3__shell">
@@ -211,7 +211,7 @@ export function BookStep3ConfirmationScreen({
                   </div>
                   <div
                     className="book-step-3__order-row"
-                    data-proto-booster-line="true"
+                    data-studio-booster-line="true"
                   >
                     <p>{BOOSTER_DOSE_SUMMARY_LABEL}</p>
                     <p className="book-step-3__order-plain">
@@ -295,7 +295,7 @@ export function BookStep3ConfirmationScreen({
               <button
                 type="button"
                 className="book-step-3__open-appt"
-                data-proto-open-appointment="true"
+                data-studio-open-appointment="true"
                 aria-label="Open Appointments"
                 onClick={onOpenAppointments}
               >

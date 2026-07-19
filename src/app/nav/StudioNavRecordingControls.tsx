@@ -95,13 +95,13 @@ export function StudioNavRecordingEventCounter() {
   const ui = useRecordingUiSnapshot();
   const label = formatRecordingEventCounter(ui.eventCount);
   const stateClass = ui.isRecording
-    ? " proto-nav-scenario__counter--recording-live"
+    ? " studio-nav-scenario__counter--recording-live"
     : ui.isPaused
-      ? " proto-nav-scenario__counter--recording-paused"
+      ? " studio-nav-scenario__counter--recording-paused"
       : "";
   return (
     <span
-      className={`proto-nav-scenario__counter proto-nav-scenario__counter--recording${stateClass}`}
+      className={`studio-nav-scenario__counter studio-nav-scenario__counter--recording${stateClass}`}
       aria-live="polite"
       aria-label={`Recorded events: ${ui.eventCount}`}
       title={
@@ -228,12 +228,12 @@ export function StudioNavRecordingModeSlot({
   }, [recModeLocked, recMode]);
 
   return (
-    <div className="proto-nav-scenario__deck">
+    <div className="studio-nav-scenario__deck">
       <span
-        className="proto-nav-scenario__mode-control"
+        className="studio-nav-scenario__mode-control"
         aria-disabled={recModeLocked || undefined}
       >
-        <span className="proto-nav-scenario__mode-label" aria-hidden>
+        <span className="studio-nav-scenario__mode-label" aria-hidden>
           REC
         </span>
         <StudioPlaybackRecSwitch
@@ -266,7 +266,7 @@ export function StudioNavRecordingModeSlot({
           {recMode && !recModeLocked ? (
             <motion.span
               key="rec-event-counter"
-              className="proto-nav-scenario__panel-motion-inline"
+              className="studio-nav-scenario__panel-motion-inline"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -277,12 +277,12 @@ export function StudioNavRecordingModeSlot({
           ) : null}
         </AnimatePresence>
       </span>
-      <div className="proto-nav-scenario__panel-swap" aria-live="polite">
+      <div className="studio-nav-scenario__panel-swap" aria-live="polite">
         <AnimatePresence initial={false} mode="wait">
           {recMode && !recModeLocked ? (
             <motion.div
               key="rec-panel"
-              className="proto-nav-scenario__panel-swap-item"
+              className="studio-nav-scenario__panel-swap-item"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -303,7 +303,7 @@ export function StudioNavRecordingModeSlot({
 /**
  * Recording transport buttons for the shared cassette deck slot.
  * Parent (StudioNavScenarioControls) mounts this XOR the playback transport.
- * Uses the same `proto-nav-scenario__btn` chrome as cassette controls.
+ * Uses the same `studio-nav-scenario__btn` chrome as cassette controls.
  */
 export function StudioNavRecordingControls({
   getStartOptions,
@@ -321,7 +321,7 @@ export function StudioNavRecordingControls({
   }, [statusNote]);
 
   const flashTap = (button: HTMLButtonElement) => {
-    flashControlRoomButton(button, "proto-nav-scenario__btn--tap");
+    flashControlRoomButton(button, "studio-nav-scenario__btn--tap");
   };
 
   const handleStart = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -413,9 +413,9 @@ export function StudioNavRecordingControls({
   };
 
   const panelClass = [
-    "proto-nav-recording-panel",
-    ui.isRecording ? "proto-nav-recording-panel--live" : "",
-    ui.isPaused ? "proto-nav-recording-panel--paused" : "",
+    "studio-nav-recording-panel",
+    ui.isRecording ? "studio-nav-recording-panel--live" : "",
+    ui.isPaused ? "studio-nav-recording-panel--paused" : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -423,13 +423,13 @@ export function StudioNavRecordingControls({
   return (
     <span className={panelClass} role="group" aria-label="Journey recording">
       {statusNote ? (
-        <span className="proto-nav-recording__label" aria-live="polite">
+        <span className="studio-nav-recording__label" aria-live="polite">
           {statusNote}
         </span>
       ) : null}
       <button
         type="button"
-        className="proto-nav-step-btn proto-nav-scenario__btn"
+        className="studio-nav-step-btn studio-nav-scenario__btn"
         aria-label="Start recording"
         title="Start recording"
         disabled={ui.hasLive || replaying}
@@ -439,7 +439,7 @@ export function StudioNavRecordingControls({
       </button>
       <button
         type="button"
-        className="proto-nav-step-btn proto-nav-scenario__btn"
+        className="studio-nav-step-btn studio-nav-scenario__btn"
         aria-label={ui.isPaused ? "Resume recording" : "Pause recording"}
         title={ui.isPaused ? "Resume recording" : "Pause recording"}
         disabled={!ui.hasLive || replaying}
@@ -449,7 +449,7 @@ export function StudioNavRecordingControls({
       </button>
       <button
         type="button"
-        className="proto-nav-step-btn proto-nav-scenario__btn"
+        className="studio-nav-step-btn studio-nav-scenario__btn"
         aria-label="Stop recording"
         title="Stop recording"
         disabled={!ui.hasLive || replaying}
@@ -459,7 +459,7 @@ export function StudioNavRecordingControls({
       </button>
       <button
         type="button"
-        className="proto-nav-step-btn proto-nav-scenario__btn"
+        className="studio-nav-step-btn studio-nav-scenario__btn"
         aria-label="Download recording JSON"
         title="Download .recording.json"
         disabled={!ui.canExport || replaying}
@@ -469,7 +469,7 @@ export function StudioNavRecordingControls({
       </button>
       <button
         type="button"
-        className="proto-nav-step-btn proto-nav-scenario__btn"
+        className="studio-nav-step-btn studio-nav-scenario__btn"
         aria-label="Import recording JSON"
         title="Import .recording.json"
         disabled={ui.hasLive || replaying}
@@ -479,7 +479,7 @@ export function StudioNavRecordingControls({
       </button>
       <button
         type="button"
-        className="proto-nav-step-btn proto-nav-scenario__btn"
+        className="studio-nav-step-btn studio-nav-scenario__btn"
         aria-label="Replay last recording"
         title="Replay last / imported session"
         disabled={!ui.canReplay || replaying}
@@ -491,7 +491,7 @@ export function StudioNavRecordingControls({
         ref={fileInputRef}
         type="file"
         accept=".json,.recording.json,application/json"
-        className="proto-nav-recording__file"
+        className="studio-nav-recording__file"
         onChange={handleImportFile}
       />
     </span>

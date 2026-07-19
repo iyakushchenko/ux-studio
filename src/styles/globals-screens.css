@@ -1,6 +1,6 @@
 /* Service tile cards in the listing are hardcoded w-[928px]; make them
  * fill the flex-[1_0_0] Body8 column so they resize with the viewport. */
-.proto-viewport > div > div:nth-child(9) [data-name="boots-pharmacy.service.tile"] {
+.studio-viewport > div > div:nth-child(9) [data-name="boots-pharmacy.service.tile"] {
   width: 100% !important;
   min-width: unset !important;
 }
@@ -58,16 +58,16 @@
   }
 }
 
-.proto-viewport > div > div:nth-child(9) .proto-plp-tiles-host {
+.studio-viewport > div > div:nth-child(9) .proto-plp-tiles-host {
   position: relative !important;
   min-height: 160px;
 }
 
-.proto-viewport > div > div:nth-child(9) .proto-plp-tiles-host.proto-plp-listing--loading {
+.studio-viewport > div > div:nth-child(9) .proto-plp-tiles-host.proto-plp-listing--loading {
   min-height: 220px;
 }
 
-.proto-viewport > div > div:nth-child(9) .proto-plp-listing-loader {
+.studio-viewport > div > div:nth-child(9) .proto-plp-listing-loader {
   position: absolute;
   inset: 0;
   z-index: 3;
@@ -78,18 +78,18 @@
   border-radius: 8px;
 }
 
-.proto-viewport > div > div:nth-child(9) .proto-plp-listing-loader[hidden] {
+.studio-viewport > div > div:nth-child(9) .proto-plp-listing-loader[hidden] {
   display: none !important;
 }
 
-.proto-viewport > div > div:nth-child(9) .proto-plp-listing-loader__inner {
+.studio-viewport > div > div:nth-child(9) .proto-plp-listing-loader__inner {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
 }
 
-.proto-viewport > div > div:nth-child(9) .proto-plp-listing-loader__spinner {
+.studio-viewport > div > div:nth-child(9) .proto-plp-listing-loader__spinner {
   width: 44px;
   height: 44px;
   display: flex;
@@ -97,34 +97,34 @@
   justify-content: center;
 }
 
-.proto-viewport > div > div:nth-child(9) .proto-plp-listing-loader__spinner svg {
+.studio-viewport > div > div:nth-child(9) .proto-plp-listing-loader__spinner svg {
   display: block;
   transform-origin: 50% 50%;
 }
 
-.proto-viewport > div > div:nth-child(9) .proto-plp-listing-loader__spinner--run svg {
+.studio-viewport > div > div:nth-child(9) .proto-plp-listing-loader__spinner--run svg {
   animation: proto-plp-spinner-turn 0.85s linear infinite !important;
   will-change: transform;
 }
 
-.proto-viewport > div > div:nth-child(9) .proto-plp-listing-loader__track {
+.studio-viewport > div > div:nth-child(9) .proto-plp-listing-loader__track {
   stroke: #c4dde3;
   stroke-width: 4;
 }
 
-.proto-viewport > div > div:nth-child(9) .proto-plp-listing-loader__arc {
+.studio-viewport > div > div:nth-child(9) .proto-plp-listing-loader__arc {
   stroke: #012169;
   stroke-width: 4;
   stroke-linecap: round;
   transform-origin: 50% 50%;
 }
 
-.proto-viewport > div > div:nth-child(9) .proto-plp-listing-loader__spinner--run .proto-plp-listing-loader__arc {
+.studio-viewport > div > div:nth-child(9) .proto-plp-listing-loader__spinner--run .proto-plp-listing-loader__arc {
   animation: proto-plp-spinner-arc 1.1s ease-in-out infinite !important;
   will-change: stroke-dasharray, stroke-dashoffset;
 }
 
-.proto-viewport > div > div:nth-child(9) .proto-plp-listing-loader__text {
+.studio-viewport > div > div:nth-child(9) .proto-plp-listing-loader__text {
   margin: 0;
   font-family: "Open Sans", sans-serif;
   font-size: 13px;
@@ -132,50 +132,50 @@
   color: #3a3a3a;
 }
 
-.proto-viewport > div > div:nth-child(9) .proto-plp-tiles-host.proto-plp-listing--loading [data-name="boots-pharmacy.service.tile"] {
+.studio-viewport > div > div:nth-child(9) .proto-plp-tiles-host.proto-plp-listing--loading [data-name="boots-pharmacy.service.tile"] {
   opacity: 0 !important;
   pointer-events: none !important;
 }
 
-.proto-viewport > div > div:nth-child(9) .proto-plp-tiles-host.proto-plp-listing--reveal [data-name="boots-pharmacy.service.tile"].proto-plp-tile--in {
+.studio-viewport > div > div:nth-child(9) .proto-plp-tiles-host.proto-plp-listing--reveal [data-name="boots-pharmacy.service.tile"].proto-plp-tile--in {
   animation: proto-plp-tile-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
   animation-delay: var(--proto-plp-stagger, 0ms);
 }
 
 /* PLP tile titles — link to PDP, keep heading colour */
-.proto-viewport > div > div:nth-child(9) a.proto-plp-tile-title-link {
+.studio-viewport > div > div:nth-child(9) a.proto-plp-tile-title-link {
   color: #3a3a3a !important;
   text-decoration: none !important;
   display: inline-block;
 }
-.proto-viewport > div > div:nth-child(9) a.proto-plp-tile-title-link:hover {
+.studio-viewport > div > div:nth-child(9) a.proto-plp-tile-title-link:hover {
   color: #012169 !important;
   text-decoration: underline !important;
   text-decoration-line: underline !important;
 }
-.proto-viewport > div > div:nth-child(9) a.proto-plp-tile-title-link p {
+.studio-viewport > div > div:nth-child(9) a.proto-plp-tile-title-link p {
   color: inherit !important;
 }
 
-.proto-viewport > div > div:nth-child(9) .proto-plp-results-count--loading {
+.studio-viewport > div > div:nth-child(9) .proto-plp-results-count--loading {
   animation: proto-plp-results-loading-pulse 0.9s ease-in-out infinite;
 }
 
-.proto-viewport > div > div:nth-child(9) .proto-plp-results-count--in {
+.studio-viewport > div > div:nth-child(9) .proto-plp-results-count--in {
   animation: proto-plp-results-count-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .proto-viewport > div > div:nth-child(9) .proto-plp-tiles-host.proto-plp-listing--reveal [data-name="boots-pharmacy.service.tile"].proto-plp-tile--in,
-  .proto-viewport > div > div:nth-child(9) .proto-plp-results-count--in,
-  .proto-viewport > div > div:nth-child(9) .proto-plp-listing-loader__spinner,
-  .proto-viewport > div > div:nth-child(9) .proto-plp-results-count--loading {
+  .studio-viewport > div > div:nth-child(9) .proto-plp-tiles-host.proto-plp-listing--reveal [data-name="boots-pharmacy.service.tile"].proto-plp-tile--in,
+  .studio-viewport > div > div:nth-child(9) .proto-plp-results-count--in,
+  .studio-viewport > div > div:nth-child(9) .proto-plp-listing-loader__spinner,
+  .studio-viewport > div > div:nth-child(9) .proto-plp-results-count--loading {
     animation: none !important;
   }
 }
 
 /* PLP service tile — price + Book now block: fixed column, wrapped green status */
-.proto-viewport > div > div:nth-child(9) [data-name="boots-pharmacy.service.tile"] > div > div[class*="flex-wrap"] {
+.studio-viewport > div > div:nth-child(9) [data-name="boots-pharmacy.service.tile"] > div > div[class*="flex-wrap"] {
   display: flex !important;
   flex-wrap: nowrap !important;
   align-items: flex-start !important;
@@ -184,12 +184,12 @@
   width: 100% !important;
 }
 
-.proto-viewport > div > div:nth-child(9) [data-name="boots-pharmacy.service.tile"] > div > div[class*="flex-wrap"] > div:first-child {
+.studio-viewport > div > div:nth-child(9) [data-name="boots-pharmacy.service.tile"] > div > div[class*="flex-wrap"] > div:first-child {
   flex: 1 1 auto !important;
   min-width: 0 !important;
 }
 
-.proto-viewport > div > div:nth-child(9) [data-name="boots-pharmacy.service.tile"] > div > div[class*="flex-wrap"] > div:last-child {
+.studio-viewport > div > div:nth-child(9) [data-name="boots-pharmacy.service.tile"] > div > div[class*="flex-wrap"] > div:last-child {
   flex: 0 0 auto !important;
   margin-left: auto !important;
   display: flex !important;
@@ -198,7 +198,7 @@
   flex-shrink: 0 !important;
 }
 
-.proto-viewport > div > div:nth-child(9) [data-name="boots-pharmacy.service.tile"] div:has(> [data-name="component.product.price"]) {
+.studio-viewport > div > div:nth-child(9) [data-name="boots-pharmacy.service.tile"] div:has(> [data-name="component.product.price"]) {
   display: flex !important;
   flex-direction: column !important;
   align-items: flex-start !important;
@@ -209,14 +209,14 @@
   white-space: normal !important;
 }
 
-.proto-viewport > div > div:nth-child(9) [data-name="boots-pharmacy.service.tile"] [data-name="component.product.price"] {
+.studio-viewport > div > div:nth-child(9) [data-name="boots-pharmacy.service.tile"] [data-name="component.product.price"] {
   display: flex !important;
   flex-wrap: nowrap !important;
   white-space: nowrap !important;
   width: 100% !important;
 }
 
-.proto-viewport > div > div:nth-child(9) [data-name="boots-pharmacy.service.tile"] div:has(> [data-name="component.product.price"]) > p {
+.studio-viewport > div > div:nth-child(9) [data-name="boots-pharmacy.service.tile"] div:has(> [data-name="component.product.price"]) > p {
   width: 100% !important;
   max-width: 100% !important;
   white-space: normal !important;
@@ -225,11 +225,11 @@
   line-height: 12px !important;
 }
 
-.proto-viewport > div > div:nth-child(9) [data-name="boots-pharmacy.service.tile"] div:has(> [data-name="component.product.price"]) > p[class*="459827"] {
+.studio-viewport > div > div:nth-child(9) [data-name="boots-pharmacy.service.tile"] div:has(> [data-name="component.product.price"]) > p[class*="459827"] {
   margin-top: 4px !important;
 }
 
-.proto-viewport > div > div:nth-child(9) [data-name="boots-pharmacy.service.tile"] > div > div[class*="flex-wrap"] > div:last-child > [data-name="component.input.button"] {
+.studio-viewport > div > div:nth-child(9) [data-name="boots-pharmacy.service.tile"] > div > div[class*="flex-wrap"] > div:last-child > [data-name="component.input.button"] {
   flex-shrink: 0 !important;
 }
 
@@ -240,23 +240,23 @@
 /* Inactive tabs only get white bg — active tab keeps (or gets) teal.
    Before JS fires, Units5 (Myself) retains its Figma bg-[#c6e5e1],
    so the correct default is visible with zero flash. */
-.proto-viewport > div > div:nth-child(8) [data-name="units"][data-toggle-index]:not([data-toggle-active]) {
+.studio-viewport > div > div:nth-child(8) [data-name="units"][data-toggle-index]:not([data-toggle-active]) {
   background: white !important;
 }
 
 /* Hide Figma aria-hidden border overlay on toggle tabs — we drive via box-shadow */
-.proto-viewport > div > div:nth-child(8) [data-name="units"][data-toggle-index] > [aria-hidden] {
+.studio-viewport > div > div:nth-child(8) [data-name="units"][data-toggle-index] > [aria-hidden] {
   display: none !important;
 }
 
 /* ACTIVE tab: teal fill, no border */
-.proto-viewport > div > div:nth-child(8) [data-name="units"][data-toggle-index][data-toggle-active] {
+.studio-viewport > div > div:nth-child(8) [data-name="units"][data-toggle-index][data-toggle-active] {
   background: #c6e5e1 !important;
   box-shadow: none !important;
 }
 
 /* INACTIVE left tab (Myself, index 0): border top + bottom + left, open on right */
-.proto-viewport > div > div:nth-child(8) [data-name="units"][data-toggle-index="0"]:not([data-toggle-active]) {
+.studio-viewport > div > div:nth-child(8) [data-name="units"][data-toggle-index="0"]:not([data-toggle-active]) {
   box-shadow:
     inset 0 1px 0 #d6d6d6,
     inset 0 -1px 0 #d6d6d6,
@@ -264,7 +264,7 @@
 }
 
 /* INACTIVE right tab (Someone else, index 1): border top + bottom + right, open on left */
-.proto-viewport > div > div:nth-child(8) [data-name="units"][data-toggle-index="1"]:not([data-toggle-active]) {
+.studio-viewport > div > div:nth-child(8) [data-name="units"][data-toggle-index="1"]:not([data-toggle-active]) {
   box-shadow:
     inset 0 1px 0 #d6d6d6,
     inset 0 -1px 0 #d6d6d6,
@@ -272,12 +272,12 @@
 }
 
 /* Hover: lighten inactive toggle tab slightly */
-.proto-viewport > div > div:nth-child(8) [data-name="units"][data-toggle-index]:not([data-toggle-active]):hover {
+.studio-viewport > div > div:nth-child(8) [data-name="units"][data-toggle-index]:not([data-toggle-active]):hover {
   background: #eef8f7 !important;
 }
 
 /* Locations popup close (X) — same as Availability Tool `.proto-popup-close` */
-.proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="icon / gse / close"] {
+.proto-lb-open .studio-viewport > div > div:nth-child(6) [data-name="icon / gse / close"] {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -288,35 +288,35 @@
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
 }
-.proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="icon / gse / close"]:hover {
+.proto-lb-open .studio-viewport > div > div:nth-child(6) [data-name="icon / gse / close"]:hover {
   background: rgba(1, 33, 105, 0.06);
   color: #012169;
 }
-.proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="icon / gse / close"]:hover path {
+.proto-lb-open .studio-viewport > div > div:nth-child(6) [data-name="icon / gse / close"]:hover path {
   fill: #012169 !important;
 }
 
 /* Locations popup — keep store rows from clipping the Choose Location CTA */
-.proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="module.product.specifications.table"] {
+.proto-lb-open .studio-viewport > div > div:nth-child(6) [data-name="module.product.specifications.table"] {
   overflow-x: hidden;
 }
-.proto-lb-open .proto-viewport > div > div:nth-child(6) .proto-lb-list-scroll > [data-name="boots-pharmacy.store"] {
+.proto-lb-open .studio-viewport > div > div:nth-child(6) .proto-lb-list-scroll > [data-name="boots-pharmacy.store"] {
   overflow: visible !important;
 }
-.proto-lb-open .proto-viewport > div > div:nth-child(6) .proto-store-main-row {
+.proto-lb-open .studio-viewport > div > div:nth-child(6) .proto-store-main-row {
   min-width: 0 !important;
 }
-.proto-lb-open .proto-viewport > div > div:nth-child(6) .proto-store-info-col {
+.proto-lb-open .studio-viewport > div > div:nth-child(6) .proto-store-info-col {
   min-width: 0 !important;
   flex: 1 1 auto !important;
 }
-.proto-lb-open .proto-viewport > div > div:nth-child(6) .proto-store-side-col {
+.proto-lb-open .studio-viewport > div > div:nth-child(6) .proto-store-side-col {
   flex-shrink: 0 !important;
 }
 
-/* Locations popup store cards — selection driven only by data-proto-selected.
+/* Locations popup store cards — selection driven only by data-studio-selected.
  * Unselected must look like default “Choose Location” (kill Figma’s baked Chosen). */
-.proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="boots-pharmacy.store"][aria-hidden="true"] {
+.proto-lb-open .studio-viewport > div > div:nth-child(6) [data-name="boots-pharmacy.store"][aria-hidden="true"] {
   display: none !important;
   pointer-events: none !important;
   height: 0 !important;
@@ -326,145 +326,145 @@
   overflow: hidden !important;
   border: none !important;
 }
-.proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="boots-pharmacy.store"]:not([data-proto-selected="true"]) {
+.proto-lb-open .studio-viewport > div > div:nth-child(6) [data-name="boots-pharmacy.store"]:not([data-studio-selected="true"]) {
   background: #ffffff !important;
 }
-.proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="boots-pharmacy.store"][data-proto-selected="true"] {
+.proto-lb-open .studio-viewport > div > div:nth-child(6) [data-name="boots-pharmacy.store"][data-studio-selected="true"] {
   background: #edf6f5 !important;
 }
-.proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-proto-loc-cta="choose"] {
+.proto-lb-open .studio-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-studio-loc-cta="choose"] {
   background: #ffffff !important;
   border: 1px solid #afccca !important;
 }
-.proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-proto-loc-cta="choose"] p,
-.proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-proto-loc-cta="choose"] span,
-.proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-proto-loc-cta="choose"] * {
+.proto-lb-open .studio-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-studio-loc-cta="choose"] p,
+.proto-lb-open .studio-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-studio-loc-cta="choose"] span,
+.proto-lb-open .studio-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-studio-loc-cta="choose"] * {
   color: #5c5c5c !important;
 }
-.proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-proto-loc-cta="choose"] path {
+.proto-lb-open .studio-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-studio-loc-cta="choose"] path {
   fill: #5c5c5c !important;
 }
-.proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-proto-loc-cta="choose"]:hover {
+.proto-lb-open .studio-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-studio-loc-cta="choose"]:hover {
   background: #c6e5e1 !important;
 }
-.proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-proto-loc-cta="choose"]:hover p,
-.proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-proto-loc-cta="choose"]:hover span {
+.proto-lb-open .studio-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-studio-loc-cta="choose"]:hover p,
+.proto-lb-open .studio-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-studio-loc-cta="choose"]:hover span {
   color: #01318f !important;
 }
-.proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-proto-loc-cta="choose"]:hover path {
+.proto-lb-open .studio-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-studio-loc-cta="choose"]:hover path {
   fill: #01318f !important;
 }
-.proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-proto-loc-cta="chosen"] {
+.proto-lb-open .studio-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-studio-loc-cta="chosen"] {
   background: #c6e5e1 !important;
   border: 1px solid #afccca !important;
 }
-.proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-proto-loc-cta="chosen"] p,
-.proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-proto-loc-cta="chosen"] span {
+.proto-lb-open .studio-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-studio-loc-cta="chosen"] p,
+.proto-lb-open .studio-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-studio-loc-cta="chosen"] span {
   color: #3a3a3a !important;
 }
 /* Chosen Location checkmark — Boots primary navy */
-.proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-proto-loc-cta="chosen"] path {
+.proto-lb-open .studio-viewport > div > div:nth-child(6) [data-name="component.input.button"][data-studio-loc-cta="chosen"] path {
   fill: #012169 !important;
 }
 
-.proto-viewport .proto-appointment-title-link {
+.studio-viewport .proto-appointment-title-link {
   font-size: 20px !important;
   font-weight: 600 !important;
   line-height: 28px !important;
 }
 
-/* ── Global text links (Make wire under .proto-viewport) ────────────────────
+/* ── Global text links (Make wire under .studio-viewport) ────────────────────
  * Rest: no underline; navy #012169. Hover: underline + #01318f.
  * SAME contract as `.uxds-link` (footer-like) — FE_STANDARDS §2.
  * Covers Make <a> / Figma underline spans / `.proto-link` only.
  * Migrated React links use `.uxds-link` (text-link.css) — excluded so kit tokens win.
  */
-.proto-viewport a:not(.uxds-link),
-.proto-viewport .proto-link,
-.proto-viewport p.underline,
-.proto-viewport p[class*="underline"],
-.proto-viewport span.underline,
-.proto-viewport span[class*="underline"],
-.proto-viewport p[class*="decoration-"],
-.proto-viewport span[class*="decoration-"] {
+.studio-viewport a:not(.uxds-link),
+.studio-viewport .proto-link,
+.studio-viewport p.underline,
+.studio-viewport p[class*="underline"],
+.studio-viewport span.underline,
+.studio-viewport span[class*="underline"],
+.studio-viewport p[class*="decoration-"],
+.studio-viewport span[class*="decoration-"] {
   text-decoration: none !important;
   text-decoration-line: none !important;
   cursor: pointer !important;
   color: #012169 !important;
   user-select: none;
 }
-.proto-viewport a:not(.uxds-link):hover,
-.proto-viewport .proto-link:hover,
-.proto-viewport p.underline:hover,
-.proto-viewport p[class*="underline"]:hover,
-.proto-viewport span.underline:hover,
-.proto-viewport span[class*="underline"]:hover,
-.proto-viewport p[class*="decoration-"]:hover,
-.proto-viewport span[class*="decoration-"]:hover {
+.studio-viewport a:not(.uxds-link):hover,
+.studio-viewport .proto-link:hover,
+.studio-viewport p.underline:hover,
+.studio-viewport p[class*="underline"]:hover,
+.studio-viewport span.underline:hover,
+.studio-viewport span[class*="underline"]:hover,
+.studio-viewport p[class*="decoration-"]:hover,
+.studio-viewport span[class*="decoration-"]:hover {
   text-decoration: underline !important;
   text-decoration-line: underline !important;
   color: #01318f !important;
 }
 /* Don’t restyle CTA button labels that happen to inherit decoration classes */
-.proto-viewport [data-name="component.input.button"] a,
-.proto-viewport [data-name="component.input.button"] p.underline,
-.proto-viewport [data-name="component.input.button"] p[class*="underline"],
-.proto-viewport [data-name="component.input.button"] span.underline,
-.proto-viewport [data-name="component.input.button"] span[class*="underline"] {
+.studio-viewport [data-name="component.input.button"] a,
+.studio-viewport [data-name="component.input.button"] p.underline,
+.studio-viewport [data-name="component.input.button"] p[class*="underline"],
+.studio-viewport [data-name="component.input.button"] span.underline,
+.studio-viewport [data-name="component.input.button"] span[class*="underline"] {
   color: inherit !important;
   cursor: inherit !important;
   user-select: inherit;
 }
-.proto-viewport [data-name="component.input.button"] a:hover,
-.proto-viewport [data-name="component.input.button"] p.underline:hover,
-.proto-viewport [data-name="component.input.button"] p[class*="underline"]:hover,
-.proto-viewport [data-name="component.input.button"] span.underline:hover,
-.proto-viewport [data-name="component.input.button"] span[class*="underline"]:hover {
+.studio-viewport [data-name="component.input.button"] a:hover,
+.studio-viewport [data-name="component.input.button"] p.underline:hover,
+.studio-viewport [data-name="component.input.button"] p[class*="underline"]:hover,
+.studio-viewport [data-name="component.input.button"] span.underline:hover,
+.studio-viewport [data-name="component.input.button"] span[class*="underline"]:hover {
   color: inherit !important;
 }
 
 /* Global links — no focus ring/outline (prototype). `.uxds-link` keeps kit focus-visible. */
-.proto-viewport a:not(.uxds-link):focus,
-.proto-viewport a:not(.uxds-link):focus-visible,
-.proto-viewport a:not(.uxds-link):active:focus,
-.proto-viewport .proto-link:focus,
-.proto-viewport .proto-link:focus-visible,
-.proto-viewport .proto-link:active:focus,
-.proto-viewport p.underline:focus,
-.proto-viewport p.underline:focus-visible,
-.proto-viewport p[class*="underline"]:focus,
-.proto-viewport p[class*="underline"]:focus-visible,
-.proto-viewport span.underline:focus,
-.proto-viewport span.underline:focus-visible,
-.proto-viewport span[class*="underline"]:focus,
-.proto-viewport span[class*="underline"]:focus-visible,
-.proto-viewport p[class*="decoration-"]:focus,
-.proto-viewport p[class*="decoration-"]:focus-visible,
-.proto-viewport span[class*="decoration-"]:focus,
-.proto-viewport span[class*="decoration-"]:focus-visible {
+.studio-viewport a:not(.uxds-link):focus,
+.studio-viewport a:not(.uxds-link):focus-visible,
+.studio-viewport a:not(.uxds-link):active:focus,
+.studio-viewport .proto-link:focus,
+.studio-viewport .proto-link:focus-visible,
+.studio-viewport .proto-link:active:focus,
+.studio-viewport p.underline:focus,
+.studio-viewport p.underline:focus-visible,
+.studio-viewport p[class*="underline"]:focus,
+.studio-viewport p[class*="underline"]:focus-visible,
+.studio-viewport span.underline:focus,
+.studio-viewport span.underline:focus-visible,
+.studio-viewport span[class*="underline"]:focus,
+.studio-viewport span[class*="underline"]:focus-visible,
+.studio-viewport p[class*="decoration-"]:focus,
+.studio-viewport p[class*="decoration-"]:focus-visible,
+.studio-viewport span[class*="decoration-"]:focus,
+.studio-viewport span[class*="decoration-"]:focus-visible {
   outline: none !important;
   box-shadow: none !important;
 }
 
 /* Locations popup search — show full near-me label (no ellipsis) */
-.proto-lb-open .proto-viewport > div > div:nth-child(6)
-  [data-name="component.input.field"][data-proto-search-near="true"] p {
+.proto-lb-open .studio-viewport > div > div:nth-child(6)
+  [data-name="component.input.field"][data-studio-search-near="true"] p {
   overflow: visible !important;
   text-overflow: clip !important;
   white-space: nowrap !important;
 }
 /* Locations popup — shared search chrome (X + search icon) with Availability Tool */
-.proto-lb-open .proto-viewport > div > div:nth-child(6) .proto-lb-search-field {
+.proto-lb-open .studio-viewport > div > div:nth-child(6) .proto-lb-search-field {
   cursor: pointer;
 }
-.proto-lb-open .proto-viewport > div > div:nth-child(6) .proto-lb-search-field:hover
+.proto-lb-open .studio-viewport > div > div:nth-child(6) .proto-lb-search-field:hover
   [data-name="Text Field"] > [aria-hidden],
-.proto-lb-open .proto-viewport > div > div:nth-child(6) .proto-lb-search-field:focus-within
+.proto-lb-open .studio-viewport > div > div:nth-child(6) .proto-lb-search-field:focus-within
   [data-name="Text Field"] > [aria-hidden] {
   border-color: #012169 !important;
   box-shadow: inset 0 0 0 2px #012169 !important;
 }
-.proto-lb-open .proto-viewport > div > div:nth-child(6) .proto-avail-found-wrap {
+.proto-lb-open .studio-viewport > div > div:nth-child(6) .proto-avail-found-wrap {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -473,29 +473,29 @@
 }
 
 /* ── Locations popup: List / Map toggle (same dynamics as PDP Myself/Someone else) ─ */
-.proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="units"][data-toggle-index]:not([data-toggle-active]) {
+.proto-lb-open .studio-viewport > div > div:nth-child(6) [data-name="units"][data-toggle-index]:not([data-toggle-active]) {
   background: white !important;
 }
-.proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="units"][data-toggle-index] > [aria-hidden] {
+.proto-lb-open .studio-viewport > div > div:nth-child(6) [data-name="units"][data-toggle-index] > [aria-hidden] {
   display: none !important;
 }
-.proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="units"][data-toggle-index][data-toggle-active] {
+.proto-lb-open .studio-viewport > div > div:nth-child(6) [data-name="units"][data-toggle-index][data-toggle-active] {
   background: #c6e5e1 !important;
   box-shadow: none !important;
 }
-.proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="units"][data-toggle-index="0"]:not([data-toggle-active]) {
+.proto-lb-open .studio-viewport > div > div:nth-child(6) [data-name="units"][data-toggle-index="0"]:not([data-toggle-active]) {
   box-shadow:
     inset 0 1px 0 #d6d6d6,
     inset 0 -1px 0 #d6d6d6,
     inset 1px 0 0 #d6d6d6 !important;
 }
-.proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="units"][data-toggle-index="1"]:not([data-toggle-active]) {
+.proto-lb-open .studio-viewport > div > div:nth-child(6) [data-name="units"][data-toggle-index="1"]:not([data-toggle-active]) {
   box-shadow:
     inset 0 1px 0 #d6d6d6,
     inset 0 -1px 0 #d6d6d6,
     inset -1px 0 0 #d6d6d6 !important;
 }
-.proto-lb-open .proto-viewport > div > div:nth-child(6) [data-name="units"][data-toggle-index]:not([data-toggle-active]):hover {
+.proto-lb-open .studio-viewport > div > div:nth-child(6) [data-name="units"][data-toggle-index]:not([data-toggle-active]):hover {
   background: #eef8f7 !important;
 }
 
@@ -512,14 +512,14 @@
   box-sizing: border-box;
   background: #e8e4dc;
 }
-.proto-lb-open[data-proto-lb-view="map"] .proto-lb-map-view {
+.proto-lb-open[data-studio-lb-view="map"] .proto-lb-map-view {
   display: flex !important;
   flex-direction: column !important;
 }
-.proto-lb-open[data-proto-lb-view="map"] .proto-lb-list-shell {
+.proto-lb-open[data-studio-lb-view="map"] .proto-lb-list-shell {
   display: none !important;
 }
-.proto-lb-open[data-proto-lb-view="list"] .proto-lb-map-view {
+.proto-lb-open[data-studio-lb-view="list"] .proto-lb-map-view {
   display: none !important;
 }
 
@@ -575,10 +575,10 @@
 .proto-lb-map-pin:hover {
   filter: drop-shadow(0 3px 6px rgba(1, 33, 105, 0.5));
 }
-.proto-lb-map-pin[data-proto-near-pin="true"] {
+.proto-lb-map-pin[data-studio-near-pin="true"] {
   display: none;
 }
-.proto-lb-map-view[data-proto-map-near="true"] .proto-lb-map-pin[data-proto-near-pin="true"] {
+.proto-lb-map-view[data-studio-map-near="true"] .proto-lb-map-pin[data-studio-near-pin="true"] {
   display: block;
   animation: proto-lb-pin-pop 0.28s ease;
 }
@@ -632,33 +632,33 @@
 .proto-chosen-slot > .proto-chosen-tile .proto-chosen-store-card > [aria-hidden] {
   display: none !important;
 }
-.proto-chosen-slot .proto-chosen-store-card [data-proto-change-loc="true"],
-.proto-chosen-slot .proto-chosen-store-card [data-proto-change-loc="true"]:hover,
-.proto-chosen-slot .proto-chosen-store-card [data-proto-change-loc="true"]:active {
+.proto-chosen-slot .proto-chosen-store-card [data-studio-change-loc="true"],
+.proto-chosen-slot .proto-chosen-store-card [data-studio-change-loc="true"]:hover,
+.proto-chosen-slot .proto-chosen-store-card [data-studio-change-loc="true"]:active {
   cursor: pointer;
   background: transparent !important;
   height: 32px !important;
   gap: 8px !important;
   box-shadow: none !important;
 }
-.proto-chosen-slot .proto-chosen-store-card [data-proto-change-loc="true"] p,
-.proto-chosen-slot .proto-chosen-store-card [data-proto-change-loc="true"] span {
+.proto-chosen-slot .proto-chosen-store-card [data-studio-change-loc="true"] p,
+.proto-chosen-slot .proto-chosen-store-card [data-studio-change-loc="true"] span {
   color: #5c5c5c !important;
   font-size: 12px !important;
 }
-.proto-chosen-slot .proto-chosen-store-card [data-proto-change-loc="true"]:hover p,
-.proto-chosen-slot .proto-chosen-store-card [data-proto-change-loc="true"]:hover span {
+.proto-chosen-slot .proto-chosen-store-card [data-studio-change-loc="true"]:hover p,
+.proto-chosen-slot .proto-chosen-store-card [data-studio-change-loc="true"]:hover span {
   color: #000000 !important;
 }
-.proto-chosen-slot .proto-chosen-store-card [data-proto-change-loc="true"]:hover svg path {
+.proto-chosen-slot .proto-chosen-store-card [data-studio-change-loc="true"]:hover svg path {
   fill: #012169 !important;
 }
 /* Hide any leftover Choose/Chosen CTAs on the page card */
-.proto-chosen-slot .proto-chosen-store-card [data-name="component.input.button"]:not([data-proto-change-loc="true"]) {
+.proto-chosen-slot .proto-chosen-store-card [data-name="component.input.button"]:not([data-studio-change-loc="true"]) {
   display: none !important;
 }
 /* Map is embedded above — no “Show on map” on the page card */
-.proto-chosen-slot .proto-chosen-store-card [data-proto-hide-show-on-map="true"] {
+.proto-chosen-slot .proto-chosen-store-card [data-studio-hide-show-on-map="true"] {
   display: none !important;
 }
 
@@ -689,7 +689,7 @@
   overflow-wrap: break-word !important;
   white-space: normal !important;
 }
-.proto-store-info-col [data-proto-hours-list="true"] {
+.proto-store-info-col [data-studio-hours-list="true"] {
   width: 100% !important;
   max-width: 100% !important;
 }
@@ -704,28 +704,28 @@
 }
 
 /* Book Appointment — hide Figma cursor affordance on location search */
-.proto-viewport > div > div:nth-child(7) [data-name=".utility / cursor"] {
+.studio-viewport > div > div:nth-child(7) [data-name=".utility / cursor"] {
   display: none !important;
 }
 
 /* PDP + PLP — hide Figma cursor (Sarah playback simulates clicks) */
-.proto-viewport > div > div:nth-child(8) [data-name=".utility / cursor"],
-.proto-viewport > div > div:nth-child(9) [data-name=".utility / cursor"] {
+.studio-viewport > div > div:nth-child(8) [data-name=".utility / cursor"],
+.studio-viewport > div > div:nth-child(9) [data-name=".utility / cursor"] {
   display: none !important;
 }
 
 /* Agentic home — hide Figma cursor affordance on send CTA */
-.proto-viewport > div > div:nth-child(11) [data-name=".utility / cursor"] {
+.studio-viewport > div > div:nth-child(11) [data-name=".utility / cursor"] {
   display: none !important;
 }
 
 /* Agentic home — multiline query input (replaces static prompt text).
  * Hugs wrapped line count (1–5 lines); shrinks when text is deleted; scrolls at max.
  * Mic + send stay top-aligned with the field. */
-.proto-viewport > div > div:nth-child(11) [data-name="Subtotal"] {
+.studio-viewport > div > div:nth-child(11) [data-name="Subtotal"] {
   align-items: flex-start !important;
 }
-.proto-viewport > div > div:nth-child(11) textarea.proto-agentic-query {
+.studio-viewport > div > div:nth-child(11) textarea.proto-agentic-query {
   flex: 1 1 0 !important;
   width: 0 !important;
   min-width: 0 !important;
@@ -749,20 +749,20 @@
   scrollbar-width: none !important; /* Firefox */
   -ms-overflow-style: none !important; /* legacy Edge */
 }
-.proto-viewport > div > div:nth-child(11) textarea.proto-agentic-query::-webkit-scrollbar {
+.studio-viewport > div > div:nth-child(11) textarea.proto-agentic-query::-webkit-scrollbar {
   display: none !important;
   width: 0 !important;
   height: 0 !important;
 }
-.proto-viewport > div > div:nth-child(11) textarea.proto-agentic-query::placeholder {
+.studio-viewport > div > div:nth-child(11) textarea.proto-agentic-query::placeholder {
   color: #7a7d87 !important;
 }
-.proto-viewport > div > div:nth-child(11) textarea.proto-agentic-query:focus {
+.studio-viewport > div > div:nth-child(11) textarea.proto-agentic-query:focus {
   outline: none !important;
 }
 
 /* Agentic (home + chat) — mic icon button (Vector) — teal wash hover */
-.proto-viewport > div > div:nth-child(11)
+.studio-viewport > div > div:nth-child(11)
   [data-name="Subtotal"]
   [data-name="component.input.button"][class*="size-[48px]"]:has([data-name="Vector"]),
 .proto-site-pilot-composer
@@ -773,7 +773,7 @@
   overflow: visible !important;
   transition: background 0.18s ease, border-color 0.18s ease !important;
 }
-.proto-viewport > div > div:nth-child(11)
+.studio-viewport > div > div:nth-child(11)
   [data-name="Subtotal"]
   [data-name="component.input.button"][class*="size-[48px]"]:has([data-name="Vector"]) > [aria-hidden],
 .proto-site-pilot-composer
@@ -781,7 +781,7 @@
   [data-name="component.input.button"][class*="size-[48px]"]:has([data-name="Vector"]) > [aria-hidden] {
   transition: border-color 0.18s ease !important;
 }
-.proto-viewport > div > div:nth-child(11)
+.studio-viewport > div > div:nth-child(11)
   [data-name="Subtotal"]
   [data-name="component.input.button"][class*="size-[48px]"]:has([data-name="Vector"]):hover,
 .proto-site-pilot-composer
@@ -789,7 +789,7 @@
   [data-name="component.input.button"][class*="size-[48px]"]:has([data-name="Vector"]):hover {
   background: #eef8f7 !important;
 }
-.proto-viewport > div > div:nth-child(11)
+.studio-viewport > div > div:nth-child(11)
   [data-name="Subtotal"]
   [data-name="component.input.button"][class*="size-[48px]"]:has([data-name="Vector"]):hover > [aria-hidden],
 .proto-site-pilot-composer
@@ -797,7 +797,7 @@
   [data-name="component.input.button"][class*="size-[48px]"]:has([data-name="Vector"]):hover > [aria-hidden] {
   border-color: #afccca !important;
 }
-.proto-viewport > div > div:nth-child(11)
+.studio-viewport > div > div:nth-child(11)
   [data-name="Subtotal"]
   [data-name="component.input.button"][class*="size-[48px]"]:has([data-name="Vector"]):hover svg path,
 .proto-site-pilot-composer
@@ -806,7 +806,7 @@
   fill: #012169 !important;
   transition: fill 0.18s ease !important;
 }
-.proto-viewport > div > div:nth-child(11)
+.studio-viewport > div > div:nth-child(11)
   [data-name="Subtotal"]
   [data-name="component.input.button"][class*="size-[48px]"]:has([data-name="Vector"]):active,
 .proto-site-pilot-composer
@@ -836,7 +836,7 @@
 }
 
 /* Agentic dialog option chips (home “Suggested…” + chat “Next…”) */
-.proto-viewport > div > div:nth-child(11)
+.studio-viewport > div > div:nth-child(11)
   [data-name="component.co.order.summary"]
   [data-name="component.gse.system.message"],
 .proto-site-pilot-composer
@@ -845,7 +845,7 @@
   user-select: none !important;
   transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.12s ease !important;
 }
-.proto-viewport > div > div:nth-child(11)
+.studio-viewport > div > div:nth-child(11)
   [data-name="component.co.order.summary"]
   [data-name="component.gse.system.message"]:hover,
 .proto-site-pilot-composer
@@ -854,7 +854,7 @@
   box-shadow: 0 2px 8px rgba(1, 33, 105, 0.12) !important;
   transform: translateY(-1px) !important;
 }
-.proto-viewport > div > div:nth-child(11)
+.studio-viewport > div > div:nth-child(11)
   [data-name="component.co.order.summary"]
   [data-name="component.gse.system.message"]:active,
 .proto-site-pilot-composer
@@ -908,7 +908,7 @@
 }
 
 /* Book Step 3 — Advantage Card points block (matches Frame218 spacing) */
-.proto-viewport > div > div:nth-child(3) .proto-confirm-advantage {
+.studio-viewport > div > div:nth-child(3) .proto-confirm-advantage {
   height: auto !important;
   min-height: 104px !important;
   max-height: none !important;
@@ -917,7 +917,7 @@
   border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
   overflow: hidden !important;
 }
-.proto-viewport > div > div:nth-child(3) .proto-confirm-advantage__inner {
+.studio-viewport > div > div:nth-child(3) .proto-confirm-advantage__inner {
   display: flex !important;
   flex-direction: row !important;
   align-items: center !important;
@@ -928,7 +928,7 @@
   padding: 4px 8px !important;
   box-sizing: border-box !important;
 }
-.proto-viewport > div > div:nth-child(3) .proto-confirm-advantage__rows {
+.studio-viewport > div > div:nth-child(3) .proto-confirm-advantage__rows {
   flex: 1 1 auto !important;
   min-width: 0 !important;
   display: grid !important;
@@ -943,15 +943,15 @@
   line-height: 24px !important;
   color: #3a3a3a !important;
 }
-.proto-viewport > div > div:nth-child(3) .proto-confirm-advantage__label {
+.studio-viewport > div > div:nth-child(3) .proto-confirm-advantage__label {
   font-weight: 400 !important;
   white-space: nowrap !important;
 }
-.proto-viewport > div > div:nth-child(3) .proto-confirm-advantage__value {
+.studio-viewport > div > div:nth-child(3) .proto-confirm-advantage__value {
   font-weight: 600 !important;
   white-space: nowrap !important;
 }
-.proto-viewport > div > div:nth-child(3) .proto-confirm-advantage__link {
+.studio-viewport > div > div:nth-child(3) .proto-confirm-advantage__link {
   grid-column: 1 / -1 !important;
   justify-self: start !important;
   margin: 4px 0 0 !important;
@@ -964,15 +964,15 @@
   line-height: 24px !important;
   text-align: left !important;
 }
-.proto-viewport > div > div:nth-child(3) .proto-confirm-advantage__link:focus:not(:focus-visible) {
+.studio-viewport > div > div:nth-child(3) .proto-confirm-advantage__link:focus:not(:focus-visible) {
   outline: none !important;
 }
-.proto-viewport > div > div:nth-child(3) .proto-confirm-advantage__link:focus-visible {
+.studio-viewport > div > div:nth-child(3) .proto-confirm-advantage__link:focus-visible {
   outline: 2px solid #012169 !important;
   outline-offset: 2px !important;
   border-radius: 4px !important;
 }
-.proto-viewport > div > div:nth-child(3) .proto-confirm-advantage__card {
+.studio-viewport > div > div:nth-child(3) .proto-confirm-advantage__card {
   flex: 0 0 auto !important;
   width: 132px !important;
   height: auto !important;
@@ -984,7 +984,7 @@
 }
 
 /* Book Step 3 — Open Appointment icon+link under primary CTAs */
-.proto-viewport > div > div:nth-child(3) .proto-confirm-open-appointment {
+.studio-viewport > div > div:nth-child(3) .proto-confirm-open-appointment {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -1003,51 +1003,51 @@
   cursor: pointer !important;
   transition: color 0.18s ease !important;
 }
-.proto-viewport > div > div:nth-child(3) .proto-confirm-open-appointment__icon {
+.studio-viewport > div > div:nth-child(3) .proto-confirm-open-appointment__icon {
   transform: scaleX(-1);
 }
-.proto-viewport > div > div:nth-child(3) .proto-confirm-open-appointment:hover {
+.studio-viewport > div > div:nth-child(3) .proto-confirm-open-appointment:hover {
   background: transparent !important;
   color: #01318f !important;
   box-shadow: none !important;
   transform: none !important;
 }
-.proto-viewport > div > div:nth-child(3) .proto-confirm-open-appointment:hover
+.studio-viewport > div > div:nth-child(3) .proto-confirm-open-appointment:hover
   .proto-confirm-open-appointment__icon {
   filter: brightness(0) saturate(100%) invert(15%) sepia(55%) saturate(3000%)
     hue-rotate(205deg) brightness(0.85);
 }
-.proto-viewport > div > div:nth-child(3) .proto-confirm-open-appointment:active {
+.studio-viewport > div > div:nth-child(3) .proto-confirm-open-appointment:active {
   background: transparent !important;
   transform: none !important;
   box-shadow: none !important;
 }
-.proto-viewport > div > div:nth-child(3) .proto-confirm-open-appointment:focus-visible {
+.studio-viewport > div > div:nth-child(3) .proto-confirm-open-appointment:focus-visible {
   outline: 2px solid #012169 !important;
   outline-offset: 2px !important;
 }
-.proto-viewport > div > div:nth-child(3) .proto-confirm-open-appointment:focus:not(:focus-visible) {
+.studio-viewport > div > div:nth-child(3) .proto-confirm-open-appointment:focus:not(:focus-visible) {
   outline: none !important;
 }
 
 /* Book Step 1 — progress + form card width matches Steps 2–3 (863px) */
-.proto-viewport > div > div:nth-child(7) [data-name="component.book.appointment.progress"] {
+.studio-viewport > div > div:nth-child(7) [data-name="component.book.appointment.progress"] {
   width: 863px !important;
   max-width: 100%;
 }
-.proto-viewport > div > div:nth-child(7)
+.studio-viewport > div > div:nth-child(7)
   [data-name="component.book.appointment.progress"]
   + [class*="rounded-[24px]"] {
   width: 863px !important;
   max-width: 100%;
 }
-.proto-viewport > div > div:nth-child(7) [data-name="component.errors.footer"] {
+.studio-viewport > div > div:nth-child(7) [data-name="component.errors.footer"] {
   width: 863px !important;
   max-width: 100%;
 }
 
 /* Confirmation — progress is read-only; all step bars use active teal */
-.proto-viewport > div > div:nth-child(3) [data-name="component.book.appointment.progress"] {
+.studio-viewport > div > div:nth-child(3) [data-name="component.book.appointment.progress"] {
   pointer-events: none;
 }
 
@@ -1059,70 +1059,70 @@
 }
 
 /* Progress bar — current (active) step: bold + Boots primary navy */
-[data-name="component.book.appointment.progress"] > [data-proto-step-active="true"] * {
+[data-name="component.book.appointment.progress"] > [data-studio-step-active="true"] * {
   font-weight: 700 !important;
   color: #012169 !important;
 }
-.proto-viewport > div > div:nth-child(3) [data-name="component.book.appointment.progress"] > * {
+.studio-viewport > div > div:nth-child(3) [data-name="component.book.appointment.progress"] > * {
   cursor: default;
 }
-.proto-viewport > div > div:nth-child(3) [data-name="component.book.appointment.progress"] > * > div:last-child {
+.studio-viewport > div > div:nth-child(3) [data-name="component.book.appointment.progress"] > * > div:last-child {
   background: #c6e5e1 !important;
 }
 
 /* Book Appointment progress — Step 1 column is back-nav on Step 2 only */
-.proto-viewport > div > div:nth-child(4) [data-name="component.book.appointment.progress"] > [data-proto-book-step-back="true"] {
+.studio-viewport > div > div:nth-child(4) [data-name="component.book.appointment.progress"] > [data-studio-book-step-back="true"] {
   cursor: pointer;
   pointer-events: auto;
   position: relative;
   z-index: 2;
 }
-.proto-viewport > div > div:nth-child(4) [data-name="component.book.appointment.progress"] > [data-proto-book-step-back="true"] > div:last-child {
+.studio-viewport > div > div:nth-child(4) [data-name="component.book.appointment.progress"] > [data-studio-book-step-back="true"] > div:last-child {
   transition: background 0.15s ease, filter 0.15s ease;
 }
-.proto-viewport > div > div:nth-child(4) [data-name="component.book.appointment.progress"] > [data-proto-book-step-back="true"]:hover > div:last-child,
-.proto-viewport > div > div:nth-child(4) [data-name="component.book.appointment.progress"] > [data-proto-book-step-back="true"]:focus-visible > div:last-child {
+.studio-viewport > div > div:nth-child(4) [data-name="component.book.appointment.progress"] > [data-studio-book-step-back="true"]:hover > div:last-child,
+.studio-viewport > div > div:nth-child(4) [data-name="component.book.appointment.progress"] > [data-studio-book-step-back="true"]:focus-visible > div:last-child {
   background: #c6e5e1 !important;
   filter: brightness(0.92);
 }
-.proto-viewport > div > div:nth-child(4) [data-name="component.book.appointment.progress"] > [data-proto-book-step-back="true"]:hover span {
+.studio-viewport > div > div:nth-child(4) [data-name="component.book.appointment.progress"] > [data-studio-book-step-back="true"]:hover span {
   color: #012169;
 }
-.proto-viewport > div > div:nth-child(4) [data-name="component.book.appointment.progress"] > [data-proto-book-step-back="true"]:focus:not(:focus-visible) {
+.studio-viewport > div > div:nth-child(4) [data-name="component.book.appointment.progress"] > [data-studio-book-step-back="true"]:focus:not(:focus-visible) {
   outline: none !important;
   box-shadow: none !important;
 }
-.proto-viewport > div > div:nth-child(4) [data-name="component.book.appointment.progress"] > [data-proto-book-step-back="true"]:focus-visible {
+.studio-viewport > div > div:nth-child(4) [data-name="component.book.appointment.progress"] > [data-studio-book-step-back="true"]:focus-visible {
   outline: 2px solid #012169;
   outline-offset: 2px;
 }
 
 /* Book Appointment — booster checkbox (single instance; no row hover wash) */
-.proto-viewport > div > div:nth-child(7) .proto-page-booster-checkbox,
-.proto-viewport > div > div:nth-child(7) .proto-page-booster-checkbox *:not([data-name="box"]) {
+.studio-viewport > div > div:nth-child(7) .proto-page-booster-checkbox,
+.studio-viewport > div > div:nth-child(7) .proto-page-booster-checkbox *:not([data-name="box"]) {
   background: transparent !important;
   outline: none !important;
   box-shadow: none !important;
 }
-.proto-viewport > div > div:nth-child(7) .proto-page-booster-checkbox [data-name="component.input.checkbox"] {
+.studio-viewport > div > div:nth-child(7) .proto-page-booster-checkbox [data-name="component.input.checkbox"] {
   cursor: pointer !important;
   background: transparent !important;
 }
-.proto-viewport > div > div:nth-child(7) .proto-page-booster-checkbox [data-name="component.input.checkbox"]:hover {
+.studio-viewport > div > div:nth-child(7) .proto-page-booster-checkbox [data-name="component.input.checkbox"]:hover {
   background: transparent !important;
 }
-.proto-viewport > div > div:nth-child(7) .proto-page-booster-checkbox [data-name="component.input.checkbox"][data-checkbox-checked="true"] [data-name="Label"] p,
-.proto-viewport > div > div:nth-child(7) .proto-page-booster-checkbox [data-name="component.input.checkbox"][data-checkbox-checked="true"] [data-name="Label"] span {
+.studio-viewport > div > div:nth-child(7) .proto-page-booster-checkbox [data-name="component.input.checkbox"][data-checkbox-checked="true"] [data-name="Label"] p,
+.studio-viewport > div > div:nth-child(7) .proto-page-booster-checkbox [data-name="component.input.checkbox"][data-checkbox-checked="true"] [data-name="Label"] span {
   font-weight: 700 !important;
 }
-.proto-viewport > div > div:nth-child(7) .proto-page-booster-checkbox [data-name="component.input.checkbox"][data-checkbox-checked="true"] [data-name="box"] {
+.studio-viewport > div > div:nth-child(7) .proto-page-booster-checkbox [data-name="component.input.checkbox"][data-checkbox-checked="true"] [data-name="box"] {
   background: #afccca !important;
   border-color: #afccca !important;
 }
-.proto-viewport > div > div:nth-child(7) .proto-page-booster-checkbox [data-name="component.input.checkbox"][data-checkbox-checked="true"] [data-name="box"] svg path {
+.studio-viewport > div > div:nth-child(7) .proto-page-booster-checkbox [data-name="component.input.checkbox"][data-checkbox-checked="true"] [data-name="box"] svg path {
   fill: #305854 !important;
 }
-.proto-viewport > div > div:nth-child(7) .proto-page-booster-checkbox [data-name="component.input.checkbox"][data-checkbox-checked="false"] [data-name="element. gse. checkbox. check mark"] {
+.studio-viewport > div > div:nth-child(7) .proto-page-booster-checkbox [data-name="component.input.checkbox"][data-checkbox-checked="false"] [data-name="element. gse. checkbox. check mark"] {
   opacity: 0 !important;
 }
 /* Remove any leftover cloned duplicates under the location tile */
@@ -1233,7 +1233,7 @@
 /* ── Screen 4: Deal Details layout ──────────────────────────────────────────── */
 
 /* Card: constrain to 1440px and centre */
-.proto-viewport > div > div:nth-child(8) [data-name="module.pdp.rtb"] {
+.studio-viewport > div > div:nth-child(8) [data-name="module.pdp.rtb"] {
   max-width: 1440px !important;
   width: 100% !important;
   margin-left: auto !important;
@@ -1241,25 +1241,25 @@
 }
 
 /* Inner row: gap equals the outer 48px padding so spacing is uniform */
-.proto-viewport > div > div:nth-child(8) [data-name="module.pdp.rtb"] > div > div {
+.studio-viewport > div > div:nth-child(8) [data-name="module.pdp.rtb"] > div > div {
   gap: 48px !important;
 }
 
 /* Image wrapper (Frame127): true 50/50, keep 1:1 aspect ratio */
-.proto-viewport > div > div:nth-child(8) [data-name="module.pdp.rtb"] > div > div > :first-child {
+.studio-viewport > div > div:nth-child(8) [data-name="module.pdp.rtb"] > div > div > :first-child {
   flex: 1 1 0 !important;
   min-width: 0 !important;
   aspect-ratio: 1 / 1 !important;
 }
 
 /* Product image: fill its 1:1 wrapper, cover crop */
-.proto-viewport > div > div:nth-child(8) [data-name="component.product.image.basic"] {
+.studio-viewport > div > div:nth-child(8) [data-name="component.product.image.basic"] {
   width: 100% !important;
   height: 100% !important;
   max-width: none !important;
   aspect-ratio: unset !important;
 }
-.proto-viewport > div > div:nth-child(8) [data-name="component.product.image.basic"] img {
+.studio-viewport > div > div:nth-child(8) [data-name="component.product.image.basic"] img {
   width: 100% !important;
   height: 100% !important;
   object-fit: cover !important;
@@ -1267,7 +1267,7 @@
 }
 
 /* Right-side RTB: equal 50% half, fluid, explicit white so nothing bleeds through */
-.proto-viewport > div > div:nth-child(8) [data-name="component.pdp.rtb"] {
+.studio-viewport > div > div:nth-child(8) [data-name="component.pdp.rtb"] {
   flex: 1 1 0 !important;
   min-width: 0 !important;
   width: auto !important;
@@ -1275,7 +1275,7 @@
 }
 
 /* Promo bar: same width/centering as the card */
-.proto-viewport > div > div:nth-child(8) [data-name="component.gse.system.message"] {
+.studio-viewport > div > div:nth-child(8) [data-name="component.gse.system.message"] {
   max-width: 1440px !important;
   width: 100% !important;
   margin-left: auto !important;
@@ -1286,8 +1286,8 @@
 
 /* Strip every background from the checkbox section and all its descendants —
    no tint, no hover fill, no outline anywhere */
-.proto-viewport > div > div:nth-child(8) [data-name="units"]:not([data-toggle-index]),
-.proto-viewport > div > div:nth-child(8) [data-name="units"]:not([data-toggle-index]) *:not([data-name="box"]) {
+.studio-viewport > div > div:nth-child(8) [data-name="units"]:not([data-toggle-index]),
+.studio-viewport > div > div:nth-child(8) [data-name="units"]:not([data-toggle-index]) *:not([data-name="box"]) {
   background: transparent !important;
   outline: none !important;
   box-shadow: none !important;
@@ -1295,7 +1295,7 @@
 
 /* ── Screen 1 (Agentic home) – full-bleed background, no seam ───────────── */
 
-.proto-viewport > div > div:nth-child(11) > [data-name="body"] {
+.studio-viewport > div > div:nth-child(11) > [data-name="body"] {
   background: linear-gradient(
     165deg,
     #c5dde8 0%,
@@ -1307,15 +1307,15 @@
 }
 
 /* Decorative Figma layers — agentic home only (do not hide global image 52) */
-.proto-viewport > div > div:nth-child(11) > [data-name="body"] [data-name="image 52"],
-.proto-viewport > div > div:nth-child(11)
+.studio-viewport > div > div:nth-child(11) > [data-name="body"] [data-name="image 52"],
+.studio-viewport > div > div:nth-child(11)
   > [data-name="body"]
   [data-name="light-neutral-olive-shiny-glowing-effects-abstract-background-design 1"] {
   display: none !important;
 }
 
 /* Agentic body decorative images — never selectable / draggable */
-.proto-viewport > div > div:nth-child(11) > [data-name="body"] img {
+.studio-viewport > div > div:nth-child(11) > [data-name="body"] img {
   user-select: none !important;
   -webkit-user-select: none !important;
   -webkit-user-drag: none !important;
@@ -1323,7 +1323,7 @@
 }
 
 /* ── Availability Checker Tool (Figma multi-step lightbox) ───────────────── */
-.proto-avail-scrim {
+.studio-avail-scrim {
   position: fixed;
   inset: 0;
   z-index: 10200;
@@ -1336,11 +1336,11 @@
   backdrop-filter: blur(6px);
   animation: proto-avail-fade 0.28s cubic-bezier(0, 0, 0.2, 1);
 }
-.proto-avail-scrim--closing {
+.studio-avail-scrim--closing {
   animation: proto-avail-fade-out 0.28s cubic-bezier(0.4, 0, 1, 1) forwards;
   pointer-events: none;
 }
-.proto-avail-scrim--closing .proto-avail-card {
+.studio-avail-scrim--closing .proto-avail-card {
   animation: proto-avail-slide-out 0.28s cubic-bezier(0.4, 0, 1, 1) forwards;
 }
 .proto-avail-card {
@@ -1423,7 +1423,7 @@
   border-radius: 0 0 16px 16px !important;
 }
 
-.proto-quick-view-popup [data-proto-hide-check-availability="true"] {
+.proto-quick-view-popup [data-studio-hide-check-availability="true"] {
   display: none !important;
 }
 
@@ -1479,12 +1479,12 @@
   box-shadow: none !important;
 }
 
-.proto-quick-view-popup [data-name="component.input.button"].proto-icon-hit,
+.proto-quick-view-popup [data-name="component.input.button"].studio-icon-hit,
 .proto-quick-view-popup
   [data-name="component.input.button"][class*="h-[32px]"]:not(:has(p)) {
   cursor: pointer !important;
 }
-.proto-quick-view-popup [data-name="component.input.button"].proto-icon-hit::before,
+.proto-quick-view-popup [data-name="component.input.button"].studio-icon-hit::before,
 .proto-quick-view-popup
   [data-name="component.input.button"][class*="h-[32px]"]:not(:has(p))::before {
   content: "";
@@ -1495,29 +1495,29 @@
   transition: background 0.18s ease;
   pointer-events: none;
 }
-.proto-quick-view-popup [data-name="component.input.button"].proto-icon-hit,
+.proto-quick-view-popup [data-name="component.input.button"].studio-icon-hit,
 .proto-quick-view-popup
   [data-name="component.input.button"][class*="h-[32px]"]:not(:has(p)) {
   position: relative;
 }
-.proto-quick-view-popup [data-name="component.input.button"].proto-icon-hit:hover::before,
+.proto-quick-view-popup [data-name="component.input.button"].studio-icon-hit:hover::before,
 .proto-quick-view-popup
   [data-name="component.input.button"][class*="h-[32px]"]:not(:has(p)):hover::before {
   background: #c6e5e1 !important;
 }
-.proto-quick-view-popup [data-name="component.input.button"].proto-icon-hit:active::before,
+.proto-quick-view-popup [data-name="component.input.button"].studio-icon-hit:active::before,
 .proto-quick-view-popup
   [data-name="component.input.button"][class*="h-[32px]"]:not(:has(p)):active::before {
   background: #afccca !important;
 }
-.proto-quick-view-popup [data-name="component.input.button"].proto-icon-hit svg path,
+.proto-quick-view-popup [data-name="component.input.button"].studio-icon-hit svg path,
 .proto-quick-view-popup
   [data-name="component.input.button"][class*="h-[32px]"]:not(:has(p))
   svg
   path {
   transition: fill 0.18s ease;
 }
-.proto-quick-view-popup [data-name="component.input.button"].proto-icon-hit:hover svg path,
+.proto-quick-view-popup [data-name="component.input.button"].studio-icon-hit:hover svg path,
 .proto-quick-view-popup
   [data-name="component.input.button"][class*="h-[32px]"]:not(:has(p)):hover
   svg
@@ -1525,7 +1525,7 @@
   fill: #01318f !important;
 }
 .proto-quick-view-popup
-  [data-name="component.input.button"].proto-icon-hit:hover
+  [data-name="component.input.button"].studio-icon-hit:hover
   [data-name="icon=add to wishlist"][data-fav-active="true"]
   svg
   path,
@@ -1808,7 +1808,7 @@
   width: 100%;
   align-self: stretch;
 }
-.proto-avail-field-wrap--stack .proto-tertiary-cta {
+.proto-avail-field-wrap--stack .studio-tertiary-cta {
   align-self: center;
 }
 .proto-avail-field-wrap:not(.proto-avail-field-wrap--stack) .proto-avail-field,
@@ -1822,8 +1822,8 @@
   width: 100%;
   min-width: 0;
 }
-.proto-avail-field-wrap .proto-tertiary-cta,
-.proto-avail-search-row .proto-tertiary-cta {
+.proto-avail-field-wrap .studio-tertiary-cta,
+.proto-avail-search-row .studio-tertiary-cta {
   flex-shrink: 0;
 }
 .proto-avail-field {
@@ -1862,8 +1862,8 @@
   display: none !important;
 }
 /* Figma export search rows — hide clear glyph when field is empty / placeholder */
-.proto-viewport
-  [data-name="Text Field"]:not([data-proto-search-filled="true"])
+.studio-viewport
+  [data-name="Text Field"]:not([data-studio-search-filled="true"])
   [data-name="icon=clear"] {
   display: none !important;
 }
@@ -2238,14 +2238,14 @@
   margin-top: 4px;
   max-width: 100%;
 }
-.proto-avail-hero .proto-avail-chosen-pharmacy-cta .proto-tertiary-cta__label {
+.proto-avail-hero .proto-avail-chosen-pharmacy-cta .studio-tertiary-cta__label {
   text-align: left;
   white-space: normal;
 }
 .proto-avail-panel--center .proto-avail-chosen-pharmacy-cta {
   max-width: 100%;
 }
-.proto-avail-panel--center .proto-avail-chosen-pharmacy-cta .proto-tertiary-cta__label {
+.proto-avail-panel--center .proto-avail-chosen-pharmacy-cta .studio-tertiary-cta__label {
   text-align: left;
   white-space: normal;
 }
@@ -2767,23 +2767,23 @@
 }
 
 /* Book Step 2 — calendar date + time slot hover / selection */
-.proto-viewport > div > div:nth-child(4) [data-name="calendar. date. cell"][data-proto-cal-available] {
+.studio-viewport > div > div:nth-child(4) [data-name="calendar. date. cell"][data-studio-cal-available] {
   transition: background 0.15s ease, box-shadow 0.15s ease;
   user-select: none;
 }
-.proto-viewport > div > div:nth-child(4)
-  [data-name="calendar. date. cell"][data-proto-cal-today]:not([data-proto-cal-selected]) {
+.studio-viewport > div > div:nth-child(4)
+  [data-name="calendar. date. cell"][data-studio-cal-today]:not([data-studio-cal-selected]) {
   background: #f5f5f5 !important;
   border-radius: 4px !important;
   box-shadow: inset 0 0 0 1px #afafaf !important;
 }
-.proto-viewport > div > div:nth-child(4)
-  [data-name="calendar. date. cell"][data-proto-cal-today][data-proto-cal-unavailable] {
+.studio-viewport > div > div:nth-child(4)
+  [data-name="calendar. date. cell"][data-studio-cal-today][data-studio-cal-unavailable] {
   pointer-events: auto !important;
   cursor: default;
 }
-.proto-viewport > div > div:nth-child(4)
-  [data-name="calendar. date. cell"][data-proto-cal-available]:not([data-proto-cal-selected]):hover {
+.studio-viewport > div > div:nth-child(4)
+  [data-name="calendar. date. cell"][data-studio-cal-available]:not([data-studio-cal-selected]):hover {
   background: #ffffff !important;
   border-radius: 4px !important;
   box-shadow:
@@ -2791,39 +2791,39 @@
     inset 0 0 0 1px #afafaf !important;
 }
 /* Non-selected available cells — kill stale Figma bold on former defaults (e.g. 24) */
-.proto-viewport > div > div:nth-child(4)
-  [data-name="calendar. date. cell"][data-proto-cal-available]:not([data-proto-cal-selected]) > div,
-.proto-viewport > div > div:nth-child(4)
-  [data-name="calendar. date. cell"][data-proto-cal-available]:not([data-proto-cal-selected]) p {
+.studio-viewport > div > div:nth-child(4)
+  [data-name="calendar. date. cell"][data-studio-cal-available]:not([data-studio-cal-selected]) > div,
+.studio-viewport > div > div:nth-child(4)
+  [data-name="calendar. date. cell"][data-studio-cal-available]:not([data-studio-cal-selected]) p {
   font-family: "Open Sans", sans-serif !important;
   font-weight: 400 !important;
   font-size: 13px !important;
   line-height: 24px !important;
 }
-.proto-viewport > div > div:nth-child(4)
-  [data-name="calendar. date. cell"][data-proto-cal-selected] {
+.studio-viewport > div > div:nth-child(4)
+  [data-name="calendar. date. cell"][data-studio-cal-selected] {
   background: #c6e5e1 !important;
   border-radius: 4px !important;
   box-shadow: none !important;
 }
 /* Active selected date/time — teal + bold */
-.proto-viewport > div > div:nth-child(4)
-  [data-name="calendar. date. cell"][data-proto-cal-selected] > div,
-.proto-viewport > div > div:nth-child(4)
-  [data-name="calendar. date. cell"][data-proto-cal-selected] p {
+.studio-viewport > div > div:nth-child(4)
+  [data-name="calendar. date. cell"][data-studio-cal-selected] > div,
+.studio-viewport > div > div:nth-child(4)
+  [data-name="calendar. date. cell"][data-studio-cal-selected] p {
   font-family: "Open Sans", sans-serif !important;
   font-weight: 700 !important;
   font-size: 13px !important;
   line-height: 24px !important;
 }
-.proto-viewport > div > div:nth-child(4)
-  [data-name="calendar. date. cell"][data-proto-cal-unavailable] {
+.studio-viewport > div > div:nth-child(4)
+  [data-name="calendar. date. cell"][data-studio-cal-unavailable] {
   cursor: default !important;
   pointer-events: none !important;
 }
 
 /* Chat — brief flash on “Find available slots for today” user bubble only */
-.proto-viewport > div > div:nth-child(10)
+.studio-viewport > div > div:nth-child(10)
   [data-name="query"]
   [data-name="component.co.order.summary"].proto-chat-highlight {
   animation: proto-chat-flash 0.9s ease;

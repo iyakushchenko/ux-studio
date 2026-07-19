@@ -7,18 +7,18 @@ const page = await browser.newPage({
 });
 
 await page.goto("http://localhost:5173/", { waitUntil: "networkidle" });
-await page.locator(".proto-nav-tabs button").filter({ hasText: /Site Pilot\. Chat/i }).click();
+await page.locator(".studio-nav-tabs button").filter({ hasText: /Site Pilot\. Chat/i }).click();
 await page.waitForTimeout(1500);
 
 const read = () =>
   page.evaluate(() => {
-    const el = document.querySelector(".proto-scroll--prototype:not(.hidden)");
+    const el = document.querySelector(".studio-scroll--prototype:not(.hidden)");
     const max = el ? el.scrollHeight - el.clientHeight : 0;
     return { top: el?.scrollTop ?? 0, max, atBottom: el ? Math.abs(el.scrollTop - max) < 4 : false };
   });
 
 const start = await read();
-await page.locator(".proto-nav-scenario__deck .proto-nav-scenario__btn").nth(1).click();
+await page.locator(".studio-nav-scenario__deck .studio-nav-scenario__btn").nth(1).click();
 
 const timeline = [{ ms: 0, ...(await read()) }];
 for (let ms = 50; ms <= 800; ms += 50) {

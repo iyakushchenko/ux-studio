@@ -207,7 +207,7 @@ async function runBookNow(options?: { skip?: boolean }): Promise<boolean> {
 
 async function waitForStoreList(card: HTMLElement): Promise<boolean> {
   for (let i = 0; i < 80; i++) {
-    if (card.querySelector("[data-proto-avail-store]")) return true;
+    if (card.querySelector("[data-studio-avail-store]")) return true;
     await delay(50);
   }
   return false;
@@ -220,7 +220,7 @@ async function navigateFromStartToStoreList(
   card: HTMLElement,
   options?: { skip?: boolean }
 ): Promise<boolean> {
-  if (card.querySelector("[data-proto-avail-store]")) return true;
+  if (card.querySelector("[data-studio-avail-store]")) return true;
   if (card.querySelector(".proto-avail-calendars")) return true;
 
   const startPanel = card.querySelector(".proto-avail-body--panel");
@@ -249,7 +249,7 @@ async function ensureStoreListVisible(
   card: HTMLElement,
   options?: { skip?: boolean }
 ): Promise<boolean> {
-  if (card.querySelector("[data-proto-avail-store]")) return true;
+  if (card.querySelector("[data-studio-avail-store]")) return true;
 
   const listTab = Array.from(card.querySelectorAll<HTMLElement>('[role="tab"]')).find(
     (tab) => /^list$/i.test((tab.textContent ?? "").trim())
@@ -315,7 +315,7 @@ export async function runSelectLocationStore(
   if (!(await ensureStoreListVisible(card, options))) return false;
 
   const storeCard = card.querySelector<HTMLElement>(
-    `[data-proto-avail-store="${storeId}"]`
+    `[data-studio-avail-store="${storeId}"]`
   );
   if (!storeCard || shouldAbort()) return false;
 
@@ -366,7 +366,7 @@ async function runSelectLocation(options?: { skip?: boolean }): Promise<Playback
   }
 
   if (
-    !card.querySelector("[data-proto-avail-store]") &&
+    !card.querySelector("[data-studio-avail-store]") &&
     card.querySelector(".proto-avail-body--panel")
   ) {
     const navigated = await navigateFromStartToStoreList(card, options);

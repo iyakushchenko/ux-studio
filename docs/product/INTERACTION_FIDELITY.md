@@ -64,7 +64,7 @@ Same rule when enriching Boots Make wire or any in-place screen: if we touch it 
 When a Make / concept screen is rebuilt in React, **migrate every interaction that already worked** on the prior page (checkbox/booster toggle, Continue gating, search + near-me openers, Change links, breadcrumbs, etc.).
 
 - Do **not** ship a static visual shell that drops handlers.
-- Prefer React props + `src/uxds/interactions/` kits; mark React-owned rows (`data-proto-react-owned` / host `[data-proto-react-screen]`) so Make global input mutators do not fight React state.
+- Prefer React props + `src/uxds/interactions/` kits; mark React-owned rows (`data-studio-react-owned` / host `[data-studio-react-screen]`) so Make global input mutators do not fight React state.
 - Retire a behavior only when the PO explicitly asks.
 - **Also migrate hover / focus / active** from Make CSS (`:hover`, transitions, underline/fill changes) into kit CSS (`src/uxds/components/`) or co-located screen CSS — flat dead controls fail interaction fidelity even when click handlers work.
 
@@ -116,7 +116,7 @@ Pages **compose** these kits; they do not reimplement them.
 
 Shared modules still expose stable hooks for recording/playback:
 
-- `data-name`, `data-proto-*` as in [../shell/RECORDING.md](../shell/RECORDING.md)
+- `data-name`, `data-studio-*` as in [../shell/RECORDING.md](../shell/RECORDING.md)
 - Screen registry + journey beats per [PAGE_BUILD_CONTRACT.md](./PAGE_BUILD_CONTRACT.md)
 
 ---

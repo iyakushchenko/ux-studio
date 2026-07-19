@@ -110,7 +110,7 @@ Refs: [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) §6
 | G4 | REC vs play chrome labels/gates match JSX source of truth | | |
 | G5 | **Studio chrome parity when AIR / browse:** while AIR (playback live), REC mode switch + recording controls are disabled/forced off the same way cassette step buttons / CJM switch lock — no REC usable during AIR | | |
 | G6 | **REC ⊗ CJM:** when CJM (journey mode) is ON, REC switch is `disabled` (clear visual disabled) and cannot enter Rec mode; when REC is ON, CJM is off/disabled. Gate: `studioModeXor.ts` + MCP sanity `rec-disabled-when-cjm-on` | | |
-| G7 | **Hybrid mount:** React host present; Make chrome hidden (`data-proto-make-retired`); Make wire gated; AIR hooks preserved (`data-name` / `data-proto-*`) | | |
+| G7 | **Hybrid mount:** React host present; Make chrome hidden (`data-studio-make-retired`); Make wire gated; AIR hooks preserved (`data-name` / `data-studio-*`) | | |
 | G8 | **Short grids left-aligned:** incomplete last rows of slot/chip grids share column 0 with full rows (no `space-between` + narrow pads) | | |
 | G9 | **Step/tab targets:** in-page progress + Studio Book Step N navigate to `PROTO_INDEX_BOOK_STEP*` — never snap to Home/tab1 via beat fallback while browsing (`shouldNavigateBeatTabOnEnter`) | | |
 

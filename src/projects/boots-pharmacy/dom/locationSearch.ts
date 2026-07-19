@@ -29,7 +29,7 @@ function attachPlpFilterSearchSync(
   clearBtn: HTMLButtonElement | null
 ): void {
   const typed = input as PlpSearchInput;
-  if (typed.dataset.protoPlpSearchSync === PLP_SEARCH_SYNC_VERSION) return;
+  if (typed.dataset.studioPlpSearchSync === PLP_SEARCH_SYNC_VERSION) return;
 
   if (typed.__protoPlpSearchHandler) {
     input.removeEventListener("input", typed.__protoPlpSearchHandler);
@@ -41,7 +41,7 @@ function attachPlpFilterSearchSync(
     syncPlpFilterListSearch(undefined, { refreshResults: false });
   };
   typed.__protoPlpSearchHandler = handler;
-  typed.dataset.protoPlpSearchSync = PLP_SEARCH_SYNC_VERSION;
+  typed.dataset.studioPlpSearchSync = PLP_SEARCH_SYNC_VERSION;
   input.addEventListener("input", handler);
 }
 
@@ -49,7 +49,7 @@ function attachPlpSearchIconHandlers(
   searchIconHost: HTMLElement,
   input: HTMLInputElement
 ): void {
-  if (searchIconHost.dataset.protoSearchIconWired === "1") return;
+  if (searchIconHost.dataset.studioSearchIconWired === "1") return;
 
   searchIconHost.style.cursor = "pointer";
   searchIconHost.setAttribute("role", "button");
@@ -66,7 +66,7 @@ function attachPlpSearchIconHandlers(
     e.preventDefault();
     input.focus();
   });
-  searchIconHost.dataset.protoSearchIconWired = "1";
+  searchIconHost.dataset.studioSearchIconWired = "1";
 }
 
 function repairBrokenPlpSearchIcon(textField: HTMLElement): HTMLElement | null {
@@ -136,7 +136,7 @@ function syncSearchFieldFilled(
   query: string
 ): void {
   const empty = isLocationSearchQueryEmpty(query);
-  textField.dataset.protoSearchFilled = empty ? "false" : "true";
+  textField.dataset.studioSearchFilled = empty ? "false" : "true";
 }
 
 function wirePlpSearchField(fieldHost: HTMLElement): void {
@@ -145,7 +145,7 @@ function wirePlpSearchField(fieldHost: HTMLElement): void {
 
   let input = textField.querySelector<HTMLInputElement>(".proto-search-input");
   if (
-    fieldHost.dataset.protoSearchWired === PLP_SEARCH_WIRE_VERSION &&
+    fieldHost.dataset.studioSearchWired === PLP_SEARCH_WIRE_VERSION &&
     input
   ) {
     const searchIconHost = repairBrokenPlpSearchIcon(textField);
@@ -185,7 +185,7 @@ function wirePlpSearchField(fieldHost: HTMLElement): void {
     );
     fieldHost.classList.add("proto-plp-search-field");
     textField.classList.add("proto-search-field");
-    fieldHost.dataset.protoSearchWired = PLP_SEARCH_WIRE_VERSION;
+    fieldHost.dataset.studioSearchWired = PLP_SEARCH_WIRE_VERSION;
     return;
   }
 
@@ -255,7 +255,7 @@ function wirePlpSearchField(fieldHost: HTMLElement): void {
 
   fieldHost.classList.add("proto-plp-search-field");
   textField.classList.add("proto-search-field");
-  fieldHost.dataset.protoSearchWired = PLP_SEARCH_WIRE_VERSION;
+  fieldHost.dataset.studioSearchWired = PLP_SEARCH_WIRE_VERSION;
   sync();
 }
 
@@ -282,7 +282,7 @@ export function syncFigmaSearchClearIcons(root: ParentNode = document): void {
     const empty = isFigmaSearchFieldEmpty(tf);
     clear.hidden = empty;
     clear.style.display = empty ? "none" : "";
-    tf.dataset.protoSearchFilled = empty ? "false" : "true";
+    tf.dataset.studioSearchFilled = empty ? "false" : "true";
   });
 }
 
@@ -446,7 +446,7 @@ export function wirePopupLocationSearchChrome(opts: WirePopupSearchChromeOpts) {
     searchBtn.type = "button";
     searchBtn.className = "proto-avail-field__icon";
     searchBtn.setAttribute("aria-label", "Search");
-    searchBtn.dataset.protoLbSearchIcon = "true";
+    searchBtn.dataset.studioLbSearchIcon = "true";
     while (searchIconHost.firstChild) {
       searchBtn.appendChild(searchIconHost.firstChild);
     }
@@ -460,7 +460,7 @@ export function wirePopupLocationSearchChrome(opts: WirePopupSearchChromeOpts) {
     viewCleanups.push(() => searchBtn.removeEventListener("click", onSearchIcon));
   } else if (row) {
     const searchBtn = row.querySelector<HTMLButtonElement>(
-      "[data-proto-lb-search-icon='true']"
+      "[data-studio-lb-search-icon='true']"
     );
     searchBtn?.addEventListener("click", onSearchIcon);
     if (searchBtn) {
@@ -509,7 +509,7 @@ export function wirePopupNearMeCta(
     viewCleanups: (() => void)[];
   }
 ) {
-  nearMeBtn.classList.add("proto-tertiary-cta", "proto-tertiary-cta--compact");
+  nearMeBtn.classList.add("studio-tertiary-cta", "studio-tertiary-cta--compact");
   nearMeBtn.style.cursor = "pointer";
 
   const onNearMe = (e: Event) => {

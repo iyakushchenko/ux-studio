@@ -95,20 +95,20 @@ export function isAnchorCenterInScrollRoot(
 export function findSameScreenViewportAnchor(
   root: ParentNode = document
 ): HTMLElement | null {
-  const viewport = root.querySelector(".proto-viewport");
+  const viewport = root.querySelector(".studio-viewport");
   if (!viewport) return null;
 
-  const marked = viewport.querySelector<HTMLElement>("[data-proto-viewport-anchor]");
+  const marked = viewport.querySelector<HTMLElement>("[data-studio-viewport-anchor]");
   if (marked) return marked;
 
   const selected = viewport.querySelector<HTMLElement>(
-    '[data-proto-cal-selected="true"]'
+    '[data-studio-cal-selected="true"]'
   );
   if (selected) return selected;
 
   return (
     viewport.querySelector<HTMLElement>(
-      '[data-proto-cal-kind="time"]:not([data-proto-cal-unavailable="true"])'
+      '[data-studio-cal-kind="time"]:not([data-studio-cal-unavailable="true"])'
     ) ?? null
   );
 }

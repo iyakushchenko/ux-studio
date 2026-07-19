@@ -33,7 +33,7 @@ const CURSOR_PARK_TRAVEL_MS = 520;
 const CURSOR_HOTSPOT_X = 4;
 const CURSOR_HOTSPOT_Y = 1;
 
-export const DEMO_CLICK_EVENT = "proto-demo-click";
+export const DEMO_CLICK_EVENT = "studio-demo-click";
 export const DEMO_CURSOR_PARKED_CLASS = "proto-chat-demo-cursor--parked";
 
 export function notifyStudioDemoClick(): void {
@@ -640,7 +640,7 @@ const FIELD_INTERACTION_SELECTORS = [
 const BUTTON_INTERACTION_SELECTORS = [
   '[data-name="component.input.button"]',
   "button",
-  ".proto-tertiary-cta",
+  ".studio-tertiary-cta",
   ".proto-avail-tertiary",
   ".proto-avail-btn-primary",
   ".proto-avail-btn-secondary",

@@ -6576,7 +6576,7 @@ function ModuleBreadcrumbs() {
                     </div>
                   </div>
                 </div>
-                <p className="[word-break:break-word] decoration-[5%] decoration-solid font-['Open_Sans:Regular',sans-serif] font-normal leading-[12px] relative shrink-0 text-[#7a7d87] text-[10px] underline whitespace-nowrap" data-proto-crumb="vaccination" style={{ fontVariationSettings: '"wdth" 100', fontFeatureSettings: '"lnum", "pnum"' }}>
+                <p className="[word-break:break-word] decoration-[5%] decoration-solid font-['Open_Sans:Regular',sans-serif] font-normal leading-[12px] relative shrink-0 text-[#7a7d87] text-[10px] underline whitespace-nowrap" data-studio-crumb="vaccination" style={{ fontVariationSettings: '"wdth" 100', fontFeatureSettings: '"lnum", "pnum"' }}>
                   Vaccination
                 </p>
                 <div className="relative shrink-0 size-[16px]" data-name="component.gse.breadcrumbs.delimiter">

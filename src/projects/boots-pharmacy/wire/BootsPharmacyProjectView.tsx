@@ -169,14 +169,14 @@ const AGENTIC_HOME_HEADING_LOGGED_IN =
 /** Agentic home hero line — personalised when header login is active. */
 function findAgenticHomeHeading(screen: HTMLElement): HTMLElement | null {
   const tagged = screen.querySelector<HTMLElement>(
-    "[data-proto-agentic-home-heading]"
+    "[data-studio-agentic-home-heading]"
   );
   if (tagged) return tagged;
 
   const pilotLogo = screen.querySelector('[data-name="boots.ai assistant 3"]');
   const heroSibling = pilotLogo?.nextElementSibling;
   if (heroSibling instanceof HTMLElement && heroSibling.tagName === "P") {
-    heroSibling.dataset.protoAgenticHomeHeading = "true";
+    heroSibling.dataset.studioAgenticHomeHeading = "true";
     return heroSibling;
   }
 
@@ -193,7 +193,7 @@ function resolveAgenticHomeLoggedIn(loggedInFlag: boolean): boolean {
 
 function syncAgenticHomeHeading(isLoggedIn: boolean): void {
   const screen = document.querySelector(
-    ".proto-viewport > div > div:nth-child(11)"
+    ".studio-viewport > div > div:nth-child(11)"
   ) as HTMLElement | null;
   if (!screen) return;
 
@@ -221,7 +221,7 @@ function bindAgenticHomeHeadingSync(isLoggedIn: boolean): () => void {
   const t = window.setTimeout(apply, 0);
 
   const screen = document.querySelector(
-    ".proto-viewport > div > div:nth-child(11)"
+    ".studio-viewport > div > div:nth-child(11)"
   ) as HTMLElement | null;
   const heading = screen ? findAgenticHomeHeading(screen) : null;
   const mo =
@@ -392,10 +392,10 @@ function bindAgenticQueryAutoHeight(ta: HTMLTextAreaElement): () => void {
 let protoStoreSeq = 0;
 
 function ensureStoreId(store: HTMLElement): string {
-  if (!store.dataset.protoStoreId) {
-    store.dataset.protoStoreId = `loc-${++protoStoreSeq}`;
+  if (!store.dataset.studioStoreId) {
+    store.dataset.studioStoreId = `loc-${++protoStoreSeq}`;
   }
-  return store.dataset.protoStoreId;
+  return store.dataset.studioStoreId;
 }
 
 /** My Account copy — legacy rental/equipment/order → appointment vocabulary (Figma export is read-only). */
@@ -462,7 +462,7 @@ function extractStoreLocation(store: HTMLElement): ChosenLocation {
 }
 
 function findStoreHoursList(store: HTMLElement): HTMLElement | null {
-  const marked = store.querySelector<HTMLElement>("[data-proto-hours-list='true']");
+  const marked = store.querySelector<HTMLElement>("[data-studio-hours-list='true']");
   if (marked) return marked;
   return (
     Array.from(store.querySelectorAll<HTMLElement>("div")).find((el) => {
@@ -533,7 +533,7 @@ function layoutStoreCardColumns(store: HTMLElement) {
 
   // Must be a short flex row (From you + button), not the whole card
   const rightButtons = right.querySelectorAll(
-    ":scope > [data-name='component.input.button'], :scope > [data-proto-change-loc='true']"
+    ":scope > [data-name='component.input.button'], :scope > [data-studio-change-loc='true']"
   );
   if (!right.contains(fromBlock)) return;
 
@@ -559,7 +559,7 @@ function layoutStoreCardColumns(store: HTMLElement) {
 
   // Prefer CTA sitting beside From you inside the right column
   const changeCta = store.querySelector<HTMLElement>(
-    "[data-proto-change-loc='true']"
+    "[data-studio-change-loc='true']"
   );
   const chooseCta = Array.from(
     store.querySelectorAll<HTMLElement>("[data-name='component.input.button']")
@@ -588,7 +588,7 @@ function wireStoreWorkingHours(overlay: HTMLElement) {
     const hours = findStoreHoursList(store);
     if (hours) {
       template = hours.cloneNode(true) as HTMLElement;
-      template.dataset.protoHoursList = "true";
+      template.dataset.studioHoursList = "true";
       break;
     }
   }
@@ -609,16 +609,16 @@ function wireStoreWorkingHours(overlay: HTMLElement) {
       if (infoCol) infoCol.appendChild(hours);
       else store.appendChild(hours);
     }
-    hours.dataset.protoHoursList = "true";
+    hours.dataset.studioHoursList = "true";
     styleStoreHoursList(hours);
     // Re-assert hours stay in the address column after insert
     layoutStoreCardColumns(store);
 
     // Default collapsed on every card (including Figma’s pre-expanded one)
-    if (store.dataset.protoHoursOpen == null) {
-      store.dataset.protoHoursOpen = "false";
+    if (store.dataset.studioHoursOpen == null) {
+      store.dataset.studioHoursOpen = "false";
     }
-    const open = store.dataset.protoHoursOpen === "true";
+    const open = store.dataset.studioHoursOpen === "true";
     setStoreHoursVisible(hours, open);
     toggle.textContent = open ? "Hide working hours" : "See working hours";
     styleStoreActionLink(toggle);
@@ -630,9 +630,9 @@ function wireStoreWorkingHours(overlay: HTMLElement) {
       // Page card already has an embedded map — hide the redundant link
       if (
         store.classList.contains("proto-chosen-store-card") ||
-        store.dataset.protoChosenPageCard === "true"
+        store.dataset.studioChosenPageCard === "true"
       ) {
-        mapLink.dataset.protoHideShowOnMap = "true";
+        mapLink.dataset.studioHideShowOnMap = "true";
         (mapLink as HTMLElement).style.display = "none";
       } else {
         styleStoreActionLink(mapLink as HTMLElement);
@@ -699,17 +699,17 @@ function readBookingSlotFromScreen(
 
   screen
     .querySelectorAll<HTMLElement>(
-      '[data-name="calendar. date. cell"][data-proto-cal-selected="true"]'
+      '[data-name="calendar. date. cell"][data-studio-cal-selected="true"]'
     )
     .forEach((cell) => {
-      if (cell.dataset.protoCalKind === "date") {
-        const m = cell.dataset.protoCalMonth;
+      if (cell.dataset.studioCalKind === "date") {
+        const m = cell.dataset.studioCalMonth;
         if (m === "June" || m === "July") month = m;
-        const d = Number(cell.dataset.protoCalValue);
+        const d = Number(cell.dataset.studioCalValue);
         if (Number.isFinite(d)) day = d;
       }
-      if (cell.dataset.protoCalKind === "time") {
-        time = cell.dataset.protoCalValue;
+      if (cell.dataset.studioCalKind === "time") {
+        time = cell.dataset.studioCalValue;
       }
     });
 
@@ -748,7 +748,7 @@ function stripCalCellChrome(cell: HTMLElement) {
     .trim();
 
   // Drop Figma’s baked-in selected typography (Inter SemiBold / 16px on “24”, “16:30”)
-  // so only [data-proto-cal-selected] can look bold.
+  // so only [data-studio-cal-selected] can look bold.
   cell.querySelectorAll<HTMLElement>("div, p").forEach((el) => {
     el.className = el.className
       .replace(/font-\['Inter:[^']+'\]/g, "font-['Open_Sans:Regular',sans-serif]")
@@ -1375,7 +1375,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
 
     const mark = () => {
       const screen = document.querySelector(
-        `.proto-viewport > div > div:nth-child(${childIndex})`
+        `.studio-viewport > div > div:nth-child(${childIndex})`
       ) as HTMLElement | null;
       const progress = screen?.querySelector<HTMLElement>(
         '[data-name="component.book.appointment.progress"]'
@@ -1386,9 +1386,9 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
         .forEach((col) => {
           const text = (col.textContent ?? "").replace(/\s+/g, " ");
           if (activePattern.test(text)) {
-            col.dataset.protoStepActive = "true";
+            col.dataset.studioStepActive = "true";
           } else {
-            delete col.dataset.protoStepActive;
+            delete col.dataset.studioStepActive;
           }
         });
     };
@@ -1516,7 +1516,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     if (SCREENS[current]?.childIndex !== 7) return;
     if (isBookStep1ReactMounted()) return;
     const screen = document.querySelector(
-      ".proto-viewport > div > div:nth-child(7)"
+      ".studio-viewport > div > div:nth-child(7)"
     ) as HTMLElement | null;
     const crumbs = screen?.querySelector<HTMLElement>(
       "[data-name='component.breadcrumbs']"
@@ -1534,7 +1534,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 11) return;
     const screen = document.querySelector(
-      ".proto-viewport > div > div:nth-child(11)"
+      ".studio-viewport > div > div:nth-child(11)"
     ) as HTMLElement | null;
     const card = screen?.querySelector<HTMLElement>(
       '[data-name="component.co.order.summary"]'
@@ -1653,7 +1653,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       return;
     }
     const screen = document.querySelector(
-      ".proto-viewport > div > div:nth-child(10)"
+      ".studio-viewport > div > div:nth-child(10)"
     ) as HTMLElement | null;
     if (!screen) return;
     mountSitePilotChatComposerDock(screen);
@@ -1671,7 +1671,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       return;
     }
     const screen = document.querySelector(
-      ".proto-viewport > div > div:nth-child(10)"
+      ".studio-viewport > div > div:nth-child(10)"
     ) as HTMLElement | null;
     if (!screen) return;
     mountSitePilotChatComposerDock(screen);
@@ -1689,7 +1689,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       chatBeatActive || activeScreenScenario?.id === "site-pilot-chat";
     if (onChatTab || chatActive) return;
     const screen = document.querySelector(
-      ".proto-viewport > div > div:nth-child(10)"
+      ".studio-viewport > div > div:nth-child(10)"
     ) as HTMLElement | null;
     if (screen) teardownSitePilotChatComposerDock(screen);
   }, [current, chatBeatActive, activeScreenScenario?.id]);
@@ -1710,7 +1710,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       cleanup = undefined;
 
       const screen = document.querySelector(
-        ".proto-viewport > div > div:nth-child(10)"
+        ".studio-viewport > div > div:nth-child(10)"
       ) as HTMLElement | null;
       if (screen instanceof HTMLElement) {
         mountSitePilotChatComposerDock(screen);
@@ -1757,13 +1757,13 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     const onScenarioDeckClick = (e: Event) => {
       if (!isSitePilotChatThinking()) return;
       const t = e.target as Element | null;
-      if (!t?.closest(".proto-nav-scenario")) return;
+      if (!t?.closest(".studio-nav-scenario")) return;
       cancelThinking();
     };
 
     const bindScenarioDeckInterrupt = () => {
       scenarioDeck =
-        scenarioDeck ?? document.querySelector<HTMLElement>(".proto-nav-scenario");
+        scenarioDeck ?? document.querySelector<HTMLElement>(".studio-nav-scenario");
       scenarioDeck?.addEventListener("click", onScenarioDeckClick, true);
     };
 
@@ -1780,7 +1780,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       if (sendBtn) setSitePilotChatSendThinkingMode(sendBtn, false);
       if (scenarioVisibleCountRef.current === 1) {
         const screen = document.querySelector(
-          ".proto-viewport > div > div:nth-child(10)"
+          ".studio-viewport > div > div:nth-child(10)"
         );
         syncSitePilotChatThinkingHint(screen, true);
       }
@@ -1828,7 +1828,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       }
 
       const screen = document.querySelector(
-        ".proto-viewport > div > div:nth-child(10)"
+        ".studio-viewport > div > div:nth-child(10)"
       );
       if (!screen) return;
 
@@ -1900,7 +1900,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 10) return;
     const screen = document.querySelector(
-      ".proto-viewport > div > div:nth-child(10)"
+      ".studio-viewport > div > div:nth-child(10)"
     ) as HTMLElement | null;
     if (!screen) return;
 
@@ -2163,7 +2163,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 8) return;
     const screen = document.querySelector(
-      ".proto-viewport > div > div:nth-child(8)"
+      ".studio-viewport > div > div:nth-child(8)"
     ) as HTMLElement | null;
     if (!screen) return;
 
@@ -2233,7 +2233,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 8) return;
     const screen = document.querySelector(
-      ".proto-viewport > div > div:nth-child(8)"
+      ".studio-viewport > div > div:nth-child(8)"
     ) as HTMLElement | null;
     if (!screen) return;
 
@@ -2249,7 +2249,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     const loginBlock = reqText?.parentElement;
 
     // Wire "Vaccination" breadcrumb to navigate to PLP
-    const vacCrumb = screen.querySelector<HTMLElement>('[data-proto-crumb="vaccination"]');
+    const vacCrumb = screen.querySelector<HTMLElement>('[data-studio-crumb="vaccination"]');
     const onVacCrumb = (e: Event) => { e.preventDefault(); setCurrent(INDEX_PLP); };
     if (vacCrumb) {
       vacCrumb.style.cursor = "pointer";
@@ -2284,7 +2284,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
 
   // Wire wishlist heart icons on all pages
   useEffect(() => {
-    const viewport = document.querySelector(".proto-viewport");
+    const viewport = document.querySelector(".studio-viewport");
     if (!viewport) return;
     const hearts = viewport.querySelectorAll<HTMLElement>('[data-name="icon=add to wishlist"]');
     const handlers: Array<[HTMLElement, () => void]> = [];
@@ -2295,7 +2295,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
 
       const btn = heart.closest('[data-name="component.input.button"]') as HTMLElement | null;
       const target = btn || heart;
-      const plpScreen = heart.closest(".proto-viewport > div > div:nth-child(9)");
+      const plpScreen = heart.closest(".studio-viewport > div > div:nth-child(9)");
       const tile = heart.closest('[data-name="boots-pharmacy.service.tile"]');
       let id = `vaccine-${i}`;
       if (tile && plpScreen) {
@@ -2305,7 +2305,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
         const tileIndex = tiles.indexOf(tile as HTMLElement);
         if (tileIndex >= 0) id = plpTileWishlistId(tileIndex);
       }
-      target.dataset.protoWishlistId = id;
+      target.dataset.studioWishlistId = id;
       target.style.cursor = "pointer";
 
       // Set initial state
@@ -2395,18 +2395,18 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     if (popupOpen) {
       const prevBodyOverflow = document.body.style.overflow;
       document.body.style.overflow = "hidden";
-      scrollEl?.classList.add("proto-scroll--locked");
-      scrollEl?.setAttribute("data-proto-scroll-locked", "true");
+      scrollEl?.classList.add("studio-scroll--locked");
+      scrollEl?.setAttribute("data-studio-scroll-locked", "true");
       return () => {
         window.removeEventListener("keydown", onKey);
         document.body.style.overflow = prevBodyOverflow;
-        scrollEl?.classList.remove("proto-scroll--locked");
-        scrollEl?.removeAttribute("data-proto-scroll-locked");
+        scrollEl?.classList.remove("studio-scroll--locked");
+        scrollEl?.removeAttribute("data-studio-scroll-locked");
       };
     }
 
-    scrollEl?.classList.remove("proto-scroll--locked");
-    scrollEl?.removeAttribute("data-proto-scroll-locked");
+    scrollEl?.classList.remove("studio-scroll--locked");
+    scrollEl?.removeAttribute("data-studio-scroll-locked");
     return () => window.removeEventListener("keydown", onKey);
   }, [
     availabilityOpen,
@@ -2421,7 +2421,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 9) return;
     const screen = document.querySelector(
-      ".proto-viewport > div > div:nth-child(9)"
+      ".studio-viewport > div > div:nth-child(9)"
     ) as HTMLElement | null;
     if (!screen) return;
 
@@ -2444,7 +2444,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     ).filter((btn) => isQuickViewBtn(btn));
 
     quickViewBtns.forEach((btn) => {
-      btn.dataset.protoQuickView = "true";
+      btn.dataset.studioQuickView = "true";
       btn.setAttribute("role", "button");
       btn.tabIndex = 0;
       btn.style.cursor = "pointer";
@@ -2473,7 +2473,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
 
     return () => {
       quickViewBtns.forEach((btn) => {
-        delete btn.dataset.protoQuickView;
+        delete btn.dataset.studioQuickView;
         btn.removeEventListener("click", openQv);
       });
       screen.removeEventListener("click", onClick, true);
@@ -2485,7 +2485,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 9) return;
     const screen = document.querySelector(
-      ".proto-viewport > div > div:nth-child(9)"
+      ".studio-viewport > div > div:nth-child(9)"
     ) as HTMLElement | null;
     if (!screen) return;
 
@@ -2528,7 +2528,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 9) return;
     const screen = document.querySelector(
-      ".proto-viewport > div > div:nth-child(9)"
+      ".studio-viewport > div > div:nth-child(9)"
     ) as HTMLElement | null;
     if (!screen) return;
 
@@ -2565,7 +2565,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
 
     const applySticky = () => {
       const screenDiv = document.querySelector(
-        `.proto-viewport > div > div:nth-child(${SCREEN2_CHILD})`
+        `.studio-viewport > div > div:nth-child(${SCREEN2_CHILD})`
       ) as HTMLElement | null;
       if (!screenDiv) return;
 
@@ -2573,7 +2573,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       microHeader = screenDiv.children[1] as HTMLElement;
       if (!microHeader) return;
 
-      microHeader.dataset.protoStickyGroup = "true";
+      microHeader.dataset.studioStickyGroup = "true";
       Object.assign(microHeader.style, {
         position: "sticky",
         top: "var(--sticky-top, 64px)",
@@ -2587,7 +2587,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     return () => {
       cancelAnimationFrame(raf);
       if (!microHeader) return;
-      delete microHeader.dataset.protoStickyGroup;
+      delete microHeader.dataset.studioStickyGroup;
       microHeader.style.removeProperty("position");
       microHeader.style.removeProperty("top");
       microHeader.style.removeProperty("z-index");
@@ -2599,7 +2599,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   useEffect(() => {
     if (isBookStep1ReactMounted()) return;
     const screen = document.querySelector(
-      ".proto-viewport > div > div:nth-child(7)"
+      ".studio-viewport > div > div:nth-child(7)"
     ) as HTMLElement | null;
     if (!screen) return;
 
@@ -2666,7 +2666,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   useEffect(() => {
     for (const childIdx of [1, 2]) {
       const page = document.querySelector(
-        `.proto-viewport > div > div:nth-child(${childIdx})`
+        `.studio-viewport > div > div:nth-child(${childIdx})`
       ) as HTMLElement | null;
       if (page) rewriteAccountAppointmentCopy(page);
     }
@@ -2676,7 +2676,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 2) return;
     const page = document.querySelector(
-      ".proto-viewport > div > div:nth-child(2)"
+      ".studio-viewport > div > div:nth-child(2)"
     ) as HTMLElement | null;
     if (!page) return;
 
@@ -2703,7 +2703,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 1) return;
     const page = document.querySelector(
-      ".proto-viewport > div > div:nth-child(1)"
+      ".studio-viewport > div > div:nth-child(1)"
     ) as HTMLElement | null;
     if (!page) return;
 
@@ -2737,10 +2737,10 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   useEffect(() => {
     if (isBookStep1ReactMounted()) return;
     const page5 = document.querySelector(
-      ".proto-viewport > div > div:nth-child(7)"
+      ".studio-viewport > div > div:nth-child(7)"
     ) as HTMLElement | null;
     const page6 = document.querySelector(
-      ".proto-viewport > div > div:nth-child(5)"
+      ".studio-viewport > div > div:nth-child(5)"
     ) as HTMLElement | null;
     if (!page5 || !page6) return;
 
@@ -2813,7 +2813,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
 
     // Full store card (same as popup) with Change location instead of Chosen CTA
     const popupOverlay = document.querySelector(
-      ".proto-viewport > div > div:nth-child(6)"
+      ".studio-viewport > div > div:nth-child(6)"
     ) as HTMLElement | null;
     const popupStores = Array.from(
       popupOverlay?.querySelectorAll<HTMLElement>(
@@ -2821,17 +2821,17 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       ) ?? []
     ).filter(
       (s) =>
-        s.dataset.protoOrphanStore !== "true" &&
+        s.dataset.studioOrphanStore !== "true" &&
         s.getAttribute("aria-hidden") !== "true"
     );
     // Prefer Covent Garden (non-demo) so we never clone an “Oxford Street” demo card
     const storeTemplate =
       popupStores.find(
         (s) =>
-          !s.dataset.protoDemoStore &&
+          !s.dataset.studioDemoStore &&
           /Covent Garden/i.test(extractStoreLocation(s).name)
       ) ??
-      popupStores.find((s) => !s.dataset.protoDemoStore) ??
+      popupStores.find((s) => !s.dataset.studioDemoStore) ??
       popupStores[0] ??
       null;
 
@@ -2863,7 +2863,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
         .querySelectorAll<HTMLElement>("[data-name='component.input.button']")
         .forEach((btn) => {
           if (
-            btn.dataset.protoChangeLoc === "true" ||
+            btn.dataset.studioChangeLoc === "true" ||
             /change location/i.test(btn.textContent ?? "")
           ) {
             return;
@@ -2874,7 +2874,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
         });
 
       let changeCta = card.querySelector<HTMLElement>(
-        "[data-proto-change-loc='true']"
+        "[data-studio-change-loc='true']"
       );
       if (changeCta && /change location/i.test(changeCta.textContent ?? "")) {
         if (sideCol && changeCta.parentElement !== sideCol) {
@@ -2887,14 +2887,14 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       const mkChange = () => {
         if (changeBtnTemplate) {
           const btn = changeBtnTemplate.cloneNode(true) as HTMLElement;
-          btn.dataset.protoChangeLoc = "true";
+          btn.dataset.studioChangeLoc = "true";
           btn.style.removeProperty("background");
           btn.className = btn.className.replace(/bg-\[[^\]]+\]/g, "");
           return btn;
         }
         const btn = document.createElement("div");
         btn.setAttribute("data-name", "component.input.button");
-        btn.dataset.protoChangeLoc = "true";
+        btn.dataset.studioChangeLoc = "true";
         btn.className =
           "content-stretch flex gap-[8px] h-[32px] items-center justify-center px-[12px] py-[8px] relative rounded-[360px] shrink-0";
         if (editIconTemplate) {
@@ -2936,10 +2936,10 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     if (!storeCard && storeTemplate && tile) {
       storeCard = storeTemplate.cloneNode(true) as HTMLElement;
       storeCard.classList.add("proto-chosen-store-card");
-      storeCard.dataset.protoChosenPageCard = "true";
-      delete storeCard.dataset.protoSelected;
-      delete storeCard.dataset.protoOrphanStore;
-      delete storeCard.dataset.protoDemoStore;
+      storeCard.dataset.studioChosenPageCard = "true";
+      delete storeCard.dataset.studioSelected;
+      delete storeCard.dataset.studioOrphanStore;
+      delete storeCard.dataset.studioDemoStore;
       storeCard.removeAttribute("aria-hidden");
       storeCard.style.removeProperty("display");
 
@@ -2985,7 +2985,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
 
     const changeBtn =
       storeCard?.querySelector<HTMLElement>(
-        "[data-name='component.input.button'][data-proto-change-loc='true']"
+        "[data-name='component.input.button'][data-studio-change-loc='true']"
       ) ??
       Array.from(
         slot.querySelectorAll<HTMLElement>("[data-name='component.input.button']")
@@ -3024,8 +3024,8 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       const hours = findStoreHoursList(storeCard);
       const toggle = findStoreHoursToggle(storeCard) ?? label;
       if (!hours) return;
-      const willOpen = storeCard.dataset.protoHoursOpen !== "true";
-      storeCard.dataset.protoHoursOpen = willOpen ? "true" : "false";
+      const willOpen = storeCard.dataset.studioHoursOpen !== "true";
+      storeCard.dataset.studioHoursOpen = willOpen ? "true" : "false";
       styleStoreHoursList(hours);
       setStoreHoursVisible(hours, willOpen);
       toggle.textContent = willOpen ? "Hide working hours" : "See working hours";
@@ -3052,7 +3052,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     if (SCREENS[current]?.childIndex !== 4) return;
     if (isBookStep2ReactMounted()) return;
     const screen = document.querySelector(
-      ".proto-viewport > div > div:nth-child(4)"
+      ".studio-viewport > div > div:nth-child(4)"
     ) as HTMLElement | null;
     if (!screen) return;
 
@@ -3115,55 +3115,55 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       if (isDay) {
         const month = monthForCell(cell);
         if (month === "June" && label === "12") {
-          cell.dataset.protoCalToday = "true";
+          cell.dataset.studioCalToday = "true";
           cell.setAttribute("title", TODAY_TOOLTIP);
           cell.setAttribute("aria-label", TODAY_TOOLTIP);
         }
       }
 
       if (calCellIsUnavailable(cell)) {
-        cell.dataset.protoCalUnavailable = "true";
-        delete cell.dataset.protoCalAvailable;
+        cell.dataset.studioCalUnavailable = "true";
+        delete cell.dataset.studioCalAvailable;
         cell.style.cursor = "default";
         cell.style.pointerEvents = "none";
         return;
       }
 
-      cell.dataset.protoCalAvailable = "true";
-      delete cell.dataset.protoCalUnavailable;
+      cell.dataset.studioCalAvailable = "true";
+      delete cell.dataset.studioCalUnavailable;
       cell.style.cursor = "pointer";
       cell.style.pointerEvents = "auto";
       cell.setAttribute("role", "button");
       cell.tabIndex = 0;
 
       if (isTime) {
-        cell.dataset.protoCalKind = "time";
-        cell.dataset.protoCalValue = label;
+        cell.dataset.studioCalKind = "time";
+        cell.dataset.studioCalValue = label;
         meta.set(cell, { kind: "time", value: label });
         return;
       }
 
       const month = monthForCell(cell);
       if (!month) return;
-      cell.dataset.protoCalKind = "date";
-      cell.dataset.protoCalValue = label;
-      cell.dataset.protoCalMonth = month;
+      cell.dataset.studioCalKind = "date";
+      cell.dataset.studioCalValue = label;
+      cell.dataset.studioCalMonth = month;
       meta.set(cell, { kind: "date", value: label, month });
     });
 
     const clearSelected = (kind: "date" | "time") => {
       cells.forEach((cell) => {
-        if (cell.dataset.protoCalKind !== kind) return;
-        delete cell.dataset.protoCalSelected;
+        if (cell.dataset.studioCalKind !== kind) return;
+        delete cell.dataset.studioCalSelected;
       });
     };
 
     const selectCell = (cell: HTMLElement) => {
       const m = meta.get(cell);
-      if (!m || cell.dataset.protoCalUnavailable === "true") return;
+      if (!m || cell.dataset.studioCalUnavailable === "true") return;
 
       clearSelected(m.kind);
-      cell.dataset.protoCalSelected = "true";
+      cell.dataset.studioCalSelected = "true";
 
       if (m.kind === "date" && m.month) {
         const day = Number(m.value);
@@ -3186,7 +3186,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
         '[data-name="calendar. date. cell"]'
       ) as HTMLElement | null;
       if (!cell || !meta.has(cell)) return;
-      if (cell.dataset.protoCalUnavailable === "true") return;
+      if (cell.dataset.studioCalUnavailable === "true") return;
       e.preventDefault();
       e.stopPropagation();
       selectCell(cell);
@@ -3198,7 +3198,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
         '[data-name="calendar. date. cell"]'
       ) as HTMLElement | null;
       if (!cell || !meta.has(cell)) return;
-      if (cell.dataset.protoCalUnavailable === "true") return;
+      if (cell.dataset.studioCalUnavailable === "true") return;
       e.preventDefault();
       selectCell(cell);
     };
@@ -3218,7 +3218,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     if (SCREENS[current]?.childIndex !== 4) return;
     if (isBookStep2ReactMounted()) return;
     const screen = document.querySelector(
-      ".proto-viewport > div > div:nth-child(4)"
+      ".studio-viewport > div > div:nth-child(4)"
     ) as HTMLElement | null;
     if (!screen) return;
 
@@ -3269,7 +3269,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     if (SCREENS[current]?.childIndex !== 3) return;
     if (isBookStep3ReactMounted()) return;
     const screen = document.querySelector(
-      ".proto-viewport > div > div:nth-child(3)"
+      ".studio-viewport > div > div:nth-child(3)"
     ) as HTMLElement | null;
     const summary = screen?.querySelector<HTMLElement>(
       '[data-name="component.appointment.summary"]'
@@ -3300,7 +3300,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       pointsLabel.nextElementSibling?.textContent?.trim() ?? "450";
     const spendValue = spendLabel?.nextElementSibling?.textContent?.trim() ?? "1890";
 
-    block.dataset.protoAdvantagePatched = "true";
+    block.dataset.studioAdvantagePatched = "true";
     block.classList.add("proto-confirm-advantage");
 
     const inner = document.createElement("div");
@@ -3332,7 +3332,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     if (SCREENS[current]?.childIndex !== 3) return;
     if (isBookStep3ReactMounted()) return;
     const screen = document.querySelector(
-      ".proto-viewport > div > div:nth-child(3)"
+      ".studio-viewport > div > div:nth-child(3)"
     ) as HTMLElement | null;
     if (!screen) return;
 
@@ -3374,12 +3374,12 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   }, [current]);
 
   // Book Step 3 — Open Appointments link → Appointment History (tab 8)
-  // Make path only — React Step 3 owns `data-proto-open-appointment`.
+  // Make path only — React Step 3 owns `data-studio-open-appointment`.
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 3) return;
     if (isBookStep3ReactMounted()) return;
     const screen = document.querySelector(
-      ".proto-viewport > div > div:nth-child(3)"
+      ".studio-viewport > div > div:nth-child(3)"
     ) as HTMLElement | null;
     const summary = screen?.querySelector<HTMLElement>(
       '[data-name="component.appointment.summary"]'
@@ -3395,13 +3395,13 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     if (!footer) return;
 
     let openAppt = footer.querySelector<HTMLButtonElement>(
-      '[data-proto-open-appointment="true"]'
+      '[data-studio-open-appointment="true"]'
     );
     if (!openAppt) {
       openAppt = document.createElement("button");
       openAppt.type = "button";
       openAppt.className = "proto-confirm-open-appointment";
-      openAppt.dataset.protoOpenAppointment = "true";
+      openAppt.dataset.studioOpenAppointment = "true";
       openAppt.setAttribute("aria-label", "Open Appointments");
 
       const icon = document.createElement("img");
@@ -3450,7 +3450,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     if (childIndex !== 4 && childIndex !== 3) return;
     if (childIndex === 4 && isBookStep2ReactMounted()) return;
     const screen = document.querySelector(
-      `.proto-viewport > div > div:nth-child(${childIndex})`
+      `.studio-viewport > div > div:nth-child(${childIndex})`
     ) as HTMLElement | null;
     if (!screen) return;
 
@@ -3488,7 +3488,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       btn.setAttribute("role", "button");
       btn.tabIndex = 0;
       btn.style.cursor = "pointer";
-      btn.dataset.protoLocChange = "true";
+      btn.dataset.studioLocChange = "true";
     });
 
     // Capture-phase so calendar / other screen handlers can’t swallow the click
@@ -3513,7 +3513,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     screen.addEventListener("keydown", onKey);
 
     return () => {
-      locationChangeBtns.forEach((btn) => delete btn.dataset.protoLocChange);
+      locationChangeBtns.forEach((btn) => delete btn.dataset.studioLocChange);
       screen.removeEventListener("click", onClick, true);
       screen.removeEventListener("keydown", onKey);
     };
@@ -3524,7 +3524,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     const childIndices = [7, 4, 3];
     childIndices.forEach((childIndex) => {
       const screen = document.querySelector(
-        `.proto-viewport > div > div:nth-child(${childIndex})`
+        `.studio-viewport > div > div:nth-child(${childIndex})`
       ) as HTMLElement | null;
       if (!screen) return;
 
@@ -3559,7 +3559,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     const label = recipientModeLabel(chosenRecipient);
     childIndices.forEach((childIndex) => {
       const screen = document.querySelector(
-        `.proto-viewport > div > div:nth-child(${childIndex})`
+        `.studio-viewport > div > div:nth-child(${childIndex})`
       ) as HTMLElement | null;
       if (!screen) return;
 
@@ -3594,7 +3594,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     const value = formatBookingDateTimeLabel(chosenBookingSlot);
     childIndices.forEach((childIndex) => {
       const screen = document.querySelector(
-        `.proto-viewport > div > div:nth-child(${childIndex})`
+        `.studio-viewport > div > div:nth-child(${childIndex})`
       ) as HTMLElement | null;
       if (!screen) return;
 
@@ -3643,7 +3643,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     const label = boosterDoseSummaryLabel(includeBoosterDose);
     childIndices.forEach((childIndex) => {
       const screen = document.querySelector(
-        `.proto-viewport > div > div:nth-child(${childIndex})`
+        `.studio-viewport > div > div:nth-child(${childIndex})`
       ) as HTMLElement | null;
       if (!screen) return;
 
@@ -3682,7 +3682,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
 
     pricingScreens.forEach(({ childIndex, mode }) => {
       const screen = document.querySelector(
-        `.proto-viewport > div > div:nth-child(${childIndex})`
+        `.studio-viewport > div > div:nth-child(${childIndex})`
       ) as HTMLElement | null;
       if (!screen) return;
 
@@ -3711,7 +3711,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     if (childIndex === 4 && isBookStep2ReactMounted()) return;
 
     const screen = document.querySelector(
-      `.proto-viewport > div > div:nth-child(${childIndex})`
+      `.studio-viewport > div > div:nth-child(${childIndex})`
     ) as HTMLElement | null;
     if (!screen) return;
 
@@ -3745,7 +3745,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     ).filter((btn) => isVaccineChangeBtn(btn));
 
     changeBtns.forEach((btn) => {
-      btn.dataset.protoVaccineChange = "true";
+      btn.dataset.studioVaccineChange = "true";
       btn.style.cursor = "pointer";
       btn.setAttribute("role", "button");
       btn.tabIndex = 0;
@@ -3774,7 +3774,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
 
     return () => {
       changeBtns.forEach((btn) => {
-        delete btn.dataset.protoVaccineChange;
+        delete btn.dataset.studioVaccineChange;
         btn.removeEventListener("click", openPicker);
       });
       screen.removeEventListener("click", onClick, true);
@@ -3790,7 +3790,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     if (childIndex === 4 && isBookStep2ReactMounted()) return;
 
     const screen = document.querySelector(
-      `.proto-viewport > div > div:nth-child(${childIndex})`
+      `.studio-viewport > div > div:nth-child(${childIndex})`
     ) as HTMLElement | null;
     if (!screen) return;
 
@@ -3824,7 +3824,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     ).filter((btn) => isRecipientChangeBtn(btn));
 
     changeBtns.forEach((btn) => {
-      btn.dataset.protoRecipientChange = "true";
+      btn.dataset.studioRecipientChange = "true";
       btn.style.cursor = "pointer";
       btn.setAttribute("role", "button");
       btn.tabIndex = 0;
@@ -3853,7 +3853,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
 
     return () => {
       changeBtns.forEach((btn) => {
-        delete btn.dataset.protoRecipientChange;
+        delete btn.dataset.studioRecipientChange;
         btn.removeEventListener("click", openPicker);
       });
       screen.removeEventListener("click", onClick, true);
@@ -3873,7 +3873,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       const lockProgress = () => {
         const root = prototypeScrollElRef.current;
         const screen = root?.querySelector(
-          ".proto-viewport > div > div:nth-child(3)"
+          ".studio-viewport > div > div:nth-child(3)"
         ) as HTMLElement | null;
         const progress = screen?.querySelector<HTMLElement>(
           '[data-name="component.book.appointment.progress"]'
@@ -3883,8 +3883,8 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
         Array.from(progress.children)
           .filter((n): n is HTMLElement => n instanceof HTMLElement)
           .forEach((col) => {
-            delete col.dataset.protoBookStepBack;
-            delete col.dataset.protoBookStepComplete;
+            delete col.dataset.studioBookStepBack;
+            delete col.dataset.studioBookStepComplete;
             col.removeAttribute("role");
             col.removeAttribute("aria-label");
             col.tabIndex = -1;
@@ -3941,8 +3941,8 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
 
     const teardown = () => {
       if (step1Col) {
-        delete step1Col.dataset.protoBookStepBack;
-        delete step1Col.dataset.protoBookStepComplete;
+        delete step1Col.dataset.studioBookStepBack;
+        delete step1Col.dataset.studioBookStepComplete;
         step1Col.removeAttribute("role");
         step1Col.removeAttribute("aria-label");
         step1Col.tabIndex = -1;
@@ -3960,7 +3960,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
 
       const root = prototypeScrollElRef.current;
       const screen = root?.querySelector(
-        `.proto-viewport > div > div:nth-child(${childIndex})`
+        `.studio-viewport > div > div:nth-child(${childIndex})`
       ) as HTMLElement | null;
       if (!screen) return;
 
@@ -3973,7 +3973,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       const step1Bar = bookProgressBar(step1Col);
       if (step1Bar) markBookProgressCompleted(step1Bar);
 
-      step1Col.dataset.protoBookStepBack = "true";
+      step1Col.dataset.studioBookStepBack = "true";
       step1Col.setAttribute("role", "button");
       step1Col.setAttribute("aria-label", "Go back to Choose Location");
       step1Col.tabIndex = 0;
@@ -4005,7 +4005,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     if (SCREENS[current]?.childIndex !== 7) return;
     if (isBookStep1ReactMounted()) return;
     const screen = document.querySelector(
-      ".proto-viewport > div > div:nth-child(7)"
+      ".studio-viewport > div > div:nth-child(7)"
     ) as HTMLElement | null;
     if (!screen) return;
 
@@ -4099,7 +4099,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
 
     if (!isBookStep1ReactMounted()) {
       const page5 = document.querySelector(
-        ".proto-viewport > div > div:nth-child(7)"
+        ".studio-viewport > div > div:nth-child(7)"
       ) as HTMLElement | null;
       page5
         ?.querySelectorAll<HTMLElement>(".proto-chosen-checkbox")
@@ -4108,7 +4108,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     }
 
     const pdpScreen = document.querySelector(
-      ".proto-viewport > div > div:nth-child(8)"
+      ".studio-viewport > div > div:nth-child(8)"
     ) as HTMLElement | null;
     wireBoosterCheckbox(pdpScreen, { isPdp: true });
 
@@ -4133,12 +4133,12 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
 
     syncRow(
       document.querySelector(
-        ".proto-viewport > div > div:nth-child(7)"
+        ".studio-viewport > div > div:nth-child(7)"
       ) as HTMLElement | null
     );
     syncRow(
       document.querySelector(
-        ".proto-viewport > div > div:nth-child(8)"
+        ".studio-viewport > div > div:nth-child(8)"
       ) as HTMLElement | null,
       true
     );
@@ -4147,7 +4147,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   // PDP — keep checkbox section white; sync Book now price from shared booster state
   useEffect(() => {
     const screen = document.querySelector(
-      ".proto-viewport > div > div:nth-child(8)"
+      ".studio-viewport > div > div:nth-child(8)"
     ) as HTMLElement | null;
     if (!screen) return;
 
@@ -4196,7 +4196,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   // border (no shared inner edge) to whichever tab is inactive.
   useEffect(() => {
     const screen = document.querySelector(
-      ".proto-viewport > div > div:nth-child(8)"
+      ".studio-viewport > div > div:nth-child(8)"
     ) as HTMLElement | null;
     if (!screen) return;
 
@@ -4244,7 +4244,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     syncChickenpoxWishlistHearts();
 
     const screen = document.querySelector(
-      ".proto-viewport > div > div:nth-child(8)"
+      ".studio-viewport > div > div:nth-child(8)"
     ) as HTMLElement | null;
     if (!screen) return;
 
@@ -4279,36 +4279,36 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
    */
   const dynamicCSS = `
     /* Flex column fill chain — footer sticks even when browser zoom changes */
-    .proto-scroll--prototype:not(.hidden) {
+    .studio-scroll--prototype:not(.hidden) {
       display: flex !important;
       flex-direction: column !important;
     }
 
-    .proto-scroll--prototype > .proto-viewport {
+    .studio-scroll--prototype > .studio-viewport {
       flex: 1 1 auto !important;
       display: flex !important;
       flex-direction: column !important;
-      min-height: ${isViewportLocked ? "0" : "var(--proto-scroll-min-px, 100%)"} !important;
+      min-height: ${isViewportLocked ? "0" : "var(--studio-scroll-min-px, 100%)"} !important;
       ${isViewportLocked ? "height: 100% !important;" : ""}
     }
 
     /* Frame219 root — override size-full (height:100% breaks % chain when zoomed) */
-    .proto-viewport > div {
+    .studio-viewport > div {
       flex: 1 1 auto !important;
       display: flex !important;
       flex-direction: column !important;
       height: ${isViewportLocked ? "100%" : "auto"} !important;
-      min-height: ${isViewportLocked ? "0" : "var(--proto-scroll-min-px, 100%)"} !important;
+      min-height: ${isViewportLocked ? "0" : "var(--studio-scroll-min-px, 100%)"} !important;
       width: 100% !important;
     }
 
     /* Hide all screens */
-    .proto-viewport > div > div {
+    .studio-viewport > div > div {
       display: none !important;
     }
 
     /* Active screen: pull into normal flow, full-width */
-    .proto-viewport > div > div:nth-child(${childIndex}) {
+    .studio-viewport > div > div:nth-child(${childIndex}) {
       display: flex !important;
       flex-direction: column !important;
       align-items: center !important;
@@ -4319,7 +4319,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       left: auto !important;
       top: auto !important;
       height: ${isViewportLocked ? "100%" : "auto"} !important;
-      min-height: ${isViewportLocked ? "0" : "var(--proto-scroll-min-px, 100%)"} !important;
+      min-height: ${isViewportLocked ? "0" : "var(--studio-scroll-min-px, 100%)"} !important;
       flex: 1 1 auto !important;
       overflow: ${isViewportLocked ? "hidden" : "visible"} !important;
       overflow-x: ${isViewportLocked ? "hidden" : "visible"} !important;
@@ -4329,11 +4329,11 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     ${
       isViewportLocked
         ? `
-    .proto-scroll--prototype > .proto-viewport {
+    .studio-scroll--prototype > .studio-viewport {
       min-height: 0 !important;
       height: 100% !important;
     }
-    .proto-viewport > div {
+    .studio-viewport > div {
       min-height: 0 !important;
       height: 100% !important;
     }
@@ -4342,10 +4342,10 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     }
 
     /* Push footer to the bottom when the page is shorter than the viewport */
-    .proto-viewport > div > div:nth-child(${childIndex}) > .proto-footer-mount,
-    .proto-viewport > div > div:nth-child(${childIndex}) > [data-name="boots.phm.module.footer"],
-    .proto-viewport > div > div:nth-child(${childIndex}) > [data-name="boots-pharmacy.module.footer"],
-    .proto-viewport > div > div:nth-child(${childIndex}) > [data-name="module.footer"] {
+    .studio-viewport > div > div:nth-child(${childIndex}) > .proto-footer-mount,
+    .studio-viewport > div > div:nth-child(${childIndex}) > [data-name="boots.phm.module.footer"],
+    .studio-viewport > div > div:nth-child(${childIndex}) > [data-name="boots-pharmacy.module.footer"],
+    .studio-viewport > div > div:nth-child(${childIndex}) > [data-name="module.footer"] {
       margin-top: auto !important;
       flex-shrink: 0 !important;
     }
@@ -4354,14 +4354,14 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
      * Some screens hardcode w-[1440px] on the header/footer instead of w-full.
      * Override all of them to stretch full-width for the active screen.
      */
-    .proto-viewport > div > div:nth-child(${childIndex}) [data-name="boots-pharmacy.module.header"],
-    .proto-viewport > div > div:nth-child(${childIndex}) [data-name="boots.phm.module.footer"],
-    .proto-viewport > div > div:nth-child(${childIndex}) [data-name="boots-pharmacy.module.footer"],
-    .proto-viewport > div > div:nth-child(${childIndex}) [data-name="module.footer"],
-    .proto-viewport > div > div:nth-child(${childIndex}) [data-name="module.breadcrumbs"],
-    .proto-viewport > div > div:nth-child(${childIndex}) [data-name="boots.phm.module.footer.copyright"],
-    .proto-viewport > div > div:nth-child(${childIndex}) > .proto-footer-mount,
-    .proto-viewport > div > div:nth-child(${childIndex}) .proto-footer {
+    .studio-viewport > div > div:nth-child(${childIndex}) [data-name="boots-pharmacy.module.header"],
+    .studio-viewport > div > div:nth-child(${childIndex}) [data-name="boots.phm.module.footer"],
+    .studio-viewport > div > div:nth-child(${childIndex}) [data-name="boots-pharmacy.module.footer"],
+    .studio-viewport > div > div:nth-child(${childIndex}) [data-name="module.footer"],
+    .studio-viewport > div > div:nth-child(${childIndex}) [data-name="module.breadcrumbs"],
+    .studio-viewport > div > div:nth-child(${childIndex}) [data-name="boots.phm.module.footer.copyright"],
+    .studio-viewport > div > div:nth-child(${childIndex}) > .proto-footer-mount,
+    .studio-viewport > div > div:nth-child(${childIndex}) .proto-footer {
       width: 100% !important;
       min-width: 1200px !important;
     }
@@ -4369,7 +4369,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     /*
      * Screen 1 height chain:
      * viewportRef (flex-1, computed height H)
-     *   .proto-viewport (height: 100% = H)
+     *   .studio-viewport (height: 100% = H)
      *     Frame219 root (height: 100% = H)
      *       screen-1 div (height: 100% = H)
      *         header (sticky, ~66px)
@@ -4381,20 +4381,20 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
      * overflow-y: auto on viewportRef means a scrollbar only appears if the
      * viewport is shrunk until the content no longer fits.
      */
-    .proto-viewport > div > div:nth-child(11) > [data-name="body"] {
+    .studio-viewport > div > div:nth-child(11) > [data-name="body"] {
       flex: 1 1 auto !important;
       width: 100% !important;
       min-height: 0 !important;
       height: auto !important;
       align-self: stretch !important;
     }
-    .proto-viewport > div > div:nth-child(11) > [data-name="body"] > div {
+    .studio-viewport > div > div:nth-child(11) > [data-name="body"] > div {
       height: 100% !important;
       min-height: 100% !important;
       flex: 1 !important;
       overflow: hidden !important;
     }
-    .proto-viewport > div > div:nth-child(11) > [data-name="body"] > div > div {
+    .studio-viewport > div > div:nth-child(11) > [data-name="body"] > div > div {
       height: 100% !important;
       min-height: 100% !important;
     }
@@ -4404,7 +4404,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
      *   FrameForUx (absolute, h-[1909px]) → GuideStep (absolute, left-0, overflow-clip)
      * The outer override above flattens FrameForUx; this flattens GuideStep too.
      */
-    .proto-viewport > div > div:nth-child(5) > [data-name="Guide. Step 8"] {
+    .studio-viewport > div > div:nth-child(5) > [data-name="Guide. Step 8"] {
       position: static !important;
       width: 100% !important;
       height: auto !important;
@@ -4417,8 +4417,8 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     }
 
     /* Search field on screen 5 gets a hover ring so the click affordance is clear */
-    .proto-viewport > div > div:nth-child(7) [data-name='component.input.field']:hover [data-name='Text Field'] > [aria-hidden],
-    .proto-viewport > div > div:nth-child(7) [data-name='component.input.field']:focus-within [data-name='Text Field'] > [aria-hidden] {
+    .studio-viewport > div > div:nth-child(7) [data-name='component.input.field']:hover [data-name='Text Field'] > [aria-hidden],
+    .studio-viewport > div > div:nth-child(7) [data-name='component.input.field']:focus-within [data-name='Text Field'] > [aria-hidden] {
       border-color: #012169 !important;
       box-shadow: inset 0 0 0 2px #012169 !important;
     }
@@ -4426,7 +4426,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     /* GPS button beside the search field — scope the ::before circle so it doesn't
        bleed outside the button bounds (it's already correct; this prevents z-index
        stacking issues with the search row). */
-    .proto-viewport > div > div:nth-child(7) [data-name="component.input.button"] {
+    .studio-viewport > div > div:nth-child(7) [data-name="component.input.button"] {
       overflow: visible !important;
     }
   `;
@@ -4516,7 +4516,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       <style>{dynamicCSS}</style>
       <div
         ref={appContentRef}
-        className="proto-app-content flex flex-1 min-h-0 w-full flex-col overflow-hidden bg-white"
+        className="studio-app-content flex flex-1 min-h-0 w-full flex-col overflow-hidden bg-white"
         style={{ isolation: "isolate" }}
       >
         <div
@@ -4530,13 +4530,13 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
         </div>
         <div
           ref={prototypeScrollElRef}
-          className={`proto-scroll proto-scroll--prototype min-h-0 flex-1 overflow-y-auto overflow-x-hidden w-full${
+          className={`proto-scroll studio-scroll--prototype min-h-0 flex-1 overflow-y-auto overflow-x-hidden w-full${
             hubOpen ? " hidden" : ""
           }`}
           onScroll={savePrototypeScroll}
         >
           <div
-            className="proto-viewport w-full"
+            className="studio-viewport w-full"
             style={{
               minHeight: isViewportLocked ? "0" : "100%",
               height: isViewportLocked ? "100%" : "auto",

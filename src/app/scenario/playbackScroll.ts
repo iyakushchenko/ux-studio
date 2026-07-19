@@ -188,12 +188,12 @@ export async function beginDemoTargetPageScroll(
 
 export function getPrototypeScrollRoot(from?: HTMLElement | null): HTMLElement | null {
   if (from) {
-    const nested = from.closest<HTMLElement>(".proto-scroll--prototype");
+    const nested = from.closest<HTMLElement>(".studio-scroll--prototype");
     if (nested) return nested;
   }
   return (
-    document.querySelector<HTMLElement>(".proto-scroll--prototype:not(.hidden)") ??
-    document.querySelector<HTMLElement>(".proto-scroll--prototype")
+    document.querySelector<HTMLElement>(".studio-scroll--prototype:not(.hidden)") ??
+    document.querySelector<HTMLElement>(".studio-scroll--prototype")
   );
 }
 
@@ -203,14 +203,14 @@ export function isPrototypePageScrollLocked(
 ): boolean {
   const root = scrollEl ?? getPrototypeScrollRoot();
   return (
-    root?.classList?.contains("proto-scroll--locked") ||
-    root?.dataset.protoScrollLocked === "true"
+    root?.classList?.contains("studio-scroll--locked") ||
+    root?.dataset.studioScrollLocked === "true"
   );
 }
 
 /** Demo targets inside overlay scrims must not pull the page behind them. */
 export function isPrototypeOverlayTarget(target: HTMLElement): boolean {
-  return Boolean(target.closest(".proto-avail-scrim, .proto-avail-card"));
+  return Boolean(target.closest(".studio-avail-scrim, .proto-avail-card"));
 }
 
 function shouldSkipPrototypePageScroll(

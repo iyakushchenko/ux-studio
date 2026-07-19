@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Naming (new files)
 
-Full pack: [docs/product/NAMING.md](docs/product/NAMING.md).
+Full pack: [docs/product/NAMING.md](docs/product/NAMING.md) · map: [ARCHITECTURE.md](docs/product/ARCHITECTURE.md) · [HYGIENE.md](docs/product/HYGIENE.md).
 
 | Kind | Convention |
 |------|------------|
@@ -13,11 +13,13 @@ Full pack: [docs/product/NAMING.md](docs/product/NAMING.md).
 | Hooks / modules / mounts / contracts | `camelCase.ts(x)` |
 | Screen folders | kebab **`=` `screenId`** (`book-step-1`, not `book-step1`) |
 | Page / kit CSS | `kebab-case.css` (BEM block ≈ screenId) |
+| PANEL chrome CSS | `.studio-nav-*` / `.studio-*` — **no new `.proto-*`** |
+| DOM attrs | `data-studio-*` — **no new `data-proto-*`** |
 | Product doctrine docs | `SCREAMING_SNAKE.md` |
 | Project docs | `docs/projects/<id>/…` |
 | Scripts | `kebab-case.mjs` |
 | Tests | `*.test.ts` in `__tests__/` (colocated OK for tiny UXDS pure units) |
 
-**Hard forbid:** no new `proto*` / `Proto*` filenames — this is UX Studio (`studio*`, domain folders). Prefer `window.__studio*`; keep `__proto*` as legacy aliases. Do not half-rename `.proto-*` CSS / `data-proto-*` (phase 2).
+**Hard forbid:** no new `proto*` / `Proto*` filenames; no new `.proto-*` / `data-proto-*`. Prefer `window.__studio*`; keep `__proto*` aliases. Concept LEGACY `.proto-*` may remain until that Make screen retires.
 
-**Forward-only:** do not mass-rename historical docs. High-ROI renames only when they stop agents stumbling (e.g. folder ≠ URL id).
+**Forward-only:** do not mass-rename historical docs. High-ROI renames only when they stop agents stumbling.

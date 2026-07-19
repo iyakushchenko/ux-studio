@@ -215,7 +215,7 @@ describe("prototype page scroll lock", () => {
       scrollTop: 0,
       scrollHeight: 1200,
       clientHeight: 400,
-      classList: { contains: (name: string) => name === "proto-scroll--locked" },
+      classList: { contains: (name: string) => name === "studio-scroll--locked" },
       dataset: {},
     } as unknown as HTMLElement;
 
@@ -229,7 +229,7 @@ describe("prototype page scroll lock", () => {
       scrollHeight: 1200,
       clientHeight: 400,
       classList: {
-        contains: (name: string) => name === "proto-scroll--journey-locked",
+        contains: (name: string) => name === "studio-scroll--journey-locked",
       },
       dataset: {},
     } as unknown as HTMLElement;

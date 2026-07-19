@@ -44,10 +44,10 @@ export const SCENARIO_FRAME_ANIM_MS = 480;
 export const SCENARIO_FRAME_MAX_PX = 3200;
 
 function clearFrameHideTimer(frame: HTMLElement): void {
-  const id = frame.dataset.protoScenarioHideTid;
+  const id = frame.dataset.studioScenarioHideTid;
   if (!id) return;
   window.clearTimeout(Number(id));
-  delete frame.dataset.protoScenarioHideTid;
+  delete frame.dataset.studioScenarioHideTid;
 }
 
 function reflowFrame(frame: HTMLElement): void {
@@ -81,7 +81,7 @@ function animateFrameOut(frame: HTMLElement, onDone: () => void): void {
   };
 
   frame.addEventListener("transitionend", onEnd);
-  frame.dataset.protoScenarioHideTid = String(
+  frame.dataset.studioScenarioHideTid = String(
     window.setTimeout(finish, SCENARIO_FRAME_ANIM_MS + 80)
   );
 }
@@ -92,11 +92,11 @@ export function applyScenarioFrameVisibility(
 ): void {
   frames.forEach((frame, index) => {
     const visible = index < visibleCount;
-    const wasVisible = frame.dataset.protoScenarioVisible === "true";
-    const wasHidden = frame.dataset.protoScenarioVisible === "false";
+    const wasVisible = frame.dataset.studioScenarioVisible === "true";
+    const wasHidden = frame.dataset.studioScenarioVisible === "false";
 
     frame.classList.add("proto-scenario-frame");
-    frame.dataset.protoScenarioFrame = String(index + 1);
+    frame.dataset.studioScenarioFrame = String(index + 1);
 
     if (visible) {
       clearFrameHideTimer(frame);
@@ -110,30 +110,30 @@ export function applyScenarioFrameVisibility(
         frame.style.display = "";
         frame.classList.remove("proto-scenario-frame--hidden");
       }
-      frame.dataset.protoScenarioVisible = "true";
+      frame.dataset.studioScenarioVisible = "true";
       return;
     }
 
     if (!wasVisible && !wasHidden) {
       frame.classList.add("proto-scenario-frame--hidden");
-      frame.dataset.protoScenarioVisible = "false";
-      frame.dataset.protoScenarioHideTid = String(
+      frame.dataset.studioScenarioVisible = "false";
+      frame.dataset.studioScenarioHideTid = String(
         window.setTimeout(() => {
-          if (frame.dataset.protoScenarioVisible === "false") {
+          if (frame.dataset.studioScenarioVisible === "false") {
             frame.style.display = "none";
           }
-          delete frame.dataset.protoScenarioHideTid;
+          delete frame.dataset.studioScenarioHideTid;
         }, SCENARIO_FRAME_ANIM_MS + 50)
       );
       return;
     }
 
-    frame.dataset.protoScenarioVisible = "false";
+    frame.dataset.studioScenarioVisible = "false";
     animateFrameOut(frame, () => {
-      if (frame.dataset.protoScenarioVisible === "false") {
+      if (frame.dataset.studioScenarioVisible === "false") {
         frame.style.display = "none";
       }
-      delete frame.dataset.protoScenarioHideTid;
+      delete frame.dataset.studioScenarioHideTid;
     });
   });
 }
@@ -184,8 +184,8 @@ export function scrollPrototypeScrollToTop(
 ): void {
   const el =
     scrollEl ??
-    document.querySelector<HTMLElement>(".proto-scroll--prototype:not(.hidden)") ??
-    document.querySelector<HTMLElement>(".proto-scroll--prototype");
+    document.querySelector<HTMLElement>(".studio-scroll--prototype:not(.hidden)") ??
+    document.querySelector<HTMLElement>(".studio-scroll--prototype");
   if (!el) return;
 
   if (behavior === "smooth") {
@@ -221,8 +221,8 @@ export function scrollPrototypeScrollToBottom(
 ): void {
   const el =
     scrollEl ??
-    document.querySelector<HTMLElement>(".proto-scroll--prototype:not(.hidden)") ??
-    document.querySelector<HTMLElement>(".proto-scroll--prototype");
+    document.querySelector<HTMLElement>(".studio-scroll--prototype:not(.hidden)") ??
+    document.querySelector<HTMLElement>(".studio-scroll--prototype");
   if (!el) return;
 
   const top = Math.max(0, el.scrollHeight - el.clientHeight);
@@ -341,8 +341,8 @@ export function   bumpScenarioScrollGeneration(): void {
 function resolveScrollEl(scrollEl?: HTMLElement | null): HTMLElement | null {
   return (
     scrollEl ??
-    document.querySelector<HTMLElement>(".proto-scroll--prototype:not(.hidden)") ??
-    document.querySelector<HTMLElement>(".proto-scroll--prototype")
+    document.querySelector<HTMLElement>(".studio-scroll--prototype:not(.hidden)") ??
+    document.querySelector<HTMLElement>(".studio-scroll--prototype")
   );
 }
 

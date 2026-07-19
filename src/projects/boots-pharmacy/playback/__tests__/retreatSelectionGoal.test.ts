@@ -77,15 +77,15 @@ function matches(el: MockElement, selector: string): boolean {
     if (part.startsWith(".")) {
       const cls = part.slice(1);
       if (!current.classList.contains(cls)) return false;
-    } else if (part.includes("[data-proto-cal-kind=")) {
-      const kind = part.match(/data-proto-cal-kind="([^"]+)"/)?.[1];
-      const month = part.match(/data-proto-cal-month="([^"]+)"/)?.[1];
-      const value = part.match(/data-proto-cal-value="([^"]+)"/)?.[1];
-      const selected = part.match(/data-proto-cal-selected="([^"]+)"/)?.[1];
-      if (kind && current.dataset.protoCalKind !== kind) return false;
-      if (month && current.dataset.protoCalMonth !== month) return false;
-      if (value && current.dataset.protoCalValue !== value) return false;
-      if (selected && current.dataset.protoCalSelected !== selected) return false;
+    } else if (part.includes("[data-studio-cal-kind=")) {
+      const kind = part.match(/data-studio-cal-kind="([^"]+)"/)?.[1];
+      const month = part.match(/data-studio-cal-month="([^"]+)"/)?.[1];
+      const value = part.match(/data-studio-cal-value="([^"]+)"/)?.[1];
+      const selected = part.match(/data-studio-cal-selected="([^"]+)"/)?.[1];
+      if (kind && current.dataset.studioCalKind !== kind) return false;
+      if (month && current.dataset.studioCalMonth !== month) return false;
+      if (value && current.dataset.studioCalValue !== value) return false;
+      if (selected && current.dataset.studioCalSelected !== selected) return false;
     } else if (part.includes(":not(")) {
       const cls = part.match(/\.([\w-]+)/)?.[1];
       if (cls && current.classList.contains(cls)) return false;
@@ -117,10 +117,10 @@ function queryMock(
     node.children.forEach(visit);
   };
   visit(root);
-  if (selector.startsWith(".proto-viewport")) {
-    const viewport = root.classList.contains("proto-viewport")
+  if (selector.startsWith(".studio-viewport")) {
+    const viewport = root.classList.contains("studio-viewport")
       ? root
-      : root.querySelector(".proto-viewport");
+      : root.querySelector(".studio-viewport");
     if (viewport) {
       const direct = selector.match(/div:nth-child\((\d+)\)/);
       if (direct) {
@@ -144,43 +144,43 @@ function mountBookStep2Dom(options: {
   const screen = createElement("div");
   const dateCell = createElement("div", {
     dataset: {
-      protoCalKind: "date",
-      protoCalMonth: options.month,
-      protoCalValue: String(options.day),
-      protoCalSelected: "true",
+      studioCalKind: "date",
+      studioCalMonth: options.month,
+      studioCalValue: String(options.day),
+      studioCalSelected: "true",
     },
   });
   append(screen, dateCell);
   const timeValue = options.time ?? "16:30";
   const timeCell = createElement("div", {
     dataset: {
-      protoCalKind: "time",
-      protoCalValue: timeValue,
-      ...(options.timeSelected ? { protoCalSelected: "true" } : {}),
+      studioCalKind: "time",
+      studioCalValue: timeValue,
+      ...(options.timeSelected ? { studioCalSelected: "true" } : {}),
     },
   });
   append(screen, timeCell);
 
   screen.querySelector = (sel: string) => {
     if (
-      sel.includes('[data-proto-cal-kind="date"]') &&
-      sel.includes(`data-proto-cal-month="${options.month}"`) &&
-      sel.includes(`data-proto-cal-value="${options.day}"`) &&
-      sel.includes('data-proto-cal-selected="true"')
+      sel.includes('[data-studio-cal-kind="date"]') &&
+      sel.includes(`data-studio-cal-month="${options.month}"`) &&
+      sel.includes(`data-studio-cal-value="${options.day}"`) &&
+      sel.includes('data-studio-cal-selected="true"')
     ) {
       return dateCell;
     }
     if (
-      sel.includes('[data-proto-cal-kind="time"]') &&
-      sel.includes(`data-proto-cal-value="${timeValue}"`) &&
-      sel.includes('data-proto-cal-selected="true"')
+      sel.includes('[data-studio-cal-kind="time"]') &&
+      sel.includes(`data-studio-cal-value="${timeValue}"`) &&
+      sel.includes('data-studio-cal-selected="true"')
     ) {
       return options.timeSelected ? timeCell : null;
     }
     if (
-      sel.includes('[data-proto-cal-kind="time"]') &&
-      sel.includes('data-proto-cal-selected="true"') &&
-      !sel.includes("data-proto-cal-value=")
+      sel.includes('[data-studio-cal-kind="time"]') &&
+      sel.includes('data-studio-cal-selected="true"') &&
+      !sel.includes("data-studio-cal-value=")
     ) {
       return options.timeSelected ? timeCell : null;
     }
@@ -189,35 +189,35 @@ function mountBookStep2Dom(options: {
 
   vi.stubGlobal("document", {
     querySelector(sel: string) {
-      if (sel === ".proto-viewport > div > div:nth-child(4)") return screen;
+      if (sel === ".studio-viewport > div > div:nth-child(4)") return screen;
       if (
-        sel.includes('[data-proto-cal-kind="date"]') &&
-        sel.includes(`data-proto-cal-month="${options.month}"`) &&
-        sel.includes(`data-proto-cal-value="${options.day}"`) &&
-        sel.includes('data-proto-cal-selected="true"')
+        sel.includes('[data-studio-cal-kind="date"]') &&
+        sel.includes(`data-studio-cal-month="${options.month}"`) &&
+        sel.includes(`data-studio-cal-value="${options.day}"`) &&
+        sel.includes('data-studio-cal-selected="true"')
       ) {
         return dateCell;
       }
       if (
-        sel.includes('[data-proto-cal-kind="time"]') &&
-        sel.includes(`data-proto-cal-value="${timeValue}"`) &&
-        sel.includes('data-proto-cal-selected="true"')
+        sel.includes('[data-studio-cal-kind="time"]') &&
+        sel.includes(`data-studio-cal-value="${timeValue}"`) &&
+        sel.includes('data-studio-cal-selected="true"')
       ) {
         return options.timeSelected ? timeCell : null;
       }
       if (
-        sel.includes('[data-proto-cal-kind="time"]') &&
-        sel.includes(`data-proto-cal-value="15:30"`)
+        sel.includes('[data-studio-cal-kind="time"]') &&
+        sel.includes(`data-studio-cal-value="15:30"`)
       ) {
         return timeValue === "15:30" && options.timeSelected ? timeCell : null;
       }
       if (
-        sel.includes('[data-proto-cal-kind="time"]') &&
-        sel.includes(`data-proto-cal-value="16:30"`)
+        sel.includes('[data-studio-cal-kind="time"]') &&
+        sel.includes(`data-studio-cal-value="16:30"`)
       ) {
         return timeValue === "16:30" && options.timeSelected ? timeCell : null;
       }
-      if (sel.includes('[data-proto-cal-selected="true"]') && sel.includes("time")) {
+      if (sel.includes('[data-studio-cal-selected="true"]') && sel.includes("time")) {
         return options.timeSelected ? timeCell : null;
       }
       return null;

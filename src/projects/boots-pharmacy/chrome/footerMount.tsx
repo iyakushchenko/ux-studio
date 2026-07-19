@@ -22,7 +22,7 @@ function mountProtoFooterOnPage(
     page.querySelectorAll<HTMLElement>(selector).forEach((footer) => {
       if (footer.classList.contains(FOOTER_MOUNT_CLASS)) return;
       footer.style.display = "none";
-      footer.dataset.protoFooterHidden = "true";
+      footer.dataset.studioFooterHidden = "true";
     });
   }
 
@@ -54,14 +54,14 @@ function stripProtoFooterFromPage(page: HTMLElement): void {
 export function setupFooters(handlers: FooterNavHandlers = {}): void {
   for (const childIdx of SITE_PILOT_CHILD_INDICES) {
     const page = document.querySelector(
-      `.proto-viewport > div > div:nth-child(${childIdx})`,
+      `.studio-viewport > div > div:nth-child(${childIdx})`,
     ) as HTMLElement | null;
     if (page) stripProtoFooterFromPage(page);
   }
 
   for (const childIdx of FOOTER_CHILD_INDICES) {
     const page = document.querySelector(
-      `.proto-viewport > div > div:nth-child(${childIdx})`,
+      `.studio-viewport > div > div:nth-child(${childIdx})`,
     ) as HTMLElement | null;
     if (!page) continue;
 

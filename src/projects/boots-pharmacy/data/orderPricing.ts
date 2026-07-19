@@ -70,12 +70,12 @@ export function setCoTotalPrice(
 }
 
 function syncBoosterDoseRow(list: HTMLElement, included: boolean) {
-  let row = list.querySelector<HTMLElement>('[data-proto-booster-line]');
+  let row = list.querySelector<HTMLElement>('[data-studio-booster-line]');
   if (!row) {
     const template = list.querySelector<HTMLElement>('[data-name="Shipping"]');
     if (!template) return;
     row = template.cloneNode(true) as HTMLElement;
-    row.dataset.protoBoosterLine = "true";
+    row.dataset.studioBoosterLine = "true";
     row.removeAttribute("data-name");
     list.querySelector('[data-name="Order Discount"]')?.after(row);
   }
@@ -127,12 +127,12 @@ export function syncAccountOrderSummary(
   setRow("Sales Tax", formatGbp(pricing.tax));
   setRow("Total", formatGbp(pricing.total));
 
-  let boosterRow = block.querySelector<HTMLElement>('[data-proto-booster-line]');
+  let boosterRow = block.querySelector<HTMLElement>('[data-studio-booster-line]');
   if (!boosterRow) {
     const template = block.querySelector<HTMLElement>('[data-name="Shipping"]');
     if (!template) return;
     boosterRow = template.cloneNode(true) as HTMLElement;
-    boosterRow.dataset.protoBoosterLine = "true";
+    boosterRow.dataset.studioBoosterLine = "true";
     boosterRow.removeAttribute("data-name");
     block.querySelector('[data-name="Order Discount"]')?.after(boosterRow);
   }

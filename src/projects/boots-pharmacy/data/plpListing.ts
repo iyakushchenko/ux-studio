@@ -115,7 +115,7 @@ type ActivePlpFilters = {
   countries: string[];
 };
 
-const PLP_SCREEN_SELECTOR = ".proto-viewport > div > div:nth-child(9)";
+const PLP_SCREEN_SELECTOR = ".studio-viewport > div > div:nth-child(9)";
 const PLP_TILE_SELECTOR = `${PLP_SCREEN_SELECTOR} [data-name="boots-pharmacy.service.tile"]`;
 const PLP_FILTERS_SELECTOR = '[data-name="module.plp.filters"]';
 const PLP_FILTER_LIST_MAX = 10;
@@ -694,9 +694,9 @@ function ensurePlpFilterCheckboxList(
       );
       if (checkboxRow) {
         checkboxRow.dataset.checkboxChecked = "false";
-        checkboxRow.removeAttribute("data-proto-filter-disabled");
+        checkboxRow.removeAttribute("data-studio-filter-disabled");
       }
-      item.dataset.protoFilterDisabled = "false";
+      item.dataset.studioFilterDisabled = "false";
       item.removeAttribute("aria-disabled");
       list.appendChild(item);
     }
@@ -721,7 +721,7 @@ function ensurePlpFilterLists(
   jabTiles: HTMLElement[]
 ): void {
   jabTiles.forEach((tile) => {
-    tile.removeAttribute("data-proto-filter-meta");
+    tile.removeAttribute("data-studio-filter-meta");
   });
 
   const filters = readActivePlpFilters(root);
@@ -734,10 +734,10 @@ function ensurePlpFilterLists(
   const countrySection = findFilterSection(root, /by country/i);
   const countryLabels = collectPlpCountryFilterLabels(jabTiles, filters);
   const countryLabelsKey = `${filters.regions.join("|")}::${countryLabels.join("|")}`;
-  if (countrySection?.dataset.protoPlpCountryLabelsKey !== countryLabelsKey) {
+  if (countrySection?.dataset.studioPlpCountryLabelsKey !== countryLabelsKey) {
     clearCountryFilterSelections(countrySection);
     if (countrySection) {
-      countrySection.dataset.protoPlpCountryLabelsKey = countryLabelsKey;
+      countrySection.dataset.studioPlpCountryLabelsKey = countryLabelsKey;
     }
   }
   ensurePlpFilterCheckboxList(countrySection, countryLabels);
@@ -748,7 +748,7 @@ function setFilterCheckboxItemState(item: HTMLElement, count: number): boolean {
   setFilterRowCount(item, count);
 
   const disabled = count === 0;
-  item.dataset.protoFilterDisabled = disabled ? "true" : "false";
+  item.dataset.studioFilterDisabled = disabled ? "true" : "false";
   item.setAttribute("aria-disabled", disabled ? "true" : "false");
 
   const checkboxRow = item.querySelector<HTMLElement>(
@@ -756,7 +756,7 @@ function setFilterCheckboxItemState(item: HTMLElement, count: number): boolean {
   );
   if (!checkboxRow) return false;
 
-  checkboxRow.dataset.protoFilterDisabled = disabled ? "true" : "false";
+  checkboxRow.dataset.studioFilterDisabled = disabled ? "true" : "false";
   if (disabled && checkboxRow.dataset.checkboxChecked === "true") {
     checkboxRow.dataset.checkboxChecked = "false";
     return true;
@@ -767,7 +767,7 @@ function setFilterCheckboxItemState(item: HTMLElement, count: number): boolean {
 export function isPlpFilterCheckboxDisabled(target: HTMLElement): boolean {
   return (
     target.closest('[data-name="component.plp.filter.checkbox.item"]')
-      ?.dataset.protoFilterDisabled === "true"
+      ?.dataset.studioFilterDisabled === "true"
   );
 }
 
@@ -1110,12 +1110,12 @@ function syncPlpListingResults(
 
   const jabTiles = Array.from(
     screen.querySelectorAll<HTMLElement>(PLP_TILE_SELECTOR)
-  ).filter((tile) => tile.dataset.protoPlpBundle !== "true");
+  ).filter((tile) => tile.dataset.studioPlpBundle !== "true");
 
   if (!jabTiles.length) return;
 
   jabTiles.forEach((tile) => {
-    tile.dataset.protoPlpJab = "true";
+    tile.dataset.studioPlpJab = "true";
   });
 
   const container = jabTiles[0].parentElement;
@@ -1241,7 +1241,7 @@ export function ensurePlpTileTitleLinks(root: ParentNode = document): void {
     const link = document.createElement("a");
     link.href = "#";
     link.className = "proto-link proto-plp-tile-title-link";
-    link.setAttribute("data-proto-plp-tile-title", "true");
+    link.setAttribute("data-studio-plp-tile-title", "true");
     titleEl.parentElement?.insertBefore(link, titleEl);
     link.appendChild(titleEl);
   });
@@ -1310,15 +1310,15 @@ function inferTileMeta(title: string, index: number): TileFilterMeta {
 }
 
 function ensureTileMeta(tile: HTMLElement, index: number): TileFilterMeta {
-  if (tile.dataset.protoFilterMeta) {
+  if (tile.dataset.studioFilterMeta) {
     try {
-      return JSON.parse(tile.dataset.protoFilterMeta) as TileFilterMeta;
+      return JSON.parse(tile.dataset.studioFilterMeta) as TileFilterMeta;
     } catch {
       /* re-tag below */
     }
   }
   const meta = inferTileMeta(getTileTitle(tile), index);
-  tile.dataset.protoFilterMeta = JSON.stringify(meta);
+  tile.dataset.studioFilterMeta = JSON.stringify(meta);
   return meta;
 }
 
@@ -1469,7 +1469,7 @@ function ensureBundleTiles(
   template: HTMLElement
 ): HTMLElement[] {
   const existing = Array.from(
-    container.querySelectorAll<HTMLElement>('[data-proto-plp-bundle="true"]')
+    container.querySelectorAll<HTMLElement>('[data-studio-plp-bundle="true"]')
   );
   if (existing.length >= PLP_BUNDLE_ITEMS.length) {
     existing.forEach((tile, index) => {
@@ -1483,9 +1483,9 @@ function ensureBundleTiles(
   const created: HTMLElement[] = [];
   PLP_BUNDLE_ITEMS.forEach((bundle) => {
     const tile = template.cloneNode(true) as HTMLElement;
-    tile.dataset.protoPlpBundle = "true";
-    tile.removeAttribute("data-proto-plp-jab");
-    tile.removeAttribute("data-proto-filter-meta");
+    tile.dataset.studioPlpBundle = "true";
+    tile.removeAttribute("data-studio-plp-jab");
+    tile.removeAttribute("data-studio-filter-meta");
     tile.style.display = "none";
     tile.classList.remove("proto-plp-tile--in");
     applyBundleToTile(tile, bundle);
@@ -1529,7 +1529,7 @@ function syncPlpSearchInputClearState(
   const textField = input.closest<HTMLElement>('[data-name="Text Field"]');
   if (!textField) return;
 
-  textField.dataset.protoSearchFilled = value.trim() ? "true" : "false";
+  textField.dataset.studioSearchFilled = value.trim() ? "true" : "false";
   const clearBtn = textField.querySelector<HTMLButtonElement>(
     ".proto-plp-search-clear"
   );
@@ -1649,7 +1649,7 @@ function wirePlpActiveFilterChipLinks(
   controls: HTMLElement,
   root: ParentNode
 ): void {
-  if (controls.dataset.protoPlpFilterChipsWired === "1") return;
+  if (controls.dataset.studioPlpFilterChipsWired === "1") return;
 
   controls.addEventListener("click", (e) => {
     const chip = (e.target as Element | null)?.closest<HTMLAnchorElement>(
@@ -1660,34 +1660,34 @@ function wirePlpActiveFilterChipLinks(
     e.preventDefault();
     e.stopPropagation();
 
-    const facet = chip.dataset.protoPlpFilterFacet as
+    const facet = chip.dataset.studioPlpFilterFacet as
       | PlpActiveFilterChip["facet"]
       | undefined;
-    const label = chip.dataset.protoPlpFilterLabel;
+    const label = chip.dataset.studioPlpFilterLabel;
     if (!facet || !label) return;
 
     removePlpFilterChip(root, facet, label);
     syncPlpListingFilters(root);
   });
 
-  controls.dataset.protoPlpFilterChipsWired = "1";
+  controls.dataset.studioPlpFilterChipsWired = "1";
 }
 
 function buildPlpResetFiltersButton(root: ParentNode): HTMLButtonElement {
   const resetBtn = document.createElement("button");
   resetBtn.type = "button";
-  resetBtn.dataset.protoPlpResetFilters = "true";
-  resetBtn.dataset.protoPlpResetBuilt = "7";
+  resetBtn.dataset.studioPlpResetFilters = "true";
+  resetBtn.dataset.studioPlpResetBuilt = "7";
   resetBtn.className =
-    "proto-tertiary-cta proto-tertiary-cta--compact proto-plp-reset-filters-link";
+    "studio-tertiary-cta studio-tertiary-cta--compact proto-plp-reset-filters-link";
   resetBtn.setAttribute("aria-label", "Reset Filters");
 
   const iconWrap = document.createElement("span");
-  iconWrap.className = "proto-tertiary-cta__icon";
+  iconWrap.className = "studio-tertiary-cta__icon";
   iconWrap.innerHTML = trashIconSvg;
 
   const label = document.createElement("span");
-  label.className = "proto-tertiary-cta__label";
+  label.className = "studio-tertiary-cta__label";
   label.textContent = "Reset Filters";
 
   resetBtn.append(iconWrap, label);
@@ -1705,14 +1705,14 @@ function ensurePlpResetFiltersButton(
 
   let resetBtn =
     messageRow.querySelector<HTMLButtonElement>(
-      '[data-proto-plp-reset-filters="true"]'
+      '[data-studio-plp-reset-filters="true"]'
     ) ??
     controls?.querySelector<HTMLButtonElement>(
-      '[data-proto-plp-reset-filters="true"]'
+      '[data-studio-plp-reset-filters="true"]'
     ) ??
     null;
 
-  if (resetBtn && resetBtn.dataset.protoPlpResetBuilt !== "7") {
+  if (resetBtn && resetBtn.dataset.studioPlpResetBuilt !== "7") {
     const fresh = buildPlpResetFiltersButton(root);
     resetBtn.replaceWith(fresh);
     resetBtn = fresh;
@@ -1780,8 +1780,8 @@ function renderPlpResultsSummary(
       const link = document.createElement("a");
       link.href = "#";
       link.className = "proto-link proto-plp-filter-chip";
-      link.dataset.protoPlpFilterFacet = chip.facet;
-      link.dataset.protoPlpFilterLabel = chip.label;
+      link.dataset.studioPlpFilterFacet = chip.facet;
+      link.dataset.studioPlpFilterLabel = chip.label;
       link.textContent = chip.label;
       summaryEl.appendChild(link);
     });

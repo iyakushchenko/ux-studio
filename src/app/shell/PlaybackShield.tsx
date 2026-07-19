@@ -9,7 +9,7 @@ export function PlaybackShield() {
 
   return (
     <div
-      className="proto-playback-shield"
+      className="studio-playback-shield"
       aria-hidden="true"
       onPointerDown={block}
       onPointerUp={block}

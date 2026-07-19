@@ -26,7 +26,7 @@ function VaccineTile({
   return (
     <div
       className={`proto-vaccine-tile${chosen ? " proto-vaccine-tile--chosen" : ""}`}
-      data-proto-vaccine-id={vaccine.id}
+      data-studio-vaccine-id={vaccine.id}
     >
       <div className="proto-vaccine-tile__main">
         <div className="proto-vaccine-tile__head">

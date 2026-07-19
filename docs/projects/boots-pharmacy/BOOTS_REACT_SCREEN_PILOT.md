@@ -56,7 +56,7 @@ Status: **OK** = matches Make; **Partial** = works with known delta; **Gap** = s
 | Continue with store → Book Step 2 | OK | `setCurrent(5)` |
 | Change vaccine / recipient | OK | Opens existing pickers |
 | Change location (chosen card) | OK | Re-opens Availability list |
-| Booster checkbox toggle | OK | React state; `data-proto-react-owned` skips Make mutators |
+| Booster checkbox toggle | OK | React state; `data-studio-react-owned` skips Make mutators |
 | Learn more disclosure | OK | UXDS `Disclosure` kit |
 | Breadcrumb Home → Site Pilot Home | OK | Wire click delegation on crumbs |
 | Availability choose store → chosen card + map | OK | Existing overlay callback |
@@ -93,12 +93,12 @@ Status: **OK** = matches Make; **Partial** = works with known delta; **Gap** = s
 |------|--------------|
 | `component.input.field` (search) | OK |
 | `component.input.button` (CTAs / Change / near-me) | OK |
-| `component.input.checkbox` + `data-proto-booster` + `data-proto-react-owned` | OK |
+| `component.input.checkbox` + `data-studio-booster` + `data-studio-react-owned` | OK |
 | `component.book.appointment.progress` | OK |
 | `.proto-chosen-slot` / store block | OK |
 | `module.breadcrumbs` / `component.breadcrumbs` | OK |
-| `data-proto-change-loc` | OK |
-| Host `[data-proto-react-screen="book-step-1"]` | OK |
+| `data-studio-change-loc` | OK |
+| Host `[data-studio-react-screen="book-step-1"]` | OK |
 
 ---
 

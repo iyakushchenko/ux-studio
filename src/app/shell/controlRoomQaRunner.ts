@@ -69,12 +69,12 @@ function counterStep(counter: string | null | undefined): number | null {
 }
 
 function isOnAir(): boolean {
-  return document.querySelector(".proto-nav-scenario--on-air") != null;
+  return document.querySelector(".studio-nav-scenario--on-air") != null;
 }
 
 function hoverCounter(): void {
   document
-    .querySelector(".proto-nav-scenario__counter")
+    .querySelector(".studio-nav-scenario__counter")
     ?.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
 }
 

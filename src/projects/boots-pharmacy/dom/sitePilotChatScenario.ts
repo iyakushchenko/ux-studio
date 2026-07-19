@@ -16,8 +16,8 @@ const SCREEN_CHILD = 10;
 function getScrollHost(): HTMLElement | null {
   return (
     document.querySelector<HTMLElement>(
-      ".proto-scroll--prototype:not(.hidden)"
-    ) ?? document.querySelector<HTMLElement>(".proto-scroll--prototype")
+      ".studio-scroll--prototype:not(.hidden)"
+    ) ?? document.querySelector<HTMLElement>(".studio-scroll--prototype")
   );
 }
 
@@ -29,7 +29,7 @@ function getChatSummary(screen: ParentNode): HTMLElement | null {
 
 function findPortalDock(): HTMLElement | null {
   return document.querySelector<HTMLElement>(
-    `.${DOCK_CLASS}.${DOCK_PORTAL_CLASS}[data-proto-chat-screen="${SCREEN_CHILD}"]`
+    `.${DOCK_CLASS}.${DOCK_PORTAL_CLASS}[data-studio-chat-screen="${SCREEN_CHILD}"]`
   );
 }
 
@@ -38,7 +38,7 @@ function findInPlaceComposer(screen: ParentNode): HTMLElement | null {
   if (!summary) return null;
   return (
     summary.querySelector<HTMLElement>(
-      `.${COMPOSER_CARD_CLASS}[data-proto-chat-composer="true"]`
+      `.${COMPOSER_CARD_CLASS}[data-studio-chat-composer="true"]`
     ) ?? findSummaryComposer(summary)
   );
 }
@@ -120,19 +120,19 @@ function syncInPlaceGeometry(
 
 function applyComposerDockSuppressed(screen?: ParentNode | null): void {
   const suppressed = document.body.hasAttribute(
-    "data-proto-chat-composer-suppressed"
+    "data-studio-chat-composer-suppressed"
   );
   const composer = findInPlaceComposer(
     screen ??
       document.querySelector<HTMLElement>(
-        ".proto-viewport > div > div:nth-child(10)"
+        ".studio-viewport > div > div:nth-child(10)"
       ) ??
       document
   );
   if (composer) {
     composer.hidden = suppressed;
     const screen = document.querySelector<HTMLElement>(
-      ".proto-viewport > div > div:nth-child(10)"
+      ".studio-viewport > div > div:nth-child(10)"
     );
     const disclaimer = screen ? disclaimerByScreen.get(screen) : null;
     if (disclaimer) disclaimer.hidden = suppressed;
@@ -143,13 +143,13 @@ function applyComposerDockSuppressed(screen?: ParentNode | null): void {
 }
 
 function clearComposerScenarioStyles(composer: HTMLElement): void {
-  const id = composer.dataset.protoScenarioHideTid;
+  const id = composer.dataset.studioScenarioHideTid;
   if (id) window.clearTimeout(Number(id));
   composer.classList.remove("proto-scenario-frame", "proto-scenario-frame--hidden");
   composer.style.display = "";
-  delete composer.dataset.protoScenarioVisible;
-  delete composer.dataset.protoScenarioFrame;
-  delete composer.dataset.protoScenarioHideTid;
+  delete composer.dataset.studioScenarioVisible;
+  delete composer.dataset.studioScenarioFrame;
+  delete composer.dataset.studioScenarioHideTid;
 }
 
 function restoreChatDom(summary: HTMLElement, paddingDiv: HTMLElement): void {
@@ -163,14 +163,14 @@ function restoreChatDom(summary: HTMLElement, paddingDiv: HTMLElement): void {
   summary.classList.remove("proto-chat-layout");
 
   summary
-    .querySelectorAll<HTMLElement>(`.${COMPOSER_CARD_CLASS}[data-proto-chat-composer="true"]`)
+    .querySelectorAll<HTMLElement>(`.${COMPOSER_CARD_CLASS}[data-studio-chat-composer="true"]`)
     .forEach((composer) => {
       composer.classList.remove(COMPOSER_CARD_CLASS, DOCK_IN_PLACE_CLASS);
       composer.style.removeProperty("left");
       composer.style.removeProperty("width");
       composer.style.removeProperty("bottom");
       composer.hidden = false;
-      delete composer.dataset.protoChatComposer;
+      delete composer.dataset.studioChatComposer;
     });
 
   paddingDiv
@@ -193,7 +193,7 @@ function restoreChatDom(summary: HTMLElement, paddingDiv: HTMLElement): void {
     if (composer) {
       summary.appendChild(composer);
       composer.classList.remove(COMPOSER_CARD_CLASS);
-      delete composer.dataset.protoChatComposer;
+      delete composer.dataset.studioChatComposer;
     }
     if (disclaimer) {
       paddingDiv.appendChild(disclaimer);
@@ -202,12 +202,12 @@ function restoreChatDom(summary: HTMLElement, paddingDiv: HTMLElement): void {
   }
 
   summary
-    .querySelectorAll<HTMLElement>('[data-proto-chat-composer="true"]')
-    .forEach((el) => delete el.dataset.protoChatComposer);
+    .querySelectorAll<HTMLElement>('[data-studio-chat-composer="true"]')
+    .forEach((el) => delete el.dataset.studioChatComposer);
 }
 
 export function isSitePilotChatComposerFrame(el: HTMLElement): boolean {
-  if (el.dataset.protoChatComposer === "true") return true;
+  if (el.dataset.studioChatComposer === "true") return true;
   if (el.classList.contains(COMPOSER_CARD_CLASS)) return true;
   if (el.matches('[data-name="query"], [data-name="reply"]')) return false;
 
@@ -229,7 +229,7 @@ export function isSitePilotChatComposerFrame(el: HTMLElement): boolean {
 /** Composer card — fixed in summary after setup. */
 export function findSitePilotChatComposerCard(): HTMLElement | null {
   const screen = document.querySelector<HTMLElement>(
-    ".proto-viewport > div > div:nth-child(10)"
+    ".studio-viewport > div > div:nth-child(10)"
   );
   if (!screen) return null;
 
@@ -265,7 +265,7 @@ function findChatDisclaimer(paddingDiv: HTMLElement): HTMLParagraphElement | nul
 
 /** Hide composer while availability / other overlays are open. */
 export function setSitePilotChatComposerDockSuppressed(suppressed: boolean): void {
-  document.body.toggleAttribute("data-proto-chat-composer-suppressed", suppressed);
+  document.body.toggleAttribute("data-studio-chat-composer-suppressed", suppressed);
   applyComposerDockSuppressed();
 }
 
@@ -345,7 +345,7 @@ export function setupSitePilotChatComposerDock(
   if (!composer) return () => {};
 
   clearComposerScenarioStyles(composer);
-  composer.dataset.protoChatComposer = "true";
+  composer.dataset.studioChatComposer = "true";
   composer.classList.add(COMPOSER_CARD_CLASS, DOCK_IN_PLACE_CLASS);
   screen.classList.add("proto-chat-screen");
 
@@ -397,7 +397,7 @@ export function collectSitePilotChatScenarioFrames(
       node instanceof HTMLElement &&
       !isSitePilotChatComposerFrame(node) &&
       !node.classList.contains(COMPOSER_CARD_CLASS) &&
-      !node.hasAttribute("data-proto-chat-thinking") &&
+      !node.hasAttribute("data-studio-chat-thinking") &&
       !isSitePilotChatFeedbackFrame(node)
   );
 }

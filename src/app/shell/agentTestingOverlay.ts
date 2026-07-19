@@ -180,7 +180,7 @@ function unbindBeforeUnload(): void {
 function setHint(text: string): void {
   if (typeof document === "undefined") return;
   const el = document.querySelector<HTMLElement>(
-    ".proto-agent-testing-overlay__hint"
+    ".studio-agent-testing-overlay__hint"
   );
   if (el) el.textContent = text;
 }
@@ -190,7 +190,7 @@ function renderHistory(entries: HistoryEntry[]): void {
   const root = document.getElementById(ROOT_ID);
   if (!root) return;
   let box = root.querySelector<HTMLElement>(
-    ".proto-agent-testing-overlay__history"
+    ".studio-agent-testing-overlay__history"
   );
   const prior = entries.slice(1, HISTORY_MAX); // skip the just-pushed current
   if (prior.length === 0) {
@@ -199,13 +199,13 @@ function renderHistory(entries: HistoryEntry[]): void {
   }
   if (!box) {
     box = document.createElement("div");
-    box.className = "proto-agent-testing-overlay__history";
-    const panel = root.querySelector(".proto-agent-testing-overlay__panel");
+    box.className = "studio-agent-testing-overlay__history";
+    const panel = root.querySelector(".studio-agent-testing-overlay__panel");
     panel?.appendChild(box);
   }
   box.replaceChildren();
   const label = document.createElement("p");
-  label.className = "proto-agent-testing-overlay__history-label";
+  label.className = "studio-agent-testing-overlay__history-label";
   label.textContent = "Recent";
   box.appendChild(label);
   const list = document.createElement("ul");
@@ -231,18 +231,18 @@ function ensureRoot(): HTMLElement | null {
   root.className = "agent-testing-overlay";
   root.setAttribute("aria-live", "polite");
   root.innerHTML = `
-    <div class="proto-agent-testing-overlay__capture" aria-hidden="true"></div>
-    <div class="proto-agent-testing-overlay__panel" role="status">
-      <div class="proto-agent-testing-overlay__header">
-        <p class="proto-agent-testing-overlay__title">AGENT TESTING</p>
-        <button type="button" class="proto-agent-testing-overlay__dismiss">Dismiss</button>
+    <div class="studio-agent-testing-overlay__capture" aria-hidden="true"></div>
+    <div class="studio-agent-testing-overlay__panel" role="status">
+      <div class="studio-agent-testing-overlay__header">
+        <p class="studio-agent-testing-overlay__title">AGENT TESTING</p>
+        <button type="button" class="studio-agent-testing-overlay__dismiss">Dismiss</button>
       </div>
-      <p class="proto-agent-testing-overlay__hint">Page visible — clicks blocked. Status log below.</p>
-      <ol class="proto-agent-testing-overlay__log"></ol>
+      <p class="studio-agent-testing-overlay__hint">Page visible — clicks blocked. Status log below.</p>
+      <ol class="studio-agent-testing-overlay__log"></ol>
     </div>
   `;
   const dismiss = root.querySelector<HTMLButtonElement>(
-    ".proto-agent-testing-overlay__dismiss"
+    ".studio-agent-testing-overlay__dismiss"
   );
   dismiss?.addEventListener("click", () => {
     stopAgentTestingOverlay({ force: true, reload: false });
@@ -256,7 +256,7 @@ function renderLog(): void {
   if (typeof document.getElementById !== "function") return;
   const root = document.getElementById(ROOT_ID);
   const list = root?.querySelector<HTMLOListElement>(
-    ".proto-agent-testing-overlay__log"
+    ".studio-agent-testing-overlay__log"
   );
   if (!list) return;
   list.replaceChildren();
@@ -271,7 +271,7 @@ function renderLog(): void {
 function setTitle(title: string): void {
   if (typeof document === "undefined") return;
   const el = document.querySelector<HTMLElement>(
-    ".proto-agent-testing-overlay__title"
+    ".studio-agent-testing-overlay__title"
   );
   if (el) el.textContent = title;
 }
@@ -283,7 +283,7 @@ function stamp(line: string): string {
 
 function releaseClickGuard(): void {
   if (typeof document === "undefined") return;
-  delete document.documentElement.dataset.protoAgentTesting;
+  delete document.documentElement.dataset.studioAgentTesting;
 }
 
 function teardownDom(): void {
@@ -293,9 +293,9 @@ function teardownDom(): void {
   if (root) {
     root.dataset.active = "false";
     root.dataset.settling = "false";
-    root.querySelector(".proto-agent-testing-overlay__history")?.remove();
+    root.querySelector(".studio-agent-testing-overlay__history")?.remove();
   }
-  delete document.documentElement.dataset.protoAgentTesting;
+  delete document.documentElement.dataset.studioAgentTesting;
 }
 
 function scheduleReload(delayMs = 120): void {
@@ -378,10 +378,10 @@ export function startAgentTestingOverlay(title?: string): void {
   if (root) {
     root.dataset.active = "true";
     root.dataset.settling = "false";
-    root.querySelector(".proto-agent-testing-overlay__history")?.remove();
+    root.querySelector(".studio-agent-testing-overlay__history")?.remove();
   }
   if (typeof document !== "undefined") {
-    document.documentElement.dataset.protoAgentTesting = "true";
+    document.documentElement.dataset.studioAgentTesting = "true";
   }
   setTitle(resolved);
   setHint("Page visible — clicks blocked. Status log below.");
@@ -487,7 +487,7 @@ export function installAgentTestingOverlayApi(): void {
       if (orphan) {
         orphan.dataset.active = "false";
         orphan.dataset.settling = "false";
-        delete document.documentElement.dataset.protoAgentTesting;
+        delete document.documentElement.dataset.studioAgentTesting;
       }
     }
     nest = 0;
@@ -522,7 +522,7 @@ export function uninstallAgentTestingOverlayApi(): void {
     if (typeof document.getElementById === "function") {
       document.getElementById(ROOT_ID)?.remove();
     }
-    delete document.documentElement.dataset.protoAgentTesting;
+    delete document.documentElement.dataset.studioAgentTesting;
   }
   if (typeof window !== "undefined") {
     delete window.__protoAgentTestingOverlay;

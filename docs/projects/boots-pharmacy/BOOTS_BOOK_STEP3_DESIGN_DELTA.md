@@ -25,7 +25,7 @@ Same Boots content grid as Steps 1–2: shell **1440 / 64** → inner **1312**; 
 | Contact / pay meta | Static Sarah demo copy | Contract constants | **match** |
 | Advantage Card | Wire-patched rows + card image | Built-in layout (no LEGACY) | **match** |
 | Explore / Calendar CTAs | Navy commerce pills | `ButtonPrimary` + `--commerce` | **match** (Calendar inert as Make) |
-| Open Appointments | Tertiary icon+label; AIR `data-proto-open-appointment` | Same hook | **match** |
+| Open Appointments | Tertiary icon+label; AIR `data-studio-open-appointment` | Same hook | **match** |
 | Proto header/footer | Studio mounts | Intentional | **intentional** |
 
 ---
@@ -33,6 +33,6 @@ Same Boots content grid as Steps 1–2: shell **1440 / 64** → inner **1312**; 
 ## Studio hooks preserved
 
 - `component.appointment.summary`, `component.co.order.summary`, `component.book.appointment.progress`
-- `data-proto-open-appointment="true"` (playback `confirmation-open-appointments`)
+- `data-studio-open-appointment="true"` (playback `confirmation-open-appointments`)
 - `component.input.button` (Explore / Calendar)
-- Host `[data-proto-react-screen="book-step-3"]`
+- Host `[data-studio-react-screen="book-step-3"]`

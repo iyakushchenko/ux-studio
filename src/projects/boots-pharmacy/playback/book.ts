@@ -79,7 +79,7 @@ function isBookDateCellSelected(
 ): boolean {
   return (
     screen.querySelector<HTMLElement>(
-      `[data-name="calendar. date. cell"][data-proto-cal-kind="date"][data-proto-cal-month="${month}"][data-proto-cal-value="${day}"][data-proto-cal-selected="true"]`
+      `[data-name="calendar. date. cell"][data-studio-cal-kind="date"][data-studio-cal-month="${month}"][data-studio-cal-value="${day}"][data-studio-cal-selected="true"]`
     ) != null
   );
 }
@@ -87,7 +87,7 @@ function isBookDateCellSelected(
 function isBookTimeCellSelected(screen: HTMLElement, time: string): boolean {
   return (
     screen.querySelector<HTMLElement>(
-      `[data-name="calendar. date. cell"][data-proto-cal-kind="time"][data-proto-cal-value="${time}"][data-proto-cal-selected="true"]`
+      `[data-name="calendar. date. cell"][data-studio-cal-kind="time"][data-studio-cal-value="${time}"][data-studio-cal-selected="true"]`
     ) != null
   );
 }
@@ -95,7 +95,7 @@ function isBookTimeCellSelected(screen: HTMLElement, time: string): boolean {
 function isAnyBookTimeSelected(screen: HTMLElement): boolean {
   return (
     screen.querySelector<HTMLElement>(
-      '[data-name="calendar. date. cell"][data-proto-cal-kind="time"][data-proto-cal-selected="true"]'
+      '[data-name="calendar. date. cell"][data-studio-cal-kind="time"][data-studio-cal-selected="true"]'
     ) != null
   );
 }
@@ -281,9 +281,9 @@ async function findBookDateCell(
   for (let i = 0; i < 80; i++) {
     if (shouldAbort()) return null;
     const cell = screen.querySelector<HTMLElement>(
-      `[data-name="calendar. date. cell"][data-proto-cal-kind="date"][data-proto-cal-month="${month}"][data-proto-cal-value="${day}"]`
+      `[data-name="calendar. date. cell"][data-studio-cal-kind="date"][data-studio-cal-month="${month}"][data-studio-cal-value="${day}"]`
     );
-    if (cell && cell.dataset.protoCalUnavailable !== "true") return cell;
+    if (cell && cell.dataset.studioCalUnavailable !== "true") return cell;
     await delay(50);
   }
   return null;
@@ -296,9 +296,9 @@ async function findBookTimeCell(
   for (let i = 0; i < 80; i++) {
     if (shouldAbort()) return null;
     const cell = screen.querySelector<HTMLElement>(
-      `[data-name="calendar. date. cell"][data-proto-cal-kind="time"][data-proto-cal-value="${time}"]`
+      `[data-name="calendar. date. cell"][data-studio-cal-kind="time"][data-studio-cal-value="${time}"]`
     );
-    if (cell && cell.dataset.protoCalUnavailable !== "true") return cell;
+    if (cell && cell.dataset.studioCalUnavailable !== "true") return cell;
     await delay(50);
   }
   return null;
@@ -307,10 +307,10 @@ async function findBookTimeCell(
 function clearBookTimeSelection(screen: HTMLElement): void {
   screen
     .querySelectorAll<HTMLElement>(
-      '[data-name="calendar. date. cell"][data-proto-cal-kind="time"]'
+      '[data-name="calendar. date. cell"][data-studio-cal-kind="time"]'
     )
     .forEach((cell) => {
-      delete cell.dataset.protoCalSelected;
+      delete cell.dataset.studioCalSelected;
     });
 }
 
@@ -323,7 +323,7 @@ async function selectBookDateCell(
 ): Promise<boolean> {
   const dateCell = await findBookDateCell(screen, month, day);
   if (!dateCell || shouldAbort()) return false;
-  if (dateCell.dataset.protoCalSelected === "true") return true;
+  if (dateCell.dataset.studioCalSelected === "true") return true;
   return clickBookCell(dateCell, options);
 }
 
@@ -408,7 +408,7 @@ async function waitForBookTimeAnchor(
   for (let i = 0; i < 80; i++) {
     if (shouldAbort()) return null;
     const cell = screen.querySelector<HTMLElement>(
-      '[data-name="calendar. date. cell"][data-proto-cal-kind="time"]'
+      '[data-name="calendar. date. cell"][data-studio-cal-kind="time"]'
     );
     if (cell) return cell;
     await delay(50);
@@ -521,7 +521,7 @@ async function runSelectBookDate(options?: {
   );
   if (!dateCell || shouldAbort()) return false;
 
-  if (dateCell.dataset.protoCalSelected === "true") {
+  if (dateCell.dataset.studioCalSelected === "true") {
     return !shouldAbort();
   }
 
@@ -555,7 +555,7 @@ async function runSelectBookTime(options?: {
   }
   if (!timeCell || shouldAbort()) return false;
 
-  if (timeCell.dataset.protoCalSelected === "true") {
+  if (timeCell.dataset.studioCalSelected === "true") {
     if (!options?.skip && !options?.instant && !didSectionScroll) {
       await animateDemoTargetIntoView(timeCell, { shouldAbort });
       if (shouldAbort()) return false;

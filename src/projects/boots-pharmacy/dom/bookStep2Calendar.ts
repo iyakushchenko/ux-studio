@@ -37,7 +37,7 @@ export type BookStep2RetreatSlotDetail = {
 };
 
 /** @deprecated Use RETREAT_SYNC_EVENT — kept for tests. */
-export const BOOK_STEP2_RETREAT_DEFAULT_EVENT = "proto-retreat-sync";
+export const BOOK_STEP2_RETREAT_DEFAULT_EVENT = "studio-retreat-sync";
 
 const BOOKING_WEEKDAYS = [
   "Sunday",
@@ -85,7 +85,7 @@ function findBookStep2DateHeading(screen: HTMLElement): HTMLElement | null {
 
 export function bookStep2Screen(): HTMLElement | null {
   return document.querySelector<HTMLElement>(
-    ".proto-viewport > div > div:nth-child(4)"
+    ".studio-viewport > div > div:nth-child(4)"
   );
 }
 
@@ -121,9 +121,9 @@ function findBookStep2DateCell(
   day: number
 ): HTMLElement | null {
   const byData = screen.querySelector<HTMLElement>(
-    `[data-name="calendar. date. cell"][data-proto-cal-kind="date"][data-proto-cal-month="${month}"][data-proto-cal-value="${day}"]`
+    `[data-name="calendar. date. cell"][data-studio-cal-kind="date"][data-studio-cal-month="${month}"][data-studio-cal-value="${day}"]`
   );
-  if (byData && byData.dataset.protoCalUnavailable !== "true") return byData;
+  if (byData && byData.dataset.studioCalUnavailable !== "true") return byData;
 
   const monthRoots = findBookStep2MonthRoots(screen);
   for (const cell of screen.querySelectorAll<HTMLElement>(
@@ -141,9 +141,9 @@ function findBookStep2TimeCell(
   time: string
 ): HTMLElement | null {
   const byData = screen.querySelector<HTMLElement>(
-    `[data-name="calendar. date. cell"][data-proto-cal-kind="time"][data-proto-cal-value="${time}"]`
+    `[data-name="calendar. date. cell"][data-studio-cal-kind="time"][data-studio-cal-value="${time}"]`
   );
-  if (byData && byData.dataset.protoCalUnavailable !== "true") return byData;
+  if (byData && byData.dataset.studioCalUnavailable !== "true") return byData;
 
   for (const cell of screen.querySelectorAll<HTMLElement>(
     '[data-name="calendar. date. cell"]'
@@ -185,23 +185,23 @@ export function applyBookStep2CalendarFromSlot(
   slot: BookStep2CalendarSlot
 ): boolean {
   // React pilot owns selection via props — do not strip React cell chrome.
-  if (screen.dataset.protoReactScreen === "book-step-2") {
+  if (screen.dataset.studioReactScreen === "book-step-2") {
     return true;
   }
 
   screen
     .querySelectorAll<HTMLElement>('[data-name="calendar. date. cell"]')
     .forEach((cell) => {
-      delete cell.dataset.protoCalSelected;
+      delete cell.dataset.studioCalSelected;
       stripBookStep2CalCellChrome(cell);
     });
 
   const dateCell = findBookStep2DateCell(screen, slot.month, slot.day);
-  if (!dateCell || dateCell.dataset.protoCalUnavailable === "true") {
+  if (!dateCell || dateCell.dataset.studioCalUnavailable === "true") {
     return false;
   }
 
-  dateCell.dataset.protoCalSelected = "true";
+  dateCell.dataset.studioCalSelected = "true";
 
   const heading = findBookStep2DateHeading(screen);
   if (heading) {
@@ -210,8 +210,8 @@ export function applyBookStep2CalendarFromSlot(
 
   if (slot.time) {
     const timeCell = findBookStep2TimeCell(screen, slot.time);
-    if (timeCell && timeCell.dataset.protoCalUnavailable !== "true") {
-      timeCell.dataset.protoCalSelected = "true";
+    if (timeCell && timeCell.dataset.studioCalUnavailable !== "true") {
+      timeCell.dataset.studioCalSelected = "true";
     }
   }
 

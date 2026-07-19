@@ -21,29 +21,30 @@ Agents **do not** offer A/B/C tech menus. They decide, document, build, report. 
 
 1. [product/COMMAND_DOCTRINE.md](./product/COMMAND_DOCTRINE.md) — **composite role + proactive** + who decides + §6–§7 handoff + FE audit (read first every session)
 2. [product/LESSONS_LEARNED.md](./product/LESSONS_LEARNED.md) — progressive failure/win capture (read before UI close)
-3. [product/NAMING.md](./product/NAMING.md) — file/folder naming for **new** files
-4. [product/POST_CHANGE_CHECKLIST.md](./product/POST_CHANGE_CHECKLIST.md) — local gates before “done”
-5. [product/NEXT_STEPS.md](./product/NEXT_STEPS.md) — living NOW / NEXT / LATER board
-6. [product/SOLUTION_REQUIREMENTS.md](./product/SOLUTION_REQUIREMENTS.md) — readiness + locked defaults (proceed checklist)
-7. [product/PRODUCT_OWNER_BRIEF.md](./product/PRODUCT_OWNER_BRIEF.md) — A–Z for the Product Owner
-8. [product/CONCEPT_INTAKE.md](./product/CONCEPT_INTAKE.md) — **messy concepts in → Studio pages out** (business logic)
-9. [product/PROJECT_STYLEGUIDE.md](./product/PROJECT_STYLEGUIDE.md) — per-brand delta (colors, logos → theme.css remaps)
-10. [product/CSS_BASE_THEME.md](./product/CSS_BASE_THEME.md) — **BASE → THEME → PANEL → LEGACY** (no CSS dump)
-11. [product/DS_STRICTNESS.md](./product/DS_STRICTNESS.md) — **no near-duplicates;** UXDS + theme only; deviations registered; no React growth in LEGACY
-12. [product/UX_STUDIO_VISION.md](./product/UX_STUDIO_VISION.md) — product north star
-13. [product/PAGE_BUILD_CONTRACT.md](./product/PAGE_BUILD_CONTRACT.md) — React + UXDS
-14. [product/COMPONENT_LIBRARY.md](./product/COMPONENT_LIBRARY.md) — migrated pages = real React kits; grow by migration
-15. [product/VISUAL_FIDELITY.md](./product/VISUAL_FIDELITY.md) — **concept L&F mandatory**, no visual zoo, rebuild behavior parity
-16. [product/INTERACTION_FIDELITY.md](./product/INTERACTION_FIDELITY.md) — **recording needs interactive pages** + shared behavior library
-17. [product/FE_UI_UX_AUDIT.md](./product/FE_UI_UX_AUDIT.md) — **post-UI audit checklist** (PROVEN before PO; G5 AIR/REC + G6 REC⊗CJM)
-18. [product/FE_STANDARDS.md](./product/FE_STANDARDS.md) — content column, CTA nowrap, **one text-link pattern**, layout hygiene
-19. [product/CI_ACTIONS_BUDGET.md](./product/CI_ACTIONS_BUDGET.md) — slim Actions; smoke on-demand; post-push sitrep
-20. [product/VERSIONING.md](./product/VERSIONING.md) — local semver + CHANGELOG (no Release CI yet)
-21. [product/PRODUCT_FORECAST.md](./product/PRODUCT_FORECAST.md) — engine product map (URL, REC, UXDS, CI, overlay, X-Suite)
-22. [uxds/README.md](./uxds/README.md) — UXDS Larkin inventory · [uxds/DEVIATIONS.md](./uxds/DEVIATIONS.md) · [uxds/TOKEN_BRIDGE.md](./uxds/TOKEN_BRIDGE.md)
-23. [product/X_SUITE_INTEGRATION.md](./product/X_SUITE_INTEGRATION.md) — Summarizer / X-Suite → Studio seam
-24. [projects/boots-pharmacy/](./projects/boots-pharmacy/) — Boots design deltas, pilots, FE audits
-25. [shell/SHELL.md](./shell/SHELL.md) · [shell/URL.md](./shell/URL.md) · [shell/PROJECTS.md](./shell/PROJECTS.md) · [shell/PLAYBACK.md](./shell/PLAYBACK.md) · [shell/RECORDING.md](./shell/RECORDING.md)
+3. [product/NAMING.md](./product/NAMING.md) — file/folder naming + domain CSS/attrs (no new `.proto-*`)
+4. [product/ARCHITECTURE.md](./product/ARCHITECTURE.md) · [product/HYGIENE.md](./product/HYGIENE.md) — engine folder map + LOC ratchet
+5. [product/POST_CHANGE_CHECKLIST.md](./product/POST_CHANGE_CHECKLIST.md) — local gates before “done”
+6. [product/NEXT_STEPS.md](./product/NEXT_STEPS.md) — living NOW / NEXT / LATER board
+7. [product/SOLUTION_REQUIREMENTS.md](./product/SOLUTION_REQUIREMENTS.md) — readiness + locked defaults (proceed checklist)
+8. [product/PRODUCT_OWNER_BRIEF.md](./product/PRODUCT_OWNER_BRIEF.md) — A–Z for the Product Owner
+9. [product/CONCEPT_INTAKE.md](./product/CONCEPT_INTAKE.md) — **messy concepts in → Studio pages out** (business logic)
+10. [product/PROJECT_STYLEGUIDE.md](./product/PROJECT_STYLEGUIDE.md) — per-brand delta (colors, logos → theme.css remaps)
+11. [product/CSS_BASE_THEME.md](./product/CSS_BASE_THEME.md) — **BASE → THEME → PANEL → LEGACY** (no CSS dump)
+12. [product/DS_STRICTNESS.md](./product/DS_STRICTNESS.md) — **no near-duplicates;** UXDS + theme only; deviations registered; no React growth in LEGACY
+13. [product/UX_STUDIO_VISION.md](./product/UX_STUDIO_VISION.md) — product north star
+14. [product/PAGE_BUILD_CONTRACT.md](./product/PAGE_BUILD_CONTRACT.md) — React + UXDS
+15. [product/COMPONENT_LIBRARY.md](./product/COMPONENT_LIBRARY.md) — migrated pages = real React kits; grow by migration
+16. [product/VISUAL_FIDELITY.md](./product/VISUAL_FIDELITY.md) — **concept L&F mandatory**, no visual zoo, rebuild behavior parity
+17. [product/INTERACTION_FIDELITY.md](./product/INTERACTION_FIDELITY.md) — **recording needs interactive pages** + shared behavior library
+18. [product/FE_UI_UX_AUDIT.md](./product/FE_UI_UX_AUDIT.md) — **post-UI audit checklist** (PROVEN before PO; G5 AIR/REC + G6 REC⊗CJM)
+19. [product/FE_STANDARDS.md](./product/FE_STANDARDS.md) — content column, CTA nowrap, **one text-link pattern**, layout hygiene
+20. [product/CI_ACTIONS_BUDGET.md](./product/CI_ACTIONS_BUDGET.md) — slim Actions; smoke on-demand; post-push sitrep
+21. [product/VERSIONING.md](./product/VERSIONING.md) — local semver + CHANGELOG (no Release CI yet)
+22. [product/PRODUCT_FORECAST.md](./product/PRODUCT_FORECAST.md) — engine product map (URL, REC, UXDS, CI, overlay, X-Suite)
+23. [uxds/README.md](./uxds/README.md) — UXDS Larkin inventory · [uxds/DEVIATIONS.md](./uxds/DEVIATIONS.md) · [uxds/TOKEN_BRIDGE.md](./uxds/TOKEN_BRIDGE.md)
+24. [product/X_SUITE_INTEGRATION.md](./product/X_SUITE_INTEGRATION.md) — Summarizer / X-Suite → Studio seam
+25. [projects/boots-pharmacy/](./projects/boots-pharmacy/) — Boots design deltas, pilots, FE audits
+26. [shell/SHELL.md](./shell/SHELL.md) · [shell/URL.md](./shell/URL.md) · [shell/PROJECTS.md](./shell/PROJECTS.md) · [shell/PLAYBACK.md](./shell/PLAYBACK.md) · [shell/RECORDING.md](./shell/RECORDING.md)
 
 Agent entry: [../AGENTS.md](../AGENTS.md)
 

@@ -259,7 +259,7 @@ export function setupProtoMapView(
     pin.className = "proto-lb-map-pin";
     pin.setAttribute("role", "button");
     pin.tabIndex = 0;
-    if (spec.nearOnly) pin.dataset.protoNearPin = "true";
+    if (spec.nearOnly) pin.dataset.studioNearPin = "true";
     pin.style.left = spec.left;
     pin.style.top = spec.top;
     pin.innerHTML = MAP_PIN_SVG;
@@ -299,7 +299,7 @@ export function setupProtoMapView(
   const panCleanup = enableClampedMapPan(viewport, surface, bg);
 
   const setNearMe = (on: boolean) => {
-    mapView.dataset.protoMapNear = on ? "true" : "false";
+    mapView.dataset.studioMapNear = on ? "true" : "false";
   };
   setNearMe(false);
 

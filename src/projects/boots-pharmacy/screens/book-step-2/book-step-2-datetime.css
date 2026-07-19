@@ -1,6 +1,6 @@
 /* Book Step 2 — React pilot; visual source = Make Body3 + live wire calendar CSS */
 
-.proto-react-screen-host[data-proto-react-screen="book-step-2"] {
+.studio-react-screen-host[data-studio-react-screen="book-step-2"] {
   display: flex;
   flex-direction: column;
   flex: 1 1 auto;

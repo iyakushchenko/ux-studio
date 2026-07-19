@@ -224,7 +224,7 @@ componentBody = componentBody.replace(
 );
 
 componentBody = componentBody.replace(
-  /  return \(\n    <div\n      className="proto-app-root[\s\S]*?<StudioNavPanel[\s\S]*?\/>\n\n      <div/,
+  /  return \(\n    <div\n      className="studio-app-root[\s\S]*?<StudioNavPanel[\s\S]*?\/>\n\n      <div/,
   "  return (\n    <>\n      <style>{dynamicCSS}</style>\n      <div"
 );
 

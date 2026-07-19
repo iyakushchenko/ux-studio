@@ -73,12 +73,12 @@ type ScrollIntent = {
 
 function clearScenarioFrameStyles(frames: HTMLElement[]): void {
   frames.forEach((frame) => {
-    const id = frame.dataset.protoScenarioHideTid;
+    const id = frame.dataset.studioScenarioHideTid;
     if (id) window.clearTimeout(Number(id));
     frame.style.display = "";
-    delete frame.dataset.protoScenarioVisible;
-    delete frame.dataset.protoScenarioFrame;
-    delete frame.dataset.protoScenarioHideTid;
+    delete frame.dataset.studioScenarioVisible;
+    delete frame.dataset.studioScenarioFrame;
+    delete frame.dataset.studioScenarioHideTid;
     frame.classList.remove("proto-scenario-frame", "proto-scenario-frame--hidden");
   });
 }
@@ -259,7 +259,7 @@ export function useScenarioPlayback({
     const frames = collectFrames();
     framesRef.current = frames;
     frames.forEach((frame, index) => {
-      frame.dataset.protoScenarioFrame = String(index + 1);
+      frame.dataset.studioScenarioFrame = String(index + 1);
     });
     setTotalFrames(scenarioTotalFor(frames.length, hasFinale));
 
@@ -326,7 +326,7 @@ export function useScenarioPlayback({
     if (frames.length === 0) return frames;
     framesRef.current = frames;
     frames.forEach((frame, index) => {
-      frame.dataset.protoScenarioFrame = String(index + 1);
+      frame.dataset.studioScenarioFrame = String(index + 1);
     });
     setTotalFrames(scenarioTotalFor(frames.length, hasFinale));
     const restoreFull = restoreFullOnInitRef?.current === true;

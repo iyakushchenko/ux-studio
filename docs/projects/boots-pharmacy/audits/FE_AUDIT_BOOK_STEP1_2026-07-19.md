@@ -30,9 +30,9 @@ Live localhost audit of React Book Step 1 confirms the claimed fidelity ship: bo
 
 | # | Result | Evidence |
 |---|--------|----------|
-| A1 | **PASS** | React `.book-step-1` mounted (`data-proto-react-screen=book-step-1`); Make body/header/footer retired. H1 39/48, card white 24px radius, progress active navy 700 / bar `#c6e5e1`, checked booster `#afccca` — matches delta / live Make. |
+| A1 | **PASS** | React `.book-step-1` mounted (`data-studio-react-screen=book-step-1`); Make body/header/footer retired. H1 39/48, card white 24px radius, progress active navy 700 / bar `#c6e5e1`, checked booster `#afccca` — matches delta / live Make. |
 | A2 | **PASS** | Delta covered: body fill img `6d60145a…` opacity 0.31 `object-position: 50% 100%`; crumbs white / no border / Home `#305854`; shell/inner split; NearMeCta tertiary. |
-| A3 | **PASS** | Remaps scoped to `.book-step-1*` + shared `.proto-tertiary-cta` / `.proto-near-me-cta`; no accidental global wash observed on this path. |
+| A3 | **PASS** | Remaps scoped to `.book-step-1*` + shared `.studio-tertiary-cta` / `.proto-near-me-cta`; no accidental global wash observed on this path. |
 
 ### B. Layout / max-width / alignment
 
@@ -55,7 +55,7 @@ Live localhost audit of React Book Step 1 confirms the claimed fidelity ship: bo
 
 | # | Result | Evidence |
 |---|--------|----------|
-| D1 | **PASS** | Change hover CSS → label black / icon `#012169`. Near-me via `.proto-tertiary-cta:hover` same language + img filter → navy. Search inset navy ring on hover/focus. |
+| D1 | **PASS** | Change hover CSS → label black / icon `#012169`. Near-me via `.studio-tertiary-cta:hover` same language + img filter → navy. Search inset navy ring on hover/focus. |
 | D2 | **PASS** | Explicit `:focus-visible` on crumb, Change, search, Learn more. Near-me/tertiary suppresses mouse `:focus` only (`:focus:not(:focus-visible)`); keyboard retains UA focus ring. |
 | D3 | **PASS** | Booster checked `#afccca` + mark `#305854`; Continue hover/active navy darken in screen CSS. |
 | D4 | **N/A** | No disabled primary on this empty-location path — Continue stays enabled and gates via Availability dialog (honest). |
@@ -74,7 +74,7 @@ Live localhost audit of React Book Step 1 confirms the claimed fidelity ship: bo
 |---|--------|----------|
 | F1 | **PASS** | Change + near-me share tertiary mute → navy language; primary Continue navy pill only. |
 | F2 | **PASS** | Near-me/Change quieter than Continue; progress labels secondary to H1. |
-| F3 | **PASS** | Tip `2ea93a0` removed FilterChip near-me fork; single `NearMeCta` / `.proto-tertiary-cta`. |
+| F3 | **PASS** | Tip `2ea93a0` removed FilterChip near-me fork; single `NearMeCta` / `.studio-tertiary-cta`. |
 
 ### G. Nav chrome logic
 
@@ -99,7 +99,7 @@ Live localhost audit of React Book Step 1 confirms the claimed fidelity ship: bo
 
 1. **Content grid + crumb/logo align** — 1440/64/1312; logo vs Home Δx = 0 at 1440 viewport.  
 2. **Body fill restored** — decorative PNG @ 0.31, object-position bottom, loads (`naturalWidth > 0`).  
-3. **Near-me = Change tertiary language** — shared `NearMeCta` / `.proto-tertiary-cta--compact`: `#5c5c5c` label, teal icon treatment, `nowrap`, no wash.  
+3. **Near-me = Change tertiary language** — shared `NearMeCta` / `.studio-tertiary-cta--compact`: `#5c5c5c` label, teal icon treatment, `nowrap`, no wash.  
 4. **863px progress/card + live progress type** — 16px / 700 / `#012169` active.  
 5. **Interactions live** — booster toggle, Learn more open, Continue → Availability when no store.
 

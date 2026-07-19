@@ -7,11 +7,11 @@ alwaysApply: true
 
 After changes to **code**, **UI**, or **config**, before considering the task done:
 
-1. `npm test` (fix failures) — includes `check:links`.
+1. `npm test` (fix failures) — includes `check:links` + `check:hygiene`.
 2. `npm run build` (must stay green — Pages uses the same signal).
 3. Update authoritative docs if behavior changed (`docs/product/*` or `docs/projects/<id>/`). New files: [NAMING.md](docs/product/NAMING.md). Append durable lessons to [LESSONS_LEARNED.md](docs/product/LESSONS_LEARNED.md).
-4. UI-facing ships: strict FE audit **PROVEN** under `docs/projects/<id>/audits/` — tests alone are BAD; browser proof for hybrid/chrome; blast-radius + REC⊗CJM⊗AIR.
-5. Chrome / playback: local MCP (`__protoRunMcpSanityCheck`, REC⊗CJM) or lean `npm run smoke` — not full marathon in CI. Agent overlay touch + sitrep settle; strip ephemeral URL params.
+4. UI-facing ships: strict FE audit **PROVEN** under `docs/projects/<id>/audits/` — tests alone are BAD; browser proof for hybrid/chrome; blast-radius + REC⊗CJM⊗AIR. After domain CSS class renames: Nazi QA **light** on chrome.
+5. Chrome / playback: local MCP (`__studioRunMcpSanityCheck` / `__protoRunMcpSanityCheck`, REC⊗CJM) or lean `npm run smoke` — not full marathon in CI. Agent overlay touch + sitrep settle; strip ephemeral URL params. Selectors use `data-studio-*` / `.studio-nav-*`.
 6. After push: `gh run list -R iyakushchenko/ux-studio -L 10` (never assume green from local).
 7. User-visible / durable seams: `npm run notes:append -- --lane=<lane> --intent="…"`.
 8. Commit when coherent (and allowed).

@@ -14,7 +14,7 @@ import {
   PDP_PRICE_WITHOUT_BOOSTER,
 } from "@/projects/boots-pharmacy/data/orderPricing";
 
-const PDP_SCREEN_SELECTOR = ".proto-viewport > div > div:nth-child(8)";
+const PDP_SCREEN_SELECTOR = ".studio-viewport > div > div:nth-child(8)";
 const PDP_RTB_MODULE_SELECTOR = `${PDP_SCREEN_SELECTOR} [data-name="module.pdp.rtb"]`;
 
 export function getPdpRtbStackSource(): HTMLElement | null {
@@ -33,7 +33,7 @@ export function clonePdpRtbStack(): HTMLElement | null {
   const source = getPdpRtbStackSource();
   if (!source) return null;
   const clone = source.cloneNode(true) as HTMLElement;
-  clone.dataset.protoQuickViewClone = "true";
+  clone.dataset.studioQuickViewClone = "true";
   clone.classList.add("proto-quick-view-rtb-stack");
   return clone;
 }
@@ -44,7 +44,7 @@ function isCheckAvailabilityBtn(btn: HTMLElement): boolean {
 
 function isViewDetailsBtn(btn: HTMLElement): boolean {
   return (
-    btn.dataset.protoQuickViewDetails === "true" ||
+    btn.dataset.studioQuickViewDetails === "true" ||
     /^view details$/i.test((btn.textContent ?? "").replace(/\s+/g, " ").trim())
   );
 }
@@ -61,7 +61,7 @@ function prepareViewDetailsButton(root: HTMLElement): HTMLElement | null {
 
   const label = btn.querySelector("p");
   if (label) label.textContent = "View Details";
-  btn.dataset.protoQuickViewDetails = "true";
+  btn.dataset.studioQuickViewDetails = "true";
   btn.hidden = false;
   btn.style.removeProperty("display");
   return btn;
@@ -181,10 +181,10 @@ export function wireQuickViewRtb(
   root: HTMLElement,
   handlers: QuickViewRtbHandlers
 ): () => void {
-  if (root.dataset.protoQuickViewWired === "1") {
+  if (root.dataset.studioQuickViewWired === "1") {
     return () => {};
   }
-  root.dataset.protoQuickViewWired = "1";
+  root.dataset.studioQuickViewWired = "1";
 
   wireProtoIconHitButtons(root);
   syncQuickViewLoginBlock(root, handlers.loggedIn);
@@ -245,7 +245,7 @@ export function wireQuickViewRtb(
   });
 
   return () => {
-    delete root.dataset.protoQuickViewWired;
+    delete root.dataset.studioQuickViewWired;
     cleanups.forEach((fn) => fn());
   };
 }

@@ -641,7 +641,7 @@ export function registerStudioMcpHelpers(options: {
       orchestraMode: options.getOrchestraModeId?.() ?? null,
       diagnosticOpen: options.isDiagnosticOpen(),
       logLen: log.length,
-      isOnAir: document.querySelector(".proto-nav-scenario--on-air") != null,
+      isOnAir: document.querySelector(".studio-nav-scenario--on-air") != null,
       isPlaying: playBtn?.getAttribute("aria-pressed") === "true",
       canStepForward: stepFwd ? !stepFwd.hasAttribute("disabled") : undefined,
       canStepBack: stepBack ? !stepBack.hasAttribute("disabled") : undefined,

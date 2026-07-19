@@ -3,20 +3,20 @@
 }
 
 /* Prototype scroll pane — flex fill + zoom-safe min height (see useScrollFill) */
-.proto-scroll--prototype:not(.hidden) {
+.studio-scroll--prototype:not(.hidden) {
   display: flex;
   flex-direction: column;
 }
 
-.proto-scroll--prototype > .proto-viewport {
+.studio-scroll--prototype > .studio-viewport {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  min-height: var(--proto-scroll-min-px, 100%);
+  min-height: var(--studio-scroll-min-px, 100%);
 }
 
-.proto-scroll--prototype.proto-scroll--locked,
-.proto-scroll--prototype.proto-scroll--journey-locked {
+.studio-scroll--prototype.studio-scroll--locked,
+.studio-scroll--prototype.studio-scroll--journey-locked {
   overflow: hidden !important;
   overscroll-behavior: contain;
   touch-action: none;
@@ -29,7 +29,7 @@
 }
 
 /* Studio playback — block user input on wire (pages + popups); nav deck stays live */
-.proto-wire-mount {
+.studio-wire-mount {
   position: relative;
   flex: 1 1 auto;
   min-height: 0;
@@ -37,31 +37,31 @@
   display: flex;
   flex-direction: column;
 }
-.proto-wire-mount--playback-locked {
+.studio-wire-mount--playback-locked {
   cursor: not-allowed;
 }
-.proto-wire-mount--playback-locked .proto-app-content {
+.studio-wire-mount--playback-locked .studio-app-content {
   cursor: not-allowed;
 }
-.proto-wire-mount--playback-locked .proto-playback-shield {
+.studio-wire-mount--playback-locked .studio-playback-shield {
   cursor: not-allowed;
 }
 
 /* Scripted clicks — suppress native hover/active hit circles; cursor carries the touch cue */
-.proto-wire-mount--playback-locked .proto-icon-hit::before,
-.proto-wire-mount--playback-locked
-  .proto-viewport [data-name="component.input.button"][class*="h-[32px]"]:not(:has(p))::before,
-.proto-wire-mount--playback-locked .proto-icon-hit:hover::before,
-.proto-wire-mount--playback-locked .proto-icon-hit:active::before,
-.proto-wire-mount--playback-locked
-  .proto-viewport [data-name="component.input.button"][class*="h-[32px]"]:not(:has(p)):hover::before,
-.proto-wire-mount--playback-locked
-  .proto-viewport [data-name="component.input.button"][class*="h-[32px]"]:not(:has(p)):active::before {
+.studio-wire-mount--playback-locked .studio-icon-hit::before,
+.studio-wire-mount--playback-locked
+  .studio-viewport [data-name="component.input.button"][class*="h-[32px]"]:not(:has(p))::before,
+.studio-wire-mount--playback-locked .studio-icon-hit:hover::before,
+.studio-wire-mount--playback-locked .studio-icon-hit:active::before,
+.studio-wire-mount--playback-locked
+  .studio-viewport [data-name="component.input.button"][class*="h-[32px]"]:not(:has(p)):hover::before,
+.studio-wire-mount--playback-locked
+  .studio-viewport [data-name="component.input.button"][class*="h-[32px]"]:not(:has(p)):active::before {
   background: transparent !important;
 }
 
 /* Screen / hub navigation — crossfade on wire mount (see useNavTransition) */
-.proto-wire-mount--nav-cross {
+.studio-wire-mount--nav-cross {
   animation: proto-wire-nav-cross 280ms ease forwards;
   pointer-events: none;
 }
@@ -82,14 +82,14 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .proto-wire-mount--nav-cross {
+  .studio-wire-mount--nav-cross {
     animation: none;
     opacity: 1;
     pointer-events: auto;
   }
 }
 
-.proto-playback-shield {
+.studio-playback-shield {
   position: absolute;
   inset: 0;
   z-index: 10045;
@@ -100,7 +100,7 @@
 }
 
 /* Chat composer portal — above playback shield, below availability scrim (10000) when suppressed */
-.proto-chat-composer-portal-host {
+.studio-chat-composer-portal-host {
   position: absolute;
   inset: 0;
   z-index: 10100;
@@ -109,7 +109,7 @@
 }
 
 /* Fatal runtime fallback — import/TDZ/render crashes */
-.proto-fatal-error {
+.studio-fatal-error {
   min-height: 100dvh;
   display: flex;
   align-items: center;
@@ -119,14 +119,14 @@
   color: #212121;
   font-family: "Open Sans", system-ui, sans-serif;
 }
-.proto-fatal-error__card {
+.studio-fatal-error__card {
   width: min(640px, 100%);
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 5px 13px 2px rgba(0, 0, 0, 0.12);
   padding: 24px 28px;
 }
-.proto-fatal-error__eyebrow {
+.studio-fatal-error__eyebrow {
   margin: 0 0 6px;
   font-size: 11px;
   font-weight: 600;
@@ -134,22 +134,22 @@
   text-transform: uppercase;
   color: #5c5c5c;
 }
-.proto-fatal-error__title {
+.studio-fatal-error__title {
   margin: 0 0 10px;
   font-size: 22px;
   line-height: 1.25;
   color: #012169;
 }
-.proto-fatal-error__summary {
+.studio-fatal-error__summary {
   margin: 0 0 18px;
   font-size: 14px;
   line-height: 1.55;
   color: #333;
 }
-.proto-fatal-error__section {
+.studio-fatal-error__section {
   margin-bottom: 16px;
 }
-.proto-fatal-error__heading {
+.studio-fatal-error__heading {
   margin: 0 0 6px;
   font-size: 12px;
   font-weight: 700;
@@ -157,26 +157,26 @@
   letter-spacing: 0.04em;
   color: #012169;
 }
-.proto-fatal-error__list {
+.studio-fatal-error__list {
   margin: 0;
   padding-left: 18px;
   font-size: 13px;
   line-height: 1.5;
   color: #444;
 }
-.proto-fatal-error__list li + li {
+.studio-fatal-error__list li + li {
   margin-top: 4px;
 }
-.proto-fatal-error__details {
+.studio-fatal-error__details {
   margin: 16px 0;
   font-size: 13px;
 }
-.proto-fatal-error__details-summary {
+.studio-fatal-error__details-summary {
   cursor: pointer;
   color: #012169;
   font-weight: 600;
 }
-.proto-fatal-error__pre {
+.studio-fatal-error__pre {
   margin: 10px 0 0;
   padding: 12px;
   border-radius: 6px;
@@ -187,45 +187,45 @@
   white-space: pre-wrap;
   word-break: break-word;
 }
-.proto-fatal-error__pre--stack {
+.studio-fatal-error__pre--stack {
   margin-top: 8px;
   color: #555;
 }
-.proto-fatal-error__actions {
+.studio-fatal-error__actions {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
   margin-top: 8px;
 }
-.proto-fatal-error__btn {
+.studio-fatal-error__btn {
   padding: 10px 16px;
   border-radius: 6px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
 }
-.proto-fatal-error__btn--primary {
+.studio-fatal-error__btn--primary {
   border: none;
   background: #012169;
   color: #fff;
 }
-.proto-fatal-error__btn--primary:hover {
+.studio-fatal-error__btn--primary:hover {
   background: #023a8c;
 }
-.proto-fatal-error__btn--secondary {
+.studio-fatal-error__btn--secondary {
   border: 1px solid #ccc;
   background: #fff;
   color: #333;
 }
-.proto-fatal-error__btn--secondary:hover {
+.studio-fatal-error__btn--secondary:hover {
   background: #f5f5f5;
 }
-.proto-fatal-error__btn--copied {
+.studio-fatal-error__btn--copied {
   border-color: #2f855a;
   color: #2f855a;
 }
 /* legacy single-button class — keep for bootstrap HTML fallback */
-.proto-fatal-error__reload {
+.studio-fatal-error__reload {
   margin-top: 8px;
   padding: 10px 16px;
   border: none;
@@ -236,12 +236,12 @@
   font-weight: 600;
   cursor: pointer;
 }
-.proto-fatal-error__reload:hover {
+.studio-fatal-error__reload:hover {
   background: #023a8c;
 }
 
 /* Playback diagnostic — non-fatal overlay when scripts stall or desync */
-.proto-playback-diagnostic {
+.studio-playback-diagnostic {
   position: fixed;
   inset: 0;
   z-index: 10100;
@@ -252,7 +252,7 @@
   pointer-events: none;
   background: rgba(1, 33, 105, 0.18);
 }
-.proto-playback-diagnostic__card {
+.studio-playback-diagnostic__card {
   pointer-events: auto;
   width: min(640px, 100%);
   max-height: min(85dvh, 720px);
@@ -263,7 +263,7 @@
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
   padding: 20px 24px;
 }
-.proto-playback-diagnostic__eyebrow {
+.studio-playback-diagnostic__eyebrow {
   margin: 0 0 6px;
   font-size: 11px;
   font-weight: 700;
@@ -271,22 +271,22 @@
   text-transform: uppercase;
   color: #c53030;
 }
-.proto-playback-diagnostic__title {
+.studio-playback-diagnostic__title {
   margin: 0 0 8px;
   font-size: 20px;
   line-height: 1.25;
   color: #012169;
 }
-.proto-playback-diagnostic__summary {
+.studio-playback-diagnostic__summary {
   margin: 0 0 16px;
   font-size: 14px;
   line-height: 1.55;
   color: #333;
 }
-.proto-playback-diagnostic__section {
+.studio-playback-diagnostic__section {
   margin-bottom: 14px;
 }
-.proto-playback-diagnostic__heading {
+.studio-playback-diagnostic__heading {
   margin: 0 0 6px;
   font-size: 11px;
   font-weight: 700;
@@ -294,26 +294,26 @@
   letter-spacing: 0.04em;
   color: #012169;
 }
-.proto-playback-diagnostic__list {
+.studio-playback-diagnostic__list {
   margin: 0;
   padding-left: 18px;
   font-size: 13px;
   line-height: 1.5;
   color: #444;
 }
-.proto-playback-diagnostic__list li + li {
+.studio-playback-diagnostic__list li + li {
   margin-top: 4px;
 }
-.proto-playback-diagnostic__details {
+.studio-playback-diagnostic__details {
   margin: 12px 0;
   font-size: 13px;
 }
-.proto-playback-diagnostic__details-summary {
+.studio-playback-diagnostic__details-summary {
   cursor: pointer;
   color: #012169;
   font-weight: 600;
 }
-.proto-playback-diagnostic__pre {
+.studio-playback-diagnostic__pre {
   margin: 8px 0 0;
   padding: 10px;
   border-radius: 6px;
@@ -324,13 +324,13 @@
   white-space: pre-wrap;
   word-break: break-word;
 }
-.proto-playback-diagnostic__actions {
+.studio-playback-diagnostic__actions {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
   margin-top: 8px;
 }
-.proto-playback-diagnostic__btn {
+.studio-playback-diagnostic__btn {
   padding: 9px 14px;
   border-radius: 6px;
   border: 1px solid #ccc;
@@ -340,15 +340,15 @@
   font-weight: 600;
   cursor: pointer;
 }
-.proto-playback-diagnostic__btn--primary {
+.studio-playback-diagnostic__btn--primary {
   border-color: #012169;
   background: #012169;
   color: #fff;
 }
-.proto-playback-diagnostic__btn--primary:hover {
+.studio-playback-diagnostic__btn--primary:hover {
   background: #023a8c;
 }
-.proto-playback-diagnostic__btn--copied {
+.studio-playback-diagnostic__btn--copied {
   border-color: #38a169;
   background: #276749;
   color: #fff;
@@ -359,7 +359,7 @@
 }
 
 /* Boots Pharmacy logo → navigates to Agentic home (wired in App) */
-.proto-viewport [data-name="boots-pharmacy"] {
+.studio-viewport [data-name="boots-pharmacy"] {
   cursor: pointer !important;
 }
 
@@ -376,61 +376,61 @@
  * exclude them from the transparent tertiary overrides below.
  */
 
-.proto-viewport [data-name="component.input.button"][class*="h-[32px]"] {
+.studio-viewport [data-name="component.input.button"][class*="h-[32px]"] {
   cursor: pointer !important;
   user-select: none !important;
   position: relative !important;
 }
-.proto-viewport
+.studio-viewport
   [data-name="component.input.button"][class*="h-[32px]"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]):not([class*="bg-[#c6e5e1]"]) {
   background: transparent !important;
 }
 
 /* Tertiary CTAs with a text label — no circle/wash; icon→primary navy, text→black */
-.proto-viewport
+.studio-viewport
   [data-name="component.input.button"][class*="h-[32px]"]:has(p):not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]):not([class*="bg-[#c6e5e1]"]),
-.proto-viewport
+.studio-viewport
   [data-name="component.input.button"][class*="h-[32px]"]:has(p):not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]):not([class*="bg-[#c6e5e1]"]):hover,
-.proto-viewport
+.studio-viewport
   [data-name="component.input.button"][class*="h-[32px]"]:has(p):not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]):not([class*="bg-[#c6e5e1]"]):active,
-.proto-viewport [data-name="component.input.button"][data-proto-change-loc="true"],
-.proto-viewport [data-name="component.input.button"][data-proto-change-loc="true"]:hover,
-.proto-viewport [data-name="component.input.button"][data-proto-change-loc="true"]:active {
+.studio-viewport [data-name="component.input.button"][data-studio-change-loc="true"],
+.studio-viewport [data-name="component.input.button"][data-studio-change-loc="true"]:hover,
+.studio-viewport [data-name="component.input.button"][data-studio-change-loc="true"]:active {
   background: transparent !important;
   box-shadow: none !important;
   transform: none !important;
 }
-.proto-viewport
+.studio-viewport
   [data-name="component.input.button"][class*="h-[32px]"]:has(p):not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"])::before,
-.proto-viewport [data-name="component.input.button"][data-proto-change-loc="true"]::before {
+.studio-viewport [data-name="component.input.button"][data-studio-change-loc="true"]::before {
   content: none !important;
   display: none !important;
 }
-.proto-viewport
+.studio-viewport
   [data-name="component.input.button"][class*="h-[32px]"]:has(p):not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]) p,
-.proto-viewport
+.studio-viewport
   [data-name="component.input.button"][class*="h-[32px]"]:has(p):not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]) span,
-.proto-viewport [data-name="component.input.button"][data-proto-change-loc="true"] p,
-.proto-viewport [data-name="component.input.button"][data-proto-change-loc="true"] span {
+.studio-viewport [data-name="component.input.button"][data-studio-change-loc="true"] p,
+.studio-viewport [data-name="component.input.button"][data-studio-change-loc="true"] span {
   transition: color 0.18s ease !important;
 }
-.proto-viewport
+.studio-viewport
   [data-name="component.input.button"][class*="h-[32px]"]:has(p):not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]) svg path,
-.proto-viewport [data-name="component.input.button"][data-proto-change-loc="true"] svg path {
+.studio-viewport [data-name="component.input.button"][data-studio-change-loc="true"] svg path {
   transition: fill 0.18s ease !important;
 }
-.proto-viewport
+.studio-viewport
   [data-name="component.input.button"][class*="h-[32px]"]:has(p):not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]):hover p,
-.proto-viewport
+.studio-viewport
   [data-name="component.input.button"][class*="h-[32px]"]:has(p):not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]):hover span,
-.proto-viewport [data-name="component.input.button"][data-proto-change-loc="true"]:hover p,
-.proto-viewport [data-name="component.input.button"][data-proto-change-loc="true"]:hover span {
+.studio-viewport [data-name="component.input.button"][data-studio-change-loc="true"]:hover p,
+.studio-viewport [data-name="component.input.button"][data-studio-change-loc="true"]:hover span {
   color: #000000 !important;
 }
-.proto-viewport
+.studio-viewport
   [data-name="component.input.button"][class*="h-[32px]"]:has(p):not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]):hover svg path,
-.proto-viewport [data-name="component.input.button"][data-proto-change-loc="true"]:hover svg path,
-.proto-tertiary-cta:hover svg path {
+.studio-viewport [data-name="component.input.button"][data-studio-change-loc="true"]:hover svg path,
+.studio-tertiary-cta:hover svg path {
   fill: var(--uxds-text-link-link) !important;
 }
 
@@ -445,7 +445,7 @@
 /* ── Tertiary CTA — icon + link (Find a store, Change location, near-me, etc.) ──
  * No hover background/circle; muted icon → navy; label → black on hover.
  */
-.proto-tertiary-cta,
+.studio-tertiary-cta,
 .proto-avail-tertiary {
   display: inline-flex;
   align-items: center;
@@ -471,7 +471,7 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.proto-tertiary-cta--compact,
+.studio-tertiary-cta--compact,
 .proto-avail-tertiary {
   height: 32px;
   padding: 8px 12px;
@@ -479,15 +479,15 @@
   letter-spacing: -0.36px;
 }
 
-.proto-tertiary-cta::before {
+.studio-tertiary-cta::before {
   content: none !important;
   display: none !important;
 }
 
-.proto-tertiary-cta:hover,
-.proto-tertiary-cta:active,
-.proto-tertiary-cta.proto-chat-cta--hover,
-.proto-tertiary-cta.proto-chat-cta--pressed,
+.studio-tertiary-cta:hover,
+.studio-tertiary-cta:active,
+.studio-tertiary-cta.proto-chat-cta--hover,
+.studio-tertiary-cta.proto-chat-cta--pressed,
 .proto-avail-tertiary:hover,
 .proto-avail-tertiary:active,
 .proto-avail-tertiary.proto-chat-cta--hover,
@@ -498,7 +498,7 @@
   color: #000000;
 }
 
-.proto-tertiary-cta__icon {
+.studio-tertiary-cta__icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -508,74 +508,74 @@
   pointer-events: none;
 }
 
-.proto-tertiary-cta__icon img,
-.proto-tertiary-cta__icon svg,
-.proto-tertiary-cta > img,
+.studio-tertiary-cta__icon img,
+.studio-tertiary-cta__icon svg,
+.studio-tertiary-cta > img,
 .proto-avail-tertiary img {
   display: block;
   width: 16px;
   height: 16px;
 }
 
-.proto-tertiary-cta svg path {
+.studio-tertiary-cta svg path {
   fill: var(--uxds-icon-icon-accent-soft);
   transition: fill 0.18s ease;
 }
 
-.proto-tertiary-cta:hover svg path,
-.proto-tertiary-cta.proto-chat-cta--hover svg path {
+.studio-tertiary-cta:hover svg path,
+.studio-tertiary-cta.proto-chat-cta--hover svg path {
   fill: var(--uxds-text-link-link);
 }
 
-.proto-tertiary-cta__icon svg.proto-tertiary-cta__svg--stroke path {
+.studio-tertiary-cta__icon svg.studio-tertiary-cta__svg--stroke path {
   fill: none !important;
   stroke: var(--uxds-icon-icon-accent-soft);
   stroke-width: 1.25;
   transition: stroke 0.18s ease;
 }
 
-.proto-tertiary-cta:hover .proto-tertiary-cta__icon svg.proto-tertiary-cta__svg--stroke path,
-.proto-tertiary-cta.proto-chat-cta--hover .proto-tertiary-cta__icon svg.proto-tertiary-cta__svg--stroke path {
+.studio-tertiary-cta:hover .studio-tertiary-cta__icon svg.studio-tertiary-cta__svg--stroke path,
+.studio-tertiary-cta.proto-chat-cta--hover .studio-tertiary-cta__icon svg.studio-tertiary-cta__svg--stroke path {
   fill: none !important;
   stroke: var(--uxds-text-link-link);
 }
 
-.proto-tertiary-cta__icon img,
-.proto-tertiary-cta > img,
+.studio-tertiary-cta__icon img,
+.studio-tertiary-cta > img,
 .proto-avail-tertiary img {
   filter: brightness(0) saturate(100%) invert(86%) sepia(7%) saturate(622%)
     hue-rotate(131deg) brightness(92%) contrast(88%);
   transition: filter 0.18s ease;
 }
 
-.proto-tertiary-cta:hover .proto-tertiary-cta__icon img,
-.proto-tertiary-cta:hover > img,
-.proto-tertiary-cta.proto-chat-cta--hover .proto-tertiary-cta__icon img,
-.proto-tertiary-cta.proto-chat-cta--hover > img,
+.studio-tertiary-cta:hover .studio-tertiary-cta__icon img,
+.studio-tertiary-cta:hover > img,
+.studio-tertiary-cta.proto-chat-cta--hover .studio-tertiary-cta__icon img,
+.studio-tertiary-cta.proto-chat-cta--hover > img,
 .proto-avail-tertiary:hover img,
 .proto-avail-tertiary.proto-chat-cta--hover img {
   filter: brightness(0) saturate(100%) invert(15%) sepia(55%) saturate(3000%)
     hue-rotate(205deg) brightness(0.85);
 }
 
-.proto-tertiary-cta__label {
+.studio-tertiary-cta__label {
   transition: color 0.18s ease;
 }
 
-.proto-tertiary-cta:focus:not(:focus-visible),
+.studio-tertiary-cta:focus:not(:focus-visible),
 .proto-avail-tertiary:focus:not(:focus-visible) {
   outline: none !important;
   box-shadow: none !important;
 }
 
-.proto-tertiary-cta:active:not(:focus-visible),
+.studio-tertiary-cta:active:not(:focus-visible),
 .proto-avail-tertiary:active:not(:focus-visible) {
   outline: none !important;
   box-shadow: none !important;
 }
 
 /* Icon-only hit target — circular hover wash (PDP share/heart, footer socials, etc.) */
-.proto-icon-hit {
+.studio-icon-hit {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -593,7 +593,7 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.proto-viewport [data-name="component.input.button"][class*="h-[32px]"]:not(:has(p)) {
+.studio-viewport [data-name="component.input.button"][class*="h-[32px]"]:not(:has(p)) {
   position: relative !important;
   background: transparent !important;
   box-shadow: none !important;
@@ -602,7 +602,7 @@
   user-select: none !important;
 }
 
-.proto-icon-hit__glyph {
+.studio-icon-hit__glyph {
   position: relative;
   z-index: 1;
   display: flex;
@@ -611,30 +611,30 @@
   pointer-events: none;
 }
 
-.proto-icon-hit__glyph--16 {
+.studio-icon-hit__glyph--16 {
   width: 16px;
   height: 16px;
 }
 
-.proto-icon-hit__glyph--24 {
+.studio-icon-hit__glyph--24 {
   width: 24px;
   height: 24px;
 }
 
-.proto-icon-hit__glyph svg {
+.studio-icon-hit__glyph svg {
   display: block;
   width: 100%;
   height: 100%;
 }
 
 /* Figma-export footer social wrappers (24px glyph, 32px hit target) */
-.proto-icon-hit.proto-icon-hit--figma-glyph-24[class*="size-[24px]"] {
+.studio-icon-hit.studio-icon-hit--figma-glyph-24[class*="size-[24px]"] {
   width: 32px !important;
   height: 32px !important;
 }
 
-.proto-icon-hit::before,
-.proto-viewport [data-name="component.input.button"][class*="h-[32px]"]:not(:has(p))::before {
+.studio-icon-hit::before,
+.studio-viewport [data-name="component.input.button"][class*="h-[32px]"]:not(:has(p))::before {
   content: "" !important;
   position: absolute !important;
   width: 32px !important;
@@ -649,70 +649,70 @@
   pointer-events: none !important;
 }
 
-.proto-icon-hit:hover::before,
-.proto-viewport [data-name="component.input.button"][class*="h-[32px]"]:not(:has(p)):hover::before {
+.studio-icon-hit:hover::before,
+.studio-viewport [data-name="component.input.button"][class*="h-[32px]"]:not(:has(p)):hover::before {
   background: #eef8f7 !important;
 }
 
-.proto-icon-hit:active::before,
-.proto-viewport [data-name="component.input.button"][class*="h-[32px]"]:not(:has(p)):active::before {
+.studio-icon-hit:active::before,
+.studio-viewport [data-name="component.input.button"][class*="h-[32px]"]:not(:has(p)):active::before {
   background: #c6e5e1 !important;
 }
 
-.proto-icon-hit svg path,
-.proto-viewport [data-name="component.input.button"][class*="h-[32px]"]:not(:has(p)) svg path {
+.studio-icon-hit svg path,
+.studio-viewport [data-name="component.input.button"][class*="h-[32px]"]:not(:has(p)) svg path {
   transition: fill 0.18s ease !important;
 }
 
-.proto-icon-hit:hover svg path,
-.proto-viewport [data-name="component.input.button"][class*="h-[32px]"]:not(:has(p)):hover svg path {
+.studio-icon-hit:hover svg path,
+.studio-viewport [data-name="component.input.button"][class*="h-[32px]"]:not(:has(p)):hover svg path {
   fill: #01318f !important;
 }
 
 /* Heart hover when favourited — deepen fuchsia */
-.proto-icon-hit:hover [data-name="icon=add to wishlist"][data-fav-active="true"] svg path,
-.proto-viewport [data-name="component.input.button"][class*="h-[32px]"]:not(:has(p)):hover [data-name="icon=add to wishlist"][data-fav-active="true"] svg path {
+.studio-icon-hit:hover [data-name="icon=add to wishlist"][data-fav-active="true"] svg path,
+.studio-viewport [data-name="component.input.button"][class*="h-[32px]"]:not(:has(p)):hover [data-name="icon=add to wishlist"][data-fav-active="true"] svg path {
   fill: #c2186e !important;
 }
 
 /* CTAs and toggle tabs: text non-selectable */
-.proto-viewport [data-name="component.input.button"],
-.proto-viewport [data-name="component.input.button"] *,
-.proto-viewport [data-name="units"][data-toggle-index],
-.proto-viewport [data-name="units"][data-toggle-index] * {
+.studio-viewport [data-name="component.input.button"],
+.studio-viewport [data-name="component.input.button"] *,
+.studio-viewport [data-name="units"][data-toggle-index],
+.studio-viewport [data-name="units"][data-toggle-index] * {
   user-select: none !important;
 }
 
 /* Global toggles — inactive label regular; active label semibold
  * (Myself/Someone else, List/Map, and any future [data-toggle-index] pair) */
-.proto-viewport [data-name="units"][data-toggle-index]:not([data-toggle-active]) p,
-.proto-viewport [data-name="units"][data-toggle-index]:not([data-toggle-active]) span,
-.proto-lb-open .proto-viewport [data-name="units"][data-toggle-index]:not([data-toggle-active]) p,
-.proto-lb-open .proto-viewport [data-name="units"][data-toggle-index]:not([data-toggle-active]) span {
+.studio-viewport [data-name="units"][data-toggle-index]:not([data-toggle-active]) p,
+.studio-viewport [data-name="units"][data-toggle-index]:not([data-toggle-active]) span,
+.proto-lb-open .studio-viewport [data-name="units"][data-toggle-index]:not([data-toggle-active]) p,
+.proto-lb-open .studio-viewport [data-name="units"][data-toggle-index]:not([data-toggle-active]) span {
   font-weight: 400 !important;
   font-family: "Open Sans", sans-serif !important;
 }
-.proto-viewport [data-name="units"][data-toggle-index][data-toggle-active] p,
-.proto-viewport [data-name="units"][data-toggle-index][data-toggle-active] span,
-.proto-lb-open .proto-viewport [data-name="units"][data-toggle-index][data-toggle-active] p,
-.proto-lb-open .proto-viewport [data-name="units"][data-toggle-index][data-toggle-active] span {
+.studio-viewport [data-name="units"][data-toggle-index][data-toggle-active] p,
+.studio-viewport [data-name="units"][data-toggle-index][data-toggle-active] span,
+.proto-lb-open .studio-viewport [data-name="units"][data-toggle-index][data-toggle-active] p,
+.proto-lb-open .studio-viewport [data-name="units"][data-toggle-index][data-toggle-active] span {
   font-weight: 600 !important;
   font-family: "Open Sans", sans-serif !important;
 }
 
 /* Toggle tabs — no focus ring (browser / theme outline looks unpolished) */
-.proto-viewport [data-name="units"][data-toggle-index]:focus,
-.proto-viewport [data-name="units"][data-toggle-index]:focus-visible,
-.proto-lb-open .proto-viewport [data-name="units"][data-toggle-index]:focus,
-.proto-lb-open .proto-viewport [data-name="units"][data-toggle-index]:focus-visible {
+.studio-viewport [data-name="units"][data-toggle-index]:focus,
+.studio-viewport [data-name="units"][data-toggle-index]:focus-visible,
+.proto-lb-open .studio-viewport [data-name="units"][data-toggle-index]:focus,
+.proto-lb-open .studio-viewport [data-name="units"][data-toggle-index]:focus-visible {
   outline: none !important;
   box-shadow: none !important;
 }
 
 /* Primary CTA — darken slightly, lift with shadow.
  * Also covers Agentic send (Figma #003fcc) → same Boots navy as PDP. */
-.proto-viewport [data-name="component.input.button"][class*="bg-[#012169]"],
-.proto-viewport [data-name="component.input.button"][class*="bg-[#003fcc]"],
+.studio-viewport [data-name="component.input.button"][class*="bg-[#012169]"],
+.studio-viewport [data-name="component.input.button"][class*="bg-[#003fcc]"],
 .proto-site-pilot-composer
   [data-name="Subtotal"]
   [data-name="component.input.button"].proto-agentic-send,
@@ -723,10 +723,10 @@
   background: #012169 !important;
   transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.12s ease !important;
 }
-.proto-viewport [data-name="component.input.button"][class*="bg-[#012169]"]:hover,
-.proto-viewport [data-name="component.input.button"][class*="bg-[#012169]"].proto-chat-cta--hover,
-.proto-viewport [data-name="component.input.button"][class*="bg-[#003fcc]"]:hover,
-.proto-viewport [data-name="component.input.button"][class*="bg-[#003fcc]"].proto-chat-cta--hover,
+.studio-viewport [data-name="component.input.button"][class*="bg-[#012169]"]:hover,
+.studio-viewport [data-name="component.input.button"][class*="bg-[#012169]"].proto-chat-cta--hover,
+.studio-viewport [data-name="component.input.button"][class*="bg-[#003fcc]"]:hover,
+.studio-viewport [data-name="component.input.button"][class*="bg-[#003fcc]"].proto-chat-cta--hover,
 .proto-site-pilot-composer
   [data-name="Subtotal"]
   [data-name="component.input.button"].proto-agentic-send:hover,
@@ -743,10 +743,10 @@
   box-shadow: 0 4px 12px rgba(1, 33, 105, 0.35) !important;
   transform: translateY(-1px) !important;
 }
-.proto-viewport [data-name="component.input.button"][class*="bg-[#012169]"]:active,
-.proto-viewport [data-name="component.input.button"][class*="bg-[#012169]"].proto-chat-cta--pressed,
-.proto-viewport [data-name="component.input.button"][class*="bg-[#003fcc]"]:active,
-.proto-viewport [data-name="component.input.button"][class*="bg-[#003fcc]"].proto-chat-cta--pressed,
+.studio-viewport [data-name="component.input.button"][class*="bg-[#012169]"]:active,
+.studio-viewport [data-name="component.input.button"][class*="bg-[#012169]"].proto-chat-cta--pressed,
+.studio-viewport [data-name="component.input.button"][class*="bg-[#003fcc]"]:active,
+.studio-viewport [data-name="component.input.button"][class*="bg-[#003fcc]"].proto-chat-cta--pressed,
 .proto-site-pilot-composer
   [data-name="Subtotal"]
   [data-name="component.input.button"].proto-agentic-send:active,
@@ -765,7 +765,7 @@
 }
 
 /* Chat primaries — Figma exports hover tint (#003fcb); rest until hover or sim cursor. */
-.proto-viewport > div > div:nth-child(10)
+.studio-viewport > div > div:nth-child(10)
   [data-name="component.input.button"][class*="bg-[#003fcb]"] {
   cursor: pointer !important;
   background: #012169 !important;
@@ -773,46 +773,46 @@
   transform: none !important;
   transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.12s ease !important;
 }
-.proto-viewport > div > div:nth-child(10)
+.studio-viewport > div > div:nth-child(10)
   [data-name="component.input.button"][class*="bg-[#003fcb]"]:hover,
-.proto-viewport > div > div:nth-child(10)
+.studio-viewport > div > div:nth-child(10)
   [data-name="component.input.button"][class*="bg-[#003fcb]"].proto-chat-cta--hover {
   background: #01318f !important;
   box-shadow: 0 4px 12px rgba(1, 33, 105, 0.35) !important;
   transform: translateY(-1px) !important;
 }
-.proto-viewport > div > div:nth-child(10)
+.studio-viewport > div > div:nth-child(10)
   [data-name="component.input.button"][class*="bg-[#003fcb]"]:active,
-.proto-viewport > div > div:nth-child(10)
+.studio-viewport > div > div:nth-child(10)
   [data-name="component.input.button"][class*="bg-[#003fcb]"].proto-chat-cta--pressed {
   background: #011a5c !important;
   transform: translateY(0) !important;
   box-shadow: none !important;
 }
 /* Cursor demo graphic sits above the lifted CTA */
-.proto-viewport [data-name=".utility / cursor"] {
+.studio-viewport [data-name=".utility / cursor"] {
   z-index: 5 !important;
   pointer-events: none !important;
 }
-.proto-viewport > div > div:nth-child(10) [data-name="component.co.order.summary"],
+.studio-viewport > div > div:nth-child(10) [data-name="component.co.order.summary"],
 .proto-site-pilot-composer {
   overflow: visible !important;
 }
-.proto-viewport > div > div:nth-child(10) [data-name="component.co.order.summary"] > div,
+.studio-viewport > div > div:nth-child(10) [data-name="component.co.order.summary"] > div,
 .proto-site-pilot-composer > div {
   overflow: visible !important;
 }
 
 /* Secondary CTA — the border-[#afccca] is on an inner aria-hidden child,
    so use :has() to target the button by its child */
-.proto-viewport [data-name="component.input.button"]:has(> [aria-hidden][class*="border-[#afccca]"]),
-.proto-viewport [data-name="component.input.button"][class*="border-[#afccca]"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]) {
+.studio-viewport [data-name="component.input.button"]:has(> [aria-hidden][class*="border-[#afccca]"]),
+.studio-viewport [data-name="component.input.button"][class*="border-[#afccca]"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]) {
   cursor: pointer !important;
   transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.12s ease !important;
 }
 /* Secondary icons — visible at rest (#5c5c5c), navy on hover */
-.proto-viewport [data-name="component.input.button"]:has(> [aria-hidden][class*="border-[#afccca]"]) svg path,
-.proto-viewport [data-name="component.input.button"][class*="border-[#afccca]"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]) svg path {
+.studio-viewport [data-name="component.input.button"]:has(> [aria-hidden][class*="border-[#afccca]"]) svg path,
+.studio-viewport [data-name="component.input.button"][class*="border-[#afccca]"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]) svg path {
   fill: #5c5c5c !important;
 }
 .proto-secondary-cta-icon {
@@ -821,70 +821,70 @@
   height: 16px;
   flex-shrink: 0;
 }
-.proto-viewport [data-name="component.input.button"]:has(> [aria-hidden][class*="border-[#afccca]"]) :is([data-name*="icon"], [data-name="glyph"]) img,
-.proto-viewport [data-name="component.input.button"][class*="border-[#afccca]"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]) :is([data-name*="icon"], [data-name="glyph"]) img {
+.studio-viewport [data-name="component.input.button"]:has(> [aria-hidden][class*="border-[#afccca]"]) :is([data-name*="icon"], [data-name="glyph"]) img,
+.studio-viewport [data-name="component.input.button"][class*="border-[#afccca]"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]) :is([data-name*="icon"], [data-name="glyph"]) img {
   filter: brightness(0) saturate(100%) invert(37%) sepia(5%) saturate(635%) hue-rotate(169deg) brightness(94%) contrast(86%);
 }
-.proto-viewport [data-name="component.input.button"]:has(> [aria-hidden][class*="border-[#afccca]"]):hover,
-.proto-viewport [data-name="component.input.button"]:has(> [aria-hidden][class*="border-[#afccca]"]).proto-chat-cta--hover {
+.studio-viewport [data-name="component.input.button"]:has(> [aria-hidden][class*="border-[#afccca]"]):hover,
+.studio-viewport [data-name="component.input.button"]:has(> [aria-hidden][class*="border-[#afccca]"]).proto-chat-cta--hover {
   background: #c6e5e1 !important;
   box-shadow: 0 4px 12px rgba(175,204,202,0.4) !important;
   transform: translateY(-1px) !important;
 }
-.proto-viewport [data-name="component.input.button"]:has(> [aria-hidden][class*="border-[#afccca]"]):hover svg path,
-.proto-viewport [data-name="component.input.button"]:has(> [aria-hidden][class*="border-[#afccca]"]).proto-chat-cta--hover svg path,
-.proto-viewport [data-name="component.input.button"][class*="border-[#afccca]"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]):hover svg path,
-.proto-viewport [data-name="component.input.button"][class*="border-[#afccca]"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]).proto-chat-cta--hover svg path {
+.studio-viewport [data-name="component.input.button"]:has(> [aria-hidden][class*="border-[#afccca]"]):hover svg path,
+.studio-viewport [data-name="component.input.button"]:has(> [aria-hidden][class*="border-[#afccca]"]).proto-chat-cta--hover svg path,
+.studio-viewport [data-name="component.input.button"][class*="border-[#afccca]"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]):hover svg path,
+.studio-viewport [data-name="component.input.button"][class*="border-[#afccca]"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]).proto-chat-cta--hover svg path {
   fill: #01318f !important;
 }
 .proto-avail-btn-secondary:hover .proto-secondary-cta-icon,
 .proto-avail-btn-secondary.proto-chat-cta--hover .proto-secondary-cta-icon,
-.proto-viewport [data-name="component.input.button"]:has(> [aria-hidden][class*="border-[#afccca]"]):hover :is([data-name*="icon"], [data-name="glyph"]) img,
-.proto-viewport [data-name="component.input.button"]:has(> [aria-hidden][class*="border-[#afccca]"]).proto-chat-cta--hover :is([data-name*="icon"], [data-name="glyph"]) img,
-.proto-viewport [data-name="component.input.button"][class*="border-[#afccca]"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]):hover :is([data-name*="icon"], [data-name="glyph"]) img,
-.proto-viewport [data-name="component.input.button"][class*="border-[#afccca]"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]).proto-chat-cta--hover :is([data-name*="icon"], [data-name="glyph"]) img {
+.studio-viewport [data-name="component.input.button"]:has(> [aria-hidden][class*="border-[#afccca]"]):hover :is([data-name*="icon"], [data-name="glyph"]) img,
+.studio-viewport [data-name="component.input.button"]:has(> [aria-hidden][class*="border-[#afccca]"]).proto-chat-cta--hover :is([data-name*="icon"], [data-name="glyph"]) img,
+.studio-viewport [data-name="component.input.button"][class*="border-[#afccca]"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]):hover :is([data-name*="icon"], [data-name="glyph"]) img,
+.studio-viewport [data-name="component.input.button"][class*="border-[#afccca]"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]).proto-chat-cta--hover :is([data-name*="icon"], [data-name="glyph"]) img {
   filter: brightness(0) saturate(100%) invert(15%) sepia(55%) saturate(3000%) hue-rotate(205deg) brightness(0.85);
 }
-.proto-viewport [data-name="component.input.button"]:has(> [aria-hidden][class*="border-[#afccca]"]):hover *,
-.proto-viewport [data-name="component.input.button"]:has(> [aria-hidden][class*="border-[#afccca]"]).proto-chat-cta--hover * {
+.studio-viewport [data-name="component.input.button"]:has(> [aria-hidden][class*="border-[#afccca]"]):hover *,
+.studio-viewport [data-name="component.input.button"]:has(> [aria-hidden][class*="border-[#afccca]"]).proto-chat-cta--hover * {
   color: #01318f !important;
 }
-.proto-viewport [data-name="component.input.button"]:has(> [aria-hidden][class*="border-[#afccca]"]):active,
-.proto-viewport [data-name="component.input.button"]:has(> [aria-hidden][class*="border-[#afccca]"]).proto-chat-cta--pressed {
+.studio-viewport [data-name="component.input.button"]:has(> [aria-hidden][class*="border-[#afccca]"]):active,
+.studio-viewport [data-name="component.input.button"]:has(> [aria-hidden][class*="border-[#afccca]"]).proto-chat-cta--pressed {
   background: #afccca !important;
   transform: translateY(0) !important;
   box-shadow: none !important;
 }
 
 /* PLP tile compact actions — Add to Bookmarks, Quick View (no filled primary bg). */
-.proto-viewport [data-name="boots-pharmacy.service.tile"]
+.studio-viewport [data-name="boots-pharmacy.service.tile"]
   [data-name="component.input.button"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]) {
   cursor: pointer !important;
   transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.12s ease !important;
 }
-.proto-viewport [data-name="boots-pharmacy.service.tile"]
+.studio-viewport [data-name="boots-pharmacy.service.tile"]
   [data-name="component.input.button"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]):hover,
-.proto-viewport [data-name="boots-pharmacy.service.tile"]
+.studio-viewport [data-name="boots-pharmacy.service.tile"]
   [data-name="component.input.button"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]).proto-chat-cta--hover {
   background: #c6e5e1 !important;
   box-shadow: 0 4px 12px rgba(175, 204, 202, 0.4) !important;
   transform: translateY(-1px) !important;
 }
-.proto-viewport [data-name="boots-pharmacy.service.tile"]
+.studio-viewport [data-name="boots-pharmacy.service.tile"]
   [data-name="component.input.button"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]):hover svg path,
-.proto-viewport [data-name="boots-pharmacy.service.tile"]
+.studio-viewport [data-name="boots-pharmacy.service.tile"]
   [data-name="component.input.button"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]).proto-chat-cta--hover svg path {
   fill: #01318f !important;
 }
-.proto-viewport [data-name="boots-pharmacy.service.tile"]
+.studio-viewport [data-name="boots-pharmacy.service.tile"]
   [data-name="component.input.button"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]):hover *,
-.proto-viewport [data-name="boots-pharmacy.service.tile"]
+.studio-viewport [data-name="boots-pharmacy.service.tile"]
   [data-name="component.input.button"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]).proto-chat-cta--hover * {
   color: #01318f !important;
 }
-.proto-viewport [data-name="boots-pharmacy.service.tile"]
+.studio-viewport [data-name="boots-pharmacy.service.tile"]
   [data-name="component.input.button"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]):active,
-.proto-viewport [data-name="boots-pharmacy.service.tile"]
+.studio-viewport [data-name="boots-pharmacy.service.tile"]
   [data-name="component.input.button"]:not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]).proto-chat-cta--pressed {
   background: #afccca !important;
   transform: translateY(0) !important;
@@ -905,9 +905,9 @@
  * Hover/focus uses the aria-hidden border overlay — same inset ring as
  * `.proto-avail-field`, and avoids painting a wash on the Text Field body. */
 
-.proto-viewport [data-name="component.input.field"]:hover [data-name="Text Field"] > [aria-hidden],
-.proto-viewport [data-name="component.input.field"]:focus-within [data-name="Text Field"] > [aria-hidden],
-.proto-viewport [data-name="component.input.field"].proto-chat-cta--hover [data-name="Text Field"] > [aria-hidden],
+.studio-viewport [data-name="component.input.field"]:hover [data-name="Text Field"] > [aria-hidden],
+.studio-viewport [data-name="component.input.field"]:focus-within [data-name="Text Field"] > [aria-hidden],
+.studio-viewport [data-name="component.input.field"].proto-chat-cta--hover [data-name="Text Field"] > [aria-hidden],
 .proto-search-field:hover > [aria-hidden],
 .proto-search-field:focus-within > [aria-hidden],
 .proto-search-field.proto-chat-cta--hover > [aria-hidden] {
@@ -915,7 +915,7 @@
   box-shadow: inset 0 0 0 2px #012169 !important;
 }
 
-.proto-viewport [data-name="component.input.field"] [data-name="Text Field"] > [aria-hidden],
+.studio-viewport [data-name="component.input.field"] [data-name="Text Field"] > [aria-hidden],
 .proto-search-field > [aria-hidden] {
   transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
@@ -1011,8 +1011,8 @@
  * Ancestors between header and scrollport must stay overflow:visible.
  */
 
-.proto-viewport,
-.proto-viewport > div {
+.studio-viewport,
+.studio-viewport > div {
   overflow: visible !important;
   transform: none !important;
   filter: none !important;
@@ -1124,7 +1124,7 @@
 
 /* Page 2 Site Pilot secondary header — Figma hardcodes w-[1312px]; keep the
  * same optical column as the main nav, fluid across viewport widths. */
-.proto-viewport > div > div:nth-child(10) [data-proto-sticky-group] {
+.studio-viewport > div > div:nth-child(10) [data-studio-sticky-group] {
   width: 100% !important;
   max-width: none !important;
   align-self: stretch !important;
@@ -1134,7 +1134,7 @@
   padding-right: 64px !important;
 }
 /* Frame338 is the only child of Frame337 once sticky attr is applied */
-.proto-viewport > div > div:nth-child(10) [data-proto-sticky-group] > :first-child {
+.studio-viewport > div > div:nth-child(10) [data-studio-sticky-group] > :first-child {
   width: 100% !important;
   max-width: 1312px !important;
   min-width: 0 !important;
@@ -1144,7 +1144,7 @@
   gap: 12px 16px !important;
   box-sizing: border-box !important;
 }
-.proto-viewport > div > div:nth-child(10) > :nth-child(2):not([data-proto-sticky-group]) {
+.studio-viewport > div > div:nth-child(10) > :nth-child(2):not([data-studio-sticky-group]) {
   width: 100% !important;
   max-width: none !important;
   box-sizing: border-box !important;
@@ -1155,7 +1155,7 @@
   align-items: center !important;
 }
 /* Frame338 row inside Site Pilot bar */
-.proto-viewport > div > div:nth-child(10) > :nth-child(2):not([data-proto-sticky-group]) > div {
+.studio-viewport > div > div:nth-child(10) > :nth-child(2):not([data-studio-sticky-group]) > div {
   width: 100% !important;
   max-width: 1312px !important;
   min-width: 0 !important;
@@ -1171,53 +1171,53 @@
  * flex stretch make the thread look left-shifted. Kill the artboard shadow and
  * pin the chat column to the horizontal center.
  */
-.proto-viewport > div > div:nth-child(10) {
+.studio-viewport > div > div:nth-child(10) {
   filter: none !important;
   -webkit-filter: none !important;
   transform: none !important;
 }
-.proto-viewport > div > div:nth-child(10) > [data-name="body"] {
+.studio-viewport > div > div:nth-child(10) > [data-name="body"] {
   width: 100% !important;
   align-self: stretch !important;
   box-sizing: border-box !important;
 }
 /* Fill scrollport height so blue bg is not torn on frame 1 — thread still grows when long */
-.proto-viewport > div > div:nth-child(10).proto-chat-screen {
+.studio-viewport > div > div:nth-child(10).proto-chat-screen {
   display: flex !important;
   flex-direction: column !important;
   flex: 0 0 auto !important;
-  min-height: var(--proto-scroll-min-px, 100%) !important;
+  min-height: var(--studio-scroll-min-px, 100%) !important;
   height: auto !important;
   --proto-scenario-frame-max: 3200px;
 }
 /* Frame 1 — hide vertical scroll track only; never clip the screen (breaks sticky Site Pilot bar) */
-.proto-scroll--prototype.proto-chat-scenario-at-start {
+.studio-scroll--prototype.proto-chat-scenario-at-start {
   overflow-y: hidden !important;
   overflow-x: hidden !important;
   overscroll-behavior: none;
 }
-.proto-viewport > div > div:nth-child(10).proto-chat-screen[data-proto-scenario-at-start="true"] {
-  min-height: var(--proto-scroll-min-px, 100%) !important;
+.studio-viewport > div > div:nth-child(10).proto-chat-screen[data-studio-scenario-at-start="true"] {
+  min-height: var(--studio-scroll-min-px, 100%) !important;
   height: auto !important;
   max-height: none !important;
   overflow: visible !important;
 }
-.proto-scroll--prototype.proto-chat-scenario-at-start
-  .proto-viewport > div > div:nth-child(10).proto-chat-screen > [data-name="body"],
-.proto-scroll--prototype.proto-chat-scenario-at-start
-  .proto-viewport > div > div:nth-child(10).proto-chat-screen
+.studio-scroll--prototype.proto-chat-scenario-at-start
+  .studio-viewport > div > div:nth-child(10).proto-chat-screen > [data-name="body"],
+.studio-scroll--prototype.proto-chat-scenario-at-start
+  .studio-viewport > div > div:nth-child(10).proto-chat-screen
   > [data-name="body"] > div {
   min-height: 100% !important;
   flex: 1 1 auto !important;
   overflow: visible !important;
 }
-.proto-viewport > div > div:nth-child(10).proto-chat-screen > [data-name="body"] {
+.studio-viewport > div > div:nth-child(10).proto-chat-screen > [data-name="body"] {
   flex: 1 1 auto !important;
   min-height: auto !important;
   height: auto !important;
   overflow: visible !important;
 }
-.proto-viewport > div > div:nth-child(10).proto-chat-screen > [data-name="body"] > div {
+.studio-viewport > div > div:nth-child(10).proto-chat-screen > [data-name="body"] > div {
   display: flex !important;
   flex-direction: column !important;
   flex: 1 1 auto !important;
@@ -1225,13 +1225,13 @@
   height: auto !important;
   overflow: visible !important;
 }
-.proto-viewport > div > div:nth-child(10) > [data-name="body"] > div,
-.proto-viewport > div > div:nth-child(10) > [data-name="body"] > div > div {
+.studio-viewport > div > div:nth-child(10) > [data-name="body"] > div,
+.studio-viewport > div > div:nth-child(10) > [data-name="body"] > div > div {
   width: 100% !important;
   align-items: center !important;
   box-sizing: border-box !important;
 }
-.proto-viewport > div > div:nth-child(10)
+.studio-viewport > div > div:nth-child(10)
   [data-name="component.appointment.summary"] {
   width: min(864px, 100%) !important;
   max-width: 864px !important;
@@ -1241,12 +1241,12 @@
   padding-bottom: var(--proto-chat-composer-h, 0px) !important;
   box-sizing: border-box !important;
 }
-.proto-viewport > div > div:nth-child(10).proto-chat-screen {
+.studio-viewport > div > div:nth-child(10).proto-chat-screen {
   --proto-scenario-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --proto-scenario-frame-duration: 0.48s;
 }
 /* Scenario frames — smooth reveal / hide; clip only while collapsing */
-.proto-viewport > div > div:nth-child(10) .proto-scenario-frame {
+.studio-viewport > div > div:nth-child(10) .proto-scenario-frame {
   overflow: visible !important;
   max-height: var(--proto-scenario-frame-max, 3200px);
   margin-block: 0;
@@ -1259,7 +1259,7 @@
     max-height 0.52s var(--proto-scenario-ease, cubic-bezier(0.22, 1, 0.36, 1)),
     margin-block var(--proto-scenario-frame-duration, 0.48s) var(--proto-scenario-ease, cubic-bezier(0.22, 1, 0.36, 1));
 }
-.proto-viewport > div > div:nth-child(10) .proto-scenario-frame.proto-scenario-frame--hidden {
+.studio-viewport > div > div:nth-child(10) .proto-scenario-frame.proto-scenario-frame--hidden {
   opacity: 0;
   transform: translateY(8px) scale(0.99);
   max-height: 0;
@@ -1268,20 +1268,20 @@
   overflow: hidden !important;
 }
 /* Agent thinking bubble — injected at send; not a scenario frame */
-.proto-viewport > div > div:nth-child(10) .proto-chat-thinking-bubble {
+.studio-viewport > div > div:nth-child(10) .proto-chat-thinking-bubble {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   width: 100%;
   flex-shrink: 0;
 }
-.proto-viewport > div > div:nth-child(10) .proto-chat-thinking-bubble--hint {
+.studio-viewport > div > div:nth-child(10) .proto-chat-thinking-bubble--hint {
   align-items: flex-start;
 }
-.proto-viewport > div > div:nth-child(10) .proto-chat-thinking-bubble[hidden] {
+.studio-viewport > div > div:nth-child(10) .proto-chat-thinking-bubble[hidden] {
   display: none !important;
 }
-.proto-viewport > div > div:nth-child(10) .proto-chat-thinking-bubble__inner {
+.studio-viewport > div > div:nth-child(10) .proto-chat-thinking-bubble__inner {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1292,7 +1292,7 @@
   background: rgba(215, 233, 248, 0.57);
   box-sizing: border-box;
 }
-.proto-viewport > div > div:nth-child(10) .proto-chat-thinking-bubble--reveal .proto-chat-thinking-bubble__inner {
+.studio-viewport > div > div:nth-child(10) .proto-chat-thinking-bubble--reveal .proto-chat-thinking-bubble__inner {
   animation: proto-chat-thinking-reveal var(--proto-scenario-frame-duration, 0.48s)
     var(--proto-scenario-ease, cubic-bezier(0.22, 1, 0.36, 1)) both;
 }
@@ -1306,7 +1306,7 @@
     transform: translateY(0) scale(1);
   }
 }
-.proto-viewport > div > div:nth-child(10) .proto-chat-thinking-bubble--exit .proto-chat-thinking-bubble__inner {
+.studio-viewport > div > div:nth-child(10) .proto-chat-thinking-bubble--exit .proto-chat-thinking-bubble__inner {
   animation: proto-chat-thinking-exit 0.36s
     var(--proto-scenario-ease, cubic-bezier(0.22, 1, 0.36, 1)) both;
 }
@@ -1320,14 +1320,14 @@
     transform: translateY(6px) scale(0.99);
   }
 }
-.proto-viewport > div > div:nth-child(10) .proto-chat-thinking-dots {
+.studio-viewport > div > div:nth-child(10) .proto-chat-thinking-dots {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   min-height: 8px;
 }
-.proto-viewport > div > div:nth-child(10) .proto-chat-thinking-dots > span {
+.studio-viewport > div > div:nth-child(10) .proto-chat-thinking-dots > span {
   width: 7px;
   height: 7px;
   border-radius: 50%;
@@ -1335,13 +1335,13 @@
   opacity: 0.35;
   transform: translateY(0);
 }
-.proto-viewport > div > div:nth-child(10) .proto-chat-thinking-dots--run > span {
+.studio-viewport > div > div:nth-child(10) .proto-chat-thinking-dots--run > span {
   animation: proto-chat-thinking-dot 1s ease-in-out infinite;
 }
-.proto-viewport > div > div:nth-child(10) .proto-chat-thinking-dots--run > span:nth-child(2) {
+.studio-viewport > div > div:nth-child(10) .proto-chat-thinking-dots--run > span:nth-child(2) {
   animation-delay: 0.15s;
 }
-.proto-viewport > div > div:nth-child(10) .proto-chat-thinking-dots--run > span:nth-child(3) {
+.studio-viewport > div > div:nth-child(10) .proto-chat-thinking-dots--run > span:nth-child(3) {
   animation-delay: 0.3s;
 }
 @keyframes proto-chat-thinking-dot {
@@ -1356,7 +1356,7 @@
     transform: translateY(-3px);
   }
 }
-.proto-viewport > div > div:nth-child(10) .proto-chat-thinking-bubble__sr {
+.studio-viewport > div > div:nth-child(10) .proto-chat-thinking-bubble__sr {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -1374,16 +1374,16 @@
   width: 14px !important;
   height: 14px !important;
 }
-.proto-viewport > div > div:nth-child(10) .proto-chat-feedback-frame {
+.studio-viewport > div > div:nth-child(10) .proto-chat-feedback-frame {
   display: none !important;
 }
 /* Hide static Figma demo cursors — Sarah clicks are simulated in playback */
-.proto-viewport > div > div:nth-child(10) [data-name=".utility / cursor"] {
+.studio-viewport > div > div:nth-child(10) [data-name=".utility / cursor"] {
   display: none !important;
 }
 .proto-chat-demo-cursor {
   position: fixed;
-  /* Above .proto-avail-scrim (10200) — robo-cursor must show on overlay steps */
+  /* Above .studio-avail-scrim (10200) — robo-cursor must show on overlay steps */
   z-index: 10250;
   width: 37px;
   height: 37px;
@@ -1460,7 +1460,7 @@
 .proto-chat-demo-cursor--exit {
   will-change: left, top, opacity;
 }
-.proto-viewport > div > div:nth-child(10)
+.studio-viewport > div > div:nth-child(10)
   [data-name="component.input.button"].proto-chat-cta--pressed {
   transform: scale(0.96) !important;
   box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.2) !important;
@@ -1540,12 +1540,12 @@
   text-align: center !important;
 }
 /* Site Pilot chat — no mini footer. */
-.proto-viewport > div > div:nth-child(10) > .proto-footer-mount {
+.studio-viewport > div > div:nth-child(10) > .proto-footer-mount {
   display: none !important;
 }
 /* Left cluster (logo + Contact Support) — allow shrink */
-.proto-viewport > div > div:nth-child(10) [data-proto-sticky-group] > :first-child > :first-child,
-.proto-viewport > div > div:nth-child(10) > :nth-child(2):not([data-proto-sticky-group]) > div > :first-child {
+.studio-viewport > div > div:nth-child(10) [data-studio-sticky-group] > :first-child > :first-child,
+.studio-viewport > div > div:nth-child(10) > :nth-child(2):not([data-studio-sticky-group]) > div > :first-child {
   width: auto !important;
   max-width: 100% !important;
   flex: 1 1 auto !important;
@@ -1574,22 +1574,22 @@
 /* ── Account pages: Order Details (child 1) + Order History (child 2) ─────── */
 /* Match header/breadcrumb grid: 1440px outer, 1312px content inside 64px pad. */
 
-.proto-viewport > div > div:nth-child(1) > [data-name="body"],
-.proto-viewport > div > div:nth-child(2) > [data-name="body"] {
+.studio-viewport > div > div:nth-child(1) > [data-name="body"],
+.studio-viewport > div > div:nth-child(2) > [data-name="body"] {
   width: 100% !important;
   align-self: stretch !important;
   box-sizing: border-box !important;
 }
 
 /* Order Details — centre shell */
-.proto-viewport > div > div:nth-child(1) > [data-name="body"] > div {
+.studio-viewport > div > div:nth-child(1) > [data-name="body"] > div {
   width: 100% !important;
   box-sizing: border-box !important;
   justify-content: center !important;
 }
 
 /* Order Details — padded content row */
-.proto-viewport > div > div:nth-child(1) > [data-name="body"] > div > div {
+.studio-viewport > div > div:nth-child(1) > [data-name="body"] > div > div {
   width: 100% !important;
   max-width: 1440px !important;
   margin-left: auto !important;
@@ -1598,7 +1598,7 @@
 }
 
 /* Order History — padded row is a direct child of body (no extra wrapper) */
-.proto-viewport > div > div:nth-child(2) > [data-name="body"] > div {
+.studio-viewport > div > div:nth-child(2) > [data-name="body"] > div {
   width: 100% !important;
   max-width: 1440px !important;
   margin-left: auto !important;
@@ -1607,13 +1607,13 @@
 }
 
 /* Mounted Footer — stretch full width on every screen that uses it */
-.proto-viewport > div > div:nth-child(1) > .proto-footer-mount,
-.proto-viewport > div > div:nth-child(2) > .proto-footer-mount,
-.proto-viewport > div > div:nth-child(3) > .proto-footer-mount,
-.proto-viewport > div > div:nth-child(4) > .proto-footer-mount,
-.proto-viewport > div > div:nth-child(7) > .proto-footer-mount,
-.proto-viewport > div > div:nth-child(8) > .proto-footer-mount,
-.proto-viewport > div > div:nth-child(9) > .proto-footer-mount {
+.studio-viewport > div > div:nth-child(1) > .proto-footer-mount,
+.studio-viewport > div > div:nth-child(2) > .proto-footer-mount,
+.studio-viewport > div > div:nth-child(3) > .proto-footer-mount,
+.studio-viewport > div > div:nth-child(4) > .proto-footer-mount,
+.studio-viewport > div > div:nth-child(7) > .proto-footer-mount,
+.studio-viewport > div > div:nth-child(8) > .proto-footer-mount,
+.studio-viewport > div > div:nth-child(9) > .proto-footer-mount {
   width: 100% !important;
   align-self: stretch !important;
 }
@@ -1836,7 +1836,7 @@
   --proto-footer-social-size: 28px;
 }
 
-.proto-footer__social-icons .proto-icon-hit__glyph--24 {
+.proto-footer__social-icons .studio-icon-hit__glyph--24 {
   width: var(--proto-footer-social-size);
   height: var(--proto-footer-social-size);
 }
@@ -1863,28 +1863,28 @@
   overflow: visible;
 }
 
-.proto-footer__social-icons .proto-icon-hit:focus,
-.proto-footer__social-icons .proto-icon-hit:focus-visible,
-.proto-footer__social-icons .proto-icon-hit:focus:not(:focus-visible) {
+.proto-footer__social-icons .studio-icon-hit:focus,
+.proto-footer__social-icons .studio-icon-hit:focus-visible,
+.proto-footer__social-icons .studio-icon-hit:focus:not(:focus-visible) {
   outline: none !important;
   box-shadow: none !important;
 }
 
 /* No lingering focus wash after click — but keep hover + pressed circles */
-.proto-footer__social-icons .proto-icon-hit:focus:not(:hover):not(:active)::before,
-.proto-footer__social-icons .proto-icon-hit:focus-visible:not(:hover):not(:active)::before {
+.proto-footer__social-icons .studio-icon-hit:focus:not(:hover):not(:active)::before,
+.proto-footer__social-icons .studio-icon-hit:focus-visible:not(:hover):not(:active)::before {
   background: transparent !important;
 }
 
-.proto-footer__social-icons .proto-icon-hit:hover::before {
+.proto-footer__social-icons .studio-icon-hit:hover::before {
   background: #eef8f7 !important;
 }
 
-.proto-footer__social-icons .proto-icon-hit:active::before {
+.proto-footer__social-icons .studio-icon-hit:active::before {
   background: #c6e5e1 !important;
 }
 
-.proto-icon-hit:hover .proto-footer-social-glyph__mark svg path {
+.studio-icon-hit:hover .proto-footer-social-glyph__mark svg path {
   fill: #01318f !important;
 }
 
@@ -1990,8 +1990,8 @@
 }
 
 /* Sidebar — fixed 304px */
-.proto-viewport > div > div:nth-child(1) [data-name="module.ma.navigation"],
-.proto-viewport > div > div:nth-child(2) [data-name="module.ma.navigation"] {
+.studio-viewport > div > div:nth-child(1) [data-name="module.ma.navigation"],
+.studio-viewport > div > div:nth-child(2) [data-name="module.ma.navigation"] {
   flex: 0 0 304px !important;
   width: 304px !important;
   min-width: 304px !important;
@@ -1999,24 +1999,24 @@
 }
 
 /* Main content column */
-.proto-viewport > div > div:nth-child(1) [data-name="Content"],
-.proto-viewport > div > div:nth-child(2) [data-name="Content"],
-.proto-viewport > div > div:nth-child(1) [data-name="Right Column"],
-.proto-viewport > div > div:nth-child(2) [data-name="Right Column"],
-.proto-viewport > div > div:nth-child(2) [data-name="Left"] {
+.studio-viewport > div > div:nth-child(1) [data-name="Content"],
+.studio-viewport > div > div:nth-child(2) [data-name="Content"],
+.studio-viewport > div > div:nth-child(1) [data-name="Right Column"],
+.studio-viewport > div > div:nth-child(2) [data-name="Right Column"],
+.studio-viewport > div > div:nth-child(2) [data-name="Left"] {
   flex: 1 1 0 !important;
   min-width: 0 !important;
   width: auto !important;
   align-items: stretch !important;
 }
 
-.proto-viewport > div > div:nth-child(2) [data-name="2 Columns"] {
+.studio-viewport > div > div:nth-child(2) [data-name="2 Columns"] {
   width: 100% !important;
 }
 
 /* Order cards — Figma hardcodes w-[976px]; fill the remaining column */
-.proto-viewport > div > div:nth-child(1) [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"],
-.proto-viewport > div > div:nth-child(2) [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"] {
+.studio-viewport > div > div:nth-child(1) [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"],
+.studio-viewport > div > div:nth-child(2) [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"] {
   width: 100% !important;
   max-width: 100% !important;
   min-width: 0 !important;
@@ -2027,10 +2027,10 @@
 }
 
 /* Card title — “Appointment #…” (Figma 25px; slightly smaller for balance) */
-.proto-viewport > div > div:nth-child(1)
+.studio-viewport > div > div:nth-child(1)
   [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]
   > p,
-.proto-viewport > div > div:nth-child(2)
+.studio-viewport > div > div:nth-child(2)
   [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]
   > p {
   font-size: 20px !important;
@@ -2038,34 +2038,34 @@
 }
 
 /* Inner white detail panel — softer border, tighter padding */
-.proto-viewport > div > div:nth-child(1)
+.studio-viewport > div > div:nth-child(1)
   [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]
   > .bg-white
   > .pointer-events-none[aria-hidden],
-.proto-viewport > div > div:nth-child(2)
+.studio-viewport > div > div:nth-child(2)
   [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]
   > .bg-white
   > .pointer-events-none[aria-hidden] {
   border-color: #ebebeb !important;
 }
 
-.proto-viewport > div > div:nth-child(1)
+.studio-viewport > div > div:nth-child(1)
   [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]
   > .bg-white
   > div:not([aria-hidden]),
-.proto-viewport > div > div:nth-child(2)
+.studio-viewport > div > div:nth-child(2)
   [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]
   > .bg-white
   > div:not([aria-hidden]) {
   padding: 20px !important;
 }
 
-.proto-viewport > div > div:nth-child(1)
+.studio-viewport > div > div:nth-child(1)
   [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]
   > .bg-white
   > div:not([aria-hidden])
   > div,
-.proto-viewport > div > div:nth-child(2)
+.studio-viewport > div > div:nth-child(2)
   [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]
   > .bg-white
   > div:not([aria-hidden])
@@ -2073,30 +2073,30 @@
   gap: 2px !important;
 }
 
-.proto-viewport > div > div:nth-child(1)
+.studio-viewport > div > div:nth-child(1)
   [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]
   [data-name="row"],
-.proto-viewport > div > div:nth-child(2)
+.studio-viewport > div > div:nth-child(2)
   [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]
   [data-name="row"] {
   gap: 8px 20px !important;
 }
 
-.proto-viewport > div > div:nth-child(1)
+.studio-viewport > div > div:nth-child(1)
   [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]
   [data-name="CTAs"],
-.proto-viewport > div > div:nth-child(2)
+.studio-viewport > div > div:nth-child(2)
   [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]
   [data-name="CTAs"] {
   gap: 12px !important;
   align-items: center !important;
 }
 
-.proto-viewport > div > div:nth-child(1)
+.studio-viewport > div > div:nth-child(1)
   [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]
   [data-name="CTAs"]
   .proto-avail-btn-primary--sm,
-.proto-viewport > div > div:nth-child(2)
+.studio-viewport > div > div:nth-child(2)
   [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]
   [data-name="CTAs"]
   .proto-avail-btn-primary--sm {
@@ -2104,19 +2104,19 @@
 }
 
 /* Appointment card detail rows — Figma exports ~10–12px; bump for readability */
-.proto-viewport > div > div:nth-child(1)
+.studio-viewport > div > div:nth-child(1)
   [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]
   [data-name="row"]
   p,
-.proto-viewport > div > div:nth-child(2)
+.studio-viewport > div > div:nth-child(2)
   [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]
   [data-name="row"]
   p,
-.proto-viewport > div > div:nth-child(1)
+.studio-viewport > div > div:nth-child(1)
   [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]
   [data-name="component.product.price"]
   p,
-.proto-viewport > div > div:nth-child(2)
+.studio-viewport > div > div:nth-child(2)
   [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]
   [data-name="component.product.price"]
   p {
@@ -2156,76 +2156,76 @@
 }
 
 /* Appointment Cancel CTA — navy label; hover icon → coral/red */
-.proto-viewport > div > div:nth-child(1)
+.studio-viewport > div > div:nth-child(1)
   [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]
   [data-name="CTAs"]
-  [data-proto-appointment-cancel="true"]
+  [data-studio-appointment-cancel="true"]
   p,
-.proto-viewport > div > div:nth-child(2)
+.studio-viewport > div > div:nth-child(2)
   [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]
   [data-name="CTAs"]
-  [data-proto-appointment-cancel="true"]
+  [data-studio-appointment-cancel="true"]
   p,
-.proto-viewport > div > div:nth-child(1)
+.studio-viewport > div > div:nth-child(1)
   [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]
   [data-name="CTAs"]
-  [data-proto-appointment-cancel="true"]:hover
+  [data-studio-appointment-cancel="true"]:hover
   p,
-.proto-viewport > div > div:nth-child(2)
+.studio-viewport > div > div:nth-child(2)
   [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]
   [data-name="CTAs"]
-  [data-proto-appointment-cancel="true"]:hover
+  [data-studio-appointment-cancel="true"]:hover
   p,
-.proto-viewport > div > div:nth-child(1)
+.studio-viewport > div > div:nth-child(1)
   [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]
   [data-name="CTAs"]
-  [data-proto-appointment-cancel="true"]:active
+  [data-studio-appointment-cancel="true"]:active
   p,
-.proto-viewport > div > div:nth-child(2)
+.studio-viewport > div > div:nth-child(2)
   [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]
   [data-name="CTAs"]
-  [data-proto-appointment-cancel="true"]:active
+  [data-studio-appointment-cancel="true"]:active
   p {
   color: #012169 !important;
 }
 
-.proto-viewport > div > div:nth-child(1)
+.studio-viewport > div > div:nth-child(1)
   [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]
   [data-name="CTAs"]
-  [data-proto-appointment-cancel="true"]
+  [data-studio-appointment-cancel="true"]
   svg
   path,
-.proto-viewport > div > div:nth-child(2)
+.studio-viewport > div > div:nth-child(2)
   [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]
   [data-name="CTAs"]
-  [data-proto-appointment-cancel="true"]
+  [data-studio-appointment-cancel="true"]
   svg
   path {
   transition: stroke 0.18s ease, fill 0.18s ease !important;
 }
 
-.proto-viewport > div > div:nth-child(1)
+.studio-viewport > div > div:nth-child(1)
   [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]
   [data-name="CTAs"]
-  [data-proto-appointment-cancel="true"]:hover
+  [data-studio-appointment-cancel="true"]:hover
   svg
   path,
-.proto-viewport > div > div:nth-child(2)
+.studio-viewport > div > div:nth-child(2)
   [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]
   [data-name="CTAs"]
-  [data-proto-appointment-cancel="true"]:hover
+  [data-studio-appointment-cancel="true"]:hover
   svg
   path,
-.proto-viewport > div > div:nth-child(1)
+.studio-viewport > div > div:nth-child(1)
   [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]
   [data-name="CTAs"]
-  [data-proto-appointment-cancel="true"]:active
+  [data-studio-appointment-cancel="true"]:active
   svg
   path,
-.proto-viewport > div > div:nth-child(2)
+.studio-viewport > div > div:nth-child(2)
   [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]
   [data-name="CTAs"]
-  [data-proto-appointment-cancel="true"]:active
+  [data-studio-appointment-cancel="true"]:active
   svg
   path {
   stroke: #c96b6b !important;
@@ -2233,16 +2233,16 @@
 }
 
 /* Load more — keep centred narrow block */
-.proto-viewport > div > div:nth-child(2) [data-name="b2b.component.gse.load.more"] {
+.studio-viewport > div > div:nth-child(2) [data-name="b2b.component.gse.load.more"] {
   width: 100% !important;
   max-width: 376px !important;
   align-self: center !important;
 }
 
 /* Order summary + contact/payment blocks */
-.proto-viewport > div > div:nth-child(1) [data-name="component.co.buyer.info.static"],
-.proto-viewport > div > div:nth-child(1) [data-name="component.co.product.in.this.order"],
-.proto-viewport > div > div:nth-child(1) [data-name="Info Blocks / Order Summary/NO"] {
+.studio-viewport > div > div:nth-child(1) [data-name="component.co.buyer.info.static"],
+.studio-viewport > div > div:nth-child(1) [data-name="component.co.product.in.this.order"],
+.studio-viewport > div > div:nth-child(1) [data-name="Info Blocks / Order Summary/NO"] {
   width: 100% !important;
   max-width: 100% !important;
 }
@@ -2252,7 +2252,7 @@
 /* Hero: full-width band, content constrained to the 1440px optical grid.
  * padding-inline grows at (viewport - 1440) / 2 so the background bleeds
  * edge-to-edge while Copy + Image stay inside the same column as the header. */
-.proto-viewport > div > div:nth-child(9) [data-name="module.plp.hero"] {
+.studio-viewport > div > div:nth-child(9) [data-name="module.plp.hero"] {
   width: 100% !important;
   min-width: unset !important;
   padding-left: max(0px, calc((100% - 1440px) / 2)) !important;
@@ -2260,7 +2260,7 @@
 }
 
 /* Remove the white bg wash so the blurred photo is the dominant background */
-.proto-viewport > div > div:nth-child(9) [data-name="component.plp.hero.bg"] {
+.studio-viewport > div > div:nth-child(9) [data-name="component.plp.hero.bg"] {
   background: transparent !important;
   opacity: 1 !important;
 }
@@ -2275,13 +2275,13 @@
   cursor: pointer !important;
 }
 
-[data-name="component.plp.filter.checkbox.item"][data-proto-filter-disabled="true"] {
+[data-name="component.plp.filter.checkbox.item"][data-studio-filter-disabled="true"] {
   cursor: not-allowed !important;
   opacity: 0.45;
   pointer-events: none;
 }
 
-[data-name="component.plp.filter.checkbox.item"][data-proto-filter-disabled="true"]
+[data-name="component.plp.filter.checkbox.item"][data-studio-filter-disabled="true"]
   [data-name="component.input.checkbox"] {
   cursor: not-allowed !important;
 }
@@ -2396,26 +2396,26 @@
  * ModuleLaptopSpecs  (has aria-hidden bg div + sibling content div)
  * ModuleLaptopSpecs1 (bg-white > centering div > padding div)
  */
-.proto-viewport > div > div:nth-child(9) [data-name="module.laptop.specs"] > div:not([aria-hidden]) {
+.studio-viewport > div > div:nth-child(9) [data-name="module.laptop.specs"] > div:not([aria-hidden]) {
   max-width: 1440px !important;
   width: 100% !important;
   margin-left: auto !important;
   margin-right: auto !important;
 }
-.proto-viewport > div > div:nth-child(9) [data-name="module.laptop.specs"] > div > div {
+.studio-viewport > div > div:nth-child(9) [data-name="module.laptop.specs"] > div > div {
   max-width: 1440px !important;
   width: 100% !important;
   margin-left: auto !important;
   margin-right: auto !important;
 }
 
-.proto-viewport > div > div:nth-child(9) [data-name="component.filter.controls"] {
+.studio-viewport > div > div:nth-child(9) [data-name="component.filter.controls"] {
   flex-direction: column !important;
   align-items: stretch !important;
   gap: 0 !important;
 }
 
-.proto-viewport > div > div:nth-child(9) .proto-plp-filter-controls__row {
+.studio-viewport > div > div:nth-child(9) .proto-plp-filter-controls__row {
   display: flex !important;
   flex-wrap: wrap !important;
   align-items: center !important;
@@ -2429,7 +2429,7 @@
   text-align: left !important;
 }
 
-.proto-viewport > div > div:nth-child(9) .proto-plp-results-summary {
+.studio-viewport > div > div:nth-child(9) .proto-plp-results-summary {
   margin: 0 !important;
   flex: 1 1 auto !important;
   min-width: 0 !important;
@@ -2437,7 +2437,7 @@
   text-align: left !important;
 }
 
-.proto-viewport > div > div:nth-child(9) .proto-plp-filter-chip {
+.studio-viewport > div > div:nth-child(9) .proto-plp-filter-chip {
   display: inline !important;
   font: inherit !important;
   color: #012169 !important;
@@ -2446,20 +2446,20 @@
   cursor: pointer !important;
 }
 
-.proto-viewport > div > div:nth-child(9) .proto-plp-filter-chip:hover {
+.studio-viewport > div > div:nth-child(9) .proto-plp-filter-chip:hover {
   color: #001a52 !important;
 }
 
-.proto-viewport > div > div:nth-child(9) .proto-plp-reset-filters-link {
+.studio-viewport > div > div:nth-child(9) .proto-plp-reset-filters-link {
   flex: 0 0 auto !important;
   margin-left: auto !important;
 }
 
-.proto-viewport > div > div:nth-child(9) .proto-plp-reset-filters-link[hidden] {
+.studio-viewport > div > div:nth-child(9) .proto-plp-reset-filters-link[hidden] {
   display: none !important;
 }
 
-.proto-viewport > div > div:nth-child(9) [data-proto-plp-reset-filters="true"] {
+.studio-viewport > div > div:nth-child(9) [data-studio-plp-reset-filters="true"] {
   font-family: inherit;
 }
 

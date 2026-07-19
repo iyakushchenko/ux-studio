@@ -49,13 +49,13 @@ export function abortSitePilotChatPlaybackPrelude(): void {
 
 function getChatScreen(): HTMLElement | null {
   return document.querySelector<HTMLElement>(
-    ".proto-viewport > div > div:nth-child(10)"
+    ".studio-viewport > div > div:nth-child(10)"
   );
 }
 
 function scrollChatToBottom(instant = false): void {
   const scrollEl = document.querySelector<HTMLElement>(
-    ".proto-scroll--prototype:not(.hidden)"
+    ".studio-scroll--prototype:not(.hidden)"
   );
   scrollPrototypeScrollToBottom(scrollEl, instant ? "instant" : "smooth");
 }
@@ -213,7 +213,7 @@ export async function runSitePilotChatBeforeReveal(
     removeDemoCursor();
     const screen = getChatScreen();
     const scrollEl = document.querySelector<HTMLElement>(
-      ".proto-scroll--prototype:not(.hidden)"
+      ".studio-scroll--prototype:not(.hidden)"
     );
     if (screen) beginSitePilotChatPlaybackThinking(screen, frame);
     if (scrollEl) {

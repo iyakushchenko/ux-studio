@@ -11,15 +11,15 @@ const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
 await page.goto("http://localhost:5173/", { waitUntil: "networkidle" });
 await page.waitForTimeout(800);
 
-const chatTab = page.locator(".proto-nav-tabs button").filter({ hasText: /Site Pilot\. Chat/i });
+const chatTab = page.locator(".studio-nav-tabs button").filter({ hasText: /Site Pilot\. Chat/i });
 await chatTab.click();
 await page.waitForTimeout(1500);
 
 const report = await page.evaluate(() => {
-  const scrollEl = document.querySelector(".proto-scroll--prototype:not(.hidden)");
+  const scrollEl = document.querySelector(".studio-scroll--prototype:not(.hidden)");
   const dock = document.querySelector(".proto-chat-composer-dock--portal");
   const summary = document.querySelector(
-    '.proto-viewport > div > div:nth-child(10) [data-name="component.appointment.summary"]'
+    '.studio-viewport > div > div:nth-child(10) [data-name="component.appointment.summary"]'
   );
   const frames = summary
     ? Array.from(summary.children).filter((el) => el instanceof HTMLElement)

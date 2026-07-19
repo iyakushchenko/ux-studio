@@ -181,14 +181,14 @@ function findCtaButton(ctas: HTMLElement, label: RegExp): HTMLElement | null {
 
 function findAppointmentEditBtn(ctas: HTMLElement): HTMLElement | null {
   return (
-    ctas.querySelector<HTMLElement>('[data-proto-appointment-edit="true"]') ??
+    ctas.querySelector<HTMLElement>('[data-studio-appointment-edit="true"]') ??
     findCtaButton(ctas, /^edit(\s+appointment)?$/i)
   );
 }
 
 function findAppointmentCancelBtn(ctas: HTMLElement): HTMLElement | null {
   return (
-    ctas.querySelector<HTMLElement>('[data-proto-appointment-cancel="true"]') ??
+    ctas.querySelector<HTMLElement>('[data-studio-appointment-cancel="true"]') ??
     findCtaButton(ctas, /^cancel(\s+appointment)?$/i)
   );
 }
@@ -197,8 +197,8 @@ function hideAppointmentEditCancelBtns(ctas: HTMLElement): void {
   ctas.querySelectorAll<HTMLElement>('[data-name="component.input.button"]').forEach((btn) => {
     const text = (btn.textContent ?? "").replace(/\s+/g, " ").trim();
     if (
-      btn.dataset.protoAppointmentEdit === "true" ||
-      btn.dataset.protoAppointmentCancel === "true" ||
+      btn.dataset.studioAppointmentEdit === "true" ||
+      btn.dataset.studioAppointmentCancel === "true" ||
       /^edit(\s+appointment)?$/i.test(text) ||
       /^cancel(\s+appointment)?$/i.test(text)
     ) {
@@ -209,7 +209,7 @@ function hideAppointmentEditCancelBtns(ctas: HTMLElement): void {
 
 function cloneEditIcon(): HTMLElement {
   const src = document.querySelector<HTMLElement>(
-    '.proto-viewport [data-name="icon=edit"]'
+    '.studio-viewport [data-name="icon=edit"]'
   );
   if (src) return src.cloneNode(true) as HTMLElement;
   const wrap = document.createElement("div");
@@ -244,13 +244,13 @@ function convertToIconTextBtn(
   kind: "edit" | "cancel",
   label: string
 ): void {
-  btn.dataset.protoAppointmentIconText = "true";
-  delete btn.dataset.protoAppointmentCancel;
-  delete btn.dataset.protoAppointmentEdit;
+  btn.dataset.studioAppointmentIconText = "true";
+  delete btn.dataset.studioAppointmentCancel;
+  delete btn.dataset.studioAppointmentEdit;
   if (kind === "cancel") {
-    btn.dataset.protoAppointmentCancel = "true";
+    btn.dataset.studioAppointmentCancel = "true";
   } else {
-    btn.dataset.protoAppointmentEdit = "true";
+    btn.dataset.studioAppointmentEdit = "true";
   }
   btn.setAttribute("data-name", "component.input.button");
   btn.className = ICON_TEXT_BTN_CLASS;
@@ -264,12 +264,12 @@ function convertToIconTextBtn(
 
 function ensureViewDetailsBtn(ctas: HTMLElement): HTMLButtonElement {
   let btn = ctas.querySelector<HTMLButtonElement>(
-    '[data-proto-appointment-view-details="true"]'
+    '[data-studio-appointment-view-details="true"]'
   );
   if (!btn) {
     btn = document.createElement("button");
     btn.type = "button";
-    btn.dataset.protoAppointmentViewDetails = "true";
+    btn.dataset.studioAppointmentViewDetails = "true";
     btn.className = "proto-avail-btn-primary proto-avail-btn-primary--sm";
     btn.textContent = "View Details";
   }
@@ -454,7 +454,7 @@ function syncRefundPendingNoteRow(
   const statusRow = findRow(card, "status");
   if (!container || !statusRow) return () => {};
 
-  let row = container.querySelector<HTMLElement>("[data-proto-refund-pending-row]");
+  let row = container.querySelector<HTMLElement>("[data-studio-refund-pending-row]");
   const note = appt.refundPendingNote;
 
   if (!note) {
@@ -464,7 +464,7 @@ function syncRefundPendingNoteRow(
 
   if (!row) {
     row = statusRow.cloneNode(true) as HTMLElement;
-    row.setAttribute("data-proto-refund-pending-row", "true");
+    row.setAttribute("data-studio-refund-pending-row", "true");
     const label = row.querySelector("p");
     if (label) {
       label.textContent = "";
@@ -518,12 +518,12 @@ function syncRefundPendingNoteRow(
 }
 
 function syncCancellationReasonRow(card: HTMLElement, appt: Appointment): void {
-  const refundRow = card.querySelector<HTMLElement>("[data-proto-refund-pending-row]");
+  const refundRow = card.querySelector<HTMLElement>("[data-studio-refund-pending-row]");
   const statusRow = findRow(card, "status");
   const insertAfter = refundRow ?? statusRow;
 
   syncOptionalDetailRow(card, {
-    dataAttr: "data-proto-cancellation-reason-row",
+    dataAttr: "data-studio-cancellation-reason-row",
     label: "Cancellation reason",
     value: appt.cancellationReason,
     insertAfter,
@@ -552,14 +552,14 @@ function ensureHistoryCardCount(page: HTMLElement): () => void {
     ).length < needed
   ) {
     const clone = template.cloneNode(true) as HTMLElement;
-    clone.dataset.protoAppointmentCardClone = "true";
+    clone.dataset.studioAppointmentCardClone = "true";
     if (loadMore) list.insertBefore(clone, loadMore);
     else list.appendChild(clone);
   }
 
   return () => {
     list
-      .querySelectorAll<HTMLElement>('[data-proto-appointment-card-clone="true"]')
+      .querySelectorAll<HTMLElement>('[data-studio-appointment-card-clone="true"]')
       .forEach((el) => el.remove());
   };
 }
@@ -727,7 +727,7 @@ function syncDetailPricing(page: HTMLElement, appt: Appointment): void {
     setRow("Order Discount", formatGbp(appt.pricing.discount));
     setRow("Sales Tax", formatGbp(appt.pricing.tax));
     setRow("Total", formatGbp(appt.pricing.total));
-    summary.querySelector('[data-proto-booster-line]')?.remove();
+    summary.querySelector('[data-studio-booster-line]')?.remove();
     return;
   }
 

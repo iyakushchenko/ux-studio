@@ -29,19 +29,19 @@ export function StudioJourneySwitch({
             : "CJM off — free screen navigation"
       }
       disabled={disabled}
-      className={`proto-studio-mode-switch proto-studio-journey-switch${
-        checked ? " proto-studio-mode-switch--on" : ""
+      className={`studio-mode-switch studio-journey-switch${
+        checked ? " studio-mode-switch--on" : ""
       }`}
       onClick={(event) => {
         flashControlRoomButton(
           event.currentTarget,
-          "proto-studio-mode-switch--tap"
+          "studio-mode-switch--tap"
         );
         onChange(!checked);
       }}
     >
-      <span className="proto-studio-mode-switch__track" aria-hidden>
-        <span className="proto-studio-mode-switch__thumb" />
+      <span className="studio-mode-switch__track" aria-hidden>
+        <span className="studio-mode-switch__thumb" />
       </span>
     </button>
   );

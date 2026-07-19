@@ -28,7 +28,7 @@ Figma Make / static strips are **intent only**. Not the architecture we grow.
 | **Interaction** | Anticipated controls must work before recording is expected — shared kits under `src/uxds/interactions/` ([INTERACTION_FIDELITY.md](./INTERACTION_FIDELITY.md)) |
 | **Reuse** | Maximize UXDS + internal ready components + interaction kits; when PO asks for a page “from what we have,” compose — don’t invent ([CONCEPT_INTAKE.md](./CONCEPT_INTAKE.md) §5 mode B) |
 | **Patterns** | Styleguide patterns reused across projects; brand identity stays in the project delta |
-| **Wiring for Studio** | Stable `data-name` / `data-proto-*` / screen registry so playback + recording keep working |
+| **Wiring for Studio** | Stable `data-name` / `data-studio-*` / screen registry so playback + recording keep working |
 
 ---
 

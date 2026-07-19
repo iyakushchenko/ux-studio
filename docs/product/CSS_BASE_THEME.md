@@ -39,10 +39,10 @@ Preamble (fonts, Tailwind, `src/styles/theme.css` shadcn tokens) loads first for
 
 | Path | Owns |
 |------|------|
-| `src/projects/boots-pharmacy/styleguide/theme.css` | Boots remaps under `[data-proto-project="boots-pharmacy"]` only |
+| `src/projects/boots-pharmacy/styleguide/theme.css` | Boots remaps under `[data-studio-project="boots-pharmacy"]` only |
 | Future: `src/projects/<id>/styleguide/theme.css` | Same contract per project |
 
-Theme off = remove `data-proto-project` and/or skip the theme import → UXDS BASE remains.
+Theme off = remove `data-studio-project` and/or skip the theme import → UXDS BASE remains.
 
 ### PANEL
 

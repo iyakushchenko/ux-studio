@@ -36,7 +36,7 @@ Sibling **tertiary icon+text** CTAs on the same surface must share **one** icon 
 
 | Rule | Expectation |
 |------|-------------|
-| **Source of truth** | Availability popup / Make tertiary beside search (`.proto-tertiary-cta--compact` + 16×16 map-pin + nowrap) — **not** a FilterChip restyle and **not** a Change-pencil one-off fork |
+| **Source of truth** | Availability popup / Make tertiary beside search (`.studio-tertiary-cta--compact` + 16×16 map-pin + nowrap) — **not** a FilterChip restyle and **not** a Change-pencil one-off fork |
 | **Placement** | Right of the search field when the concept shows side-by-side (Make `Frame209` / `.proto-avail-search-row`) |
 | **Shared class** | `.proto-near-me-cta` on top of tertiary compact chrome — typography, color, icon, hover stay in sync |
 
@@ -144,7 +144,7 @@ Use `nowrap` for short CTAs, chips, crumb current labels, and tertiary pills unl
 
 **Honesty (2026-07-19):** Before this checkpoint, `package.json` listed unused `motion` (no `src/` imports). Touchpoint label resize was custom CSS (`width 0.34s ease`); Playback↔Rec swapped with a hard mount/unmount. Now: direct dependency `framer-motion@12.42.2` is imported and used for panel swap + touchpoint label width. Studio LED blink keyframes in `studioNavPanel.css` remain CSS until migrated (register if expanded).
 
-**Shell reference:** `StudioNavScenarioControls` — `AnimatePresence mode="wait"` on `.proto-nav-scenario__panel-swap`.
+**Shell reference:** `StudioNavScenarioControls` — `AnimatePresence mode="wait"` on `.studio-nav-scenario__panel-swap`.
 
 ---
 

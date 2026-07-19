@@ -114,7 +114,7 @@ export function notePlaybackRetreatSync(options: {
 /** Describe a demo-click target for diagnostic reports. */
 export function describePlaybackElement(el: HTMLElement): string {
   const root =
-    el.closest<HTMLElement>("[data-proto-avail-store]") ??
+    el.closest<HTMLElement>("[data-studio-avail-store]") ??
     el.closest<HTMLElement>("[data-name]") ??
     el;
 
@@ -125,7 +125,7 @@ export function describePlaybackElement(el: HTMLElement): string {
   const dataName = root.getAttribute("data-name");
   if (dataName) parts.push(`data-name="${dataName}"`);
 
-  const storeId = root.getAttribute("data-proto-avail-store");
+  const storeId = root.getAttribute("data-studio-avail-store");
   if (storeId) parts.push(`store="${storeId}"`);
 
   const aria = root.getAttribute("aria-label")?.trim();

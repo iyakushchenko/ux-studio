@@ -81,7 +81,7 @@ export default function QuickViewPopup({
   useEffect(() => {
     if (!open) return;
     const clone = mountRef.current?.querySelector<HTMLElement>(
-      '[data-proto-quick-view-clone="true"]'
+      '[data-studio-quick-view-clone="true"]'
     );
     if (!clone) return;
     syncQuickViewBoosterState(clone, includeBoosterDose);

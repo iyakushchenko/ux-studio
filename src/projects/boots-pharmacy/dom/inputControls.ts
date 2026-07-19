@@ -18,18 +18,18 @@ export function isBoxCheckedFromFigma(box: HTMLElement): boolean {
 }
 
 export function isBoosterCheckboxRow(row: HTMLElement): boolean {
-  return row.dataset.protoBooster === "true";
+  return row.dataset.studioBooster === "true";
 }
 
 export function markBoosterCheckboxRow(row: HTMLElement): void {
-  row.dataset.protoBooster = "true";
+  row.dataset.studioBooster = "true";
 }
 
 /** React pilot screens own their own checkbox/radio state — do not Make-mutate them. */
 export function isReactOwnedInputRow(row: HTMLElement): boolean {
   return (
-    row.dataset.protoReactOwned === "true" ||
-    !!row.closest("[data-proto-react-screen]")
+    row.dataset.studioReactOwned === "true" ||
+    !!row.closest("[data-studio-react-screen]")
   );
 }
 
@@ -37,14 +37,14 @@ function standardizeCheckboxBox(box: HTMLElement): void {
   box.className = "absolute left-0 top-0 size-[24px] rounded-[2px]";
   box.replaceChildren();
   box.insertAdjacentHTML("beforeend", CHECKMARK_HTML);
-  box.dataset.protoStandardized = "1";
+  box.dataset.studioStandardized = "1";
 }
 
 function standardizeRadioBox(box: HTMLElement): void {
   box.className = "absolute left-0 top-0 size-[24px] rounded-[360px]";
   box.replaceChildren();
   box.insertAdjacentHTML("beforeend", RADIO_DOT_HTML);
-  box.dataset.protoStandardized = "1";
+  box.dataset.studioStandardized = "1";
 }
 
 function findCheckboxRow(target: HTMLElement): HTMLElement | null {
@@ -69,7 +69,7 @@ export function ensureCheckboxRow(row: HTMLElement): void {
   const box = row.querySelector<HTMLElement>('[data-name="box"]');
   if (!box) return;
 
-  if (box.dataset.protoStandardized !== "1") {
+  if (box.dataset.studioStandardized !== "1") {
     if (row.dataset.checkboxChecked === undefined && !isBoosterCheckboxRow(row)) {
       const plpFilterPanel = row.closest('[data-name="module.plp.filters"]');
       row.dataset.checkboxChecked = plpFilterPanel
@@ -86,7 +86,7 @@ export function ensureRadioRow(row: HTMLElement): void {
   const box = row.querySelector<HTMLElement>('[data-name="box"]');
   if (!box) return;
 
-  if (box.dataset.protoStandardized !== "1") {
+  if (box.dataset.studioStandardized !== "1") {
     if (row.dataset.radioChecked === undefined) {
       row.dataset.radioChecked = String(isBoxCheckedFromFigma(box));
     }
@@ -161,7 +161,7 @@ export const PLP_FILTER_VIEW_ALL_SELECTOR =
 const PLP_FILTER_VIEW_ALL = PLP_FILTER_VIEW_ALL_SELECTOR;
 
 function wirePlpFilterViewAllLink(el: HTMLElement): void {
-  if (el.dataset.protoViewAllWired === "2") return;
+  if (el.dataset.studioViewAllWired === "2") return;
 
   let link: HTMLAnchorElement;
   if (el instanceof HTMLAnchorElement) {
@@ -184,7 +184,7 @@ function wirePlpFilterViewAllLink(el: HTMLElement): void {
     e.preventDefault();
     handlePlpFilterViewAllClick(link);
   });
-  link.dataset.protoViewAllWired = "2";
+  link.dataset.studioViewAllWired = "2";
 }
 
 export function wirePlpFilterViewAllLinks(root: ParentNode = document): void {

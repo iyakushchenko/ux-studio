@@ -10,14 +10,14 @@
 
 Complete before calling the task **done** (including late in a long session):
 
-1. **`npm test`** — static contracts (`check:links`) + Vitest. Fix failures.
+1. **`npm test`** — static contracts (`check:links` + `check:hygiene`) + Vitest. Fix failures.
 2. **`npm run build`** — Vite production build must stay green (same signal Pages uses; base `/ux-studio/` on deploy).
 3. **Behavior / docs** — if product behavior changed, update matching `docs/product/*` or `docs/projects/<id>/` the same turn. New files follow [NAMING.md](./NAMING.md).
-4. **UI-facing handoff** — strict FE audit per [FE_UI_UX_AUDIT.md](./FE_UI_UX_AUDIT.md) until **PROVEN** under `docs/projects/<id>/audits/` (doctrine §7). Green tests alone are not enough.
+4. **UI-facing handoff** — strict FE audit per [FE_UI_UX_AUDIT.md](./FE_UI_UX_AUDIT.md) until **PROVEN** under `docs/projects/<id>/audits/` (doctrine §7). Green tests alone are not enough. Domain CSS renames → Nazi QA **light** on chrome.
 5. **Blast-radius + chrome XOR** — adjacent links/CTAs/counters/panel XOR; **REC ⊗ CJM ⊗ AIR** (`studioModeXor.test.ts`, sanity `rec-disabled-when-cjm-on`, audit G5–G6).
-6. **Interactive / chrome / playback** — local MCP (`__protoRunMcpSanityCheck`) or lean `npm run smoke` against `npm run dev`. Full marathon (`PROTO_SMOKE_PROFILE=full`) only when investigating. Agent runs: `__protoAgentTestingOverlay` touch + sitrep settle; strip ephemeral URL params ([../shell/RECORDING.md](../shell/RECORDING.md), [../shell/URL.md](../shell/URL.md)).
-7. **URL / hybrid / mounts** — navigable `?project=&screen=`; React host mounted; Make retired; createRoot unmount **deferred**; short grids left-aligned; Step tabs → `PROTO_INDEX_BOOK_STEP*`. See [LESSONS_LEARNED.md](./LESSONS_LEARNED.md).
-8. **CSS layers** — no new React styles in LEGACY (BASE → THEME → PANEL → LEGACY).
+6. **Interactive / chrome / playback** — local MCP (`__studioRunMcpSanityCheck` / `__protoRunMcpSanityCheck`) or lean `npm run smoke` against `npm run dev`. Full marathon (`PROTO_SMOKE_PROFILE=full`) only when investigating. Agent runs: overlay touch + sitrep settle; strip ephemeral URL params. Selectors: `data-studio-*` / `.studio-nav-*` ([../shell/RECORDING.md](../shell/RECORDING.md), [../shell/URL.md](../shell/URL.md)).
+7. **URL / hybrid / mounts** — navigable `?project=&screen=`; React host mounted; Make retired (`data-studio-make-retired`); createRoot unmount **deferred**; short grids left-aligned; Step tabs → `INDEX_BOOK_STEP*`. See [LESSONS_LEARNED.md](./LESSONS_LEARNED.md).
+8. **CSS layers + domain CSS** — no new React styles in LEGACY; no new `.proto-*` / `data-proto-*` ([NAMING.md](./NAMING.md), [HYGIENE.md](./HYGIENE.md)).
 9. **Changelog + lessons** — user-visible / durable seams: `npm run notes:append -- --lane=<lane> --intent="…"`. Append new failure classes to [LESSONS_LEARNED.md](./LESSONS_LEARNED.md).
 10. **Commit** when coherent and allowed. After **push**: BE sitrep `gh run list -R iyakushchenko/ux-studio -L 10` ([CI_ACTIONS_BUDGET.md](./CI_ACTIONS_BUDGET.md) §5).
 

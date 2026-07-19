@@ -24,7 +24,7 @@ async function main() {
   });
 
   const diagnosticText = await page.evaluate(() => {
-    const el = document.querySelector(".proto-playback-diagnostic");
+    const el = document.querySelector(".studio-playback-diagnostic");
     return el?.textContent?.slice(0, 500) ?? null;
   });
 

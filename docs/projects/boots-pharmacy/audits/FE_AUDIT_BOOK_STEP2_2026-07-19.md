@@ -20,7 +20,7 @@
 
 ## Summary
 
-Live localhost audit of React Book Step 2 confirms hybrid mount at Frame child 4: Make body/header/crumbs/footer retired (`display:none` + `data-proto-make-retired`), React host `.book-step-2` with progress/card **863px**, grid **1440/64/1312**, body fill opacity **0.31**, default slot June **24** / **16:30** (`#c6e5e1` selected), date/time click + Reserve → Step 3 Confirmation. MCP sanity **pass** including `rec-disabled-when-cjm-on`. No LEGACY growth for this page (styles in `book-step-2-datetime.css` only). Intentional: Proto header/footer Studio chrome; wire heading weekday (Wednesday) over Figma Thursday typo.
+Live localhost audit of React Book Step 2 confirms hybrid mount at Frame child 4: Make body/header/crumbs/footer retired (`display:none` + `data-studio-make-retired`), React host `.book-step-2` with progress/card **863px**, grid **1440/64/1312**, body fill opacity **0.31**, default slot June **24** / **16:30** (`#c6e5e1` selected), date/time click + Reserve → Step 3 Confirmation. MCP sanity **pass** including `rec-disabled-when-cjm-on`. No LEGACY growth for this page (styles in `book-step-2-datetime.css` only). Intentional: Proto header/footer Studio chrome; wire heading weekday (Wednesday) over Figma Thursday typo.
 
 ---
 
@@ -66,7 +66,7 @@ Live localhost audit of React Book Step 2 confirms hybrid mount at Frame child 4
 |---|--------|----------|
 | E1 | **PASS** | Click June 21 → heading `Sunday, 21st June 2026`; click 15:30 → selected `["21","15:30"]`. |
 | E2 | **PASS** | Reserve → Step 3 Confirmation (`child3Visible`, nav label Step 3). |
-| E3 | **PASS** | Live buttons + `data-proto-cal-*` hooks; Make calendar/reserve handlers gated when React mounted. |
+| E3 | **PASS** | Live buttons + `data-studio-cal-*` hooks; Make calendar/reserve handlers gated when React mounted. |
 
 ### F. Control hierarchy / no zoo
 

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type AnimationEvent } from "react";
 
-/** Exit duration — keep in sync with `.proto-avail-scrim--closing` in globals-screens.css */
+/** Exit duration — keep in sync with `.studio-avail-scrim--closing` in globals-screens.css */
 export const OVERLAY_EXIT_MS = 280;
 
 /**
@@ -41,8 +41,8 @@ export function useOverlayDismiss(open: boolean) {
   );
 
   const scrimClassName = closing
-    ? "proto-avail-scrim proto-avail-scrim--closing"
-    : "proto-avail-scrim";
+    ? "studio-avail-scrim studio-avail-scrim--closing"
+    : "studio-avail-scrim";
 
   const onScrimAnimationEnd = useCallback(
     (event: AnimationEvent<HTMLElement>) => {

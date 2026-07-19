@@ -1,6 +1,6 @@
 import { useLayoutEffect, type RefObject } from "react";
 
-const MIN_H_VAR = "--proto-scroll-min-px";
+const MIN_H_VAR = "--studio-scroll-min-px";
 
 /** Keep prototype scroll content at least as tall as the visible scroll pane (zoom-safe). */
 export function useScrollFill(

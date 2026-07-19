@@ -2,58 +2,49 @@
 
 **Updated:** 2026-07-19  
 **Owner:** Tech Director (agents execute; PO accept/reject + assets only)  
-**Forecast (engine product map):** [PRODUCT_FORECAST.md](./PRODUCT_FORECAST.md)  
-**Refs:** [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) · [CI_ACTIONS_BUDGET.md](./CI_ACTIONS_BUDGET.md) · [FE_UI_UX_AUDIT.md](./FE_UI_UX_AUDIT.md) · [COMPONENT_LIBRARY.md](./COMPONENT_LIBRARY.md) · [CSS_BASE_THEME.md](./CSS_BASE_THEME.md) · [../shell/URL.md](../shell/URL.md)
+**Forecast:** [PRODUCT_FORECAST.md](./PRODUCT_FORECAST.md) · [ARCHITECTURE.md](./ARCHITECTURE.md) · [HYGIENE.md](./HYGIENE.md)  
+**Refs:** [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) · [CI_ACTIONS_BUDGET.md](./CI_ACTIONS_BUDGET.md) · [NAMING.md](./NAMING.md) · [../shell/URL.md](../shell/URL.md)
 
 ---
 
 ## NOW
 
-1. [ ] **Versioning habit** — append notes on every user-visible ship (`npm run notes:append`). Release/tag CI stays **later**.
+1. [x] **Domain identity phase 2** — PANEL/chrome `.studio-*` + `data-studio-*` clean cut; smoke/MCP/sanity selectors updated; `__proto*` aliases kept ([NAMING.md](./NAMING.md)).
+2. [x] **File hygiene ratchet** — `npm run check:hygiene` in `npm test` ([HYGIENE.md](./HYGIENE.md)).
+3. [x] **Architecture map** — `src/app/` verb folders documented ([ARCHITECTURE.md](./ARCHITECTURE.md)).
+4. [ ] **Versioning habit** — append notes on every user-visible ship (`npm run notes:append`). Release/tag CI stays **later**.
 
 ---
 
 ## NEXT
 
-2. [ ] **Grow UXDS by page (ongoing)** — extract only when a second screen needs it; no speculative catalog ([COMPONENT_LIBRARY.md](./COMPONENT_LIBRARY.md)). Tertiary CTA layer only when next shared use forces it (summary Change already in UXDS).
-3. [ ] **Phase 2: `.proto-*` CSS / `data-proto-*` rename** — file/module identity already `studio*` / domain ([NAMING.md](./NAMING.md)). Class + attribute migration only with full codemod + visual smoke; no half-renames. Keep `window.__proto*` aliases.
-4. [ ] **Residual fidelity (low priority)** — Book Steps 1–3 Make-only hexes with no bridge token yet (`#c3c3c3`, `#7a7d87`/`#7c7c7c`, `#f2f2f2`/`#f1f1f1`, `#c4dde3`, `#ffe351`, Change hover `#000`). Do **not** invent aliases. Dead LEGACY cleanup only when next touching Make child-7/4/3 CSS paths.
+5. [ ] **Recording v2** — demo-click / wire-intent replay from stored selector chains; only then compile→journeys.
+6. [ ] **LEGACY retirement (by screen)** — no LEGACY growth; shrink Make wire + `globals-screens` as React pages land. Concept `.proto-*` classes retire with their screen.
+7. [ ] **Engine monster splits** — on next touch of `App.tsx` / `useJourneyPlayback.ts`, extract by domain (recording bridge / beat advance) — not micro-files.
+8. [ ] **Grow UXDS by page** — extract only on second use ([COMPONENT_LIBRARY.md](./COMPONENT_LIBRARY.md)).
+9. [ ] **Residual fidelity (low)** — Book Steps 1–3 Make-only hexes with no bridge token yet. Do **not** invent aliases.
 
 ---
 
 ## LATER
 
-5. [ ] **Release / tag CI** — only when versioning habit is stable and Actions budget allows.
-6. [ ] **Broader CSS check ratchets** — more `scripts/check-*.mjs` contracts (Summarizer-style), not more Playwright on every push.
-7. [ ] **On-demand lean smoke** — keep `workflow_dispatch` / local `npm run smoke`; do **not** return auto smoke to default CI without a Director rewrite of this board.
-8. [ ] **Second project rabbit** — only after Boots book + URL + REC proven on Pages ([PRODUCT_FORECAST.md](./PRODUCT_FORECAST.md) §4).
+10. [ ] **Second project rabbit** — after Boots book + URL + REC proven on Pages.
+11. [ ] **Release / tag CI** — when versioning habit is stable and Actions budget allows.
+12. [ ] **Broader CSS check ratchets** — more `scripts/check-*.mjs`, not more Playwright on every push.
+13. [ ] **On-demand lean smoke** — keep `workflow_dispatch` / local `npm run smoke`; do **not** return auto smoke to default CI without a Director rewrite of this board.
 
 ---
 
 ## Done recently (context)
 
-- [x] **Retire `proto*` filenames** — engine/project modules → `studio*` / domain names; `__studio*` window APIs + `__proto*` aliases; CSS classes phase 2 ([NAMING.md](./NAMING.md)).
-- [x] **Naming + hard guardrails** — [NAMING.md](./NAMING.md); Boots screen folders `book-step-N` = `screenId`; director checklist + `naming.mdc` / `ci-sitrep.mdc`; lessons append rule.
-- [x] **Recording replay from `screen` events** — `applyStudioScreen` shared with deep-link/popstate; ↺ / `__protoReplayRecording` restores `screenId` / `studioUrl` in order ([../shell/RECORDING.md](../shell/RECORDING.md)).
-- [x] **Studio URL scheme + agent overlay policy** — `?project=&screen=` deep links; strip `proof`; overlay `touch()` + auto-arm mutating `__proto*`; recording `kind: "screen"`; [PRODUCT_FORECAST.md](./PRODUCT_FORECAST.md); [../shell/URL.md](../shell/URL.md).
-- [x] **Fidelity debt (high-ROI)** — kits + Steps 1–3 safe hex→UXDS/theme tokens; localhost color parity; light audit [FE_AUDIT_BOOK_HEX_TOKENS_2026-07-19.md](../projects/boots-pharmacy/audits/FE_AUDIT_BOOK_HEX_TOKENS_2026-07-19.md) **PROVEN** tip `0f112dd`. Residual Make-only hex → NEXT #4.
-- [x] **UXDS book kits** — `BookAppointmentProgress` + `AppointmentSummaryPill` extracted; Steps 1–3 wired; light audit [FE_AUDIT_UXDS_BOOK_KITS_2026-07-19.md](../projects/boots-pharmacy/audits/FE_AUDIT_UXDS_BOOK_KITS_2026-07-19.md) **PROVEN** tip `d56fab1`.
-- [x] **Agent testing overlay (PO rage)** — BR corner status + invisible click capture; MCP `stop({ reload: true })`; tip `4f0e12a`.
-- [x] **Docs layout** — Boots product docs + FE audits under `docs/projects/boots-pharmacy/`; engine doctrine stays in `docs/product/`; old paths keep stubs.
-- [x] **createRoot unmount race** — defer `root.unmount()` so book-step hosts never tear down during parent commit (tip `49e6397`).
-- [x] **GitHub Pages verify (Step 3)** — deploy `1a567be` green; Pages `data-proto-react-screen=book-step-3`; Step 2 short time rows left-aligned; Step 1 under agentic-cjm browse stays (no Home/tab1 snap); REC⊗CJM (CJM on → REC disabled); `__protoAgentTestingOverlay` start/log/stop on Pages.
-- [x] **Lessons + agent testing overlay** — [LESSONS_LEARNED.md](./LESSONS_LEARNED.md); director/checklist gates; `__protoAgentTestingOverlay` for MCP runs ([../shell/RECORDING.md](../shell/RECORDING.md)); tip `e35bf41`.
-- [x] **Book Step 3 React migration** — Confirmation Frame child **3**; Make chrome hidden; AIR `data-proto-open-appointment`; audit [FE_AUDIT_BOOK_STEP3_2026-07-19.md](../projects/boots-pharmacy/audits/FE_AUDIT_BOOK_STEP3_2026-07-19.md) **PROVEN** tip `e35bf41`.
-- [x] **Book Step 2 hotfix** — time-slot last-row left-align (CSS grid); agentic-cjm browse no longer snaps Book Step 1 → Home (`shouldNavigateBeatTabOnEnter`); tip `66e7fe0`; audit note on [FE_AUDIT_BOOK_STEP2_2026-07-19.md](../projects/boots-pharmacy/audits/FE_AUDIT_BOOK_STEP2_2026-07-19.md).
-- [x] **Book Step 2 React migration** — Date/Time Frame child **4**; Make chrome hidden; calendar/reserve gated; audit [FE_AUDIT_BOOK_STEP2_2026-07-19.md](../projects/boots-pharmacy/audits/FE_AUDIT_BOOK_STEP2_2026-07-19.md) **PROVEN** (`af50556` / tip `76b5f55`).
-- [x] **GitHub Pages verify (Step 2)** — deploy green; Pages shows `data-proto-react-screen=book-step-2` + host; MCP sanity REC⊗CJM pass on deployed build.
-- [x] **REC ⊗ CJM** — REC disabled when CJM on; XOR both ways; AIR locks both (`800ec61`). Unit + MCP sanity.
-- [x] **Slim CI** — unit + build default; Playwright smoke `workflow_dispatch` only (`009fb2b`).
-- [x] **Actions bump** — checkout/setup-node v5; Node 22 app runtime (`3bec858`).
-- [x] Book Step 1 React pilot + FE audits **PROVEN** (hybrid mount; LEGACY retires screen-by-screen).
-- [x] Text-link contract + Make viewport link carve-out.
-- [x] Local versioning skeleton + post-change checklist.
-- [x] CSS layer lock BASE → THEME → PANEL → LEGACY documented.
+- [x] **Domain CSS/attrs phase 2** — `.proto-nav-*` / shell chrome → `.studio-*`; `data-proto-*` → `data-studio-*`; events/storage migrate with legacy read ([NAMING.md](./NAMING.md)).
+- [x] **Hygiene gate** — Summarizer-lean LOC ratchet; LEGACY allowlisted.
+- [x] **Retire `proto*` filenames** — modules → `studio*` / domain; `__studio*` + `__proto*` aliases.
+- [x] **Naming + hard guardrails** — screen folders = `screenId`; director + `naming.mdc` / `ci-sitrep.mdc`.
+- [x] **Recording replay from `screen` events** — `applyStudioScreen` shared with deep-link/popstate.
+- [x] **Studio URL + agent overlay** — `?project=&screen=`; strip `proof`; overlay touch + sitrep.
+- [x] **Fidelity debt (high-ROI)** + UXDS book kits — PROVEN audits under `docs/projects/boots-pharmacy/audits/`.
+- [x] **REC ⊗ CJM** + slim CI + Book Steps 1–3 React pilots — PROVEN.
 
 ---
 
@@ -63,23 +54,23 @@
 |------|------|
 | **REC ⊗ CJM ⊗ AIR** | REC off when journey mode on; XOR; AIR locks both |
 | **No LEGACY growth** | New React page styles → screen CSS / UXDS / theme only |
+| **No new `.proto-*` / `data-proto-*`** | PANEL/chrome/attrs use `.studio-*` / `data-studio-*` |
 | **Nazi QA** | UI ship needs audit **PROVEN** before PO green-light |
-| **CI budget** | No stacking full Playwright smoke via Actions without Director OK |
-| **Post-push sitrep** | `gh run list` after push — local green ≠ remote green |
-| **Naming** | New files follow [NAMING.md](./NAMING.md); folder = `screenId` |
-| **Lessons** | Read/append [LESSONS_LEARNED.md](./LESSONS_LEARNED.md) |
-| **Clean URL** | No sticky `?proof=*` / ephemeral agent junk in the address bar |
-| **Workspace** | `E:\UX\ux-studio` only — never abandoned `UXCJM-*` clones |
+| **CI budget** | No auto marathon Playwright on every push |
+| **Post-push sitrep** | `gh run list` after push |
+| **Hygiene** | `check:hygiene` must stay green |
+| **Naming** | [NAMING.md](./NAMING.md); folder = `screenId` |
+| **Lessons** | Append [LESSONS_LEARNED.md](./LESSONS_LEARNED.md) |
+| **Clean URL** | No sticky `?proof=*` |
+| **Workspace** | `E:\UX\ux-studio` only |
 
 ---
 
 ## Related
 
 - [PRODUCT_FORECAST.md](./PRODUCT_FORECAST.md)
+- [ARCHITECTURE.md](./ARCHITECTURE.md)
+- [HYGIENE.md](./HYGIENE.md)
 - [LESSONS_LEARNED.md](./LESSONS_LEARNED.md)
 - [POST_CHANGE_CHECKLIST.md](./POST_CHANGE_CHECKLIST.md)
 - [PRODUCT_OWNER_BRIEF.md](./PRODUCT_OWNER_BRIEF.md)
-- [BOOTS_REACT_SCREEN_PILOT.md](../projects/boots-pharmacy/BOOTS_REACT_SCREEN_PILOT.md)
-- [BOOTS_BOOK_STEP2_DESIGN_DELTA.md](../projects/boots-pharmacy/BOOTS_BOOK_STEP2_DESIGN_DELTA.md)
-- [BOOTS_BOOK_STEP3_DESIGN_DELTA.md](../projects/boots-pharmacy/BOOTS_BOOK_STEP3_DESIGN_DELTA.md)
-- [COMPONENT_LIBRARY.md](./COMPONENT_LIBRARY.md)

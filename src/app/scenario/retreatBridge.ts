@@ -14,7 +14,7 @@ export type RetreatSyncDetail = {
   data?: Record<string, unknown>;
 };
 
-export const RETREAT_SYNC_EVENT = "proto-retreat-sync";
+export const RETREAT_SYNC_EVENT = "studio-retreat-sync";
 
 export function dispatchRetreatSync(detail: RetreatSyncDetail): void {
   window.dispatchEvent(

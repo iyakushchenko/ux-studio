@@ -20,8 +20,8 @@ Same Boots content grid as Step 1: shell **1440 / 64** → inner **1312**; body 
 | Progress | Step 1 completed teal; Step 2 active navy; Step 3 white | Same + wire step-back on “Choose Location” | **match** |
 | Summary pills | Vaccine / Recipient / Location + Change tertiary | Same kits language as Step 1 | **match** |
 | Notice | `#c4dde3` 28-day message | Same | **match** |
-| Month calendars | June + July side-by-side, 32px cells | Same grid + `data-proto-cal-*` | **match** |
-| Today (12 Jun) | Wire `data-proto-cal-today` grey ring | Same + tooltip | **match** |
+| Month calendars | June + July side-by-side, 32px cells | Same grid + `data-studio-cal-*` | **match** |
+| Today (12 Jun) | Wire `data-studio-cal-today` grey ring | Same + tooltip | **match** |
 | Selected date/time | `#c6e5e1` + bold 13px | Page CSS (not LEGACY) | **match** |
 | Time bands | Morning / Afternoon / Evening | Make availability (15:15+) | **match** |
 | Date heading | `Wednesday, 24th June 2026` (wire SOT; Figma said Thursday) | `formatBookStep2Heading` | **match** (wire) |
@@ -33,8 +33,8 @@ Same Boots content grid as Step 1: shell **1440 / 64** → inner **1312**; body 
 
 ## Studio hooks preserved
 
-- `calendar. date. cell` + `data-proto-cal-kind|value|month|selected|available|unavailable|today`
-- `component.book.appointment.progress` (+ wire `data-proto-book-step-back` on step 1)
+- `calendar. date. cell` + `data-studio-cal-kind|value|month|selected|available|unavailable|today`
+- `component.book.appointment.progress` (+ wire `data-studio-book-step-back` on step 1)
 - `component.input.button` (Change / Reserve)
 - `component.appointment.summary`, `Week Schedule`, breadcrumbs
-- Host `[data-proto-react-screen="book-step-2"]`
+- Host `[data-studio-react-screen="book-step-2"]`

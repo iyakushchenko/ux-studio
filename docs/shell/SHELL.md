@@ -41,8 +41,8 @@ Selection is persisted in `sessionStorage`:
 
 | Key | Value |
 |-----|-------|
-| `proto-studio-project` | Active project id |
-| `proto-studio-persona:<projectId>` | Active persona for that project |
+| `studio-project` | Active project id |
+| `studio-persona:<projectId>` | Active persona for that project |
 | `proto-orchestra-mode` | Active CJM mode |
 
 Changing project or persona resets beat index and stops playback.

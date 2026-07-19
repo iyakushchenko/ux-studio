@@ -132,7 +132,7 @@ import {
 import { isHeaderLoggedIn } from "@/projects/boots-pharmacy/chrome/headerMount";
 import { AVAIL_INTENT } from "@/projects/boots-pharmacy/wire/BootsPharmacyProjectView";
 
-const CHAT_SCREEN_SELECTOR = ".proto-viewport > div > div:nth-child(10)";
+const CHAT_SCREEN_SELECTOR = ".studio-viewport > div > div:nth-child(10)";
 
 export default function App() {
   const studio = useStudio();
@@ -319,7 +319,7 @@ export default function App() {
   const collectScenarioFrames = useCallback(() => {
     if (!activeScreenScenario) return [];
     const screen = document.querySelector(
-      `.proto-viewport > div > div:nth-child(${activeScreenScenario.childIndex})`
+      `.studio-viewport > div > div:nth-child(${activeScreenScenario.childIndex})`
     );
     if (!screen) return [];
 
@@ -365,7 +365,7 @@ export default function App() {
     active: activeScreenScenario != null,
     collectFrames: collectScenarioFrames,
     screenSelector: activeScreenScenario
-      ? `.proto-viewport > div > div:nth-child(${activeScreenScenario.childIndex})`
+      ? `.studio-viewport > div > div:nth-child(${activeScreenScenario.childIndex})`
       : undefined,
     scrollRootRef: prototypeScrollElRef,
     minVisibleFrames: activeScreenScenario?.minVisibleFrames,
@@ -1188,8 +1188,8 @@ export default function App() {
 
     const screen = document.querySelector<HTMLElement>(CHAT_SCREEN_SELECTOR);
     if (screen) {
-      if (atFrameStart) screen.setAttribute("data-proto-scenario-at-start", "true");
-      else screen.removeAttribute("data-proto-scenario-at-start");
+      if (atFrameStart) screen.setAttribute("data-studio-scenario-at-start", "true");
+      else screen.removeAttribute("data-studio-scenario-at-start");
       if (onChatTab || chatScenarioActive) {
         mountSitePilotChatComposerDock(screen);
       }
@@ -1213,7 +1213,7 @@ export default function App() {
 
     return () => {
       scrollEl?.classList.remove("proto-chat-scenario-at-start");
-      screen?.removeAttribute("data-proto-scenario-at-start");
+      screen?.removeAttribute("data-studio-scenario-at-start");
     };
   }, [
     current,
@@ -1306,7 +1306,7 @@ export default function App() {
       journeyMode: studioJourneyModeRef.current,
       orchestraMode: orchestraModeId,
       counter: document
-        .querySelector(".proto-nav-scenario__counter")
+        .querySelector(".studio-nav-scenario__counter")
         ?.textContent?.trim() ?? null,
     }));
     return () => registerRecordingSnapshotProvider(null);
@@ -1414,7 +1414,7 @@ export default function App() {
       },
       abortAll: () => stopAllPlaybackRef.current(),
       isDiagnosticOpen: () =>
-        document.querySelector(".proto-playback-diagnostic") != null,
+        document.querySelector(".studio-playback-diagnostic") != null,
       getState: () => ({
         journeyMode:
           document
@@ -1422,13 +1422,13 @@ export default function App() {
             ?.getAttribute("aria-checked") === "true",
         scrollLock:
           prototypeScrollElRef.current?.classList.contains(
-            "proto-scroll--journey-locked"
+            "studio-scroll--journey-locked"
           ) ?? false,
         label:
-          document.querySelector(".proto-nav-scenario__label")?.textContent?.trim() ??
+          document.querySelector(".studio-nav-scenario__label")?.textContent?.trim() ??
           null,
         counter:
-          document.querySelector(".proto-nav-scenario__counter")?.textContent?.trim() ??
+          document.querySelector(".studio-nav-scenario__counter")?.textContent?.trim() ??
           null,
         beatId: playbackSnapshotRef.current.beatId ?? null,
         availStep: playbackSnapshotRef.current.availStep ?? null,
@@ -1570,8 +1570,8 @@ export default function App() {
 
   return (
     <div
-      className="proto-app-root flex flex-col h-full max-h-[100dvh] overflow-hidden"
-      data-proto-project={studioProjectId}
+      className="studio-app-root flex flex-col h-full max-h-[100dvh] overflow-hidden"
+      data-studio-project={studioProjectId}
       style={{ fontFamily: "'Open Sans', sans-serif" }}
     >
       <PlaybackDiagnosticOverlay
@@ -1604,7 +1604,7 @@ export default function App() {
           showOrchestraControls ? (
             <StudioNavScenarioControls
               studioMenus={
-                <div className="proto-nav-studio-menus">
+                <div className="studio-nav-studio-menus">
                   {projectStudioSelect}
                   <StudioNavStudioSelect
                     options={personaSelectOptions(studioProject)}
@@ -1695,8 +1695,8 @@ export default function App() {
               }
             />
           ) : (
-            <div className="proto-nav-scenario">
-              <div className="proto-nav-studio-menus">{projectStudioSelect}</div>
+            <div className="studio-nav-scenario">
+              <div className="studio-nav-studio-menus">{projectStudioSelect}</div>
               <StudioNavRecordingModeSlot
                 getStartOptions={getRecordingStartOptions}
                 recModeLocked={navTransportLocked}
@@ -1714,16 +1714,16 @@ export default function App() {
       />
 
       <div
-        className={`proto-wire-mount flex flex-1 min-h-0 min-w-0 flex-col relative${
-          wirePlaybackCursorLocked ? " proto-wire-mount--playback-locked" : ""
+        className={`studio-wire-mount flex flex-1 min-h-0 min-w-0 flex-col relative${
+          wirePlaybackCursorLocked ? " studio-wire-mount--playback-locked" : ""
         }${navTransitionClass}`}
       >
         {wireInteractionShield && !(wire?.availabilityOpen ?? false) ? (
           <PlaybackShield />
         ) : null}
         <div
-          id="proto-chat-composer-portal-host"
-          className="proto-chat-composer-portal-host"
+          id="studio-chat-composer-portal-host"
+          className="studio-chat-composer-portal-host"
           aria-hidden
         />
         {WireComponent ? (

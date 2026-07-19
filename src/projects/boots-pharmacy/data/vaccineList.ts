@@ -67,7 +67,7 @@ function readPrice(tile: HTMLElement): string {
 export function readVaccinesFromPlp(): VaccineItem[] {
   const tiles = Array.from(
     document.querySelectorAll<HTMLElement>(
-      '.proto-viewport > div > div:nth-child(9) [data-name="boots-pharmacy.service.tile"]'
+      '.studio-viewport > div > div:nth-child(9) [data-name="boots-pharmacy.service.tile"]'
     )
   );
   if (!tiles.length) return FALLBACK_VACCINES;

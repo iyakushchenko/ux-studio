@@ -4,7 +4,7 @@
  * Page stays visible; clicks on the concept UI are blocked.
  */
 
-.proto-agent-testing-overlay {
+.studio-agent-testing-overlay {
   display: none;
   position: fixed;
   inset: 0;
@@ -14,13 +14,13 @@
   color: #f2f2f2;
 }
 
-.proto-agent-testing-overlay[data-active="true"],
-.proto-agent-testing-overlay[data-settling="true"] {
+.studio-agent-testing-overlay[data-active="true"],
+.studio-agent-testing-overlay[data-settling="true"] {
   display: block;
 }
 
 /* Transparent click sink — blocks page interaction without a lightbox */
-.proto-agent-testing-overlay__capture {
+.studio-agent-testing-overlay__capture {
   position: absolute;
   inset: 0;
   pointer-events: auto;
@@ -28,12 +28,12 @@
 }
 
 /* DONE/SITREP: release click guard so PO can use the page while reading */
-.proto-agent-testing-overlay[data-settling="true"]
-  .proto-agent-testing-overlay__capture {
+.studio-agent-testing-overlay[data-settling="true"]
+  .studio-agent-testing-overlay__capture {
   pointer-events: none;
 }
 
-.proto-agent-testing-overlay__panel {
+.studio-agent-testing-overlay__panel {
   position: absolute;
   right: 16px;
   bottom: 16px;
@@ -51,14 +51,14 @@
   pointer-events: auto;
 }
 
-.proto-agent-testing-overlay__header {
+.studio-agent-testing-overlay__header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 10px;
 }
 
-.proto-agent-testing-overlay__title {
+.studio-agent-testing-overlay__title {
   margin: 0;
   flex: 1 1 auto;
   font-size: 12px;
@@ -68,7 +68,7 @@
   line-height: 1.35;
 }
 
-.proto-agent-testing-overlay__dismiss {
+.studio-agent-testing-overlay__dismiss {
   flex: 0 0 auto;
   margin: 0;
   padding: 2px 8px;
@@ -82,19 +82,19 @@
   cursor: pointer;
 }
 
-.proto-agent-testing-overlay__dismiss:hover {
+.studio-agent-testing-overlay__dismiss:hover {
   color: #fff;
   border-color: rgba(255, 255, 255, 0.4);
 }
 
-.proto-agent-testing-overlay__hint {
+.studio-agent-testing-overlay__hint {
   margin: 0;
   font-size: 11px;
   line-height: 1.35;
   color: #b8bcc4;
 }
 
-.proto-agent-testing-overlay__log {
+.studio-agent-testing-overlay__log {
   margin: 0;
   padding: 8px 10px 8px 26px;
   flex: 1 1 auto;
@@ -111,12 +111,12 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.proto-agent-testing-overlay__log li {
+.studio-agent-testing-overlay__log li {
   margin: 0 0 3px;
   word-break: break-word;
 }
 
-.proto-agent-testing-overlay__history {
+.studio-agent-testing-overlay__history {
   margin: 0;
   padding: 6px 8px;
   border-radius: 4px;
@@ -124,7 +124,7 @@
   background: rgba(16, 18, 24, 0.65);
 }
 
-.proto-agent-testing-overlay__history-label {
+.studio-agent-testing-overlay__history-label {
   margin: 0 0 4px;
   font-size: 10px;
   font-weight: 700;
@@ -133,13 +133,13 @@
   color: #9aa0aa;
 }
 
-.proto-agent-testing-overlay__history ul {
+.studio-agent-testing-overlay__history ul {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.proto-agent-testing-overlay__history li {
+.studio-agent-testing-overlay__history li {
   margin: 0 0 2px;
   font-size: 10px;
   line-height: 1.35;
@@ -149,6 +149,6 @@
 }
 
 /* Belt-and-suspenders: disable main app while testing (released on settle) */
-html[data-proto-agent-testing="true"] #root {
+html[data-studio-agent-testing="true"] #root {
   pointer-events: none !important;
 }

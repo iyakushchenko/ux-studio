@@ -20,7 +20,7 @@
 
 ## Summary
 
-Live localhost audit of React Book Step 3 confirms hybrid mount at Frame child **3**: Make chrome retired (`display:none` + `data-proto-make-retired="book-step-3"`), React host `[data-proto-react-screen="book-step-3"]` with progress/card **863px**, shell **1440/64**, body “Appointment reserved!” + order summary, AIR hook `data-proto-open-appointment="true"` on Open Appointments. CTA labels nowrap. MCP sanity **pass** (REC⊗CJM). No LEGACY growth (`book-step-3-confirmation.css` + UXDS primary). Adjacent Step 2 slot-grid left-align + Step 1 browse tab stay re-checked PASS (`66e7fe0`).
+Live localhost audit of React Book Step 3 confirms hybrid mount at Frame child **3**: Make chrome retired (`display:none` + `data-studio-make-retired="book-step-3"`), React host `[data-studio-react-screen="book-step-3"]` with progress/card **863px**, shell **1440/64**, body “Appointment reserved!” + order summary, AIR hook `data-studio-open-appointment="true"` on Open Appointments. CTA labels nowrap. MCP sanity **pass** (REC⊗CJM). No LEGACY growth (`book-step-3-confirmation.css` + UXDS primary). Adjacent Step 2 slot-grid left-align + Step 1 browse tab stay re-checked PASS (`66e7fe0`).
 
 ---
 
@@ -65,7 +65,7 @@ Live localhost audit of React Book Step 3 confirms hybrid mount at Frame child *
 | # | Result | Evidence |
 |---|--------|----------|
 | E1 | **PASS** | Slot/location/recipient copy bound from wire; pricing rows render. |
-| E2 | **PASS** | Open Appointments keeps `data-proto-open-appointment="true"`; Explore wired; Make handlers gated when React mounted. |
+| E2 | **PASS** | Open Appointments keeps `data-studio-open-appointment="true"`; Explore wired; Make handlers gated when React mounted. |
 | E3 | **PASS** | Live buttons — not static chrome. |
 
 ### F. Control hierarchy / no zoo
@@ -116,5 +116,5 @@ Live localhost audit of React Book Step 3 confirms hybrid mount at Frame child *
 
 ## Follow-ups (non-blocking)
 
-- GitHub Pages verify `data-proto-react-screen=book-step-3` after deploy
+- GitHub Pages verify `data-studio-react-screen=book-step-3` after deploy
 - Hex→token harden on Step 3 page CSS when next touching fidelity debt

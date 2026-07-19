@@ -57,7 +57,7 @@ function syncHomeQueryHeight(ta: HTMLTextAreaElement): void {
 
 function getAgenticHomeCard(): HTMLElement | null {
   const screen = document.querySelector<HTMLElement>(
-    ".proto-viewport > div > div:nth-child(11)"
+    ".studio-viewport > div > div:nth-child(11)"
   );
   return (
     screen?.querySelector<HTMLElement>(

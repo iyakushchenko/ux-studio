@@ -1,6 +1,6 @@
 /* Book Step 3 — React pilot; visual source = Make Body2 + wire Advantage patch */
 
-.proto-react-screen-host[data-proto-react-screen="book-step-3"] {
+.studio-react-screen-host[data-studio-react-screen="book-step-3"] {
   display: flex;
   flex-direction: column;
   flex: 1 1 auto;

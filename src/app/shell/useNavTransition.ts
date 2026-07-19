@@ -9,7 +9,7 @@ export function prefersReducedNavMotion(): boolean {
 }
 
 /**
- * Crossfade on `.proto-wire-mount` — fade out, swap screen at midpoint, fade in.
+ * Crossfade on `.studio-wire-mount` — fade out, swap screen at midpoint, fade in.
  * Uses a monotonic token so consecutive panel navigations always restart the animation.
  */
 export function useNavTransition() {
@@ -60,7 +60,7 @@ export function useNavTransition() {
 
   const navTransitionClass =
     crossToken > 0
-      ? ` proto-wire-mount--nav-cross proto-wire-mount--nav-cross-${crossToken}`
+      ? ` studio-wire-mount--nav-cross studio-wire-mount--nav-cross-${crossToken}`
       : "";
 
   return { runNavTransition, navTransitionClass };

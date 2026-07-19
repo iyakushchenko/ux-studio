@@ -77,10 +77,10 @@ export function applyWishlistHeartVisual(favIcon: HTMLElement, active: boolean):
   favIcon.dataset.favActive = String(active);
   if (!path) return;
 
-  if (!path.dataset.protoHeartOutline) {
-    path.dataset.protoHeartOutline = path.getAttribute("d") ?? "";
+  if (!path.dataset.studioHeartOutline) {
+    path.dataset.studioHeartOutline = path.getAttribute("d") ?? "";
   }
-  const outlineD = path.dataset.protoHeartOutline;
+  const outlineD = path.dataset.studioHeartOutline;
 
   if (active) {
     path.setAttribute("d", FILLED_HEART_D);
@@ -97,7 +97,7 @@ export function syncChickenpoxWishlistHearts(root: ParentNode = document): void 
   const active = isInWishlist(PDP_WISHLIST_ID);
   root
     .querySelectorAll<HTMLElement>(
-      '.proto-viewport > div > div:nth-child(8) [data-name="icon=add to wishlist"], [data-proto-quick-view-clone="true"] [data-name="icon=add to wishlist"]',
+      '.studio-viewport > div > div:nth-child(8) [data-name="icon=add to wishlist"], [data-studio-quick-view-clone="true"] [data-name="icon=add to wishlist"]',
     )
     .forEach((icon) => applyWishlistHeartVisual(icon, active));
 }
@@ -223,7 +223,7 @@ export function syncMaAccountAvatars(root: ParentNode = document): void {
   root.querySelectorAll<HTMLElement>(MA_ACCOUNT_ICON).forEach((host) => {
     let img = host.querySelector<HTMLImageElement>(`img.${MA_AVATAR_CLASS}`);
     if (!img) {
-      host.dataset.protoMaAvatarWired = "1";
+      host.dataset.studioMaAvatarWired = "1";
       host.style.background = "transparent";
       Array.from(host.children).forEach((child) => {
         if (child instanceof HTMLElement) child.style.display = "none";
@@ -457,7 +457,7 @@ export function setupHeader(
   loginCallbacks = callbacks || {};
   injectFlyoutStyles();
 
-  const viewport = scrollEl.querySelector(".proto-viewport");
+  const viewport = scrollEl.querySelector(".studio-viewport");
   if (!viewport) return;
 
   const nativeHeaders = viewport.querySelectorAll<HTMLElement>(

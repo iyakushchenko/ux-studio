@@ -63,7 +63,7 @@ Triplicated progress stepper + summary pill / Change patterns from Book Steps 1â
 
 | # | Result | Evidence |
 |---|--------|----------|
-| E1 | PASS | Step 2 completed step 1 still `data-proto-book-step-back` + keyboard |
+| E1 | PASS | Step 2 completed step 1 still `data-studio-book-step-back` + keyboard |
 | E2 | PASS | Step 3 `interactive={false}` / pointer-events none |
 | E3 | PASS | `data-name="component.book.appointment.progress"` + `Week Schedule` preserved |
 

@@ -8,7 +8,7 @@ import {
   BOOK_STEP2_SCREEN_SELECTOR,
 } from "./bookStep2Contract";
 
-const HOST_CLASS = "proto-react-screen-host";
+const HOST_CLASS = "studio-react-screen-host";
 const HIDE_SELECTORS = [
   ':scope > [data-name="boots-pharmacy.module.header"]',
   ':scope > [data-name="module.breadcrumbs"]',
@@ -37,7 +37,7 @@ function ensureHost(page: HTMLElement): HTMLElement {
   if (!host) {
     host = document.createElement("div");
     host.className = HOST_CLASS;
-    host.dataset.protoReactScreen = BOOK_STEP2_REACT_SCREEN_ID;
+    host.dataset.studioReactScreen = BOOK_STEP2_REACT_SCREEN_ID;
     const footer = page.querySelector<HTMLElement>(
       ":scope > .proto-footer-mount"
     );
@@ -52,29 +52,29 @@ function hideMakeChrome(page: HTMLElement): void {
   for (const selector of HIDE_SELECTORS) {
     page.querySelectorAll<HTMLElement>(selector).forEach((el) => {
       if (el.classList.contains(HOST_CLASS)) return;
-      if (el.dataset.protoReactScreen === BOOK_STEP2_REACT_SCREEN_ID) return;
+      if (el.dataset.studioReactScreen === BOOK_STEP2_REACT_SCREEN_ID) return;
       el.style.display = "none";
-      el.dataset.protoMakeRetired = BOOK_STEP2_REACT_SCREEN_ID;
+      el.dataset.studioMakeRetired = BOOK_STEP2_REACT_SCREEN_ID;
     });
   }
-  page.dataset.protoReactScreen = BOOK_STEP2_REACT_SCREEN_ID;
+  page.dataset.studioReactScreen = BOOK_STEP2_REACT_SCREEN_ID;
 }
 
 function restoreMakeChrome(page: HTMLElement): void {
   page
     .querySelectorAll<HTMLElement>(
-      `[data-proto-make-retired="${BOOK_STEP2_REACT_SCREEN_ID}"]`
+      `[data-studio-make-retired="${BOOK_STEP2_REACT_SCREEN_ID}"]`
     )
     .forEach((el) => {
       el.style.removeProperty("display");
-      delete el.dataset.protoMakeRetired;
+      delete el.dataset.studioMakeRetired;
     });
-  delete page.dataset.protoReactScreen;
+  delete page.dataset.studioReactScreen;
 }
 
 /** True when Book Step 2 Make wire has been retired for the React pilot. */
 export function isBookStep2ReactMounted(): boolean {
-  return !!pageEl()?.dataset.protoReactScreen;
+  return !!pageEl()?.dataset.studioReactScreen;
 }
 
 export function mountBookStep2Screen(
@@ -104,7 +104,7 @@ export function unmountBookStep2Screen(): void {
 
   const page = pageEl();
   // Gate Make wire immediately; actual createRoot.unmount runs after commit.
-  if (page) delete page.dataset.protoReactScreen;
+  if (page) delete page.dataset.studioReactScreen;
 
   unmountTimer = setTimeout(() => {
     unmountTimer = null;

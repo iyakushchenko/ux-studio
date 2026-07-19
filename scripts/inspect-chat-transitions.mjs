@@ -6,15 +6,15 @@ const page = await browser.newPage({
   reducedMotion: "no-preference",
 });
 await page.goto("http://localhost:5173/", { waitUntil: "networkidle" });
-await page.locator(".proto-nav-tabs button").filter({ hasText: /Site Pilot\. Chat/i }).click();
+await page.locator(".studio-nav-tabs button").filter({ hasText: /Site Pilot\. Chat/i }).click();
 await page.waitForTimeout(1200);
 
-await page.locator(".proto-nav-scenario__btn").first().click();
+await page.locator(".studio-nav-scenario__btn").first().click();
 await page.waitForTimeout(600);
-const counter1 = await page.locator(".proto-nav-scenario__counter").textContent();
+const counter1 = await page.locator(".studio-nav-scenario__counter").textContent();
 console.log("After jump to start:", counter1);
 
-const stepFwd = page.locator(".proto-nav-scenario__deck .proto-nav-scenario__btn").nth(3);
+const stepFwd = page.locator(".studio-nav-scenario__deck .studio-nav-scenario__btn").nth(3);
 await stepFwd.click();
 
 const samples = [];
@@ -22,7 +22,7 @@ for (const delay of [0, 30, 80, 150, 250, 400]) {
   if (delay) await page.waitForTimeout(delay - (samples.length ? samples[samples.length - 1].delay : 0));
   const sample = await page.evaluate(() => {
     const f1 = document.querySelector(
-      '.proto-viewport > div > div:nth-child(10) [data-name="component.appointment.summary"] > .proto-scenario-frame[data-proto-scenario-frame="2"]'
+      '.studio-viewport > div > div:nth-child(10) [data-name="component.appointment.summary"] > .proto-scenario-frame[data-studio-scenario-frame="2"]'
     );
     if (!f1) return null;
     const cs = getComputedStyle(f1);

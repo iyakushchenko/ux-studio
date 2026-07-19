@@ -22,7 +22,7 @@ Rules:
 - Collapse runs of non-alphanumerics to single `-`
 - Never invent synonyms (`--color-primary` ❌ if UXDS has `uxds-input/.../surface-primary-solid`)
 
-**Project brand delta** (multi-brand Studio): each project ships a small `styleguide/theme.css` that **only remaps CSS variables** under `[data-proto-project="<id>"]` — see [../product/PROJECT_STYLEGUIDE.md](../product/PROJECT_STYLEGUIDE.md). Theme is optional; without it, UI uses UXDS `:root` baselines (correct and consistent, not “broken”).
+**Project brand delta** (multi-brand Studio): each project ships a small `styleguide/theme.css` that **only remaps CSS variables** under `[data-studio-project="<id>"]` — see [../product/PROJECT_STYLEGUIDE.md](../product/PROJECT_STYLEGUIDE.md). Theme is optional; without it, UI uses UXDS `:root` baselines (correct and consistent, not “broken”).
 
 ### Studio-extended roles (hand-mapped)
 
@@ -51,7 +51,7 @@ src/uxds/
 
 src/projects/<id>/styleguide/
   README.md             # brand delta notes
-  theme.css             # variable remaps only under [data-proto-project]
+  theme.css             # variable remaps only under [data-studio-project]
   assets/               # logos
 ```
 
@@ -59,7 +59,7 @@ Import order (`src/styles/index.css`): **BASE** (UXDS tokens + kits) → **THEME
 
 ### Turn theme off
 
-1. Remove `data-proto-project` from the host, and/or  
+1. Remove `data-studio-project` from the host, and/or  
 2. Do not import the project `theme.css`.  
 
 Shared components must still look correct on UXDS defaults. Do **not** grow LEGACY for new React pages — use BASE / THEME / PANEL / colocated page CSS.

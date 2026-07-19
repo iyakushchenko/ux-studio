@@ -23,7 +23,7 @@ Full map: [CSS_BASE_THEME.md](./CSS_BASE_THEME.md). Import order in `src/styles/
 | Layer | Path | Owns | Forbidden |
 |-------|------|------|-----------|
 | **BASE** | `src/uxds/**/*.css` | Tokens + shared kits | Project-only hex; engine chrome |
-| **THEME** | `src/projects/<id>/styleguide/theme.css` | Variable remaps under `[data-proto-project]` | Component rules, hover forks, layout |
+| **THEME** | `src/projects/<id>/styleguide/theme.css` | Variable remaps under `[data-studio-project]` | Component rules, hover forks, layout |
 | **PANEL** | `src/app/nav/**/*.css` (+ future `src/app/shell/`) | Engine chrome (REC / CJM / cassette) | Boots Make page rules |
 | **LEGACY** | `src/styles/globals*.css` | Quarantined Make monster | **Any NEW React page styles** |
 | **Page CSS** | `src/projects/<id>/screens/**/*.css` | Layout / structure for React screens | Parallel palettes; dumping into LEGACY |
@@ -31,7 +31,7 @@ Full map: [CSS_BASE_THEME.md](./CSS_BASE_THEME.md). Import order in `src/styles/
 ```
 BASE (:root in src/uxds/tokens/*.css + kits)
         ↓ remapped by
-THEME ([data-proto-project="<id>"] in styleguide/theme.css)
+THEME ([data-studio-project="<id>"] in styleguide/theme.css)
         ↓ consumed by
 Shared components / kits + PANEL chrome
         ↓ composed by
@@ -46,7 +46,7 @@ LEGACY Make globals — retire screen-by-screen; do not grow for React
 
 | Method | Effect |
 |--------|--------|
-| Remove / do not set `data-proto-project` on the host | Project remap selectors no longer match |
+| Remove / do not set `data-studio-project` on the host | Project remap selectors no longer match |
 | Do not import `src/projects/<id>/styleguide/theme.css` | No brand overrides load |
 
 **Verify:** Shared controls (`.uxds-link`, `.uxds-filter-chip`, `.uxds-btn-primary`, tertiary CTA) still render with UXDS `:root` defaults — readable, consistent, no missing colors.
@@ -61,7 +61,7 @@ Boots import order (see `src/styles/index.css`): BASE (`src/uxds/`) → THEME (`
 |------|-------------------|--------|
 | Regular text link | `.uxds-link` → `--uxds-text-link-link` (rest **no** underline, hover underline — footer-like; same contract as `.proto-link`) | Per-screen `#012169` / always-underline Learn more forks; competing rest-underline rules |
 | Crumb / teal link | `--uxds-text-link-link-dark` (or registered crumb class) | Reuse body-link navy for crumbs |
-| Tertiary icon+text CTA | `.proto-tertiary-cta` / `NearMeCta` | FilterChip restyles or pencil one-offs |
+| Tertiary icon+text CTA | `.studio-tertiary-cta` / `NearMeCta` | FilterChip restyles or pencil one-offs |
 | Filter chip (default) | `.uxds-filter-chip` mint/badge selected | Parallel selected fills on the same family |
 | Filter chip (strong / secondary pills) | `.uxds-filter-chip--strong` | Anonymous `.proto-avail-*` hex |
 | Commerce / navy primary CTA | `.uxds-btn-primary--commerce` or commerce tokens | Page-only `#012169` Continue |
@@ -91,7 +91,7 @@ Requires a **registered deviation** ([../uxds/DEVIATIONS.md](../uxds/DEVIATIONS.
 1. Reuse an existing role/pattern — do not fork colors.  
 2. Consume `var(--uxds-…)` in shared CSS; put brand hex only in `theme.css` (or UXDS baseline).  
 3. If inventing a class: name it, document it, register if it is a deviation.  
-4. Spot-check with theme off (no `data-proto-project` / theme import) — baselines still work.  
+4. Spot-check with theme off (no `data-studio-project` / theme import) — baselines still work.  
 5. Do not big-bang Make `globals-*.css`; migrate surfaces as they are touched.  
 6. **Never grow LEGACY for new React work** — use BASE / THEME / PANEL / page CSS ([CSS_BASE_THEME.md](./CSS_BASE_THEME.md)).
 

@@ -1,7 +1,7 @@
 /** Studio / CJM contract for Book Step 3 React pilot. */
 export const BOOK_STEP3_CHILD_INDEX = 3;
 export const BOOK_STEP3_REACT_SCREEN_ID = "book-step-3";
-export const BOOK_STEP3_SCREEN_SELECTOR = `.proto-viewport > div > div:nth-child(${BOOK_STEP3_CHILD_INDEX})`;
+export const BOOK_STEP3_SCREEN_SELECTOR = `.studio-viewport > div > div:nth-child(${BOOK_STEP3_CHILD_INDEX})`;
 
 /** Demo Advantage Card points (Make Frame218 defaults). */
 export const BOOK_STEP3_POINTS_RECEIVED = "450";

@@ -11,17 +11,17 @@ const page = await browser.newPage({
   reducedMotion: "no-preference",
 });
 await page.goto("http://localhost:5173/", { waitUntil: "networkidle" });
-await page.locator(".proto-nav-tabs button").filter({ hasText: /Site Pilot\. Chat/i }).click();
+await page.locator(".studio-nav-tabs button").filter({ hasText: /Site Pilot\. Chat/i }).click();
 await page.waitForTimeout(1000);
 
 // Jump to first frame
-await page.locator(".proto-nav-scenario__btn").first().click();
+await page.locator(".studio-nav-scenario__btn").first().click();
 await page.waitForTimeout(800);
 
 const report = await page.evaluate(() => {
-  const screen = document.querySelector(".proto-viewport > div > div:nth-child(10)");
+  const screen = document.querySelector(".studio-viewport > div > div:nth-child(10)");
   const body = screen?.querySelector('[data-name="body"]');
-  const scrollEl = document.querySelector(".proto-scroll--prototype:not(.hidden)");
+  const scrollEl = document.querySelector(".studio-scroll--prototype:not(.hidden)");
   const summary = screen?.querySelector('[data-name="component.appointment.summary"]');
   const frames = summary ? Array.from(summary.children) : [];
 
@@ -29,12 +29,12 @@ const report = await page.evaluate(() => {
   const rect = (el) => (el ? el.getBoundingClientRect() : null);
 
   return {
-    counter: document.querySelector(".proto-nav-scenario__counter")?.textContent,
+    counter: document.querySelector(".studio-nav-scenario__counter")?.textContent,
     scroll: {
       top: scrollEl?.scrollTop,
       clientH: scrollEl?.clientHeight,
       scrollH: scrollEl?.scrollHeight,
-      minH: cs(scrollEl)?.getPropertyValue("--proto-scroll-min-px"),
+      minH: cs(scrollEl)?.getPropertyValue("--studio-scroll-min-px"),
     },
     screen: {
       className: screen?.className,
@@ -60,7 +60,7 @@ const report = await page.evaluate(() => {
       h: rect(el).height,
       hidden: el.classList.contains("proto-scenario-frame--hidden"),
       transition: cs(el).transitionDuration,
-      visible: el.dataset.protoScenarioVisible,
+      visible: el.dataset.studioScenarioVisible,
     })),
   };
 });

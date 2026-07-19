@@ -9,7 +9,7 @@ type TertiaryCtaProps = {
 
 /**
  * Tertiary icon + text CTA — transparent, no hover wash; icon→navy, label→black.
- * Styled via `.proto-tertiary-cta` in globals.css.
+ * Styled via `.studio-tertiary-cta` in globals.css.
  */
 export function TertiaryCta({
   children,
@@ -20,17 +20,17 @@ export function TertiaryCta({
   type = "button",
   "aria-label": ariaLabel,
 }: TertiaryCtaProps) {
-  const sizeClass = compact ? " proto-tertiary-cta--compact" : "";
+  const sizeClass = compact ? " studio-tertiary-cta--compact" : "";
 
   return (
     <button
       type={type}
-      className={`proto-tertiary-cta${sizeClass}${className ? ` ${className}` : ""}`}
+      className={`studio-tertiary-cta${sizeClass}${className ? ` ${className}` : ""}`}
       aria-label={ariaLabel}
       onClick={onClick}
     >
-      {icon ? <span className="proto-tertiary-cta__icon">{icon}</span> : null}
-      <span className="proto-tertiary-cta__label">{children}</span>
+      {icon ? <span className="studio-tertiary-cta__icon">{icon}</span> : null}
+      <span className="studio-tertiary-cta__label">{children}</span>
     </button>
   );
 }

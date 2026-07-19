@@ -12,15 +12,15 @@ await page.goto("http://localhost:5173/", { waitUntil: "networkidle" });
 await page.waitForTimeout(800);
 
 // Tab 2 = Site Pilot Chat (current index 1)
-const chatTab = page.locator(".proto-nav-tabs button").filter({ hasText: /Site Pilot\. Chat/i });
+const chatTab = page.locator(".studio-nav-tabs button").filter({ hasText: /Site Pilot\. Chat/i });
 await chatTab.click();
 await page.waitForTimeout(1200);
 
 const report = await page.evaluate(() => {
-  const screen = document.querySelector(".proto-viewport > div > div:nth-child(10)");
+  const screen = document.querySelector(".studio-viewport > div > div:nth-child(10)");
   const summary = screen?.querySelector('[data-name="component.appointment.summary"]');
   const children = summary ? Array.from(summary.children) : [];
-  const scrollEl = document.querySelector(".proto-scroll--prototype:not(.hidden)");
+  const scrollEl = document.querySelector(".studio-scroll--prototype:not(.hidden)");
 
   const frames = children.map((el, i) => {
     const style = getComputedStyle(el);
@@ -33,14 +33,14 @@ const report = await page.evaluate(() => {
       opacity: style.opacity,
       maxHeight: style.maxHeight,
       hiddenClass: el.classList.contains("proto-scenario-frame--hidden"),
-      scenarioVisible: el.dataset.protoScenarioVisible,
+      scenarioVisible: el.dataset.studioScenarioVisible,
       rectH: Math.round(rect.height),
       rectTop: Math.round(rect.top),
       text: (el.textContent ?? "").slice(0, 60).replace(/\s+/g, " "),
     };
   });
 
-  const counter = document.querySelector(".proto-nav-scenario__counter")?.textContent?.trim();
+  const counter = document.querySelector(".studio-nav-scenario__counter")?.textContent?.trim();
   const visibleFrames = frames.filter(
     (f) => f.display !== "none" && !f.hiddenClass && f.rectH > 0
   );

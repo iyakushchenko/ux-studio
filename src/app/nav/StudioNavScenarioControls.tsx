@@ -165,7 +165,7 @@ function StudioNavSegmentLabel({
 
   return (
     <motion.span
-      className="proto-nav-scenario__label-slot"
+      className="studio-nav-scenario__label-slot"
       initial={false}
       animate={{ width }}
       transition={{
@@ -176,8 +176,8 @@ function StudioNavSegmentLabel({
       <span
         key={blinkToken}
         ref={innerRef}
-        className={`proto-nav-scenario__label${
-          blinkToken > 0 ? " proto-nav-scenario__label--touchpoint-blink" : ""
+        className={`studio-nav-scenario__label${
+          blinkToken > 0 ? " studio-nav-scenario__label--touchpoint-blink" : ""
         }`}
       >
         {label}
@@ -332,9 +332,9 @@ export function StudioNavScenarioControls({
       }, CLICK_DIODE_MS);
     };
 
-    document.addEventListener("proto-demo-click", handleDemoClick);
+    document.addEventListener("studio-demo-click", handleDemoClick);
     return () => {
-      document.removeEventListener("proto-demo-click", handleDemoClick);
+      document.removeEventListener("studio-demo-click", handleDemoClick);
       if (clickBlinkTimerRef.current != null) {
         window.clearTimeout(clickBlinkTimerRef.current);
         clickBlinkTimerRef.current = null;
@@ -365,7 +365,7 @@ export function StudioNavScenarioControls({
   };
 
   const flashTransportTap = (button: HTMLButtonElement) => {
-    flashControlRoomButton(button, "proto-nav-scenario__btn--tap");
+    flashControlRoomButton(button, "studio-nav-scenario__btn--tap");
   };
 
   const showEndDiode =
@@ -457,22 +457,22 @@ export function StudioNavScenarioControls({
     onJumpToEnd();
   };
 
-  const onAirClass = isOnAir ? " proto-nav-scenario--on-air" : "";
-  const journeyModeClass = journeyMode ? " proto-nav-scenario--journey-mode" : "";
-  const diodeErrorClass = playbackErrorActive ? " proto-nav-scenario__on-air--error" : "";
-  const diodeEndClass = showEndDiode ? " proto-nav-scenario__on-air--end" : "";
+  const onAirClass = isOnAir ? " studio-nav-scenario--on-air" : "";
+  const journeyModeClass = journeyMode ? " studio-nav-scenario--journey-mode" : "";
+  const diodeErrorClass = playbackErrorActive ? " studio-nav-scenario__on-air--error" : "";
+  const diodeEndClass = showEndDiode ? " studio-nav-scenario__on-air--end" : "";
   const diodeStepClass =
     stepBlinkActive && !isOnAir && !showEndDiode && !playbackErrorActive
-      ? " proto-nav-scenario__on-air--step"
+      ? " studio-nav-scenario__on-air--step"
       : "";
   const diodeClickClass =
     clickBlinkActive && isOnAir && !showEndDiode && !playbackErrorActive
-      ? " proto-nav-scenario__on-air--click"
+      ? " studio-nav-scenario__on-air--click"
       : "";
 
   return (
     <div
-      className={`proto-nav-scenario${onAirClass}${journeyModeClass}`}
+      className={`studio-nav-scenario${onAirClass}${journeyModeClass}`}
       role="group"
     >
       {studioMenus}
@@ -482,13 +482,13 @@ export function StudioNavScenarioControls({
           blinkToken={blinkToken}
         />
       ) : null}
-      <div className="proto-nav-scenario__deck">
+      <div className="studio-nav-scenario__deck">
         {recordingControls ? (
           <span
-            className="proto-nav-scenario__mode-control"
+            className="studio-nav-scenario__mode-control"
             aria-disabled={recModeLocked || undefined}
           >
-            <span className="proto-nav-scenario__mode-label" aria-hidden>
+            <span className="studio-nav-scenario__mode-label" aria-hidden>
               REC
             </span>
             <StudioPlaybackRecSwitch
@@ -501,7 +501,7 @@ export function StudioNavScenarioControls({
               {recMode && !recModeLocked ? (
                 <motion.span
                   key="rec-event-counter"
-                  className="proto-nav-scenario__panel-motion-inline"
+                  className="studio-nav-scenario__panel-motion-inline"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
@@ -513,12 +513,12 @@ export function StudioNavScenarioControls({
             </AnimatePresence>
           </span>
         ) : null}
-        <div className="proto-nav-scenario__panel-swap" aria-live="polite">
+        <div className="studio-nav-scenario__panel-swap" aria-live="polite">
           <AnimatePresence initial={false} mode="wait">
             {recordingControls && recMode && !recModeLocked ? (
               <motion.div
                 key="rec-panel"
-                className="proto-nav-scenario__panel-swap-item"
+                className="studio-nav-scenario__panel-swap-item"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -529,15 +529,15 @@ export function StudioNavScenarioControls({
             ) : (
               <motion.div
                 key="playback-panel"
-                className="proto-nav-scenario__panel-swap-item"
+                className="studio-nav-scenario__panel-swap-item"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={studioPanelTransition}
               >
                 {onJourneyModeChange ? (
-                  <span className="proto-nav-scenario__cjm-group">
-                    <span className="proto-nav-scenario__mode-label" aria-hidden>
+                  <span className="studio-nav-scenario__cjm-group">
+                    <span className="studio-nav-scenario__mode-label" aria-hidden>
                       CJM
                     </span>
                     <StudioJourneySwitch
@@ -562,14 +562,14 @@ export function StudioNavScenarioControls({
                     />
                   </span>
                 ) : null}
-                <span className="proto-nav-scenario__counter" aria-live="polite">
+                <span className="studio-nav-scenario__counter" aria-live="polite">
                   {formatStepCounter(
                     visibleCount,
                     totalFrames,
                     stepProgressActive
                   )}
                 </span>
-                <div className="proto-nav-scenario__deck-led" aria-hidden>
+                <div className="studio-nav-scenario__deck-led" aria-hidden>
                   <span
                     key={
                       showEndDiode
@@ -578,15 +578,15 @@ export function StudioNavScenarioControls({
                           ? `step-${stepBlinkToken}`
                           : "diode-idle"
                     }
-                    className={`proto-nav-scenario__on-air${diodeErrorClass}${diodeEndClass}${diodeStepClass}${diodeClickClass}`}
+                    className={`studio-nav-scenario__on-air${diodeErrorClass}${diodeEndClass}${diodeStepClass}${diodeClickClass}`}
                   >
-                    <span className="proto-nav-scenario__on-air-dot" />
-                    <span className="proto-nav-scenario__on-air-halo" />
+                    <span className="studio-nav-scenario__on-air-dot" />
+                    <span className="studio-nav-scenario__on-air-halo" />
                   </span>
                 </div>
                 <button
                   type="button"
-                  className="proto-nav-step-btn proto-nav-scenario__btn"
+                  className="studio-nav-step-btn studio-nav-scenario__btn"
                   aria-label="Jump to start"
                   disabled={jumpToStartDisabled}
                   onPointerDown={() =>
@@ -606,7 +606,7 @@ export function StudioNavScenarioControls({
                 </button>
                 <button
                   type="button"
-                  className="proto-nav-step-btn proto-nav-scenario__btn"
+                  className="studio-nav-step-btn studio-nav-scenario__btn"
                   aria-label="Step back"
                   disabled={stepBackDisabled}
                   onPointerDown={() =>
@@ -624,16 +624,16 @@ export function StudioNavScenarioControls({
                 >
                   <CassetteStepBackIcon />
                 </button>
-                <div className="proto-nav-scenario__play-lamp">
-                  <span className="proto-nav-scenario__halogen" aria-hidden>
-                    <span className="proto-nav-scenario__halogen-source">
-                      <span className="proto-nav-scenario__halogen-bulb" />
+                <div className="studio-nav-scenario__play-lamp">
+                  <span className="studio-nav-scenario__halogen" aria-hidden>
+                    <span className="studio-nav-scenario__halogen-source">
+                      <span className="studio-nav-scenario__halogen-bulb" />
                     </span>
-                    <span className="proto-nav-scenario__halogen-beam" />
+                    <span className="studio-nav-scenario__halogen-beam" />
                   </span>
                   <button
                     type="button"
-                    className="proto-nav-step-btn proto-nav-scenario__btn proto-nav-scenario__btn--play"
+                    className="studio-nav-step-btn studio-nav-scenario__btn studio-nav-scenario__btn--play"
                     aria-label="Play journey"
                     aria-pressed={isOnAir}
                     disabled={playDisabled}
@@ -661,7 +661,7 @@ export function StudioNavScenarioControls({
                 </div>
                 <button
                   type="button"
-                  className="proto-nav-step-btn proto-nav-scenario__btn"
+                  className="studio-nav-step-btn studio-nav-scenario__btn"
                   aria-label="Step forward"
                   disabled={stepForwardDisabled}
                   onPointerDown={() =>
@@ -683,7 +683,7 @@ export function StudioNavScenarioControls({
                 </button>
                 <button
                   type="button"
-                  className="proto-nav-step-btn proto-nav-scenario__btn"
+                  className="studio-nav-step-btn studio-nav-scenario__btn"
                   aria-label="Jump to end"
                   disabled={jumpToEndDisabled}
                   onPointerDown={() =>

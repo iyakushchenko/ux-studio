@@ -28,8 +28,8 @@ import {
 import { personaDisplayFirstName } from "@/app/shell/personaDisplayName";
 import { parseStudioUrl } from "@/app/shell/studioUrl";
 
-const PROJECT_STORAGE_KEY = "proto-studio-project";
-const PERSONA_STORAGE_KEY = "proto-studio-persona";
+const PROJECT_STORAGE_KEY = "studio-project";
+const PERSONA_STORAGE_KEY = "studio-persona";
 
 function readStoredProjectId(): ProjectId {
   const fromUrl = parseStudioUrl().projectId;

@@ -20,7 +20,7 @@
 │  src/projects/<id>/styleguide/          │
 │  Brand primary, logos, accents, fonts   │
 │  CSS variables ONLY under               │
-│  [data-proto-project="<id>"]            │
+│  [data-studio-project="<id>"]            │
 │  Small helper — not a second DS         │
 └─────────────────────────────────────────┘
 ```
@@ -28,7 +28,7 @@
 | Layer | Owns | Does not own |
 |-------|------|--------------|
 | **UXDS base** | Roles, spacing scale, component anatomy, semantic token **names** + baseline values | Client brand identity |
-| **Project delta** | Remap `--uxds-*` / `--project-*` brand facts under `[data-proto-project]` | Component rules, hover forks, layout hacks, reinventing buttons |
+| **Project delta** | Remap `--uxds-*` / `--project-*` brand facts under `[data-studio-project]` | Component rules, hover forks, layout hacks, reinventing buttons |
 
 Screens compose **UXDS structure** + **optional project brand remaps**.
 
@@ -63,7 +63,7 @@ Example `theme.css` shape (illustrative):
 
 ```css
 /* boots-pharmacy brand delta — remaps UXDS semantic roles */
-[data-proto-project="boots-pharmacy"] {
+[data-studio-project="boots-pharmacy"] {
   --project-brand-primary: #467672;
   --project-brand-primary-darkest: #305854;
   --project-brand-primary-light: #afccca;
@@ -107,7 +107,7 @@ See [PAGE_BUILD_CONTRACT.md](./PAGE_BUILD_CONTRACT.md) §5 (visual fidelity).
 
 | Method | Effect |
 |--------|--------|
-| Remove `data-proto-project="<id>"` from the host | Remap block does not match |
+| Remove `data-studio-project="<id>"` from the host | Remap block does not match |
 | Skip importing `styleguide/theme.css` | No brand overrides load |
 
 Shared components (`.uxds-link`, `.uxds-filter-chip`, `.uxds-btn-primary`, tertiary CTA) must still render correctly on UXDS `:root` defaults. Verify when changing kit CSS.

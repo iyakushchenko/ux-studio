@@ -1,6 +1,6 @@
 import { animateScrollTo } from "@/app/scenario/playbackScroll";
 
-const THINKING_ATTR = "data-proto-chat-thinking";
+const THINKING_ATTR = "data-studio-chat-thinking";
 const THINKING_CLASS = "proto-chat-thinking-bubble";
 
 const STOP_GLYPH_HTML = `<svg class="absolute block inset-0 size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="3" width="10" height="10" rx="1.5" fill="#ffffff"/></svg>`;
@@ -38,7 +38,7 @@ function positionThinkingBubble(
       (node): node is HTMLElement =>
         node instanceof HTMLElement &&
         node !== bubble &&
-        !node.hasAttribute("data-proto-chat-thinking")
+        !node.hasAttribute("data-studio-chat-thinking")
     );
     const last = threadChildren[threadChildren.length - 1];
     if (last) insertAfter(bubble, last);
@@ -101,7 +101,7 @@ function ensureThinkingBubble(
 
 function scrollChatToBottom(): void {
   const scrollEl = document.querySelector<HTMLElement>(
-    ".proto-scroll--prototype:not(.hidden)"
+    ".studio-scroll--prototype:not(.hidden)"
   );
   if (!scrollEl) return;
   const resolveBottom = () =>
@@ -245,16 +245,16 @@ export function setSitePilotChatSendThinkingMode(
   if (!glyphHost) return;
 
   if (thinking) {
-    if (!sendBtn.dataset.protoSendGlyphHtml) {
-      sendBtn.dataset.protoSendGlyphHtml = glyphHost.innerHTML;
+    if (!sendBtn.dataset.studioSendGlyphHtml) {
+      sendBtn.dataset.studioSendGlyphHtml = glyphHost.innerHTML;
     }
     glyphHost.innerHTML = STOP_GLYPH_HTML;
     return;
   }
 
-  if (sendBtn.dataset.protoSendGlyphHtml) {
-    glyphHost.innerHTML = sendBtn.dataset.protoSendGlyphHtml;
-    delete sendBtn.dataset.protoSendGlyphHtml;
+  if (sendBtn.dataset.studioSendGlyphHtml) {
+    glyphHost.innerHTML = sendBtn.dataset.studioSendGlyphHtml;
+    delete sendBtn.dataset.studioSendGlyphHtml;
   }
   glyphHost.querySelectorAll("path").forEach((path) => {
     path.setAttribute("fill", "#ffffff");

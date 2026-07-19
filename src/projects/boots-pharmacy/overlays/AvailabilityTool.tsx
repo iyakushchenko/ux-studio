@@ -315,7 +315,7 @@ function StoreCard({
   return (
     <div
       className={`proto-avail-store${chosen ? " proto-avail-store--chosen" : ""}`}
-      data-proto-avail-store={store.id}
+      data-studio-avail-store={store.id}
     >
       <div className="proto-avail-store__main">
         <div className="proto-avail-store__head">
@@ -346,7 +346,7 @@ function StoreCard({
             open={hoursOpen}
             onToggle={onToggleHours}
             className="uxds-link proto-avail-link"
-            data-proto-avail-hours-trigger={store.id}
+            data-studio-avail-hours-trigger={store.id}
           >
             {hoursOpen ? "Hide working hours" : "See working hours"}
           </DisclosureTrigger>
@@ -361,7 +361,7 @@ function StoreCard({
         <DisclosureContent
           open={hoursOpen}
           className="proto-avail-hours"
-          data-proto-avail-hours={store.id}
+          data-studio-avail-hours={store.id}
         >
           {HOURS.map(([day, hours]) => (
             <div key={day} className="proto-avail-store__row">
@@ -645,7 +645,7 @@ export default function AvailabilityTool({
       pendingStoreScrollIdRef.current = null;
       requestAnimationFrame(() => {
         const card = storeListRef.current?.querySelector<HTMLElement>(
-          `[data-proto-avail-store="${storeId}"]`
+          `[data-studio-avail-store="${storeId}"]`
         );
         card?.scrollIntoView({ block: "nearest", behavior: "smooth" });
       });
@@ -657,7 +657,7 @@ export default function AvailabilityTool({
     pendingPinScrollRef.current = null;
     requestAnimationFrame(() => {
       const cards = storeListRef.current?.querySelectorAll<HTMLElement>(
-        "[data-proto-avail-store]"
+        "[data-studio-avail-store]"
       );
       if (!cards?.length) return;
       const card = cards[pinIndex] ?? cards[0];

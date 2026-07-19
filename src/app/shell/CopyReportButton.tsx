@@ -10,8 +10,8 @@ type Props = {
 
 export function CopyReportButton({
   getReport,
-  className = "proto-diagnostic-copy",
-  copiedClassName = "proto-diagnostic-copy--copied",
+  className = "studio-diagnostic-copy",
+  copiedClassName = "studio-diagnostic-copy--copied",
 }: Props) {
   const [copied, setCopied] = useState(false);
   const resetTimerRef = useRef<number | null>(null);

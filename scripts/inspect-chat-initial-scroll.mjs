@@ -13,17 +13,17 @@ const page = await browser.newPage({
 
 await page.goto("http://localhost:5173/", { waitUntil: "networkidle" });
 const t0 = Date.now();
-await page.locator(".proto-nav-tabs button").filter({ hasText: /Site Pilot\. Chat/i }).click();
+await page.locator(".studio-nav-tabs button").filter({ hasText: /Site Pilot\. Chat/i }).click();
 
 const timeline = [];
 for (let ms = 0; ms <= 2000; ms += 50) {
   if (ms > 0) await page.waitForTimeout(50);
   const state = await page.evaluate(() => {
-    const el = document.querySelector(".proto-scroll--prototype:not(.hidden)");
+    const el = document.querySelector(".studio-scroll--prototype:not(.hidden)");
     return {
       top: el?.scrollTop ?? null,
       max: el ? el.scrollHeight - el.clientHeight : null,
-      counter: document.querySelector(".proto-nav-scenario__counter")?.textContent ?? null,
+      counter: document.querySelector(".studio-nav-scenario__counter")?.textContent ?? null,
     };
   });
   timeline.push({ ms, ...state });
@@ -45,20 +45,20 @@ console.log(
 
 // Step back from 9/9 — scroll should lag behind hide
 await page.waitForTimeout(500);
-await page.locator(".proto-nav-scenario__deck .proto-nav-scenario__btn").nth(1).click();
+await page.locator(".studio-nav-scenario__deck .studio-nav-scenario__btn").nth(1).click();
 const stepBack = [];
 for (let ms = 0; ms <= 900; ms += 50) {
   if (ms > 0) await page.waitForTimeout(50);
   const el = await page.evaluate(() => {
-    const scroll = document.querySelector(".proto-scroll--prototype:not(.hidden)");
+    const scroll = document.querySelector(".studio-scroll--prototype:not(.hidden)");
     const f9 = document.querySelector(
-      '.proto-viewport > div > div:nth-child(10) [data-name="component.appointment.summary"] > .proto-scenario-frame[data-proto-scenario-frame="9"]'
+      '.studio-viewport > div > div:nth-child(10) [data-name="component.appointment.summary"] > .proto-scenario-frame[data-studio-scenario-frame="9"]'
     );
     return {
       top: scroll?.scrollTop ?? null,
       f9Opacity: f9 ? getComputedStyle(f9).opacity : null,
       f9H: f9?.getBoundingClientRect().height ?? null,
-      counter: document.querySelector(".proto-nav-scenario__counter")?.textContent,
+      counter: document.querySelector(".studio-nav-scenario__counter")?.textContent,
     };
   });
   stepBack.push({ ms, ...el });

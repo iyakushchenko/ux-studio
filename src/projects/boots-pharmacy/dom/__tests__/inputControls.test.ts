@@ -25,8 +25,8 @@ function mockEl(opts: {
         return el;
       }
       if (
-        selector === "[data-proto-react-screen]" &&
-        (dataset.protoReactScreen || opts.parent?.dataset.protoReactScreen)
+        selector === "[data-studio-react-screen]" &&
+        (dataset.studioReactScreen || opts.parent?.dataset.studioReactScreen)
       ) {
         return opts.parent ?? el;
       }
@@ -41,11 +41,11 @@ function mockEl(opts: {
 }
 
 describe("inputControls — React-owned / booster rows", () => {
-  it("treats data-proto-react-owned and react-screen ancestors as React-owned", () => {
-    const owned = mockEl({ dataset: { protoReactOwned: "true" } });
+  it("treats data-studio-react-owned and react-screen ancestors as React-owned", () => {
+    const owned = mockEl({ dataset: { studioReactOwned: "true" } });
     expect(isReactOwnedInputRow(owned)).toBe(true);
 
-    const host = mockEl({ dataset: { protoReactScreen: "book-step-1" } });
+    const host = mockEl({ dataset: { studioReactScreen: "book-step-1" } });
     const row = mockEl({
       name: "component.input.checkbox",
       parent: host,
@@ -59,7 +59,7 @@ describe("inputControls — React-owned / booster rows", () => {
   it("does not DOM-toggle booster checkboxes on click", () => {
     const row = mockEl({
       name: "component.input.checkbox",
-      dataset: { protoBooster: "true", checkboxChecked: "false" },
+      dataset: { studioBooster: "true", checkboxChecked: "false" },
     });
     const box = mockEl({ parent: row });
 
@@ -70,7 +70,7 @@ describe("inputControls — React-owned / booster rows", () => {
   it("does not DOM-toggle React-owned checkbox rows on click", () => {
     const row = mockEl({
       name: "component.input.checkbox",
-      dataset: { protoReactOwned: "true", checkboxChecked: "false" },
+      dataset: { studioReactOwned: "true", checkboxChecked: "false" },
     });
     const box = mockEl({ parent: row });
 

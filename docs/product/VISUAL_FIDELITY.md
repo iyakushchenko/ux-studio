@@ -35,7 +35,7 @@ UXDS is for **structure and reuse**. Brand may remap UXDS **color tokens** via t
 |--------------|----------|
 | Every scripted interaction that already worked (checkbox toggle, Continue gating, search open, near-me, Change links, breadcrumbs, etc.) | Ship a prettier/static React shell that drops click/toggle/enable behavior |
 | Wire equivalent handlers on the React screen (props + shared kits) | Assume Make DOM listeners still cover a retired Make body |
-| Skip Make global input mutators for React-owned rows (`data-proto-react-owned` / `[data-proto-react-screen]`) | Let Make `ensureCheckboxRow` / capture-click handlers fight React state |
+| Skip Make global input mutators for React-owned rows (`data-studio-react-owned` / `[data-studio-react-screen]`) | Let Make `ensureCheckboxRow` / capture-click handlers fight React state |
 
 Retire a behavior only when the PO explicitly asks. See [INTERACTION_FIDELITY.md](./INTERACTION_FIDELITY.md) §2.3 and [PAGE_BUILD_CONTRACT.md](./PAGE_BUILD_CONTRACT.md) §5–6.
 
@@ -105,7 +105,7 @@ Hierarchy: **primary chrome > secondary filters**. Secondary controls must not o
 | Shared components consume `var(--uxds-…)` so theme-off still uses UXDS baselines | Hardcoded brand hex inside shared kit CSS (except UXDS `:root` baselines) |
 | Document PO-approved visual deltas / registered deviations | Quietly “improve” concept chrome or anonymous page color forks |
 
-**Theme off:** remove `data-proto-project` and/or skip project `theme.css` import — UI must still look correct on UXDS defaults. See [DS_STRICTNESS.md](./DS_STRICTNESS.md) §3.
+**Theme off:** remove `data-studio-project` and/or skip project `theme.css` import — UI must still look correct on UXDS defaults. See [DS_STRICTNESS.md](./DS_STRICTNESS.md) §3.
 
 See [PROJECT_STYLEGUIDE.md](./PROJECT_STYLEGUIDE.md) and Boots [styleguide/README.md](../../src/projects/boots-pharmacy/styleguide/README.md).
 

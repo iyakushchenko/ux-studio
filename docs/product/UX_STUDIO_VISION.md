@@ -61,7 +61,7 @@ Full rules: [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md).
 ## Concept page guidelines (agent must follow)
 
 - Register screens in `screens.ts` with stable `childIndex`.
-- Wire interactive targets with `data-name` / `data-proto-*` (recording + robo-cursor depend on this).
+- Wire interactive targets with `data-name` / `data-studio-*` (recording + robo-cursor depend on this).
 - One beat per meaningful interaction for frame stepping.
 - Popups and overlays get playlist touchpoint keys (`popup:*`).
 - Director scripts live in project `playback/` — shell routes by beat metadata, not beat id hacks.

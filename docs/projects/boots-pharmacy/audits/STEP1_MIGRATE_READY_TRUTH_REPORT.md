@@ -33,7 +33,7 @@ Proceed to the **next** page migration — but stop lying that Book Step 1 means
 
 - **Live FE audits PROVEN twice** (localhost measured): grid 1440/64/1312, logo↔Home Δx=0, body fill @ 0.31, card/progress 863px, Continue → Availability, booster, Disclosure Learn more, STEPS once, NearMe unify page↔Availability.
 - **React screen package exists and is the SOT for this tab:** `BookStep1LocationScreen.tsx` + `book-step-1-location.css` + `mountBookStep1Screen.tsx` + contract/tests.
-- **Shared kits in use on the page:** `ButtonPrimary` + `--commerce`, `Disclosure`, `NearMeCta` / `.proto-tertiary-cta`, `.uxds-link` (Learn more + help tel).
+- **Shared kits in use on the page:** `ButtonPrimary` + `--commerce`, `Disclosure`, `NearMeCta` / `.studio-tertiary-cta`, `.uxds-link` (Learn more + help tel).
 - **Deviations registered** (not anonymous forever): `.uxds-filter-chip--strong`, `.uxds-btn-primary--commerce` in `docs/uxds/DEVIATIONS.md`.
 - **CSS layer lock is real:** `src/styles/index.css` = BASE → THEME → PANEL → LEGACY; docs mandate **no new React page styles in `globals-*.css`**.
 - **Make scripts for child 7 are gated** when React is mounted (`isBookStep1ReactMounted()` early-returns on breadcrumb/search/location Make paths).
@@ -44,10 +44,10 @@ Proceed to the **next** page migration — but stop lying that Book Step 1 means
 
 ## What is still LEGACY / hybrid
 
-- **Mount model is hybrid, not clean:** React host is injected into Make Frame `nth-child(7)`; Make header/crumbs/body/footer are `display:none` + `data-proto-make-retired`, not removed from the artboard.
+- **Mount model is hybrid, not clean:** React host is injected into Make Frame `nth-child(7)`; Make header/crumbs/body/footer are `display:none` + `data-studio-make-retired`, not removed from the artboard.
 - **Wire still owns the world:** `BootsPharmacyProjectView.tsx` mounts Step 1, opens Availability, vaccine/recipient pickers, Continue → `setCurrent(5)` **Make Book Step 2**.
 - **Dead LEGACY CSS for child 7 still ships** in `globals-screens.css` (~13 `nth-child(7)` rules: progress, help footer, booster, cursor hide). React does not need them; they are zombie weight.
-- **Tertiary / NearMe chrome still lives in LEGACY** (`globals-chrome.css` `.proto-tertiary-cta` / `.proto-near-me-cta`) — shared language, wrong layer for a “clean” BASE story.
+- **Tertiary / NearMe chrome still lives in LEGACY** (`globals-chrome.css` `.studio-tertiary-cta` / `.proto-near-me-cta`) — shared language, wrong layer for a “clean” BASE story.
 - **Availability Tool** is React overlay but still styled largely via LEGACY `.proto-avail-*` in `globals-screens.css`.
 - **Proto sticky header + Footer** are intentional Studio mounts (design delta “open”) — not Make absolute chrome, also not a pure UXDS page shell.
 - **Page CSS hex zoo:** `book-step-1-location.css` still hardcodes many Make-parity hexes (`#3a3a3a`, `#c3c3c3`, `#f5f5f5`, `#012169`, …) alongside some `var(--uxds-…)`. Tokens/theme are incomplete on this surface.

@@ -6,7 +6,7 @@ type Props = {
 export function StudioNavLogo({ className }: Props) {
   return (
     <svg
-      className={className ? `proto-nav-logo__svg ${className}` : "proto-nav-logo__svg"}
+      className={className ? `studio-nav-logo__svg ${className}` : "studio-nav-logo__svg"}
       width={20}
       height={20}
       viewBox="0 0 80 80"

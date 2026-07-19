@@ -1,6 +1,6 @@
 /* Book Step 1 — React pilot; visual source = Make Body5 + live wire CSS */
 
-.proto-react-screen-host[data-proto-react-screen="book-step-1"] {
+.studio-react-screen-host[data-studio-react-screen="book-step-1"] {
   display: flex;
   flex-direction: column;
   flex: 1 1 auto;
@@ -271,7 +271,7 @@
   flex-shrink: 0;
 }
 
-/* Shared NearMeCta chrome lives in globals-chrome (.proto-tertiary-cta / .proto-near-me-cta) */
+/* Shared NearMeCta chrome lives in globals-chrome (.studio-tertiary-cta / .proto-near-me-cta) */
 
 /* Chosen store tile — same treatment as Make .proto-chosen-tile */
 .book-step-1__chosen {

@@ -109,7 +109,7 @@ export function enableCursorQaEyes(): void {
 export function disableCursorQaEyes(): void {
   qaEyesEnabled = false;
   if (typeof document !== "undefined") {
-    delete document.documentElement.dataset.protoQaAutomation;
+    delete document.documentElement.dataset.studioQaAutomation;
   }
 }
 
@@ -139,7 +139,7 @@ export function resetPlaybackCursorDiagnostic(): void {
   context = {};
   qaEyesEnabled = false;
   if (typeof document !== "undefined") {
-    delete document.documentElement.dataset.protoQaAutomation;
+    delete document.documentElement.dataset.studioQaAutomation;
   }
 }
 

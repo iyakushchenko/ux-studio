@@ -36,12 +36,12 @@
 }
 
 .uxds-book-progress__step.is-active ol,
-.uxds-book-progress__step[data-proto-step-active="true"] ol {
+.uxds-book-progress__step[data-studio-step-active="true"] ol {
   font-weight: 700;
   color: var(--uxds-text-link-link);
 }
 
-.uxds-book-progress__step[data-proto-book-step-back="true"] {
+.uxds-book-progress__step[data-studio-book-step-back="true"] {
   cursor: pointer;
   position: relative;
   z-index: 2;
@@ -66,8 +66,8 @@
 }
 
 .uxds-book-progress__step.is-active .uxds-book-progress__bar,
-.uxds-book-progress__step[data-proto-step-active="true"] .uxds-book-progress__bar,
+.uxds-book-progress__step[data-studio-step-active="true"] .uxds-book-progress__bar,
 .uxds-book-progress__step.is-completed .uxds-book-progress__bar,
-.uxds-book-progress__step [data-proto-book-progress="completed"] {
+.uxds-book-progress__step [data-studio-book-progress="completed"] {
   background: var(--uxds-surface-accent-soft);
 }

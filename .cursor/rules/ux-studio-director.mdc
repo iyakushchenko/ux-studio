@@ -20,27 +20,29 @@ Spot or forecast: layout/L&F drift; style zoo; bad handoffs; missing hover/focus
 
 1. **Blast-radius** — after any UI change, scan adjacent chrome (sibling links/CTAs, counters, mode labels, panel XOR), not only the pixel touched.
 2. **REC ⊗ CJM ⊗ AIR XOR** — CJM on → REC disabled; REC on → CJM off; AIR locks both (`studioModeXor.ts`, audit G5–G6).
-3. **One text-link / button pattern** — footer-like `.uxds-link` / `.proto-link`; enforce `npm run check:links` (in `npm test`).
+3. **One text-link / button pattern** — footer-like `.uxds-link`; enforce `npm run check:links` (in `npm test`).
 4. **createRoot unmount deferred** — never sync `root.unmount()` during parent commit; `setTimeout(0)` + cancel on remount.
 5. **No LEGACY growth** on new React pages — page CSS / UXDS / theme only (BASE → THEME → PANEL → LEGACY).
-6. **Project docs** under `docs/projects/<id>/` — engine doctrine stays in `docs/product/`.
-7. **Post-push CI sitrep (BE)** — `gh run list -R iyakushchenko/ux-studio -L 10`; never assume green from local tests. → `ci-sitrep.mdc`
-8. **Agent overlay** — `__protoAgentTestingOverlay` touch + sitrep settle; strip ephemeral URL params (`proof`, etc.).
-9. **URL navigable state** — `?project=&screen=` for deep links / recording; folder name = `screenId`.
-10. **Nazi QA** — FE audit **PROVEN** under `docs/projects/<id>/audits/` before claiming UI done / PO green-light. Tests alone **cannot skip**.
-11. **Distrust subagent “done”** until proven (JSX/CSS gate or localhost).
-12. **Naming** — new files follow `NAMING.md` / `naming.mdc`; **no new `proto*` filenames**; prefer `__studio*` window APIs (`__proto*` aliases OK); no half-rename of `.proto-*` CSS.
-13. **Progressive learning** — append `docs/product/LESSONS_LEARNED.md` when a new failure class appears.
-14. **Actions budget** — lean CI (unit + build); no auto marathon smoke; Playwright on-demand only.
-15. **Pages base path** — deploy uses `/ux-studio/`; local often `/`; do not hardcode absolute roots.
-16. **Recording fidelity** — interactive pages + shared kits before expecting REC; screen events carry `screenId` / `studioUrl`.
-17. **UI motion** — `framer-motion` default; no keyframe zoos unless DS deviation.
+6. **Domain identity** — no new `.proto-*` / `data-proto-*`; PANEL = `.studio-*` / `data-studio-*`; prefer `__studio*` (`__proto*` aliases OK).
+7. **Hygiene** — `npm run check:hygiene` green; no silent monster growth (`HYGIENE.md`).
+8. **Project docs** under `docs/projects/<id>/` — engine doctrine stays in `docs/product/`.
+9. **Post-push CI sitrep (BE)** — `gh run list -R iyakushchenko/ux-studio -L 10`; never assume green from local tests. → `ci-sitrep.mdc`
+10. **Agent overlay** — `__studioAgentTestingOverlay` / `__protoAgentTestingOverlay` touch + sitrep settle; strip ephemeral URL params (`proof`, etc.).
+11. **URL navigable state** — `?project=&screen=` for deep links / recording; folder name = `screenId`.
+12. **Nazi QA** — FE audit **PROVEN** under `docs/projects/<id>/audits/` before claiming UI done / PO green-light. Tests alone **cannot skip**. Chrome class renames → Nazi QA light.
+13. **Distrust subagent “done”** until proven (JSX/CSS gate or localhost).
+14. **Naming** — `NAMING.md` / `ARCHITECTURE.md` domain folders; no half-renames.
+15. **Progressive learning** — append `docs/product/LESSONS_LEARNED.md` when a new failure class appears.
+16. **Actions budget** — lean CI (unit + build); no auto marathon smoke; Playwright on-demand only.
+17. **Pages base path** — deploy uses `/ux-studio/`; local often `/`; do not hardcode absolute roots.
+18. **Recording fidelity** — interactive pages + shared kits before expecting REC; screen events carry `screenId` / `studioUrl`.
+19. **UI motion** — `framer-motion` default; no keyframe zoos unless DS deviation.
 
 ## Hybrid Make + React (Boots)
 
-- Hide Make chrome when React host mounts (`data-proto-make-retired`); gate Make wire with `isBookStepNReactMounted()`.
+- Hide Make chrome when React host mounts (`data-studio-make-retired`); gate Make wire with `isBookStepNReactMounted()`.
 - Incomplete flex/grid rows → **left-align** (CSS grid), never short-row `space-between`.
-- Progress / Studio Step N → `PROTO_INDEX_BOOK_STEP*` — never remap to wrong Make “tab1” via beat fallback while browsing.
+- Progress / Studio Step N → `INDEX_BOOK_STEP*` — never remap to wrong Make “tab1” via beat fallback while browsing.
 
 ## DS / FE
 

@@ -30,7 +30,7 @@ Live localhost re-audit of React Book Step 1 at HEAD `3e7dd92` confirms prior fi
 
 | # | Result | Evidence |
 |---|--------|----------|
-| A1 | **PASS** | `.book-step-1` mounted (`data-proto-react-screen=book-step-1`). H1 39/48 `#3a3a3a`; card white 24px; progress active label `#012169` / 700; bar `#c6e5e1`; fill PNG `6d60145a…` opacity **0.31** `object-position: 50% 100%`. |
+| A1 | **PASS** | `.book-step-1` mounted (`data-studio-react-screen=book-step-1`). H1 39/48 `#3a3a3a`; card white 24px; progress active label `#012169` / 700; bar `#c6e5e1`; fill PNG `6d60145a…` opacity **0.31** `object-position: 50% 100%`. |
 | A2 | **PASS** | Delta covered for changed regions incl. NearMe unify, primary filter pills, `.uxds-link` Learn more / Show on map / help tel. |
 | A3 | **PASS** | Remaps scoped to `.book-step-1*` + shared tertiary / link / filter kits; no accidental global wash on this path. |
 
@@ -55,7 +55,7 @@ Live localhost re-audit of React Book Step 1 at HEAD `3e7dd92` confirms prior fi
 
 | # | Result | Evidence |
 |---|--------|----------|
-| D1 | **PASS** | Change hover → label black / icon `#012169`. Near-me via `.proto-tertiary-cta:hover`. Search inset navy ring. Continue hover darken. |
+| D1 | **PASS** | Change hover → label black / icon `#012169`. Near-me via `.studio-tertiary-cta:hover`. Search inset navy ring. Continue hover darken. |
 | D2 | **PASS** | `:focus-visible` rules present for crumb, Change, search, `.uxds-link`, `.uxds-btn-primary`; tertiary suppresses mouse-only `:focus`. |
 | D3 | **PASS** | Progress active navy 700; List/Map mint active; Availability “All locations” strong selected `#467672` + white text. |
 | D4 | **N/A** | Empty-location path — Continue stays enabled and opens Availability (honest gate). |
@@ -74,14 +74,14 @@ Live localhost re-audit of React Book Step 1 at HEAD `3e7dd92` confirms prior fi
 |---|--------|----------|
 | F1 | **PASS** | Change + near-me share tertiary mute → navy language; primary Continue navy pill only. |
 | F2 | **PASS** | Near-me/Change quieter than Continue; List/Map mint quieter hierarchy vs strong secondary pills. |
-| F3 | **PASS** | No FilterChip near-me fork (`filterNearCount: 0`); single `NearMeCta` / `.proto-tertiary-cta--compact`. |
+| F3 | **PASS** | No FilterChip near-me fork (`filterNearCount: 0`); single `NearMeCta` / `.studio-tertiary-cta--compact`. |
 
 ### G. Nav chrome logic
 
 | # | Result | Evidence |
 |---|--------|----------|
 | G1 | **PASS** | Idle/browse path: `REC` + `CJM` + `STEPS: 25` visible; no PLAY chrome leak observed. |
-| G2 | **PASS** | Single `.proto-nav-scenario__counter` text `STEPS: 25` — no duplicate STEPS. |
+| G2 | **PASS** | Single `.studio-nav-scenario__counter` text `STEPS: 25` — no duplicate STEPS. |
 | G3 | **PASS** | Availability scrim opens as one overlay from Continue; no conflicting second panel. |
 | G4 | **PASS** | REC mode label always-on; event counter labeled STEPS (matches post-`668a6dd` / `1aa6347` intent). |
 
@@ -97,7 +97,7 @@ Live localhost re-audit of React Book Step 1 at HEAD `3e7dd92` confirms prior fi
 
 | # | Result | Evidence |
 |---|--------|----------|
-| I1 | **PASS** | Regular links → `.uxds-link`; tertiary icon+text → `.proto-tertiary-cta` / Change pill language; filter strong selected `#467672` (not mint). |
+| I1 | **PASS** | Regular links → `.uxds-link`; tertiary icon+text → `.studio-tertiary-cta` / Change pill language; filter strong selected `#467672` (not mint). |
 | I2 | **PASS** | Page + Availability both use shared `NearMeCta` (`.proto-near-me-cta`). |
 | I3 | **PASS** | Page CSS owns shell/grid/Make structure; shared CTA/link/chip chrome in kits / globals-chrome. |
 | I4 | **PASS** | Strong filter + commerce CTA deviations registered in [../../uxds/DEVIATIONS.md](../../../uxds/DEVIATIONS.md) (kit wiring may still land separately; role language matches live). |

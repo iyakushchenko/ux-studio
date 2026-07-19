@@ -116,7 +116,7 @@ export function BookStep1LocationScreen({
     <div
       className="book-step-1"
       data-name="body"
-      data-proto-react-screen={BOOK_STEP1_REACT_SCREEN_ID}
+      data-studio-react-screen={BOOK_STEP1_REACT_SCREEN_ID}
     >
       {/*
         Content grid (same as Footer / header logo column):
@@ -236,7 +236,7 @@ export function BookStep1LocationScreen({
                       type="button"
                       className="uxds-summary-pill__change"
                       data-name="component.input.button"
-                      data-proto-change-loc="true"
+                      data-studio-change-loc="true"
                       onClick={onChangeLocation}
                     >
                       <EditGlyph />
@@ -251,8 +251,8 @@ export function BookStep1LocationScreen({
               <label
                 className="book-step-1__checkbox-row"
                 data-name="component.input.checkbox"
-                data-proto-booster="true"
-                data-proto-react-owned="true"
+                data-studio-booster="true"
+                data-studio-react-owned="true"
                 data-checkbox-checked={String(includeBoosterDose)}
               >
                 <span

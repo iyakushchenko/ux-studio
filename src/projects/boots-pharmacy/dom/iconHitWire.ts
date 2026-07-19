@@ -11,14 +11,14 @@ const FOOTER_FIND_STORE =
 export function wireFooterFindStoreTertiary(root: ParentNode = document): void {
   root.querySelectorAll<HTMLElement>(FOOTER_FIND_STORE).forEach((btn) => {
     if (!/find a store/i.test(btn.textContent ?? "")) return;
-    btn.classList.add("proto-tertiary-cta");
+    btn.classList.add("studio-tertiary-cta");
   });
 }
 
 /** Tag Figma icon-only CTAs (share, heart, etc.) with the shared hit-target class. */
 export function wireProtoIconHitButtons(root: ParentNode = document): void {
   root.querySelectorAll<HTMLElement>(ICON_ONLY_BUTTON).forEach((btn) => {
-    btn.classList.add("proto-icon-hit");
+    btn.classList.add("studio-icon-hit");
   });
 }
 
@@ -27,8 +27,8 @@ export function wireFooterSocialIconHits(root: ParentNode = document): void {
   root
     .querySelectorAll<HTMLElement>(FOOTER_SOCIAL_ICON)
     .forEach((iconEl) => {
-      if (iconEl.classList.contains("proto-icon-hit")) return;
-      iconEl.classList.add("proto-icon-hit", "proto-icon-hit--figma-glyph-24");
+      if (iconEl.classList.contains("studio-icon-hit")) return;
+      iconEl.classList.add("studio-icon-hit", "studio-icon-hit--figma-glyph-24");
       iconEl.setAttribute("role", "button");
       iconEl.setAttribute("tabindex", "0");
     });

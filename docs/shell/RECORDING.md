@@ -100,10 +100,10 @@ Cassette deck mode toggles (labels match STEPS type; pipe bars match zoom delimi
 
 **Playback | Rec** (mutually exclusive panels):
 
-- **Left (muted, same as CJM-off) / REC off** — playback mode: `REC [switch] | CJM [switch] | STEPS: N` (journey) — shared `.proto-studio-mode-switch` off chrome; no recording counter. Recording event counter and REC transport are unmounted.
+- **Left (muted, same as CJM-off) / REC off** — playback mode: `REC [switch] | CJM [switch] | STEPS: N` (journey) — shared `.studio-mode-switch` off chrome; no recording counter. Recording event counter and REC transport are unmounted.
 - **Right (red) / REC on** — rec mode: `REC [switch] STEPS: N` (recording events) + REC deck. Journey STEPS / cassette transport are unmounted.
 - **REC ⊗ CJM:** when CJM is ON, REC switch is `disabled` (cannot enter Rec). When REC is ON, CJM is off/disabled. AIR/play still locks both. Gate: `src/app/nav/studioModeXor.ts`.
-- **Transition:** `framer-motion` `AnimatePresence` (`mode="wait"`) in `StudioNavScenarioControls` — `.proto-nav-scenario__panel-swap` crossfades Playback ↔ Rec (0.34s, shared `studioMotion` timings). XOR preserved: only one interactive panel. Touchpoint label width also uses `framer-motion` (same duration).
+- **Transition:** `framer-motion` `AnimatePresence` (`mode="wait"`) in `StudioNavScenarioControls` — `.studio-nav-scenario__panel-swap` crossfades Playback ↔ Rec (0.34s, shared `studioMotion` timings). XOR preserved: only one interactive panel. Touchpoint label width also uses `framer-motion` (same duration).
 
 Leaving Rec while a capture is live **pauses** the session (does not stop/destroy it).
 
@@ -187,11 +187,11 @@ Export / replay / compile fall back to the **last stopped or imported** session 
 Prefer stable selectors on interactive targets:
 
 - `data-name="…"` — primary wire target (Figma export names)
-- `data-proto-avail-store="…"` — availability store rows
-- `data-proto-action="…"` — explicit playback actions (future)
-- `data-proto-beat="…"` — beat-scoped controls (future)
+- `data-studio-avail-store="…"` — availability store rows
+- `data-studio-action="…"` — explicit playback actions (future)
+- `data-studio-beat="…"` — beat-scoped controls (future)
 
-Demo clicks store a **selector chain** (nearest `data-proto-*` / `data-name` ancestors) for future replay targeting.
+Demo clicks store a **selector chain** (nearest `data-studio-*` / `data-name` ancestors) for future replay targeting.
 
 ---
 

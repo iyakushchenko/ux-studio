@@ -1,10 +1,10 @@
 /**
  * Boots Pharmacy brand delta - token remaps only.
- * Turn theme off: remove data-proto-project and/or skip this import.
+ * Turn theme off: remove data-studio-project and/or skip this import.
  * @see docs/product/DS_STRICTNESS.md
  */
 
-[data-proto-project="boots-pharmacy"] {
+[data-studio-project="boots-pharmacy"] {
   --project-brand-primary: #467672;
   --project-brand-primary-darkest: #305854;
   --project-brand-primary-light: #afccca;

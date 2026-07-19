@@ -11,7 +11,7 @@ type IconHitProps = {
 
 /**
  * Icon-only hit target — circular hover wash + glyph fill (PDP share / heart).
- * Styled via `.proto-icon-hit` in globals.css.
+ * Styled via `.studio-icon-hit` in globals.css.
  */
 export function IconHit({
   label,
@@ -22,16 +22,16 @@ export function IconHit({
   type = "button",
 }: IconHitProps) {
   const glyphClass =
-    glyphSize === 24 ? "proto-icon-hit__glyph--24" : "proto-icon-hit__glyph--16";
+    glyphSize === 24 ? "studio-icon-hit__glyph--24" : "studio-icon-hit__glyph--16";
 
   return (
     <button
       type={type}
-      className={`proto-icon-hit${className ? ` ${className}` : ""}`}
+      className={`studio-icon-hit${className ? ` ${className}` : ""}`}
       aria-label={label}
       onClick={onClick}
     >
-      <span className={`proto-icon-hit__glyph ${glyphClass}`}>{children}</span>
+      <span className={`studio-icon-hit__glyph ${glyphClass}`}>{children}</span>
     </button>
   );
 }

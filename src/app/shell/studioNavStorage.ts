@@ -1,19 +1,34 @@
 /** Per-project session storage keys for nav and hub state. */
 
 export function studioNavStorageKey(projectId: string): string {
-  return `proto-nav:${projectId}`;
+  return `studio-nav:${projectId}`;
 }
 
-export function protoHubStorageKey(projectId: string): string {
-  return `proto-hub:${projectId}`;
+export function studioHubStorageKey(projectId: string): string {
+  return `studio-hub:${projectId}`;
 }
 
-/** Pre–project-registry keys (Boots prototype). */
+/** @deprecated Use studioHubStorageKey */
+export const protoHubStorageKey = studioHubStorageKey;
+
+/** Pre–domain-rename keys (migrate once on read). */
+const LEGACY_NAV_PREFIX = "proto-nav:";
+const LEGACY_HUB_PREFIX = "proto-hub:";
 const LEGACY_BOOTS_NAV_KEY = "boots-vaccine-proto-nav";
 const LEGACY_BOOTS_HUB_KEY = "boots-vaccine-proto-hub";
 const BOOTS_PHARMACY_PROJECT_ID = "boots-pharmacy";
 
 function readLegacyNavIndex(projectId: string): number | null {
+  try {
+    const mid = sessionStorage.getItem(`${LEGACY_NAV_PREFIX}${projectId}`);
+    if (mid != null) {
+      const i = Number(mid);
+      sessionStorage.removeItem(`${LEGACY_NAV_PREFIX}${projectId}`);
+      if (Number.isFinite(i)) return i;
+    }
+  } catch {
+    /* ignore */
+  }
   if (projectId !== BOOTS_PHARMACY_PROJECT_ID) return null;
   try {
     const raw = sessionStorage.getItem(LEGACY_BOOTS_NAV_KEY);
@@ -28,6 +43,15 @@ function readLegacyNavIndex(projectId: string): number | null {
 }
 
 function readLegacyHubOpen(projectId: string): boolean | null {
+  try {
+    const mid = sessionStorage.getItem(`${LEGACY_HUB_PREFIX}${projectId}`);
+    if (mid != null) {
+      sessionStorage.removeItem(`${LEGACY_HUB_PREFIX}${projectId}`);
+      return mid === "1";
+    }
+  } catch {
+    /* ignore */
+  }
   if (projectId !== BOOTS_PHARMACY_PROJECT_ID) return null;
   try {
     const raw = sessionStorage.getItem(LEGACY_BOOTS_HUB_KEY);
@@ -67,7 +91,7 @@ export function readStoredNavIndex(
 
 export function readStoredHubOpen(projectId: string): boolean {
   try {
-    const raw = sessionStorage.getItem(protoHubStorageKey(projectId));
+    const raw = sessionStorage.getItem(studioHubStorageKey(projectId));
     if (raw != null) return raw === "1";
     const legacy = readLegacyHubOpen(projectId);
     if (legacy != null) {
@@ -90,7 +114,7 @@ export function storeNavIndex(projectId: string, index: number): void {
 
 export function storeHubOpen(projectId: string, open: boolean): void {
   try {
-    sessionStorage.setItem(protoHubStorageKey(projectId), open ? "1" : "0");
+    sessionStorage.setItem(studioHubStorageKey(projectId), open ? "1" : "0");
   } catch {
     /* ignore */
   }

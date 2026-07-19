@@ -79,11 +79,11 @@ export function BookAppointmentProgress({
               .filter(Boolean)
               .join(" ")}
             {...(isActive
-              ? { "data-proto-step-active": "true" as const }
+              ? { "data-studio-step-active": "true" as const }
               : {})}
             {...(canBack
               ? {
-                  "data-proto-book-step-back": "true" as const,
+                  "data-studio-book-step-back": "true" as const,
                   role: "button" as const,
                   tabIndex: 0,
                   "aria-label": `Go back to ${step.label}`,
@@ -104,7 +104,7 @@ export function BookAppointmentProgress({
             </ol>
             <div
               className="uxds-book-progress__bar"
-              data-proto-book-progress={
+              data-studio-book-progress={
                 isActive ? "current" : isCompleted ? "completed" : "upcoming"
               }
             />

@@ -138,10 +138,10 @@ export function StudioNavStudioSelect<T extends string>({
       : (selected.shortLabel ?? selected.label);
 
   return (
-    <div className="proto-nav-journey-menu" ref={rootRef}>
+    <div className="studio-nav-journey-menu" ref={rootRef}>
       <button
         type="button"
-        className="proto-nav-journey-menu__trigger"
+        className="studio-nav-journey-menu__trigger"
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={listId}
@@ -149,9 +149,9 @@ export function StudioNavStudioSelect<T extends string>({
         onClick={toggleOpen}
         onKeyDown={onTriggerKeyDown}
       >
-        <span className="proto-nav-journey-menu__label">{displayLabel}</span>
+        <span className="studio-nav-journey-menu__label">{displayLabel}</span>
         <svg
-          className="proto-nav-journey-menu__chevron"
+          className="studio-nav-journey-menu__chevron"
           width="8"
           height="8"
           viewBox="0 0 8 8"
@@ -172,7 +172,7 @@ export function StudioNavStudioSelect<T extends string>({
           id={listId}
           role="listbox"
           aria-label={ariaLabel}
-          className="proto-nav-journey-menu__panel"
+          className="studio-nav-journey-menu__panel"
           tabIndex={-1}
           onKeyDown={onListKeyDown}
         >
@@ -184,8 +184,8 @@ export function StudioNavStudioSelect<T extends string>({
               aria-selected={option.id === value}
               className={
                 option.id === value
-                  ? "proto-nav-journey-menu__option proto-nav-journey-menu__option--active"
-                  : "proto-nav-journey-menu__option"
+                  ? "studio-nav-journey-menu__option studio-nav-journey-menu__option--active"
+                  : "studio-nav-journey-menu__option"
               }
               onMouseEnter={() => setActiveIndex(index)}
               onClick={() => selectOption(option.id)}
