@@ -8,7 +8,7 @@
 **Uma §0a:** **PROVEN** @ `8d80d5f` (code tip `bf59041`)  
 **Prior prove (superseded):** `d6e4951` · **v0.0.27**  
 **Policy:** [QUINN_PDP_PROBE_CRITERIA_2026-07-19.md](./QUINN_PDP_PROBE_CRITERIA_2026-07-19.md) · [RECORDING.md](../../../shell/RECORDING.md) · recipe `studioMcpPageProbe.ts`  
-**Final Pass audit:** [FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md](./FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md) — Arch may restore HARD-GREEN
+**Final Pass audit:** [FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md](./FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md) — **HARD-GREEN** @ `c6e8931`
 
 ---
 
@@ -19,10 +19,10 @@
 | **Quinn MCP matrix** | **PASS** — **23/23** |
 | **v0.0.28 steps** | `pdp-faq-help-body` + download CTA tertiary unify / no `--bordered` + accordion focus-none CSS |
 | **Uma fidelity §0a** | **PROVEN** — [UMA_FIDELITY_PDP_2026-07-19.md](./UMA_FIDELITY_PDP_2026-07-19.md) @ `8d80d5f` |
-| **PAGE FINAL PASS HARD-GREEN?** | **Pending Arch** (`hardGreen: false` until Arch restore) |
-| **PO green-light / Home?** | **Blocked** — wait Arch HARD-GREEN + PO `+` |
+| **PAGE FINAL PASS HARD-GREEN?** | **YES** (`hardGreen: true` @ tip `c6e8931`) |
+| **PO green-light / Home?** | **Blocked** — wait PO `+` (sequencing unblocked) |
 
-**Team check line:** `Quinn MCP — pdp — PASS` (23/23 @ v0.0.28 / `bf59041`; Arch unblocked for HARD-GREEN)
+**Team check line:** `Quinn MCP — pdp — PASS` · `PAGE FINAL PASS — pdp — HARD-GREEN`
 
 **Knowledge used:** QUINN_PDP_PROBE_CRITERIA · RECORDING.md (overlay + scroll-into-view + overlay-eyes + teardown) · PAGE_FINAL_PASS.md (Quinn matrix PASS; Arch HARD-GREEN) · TEAM_KNOWLEDGE Quinn § · demo-cursor `proto-chat-cta--hover` false-fail lesson
 
@@ -95,8 +95,8 @@
 |------|--------|
 | Quinn MCP interaction matrix | **PASS** (this re-prove · 23/23 · `bf59041` / v0.0.28) |
 | Uma §0a (FAQ/CTA/focus) | **PROVEN** (`8d80d5f`) |
-| `PAGE_FINAL_PASS.json` `mcpFinalPass` HARD-GREEN | **Pending Arch** |
-| `hardGreen` | **false** until Arch restore |
+| `PAGE_FINAL_PASS.json` `mcpFinalPass` HARD-GREEN | **HARD-GREEN** @ `c6e8931` |
+| `hardGreen` | **true** |
 
 ---
 
@@ -107,4 +107,4 @@
 3. Confirm booster default checked + £150 **before** `__studioRunMcpPageProbe`.  
 4. Re-prove after any tip that lands after the last MCP stamp.  
 5. Download CTA assert compares **product** `pdp__*` classes only (demo hover adds `proto-chat-cta--hover`).  
-6. Do not stamp `hardGreen: true` from Quinn — Arch after this PASS + Uma §0a.
+6. Do not stamp `hardGreen: true` from Quinn — Arch stamps after PASS + Uma §0a (done @ `c6e8931`).

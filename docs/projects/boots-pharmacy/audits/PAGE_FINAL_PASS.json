@@ -121,21 +121,21 @@
     {
       "screenId": "pdp",
       "status": "proven",
-      "hardGreen": false,
+      "hardGreen": true,
       "stampedAt": {
-        "sha": "828ab2b",
+        "sha": "c6e8931",
         "date": "2026-07-19",
-        "note": "Structure stamp retained. User-visible FAQ body / download CTA / accordion focus polish after HARD-GREEN — Quinn + Uma must re-prove before hardGreen again."
+        "note": "Finn structure/naming + UXDS Accordion kit + ButtonPrimary Book now; header crumbs + main RTB/below; BEM pdp; data-studio-react-screen + make-retired; FAQ Make bodies + download tertiary unify + accordion focus-none. Restored after v0.0.28 polish NEEDS-REPROVE."
       },
       "mcpFinalPass": {
-        "status": "PASS",
+        "status": "HARD-GREEN",
         "pass": true,
         "stampedAt": {
-          "sha": "67a5b7c",
+          "sha": "c6e8931",
           "date": "2026-07-19",
           "version": "0.0.28",
-          "auditor": "Quinn (QA)",
-          "note": "MCP __studioRunMcpPageProbe({ screenId:\"pdp\", reload:false }) 23/23 PASS @ code tip bf59041 / v0.0.28; faq-help-body + download tertiary unify (no --bordered) + accordion focus-none; overlay-eyes + teardown clean. Uma §0a PROVEN @ 8d80d5f. hardGreen false until Arch restore. Audit: FE_AUDIT_PDP_MCP_2026-07-19.md"
+          "auditor": "Arch (Director) — Quinn MCP + Uma §0a",
+          "note": "Restored HARD-GREEN after v0.0.28 FAQ/CTA/focus polish. Quinn MCP 23/23 PASS @ bf59041 (prove 67a5b7c; tip c6e8931); Uma §0a PROVEN @ 8d80d5f; faq-help-body + download tertiary unify (no --bordered) + accordion focus-none; overlay-eyes + teardown clean. Evidence: FE_AUDIT_PDP_MCP + UMA_FIDELITY_PDP + FE_AUDIT_PDP_PAGE_FINAL_PASS."
         },
         "url": "http://127.0.0.1:5188/?project=boots-pharmacy&screen=pdp",
         "auditPath": "docs/projects/boots-pharmacy/audits/FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md",

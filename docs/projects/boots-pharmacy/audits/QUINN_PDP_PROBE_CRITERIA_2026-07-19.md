@@ -1,7 +1,7 @@
 # Quinn (QA) — PDP MCP prove criteria
 
 **Status:** MCP matrix **PASS** @ tip `bf59041` / v0.0.28 — evidence [FE_AUDIT_PDP_MCP_2026-07-19.md](./FE_AUDIT_PDP_MCP_2026-07-19.md).  
-**PAGE FINAL PASS:** **Pending Arch HARD-GREEN** (`hardGreen: false`) — Uma §0a PROVEN @ `8d80d5f`; Quinn 23/23 PASS; Arch restore next.  
+**PAGE FINAL PASS:** **HARD-GREEN** (`hardGreen: true` @ tip `c6e8931`) — Uma §0a PROVEN @ `8d80d5f`; Quinn 23/23 PASS @ `bf59041` / prove `67a5b7c`.  
 **Updated:** 2026-07-19 (FAQ Make bodies + download tertiary unify + accordion focus-none)  
 **Screen:** `pdp` (Frame child 8)  
 **Register:** [../features/PDP_MAKE_PARITY_REGISTER.md](../features/PDP_MAKE_PARITY_REGISTER.md)  
@@ -73,6 +73,6 @@ Logged-in Book now → `screen=book-step-1` — prove in a second session or aft
 2. MCP panel step log (PASS/FAIL) or probe JSON with overlay-arm + overlay-eyes — **done:** [FE_AUDIT_PDP_MCP_2026-07-19.md](./FE_AUDIT_PDP_MCP_2026-07-19.md) (**23/23**).  
 3. Register scaffold P0 rows marked Fixed/Present.  
 4. Uma fidelity §0a DS matrix **PASS** for FAQ Accordion + download CTA hover — **done** @ `8d80d5f`.  
-5. Arch team check with **Knowledge used** per role + PAGE FINAL PASS HARD-GREEN stamp.
+5. Arch team check with **Knowledge used** per role + PAGE FINAL PASS HARD-GREEN stamp — **done** @ `c6e8931`.
 
-**Until Arch Final Pass:** interaction matrix **PASS**; page status remains **NOT PAGE FINAL PASS HARD-GREEN**.
+**Final Pass:** `PAGE FINAL PASS — pdp — HARD-GREEN` (Home still waits PO `+`).

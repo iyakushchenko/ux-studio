@@ -24,9 +24,9 @@
 | **§0a download CTAs (tertiary)** | **PASS** — Guide + Leaflet **same** `.pdp__pill`; **no** `.pdp__pill--bordered` stub / CSS |
 | **§0b RTB vertical rhythm** | **PASS** — carried from v0.0.24 measure (`32px` stack; title-block `72px`) |
 | **P2 share glyph Make flip** | **PASS** — carried from v0.0.24 MCP matrix |
-| **PO green-light allowed?** | **No** — Uma §0a PROVEN; wait Quinn MCP re-prove + Arch Final Pass HARD-GREEN |
-| **PAGE FINAL PASS** | **NEEDS-REPROVE** until Quinn + Arch (Uma fidelity unblocked) |
-| **Arch Final Pass after Quinn?** | **Yes** — Uma §0a gate clear; Arch may restore HARD-GREEN after Quinn full matrix PASS |
+| **PO green-light allowed?** | **No** — wait PO `+` before Home (Final Pass HARD-GREEN restored) |
+| **PAGE FINAL PASS** | **HARD-GREEN** @ tip `c6e8931` |
+| **Arch Final Pass after Quinn?** | **Done** — Uma §0a + Quinn 23/23 → Arch HARD-GREEN restored |
 
 **Honest residuals:**  
 1. **FAQ headers without Make body** — `nhs-vaccination` / `already-have-chickenpox` / `personal-data`: static headers only (no empty expand shells; no invented copy).  
@@ -154,7 +154,7 @@
 |----------|----------|-------|
 | FAQ headers without Make body (3/6) | **Accepted Make parity** — static headers; do not invent FAQ copy | PO / content |
 | Download CTAs have no file URLs | **Accepted Make parity** — buttons only until assets exist | PO / Pax |
-| PAGE FINAL PASS / `check:page-final-pass` hardGreen | **NEEDS-REPROVE** — Quinn MCP + Arch after this Uma PROVEN | Quinn → Arch |
+| PAGE FINAL PASS / `check:page-final-pass` hardGreen | **HARD-GREEN** @ `c6e8931` | Arch |
 | Register React column catch-up notes | Doc | Bea |
 
 ---
@@ -194,7 +194,7 @@ Uma (UI/UX): typical DS checks (state matrix) — PASS (§0a; tip bf59041 / v0.0
 Uma (UI/UX): FAQ Accordion UXDS — PASS (3 Make bodies; 3 residual headers; hover navy CSS; focus outline none)
 Uma (UI/UX): download CTA tertiary unify — PASS (Guide+Leaflet .pdp__pill; no bordered stub; rest label #5c5c5c / icon navy)
 Uma (UI/UX): share glyph Make flip — PASS (carried v0.0.24)
-Uma (UI/UX): Arch Final Pass — YES after Quinn MCP HARD-GREEN (Uma §0a unblocked)
+Uma (UI/UX): Arch Final Pass — HARD-GREEN restored @ c6e8931 (Uma §0a + Quinn 23/23)
 ```
 
 **Knowledge used:** UMA_FIDELITY_NOTES §0/§0a/**§0b** · VISUAL_FIDELITY · DS_STRICTNESS · PDP_MAKE_PARITY_REGISTER L18–L19 · UXDS Accordion kit · `pdp.css` tertiary pill + accordion focus-none · Make `ComponentPdpAccordion` · PAGE_FINAL_PASS.md (Arch after Quinn).

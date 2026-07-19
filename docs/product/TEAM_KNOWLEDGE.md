@@ -148,7 +148,7 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 | Delta | Hats | LESSONS / artifact |
 |-------|------|--------------------|
 | **PDP FAQ/CTA/focus polish (PO)** — Make-sourced FAQ bodies 3/6; download tertiary unify (no leaflet stub); accordion focus-none; v0.0.28 | Bea, Uma, Finn, Quinn, Arch | PDP_MAKE_PARITY_REGISTER · UMA_FIDELITY_PDP · PAGE_FINAL_PASS.json |
-| **PDP PAGE FINAL PASS** — Quinn **23/23 PASS** + Uma §0a **PROVEN** @ `bf59041`; Arch HARD-GREEN pending (prior `828ab2b` demoted then re-proved) | Arch, Finn, Uma, Quinn, Ben, Pax | PAGE_FINAL_PASS.json · FE_AUDIT_PDP_MCP · FE_AUDIT_PDP_PAGE_FINAL_PASS · check:page-final-pass |
+| **PDP PAGE FINAL PASS** — **HARD-GREEN** @ `c6e8931` (Quinn 23/23 @ `bf59041` · Uma §0a @ `8d80d5f`; prior `828ab2b` demoted then re-proved) | Arch, Finn, Uma, Quinn, Ben, Pax | PAGE_FINAL_PASS.json · FE_AUDIT_PDP_MCP · FE_AUDIT_PDP_PAGE_FINAL_PASS · check:page-final-pass |
 | **PDP RTB vertical rhythm** — LEGACY Make `module.pdp.rtb > div > div` stole React column gap (48≠32) + forced title-block 1:1; Uma must MCP-measure section gaps before fidelity IN PROGRESS; Quinn PASS ≠ rhythm done | Uma, Finn, Arch | UMA_FIDELITY_NOTES §0b · UMA_FIDELITY_PDP · globals-screens `:not(.pdp__rtb-card)` |
 | **PDP kickoff** — Bea register before code; Finn L1–L13 mount; Uma fidelity IN PROGRESS; Quinn probe criteria prep (no false PROVEN); accordion B1 static | Arch, Bea, Finn, Uma, Quinn, Ben | [PDP_MAKE_PARITY_REGISTER.md](../projects/boots-pharmacy/features/PDP_MAKE_PARITY_REGISTER.md) · screens/pdp |
 | **PAGE FINAL PASS** — no new migrated page until previous hard-green; Finn/Uma checklist + check; parallel callsigns + Knowledge used still required | Arch, Finn, Uma, Bea | [PAGE_FINAL_PASS.md](./PAGE_FINAL_PASS.md) · TEAM · doctrine · NEXT_STEPS |
@@ -163,10 +163,16 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 | Team knowledge database + mandatory use | Arch, all | This file · TEAM.md § Knowledge use |
 | Page final-pass gate before NEXT screen; landmarks + BEM stamp | Finn, Uma, Ben, Arch | PAGE_FINAL_PASS.md · check:page-final-pass |
 
+**Knowledge improved** (2026-07-19 · stream: PDP PAGE FINAL PASS HARD-GREEN restored · tip c6e8931 · v0.0.28):
+- Arch (Director): restore HARD-GREEN only after Quinn 23/23 (faq-help-body + download unify) + Uma §0a PROVEN; veto Home until PO `+` — applied: PAGE_FINAL_PASS.json mcpFinalPass HARD-GREEN + FE_AUDIT_PDP_PAGE_FINAL_PASS + NEXT_STEPS 3e
+- Quinn (QA): re-prove MCP after user-visible polish (not false-PROVEN from prior 22/22 HARD-GREEN) — applied: FE_AUDIT_PDP_MCP 23/23 @ bf59041 / prove 67a5b7c / tip c6e8931
+- Uma (UI/UX): §0a real FAQ bodies + CTA tertiary unify + accordion focus-none before Arch stamp — applied: UMA_FIDELITY_PDP PROVEN @ 8d80d5f
+- Pax (PO sim): sequencing unblocked ≠ start Home — applied: wait PO `+`
+
 **Knowledge improved** (2026-07-19 · stream: PDP v0.0.28 Quinn MCP re-prove · tip bf59041):
 - Quinn (QA): full `__studioRunMcpPageProbe` 23/23 PASS after FAQ/CTA/focus polish; download CTA assert must ignore demo `proto-chat-cta--hover` (product `pdp__*` classes only) — applied: studioMcpPageProbe + FE_AUDIT_PDP_MCP PASS; Arch unblocked for HARD-GREEN
 - Uma (UI/UX): §0a PROVEN on polish tip before Quinn matrix — applied: UMA_FIDELITY_PDP @ 8d80d5f
-- Arch (Director): restore HARD-GREEN only after Quinn PASS + Uma PROVEN (not from stale 22/22) — applied: pending HARD-GREEN; hardGreen false until Arch stamp
+- Arch (Director): restore HARD-GREEN only after Quinn PASS + Uma PROVEN (not from stale 22/22) — applied: HARD-GREEN restored @ c6e8931
 
 **Knowledge improved** (2026-07-19 · stream: PDP PAGE FINAL PASS HARD-GREEN restored · tip 828ab2b · v0.0.27):
 - Arch (Director): restore HARD-GREEN only after Quinn 22/22 (FAQ+download) + Uma §0a PROVEN + Accordion source contract; veto Home until PO `+` — applied: PAGE_FINAL_PASS.json mcpFinalPass + FE_AUDIT_PDP_PAGE_FINAL_PASS + NEXT_STEPS 3e
