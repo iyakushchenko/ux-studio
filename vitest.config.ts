@@ -19,5 +19,12 @@ export default defineConfig({
     environment: "node",
     include: ["src/**/*.test.ts"],
     setupFiles: ["src/test/setup.ts"],
+    // forks = stable isolation; CI bounds workers (2-core GHA) via VITEST_MAX_WORKERS.
+    pool: "forks",
+    ...(process.env.CI
+      ? {
+          maxWorkers: Number(process.env.VITEST_MAX_WORKERS || 2),
+        }
+      : {}),
   },
 });

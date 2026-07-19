@@ -41,7 +41,7 @@
 | R9 | *(existing)* | PAGE FINAL PASS | `check:page-final-pass` | — | `mcpFinalPass` stamp |
 | R10 | **`robo-cursor-native-feedback`** | Robo-cursor = **native hover+press everywhere** (buttons/links/DS secondary/outline/popup close — not chat-only); press = down→dwell→up→click; default graphic after click | `vitest` | `demoCursorInteraction` + `demoCursorPseudoBridge` (top-level selector split + insertRule) | MCP: PDP Check availability bg/border change; Book now; popup close press |
 | R11 | **`fixed-localhost-reuse-tab`** | **One** localhost URL forever; agents must **not** open new ports/windows/tabs | `check:felonies` (vite `port`+`strictPort`) | — | Chrome DevTools MCP: `list_pages` → `select_page` / `navigate_page` on existing; **`new_page` only if zero pages** |
-| R12 | **`batch-ship-push`** | **No push after every tiny fix** — land local until coherent ship / PO ask / HARD-GREEN / end of wave | Process (Pax/Ben) — no static CI gate | — | — |
+| R12 | **`batch-ship-push`** | **No push after every tiny fix** + **no await CI/Pages** on routine ships (push → move on; await only HARD-GREEN / release / PO-asked prove) | Process (Pax/Ben) — no static CI gate | — | — |
 
 **Code catalog:** `src/app/shell/studioAutoRules.ts` (`STUDIO_AUTO_RULES`) — keep ids in sync with this table for **CI-gated** rules (R1–R11). **R12** is process-only (docs + director); do not invent a fake CI assert.
 
@@ -163,18 +163,23 @@ Deep links stay on that origin, e.g. `http://localhost:5173/?project=boots-pharm
 
 ---
 
-## R12 — Batch ship / push (HARD process)
+## R12 — Batch ship / push + no-await CI (HARD process)
 
-**Fail class:** Agents `git push` after every tiny fix → CI/Pages thrash, tip noise, PO loses coherent ships.
+**Fail class:**
+
+1. Agents `git push` after every tiny fix → CI/Pages thrash, tip noise, PO loses coherent ships.
+2. Agents **`gh run watch` / sleep-poll / wait for Pages** after every push → PO wall-clock burns even when CI is “only” 20–40s × many pushes.
 
 **Contract:**
 
 1. **Land local** — commit locally when coherent; keep working on the wave without pushing each micro-fix.
 2. **One push per coherent ship** — push when Pax (or human PO) says so, or at: coherent feature close · PO explicit ask · PAGE FINAL PASS HARD-GREEN · **end of wave**.
-3. **Ben** executes push + `gh` sitrep **once** for that ship — not per file.
-4. Hotfix that unblocks the human PO **may** push early — still batch remaining work after.
+3. **Ben** executes **one** push for that ship — not per file.
+4. **No await CI/Pages on routine ships** — push and **move on**. Optional one-shot `gh run list` peek is fine; **forbidden:** `gh run watch`, sleep/poll loops, babysitting Pages, blocking the next task on `in_progress`.
+5. **Await CI only when:** PAGE FINAL PASS HARD-GREEN · release/version ship · human PO explicitly asked to prove remote green.
+6. Hotfix that unblocks the human PO **may** push early — still batch remaining work after; still no routine await.
 
-**Docs:** [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) · [TEAM.md](./TEAM.md) · [TEAM_KNOWLEDGE.md](./TEAM_KNOWLEDGE.md) · [AGENTS.md](../../AGENTS.md) · director rule.
+**Docs:** [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) · [TEAM.md](./TEAM.md) · [TEAM_KNOWLEDGE.md](./TEAM_KNOWLEDGE.md) · [CI_ACTIONS_BUDGET.md](./CI_ACTIONS_BUDGET.md) §5 · [AGENTS.md](../../AGENTS.md) · director rule · `ci-sitrep.mdc`.
 
 ---
 

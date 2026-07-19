@@ -12,7 +12,7 @@ Callsigns: [TEAM.md](./TEAM.md).
 
 | Callsign | Owns |
 |----------|------|
-| **Ben** (BE) | Semver bumps (`npm run release:*`), CHANGELOG promote, `check:version` / `check:felonies` green, post-push `gh run list` |
+| **Ben** (BE) | Semver bumps (`npm run release:*`), CHANGELOG promote, `check:version` / `check:felonies` green; post-push optional `gh run list` peek (R12 — await only HARD-GREEN / release / PO prove) |
 | **Finn / Uma** | Top-bar version chip (tabs row, sticky right, overflow wins); match Studio PANEL aesthetic |
 | **Quinn** (QA) | Prove chip readable when tabs overflow; no tab/version collision; channel label correct; **after every bump: chip label === `v` + package.json** (localhost + note Pages) |
 | **Pax** (PO sim) | **Whether/when** to bump + push on user-visible ships (human PO overrides) |

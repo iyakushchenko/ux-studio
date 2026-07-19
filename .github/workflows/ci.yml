@@ -6,69 +6,102 @@ on:
   pull_request:
   workflow_dispatch:
 
-# Supersede in-flight runs on the same ref — faster tip feedback, less minute burn.
+# Supersede in-flight runs on the same ref — faster tip feedback; agents must not wait on stale CI.
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+
+env:
+  # 2-core ubuntu-latest: bound Vitest workers to avoid fork thrash.
+  VITEST_MAX_WORKERS: "2"
 
 jobs:
   # Hard static gates + Vitest (fail-fast via parallel gates script).
   # Smoke stays workflow_dispatch-only (see smoke job).
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 6
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
 
       - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
 
+      # Warm path: restore node_modules and skip npm ci (biggest wall-clock win).
+      - name: Cache node_modules
+        id: nm
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: nm-${{ runner.os }}-node22-${{ hashFiles('package-lock.json') }}
+
       - name: Install dependencies
-        run: npm ci
+        if: steps.nm.outputs.cache-hit != 'true'
+        run: npm ci --no-audit --no-fund
 
       - name: Static gates (parallel)
         run: npm run test:gates
 
       - name: Unit tests
-        run: npx vitest run
+        run: npx vitest run --pool=forks --maxWorkers=${{ env.VITEST_MAX_WORKERS }}
 
-  # Build parallel to test — avoids sequential full install+test+build wall clock.
-  # Hard gates stay in `test`; this job only proves Vite production build.
+  # Build parallel to test — one Vite prove; not sequential after unit.
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 6
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
 
       - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
 
+      - name: Cache node_modules
+        id: nm
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: nm-${{ runner.os }}-node22-${{ hashFiles('package-lock.json') }}
+
       - name: Install dependencies
-        run: npm ci
+        if: steps.nm.outputs.cache-hit != 'true'
+        run: npm ci --no-audit --no-fund
 
       - name: Build
         run: npm run build
 
   # Playwright smoke is on-demand only — day-to-day chrome QA is local MCP/agent.
-  # Auto-running smoke on every push burned Actions minutes and still missed REC⊗CJM.
   smoke:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
 
       - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
 
+      - name: Cache node_modules
+        id: nm
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: nm-${{ runner.os }}-node22-${{ hashFiles('package-lock.json') }}
+
       - name: Install dependencies
-        run: npm ci
+        if: steps.nm.outputs.cache-hit != 'true'
+        run: npm ci --no-audit --no-fund
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4

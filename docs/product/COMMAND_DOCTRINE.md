@@ -22,7 +22,7 @@
 | **Finn** | FE | React / engine implementation; mount notes |
 | **Uma** | UI/UX | Chrome, concept fidelity, Nazi visual / FE audits |
 | **Quinn** | QA | Prove (localhost/MCP), felonies, CI sitrep evidence |
-| **Ben** | BE | Version/CHANGELOG mechanics, gates, push — **must** `gh run list` ([CI_ACTIONS_BUDGET.md](./CI_ACTIONS_BUDGET.md) §5, [VERSIONING.md](./VERSIONING.md)) |
+| **Ben** | BE | Version/CHANGELOG mechanics, gates, push — optional `gh run list` peek; **no await** on routine ships ([CI_ACTIONS_BUDGET.md](./CI_ACTIONS_BUDGET.md) §5, [VERSIONING.md](./VERSIONING.md), R12) |
 | **Pax** | PO (simulated) | Acts on this project’s human-PO style (hard guardrails, Pages truth, no Actions burn, decisive next steps). **Decides whether/when to bump version + changelog + push** for user-visible ships. Human PO overrides. Channel accept stays with human PO. |
 
 The human PO does **not** need to re-argue role, sequencing, CSS architecture, motion library, or audit gates. Agent team owns them. Human PO owns product intent, design truth (Figma/UXDS), and accept/reject — and may override Pax.
@@ -35,8 +35,8 @@ For any more-or-less serious change (chrome, URL, REC, page behavior, CI gates):
 1. **Dispatch** — **Arch (Director)** is the parent coordinator. For serious workstreams, Arch **MUST** launch needed callsigns (**Bea / Finn / Uma / Quinn / Ben**) as **parallel sibling subagents** with **role-scoped prompts** — not one mega-agent wearing every hat. Full map: [TEAM.md](./TEAM.md) § Parallel dispatch. Role-scoped prompts **must** tell the sibling to re-read their knowledge section.  
 2. **Brief** — teammates get a lean artifact ([FEATURE_BRIEF_TEMPLATE.md](./FEATURE_BRIEF_TEMPLATE.md) / project `features/`), not chat-only (Bea subagent when separable).  
 3. **Build + cross-check** — Finn / Uma / Quinn as siblings when slices are independent; Quinn↔Finn and Uma↔Bea before “done”.  
-4. **Pax** — accept bump / notes / push when user-visible (human PO overrides). **Batch ship (R12):** do **not** push after every tiny fix — land local until a coherent ship, PO ask, HARD-GREEN, or end of wave ([STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R12 · [TEAM.md](./TEAM.md) § Batch ship).  
-5. **Board + gates** — Arch synthesizes, assigns blockers, updates [NEXT_STEPS.md](./NEXT_STEPS.md); Quinn MCP prove still required before audit **PROVEN**; Ben updates notes/CHANGELOG when Pax says bump and runs **CI sitrep** after push (`gh run list`). Team check includes **`Knowledge used:`** per role; close-out includes **Knowledge improved** sitrep. Arch rejects write-only knowledge appends.  
+4. **Pax** — accept bump / notes / push when user-visible (human PO overrides). **Batch ship (R12):** do **not** push after every tiny fix — land local until a coherent ship, PO ask, HARD-GREEN, or end of wave; **do not await CI/Pages** on routine ships ([STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R12 · [TEAM.md](./TEAM.md) § Batch ship).  
+5. **Board + gates** — Arch synthesizes, assigns blockers, updates [NEXT_STEPS.md](./NEXT_STEPS.md); Quinn MCP prove still required before audit **PROVEN**; Ben updates notes/CHANGELOG when Pax says bump, pushes once, and **moves on** (optional `gh run list` peek — await only HARD-GREEN / release / PO prove). Team check includes **`Knowledge used:`** per role; close-out includes **Knowledge improved** sitrep. Arch rejects write-only knowledge appends.  
 6. **PAGE FINAL PASS** — before opening the **next** migrated page, previous page must be **hard-green** per [PAGE_FINAL_PASS.md](./PAGE_FINAL_PASS.md). Arch vetoes next-page briefs/mounts otherwise.  
 7. **Reflex** — after HARD-GREEN, Arch micro-retro → [TEAM_KNOWLEDGE.md](./TEAM_KNOWLEDGE.md) (Knowledge improved) before next-page brief/mount — [TEAM.md](./TEAM.md) § Reflex.
 
@@ -122,8 +122,8 @@ The PO may override with a clear product veto (“wrong priority for the busines
 10. **Distrust handoffs (§6)** — subagent “done” is BAD until proven.
 11. **Nazi FE audit before UI close (§7)** — no PO green-light without **PROVEN** ([FE_UI_UX_AUDIT.md](./FE_UI_UX_AUDIT.md)).
 12. **Lead** — if blocked on a PO asset, choose the best unblocked path and say what is waiting on them.
-13. **Post-push CI sitrep (BE hat)** — after any push / CI-impacting change, check latest Actions with `gh run list` (and failed logs). Local green ≠ remote green. Cancelled runs are often concurrency supersedes — verify the tip SHA run ([CI_ACTIONS_BUDGET.md](./CI_ACTIONS_BUDGET.md) §5).
-14. **Batch ship / push (R12)** — **no push after every tiny fix.** Commit locally as needed; **one push** per coherent ship / PO ask / HARD-GREEN / end of wave. Pax owns the push call; Ben executes once + sitrep. → [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R12 · [TEAM.md](./TEAM.md).
+13. **Post-push CI sitrep (BE hat)** — after routine push: optional one-shot `gh run list` peek, then **move on**. **Do not** `gh run watch` / sleep-poll / await Pages. Await CI only for HARD-GREEN / release / PO-asked prove. Local green ≠ remote green — do not *claim* remote green without evidence; also do not *wait* for it on routine work. Cancelled runs are often concurrency supersedes ([CI_ACTIONS_BUDGET.md](./CI_ACTIONS_BUDGET.md) §5).
+14. **Batch ship / push (R12)** — **no push after every tiny fix** and **no await CI/Pages on routine ships.** One push per coherent ship / PO ask / HARD-GREEN / end of wave. Pax owns the push call; Ben executes once and continues. → [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R12 · [TEAM.md](./TEAM.md).
 
 ---
 

@@ -44,7 +44,7 @@ Full PLP example: [TEAM_RETRO_2026-07-19_PLP.md](./TEAM_RETRO_2026-07-19_PLP.md)
 | **Finn (FE)** | React / engine implementation; co-owns Final Pass checklist + `check:page-final-pass` with Uma | Code + mount notes in brief or PR · [PAGE_FINAL_PASS.md](./PAGE_FINAL_PASS.md) |
 | **Uma (UI/UX)** | Chrome, concept fidelity, Nazi visual; co-owns Final Pass checklist + check with Finn | FE audits under `docs/projects/<id>/audits/` · [PAGE_FINAL_PASS.md](./PAGE_FINAL_PASS.md) |
 | **Quinn (QA)** | Prove, MCP, felonies, CI sitrep | Prove notes (localhost / MCP / gate evidence). Owns prove for post-agent clean slate (no sticky Choose Pharmacy after `__protoRun*` / `stop({ reload: true })`). **After every version bump:** prove tab-bar chip `v` + `package.json` semver + channel (localhost; note Pages) |
-| **Ben (BE)** | Version / changelog / CI / gates / push mechanics | [VERSIONING.md](./VERSIONING.md), check scripts, `gh run list` |
+| **Ben (BE)** | Version / changelog / CI / gates / push mechanics | [VERSIONING.md](./VERSIONING.md), check scripts, optional `gh run list` peek (R12 no-await) |
 | **Pax (PO sim)** | Acts like this project’s human PO: intolerant of near-dups / missed chrome; wants hard guardrails, Pages truth, no Actions burn, decisive next steps. **Decides whether/when to bump version + changelog + push** (human PO overrides) | [PRODUCT_OWNER_BRIEF.md](./PRODUCT_OWNER_BRIEF.md) decisions log |
 
 Never bare callsign alone in team output — always `Name (Role)` as above.
@@ -208,23 +208,26 @@ Arch spawns siblings → Bea brief → Finn (+ Uma) build → Quinn prove + Uma 
 | PAGE FINAL PASS | Next migrated page started while previous not hard-green ([PAGE_FINAL_PASS.md](./PAGE_FINAL_PASS.md)) |
 | Pax | Version/push on user-visible ship without Pax (or human PO) call |
 | Batch ship (R12) | Push after every tiny fix / mid-wave thrash — land local; one push per coherent ship ([STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R12) |
+| Await CI (R12) | `gh run watch` / sleep-poll / wait for Pages after routine push — push and move on; await only HARD-GREEN / release / PO prove |
 | Version bump | Ben bumps `package.json` but Quinn did not prove UI chip matches (chip lie = felony) |
-| CI | Push without Ben `gh` sitrep when CI was touched |
+| CI | Claim remote green with no evidence **or** burn the wave awaiting routine CI |
 | Board | NEXT_STEPS / notes stale after Pax said bump |
 
 ---
 
 ## Batch ship / push (R12 — HARD)
 
-**PO pain:** CI/Pages thrash when agents push every one-liner.
+**PO pain:** (1) CI/Pages thrash when agents push every one-liner. (2) Agents **waiting** on `gh run` / Pages after every push burns PO time even when CI is short.
 
 | Do | Do not |
 |----|--------|
 | Land commits locally through the wave | `git push` after each micro-fix |
 | One push when: coherent ship · PO ask · HARD-GREEN · end of wave | Mid-wave “just to sync” pushes |
-| Pax calls push; Ben executes + `gh` sitrep once | Ben auto-pushes on green tests alone |
+| Pax calls push; Ben executes **once** and **moves on** | Ben auto-pushes on green tests alone |
+| Optional one-shot `gh run list` peek | `gh run watch` / sleep-poll / await Pages on routine ships |
+| Await CI only for HARD-GREEN · release · PO-asked prove | Block the next task on `in_progress` CI |
 
-Hotfix that unblocks the human PO may push early; batch the rest after. Full Auto-Rule: [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R12.
+Hotfix that unblocks the human PO may push early; batch the rest after. Full Auto-Rule: [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R12 · sitrep policy: [CI_ACTIONS_BUDGET.md](./CI_ACTIONS_BUDGET.md) §5.
 
 ---
 

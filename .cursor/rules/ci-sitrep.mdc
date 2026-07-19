@@ -1,20 +1,27 @@
 ---
-description: Post-push CI sitrep — never assume green from local tests
+description: Post-push CI peek — no await on routine ships; await only HARD-GREEN / release / PO prove
 alwaysApply: true
 ---
 
-# CI sitrep (BE hat)
+# CI sitrep (BE hat) — R12 no-await
 
 After any `git push` / merge that can trigger Actions:
 
+**Routine ships (default):** push and **move on**. Optional one-shot peek — do **not** block the next task:
+
 ```bash
-gh run list -R iyakushchenko/ux-studio -L 10
-# on red / cancelled:
+gh run list -R iyakushchenko/ux-studio -L 5
+# only if already red/cancelled on the tip SHA:
 gh run view <id> --log-failed
 ```
 
-- Local `npm test` / `build` green ≠ Actions green until sitrep proves it.
-- `cancelled` often = concurrency supersede — check the **newer** run for the tip SHA.
-- Default CI = unit + build only. **No** auto Playwright marathon; smoke = `workflow_dispatch` / local.
+**Forbidden on routine ships:** `gh run watch`, sleep/poll loops, waiting for Pages deploy, or stalling the wave on `in_progress`.
 
-→ [docs/product/CI_ACTIONS_BUDGET.md](docs/product/CI_ACTIONS_BUDGET.md) §5 · [docs/product/COMMAND_DOCTRINE.md](docs/product/COMMAND_DOCTRINE.md) BE hat
+**Await CI only when:** PAGE FINAL PASS HARD-GREEN · release/version ship · human PO explicitly asked to prove remote green.
+
+- Local `npm test` / `build` green ≠ Actions green — do not *claim* remote green without evidence; also do not *wait* for it on routine work.
+- `cancelled` often = concurrency supersede — check the **newer** run for the tip SHA when you do look.
+- Default CI = unit + build only. **No** auto Playwright marathon; smoke = `workflow_dispatch` / local.
+- Concurrency: CI + Pages **cancel-in-progress** on same ref — stale runs die; do not babysit them.
+
+→ [docs/product/CI_ACTIONS_BUDGET.md](docs/product/CI_ACTIONS_BUDGET.md) §5 · [STUDIO_AUTO_RULES.md](docs/product/STUDIO_AUTO_RULES.md) R12 · [COMMAND_DOCTRINE.md](docs/product/COMMAND_DOCTRINE.md) BE hat

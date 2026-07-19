@@ -88,7 +88,7 @@ A screen is **DONE** only when **all** are true:
 | **No new `.proto-*` / `data-proto-*`** | PANEL/chrome/attrs use `.studio-*` / `data-studio-*` |
 | **Nazi QA** | UI ship needs audit **PROVEN** before PO green-light |
 | **CI budget** | No auto marathon Playwright on every push |
-| **Post-push sitrep** | `gh run list` after push |
+| **Post-push (R12)** | Optional `gh run list` peek; **no await** unless HARD-GREEN / release / PO prove |
 | **Hygiene** | `check:hygiene` must stay green |
 | **Felonies** | `check:felonies` + `check:version` + `check:page-final-pass` in `npm test` |
 | **Naming** | [NAMING.md](./NAMING.md); folder = `screenId` |

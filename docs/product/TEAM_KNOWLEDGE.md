@@ -103,27 +103,27 @@
 
 | Must re-read | Focus |
 |--------------|--------|
-| [VERSIONING.md](./VERSIONING.md) · [CI_ACTIONS_BUDGET.md](./CI_ACTIONS_BUDGET.md) §5 | Bump DoD + `gh` sitrep |
+| [VERSIONING.md](./VERSIONING.md) · [CI_ACTIONS_BUDGET.md](./CI_ACTIONS_BUDGET.md) §5 | Bump DoD + **no-await** post-push peek |
 | [PARITY_RATCHETS.md](./PARITY_RATCHETS.md) · felonies in doctrine §4 | Keep gates honest |
-| LESSONS: version chip, post-push sitrep, overlay hygiene, **fixed localhost** | BE + Quinn session hygiene; one Vite on `:5173` |
+| LESSONS: version chip, post-push **no-await**, overlay hygiene, **fixed localhost** | BE + Quinn session hygiene; one Vite on `:5173` |
 | `PARITY_PROVEN.json` · `PAGE_FINAL_PASS.json` ownership | No chat-only PROVEN / final-pass |
 | [../shell/URL.md](../shell/URL.md) + `check:felonies` overlay registry | **Modal URL registry mandatory** same PR as dialog ship |
 | [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R11 · `vite.config.ts` | `port`/`strictPort` felony; smoke URL default |
-| [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) **R12** · [TEAM.md](./TEAM.md) § Batch ship | **One batched push** per coherent ship — no push-after-every-fix; lean CI (`npm ci` + cache + parallel test∥build) |
+| [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) **R12** · [TEAM.md](./TEAM.md) § Batch ship | **One batched push** + **no await CI/Pages** on routine ships; lean CI (`node_modules` cache + parallel test∥build) |
 
-**Knowledge used tip:** VERSIONING DoD + CI sitrep + fixed-localhost-reuse-tab + **batch-ship-push (R12)** + modal URL table.
+**Knowledge used tip:** VERSIONING DoD + R12 no-await peek + fixed-localhost-reuse-tab + **batch-ship-push (R12)** + modal URL table.
 
 ### Pax (PO sim)
 
 | Must re-read | Focus |
 |--------------|--------|
 | [PRODUCT_OWNER_BRIEF.md](./PRODUCT_OWNER_BRIEF.md) §K | Decisions log |
-| [TEAM.md](./TEAM.md) Pax owns · **§ Batch ship (R12)** | Bump / notes / **batched** push call |
+| [TEAM.md](./TEAM.md) Pax owns · **§ Batch ship (R12)** | Bump / notes / **batched** push call; no await-CI thrash |
 | [NEXT_STEPS.md](./NEXT_STEPS.md) | What human PO can `+` / `ok` |
 | LESSONS that changed product bar (fidelity zero-tolerance) | Accept only when gates match PO rage list |
-| [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R12 | Do not green-light mid-wave tip thrash |
+| [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R12 | Do not green-light mid-wave tip thrash **or** CI babysitting |
 
-**Knowledge used tip:** brief §K + board NOW + latest PO-rage LESSONS + **R12 batch push**.
+**Knowledge used tip:** brief §K + board NOW + latest PO-rage LESSONS + **R12 batch push + no-await**.
 
 ---
 
@@ -156,6 +156,11 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 - Ben (BE): `npm ci` + cache + parallel `test`∥`build` + `test:gates` — applied: `ci.yml` · `run-static-gates.mjs` · CI_ACTIONS_BUDGET §2.1
 - Pax (PO sim): one batched push per coherent ship (this wave) — applied: R12 process
 
+**Knowledge improved** (2026-07-19 · stream: faster CI + R12 no-await · tip post-`04358d0`):
+- Arch (Director): R12 extended — no await CI/Pages on routine ships; warm wall target ≤20–25s — applied: doctrine §2.13–14 · TEAM · STUDIO_AUTO_RULES R12 · director #9/#26 · ci-sitrep
+- Ben (BE): `node_modules` cache (skip `npm ci` on hit) + Vitest forks/workers=2 + cancel-in-progress confirmed — applied: `ci.yml` · `deploy-pages.yml` · CI_ACTIONS_BUDGET §2.1/§5
+- Pax (PO sim): push-and-move-on is the default; await CI only HARD-GREEN / release / PO prove — applied: R12 process
+
 **Knowledge improved** (2026-07-19 · stream: overflow-only scrollbar gutter · v0.0.39):
 - Finn (FE): never always-on `scrollbar-gutter: stable` — toggle `studio-scroll--overflow` via `syncStudioScrollOverflowGutter` / `useScrollFill`; keep gutter only while overflowing (+ locked) — applied: `studioScrollOverflow.ts` + `globals-chrome.css`
 - Pax (PO sim): user-visible shell fix → patch bump — applied: v0.0.39
@@ -170,8 +175,8 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 
 | Delta | Hats | LESSONS / artifact |
 |-------|------|--------------------|
-| **Batch ship / push (R12)** — no push after every tiny fix; land local until coherent ship / PO ask / HARD-GREEN / end of wave | Arch, Pax, Ben | [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R12 · TEAM § Batch ship · doctrine §2.14 |
-| **Leaner CI** — `npm ci` + npm cache; parallel `test`∥`build`; parallel `test:gates`; smoke still dispatch-only; expect ~35–45s warm wall | Ben, Arch | [CI_ACTIONS_BUDGET.md](./CI_ACTIONS_BUDGET.md) §2.1 · `ci.yml` · `run-static-gates.mjs` |
+| **Batch ship / push (R12)** — no push after every tiny fix; **no await CI/Pages** on routine ships; land local until coherent ship / PO ask / HARD-GREEN / end of wave | Arch, Pax, Ben | [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R12 · TEAM § Batch ship · doctrine §2.13–14 · ci-sitrep |
+| **Faster CI** — `node_modules` cache (skip `npm ci` on hit); parallel `test`∥`build`; Vitest forks + maxWorkers=2; cancel-in-progress ON; warm target ≤20–25s (honest floor ~18–22s) | Ben, Arch | [CI_ACTIONS_BUDGET.md](./CI_ACTIONS_BUDGET.md) §2.1 · `ci.yml` · `deploy-pages.yml` |
 | **Site Pilot public id** — URL/`screenId`=`site-pilot` (`home` reserved); folder/BEM may lag; naming audit updated | Bea, Finn, Arch | [HOME_MAKE_PARITY_REGISTER.md](../projects/boots-pharmacy/features/HOME_MAKE_PARITY_REGISTER.md) · [URL.md](../shell/URL.md) |
 | **Fixed localhost + reuse tab** — canonical `http://localhost:5173/`; Vite `strictPort`; one `npm run dev`; Chrome MCP `list_pages`→reuse (`new_page` only if empty); Auto-Rule R11 + felony | Arch, Finn, Ben, Quinn | [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R11 · `vite.config.ts` · LESSONS |
 | **Platform Motion standard** — `framer-motion` via `@/uxds/motion`; Accordion height = Motion (not CSS `0fr/1fr`); chevron CSS; shell pilots: diagnostic overlay + studio select presence | Arch, Finn, Uma, Ben, Pax | [MOTION.md](./MOTION.md) · `src/uxds/motion/` · Accordion.tsx |

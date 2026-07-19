@@ -26,10 +26,10 @@
 
 | Job | When | Cost intent |
 |-----|------|-------------|
-| `ci.yml` → `test` | push `main` + PRs | `npm ci` (cached) → `npm run test:gates` (parallel hard gates) → `vitest run` |
-| `ci.yml` → `build` | push `main` + PRs | **Parallel** Vite build (`npm ci` cached) — not sequential after unit |
+| `ci.yml` → `test` | push `main` + PRs | `node_modules` cache (skip `npm ci` on hit) → `test:gates` → `vitest --pool=forks` |
+| `ci.yml` → `build` | push `main` + PRs | **Parallel** Vite build (same nm cache) — not sequential after unit |
 | `ci.yml` → `smoke` | **`workflow_dispatch` only** | Playwright Chromium + browser cache, `PROTO_SMOKE_PROFILE=ci`, 15m cap — never on push |
-| `deploy-pages.yml` | push `main` (+ manual) | `npm ci` + cache → production build → Pages |
+| `deploy-pages.yml` | push `main` (+ manual) | same nm cache → production build → Pages (cancel-in-progress) |
 
 **Hard gates unchanged** (still fail CI): `check:links` · `hygiene` · `felonies` · `parity-ratchets` · `parity-proven` · `page-final-pass` · `theme-brand` · `version`. Only **parallelized** via `scripts/run-static-gates.mjs`.
 
@@ -38,21 +38,26 @@ Full smoke: **manual / local** — `PROTO_SMOKE_PROFILE=full npm run smoke` when
 
 **Merge bar:** `test` + `build` jobs green (`npm test` locally = gates + vitest; also run `npm run build`). Chrome XOR / REC⊗CJM proven locally (unit + MCP sanity / FE audit), not by auto CI smoke.
 
-### 2.1 Speed (2026-07-19)
+### 2.1 Speed (2026-07-19 → tip this ship)
 
 | Lever | Change |
 |-------|--------|
-| npm | Tracked `package-lock.json` → `npm ci` + `actions/setup-node` `cache: npm` (CI + Pages + smoke) |
-| Parallel jobs | `test` ∥ `build` (same ref concurrency group; cancel in-progress) |
+| npm | Tracked `package-lock.json` → `actions/setup-node` `cache: npm` **+** `node_modules` cache (skip `npm ci` on exact lockfile hit) |
+| Parallel jobs | `test` ∥ `build` (same ref concurrency group; **cancel-in-progress: true**) |
 | Gates | Parallel `test:gates` — fail-fast report, no sequential `&&` chain |
+| Vitest | `--pool=forks` + `maxWorkers=2` on CI (2-core `ubuntu-latest`) |
+| Checkout | `fetch-depth: 1`; install uses `npm ci --no-audit --no-fund` on cache miss |
 | Smoke | Remains dispatch-only; Playwright browser dir cached |
-| Not done | Vitest shard (suite ~10s local — shard would **cost** extra installs) |
+| Runners | Free floor = `ubuntu-latest` (no paid larger runners assumed) |
+| Not done | Vitest shard (would **cost** extra job installs); gutting hard gates |
 
-| Metric | Before (tip `fd3241c` era) | After (this ship) |
-|--------|----------------------------|-------------------|
-| CI wall (push, warm cache expected) | ~60–70s sequential install → `npm test` → build | **~35–45s** wall (`test` ∥ `build`; install cached) |
-| Cold cache | ~60–90s | ~45–60s (still parallel build) |
-| Smoke on push | already off | still off |
+| Metric | Before parallel (`fd3241c` era) | After `6b952e4` parallel | Target / honest floor (this ship) |
+|--------|--------------------------------|--------------------------|-----------------------------------|
+| CI wall (push, **warm** `node_modules`) | ~60–70s sequential | ~35–45s | **≤20–25s** expected; honest floor ~**18–22s** (setup ~6–8s + vitest ~9–11s) |
+| Cold / first lockfile | ~60–90s | ~35–45s | ~30–40s (`npm ci` still dominates) |
+| Smoke on push | already off | still off | still off |
+
+**Honest floor:** GitHub job boot + checkout + setup-node ≈ 6–8s; Vitest suite ≈ 9–11s local/CI. Sub-15s warm wall needs probe-test delay cuts (not done here — hard gates stay).
 
 ---
 
@@ -78,24 +83,31 @@ If the account hits Actions billing limits (Summarizer precedent): keep `workflo
 
 ---
 
-## 5. Post-push sitrep (mandatory — BE / Director)
+## 5. Post-push sitrep (BE / Director) — R12 no-await
 
-**Do not assume green.** After any `git push` (or merge) that can trigger Actions, the agent **must** check the latest GitHub Actions status before telling the PO CI is fine.
+**Do not assume green. Do not await routine CI.**
+
+| Mode | When | Behavior |
+|------|------|----------|
+| **Routine ship (default)** | Normal push after coherent batch | Push → **move on**. Optional one-shot `gh run list -L 5` peek. **Forbidden:** `gh run watch`, sleep/poll loops, waiting for Pages, blocking the next task on `in_progress`. |
+| **Await prove** | PAGE FINAL PASS HARD-GREEN · release/version · human PO asked to prove remote green | Then watch/re-check until tip SHA `CI` concludes; on red → `gh run view --log-failed`. |
 
 ```bash
-gh run list -R iyakushchenko/ux-studio -L 10
-# on failure / cancelled:
+# Routine peek (non-blocking) — optional
+gh run list -R iyakushchenko/ux-studio -L 5
+# Only when already red/cancelled on tip, or in await-prove mode:
 gh run view <id> --log-failed
 ```
 
 | Outcome | Report as… |
 |---------|------------|
-| `failure` on `CI` | **Broken** — diagnose + fix; do not claim green |
+| `failure` on tip `CI` (when you looked) | **Broken** — diagnose + fix; do not claim green |
 | `cancelled` on Deploy / CI while a newer run exists | Usually **concurrency supersede** — say so; check the newer run |
 | `success` on latest `CI` for the pushed SHA | Green for that SHA |
-| `in_progress` | Wait / re-check; do not invent a result |
+| `in_progress` on **routine** ship | **Move on** — do not invent green; do not wait |
+| `in_progress` in **await-prove** mode | Re-check until tip concludes |
 
-**Owner:** BE-hat / Tech Director owns CI health sitrep (lean budget + real status). Local `npm test` / build green ≠ Actions green until `gh run list` proves it.
+**Owner:** BE-hat / Tech Director. Local `npm test` / build green ≠ Actions green — do not *claim* remote green without evidence; also do not *burn PO time* waiting on every push. Concurrency **cancel-in-progress** is ON for CI + Pages.
 
 ---
 
