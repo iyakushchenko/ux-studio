@@ -107,6 +107,7 @@ export function SearchField({
       data-studio-react-owned="true"
       data-studio-search-filled={filled ? "true" : "false"}
       data-studio-search-icon-pos={iconPosition}
+      data-disabled={disabled ? "true" : undefined}
     >
       {label ? (
         <label className="uxds-search-field__label" htmlFor={inputId}>

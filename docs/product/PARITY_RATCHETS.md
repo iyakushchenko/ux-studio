@@ -9,6 +9,8 @@
 
 **Companion gates:** `check:felonies` (overlay eyes) · `check:parity-proven` (audit PROVEN + MCP matrix) · Uma checklist · Quinn page probe.
 
+**DS state checks are rule of thumb:** every interactive DS control shipped must have **hover/focus** styles in kit CSS (not rest-only). Uma still proves pixels; ratchets fail CI when kit CSS omits `:hover` / `:focus-within` (or equivalent) on the control shell. Seed ratchet: **search-field-states**. Extend the same pattern when a new kit ships without states.
+
 ---
 
 ## Hard process
@@ -38,6 +40,7 @@
 | 7 | **loader-dup** | Duplicate “Updating results…” | Exactly **one** `"Updating results"` in PLP source; spinner has `data-studio-plp-listing-loader`; not in count block | LESSONS loader dup |
 | 8 | **make-retired** | Make chrome still visible under React | Mount files must set `data-studio-make-retired` / `dataset.studioMakeRetired` | PLP/Book mounts |
 | 9 | **count-hide-load** | Stale/fake jab count during refresh | Loading branch renders `null` count + `data-studio-plp-results-loading`; `.plp__results-count--loading` hide rule; no `"available"` in loading arm | PO: “3 jabs available” during Reset |
+| 10 | **search-field-states** | SearchField rest-only (no hover ring) | `search-field.css` must define `.uxds-search-field__control:hover` + `:focus-within` with `border-color` / `box-shadow` (Make inset ring on shell, not icon) | Uma + Make Availability hover |
 
 ---
 

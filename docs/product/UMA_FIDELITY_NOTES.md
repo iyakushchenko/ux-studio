@@ -6,19 +6,46 @@
 
 **Hard rule:** A screen is **not PROVEN** until this checklist is explicitly pass/fail in the audit + **team check**, with MCP matrix evidence cited, and `PARITY_PROVEN.json` updated (`npm run check:parity-proven`). Green Vitest/build alone = BAD.
 
-**Programmatic contracts:** Typical Make→React misses are also gated by `npm run check:parity-ratchets` ([PARITY_RATCHETS.md](./PARITY_RATCHETS.md)) — search icons, bookmark copy, empty-heart fuchsia, Advantage bar, Book now primary, loader dup, make-retired. Uma checklist still required for pixels/hover; ratchets catch the classes we keep burning.
+**Programmatic contracts:** Typical Make→React misses are also gated by `npm run check:parity-ratchets` ([PARITY_RATCHETS.md](./PARITY_RATCHETS.md)) — search icons, **search-field-states** (kit `:hover`/`:focus-within`), bookmark copy, empty-heart fuchsia, Advantage bar, Book now primary, loader dup, make-retired. Uma checklist still required for pixels/hover; ratchets catch the classes we keep burning. DS state checks = rule of thumb for every interactive kit.
 
 **Bea (BA)** must list every Make band/component in the parity register **before** Finn codes — including **loading / empty / updating** states as **P0** rows when Make has them. Missing whole components (see Advantage Card bar on PLP) = ship fail.
 
 **Quinn (QA)** must click-hover every interactive control and **cannot PASS** if the register still has unchecked P0s.
 
-**Uma (UI/UX) explicit sign-off (every migrated screen):** must report PASS/FAIL on **(a) loading / empty / updating states** and **(b) checkbox / radio hover** — not optional, not “assumed from prior ship”.
+**Uma (UI/UX) explicit sign-off (every migrated screen):** must report PASS/FAIL on **(a) loading / empty / updating states**, **(b) checkbox / radio hover**, and **(c) typical DS state matrix** (fields/buttons) — not optional, not “assumed from prior ship”.
 
 ---
 
 ## Mandatory before PROVEN
 
 Run against Make (or Make frame export) **side-by-side** with React localhost.
+
+### 0a. Typical DS state matrix (RULE OF THUMB — every field / button)
+
+**Hard rule:** Before any screen is **PROVEN**, Uma walks the **full interactive state matrix** for every field and button on that screen — against **UXDS kit CSS** + **Make**, not rest-state only. Rest-state green + missing hover = **FAIL** (PO: SearchField had no hover).
+
+For **each** field (`SearchField` / text input) and **each** button (primary / secondary / tertiary / icon-only):
+
+| State | Must verify |
+|-------|-------------|
+| **default** | Border / fill / type / icon color match kit + Make |
+| **hover** | Ring / wash / underline per DS — **fields:** control inset ring via `--uxds-border-border-focus` (Boots → navy); **never** a box on the magnifier |
+| **focus** / focus-within | Same ring language as Make; keyboard visible |
+| **active** / pressed | CTA pressed fill when Make has it |
+| **filled** | Value + clear affordance; icon position unchanged |
+| **disabled** | Dim / non-interactive; no hover flash |
+| **error** | Only if Make/DS shows error on that control |
+| **icon positions** | Magnifier start\|end per wire; clear X count = 1; icon = bare glyph (no border/box-shadow) |
+
+- [ ] Every `SearchField` / text field: default → hover → focus → filled → clear → disabled (error if present)
+- [ ] Every button / CTA: default → hover → active → disabled
+- [ ] Icon positions stamped and correct (`data-studio-search-icon-pos`, tertiary icon language)
+- [ ] Quinn MCP-hovers ≥1 SearchField (or every search when few) — cite step in team check
+- [ ] **FAIL class:** flat dead field/button with no DS hover = ship fail
+- [ ] **FAIL class:** invent hover chrome not in UXDS kit / Make = ship fail
+- [ ] **FAIL class:** hover/focus ring painted on search **icon** instead of field control = ship fail
+
+**Why this is mandatory:** Agents keep shipping rest-state-only kits (focus without hover, icon without clear, CTA without pressed). Green Vitest does not exercise pointer states. Uma + Quinn must Nazi-hover the matrix before PROVEN — see [TEAM.md](./TEAM.md) § typical DS checks · [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md).
 
 ### 0. Loading / empty / updating states (FIRST-CLASS — capture before coding)
 
@@ -81,15 +108,17 @@ Run against Make (or Make frame export) **side-by-side** with React localhost.
 - [ ] Text-only links only where Make is text-only (`.uxds-link`)
 - [ ] Icon+text nowrap ([FE_STANDARDS.md](./FE_STANDARDS.md))
 
-### 7b. Search fields (magnifier affordance)
+### 7b. Search fields (magnifier affordance + state matrix)
 
 - [ ] Every search input uses UXDS `SearchField` (or stamps same markers) — not a bespoke bare input
 - [ ] Magnifier side matches PO/Make wire — PLP / Availability / Book Step 1 = **RIGHT** (`data-studio-search-icon-pos="end"`)
-- [ ] Magnifier is a **bare glyph** — no box border / inset ring on the icon (Make paints the ring on the field’s absolute `[aria-hidden].absolute` overlay only; UXDS control border owns hover/focus)
+- [ ] Magnifier is a **bare glyph** — no box border / inset ring on the icon (Make paints the ring on the field’s absolute `[aria-hidden].absolute` overlay only; UXDS `.uxds-search-field__control` owns hover/focus)
+- [ ] **Hover + focus** show the DS inset ring on the **control** (`--uxds-border-border-focus`, Boots navy) — §0a matrix; dead flat field = FAIL
 - [ ] **One** clear control only (`data-studio-search-clear`) — never `type="search"` native X + custom X
 - [ ] Marker `data-studio-search-icon="true"` present (ratchet #1)
-- [ ] Quinn MCP `plp-search-icons` (or screen equivalent) PASS
+- [ ] Quinn MCP `plp-search-icons` + SearchField hover prove (or screen equivalent) PASS
 - [ ] **FAIL class:** navy/grey box around the search icon from LEGACY `Text Field > [aria-hidden]` hover stealing the magnifier = ship fail
+- [ ] **FAIL class:** focus-only kit with no `:hover` on the control = ship fail
 
 ### 7c. Filter lists (View all + counters)
 
@@ -113,6 +142,7 @@ When **team check** runs, Uma must report:
 
 `Uma (UI/UX): fidelity checklist — PASS | FAIL (list failed items)`  
 `Uma (UI/UX): loading states — PASS | FAIL`  
-`Uma (UI/UX): checkbox/radio hover — PASS | FAIL`
+`Uma (UI/UX): checkbox/radio hover — PASS | FAIL`  
+`Uma (UI/UX): typical DS checks (state matrix) — PASS | FAIL`
 
 Ship cannot be “done” if Uma reports **FAIL** on any of these lines.

@@ -40,4 +40,17 @@ describe("SearchField UXDS kit", () => {
       /\[data-name="Text Field"\]\s*>\s*\[aria-hidden\],/
     );
   });
+
+  it("paints DS hover + focus ring on the control (not the icon)", () => {
+    expect(css).toMatch(
+      /\.uxds-search-field__control:hover[\s\S]*?\.uxds-search-field__control:focus-within\s*\{[\s\S]*?border-color:\s*var\(--uxds-border-border-focus\)/
+    );
+    expect(css).toMatch(
+      /\.uxds-search-field__control:hover[\s\S]*?box-shadow:\s*inset 0 0 0 2px var\(--uxds-border-border-focus\)/
+    );
+    // Icon must stay borderless even when control has ring
+    expect(css).toMatch(
+      /\.uxds-search-field__icon\s*\{[\s\S]*?border:\s*none\s*!important/
+    );
+  });
 });

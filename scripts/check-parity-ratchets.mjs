@@ -394,6 +394,34 @@ const REACT_MOUNT_FILES = [
   }
 }
 
+// ── 10) SearchField kit — control shell hover (+ focus-within) ───────────────
+// Rule of thumb (PARITY_RATCHETS.md): every interactive DS control shipped must
+// define hover/focus in kit CSS. This ratchet seeds that for SearchField.
+{
+  const css = requireFile("src/uxds/components/search-field.css");
+  if (css) {
+    const compact = css.replace(/\s+/g, " ");
+    if (!/\.uxds-search-field__control:hover\b/.test(compact)) {
+      fail(
+        "RATCHET search-field-states: search-field.css must define .uxds-search-field__control:hover (Make inset ring on control shell)"
+      );
+    }
+    if (!/\.uxds-search-field__control:focus-within\b/.test(compact)) {
+      fail(
+        "RATCHET search-field-states: search-field.css must define .uxds-search-field__control:focus-within"
+      );
+    }
+    const hoverRule = compact.match(
+      /\.uxds-search-field__control:hover(?:\s*,\s*\.uxds-search-field__control:focus-within)?\s*\{[^}]*\}/
+    );
+    if (!hoverRule || !/border-color|box-shadow/.test(hoverRule[0])) {
+      fail(
+        "RATCHET search-field-states: .uxds-search-field__control:hover must set border-color and/or box-shadow (Make ring)"
+      );
+    }
+  }
+}
+
 // ── Docs companion present ──────────────────────────────────────────────────
 {
   if (!fs.existsSync(path.join(ROOT, "docs/product/PARITY_RATCHETS.md"))) {
@@ -407,4 +435,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("parity-ratchets OK (12 contracts)");
+console.log("parity-ratchets OK (13 contracts)");

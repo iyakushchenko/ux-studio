@@ -3,6 +3,8 @@
 > _Append a bullet on coherent commits via `npm run notes:append -- --lane="<lane>" --intent="<text>"`. Preview with `npm run notes:preview`. On `npm run release:patch` this section is promoted to `## v<X.Y.Z> - DDMMYY` and a fresh empty `## Current` is re-inserted. Policy: `docs/product/VERSIONING.md`._
 
 - **docs:** Mandate typical DS state checks (hover/focus/active/disabled vs kit+Make) before screen PROVEN; Uma signs; Quinn MCP-hovers SearchField; missing DS hover = FAIL; parallel callsigns still required
+- **uxds:** SearchField control shell Make hover/focus inset ring + `search-field-states` parity ratchet (DS state rule of thumb)
+- **uxds:** SearchField hover+focus inset ring (Make navy via --uxds-border-border-focus); Uma DS state matrix + search-field-states ratchet
 
 ## v0.0.14 - 190726
 - PLP: restore region→country filter cascade (Make wire parity)
