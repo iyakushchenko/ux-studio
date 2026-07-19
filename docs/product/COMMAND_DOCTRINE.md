@@ -71,6 +71,46 @@ If the PO issues a product override, update §5 and the decisions log the same t
 
 ---
 
+## 6. Handoff verification — distrust by default
+
+**Locked (PO directive, 2026-07-19).** Applies whenever a **master / parent / tech-director** agent uses subagents.
+
+Subagents still **build**. The master owns **integration quality** and closes the loop with the PO.
+
+### Rule
+
+Treat every subagent handoff as **BAD until proven otherwise.**  
+Do **not** trust “done / success / looks good” summaries at face value.
+
+### What the master must verify
+
+Before telling the PO a slice is fine, verify critical UX and logic — especially:
+
+| Area | Why it fails quietly |
+|------|----------------------|
+| **Nav chrome** | Wrong labels, duplicate counters, REC vs STEPS collisions |
+| **Mode switches** | Record / play / idle state leakage |
+| **Counters** | Hidden vs shown, wrong copy, double mounts |
+| **Panel XOR** | Two panels open, or none when one should be |
+| **Migrated page L&F / behavior** | React rebuild drifts from concept or loses prior Make interactions |
+
+Assume **regressions** and **label collisions** until checked. Example: duplicate **STEPS** was a failed handoff that a success summary missed.
+
+### Quick verify (prefer before closing the loop)
+
+1. **Read the actual gate** — JSX/CSS that shows/hides or labels the control (not the subagent’s paraphrase).  
+2. **Or localhost check** — open the surface and confirm chrome / mode / counter / panel XOR / page behavior.  
+3. If it smells wrong → **reopen or fix** the handoff; do not green-light the PO.
+
+### Ownership
+
+| Role | Owns |
+|------|------|
+| Subagent | Build the slice |
+| Master / parent / tech director | Integration quality; verify; reopen/fix bad handoffs; only then report to PO |
+
+---
+
 ## Related
 
 - [PRODUCT_OWNER_BRIEF.md](./PRODUCT_OWNER_BRIEF.md)

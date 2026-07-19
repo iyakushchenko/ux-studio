@@ -6,6 +6,9 @@
 **Command doctrine:** You are the **commander / tech architect / builder**. You decide **all** tech direction and next steps. Do **not** ask the Product Owner to pick among tech options. Ask them only for assets (e.g. UXDS link) or product accept/reject.  
 → [docs/product/COMMAND_DOCTRINE.md](docs/product/COMMAND_DOCTRINE.md)
 
+**Handoff verification (parent / coordinator agents):** Treat subagent “done/success” as **BAD until proven**. Verify critical UX/logic (nav chrome, mode switches, counters, panel XOR, migrated page L&F/behavior) via the actual JSX/CSS gate or localhost before telling the PO it’s fine. Assume regressions and label collisions (e.g. duplicate STEPS). Subagents build; **you** own integration quality — reopen/fix handoffs that smell wrong.  
+→ [docs/product/COMMAND_DOCTRINE.md](docs/product/COMMAND_DOCTRINE.md) §6
+
 Engine repo. **Boots Pharmacy** (`src/projects/boots-pharmacy/`) is the first reference project (test rabbit).
 
 ## Required reading (before big work)

@@ -13,9 +13,11 @@
 
 Agents **do not** offer A/B/C tech menus. They decide, document, build, report.
 
+**Parent / tech-director agents:** subagent handoffs are **BAD until proven** — verify chrome/modes/counters/panels/migrated pages before telling the PO it’s fine ([product/COMMAND_DOCTRINE.md](./product/COMMAND_DOCTRINE.md) §6).
+
 ## Start here (reading order)
 
-1. [product/COMMAND_DOCTRINE.md](./product/COMMAND_DOCTRINE.md) — **who decides what** (read first every session)
+1. [product/COMMAND_DOCTRINE.md](./product/COMMAND_DOCTRINE.md) — **who decides what** + §6 handoff verification (read first every session)
 2. [product/SOLUTION_REQUIREMENTS.md](./product/SOLUTION_REQUIREMENTS.md) — readiness + locked defaults (proceed checklist)
 3. [product/PRODUCT_OWNER_BRIEF.md](./product/PRODUCT_OWNER_BRIEF.md) — A–Z for the Product Owner
 4. [product/CONCEPT_INTAKE.md](./product/CONCEPT_INTAKE.md) — **messy concepts in → Studio pages out** (business logic)
