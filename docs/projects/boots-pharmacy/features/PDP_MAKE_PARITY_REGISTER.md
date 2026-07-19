@@ -11,7 +11,7 @@
 **Status legend:** Present · Partial · Missing · Fixed · N/A
 
 **Make column:** inventory truth from Frame + wire + LEGACY CSS (2026-07-19).  
-**React column:** L1–L20 mounted; FAQ = UXDS Accordion kit (default open Who is at risk?); download CTAs = live buttons + tertiary/mint hover; Quinn matrix + Final Pass **NEEDS-REPROVE** after this ship.
+**React column:** L1–L20 mounted; FAQ = UXDS Accordion kit (default open Who is at risk?); download CTAs = live buttons + tertiary/mint hover; Quinn MCP matrix **PASS** @ `d6e4951`/v0.0.27; Final Pass **NEEDS-REPROVE** until Uma §0a + Arch HARD-GREEN.
 
 **Bea rule:** Every band before Finn codes — including loading/empty/updating as **P0** when Make has them. No invented bands.
 

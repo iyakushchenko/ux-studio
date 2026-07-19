@@ -64,10 +64,10 @@ Erase-Make **closed for PDP** after PLP HARD-GREEN. Vaccine PDP (`screenId: pdp`
 
 ## Prove notes (Quinn)
 
-- **MCP matrix PASS** 2026-07-19 — [FE_AUDIT_PDP_MCP_2026-07-19.md](../audits/FE_AUDIT_PDP_MCP_2026-07-19.md) (`__studioRunMcpPageProbe({ screenId:"pdp", reload:false })`)
-- Localhost: mount + Make leak=0; PLP→PDP; Book now login gate; Check availability modal URL; overlay-arm + overlay-eyes
-- Booster £150↔£75; empty-heart hover; below-fold reveal (compact title stamp)
-- Final Pass HARD-GREEN tip `d7ce01c` — [FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md](../audits/FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md)
+- **MCP matrix PASS** 2026-07-19 tip `d6e4951` / v0.0.27 — [FE_AUDIT_PDP_MCP_2026-07-19.md](../audits/FE_AUDIT_PDP_MCP_2026-07-19.md) (`__studioRunMcpPageProbe({ screenId:"pdp", reload:false })` · 22/22 incl. FAQ accordion + download CTA hover)
+- Localhost: mount + Make leak=0; PLP→PDP; Book now login gate; Check availability Find Pharmacy start; overlay-arm + overlay-eyes; teardown clean
+- Booster £150↔£75; empty-heart hover; below-fold reveal; FAQ toggle/reopen; `.pdp__pill:hover`
+- Final Pass HARD-GREEN — **NEEDS-REPROVE** until Arch re-stamp; Quinn matrix PASS + Uma §0a PROVEN @ `d6e4951` / docs `c037d19`
 - Register prove matrix: [PDP_MAKE_PARITY_REGISTER.md](./PDP_MAKE_PARITY_REGISTER.md)
 
 ## Pax
@@ -76,7 +76,8 @@ Erase-Make **closed for PDP** after PLP HARD-GREEN. Vaccine PDP (`screenId: pdp`
 - [ ] Push? **Arch call**
 - [ ] Notes/CHANGELOG when bump
 - [x] Resolve B1 accordion — PO go interactive (2026-07-19)
-- [ ] Quinn re-prove MCP matrix + Uma §0a for FAQ/download before HARD-GREEN again
+- [x] Quinn re-prove MCP matrix (FAQ/download) @ `d6e4951` / v0.0.27
+- [x] Uma §0a for FAQ/download @ `d6e4951` / docs `c037d19` — Arch Final Pass next
 
 ## Honest residual (expected)
 

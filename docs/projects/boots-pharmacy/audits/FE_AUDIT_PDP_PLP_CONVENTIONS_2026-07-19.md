@@ -52,4 +52,4 @@
 - Action probes use `data-studio-action` / `data-studio-accordion-*` (PLP-style studio hooks).
 - Accordion kit keeps `data-uxds-kit="accordion"`; Make `data-name` preserved on band/items.
 
-**Team check line:** `PAGE FINAL PASS — pdp — NOT-GREEN` (NEEDS-REPROVE after FAQ/CTA ship)
+**Team check line:** `PAGE FINAL PASS — pdp — NOT-GREEN` (Quinn MCP matrix PASS @ `d6e4951` / v0.0.27; HARD-GREEN awaits Uma §0a + Arch)
