@@ -345,7 +345,7 @@ export async function runSitePilotChatScenarioFinale(
     await simulateSarahCtaClick(button);
   }
 
-  if (!preludeAborted) {
-    openAvailability(intent);
-  }
+  // Open Availability even if cursor/prelude aborted mid-click (overlay idle,
+  // scroll-path diagnostic). Product path must continue to avail tool.
+  openAvailability(intent);
 }

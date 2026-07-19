@@ -269,10 +269,26 @@ export async function fadeOutSitePilotChatThinking(): Promise<void> {
   endSitePilotChatThinking();
 }
 
+function isReactOwnedSendButton(sendBtn: HTMLElement): boolean {
+  // React `SitePilotComposer` owns stop/send via `sendThinking` — never touch its glyph DOM.
+  return (
+    isChatReactMounted() ||
+    Boolean(
+      sendBtn.closest(
+        "[data-studio-chat-composer], [data-studio-react-screen], .site-pilot-composer__query-row"
+      )
+    )
+  );
+}
+
 export function setSitePilotChatSendThinkingMode(
   sendBtn: HTMLElement,
   thinking: boolean
 ): void {
+  // Imperative glyphHost.innerHTML + React SendGlyph/StopGlyph swap = removeChild crash
+  // (agentic Play / composer click). LEGACY Make composer only.
+  if (isReactOwnedSendButton(sendBtn)) return;
+
   sendBtn.classList.toggle("proto-agentic-send--stop", thinking);
   sendBtn.classList.toggle("site-pilot-composer__send--stop", thinking);
   sendBtn.setAttribute("aria-label", thinking ? "Stop" : "Send message");

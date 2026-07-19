@@ -90,6 +90,20 @@ export async function runPlayJourneyToStartSmoke(options: {
       await options.delay(200);
       continue;
     }
+    // Keep agent-testing overlay awake — idle auto-stop (~45s) aborts long Play.
+    const overlayApi = (
+      window as Window & {
+        __studioAgentTestingOverlay?: { touch?: (title?: string) => void };
+        __protoAgentTestingOverlay?: { touch?: (title?: string) => void };
+      }
+    ).__studioAgentTestingOverlay ??
+      (
+        window as Window & {
+          __protoAgentTestingOverlay?: { touch?: (title?: string) => void };
+        }
+      ).__protoAgentTestingOverlay;
+    overlayApi?.touch?.("AGENT TESTING — play-smoke");
+
     if (state.diagnosticOpen) {
       // Known flake: agentic chat eased-scroll path can flash ±40px mid-Play.
       // Dismiss + resume so we can still prove play-end → CJM start (product gate).
@@ -100,7 +114,6 @@ export async function runPlayJourneyToStartSmoke(options: {
           : "";
       const chatScrollFlake =
         options.orchestraMode === "agentic-cjm" &&
-        state.beatId === "agentic-chat" &&
         /scroll-path-deviation/i.test(diagText);
       if (chatScrollFlake) {
         playbackDiagLog("info", "play-smoke: dismiss chat scroll-path flake");

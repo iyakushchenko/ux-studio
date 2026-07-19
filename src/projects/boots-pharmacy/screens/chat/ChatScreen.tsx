@@ -15,7 +15,6 @@ import {
   beginSitePilotChatThinking,
   endSitePilotChatThinking,
   isSitePilotChatSendThinking,
-  setSitePilotChatSendThinkingMode,
 } from "@/projects/boots-pharmacy/dom/sitePilotChatThinking";
 import { SitePilotComposer } from "../shared/SitePilotComposer";
 import {
@@ -331,6 +330,11 @@ export function ChatScreen({
     getChatThinkingBridgeState
   );
 
+  // Bridge owns send/playback thinking end (Play fade-out). Clear local stop latch.
+  useEffect(() => {
+    if (thinking.mode !== "send") setSendThinking(false);
+  }, [thinking.mode]);
+
   const chips = useMemo(
     () =>
       CHAT_CHIP_LABELS.map((label) => ({
@@ -347,11 +351,8 @@ export function ChatScreen({
       const t = e.target as Element | null;
       if (!t?.closest(".studio-nav-scenario")) return;
       endSitePilotChatThinking();
+      // React SitePilotComposer owns stop/send glyph via sendThinking — no DOM glyph swap.
       setSendThinking(false);
-      const sendBtn = document.querySelector<HTMLElement>(
-        '[data-studio-react-screen="chat"] .proto-agentic-send, [data-studio-react-screen="chat"] .site-pilot-composer__send'
-      );
-      if (sendBtn) setSitePilotChatSendThinkingMode(sendBtn, false);
     };
     document.addEventListener("click", onScenarioDeckClick, true);
     return () => document.removeEventListener("click", onScenarioDeckClick, true);
@@ -361,10 +362,6 @@ export function ChatScreen({
     if (sendThinking || isSitePilotChatSendThinking()) {
       endSitePilotChatThinking();
       setSendThinking(false);
-      const sendBtn = document.querySelector<HTMLElement>(
-        '[data-studio-react-screen="chat"] .proto-agentic-send'
-      );
-      if (sendBtn) setSitePilotChatSendThinkingMode(sendBtn, false);
       return;
     }
 
@@ -373,10 +370,6 @@ export function ChatScreen({
     );
     if (screen) beginSitePilotChatThinking(screen);
     setSendThinking(true);
-    const sendBtn = document.querySelector<HTMLElement>(
-      '[data-studio-react-screen="chat"] .proto-agentic-send'
-    );
-    if (sendBtn) setSitePilotChatSendThinkingMode(sendBtn, true);
     onSend?.(query);
   };
 

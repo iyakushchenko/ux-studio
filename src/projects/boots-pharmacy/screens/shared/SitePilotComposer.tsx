@@ -192,7 +192,13 @@ export function SitePilotComposer({
         data-studio-action={sitePilotSendAction(surface)}
       >
         <span data-name="glyph" className="site-pilot-composer__send-glyph">
-          {sendThinking ? <StopGlyph /> : <SendGlyph />}
+          {/* Keep both mounted — swapping SVG trees races Motion/playback removeChild. */}
+          <span hidden={!sendThinking} aria-hidden={!sendThinking}>
+            <StopGlyph />
+          </span>
+          <span hidden={sendThinking} aria-hidden={sendThinking}>
+            <SendGlyph />
+          </span>
         </span>
       </button>
     </form>

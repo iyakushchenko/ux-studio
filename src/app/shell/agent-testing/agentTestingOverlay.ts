@@ -30,6 +30,7 @@ import {
 import { removeDemoCursor } from "@/app/scenario/demoCursor";
 import { getControlPanelSnapshot } from "@/app/shell/controlPanelLog";
 import { getCursorDiagnosticState } from "@/app/shell/playbackCursorDiagnostic";
+import { getMcpTestSession } from "@/app/shell/mcpTestGuard";
 import {
   buildLogEntryFromPlain,
   buildLogEntryFromStep,
@@ -486,6 +487,11 @@ function armIdleTimer(): void {
   if (!active || settling) return;
   idleTimer = setTimeout(() => {
     if (!active || settling) return;
+    // Journey/play smokes run minutes — never idle-kill an active MCP session.
+    if (getMcpTestSession()) {
+      armIdleTimer();
+      return;
+    }
     try {
       logAgentTestingOverlay("overlay auto-stop: idle timeout");
     } catch {
