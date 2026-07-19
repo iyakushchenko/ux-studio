@@ -197,5 +197,6 @@ Avoid:
 | 2026-07-19 | **Hover/focus fidelity:** Make `:hover` / focus / active (CTAs, fields, chips, checkboxes) must migrate into UXDS kit CSS + co-located screen CSS — no flat dead controls. Book Step 1 parity table in BOOTS_REACT_SCREEN_PILOT.md |
 | 2026-07-19 | **CSS architecture:** React screens use scoped/co-located CSS + small `src/uxds/` kit CSS; project theme remaps brand; Make monster `globals-*.css` retires screen-by-screen. See PAGE_BUILD_CONTRACT.md §8 |
 | 2026-07-19 | **Handoff verification — distrust by default:** master/parent agents must not trust subagent done/success summaries; verify critical UX/logic (nav chrome, modes, counters, panel XOR, migrated L&F/behavior) via JSX/CSS gate or localhost before green-lighting PO; reopen/fix smelling handoffs. See COMMAND_DOCTRINE.md §6 |
+| 2026-07-19 | **FE/UI/UX audit before PO green-light:** after any UI-facing subagent ship, master must run or spawn a rigorous FE/UI/UX audit; implementer “done” and tests-passed alone are BAD until audit PROVEN. Covers visual fidelity, layout/max-width/alignment, icon+text CTA nowrap, hover/focus, behavior parity, control hierarchy/no zoo, nav chrome (mode XOR, counters), regressions. See COMMAND_DOCTRINE.md §7, FE_UI_UX_AUDIT.md, FE_STANDARDS.md |
 
 New durable decisions get a row here in the same session they are made.

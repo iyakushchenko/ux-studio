@@ -111,10 +111,61 @@ Assume **regressions** and **label collisions** until checked. Example: duplicat
 
 ---
 
+## 7. FE / UI / UX audit verification (mandatory after UI ships)
+
+**Locked (PO directive, 2026-07-19).** Extends §6 for **any UI-facing** handoff.
+
+An implementer (or implementer-subagent) claiming “done,” “tests passed,” or “looks good” is **not** proof. Treat that claim as **BAD until a rigorous FE/UI/UX audit is PROVEN.**
+
+### Rule
+
+After any UI-facing subagent ship (concept page, shell chrome, kit CSS that changes visible UI, layout/CTA work), the **master must run or spawn a separate FE/UI/UX audit verification pass** before telling the PO the slice is good.
+
+| Claim | Status until audit |
+|-------|--------------------|
+| Implementer “done / success” | **BAD** |
+| Unit tests / build / lean smoke green alone | **Insufficient** for visual work |
+| Audit checklist filled with **PROVEN** overall | Only then may master green-light PO |
+
+### Who may audit
+
+| Role | Allowed? |
+|------|----------|
+| Master / parent / tech director (self) | Yes — preferred when scope is small |
+| Separate audit subagent spawned by master | Yes — preferred when implementer was a subagent |
+| Same implementer marking their own ship “audited” | **No** — not proof |
+
+### Audit must cover
+
+Use the checklist in [FE_UI_UX_AUDIT.md](./FE_UI_UX_AUDIT.md). At minimum:
+
+| Area | Fail if… |
+|------|----------|
+| **Visual fidelity to concept** | L&F drifts; generic DS restyle; design-delta gaps ([VISUAL_FIDELITY.md](./VISUAL_FIDELITY.md)) |
+| **Layout / max-width / alignment** | Content column wrong; misaligned rows; broken breakpoints ([FE_STANDARDS.md](./FE_STANDARDS.md)) |
+| **No wrap on icon+text CTAs** | Icon and label stack or wrap mid-control |
+| **Hover / focus** | Flat dead controls; missing Make parity states |
+| **Behavior parity** | Prior interactions dropped on rebuild ([INTERACTION_FIDELITY.md](./INTERACTION_FIDELITY.md)) |
+| **Control hierarchy / no zoo** | Competing active languages; secondary chrome as loud as primary |
+| **Nav chrome logic** | Mode XOR broken; counters wrong/duplicate; REC vs play leakage |
+| **No obvious regressions** | Adjacent screens/chrome worse than before the ship |
+
+### Closing the loop
+
+1. Spawn or perform audit → fill [templates/FE_AUDIT_RESULT.md](./templates/FE_AUDIT_RESULT.md) (or equivalent table).  
+2. Overall **FAIL** → reopen / fix; do **not** tell the PO it’s good.  
+3. Overall **PROVEN** → master may report to PO.  
+4. **Do not** close visual work on “tests passed” alone.
+
+---
+
 ## Related
 
 - [PRODUCT_OWNER_BRIEF.md](./PRODUCT_OWNER_BRIEF.md)
 - [PAGE_BUILD_CONTRACT.md](./PAGE_BUILD_CONTRACT.md)
+- [FE_UI_UX_AUDIT.md](./FE_UI_UX_AUDIT.md)
+- [FE_STANDARDS.md](./FE_STANDARDS.md)
+- [VISUAL_FIDELITY.md](./VISUAL_FIDELITY.md)
 - [INTERACTION_FIDELITY.md](./INTERACTION_FIDELITY.md)
 - [UXDS_ACCESS.md](./UXDS_ACCESS.md)
 - [../README.md](../README.md)

@@ -57,7 +57,8 @@ Boots remains the **first rabbit**: we prove the rebuild pipeline on Boots, then
 
 ## 5. Visual fidelity (locked — PO)
 
-**Full doctrine:** [VISUAL_FIDELITY.md](./VISUAL_FIDELITY.md).
+**Full doctrine:** [VISUAL_FIDELITY.md](./VISUAL_FIDELITY.md).  
+**FE craft rules:** [FE_STANDARDS.md](./FE_STANDARDS.md) (icon+text nowrap, content column / logo grid, scoped CSS, hover migration).
 
 **Visual look & feel of the source concept is mandatory.** Aesthetic DS “upgrades” are not.
 
@@ -66,6 +67,8 @@ Boots remains the **first rabbit**: we prove the rebuild pipeline on Boots, then
 - UXDS is for **structure and reuse under the hood**; **visible chrome must match the source page** (measure from original CSS / Make — do not invent).
 - **No visual zoo** — reuse the same active/inactive language within a surface; secondary selectors are mini / lower contrast vs primary chrome.
 - **Behavior parity** — rebuilds must keep every Make/concept interaction that already worked (checkbox, Continue gating, search/near-me, Change, crumbs, etc.) unless the PO retires it. See [VISUAL_FIDELITY.md](./VISUAL_FIDELITY.md) §1.1 and [INTERACTION_FIDELITY.md](./INTERACTION_FIDELITY.md) §2.4.
+- **Content column** — crumbs/main share the header logo grid (shell max **1440** + **64px** side pad → inner max **1312**). Never pad the 1312 inner horizontally.
+- **Icon+text CTAs** — single line (`inline-flex` + `white-space: nowrap`); label must not wrap under the icon.
 - **Brand may remap UXDS color tokens** via the project theme (`styleguide/theme.css`) so semantic roles carry Boots/concept colors — that is expected, not a license to redesign chrome.
 - Document intentional deltas only when the PO asks to change the concept look.
 
@@ -76,7 +79,7 @@ Boots remains the **first rabbit**: we prove the rebuild pipeline on Boots, then
 1. Open PO concept URL; classify early strip vs structured page ([CONCEPT_INTAKE.md](./CONCEPT_INTAKE.md)).
 2. Extract intent (flow, hypothesis) — do not require DS-perfect source.
 3. Map regions → UXDS tokens + closest `component.*` / `module.*`.
-4. Compose React screen; **match concept visuals**; use UXDS for structure/reuse, not a visual redesign.
+4. Compose React screen; **match concept visuals**; use UXDS for structure/reuse, not a visual redesign. Apply [FE_STANDARDS.md](./FE_STANDARDS.md) (shell/logo column, icon+text nowrap, scoped CSS).
 5. **Audit prior Make/concept handlers** on that screen; migrate each to React props / shared kits (behavior parity). Mark React-owned controls so Make DOM mutators skip them.
 6. **Build anticipated interactivity** from page context (and CJM deck when provided) via shared kits — CTAs, filters, accordions, forms, etc. ([INTERACTION_FIDELITY.md](./INTERACTION_FIDELITY.md)). Prefer library reuse over one-off scripts.
 7. Register screen + `data-*` hooks for cursor, touchpoints, recording.
@@ -119,6 +122,7 @@ Boots remains the **first rabbit**: we prove the rebuild pipeline on Boots, then
 
 ## Related
 
+- [FE_STANDARDS.md](./FE_STANDARDS.md) — icon+text nowrap, content column, scoped CSS
 - [CONCEPT_INTAKE.md](./CONCEPT_INTAKE.md) — business intake logic
 - [VISUAL_FIDELITY.md](./VISUAL_FIDELITY.md) — concept L&F, no visual zoo, control hierarchy
 - [INTERACTION_FIDELITY.md](./INTERACTION_FIDELITY.md) — recording prerequisite + shared behavior library
