@@ -47,6 +47,29 @@ For **each** field (`SearchField` / text input) and **each** button (primary / s
 
 **Why this is mandatory:** Agents keep shipping rest-state-only kits (focus without hover, icon without clear, CTA without pressed). Green Vitest does not exercise pointer states. Uma + Quinn must Nazi-hover the matrix before PROVEN — see [TEAM.md](./TEAM.md) § typical DS checks · [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md).
 
+### 0b. Section vertical rhythm (MANDATORY MCP/browser gate — RTB / purchase stacks)
+
+**Hard rule (PO 2026-07-19):** Before claiming **fidelity IN PROGRESS** (and before §0a / PROVEN) on any PDP / RTB / purchase column, Uma must **prove section vertical rhythm** in the browser — not rest-state colors/glyphs alone. Quinn MCP interaction PASS does **not** waive this.
+
+**Measure (Chrome DevTools MCP `evaluate_script` or equivalent):**
+
+1. Select the Make RTB column (`component.pdp.rtb` / register L6) and the React column (`.pdp__rtb-col`).
+2. For each adjacent pair in Make stack order — **title block → list price → recipient/CTA row → body blurb → booster → Book CTA row** — record:
+   - computed parent `gap` (Make `gap-[32px]` on ComponentPdpRtb)
+   - `getBoundingClientRect()` distance between sibling bottoms/tops
+   - block padding; no surprise `aspect-ratio` / `flex-grow` on text stacks
+3. Screenshot the RTB column (first viewport) as evidence in the screen stamp.
+4. **FAIL class:** cramped hierarchy; parent gap ≠ Make; LEGACY Make CSS (`nth-child` + `data-name`) restyling React mounts (e.g. forcing `gap: 48px` on the column or `aspect-ratio: 1/1` on the title block).
+5. **FAIL class:** claiming fidelity IN PROGRESS / PARTIAL layout PASS without citing measured gaps.
+
+- [ ] Parent column `gap` matches Make (PDP RTB = **32px**)
+- [ ] price → recipient gap measured = Make
+- [ ] recipient → body gap measured = Make
+- [ ] body → booster gap measured = Make
+- [ ] booster → CTA gap measured = Make
+- [ ] Title/service stack is content-sized (not stretched to media 1:1)
+- [ ] Screenshot + numbers in `UMA_FIDELITY_<SCREEN>_*.md`
+
 ### 0. Loading / empty / updating states (FIRST-CLASS — capture before coding)
 
 **Hard rule:** Before Finn codes any list/filter/search screen, Uma + Bea must capture the **exact Make loading scenario** (skeleton tiles vs spinner overlay vs dimmed list vs shimmer vs text-only). Write it into the parity register as a **P0** row with layout notes.
@@ -155,4 +178,4 @@ Kickoff fidelity targets live under `docs/projects/<id>/audits/UMA_FIDELITY_<SCR
 
 | Screen | Stamp | Status |
 |--------|-------|--------|
-| **PDP** (`pdp`) | [../projects/boots-pharmacy/audits/UMA_FIDELITY_PDP_2026-07-19.md](../projects/boots-pharmacy/audits/UMA_FIDELITY_PDP_2026-07-19.md) | **IN PROGRESS** (kickoff) — loading LE1–LE3 **N/A**; B1 accordion **static**; L1–L20 + DS matrix stamped for Finn scaffold |
+| **PDP** (`pdp`) | [../projects/boots-pharmacy/audits/UMA_FIDELITY_PDP_2026-07-19.md](../projects/boots-pharmacy/audits/UMA_FIDELITY_PDP_2026-07-19.md) | **IN PROGRESS** — §0b RTB rhythm measured PASS; **§0a NOT PASS**; **not PROVEN**; B1 accordion **static** |

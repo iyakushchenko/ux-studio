@@ -2,6 +2,10 @@
 
 > _Append a bullet on coherent commits via `npm run notes:append -- --lane="<lane>" --intent="<text>"`. Preview with `npm run notes:preview`. On `npm run release:patch` this section is promoted to `## v<X.Y.Z> - DDMMYY` and a fresh empty `## Current` is re-inserted. Policy: `docs/product/VERSIONING.md`._
 
+## v0.0.24 - 190726
+- **project:** PDP RTB vertical rhythm: isolate Make LEGACY module.pdp.rtb rules from React; restore 32px column gaps (price→recipient→body→booster); Uma §0b MCP measure gate
+- **docs:** Uma §0b section vertical rhythm MCP gate (COMMAND_DOCTRINE + TEAM_KNOWLEDGE + UMA_FIDELITY_NOTES/PDP stamp)
+
 ## v0.0.23 - 190726
 - **shell:** Agent testing overlay: thin transparent mini scrollbar on status log (WebKit + Firefox)
 

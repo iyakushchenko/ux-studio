@@ -15,9 +15,32 @@
 
 | Field | Value |
 |-------|-------|
-| **Overall** | **IN PROGRESS** — L1–L20 mounted; Uma code fixes + MCP computed/CSS evidence below; Quinn interaction prove matrix still open |
-| **PO green-light allowed?** | **No** — no PROVEN / §0a PASS stamp until Quinn MCP hover matrix + PAGE FINAL PASS |
-| **PAGE FINAL PASS** | Not stamped |
+| **Overall** | **IN PROGRESS** — L1–L20 mounted; RTB vertical rhythm fix landed (evidence below); **§0a NOT PASS**; **not PROVEN** |
+| **PO green-light allowed?** | **No** — no PROVEN / §0a PASS / PAGE FINAL PASS |
+| **PAGE FINAL PASS** | Not stamped (Quinn MCP functional PASS ≠ fidelity done) |
+| **§0b RTB vertical rhythm** | **FIXED (measured)** — see checklist; still blocks “layout PASS” claims that omit gap numbers |
+
+---
+
+## RTB vertical rhythm checklist (§0b — mandatory before fidelity IN PROGRESS)
+
+**Make truth:** `ComponentPdpRtb` = `flex-col gap-[32px]`; stack = Frame128 (title+id) → Frame180 (price) → Frame182 (Myself/Someone else) → blurb → Units7 (booster) → Frame179 (CTAs).  
+**PO hard-fail class:** cramped price→recipient→body→booster (Uma prior pass missed; claimed L6 PASS on CSS file alone).
+
+| Gate | Make | React must prove | Status |
+|------|------|------------------|--------|
+| Parent column `gap` | `32px` | computed `.pdp__rtb-col` gap = `32px` (not LEGACY `48px !important`) | **PASS** — `32px` |
+| title-block size | content (no 1:1) | `.pdp__title-block` height ≈ title+service (~72px); **not** media square | **PASS** — `72px` (was ~584 / 1:1) |
+| price → recipient | 32px sibling gap | rect distance ≈ 32 | **PASS** — `32` |
+| recipient → body | 32px | rect distance ≈ 32 | **PASS** — `32` |
+| body → booster | 32px | rect distance ≈ 32 | **PASS** — `32` |
+| booster → CTA | 32px | rect distance ≈ 32 | **PASS** — `32` |
+| Screenshot evidence | — | RTB column after fix | **PASS** — MCP screenshot post-fix |
+| LEGACY isolation | Make-only | `globals-screens` module rules `:not(.pdp__rtb-card)` | **SHIPPED** |
+
+**Root cause (2026-07-19):** Make LEGACY  
+`.studio-viewport … [data-name="module.pdp.rtb"] > div > div { gap: 48px !important }` and  
+`… > :first-child { flex:1; aspect-ratio:1/1 }` matched React `module.pdp__rtb-card > .pdp__rtb-row > .pdp__rtb-col` / title-block — stole rhythm.
 
 ---
 
@@ -25,7 +48,8 @@
 
 **URL:** `http://127.0.0.1:5186/?project=boots-pharmacy&screen=pdp&persona=sarah-jenkins&mode=agentic-cjm`  
 **Viewport:** 1440×900  
-**Method:** Chrome DevTools MCP `evaluate_script` + viewport screenshots (RTB + below-fold accordion/GP)
+**Method:** Chrome DevTools MCP `evaluate_script` + viewport screenshots (RTB + below-fold accordion/GP)  
+**Tip base:** ≥ `03687d3` / `bfad554` (overlay mini-scrollbar)
 
 | Probe | Result |
 |-------|--------|
@@ -35,6 +59,7 @@
 | Book now label default booster | `Book now - £150` |
 | Advantage bar bg | `rgb(198, 229, 225)` / radius 16px bottom |
 | RTB row gap / media aspect / Body6 pad | `48px` / `1 / 1` / `64px` top+bottom |
+| **§0b RTB column gap / title-block h / sibling gaps** | **`32px` / `72px` / all adjacent `32`** (price→recipient→blurb→booster→CTA) — was `48px` + title ~584px 1:1 |
 | Crumb sep | **Diagonal** `.pdp__crumb-sep-bar` — `1.257×14.871`, `#c3c3c3`, `rotate(30deg)`; **no** `/` text |
 | Crumb colors | Links + current `rgb(122, 125, 135)` (`#7a7d87`) |
 | L14–L20 | Below-fold present: 39px title, 14×3 accent `#afccca`, appt `#e5f1f8`, specs 864/`#dadada`, 6 accordion headers, 1 body (“Who is at risk?”), GP mint `#c6e5e1` / 24px radius |
@@ -66,8 +91,8 @@
 | **L3** | Breadcrumbs | **PASS** (fixed) | Diagonal delimiter (was `/`); crumb grey `#7a7d87` (was teal link token / `#3a3a3a` current) |
 | **L4** | RTB card stack | **PASS** | Drop shadow + top radius 16 |
 | **L5** | Hero gallery 50/50 | **PASS** | Gap 48; 1:1; cover / center top |
-| **L6** | RTB column | **PASS** | Gap 32; white fill |
-| **L7** | Title + service ID | **PASS** | 24 bold / 13 grey |
+| **L6** | RTB column | **PASS (measured)** | Gap **32px** computed after LEGACY isolation; was FAIL (48px + title 1:1) |
+| **L7** | Title + service ID | **PASS (measured)** | Content-sized title-block; 24 bold / 13 grey |
 | **L8** | List price | **PASS** | £75.00 static 25 semibold |
 | **L9** | Recipient toggle + login | **PASS** (layout/CSS) | Active mint / inactive inset / hover `#eef8f7` rule; login block when logged out |
 | **L10** | Service blurb | **PASS** | 13 / leading 24 |
@@ -92,7 +117,9 @@
 4. **I12 / I14 / I15 hover tokens** — Empty heart + share + secondary icon hover → `--project-brand-cta-navy-hover` (`#01318f`); mint/soft via theme remaps (`--uxds-surface-accent-soft`, `--uxds-filter-chip-surface-hover`).  
 5. **Make glyphs** — Question + share paths from `svgPaths.p116ea480` / `p1dcca380` (no invent).  
 6. **Download pill icons** — `#012169` via `--project-brand-cta-navy`.  
-7. **Synced L14–L20** with Finn below-fold mount for side-by-side audit.
+7. **Synced L14–L20** with Finn below-fold mount for side-by-side audit.  
+8. **RTB vertical rhythm (PO hard-fail)** — Scope Make LEGACY `module.pdp.rtb` structural rules with `:not(.pdp__rtb-card)`; React `.pdp__title-block` content-sized; host belt `gap: 32px !important` on `.pdp__rtb-col`.  
+9. **Testing ratchet** — UMA_FIDELITY_NOTES §0b + TEAM_KNOWLEDGE + COMMAND_DOCTRINE: section vertical rhythm must be MCP-measured before fidelity IN PROGRESS.
 
 ---
 
@@ -100,8 +127,9 @@
 
 | Residual | Severity | Owner |
 |----------|----------|-------|
-| Quinn MCP live `:hover` / journey prove matrix (checkbox, heart empty, toggle, CTAs, login/avail) | **P0** — blocks PROVEN | Quinn |
-| PAGE FINAL PASS / `check:page-final-pass` | P0 | Quinn + Arch |
+| Quinn MCP functional matrix | **PASS** (`03687d3` / `FE_AUDIT_PDP_MCP_2026-07-19.md`) — does **not** clear §0a / Final Pass | Quinn |
+| Uma §0a typical DS / hover pointer prove | **P0** — blocks PROVEN + PAGE FINAL PASS | Uma + Quinn |
+| PAGE FINAL PASS / `check:page-final-pass` | P0 — blocked on Uma §0a | Quinn + Arch |
 | Share glyph Make flip (`rotate-180 -scale-x-100`) — React uses same path without mirror | P2 visual | Uma / Finn |
 | Decorative Figma cursors on leaflet / GP CTA — omitted (playback N/A on React) | N/A | — |
 | Accordion interactive expand | **Blocked B1** — static until PO | Pax / Bea |
@@ -126,19 +154,21 @@
 | Invent accordion | **Clear** (static) |
 | Make visual leak | **Clear** (retired `display:none`) |
 | Rest-state PROVEN | **Held** — no PROVEN stamp |
+| RTB vertical rhythm / LEGACY steal | **Clear** — measured 32px stack; title-block 72px |
 
 ---
 
 ## team check report lines (Uma)
 
 ```
-Uma (UI/UX): fidelity checklist — PARTIAL (L1–L20 layout/type/color + crumb diagonal FIXED; §0a await Quinn MCP)
+Uma (UI/UX): fidelity checklist — PARTIAL (RTB §0b rhythm FIXED+measured; §0a NOT PASS; not PROVEN)
+Uma (UI/UX): section vertical rhythm (§0b) — PASS (measured 32px stack; title-block content-sized)
 Uma (UI/UX): loading states — N/A (no Make loader; invent = FAIL) — PASS for absence
-Uma (UI/UX): checkbox/radio hover — PARTIAL (CSS #c6e5e1; await Quinn computed :hover)
-Uma (UI/UX): typical DS checks (state matrix) — PARTIAL (stylesheet tokens Match Make; await Quinn pointer matrix)
+Uma (UI/UX): checkbox/radio hover — PARTIAL (§0a still open)
+Uma (UI/UX): typical DS checks (state matrix) — PARTIAL (§0a still open; Quinn functional PASS ≠ §0a)
 ```
 
-**Knowledge used:** UMA_FIDELITY_NOTES §0/§0a · VISUAL_FIDELITY · DS_STRICTNESS · PDP_MAKE_PARITY_REGISTER L1–L20 / I2 / I6 / I12 / I14 / I15 / B1 · Make `ModuleBreadcrumbs` delimiter · theme `--uxds-surface-accent-soft` → `#c6e5e1`.
+**Knowledge used:** UMA_FIDELITY_NOTES §0/§0a/**§0b** · VISUAL_FIDELITY · DS_STRICTNESS · PDP_MAKE_PARITY_REGISTER L6–L12 · Make `ComponentPdpRtb` gap-32 · LEGACY `:not(.pdp__rtb-card)` isolation.
 
 ---
 

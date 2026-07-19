@@ -1235,21 +1235,25 @@
 
 /* ── Screen 4: Deal Details layout ──────────────────────────────────────────── */
 
-/* Card: constrain to 1440px and centre */
-.studio-viewport > div > div:nth-child(8) [data-name="module.pdp.rtb"] {
+/* Card: constrain to 1440px and centre.
+   Exclude React `.pdp__rtb-card` — Make data-name reuse must not style React mounts. */
+.studio-viewport > div > div:nth-child(8) [data-name="module.pdp.rtb"]:not(.pdp__rtb-card) {
   max-width: 1440px !important;
   width: 100% !important;
   margin-left: auto !important;
   margin-right: auto !important;
 }
 
-/* Inner row: gap equals the outer 48px padding so spacing is uniform */
-.studio-viewport > div > div:nth-child(8) [data-name="module.pdp.rtb"] > div > div {
+/* Inner row: gap equals the outer 48px padding so spacing is uniform.
+   HARD FAIL class if this hits React: Make nest is module>div>div (row), React is
+   module.pdp__rtb-card > .pdp__rtb-row > .pdp__rtb-col — same depth, wrong target
+   (forced gap 48 on RTB column + 1:1 on title-block). */
+.studio-viewport > div > div:nth-child(8) [data-name="module.pdp.rtb"]:not(.pdp__rtb-card) > div > div {
   gap: 48px !important;
 }
 
-/* Image wrapper (Frame127): true 50/50, keep 1:1 aspect ratio */
-.studio-viewport > div > div:nth-child(8) [data-name="module.pdp.rtb"] > div > div > :first-child {
+/* Image wrapper (Frame127): true 50/50, keep 1:1 aspect ratio — Make only */
+.studio-viewport > div > div:nth-child(8) [data-name="module.pdp.rtb"]:not(.pdp__rtb-card) > div > div > :first-child {
   flex: 1 1 0 !important;
   min-width: 0 !important;
   aspect-ratio: 1 / 1 !important;

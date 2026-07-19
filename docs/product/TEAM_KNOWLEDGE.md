@@ -80,8 +80,9 @@
 | [VISUAL_FIDELITY.md](./VISUAL_FIDELITY.md) · [FE_UI_UX_AUDIT.md](./FE_UI_UX_AUDIT.md) | Audit gate |
 | LESSONS: typical DS checks, invent-vs-Make, loading scenario | Nazi hover / no invent |
 | Make register for the screen | Side-by-side bands |
+| **§0b section vertical rhythm** — MCP measure gap/padding (price→recipient→body→booster) before any fidelity IN PROGRESS claim | [UMA_FIDELITY_NOTES.md](./UMA_FIDELITY_NOTES.md) §0b · doctrine |
 
-**Knowledge used tip:** UMA notes §0/§0a + PAGE_FINAL_PASS + LESSONS DS hover / loading.
+**Knowledge used tip:** UMA notes §0/§0a/**§0b rhythm** + PAGE_FINAL_PASS + LESSONS DS hover / loading.
 
 ### Quinn (QA)
 
@@ -145,6 +146,7 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 
 | Delta | Hats | LESSONS / artifact |
 |-------|------|--------------------|
+| **PDP RTB vertical rhythm** — LEGACY Make `module.pdp.rtb > div > div` stole React column gap (48≠32) + forced title-block 1:1; Uma must MCP-measure section gaps before fidelity IN PROGRESS; Quinn PASS ≠ rhythm done | Uma, Finn, Arch | UMA_FIDELITY_NOTES §0b · UMA_FIDELITY_PDP · globals-screens `:not(.pdp__rtb-card)` |
 | **PDP kickoff** — Bea register before code; Finn L1–L13 mount; Uma fidelity IN PROGRESS; Quinn probe criteria prep (no false PROVEN); accordion B1 static | Arch, Bea, Finn, Uma, Quinn, Ben | [PDP_MAKE_PARITY_REGISTER.md](../projects/boots-pharmacy/features/PDP_MAKE_PARITY_REGISTER.md) · screens/pdp |
 | **PAGE FINAL PASS** — no new migrated page until previous hard-green; Finn/Uma checklist + check; parallel callsigns + Knowledge used still required | Arch, Finn, Uma, Bea | [PAGE_FINAL_PASS.md](./PAGE_FINAL_PASS.md) · TEAM · doctrine · NEXT_STEPS |
 | Typical DS checks mandatory before PROVEN; missing DS hover = FAIL | Uma, Quinn, Arch | LESSONS · UMA notes · ratchet search-field-states |
@@ -155,6 +157,12 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 | Agent overlay: **pre-arm** before steps; sitrep **PASS/FAIL** green/red; **forceClear** hard-remove (no stale popup) | Uma, Finn, Quinn | RECORDING.md · LESSONS · `agentTestingOverlay` |
 | Team knowledge database + mandatory use | Arch, all | This file · TEAM.md § Knowledge use |
 | Page final-pass gate before NEXT screen; landmarks + BEM stamp | Finn, Uma, Ben, Arch | PAGE_FINAL_PASS.md · check:page-final-pass |
+
+**Knowledge improved** (2026-07-19 · stream: PDP RTB vertical rhythm + Uma §0b ratchet · user-visible):
+- Uma (UI/UX): PO hard-fail RTB cramped stack — root cause Make LEGACY `module.pdp.rtb > div > div` hitting React; MCP-measured 32px gaps restored; **§0a / PROVEN not stamped** — applied: pdp.css + globals-screens `:not(.pdp__rtb-card)` + UMA_FIDELITY_PDP §0b checklist
+- Finn (FE): title-block content-sized + host belt `gap: 32px !important` — applied: screens/pdp/pdp.css
+- Arch (Director): ratchet — section vertical rhythm mandatory before fidelity IN PROGRESS; Quinn PASS ≠ rhythm — applied: COMMAND_DOCTRINE + UMA_FIDELITY_NOTES §0b + TEAM_KNOWLEDGE
+- Quinn (QA): functional MCP PASS stands; does not waive §0b/§0a — applied: residual note on stamp
 
 **Knowledge improved** (2026-07-19 · stream: PDP React kickoff scaffold · v0.0.21):
 - Arch (Director): parallel Bea→Finn/Uma/Ben after PLP HARD-GREEN + PO `+`; register-before-code enforced — applied: dispatch + board
