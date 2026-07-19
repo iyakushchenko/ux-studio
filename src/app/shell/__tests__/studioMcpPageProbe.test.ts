@@ -71,9 +71,36 @@ describe("runMcpPageProbe", () => {
     const host = { tagName: "DIV" };
     const checkbox = { tagName: "BUTTON" };
     const reset = { tagName: "BUTTON" };
-    const quick = { tagName: "BUTTON" };
+    const quick = {
+      tagName: "BUTTON",
+      getBoundingClientRect: () => ({ width: 40, height: 24 }),
+    };
     const book = { tagName: "BUTTON" };
     const close = { tagName: "BUTTON" };
+    const searchIcon = {
+      tagName: "SPAN",
+      getBoundingClientRect: () => ({ width: 24, height: 24 }),
+    };
+    const searchIcon2 = {
+      tagName: "SPAN",
+      getBoundingClientRect: () => ({ width: 24, height: 24 }),
+    };
+    const diseaseField = {
+      querySelector: (sel: string) =>
+        sel.includes("data-studio-search-icon") ? searchIcon : null,
+    };
+    const countryField = {
+      querySelector: (sel: string) =>
+        sel.includes("data-studio-search-icon") ? searchIcon2 : null,
+    };
+    const diseaseInput = {
+      closest: (sel: string) =>
+        sel.includes("component.input.field") ? diseaseField : null,
+    };
+    const countryInput = {
+      closest: (sel: string) =>
+        sel.includes("component.input.field") ? countryField : null,
+    };
     let modalOpen = false;
 
     simulateDemoPointerClick.mockImplementation(async (el: { tagName?: string }) => {
@@ -103,6 +130,9 @@ describe("runMcpPageProbe", () => {
     vi.stubGlobal("document", {
       querySelector: (sel: string) => {
         if (sel === '[data-studio-react-screen="plp"]') return host;
+        if (sel.includes('[data-studio-search-icon="true"]')) return searchIcon;
+        if (sel.includes('placeholder="Search diseases"')) return diseaseInput;
+        if (sel.includes('placeholder="Search countries"')) return countryInput;
         if (sel.includes('button[data-name="component.plp.filter.checkbox.item"]'))
           return checkbox;
         if (sel.includes("button[data-studio-plp-reset-filters")) return reset;
@@ -112,6 +142,12 @@ describe("runMcpPageProbe", () => {
         if (sel.includes('data-studio-modal="quick-view"')) return close;
         return null;
       },
+      querySelectorAll: (sel: string) => {
+        if (sel.includes('[data-studio-search-icon="true"]')) {
+          return [searchIcon, searchIcon2];
+        }
+        return [];
+      },
     });
 
     const result = await runMcpPageProbe({
@@ -120,6 +156,9 @@ describe("runMcpPageProbe", () => {
     });
     expect(result.screenId).toBe("plp");
     expect(result.checks.find((c) => c.id === "plp-host")?.pass).toBe(true);
+    expect(result.checks.find((c) => c.id === "plp-search-icons")?.pass).toBe(
+      true
+    );
     expect(result.checks.find((c) => c.id === "plp-quick-view-ready")?.pass).toBe(
       true
     );
@@ -134,9 +173,36 @@ describe("runMcpPageProbe", () => {
     const host = { tagName: "DIV" };
     const checkbox = { tagName: "BUTTON" };
     const reset = { tagName: "BUTTON" };
-    const quick = { tagName: "BUTTON" };
+    const quick = {
+      tagName: "BUTTON",
+      getBoundingClientRect: () => ({ width: 40, height: 24 }),
+    };
     const book = { tagName: "BUTTON" };
     const close = { tagName: "BUTTON" };
+    const searchIcon = {
+      tagName: "SPAN",
+      getBoundingClientRect: () => ({ width: 24, height: 24 }),
+    };
+    const searchIcon2 = {
+      tagName: "SPAN",
+      getBoundingClientRect: () => ({ width: 24, height: 24 }),
+    };
+    const diseaseField = {
+      querySelector: (sel: string) =>
+        sel.includes("data-studio-search-icon") ? searchIcon : null,
+    };
+    const countryField = {
+      querySelector: (sel: string) =>
+        sel.includes("data-studio-search-icon") ? searchIcon2 : null,
+    };
+    const diseaseInput = {
+      closest: (sel: string) =>
+        sel.includes("component.input.field") ? diseaseField : null,
+    };
+    const countryInput = {
+      closest: (sel: string) =>
+        sel.includes("component.input.field") ? countryField : null,
+    };
 
     isBlockingModalOpen.mockReturnValue(true);
     isElementBlockedByModal.mockReturnValue(true);
@@ -152,6 +218,9 @@ describe("runMcpPageProbe", () => {
     vi.stubGlobal("document", {
       querySelector: (sel: string) => {
         if (sel === '[data-studio-react-screen="plp"]') return host;
+        if (sel.includes('[data-studio-search-icon="true"]')) return searchIcon;
+        if (sel.includes('placeholder="Search diseases"')) return diseaseInput;
+        if (sel.includes('placeholder="Search countries"')) return countryInput;
         if (sel.includes('button[data-name="component.plp.filter.checkbox.item"]'))
           return checkbox;
         if (sel.includes("button[data-studio-plp-reset-filters")) return reset;
@@ -160,6 +229,12 @@ describe("runMcpPageProbe", () => {
           return book;
         if (sel.includes('data-studio-modal="quick-view"')) return close;
         return null;
+      },
+      querySelectorAll: (sel: string) => {
+        if (sel.includes('[data-studio-search-icon="true"]')) {
+          return [searchIcon, searchIcon2];
+        }
+        return [];
       },
     });
 

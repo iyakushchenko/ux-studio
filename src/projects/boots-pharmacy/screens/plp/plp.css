@@ -431,6 +431,23 @@
   border-color: #012169;
 }
 
+/* Make filter search magnifier — left affordance (asset fill #AFCCCA) */
+.plp__search-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  pointer-events: none;
+}
+
+.plp__search-icon img {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+
 .plp__search-input {
   flex: 1 1 auto;
   min-width: 0;

@@ -198,6 +198,7 @@ export function BookStep1LocationScreen({
                       </span>
                       <span
                         data-name="icon=search"
+                        data-studio-search-icon="true"
                         className="book-step-1__search-icon"
                       >
                         <SearchGlyph />

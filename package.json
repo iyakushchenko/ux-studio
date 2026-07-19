@@ -1,7 +1,7 @@
 {
   "name": "ux-studio",
   "private": true,
-  "version": "0.0.10",
+  "version": "0.0.11",
   "type": "module",
   "engines": {
     "node": ">=22"
@@ -12,6 +12,7 @@
     "check:links": "node scripts/check-text-link-contract.mjs",
     "check:hygiene": "node scripts/check-file-hygiene.mjs",
     "check:felonies": "node scripts/check-agent-felonies.mjs",
+    "check:parity-ratchets": "node scripts/check-parity-ratchets.mjs",
     "check:parity-proven": "node scripts/check-parity-proven.mjs",
     "check:version": "node scripts/check-release-version-changelog-sync.mjs",
     "notes": "node scripts/release-notes.mjs list",
@@ -22,7 +23,7 @@
     "release:patch": "node scripts/release.mjs patch",
     "release:minor": "node scripts/release.mjs minor",
     "release:major": "node scripts/release.mjs major",
-    "test": "npm run check:links && npm run check:hygiene && npm run check:felonies && npm run check:parity-proven && npm run check:version && vitest run",
+    "test": "npm run check:links && npm run check:hygiene && npm run check:felonies && npm run check:parity-ratchets && npm run check:parity-proven && npm run check:version && vitest run",
     "test:watch": "vitest",
     "smoke": "node scripts/playwright-smoke.mjs"
   },

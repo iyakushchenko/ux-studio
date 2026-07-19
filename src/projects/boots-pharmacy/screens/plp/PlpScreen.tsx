@@ -5,6 +5,7 @@ import {
   type CSSProperties,
 } from "react";
 import { TertiaryCta } from "@/app/chrome/TertiaryCta";
+import iconSearch from "@/assets/avail/search.svg";
 import plpHeroImage from "@/projects/boots-pharmacy/frame/5b75d20d7a0df34031ca23477a68cf97cac4938d.png";
 import plpBodyFill from "@/projects/boots-pharmacy/frame/dbcd84d6da292330c6f57adefa32dd4b969ac8bd.png";
 import {
@@ -190,6 +191,15 @@ function FilterSearch({
       data-name="component.input.field"
       data-studio-react-owned="true"
     >
+      {/* Make TextField5: magnifier LEFT of placeholder (mint #AFCCCA asset), then clear */}
+      <span
+        className="plp__search-icon"
+        data-name="icon=search"
+        data-studio-search-icon="true"
+        aria-hidden
+      >
+        <img src={iconSearch} alt="" width={24} height={24} />
+      </span>
       <input
         className="plp__search-input proto-search-input"
         type="search"

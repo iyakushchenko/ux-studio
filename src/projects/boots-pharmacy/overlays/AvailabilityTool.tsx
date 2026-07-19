@@ -863,6 +863,7 @@ export default function AvailabilityTool({
                   <button
                     type="button"
                     className="proto-avail-field__icon"
+                    data-studio-search-icon="true"
                     aria-label="Search"
                     onClick={() => goList(query.trim() || undefined)}
                   >
@@ -916,6 +917,7 @@ export default function AvailabilityTool({
                   <button
                     type="button"
                     className="proto-avail-field__icon"
+                    data-studio-search-icon="true"
                     aria-label="Search"
                     onClick={handleSearchIconClick}
                   >

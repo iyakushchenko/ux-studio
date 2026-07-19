@@ -10,6 +10,16 @@ Agents **must read** this file before claiming a UI or Studio-chrome slice done.
 
 ## 2026-07-19
 
+### Missing search icon = classic Make→React parity fail
+
+- **Symptom:** React PLP filter fields (“Search countries” / “Search diseases”) shipped with no magnifying glass; Make TextField5 has mint `#AFCCCA` icon **left** of the input.
+- **Root cause:** `FilterSearch` rebuilt as bare `<input type="search">` without the Make `icon=search` sibling; no CI contract for icon affordances.
+- **Gate (GLOBAL):**
+  1. Stamp `data-studio-search-icon="true"` on every React search magnifier (PLP, Book Step 1, Availability).
+  2. `npm run check:parity-ratchets` fails if search inputs/placeholders lack the marker ([PARITY_RATCHETS.md](./PARITY_RATCHETS.md) #1).
+  3. Quinn MCP page probe step `plp-search-icons` asserts ≥2 visible icons + sibling on disease/country fields.
+- **Process:** Every new typical fail class → add a ratchet (Arch/Ben). Ratchets regain trust; green Vitest alone does not.
+
 ### Overlay eyes — MCP/robo must not click through open dialogs (PO rage)
 
 - **Symptom:** MCP page probe / robo-cursor still clicked PLP tiles **under** open Quick View (and other lightboxes).

@@ -109,6 +109,40 @@ function plpProbeSteps(): ProbeStep[] {
         ) != null || "Book Now CTA missing",
     },
     {
+      id: "plp-search-icons",
+      selector:
+        '[data-studio-react-screen="plp"] [data-studio-search-icon="true"]',
+      action: "assert",
+      assert: () => {
+        const icons = document.querySelectorAll(
+          '[data-studio-react-screen="plp"] [data-studio-search-icon="true"]'
+        );
+        if (icons.length < 2) {
+          return `expected ≥2 filter search icons, found ${icons.length}`;
+        }
+        for (const el of icons) {
+          const r = (el as HTMLElement).getBoundingClientRect?.();
+          if (!r || r.width < 8 || r.height < 8) {
+            return "search icon not visible / not laid out";
+          }
+        }
+        const disease = document.querySelector(
+          '[data-studio-react-screen="plp"] input[placeholder="Search diseases"]'
+        );
+        const country = document.querySelector(
+          '[data-studio-react-screen="plp"] input[placeholder="Search countries"]'
+        );
+        for (const input of [disease, country]) {
+          if (!input) return "filter search input missing";
+          const field = input.closest('[data-name="component.input.field"]');
+          if (!field?.querySelector('[data-studio-search-icon="true"]')) {
+            return "search input missing [data-studio-search-icon] sibling";
+          }
+        }
+        return true;
+      },
+    },
+    {
       id: "plp-checkbox-filter",
       selector:
         '[data-studio-react-screen="plp"] button[data-name="component.plp.filter.checkbox.item"]',

@@ -6,6 +6,8 @@
 
 **Hard rule:** A screen is **not PROVEN** until this checklist is explicitly pass/fail in the audit + **team check**, with MCP matrix evidence cited, and `PARITY_PROVEN.json` updated (`npm run check:parity-proven`). Green Vitest/build alone = BAD.
 
+**Programmatic contracts:** Typical Make→React misses are also gated by `npm run check:parity-ratchets` ([PARITY_RATCHETS.md](./PARITY_RATCHETS.md)) — search icons, bookmark copy, empty-heart fuchsia, Advantage bar, Book now primary, loader dup, make-retired. Uma checklist still required for pixels/hover; ratchets catch the classes we keep burning.
+
 **Bea (BA)** must list every Make band/component in the parity register **before** Finn codes — including **loading / empty / updating** states as **P0** rows when Make has them. Missing whole components (see Advantage Card bar on PLP) = ship fail.
 
 **Quinn (QA)** must click-hover every interactive control and **cannot PASS** if the register still has unchecked P0s.
@@ -78,6 +80,12 @@ Run against Make (or Make frame export) **side-by-side** with React localhost.
 - [ ] Icon+text pattern where Make/DS uses tertiary compact (e.g. Reset Filters + trash)
 - [ ] Text-only links only where Make is text-only (`.uxds-link`)
 - [ ] Icon+text nowrap ([FE_STANDARDS.md](./FE_STANDARDS.md))
+
+### 7b. Search fields (magnifier affordance)
+
+- [ ] Every search input shows Make’s magnifier (left or right per Make) — not a bare placeholder
+- [ ] Marker `data-studio-search-icon="true"` present (ratchet #1)
+- [ ] Quinn MCP `plp-search-icons` (or screen equivalent) PASS
 
 ### 8. Side-by-side screenshot pass
 

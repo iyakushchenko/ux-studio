@@ -42,7 +42,7 @@ Catalog → [docs/README.md](docs/README.md)
 ```bash
 npm install
 npm run dev
-npm test             # check:links + hygiene + felonies + version + vitest
+npm test             # check:links + hygiene + felonies + parity-ratchets + parity-proven + version + vitest
 npm run build
 npm run smoke        # lean profile — local / on-demand CI only; PROTO_SMOKE_PROFILE=full for marathon
 ```

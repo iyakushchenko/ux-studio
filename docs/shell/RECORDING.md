@@ -34,6 +34,8 @@ await window.__studioRunMcpPageProbe?.({ screenId: "plp" })
 
 Drives the shared CJM/AIR **robo-cursor** (`simulateDemoPointerClick`) to each recipe target and logs **PASS** / **FAIL** on the AGENT TESTING panel. Prefer this over silent `evaluate_script` clicks for every React screen ship.
 
+**PLP recipe includes** `plp-search-icons` — asserts ≥2 visible `[data-studio-search-icon]` on filter search fields (disease/country). Source contracts: [PARITY_RATCHETS.md](../product/PARITY_RATCHETS.md).
+
 ```js
 window.__studioAgentTestingOverlay?.start("optional title") // prefer __studio*; __proto* alias OK
 window.__studioAgentTestingOverlay?.touch() // arm if inactive; no nest bump; title stays "AGENT TESTING"
