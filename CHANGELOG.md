@@ -4,6 +4,7 @@
 
 - **engine:** Chat scrollIntoView uses .chat__column host; hide scrollbar arrow buttons
 - **project:** Chat sticky composer: overlay dock + dynamic --studio-chat-composer-h pad/scroll-pad; transparent scrollbar track; probe chat-composer-scroll-pad
+- **shell:** Thin-track overflow-y:scroll when overflowing (+ chat always-scroll); lock pads --studio-scrollbar-size — no classic scrollbar-gutter white bar; no X jump
 
 ## v0.0.43 - 190726
 - **project:** Traditional pdp-book-now prefers React PDP host (skip make-retired); Chat MCP recipe expanded; Uma §0a PARTIAL composer identity — no Chat Final Pass

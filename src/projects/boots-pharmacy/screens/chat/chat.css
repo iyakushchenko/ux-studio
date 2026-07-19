@@ -30,7 +30,9 @@
 .chat__column {
   flex: 1 1 auto;
   min-height: 0;
-  overflow: auto;
+  /* Always-scroll host — force thin track so content never X-jumps */
+  overflow-x: hidden;
+  overflow-y: scroll;
   display: flex;
   flex-direction: column;
   align-items: center;

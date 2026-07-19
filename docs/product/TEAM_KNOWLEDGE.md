@@ -203,6 +203,10 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 - Finn (FE): `compressProbeDelayMs` (VITEST-only) + fake timers in page-probe unit tests — production MCP settle/pre-arm unchanged — applied: `studioMcpPageProbe.ts` · `studioMcpPageProbe.test.ts`
 - Ben (BE): local `npm test` wall ~10s → ~4s (probe file ~8.4s → ~20ms); hard gates kept; R12 one push no-await — applied: CI_ACTIONS_BUDGET §2.1 · LESSONS
 
+**Knowledge improved** (2026-07-19 · stream: thin-track scroll no X-jump · R12):
+- Finn (FE): drop `scrollbar-gutter: stable` (classic width ≠ 4px thumb); tall hosts `overflow-y: scroll` via `studio-scroll--overflow` + lock `padding-inline-end: var(--studio-scrollbar-size)`; `.chat__column` always-scroll — applied: `studioScrollOverflow.ts` · `globals-chrome.css` · `chat.css`
+- Quinn (QA): Home noBar; Chat scroll left stable; PLP lock content width stable — applied: :5173 MCP measure
+
 **Knowledge improved** (2026-07-19 · stream: overflow-only scrollbar gutter · v0.0.39):
 - Finn (FE): never always-on `scrollbar-gutter: stable` — toggle `studio-scroll--overflow` via `syncStudioScrollOverflowGutter` / `useScrollFill`; keep gutter only while overflowing (+ locked) — applied: `studioScrollOverflow.ts` + `globals-chrome.css`
 - Pax (PO sim): user-visible shell fix → patch bump — applied: v0.0.39

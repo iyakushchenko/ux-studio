@@ -4,18 +4,23 @@
 
 /*
  * Prototype scroll pane — flex fill + zoom-safe min height (see useScrollFill).
- * Do NOT always-on `scrollbar-gutter: stable` — that reserves an empty white strip
- * on short pages (Home Site Pilot) when scrollHeight <= clientHeight.
- * Overflow marker is toggled by syncStudioScrollOverflowGutter (useScrollFill).
+ * Do NOT use always-on `scrollbar-gutter: stable` — classic gutter width ≠ our
+ * thin 4px thumb and leaves an empty white strip on short Home Site Pilot.
+ * Tall hosts: force `overflow-y: scroll` (thin track) via studio-scroll--overflow.
+ * Lock: padding-inline-end matches measured --studio-scrollbar-size (no X jump).
+ * Overflow marker: syncStudioScrollOverflowGutter (useScrollFill).
  */
 .studio-scroll--prototype:not(.hidden) {
   display: flex;
   flex-direction: column;
 }
 
-/* Tall pages only — reserve classic track so modal/journey lock does not shift X */
-.studio-scroll--prototype.studio-scroll--overflow:not(.hidden) {
-  scrollbar-gutter: stable;
+/* Tall pages only — keep thin track reserved (matches ::-webkit-scrollbar width).
+ * Specificity must stay BELOW lock rules so overflow:hidden can win. */
+.studio-scroll--prototype.studio-scroll--overflow:not(
+    .studio-scroll--locked
+  ):not(.studio-scroll--journey-locked):not(.hidden) {
+  overflow-y: scroll !important;
 }
 
 .studio-scroll--prototype > .studio-viewport {
@@ -28,14 +33,23 @@
 .studio-scroll--prototype.studio-scroll--locked,
 .studio-scroll--prototype.studio-scroll--journey-locked {
   overflow: hidden !important;
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
   overscroll-behavior: contain;
   touch-action: none;
 }
 
 .studio-scroll--prototype.studio-scroll--locked.studio-scroll--overflow,
 .studio-scroll--prototype.studio-scroll--journey-locked.studio-scroll--overflow {
-  /* Keep reserved gutter while locked so hiding the scrollbar does not jump X */
-  scrollbar-gutter: stable;
+  /* Thin track gone under overflow:hidden — pad so content width stays put */
+  padding-inline-end: var(--studio-scrollbar-size, 4px);
+  box-sizing: border-box;
+}
+
+/* Chat sole scroll host — always scrolls; force thin track (no appear/disappear jump) */
+.chat__column {
+  overflow-x: hidden;
+  overflow-y: scroll;
 }
 
 /*

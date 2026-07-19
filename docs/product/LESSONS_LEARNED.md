@@ -12,9 +12,9 @@ Agents **must read** this file before claiming a UI or Studio-chrome slice done.
 
 ### Scrollbar gutter always-on → empty white strip on short pages (PO / Finn)
 
-- **Symptom / class:** Home Site Pilot shows a white bar / fake scrollbar track with nothing to scroll.
-- **Root cause:** `scrollbar-gutter: stable` on `html` + `.studio-scroll--prototype` (v0.0.33/35) always reserves classic track width even when `scrollHeight <= clientHeight`.
-- **Gate:** Reserve gutter **only when overflowing** (`studio-scroll--overflow` via `syncStudioScrollOverflowGutter` / `useScrollFill`). Keep gutter while modal/journey lock if overflow marker is set — do **not** always-on gutter to prevent modal X jump. Prove: Home no gutter; PLP/PDP modal open → content X unchanged.
+- **Symptom / class:** Home Site Pilot shows a white bar / fake scrollbar track with nothing to scroll; tall pages / modal lock still X-jump when classic `scrollbar-gutter: stable` width ≠ thin 4px thumb.
+- **Root cause:** `scrollbar-gutter: stable` reserves **classic** track width (~12–17px), not our `::-webkit-scrollbar { width: 4px }` — empty white strip on short panes; mismatch on tall panes.
+- **Gate:** Never `scrollbar-gutter: stable` for Studio hosts. Short panes stay `overflow-y: auto` (no track). Tall prototype: `studio-scroll--overflow` → `overflow-y: scroll` (thin track) via `syncStudioScrollOverflowGutter` / `useScrollFill`; lock → `padding-inline-end: var(--studio-scrollbar-size)`. Always-scroll hosts (`.chat__column`) use `overflow-y: scroll` from the start. Prove: Home no bar; Chat/PLP no X jump on scroll/lock.
 
 ### Robo-cursor hand↔arrow tip jump — CSS-align hotspots (PO / Finn + Uma)
 

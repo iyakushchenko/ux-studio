@@ -23,7 +23,7 @@ export function useScrollFill(
       if (h > 0) {
         el.style.setProperty(MIN_H_VAR, `${h}px`);
       }
-      // Reserve classic scrollbar track only when Y actually overflows (no empty white strip).
+      // Force thin-track overflow-y:scroll only when Y overflows (no empty Home strip).
       syncStudioScrollOverflowGutter(el);
     };
 
