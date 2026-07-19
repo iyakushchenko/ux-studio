@@ -131,11 +131,11 @@
         "status": "PASS",
         "pass": true,
         "stampedAt": {
-          "sha": "7c7c9e1",
+          "sha": "841ab32",
           "date": "2026-07-19",
           "version": "0.0.32",
           "auditor": "Quinn (QA)",
-          "note": "MCP __studioRunMcpPageProbe({ screenId:\"pdp\", reload:false }) 23/23 PASS @ code tip 7c7c9e1 / v0.0.32 Motion easeInOut travel (no bounce); teardown clean. Uma §0a PROVEN @ 76e2433. hardGreen false until Arch restore. Audit: FE_AUDIT_PDP_MCP_2026-07-19.md"
+          "note": "MCP __studioRunMcpPageProbe({ screenId:\"pdp\", reload:false }) 23/23 PASS @ code tip 7c7c9e1 / v0.0.32 Motion easeInOut travel (prove 841ab32); teardown clean. Uma §0a PROVEN @ 76e2433. hardGreen false until Arch restore. Audit: FE_AUDIT_PDP_MCP_2026-07-19.md"
         },
         "url": "http://127.0.0.1:5195/?project=boots-pharmacy&screen=pdp",
         "auditPath": "docs/projects/boots-pharmacy/audits/FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md",

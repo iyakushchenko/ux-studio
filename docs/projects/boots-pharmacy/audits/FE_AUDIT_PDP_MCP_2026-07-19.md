@@ -4,7 +4,7 @@
 **Date:** 2026-07-19  
 **Auditor:** Quinn (QA) — Chrome DevTools MCP localhost  
 **Ship tip (latest prove):** `7c7c9e1` · **v0.0.32** — robo-cursor Motion ease-in-out travel (no bounce)  
-**Probe stamp:** this commit — Full Pass re-prove after tip advance from v0.0.31  
+**Probe stamp:** `841ab32` — Full Pass re-prove after tip advance from v0.0.31  
 **Uma §0a:** **PROVEN** @ tip `76e2433` / v0.0.30 (docs tip `331998b`) — still valid; travel easing tip does not reopen FAQ/Accordion §0a  
 **Prior prove (superseded):** `7bce2b3` · **v0.0.31** (prove `9f47e24`)  
 **Policy:** [QUINN_PDP_PROBE_CRITERIA_2026-07-19.md](./QUINN_PDP_PROBE_CRITERIA_2026-07-19.md) · [RECORDING.md](../../../shell/RECORDING.md) · recipe `studioMcpPageProbe.ts`  

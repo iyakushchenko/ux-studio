@@ -32,7 +32,7 @@
 
 **Session:** Chrome DevTools MCP · `http://127.0.0.1:5195/?project=boots-pharmacy&screen=pdp`  
 **Version chip:** `v0.0.32`  
-**Code tip proved:** `7c7c9e1` · Quinn prove: this commit  
+**Code tip proved:** `7c7c9e1` · Quinn prove: `841ab32`  
 **Helper:** `await window.__studioRunMcpPageProbe({ screenId: "pdp", reload: false })`  
 **Result:** `{ pass: true, screenId: "pdp" }` · `failed: []` · **23/23** checks  
 **Prep:** logged-out; empty chickenpox heart; Book now **£150**  
