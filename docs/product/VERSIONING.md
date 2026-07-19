@@ -14,7 +14,7 @@ Callsigns: [TEAM.md](./TEAM.md).
 |----------|------|
 | **Ben** (BE) | Semver bumps (`npm run release:*`), CHANGELOG promote, `check:version` / `check:felonies` green, post-push `gh run list` |
 | **Finn / Uma** | Top-bar version chip (tabs row, sticky right, overflow wins); match Studio PANEL aesthetic |
-| **Quinn** (QA) | Prove chip readable when tabs overflow; no tab/version collision; channel label correct |
+| **Quinn** (QA) | Prove chip readable when tabs overflow; no tab/version collision; channel label correct; **after every bump: chip label === `v` + package.json** (localhost + note Pages) |
 | **Pax** (PO sim) | **Whether/when** to bump + push on user-visible ships (human PO overrides) |
 | **Arch / Bea** | Advise bump class (see §6); default channel for maturity |
 | **Human PO** | Accepts **channel** (`alpha` \| `beta` \| `rc` \| `stable`) — not the semver digit; may override Pax |
@@ -25,12 +25,23 @@ Callsigns: [TEAM.md](./TEAM.md).
 
 | Piece | Source |
 |-------|--------|
-| Semver display `v0.0.1` | `package.json` `version` → Vite/Vitest `define` `__STUDIO_PACKAGE_VERSION__` → `getStudioRelease()` |
+| Semver display `v0.0.3` | **Live** `package.json` JSON import in `studioRelease.ts` → `getStudioRelease()` (Vite/Vitest `define` `__STUDIO_PACKAGE_VERSION__` is fallback only) |
 | Channel badge | `STUDIO_RELEASE_CHANNEL` in `src/app/shell/studioRelease.ts` (**alpha** while on `0.0.x`) |
 | UI | `StudioNavVersionChip` — right of page tabs (`.studio-nav-tabs-row`) |
 | Overflow | Chip `flex-shrink: 0`, solid `#2e2e2e` fill, `z-index: 3`, left shadow so scrolling tabs never cover it |
+| Dev bump while `npm run dev` | Vite watches `package.json` and **restarts** so the chip cannot lie |
 
-**No hardcoded drift:** never paste a version string into JSX. Change semver only via `release.mjs` / `package.json`.
+**No hardcoded drift:** never paste a version string into JSX. Change semver only via `release.mjs` / `package.json`. Ben bumps → chip **must** update with **no** UI edit. Gate: `check:felonies` + unit test `getStudioRelease().version === package.json version`.
+
+### Version bump Definition of Done
+
+A bump is **not done** until all are true:
+
+1. `package.json` `version` == latest CHANGELOG `## v…` (`npm run check:version`)
+2. `package-lock.json` root version synced (release.mjs does this)
+3. **Quinn (QA) proves** localhost chip shows `vX.Y.Z` + channel (`data-studio-version` / `data-studio-channel`)
+4. Quinn notes Pages will show the same after deploy (or verifies Pages when deploy matters)
+5. No manual edit to `StudioNavVersionChip.tsx` / hardcoded semver in UI
 
 ---
 

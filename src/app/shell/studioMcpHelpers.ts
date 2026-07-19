@@ -694,7 +694,7 @@ export function registerStudioMcpHelpers(options: {
     options.abortAll?.();
     options.dismissDiagnostic();
     disableCursorQaEyes();
-    stopAgentTestingOverlay({ force: true });
+    stopAgentTestingOverlay({ force: true, reload: false });
     logControlPanel("qa:run", { source: "abort-all" });
     return window.__protoStudioState!();
   };

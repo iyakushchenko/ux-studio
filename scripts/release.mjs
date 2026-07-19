@@ -113,6 +113,22 @@ pkg.version = newVersion;
 fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
 console.log(`✅ Bumped version to ${newVersion}`);
 
+// Keep lockfile root version in sync so agents/tools never read a stale 0.0.x.
+const lockPath = path.join(ROOT, "package-lock.json");
+if (fs.existsSync(lockPath)) {
+  try {
+    const lock = JSON.parse(fs.readFileSync(lockPath, "utf8"));
+    lock.version = newVersion;
+    if (lock.packages && lock.packages[""]) {
+      lock.packages[""].version = newVersion;
+    }
+    fs.writeFileSync(lockPath, JSON.stringify(lock, null, 2) + "\n");
+    console.log(`🔒 Synced package-lock.json version → ${newVersion}`);
+  } catch (e) {
+    console.warn(`⚠  Could not sync package-lock.json version: ${e}`);
+  }
+}
+
 const now = new Date();
 const dateStr = [
   String(now.getDate()).padStart(2, "0"),

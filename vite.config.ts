@@ -20,11 +20,28 @@ function figmaAssetResolver() {
   }
 }
 
+const packageJsonPath = path.resolve(__dirname, 'package.json')
+
+/** When package.json bumps while `npm run dev` is running, restart so define + chip stay honest. */
+function packageJsonVersionReload() {
+  return {
+    name: 'studio-package-json-version-reload',
+    configureServer(server) {
+      server.watcher.add(packageJsonPath)
+      server.watcher.on('change', (file) => {
+        if (path.resolve(file) === packageJsonPath) {
+          server.restart()
+        }
+      })
+    },
+  }
+}
+
 export default defineConfig({
   // GitHub Pages project site: /ux-studio/
   base: process.env.VITE_BASE_PATH ?? '/',
   define: {
-    // Single source: package.json → chrome version chip (studioRelease.ts)
+    // Fallback inject; chip prefers live JSON import in studioRelease.ts
     __STUDIO_PACKAGE_VERSION__: JSON.stringify(pkg.version),
   },
   server: {
@@ -34,6 +51,7 @@ export default defineConfig({
     },
   },
   plugins: [
+    packageJsonVersionReload(),
     figmaAssetResolver(),
     // The React and Tailwind plugins are both required for Make, even if
     // Tailwind is not being actively used – do not remove them

@@ -16,7 +16,7 @@
 | **Bea (BA)** | Acceptance, flows, business logic | Lean feature briefs (`FEATURE_BRIEF_TEMPLATE.md` / `docs/projects/<id>/features/`) |
 | **Finn (FE)** | React / engine implementation | Code + mount notes in brief or PR |
 | **Uma (UI/UX)** | Chrome, concept fidelity, Nazi visual | FE audits under `docs/projects/<id>/audits/` |
-| **Quinn (QA)** | Prove, MCP, felonies, CI sitrep | Prove notes (localhost / MCP / gate evidence). Owns prove for post-agent clean slate (no sticky Choose Pharmacy after `__protoRun*` / `stop({ reload: true })`) |
+| **Quinn (QA)** | Prove, MCP, felonies, CI sitrep | Prove notes (localhost / MCP / gate evidence). Owns prove for post-agent clean slate (no sticky Choose Pharmacy after `__protoRun*` / `stop({ reload: true })`). **After every version bump:** prove tab-bar chip `v` + `package.json` semver + channel (localhost; note Pages) |
 | **Ben (BE)** | Version / changelog / CI / gates / push mechanics | [VERSIONING.md](./VERSIONING.md), check scripts, `gh run list` |
 | **Pax (PO sim)** | Acts like this project’s human PO: intolerant of near-dups / missed chrome; wants hard guardrails, Pages truth, no Actions burn, decisive next steps. **Decides whether/when to bump version + changelog + push** (human PO overrides) | [PRODUCT_OWNER_BRIEF.md](./PRODUCT_OWNER_BRIEF.md) decisions log |
 
@@ -98,6 +98,7 @@ Bea brief → Finn (+ Uma) build → Quinn prove + Uma audit (if UI)
 | Briefs | Chat-only “we’ll fix it” with no acceptance |
 | Cross-check | Finn “done” with no Quinn evidence; Uma skipped on UI |
 | Pax | Version/push on user-visible ship without Pax (or human PO) call |
+| Version bump | Ben bumps `package.json` but Quinn did not prove UI chip matches (chip lie = felony) |
 | Board | NEXT_STEPS / notes stale after Pax said bump |
 
 ---

@@ -1,8 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   DEFAULT_SETTLE_MS,
+  forceClearAgentTestingOverlay,
+  IDLE_MS,
   isAgentTestingOverlayActive,
   isAgentTestingOverlaySettling,
+  resolveAgentTestingOverlayTitle,
   startAgentTestingOverlay,
   stopAgentTestingOverlay,
   touchAgentTestingOverlay,
@@ -15,6 +18,20 @@ describe("agentTestingOverlay", () => {
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
     vi.useRealTimers();
+  });
+
+  it("strips garbled helper names from titles", () => {
+    expect(
+      resolveAgentTestingOverlayTitle(
+        "AGENT TESTING — __studioEnsureCleanStudio"
+      )
+    ).toBe("AGENT TESTING");
+    expect(
+      resolveAgentTestingOverlayTitle("__studioEnsureCleanStudio")
+    ).toBe("AGENT TESTING");
+    expect(resolveAgentTestingOverlayTitle("AGENT TESTING — mcp-sanity")).toBe(
+      "AGENT TESTING — mcp-sanity"
+    );
   });
 
   it("touch arms once without nesting", () => {
@@ -44,6 +61,26 @@ describe("agentTestingOverlay", () => {
     startAgentTestingOverlay();
     stopAgentTestingOverlay({ force: true });
     expect(isAgentTestingOverlayActive()).toBe(false);
+  });
+
+  it("forceClear always clears active + settle", () => {
+    startAgentTestingOverlay();
+    stopAgentTestingOverlay();
+    expect(isAgentTestingOverlaySettling()).toBe(true);
+    forceClearAgentTestingOverlay();
+    expect(isAgentTestingOverlayActive()).toBe(false);
+    expect(isAgentTestingOverlaySettling()).toBe(false);
+  });
+
+  it("touch without stop auto-clears after idle", () => {
+    vi.useFakeTimers();
+    touchAgentTestingOverlay();
+    expect(isAgentTestingOverlayActive()).toBe(true);
+    vi.advanceTimersByTime(IDLE_MS);
+    expect(isAgentTestingOverlayActive()).toBe(false);
+    expect(isAgentTestingOverlaySettling()).toBe(true);
+    vi.advanceTimersByTime(DEFAULT_SETTLE_MS);
+    expect(isAgentTestingOverlaySettling()).toBe(false);
   });
 
   it("stop() enters DONE settle then clears; reload waits until after settle", () => {
@@ -141,4 +178,3 @@ describe("agentTestingOverlay", () => {
     expect(isAgentTestingOverlaySettling()).toBe(false);
   });
 });
-

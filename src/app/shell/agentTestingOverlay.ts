@@ -2,16 +2,20 @@
  * Compact bottom-right agent-testing status panel.
  * Invisible full-viewport capture blocks page clicks; page stays visible.
  *
- *   window.__protoAgentTestingOverlay?.start()
- *   window.__protoAgentTestingOverlay?.touch() // arm if inactive (no nest bump)
- *   window.__protoAgentTestingOverlay?.log("clicked Book Step 2")
- *   window.__protoAgentTestingOverlay?.stop() // nest-aware → DONE settle ~5s; no reload
- *   window.__protoAgentTestingOverlay?.stop({ force: true, reload: true })
+ *   window.__studioAgentTestingOverlay?.start()
+ *   window.__studioAgentTestingOverlay?.touch() // arm if inactive (no nest bump)
+ *   window.__studioAgentTestingOverlay?.log("clicked Book Step 2")
+ *   window.__studioAgentTestingOverlay?.stop() // nest-aware → DONE settle ~5s; no reload
+ *   window.__studioAgentTestingOverlay?.stop({ force: true, reload: true })
+ *   window.__studioAgentTestingOverlay?.forceClear() // always dismiss (Dismiss button)
  *
  * MCP helpers should call stop({ reload: true }) so the PO gets a clean tab
  * after the sitrep settle window (reload runs after settle, not instantly).
  * Manual console experiments default to reload: false.
  * Post-test clean slate: hub home, no modal / ephemeral (see resetStudioAfterAgentTest).
+ *
+ * Touch-only / DevTools sessions without stop(): idle auto-stop (~45s) → sitrep,
+ * plus hard safety timeout (3 min force clear). Titles stay clean ("AGENT TESTING").
  */
 import {
   resetStudioAfterAgentTest,
@@ -19,8 +23,10 @@ import {
 } from "@/app/shell/studioUrl";
 const ROOT_ID = "agent-testing-overlay";
 const LOG_LIMIT = 80;
-/** Safety: never leave the overlay up longer than this. */
+/** Safety: never leave the overlay up longer than this (force clear). */
 const MAX_MS = 3 * 60 * 1000;
+/** Touch-only / abandoned sessions: auto stop → sitrep after idle. */
+export const IDLE_MS = 45_000;
 /** Default DONE/SITREP settle before hide (and optional reload). */
 export const DEFAULT_SETTLE_MS = 5000;
 const SETTLE_MS_MIN = 4000;
@@ -31,6 +37,8 @@ const CONTINUE_KEY = "protoAgentTestingOverlayContinue";
 const HISTORY_KEY = "protoAgentTestingOverlayHistory";
 const HISTORY_MAX = 5;
 const HISTORY_LINE_CAP = 12;
+const DEFAULT_TITLE = "AGENT TESTING";
+const SITREP_TITLE = "AGENT DONE — SITREP";
 export type StopAgentTestingOverlayOptions = {
   force?: boolean;
   /** After settle (or force teardown), reload once. MCP helpers: true. Manual: false. */
@@ -46,6 +54,8 @@ type OverlayApi = {
   /** Arm overlay if inactive; refresh safety timer if already active. Never nests. */
   touch: (title?: string) => void;
   stop: (options?: StopAgentTestingOverlayOptions) => void;
+  /** Always clear instantly (Dismiss / stuck recovery). */
+  forceClear: () => void;
   log: (line: string) => void;
   isActive: () => boolean;
 };
@@ -57,13 +67,31 @@ type HistoryEntry = {
 let active = false;
 let settling = false;
 let logLines: string[] = [];
-let sessionTitle = "AGENT TESTING";
+let sessionTitle = DEFAULT_TITLE;
 let nest = 0;
 let safetyTimer: ReturnType<typeof setTimeout> | null = null;
+let idleTimer: ReturnType<typeof setTimeout> | null = null;
 let settleTimer: ReturnType<typeof setTimeout> | null = null;
 let beforeUnloadBound = false;
+let visibilityBound = false;
 let reloadPending = false;
 let settleReload = false;
+
+/**
+ * Never show raw `__studio*` / `__proto*` helper names in the title
+ * (CSS uppercase turned `__studioEnsureCleanStudio` into garbled STUDIOENSURE…).
+ */
+export function resolveAgentTestingOverlayTitle(title?: string): string {
+  const raw = title?.trim();
+  if (!raw) return DEFAULT_TITLE;
+  if (/__(?:studio|proto)/i.test(raw)) return DEFAULT_TITLE;
+  if (/ensureCleanStudio/i.test(raw)) return DEFAULT_TITLE;
+  // Allow short labels like "AGENT TESTING — mcp-sanity"
+  if (/^AGENT TESTING\b/i.test(raw) && raw.length <= 48) return raw;
+  if (raw.length > 48) return DEFAULT_TITLE;
+  return raw;
+}
+
 function clearPersist(): void {
   try {
     sessionStorage.removeItem(PERSIST_KEY);
@@ -121,6 +149,12 @@ function clearSafetyTimer(): void {
     safetyTimer = null;
   }
 }
+function clearIdleTimer(): void {
+  if (idleTimer != null) {
+    clearTimeout(idleTimer);
+    idleTimer = null;
+  }
+}
 function clearSettleTimer(): void {
   if (settleTimer != null) {
     clearTimeout(settleTimer);
@@ -130,9 +164,33 @@ function clearSettleTimer(): void {
 function armSafetyTimer(): void {
   clearSafetyTimer();
   safetyTimer = setTimeout(() => {
-    logAgentTestingOverlay("overlay auto-stop: safety timeout");
+    try {
+      logAgentTestingOverlay("overlay auto-stop: safety timeout");
+    } catch {
+      /* ignore */
+    }
     stopAgentTestingOverlay({ force: true, reload: false });
   }, MAX_MS);
+}
+function armIdleTimer(): void {
+  clearIdleTimer();
+  if (!active || settling) return;
+  idleTimer = setTimeout(() => {
+    if (!active || settling) return;
+    try {
+      logAgentTestingOverlay("overlay auto-stop: idle timeout");
+    } catch {
+      /* ignore */
+    }
+    // Collapse nest so abandoned touch()/helper arms always settle.
+    nest = 1;
+    stopAgentTestingOverlay({ reload: false });
+  }, IDLE_MS);
+}
+function noteActivity(): void {
+  if (!active || settling) return;
+  armSafetyTimer();
+  armIdleTimer();
 }
 function clampSettleMs(ms?: number): number {
   const n = typeof ms === "number" && Number.isFinite(ms) ? ms : DEFAULT_SETTLE_MS;
@@ -145,8 +203,17 @@ function onBeforeUnload(): void {
   settling = false;
   settleReload = false;
   clearSafetyTimer();
+  clearIdleTimer();
   clearSettleTimer();
   clearPersist();
+}
+function onVisibilityChange(): void {
+  if (typeof document === "undefined") return;
+  if (document.visibilityState !== "visible") return;
+  // Returning to a stuck tab: if still active, re-arm idle so abandon clears soon.
+  if (active && !settling) {
+    armIdleTimer();
+  }
 }
 function bindBeforeUnload(): void {
   if (beforeUnloadBound || typeof window === "undefined") return;
@@ -160,6 +227,19 @@ function unbindBeforeUnload(): void {
     window.removeEventListener("beforeunload", onBeforeUnload);
   }
   beforeUnloadBound = false;
+}
+function bindVisibility(): void {
+  if (visibilityBound || typeof document === "undefined") return;
+  if (typeof document.addEventListener !== "function") return;
+  document.addEventListener("visibilitychange", onVisibilityChange);
+  visibilityBound = true;
+}
+function unbindVisibility(): void {
+  if (!visibilityBound || typeof document === "undefined") return;
+  if (typeof document.removeEventListener === "function") {
+    document.removeEventListener("visibilitychange", onVisibilityChange);
+  }
+  visibilityBound = false;
 }
 function setHint(text: string): void {
   if (typeof document === "undefined") return;
@@ -215,7 +295,7 @@ function ensureRoot(): HTMLElement | null {
     <div class="studio-agent-testing-overlay__capture" aria-hidden="true"></div>
     <div class="studio-agent-testing-overlay__panel" role="status">
       <div class="studio-agent-testing-overlay__header">
-        <p class="studio-agent-testing-overlay__title">AGENT TESTING</p>
+        <p class="studio-agent-testing-overlay__title">${DEFAULT_TITLE}</p>
         <button type="button" class="studio-agent-testing-overlay__dismiss">Dismiss</button>
       </div>
       <p class="studio-agent-testing-overlay__hint">Page visible — clicks blocked. Status log below.</p>
@@ -226,7 +306,7 @@ function ensureRoot(): HTMLElement | null {
     ".studio-agent-testing-overlay__dismiss"
   );
   dismiss?.addEventListener("click", () => {
-    stopAgentTestingOverlay({ force: true, reload: false });
+    forceClearAgentTestingOverlay();
   });
   // Last child of body — paint above #root concept lightboxes.
   (document.body ?? document.documentElement).appendChild(root);
@@ -280,17 +360,30 @@ function scheduleReload(delayMs = 120): void {
   // Defer so MCP evaluate_script can return the run result before navigation.
   window.setTimeout(() => {
     // Last chance: strip modal before reload so boot cannot reopen Choose Pharmacy.
-    resetStudioAfterAgentTest();
+    try {
+      resetStudioAfterAgentTest();
+    } catch {
+      /* ignore */
+    }
     window.location.reload();
   }, delayMs);
+}
+
+function safeResetStudio(): void {
+  try {
+    resetStudioAfterAgentTest();
+  } catch {
+    /* never leave overlay stuck because URL reset threw */
+  }
 }
 
 function finishSettle(): void {
   settling = false;
   clearSettleTimer();
   teardownDom();
-  resetStudioAfterAgentTest();
+  safeResetStudio();
   unbindBeforeUnload();
+  unbindVisibility();
   if (settleReload) {
     settleReload = false;
     scheduleReload(120);
@@ -304,7 +397,7 @@ function cancelSettle(instantReload?: boolean): void {
   clearSettleTimer();
   teardownDom();
   if (wantReload) scheduleReload(120);
-  else resetStudioAfterAgentTest();
+  else safeResetStudio();
 }
 
 function enterSettle(options?: StopAgentTestingOverlayOptions): void {
@@ -313,6 +406,7 @@ function enterSettle(options?: StopAgentTestingOverlayOptions): void {
   settling = true;
   active = false;
   clearSafetyTimer();
+  clearIdleTimer();
   clearPersist();
   const root = ensureRoot();
   if (root) {
@@ -322,8 +416,8 @@ function enterSettle(options?: StopAgentTestingOverlayOptions): void {
   // Release pointer block so PO can use the page while reading sitrep.
   releaseClickGuard();
   // Dismiss lightboxes + land hub URL during sitrep (reload re-asserts clean bar).
-  resetStudioAfterAgentTest();
-  setTitle("AGENT DONE — SITREP");
+  safeResetStudio();
+  setTitle(SITREP_TITLE);
   setHint(
     settleReload
       ? `Sitrep — page usable. Reload in ~${Math.round(settleMs / 1000)}s.`
@@ -348,7 +442,7 @@ export function startAgentTestingOverlay(title?: string): void {
   nest += 1;
   active = true;
   settling = false;
-  const resolved = title?.trim() || "AGENT TESTING";
+  const resolved = resolveAgentTestingOverlayTitle(title);
   sessionTitle = resolved;
   const root = ensureRoot();
   if (root) {
@@ -363,7 +457,8 @@ export function startAgentTestingOverlay(title?: string): void {
   setHint("Page visible — clicks blocked. Status log below.");
   writePersist(resolved);
   bindBeforeUnload();
-  armSafetyTimer();
+  bindVisibility();
+  noteActivity();
   if (nest === 1) {
     logLines = [];
     logAgentTestingOverlay("overlay start");
@@ -372,37 +467,44 @@ export function startAgentTestingOverlay(title?: string): void {
 export function stopAgentTestingOverlay(
   options?: StopAgentTestingOverlayOptions
 ): void {
-  if (options?.force) {
-    nest = 0;
-    if (active) logAgentTestingOverlay("overlay stop");
-    active = false;
-    clearSafetyTimer();
-    clearPersist();
-    resetStudioAfterAgentTest();
-    // Instant dismiss — skip sitrep settle.
-    if (settling) {
-      cancelSettle(!!options.reload);
+  try {
+    if (options?.force) {
+      nest = 0;
+      if (active) logAgentTestingOverlay("overlay stop");
+      active = false;
+      clearSafetyTimer();
+      clearIdleTimer();
+      clearPersist();
+      safeResetStudio();
+      // Instant dismiss — skip sitrep settle.
+      if (settling) {
+        cancelSettle(!!options.reload);
+        return;
+      }
+      unbindBeforeUnload();
+      unbindVisibility();
+      teardownDom();
+      if (options.reload) scheduleReload(120);
       return;
     }
-    unbindBeforeUnload();
-    teardownDom();
-    if (options.reload) scheduleReload(120);
-    return;
+    nest = Math.max(0, nest - 1);
+    if (nest > 0) return;
+    if (settling) {
+      // Already in sitrep; honor a late reload request.
+      if (options?.reload) settleReload = true;
+      return;
+    }
+    if (!active) {
+      if (options?.reload) scheduleReload(120);
+      else safeResetStudio();
+      return;
+    }
+    logAgentTestingOverlay("overlay stop");
+    enterSettle(options);
+  } catch {
+    // Last resort — never leave the click guard up.
+    forceClearAgentTestingOverlay();
   }
-  nest = Math.max(0, nest - 1);
-  if (nest > 0) return;
-  if (settling) {
-    // Already in sitrep; honor a late reload request.
-    if (options?.reload) settleReload = true;
-    return;
-  }
-  if (!active) {
-    if (options?.reload) scheduleReload(120);
-    else resetStudioAfterAgentTest();
-    return;
-  }
-  logAgentTestingOverlay("overlay stop");
-  enterSettle(options);
 }
 /**
  * Ensure the BR panel is visible while an agent drives the tab.
@@ -413,10 +515,11 @@ export function touchAgentTestingOverlay(title?: string): void {
     cancelSettle(false);
   }
   if (active) {
-    armSafetyTimer();
+    noteActivity();
+    const resolved = resolveAgentTestingOverlayTitle(title);
     if (title?.trim()) {
-      sessionTitle = title.trim();
-      setTitle(sessionTitle);
+      sessionTitle = resolved;
+      setTitle(resolved);
     }
     return;
   }
@@ -429,12 +532,44 @@ export function logAgentTestingOverlay(line: string): void {
     logLines = logLines.slice(-LOG_LIMIT);
   }
   renderLog();
+  noteActivity();
+}
+/** Instant clear — Dismiss button + stuck-overlay recovery. Never throws. */
+export function forceClearAgentTestingOverlay(): void {
+  try {
+    nest = 0;
+    active = false;
+    settling = false;
+    settleReload = false;
+    reloadPending = false;
+    clearSafetyTimer();
+    clearIdleTimer();
+    clearSettleTimer();
+    clearPersist();
+    unbindBeforeUnload();
+    unbindVisibility();
+    teardownDom();
+    releaseClickGuard();
+    safeResetStudio();
+  } catch {
+    try {
+      teardownDom();
+      releaseClickGuard();
+    } catch {
+      /* ignore */
+    }
+  }
 }
 export function isAgentTestingOverlayActive(): boolean {
   return active;
 }
 export function isAgentTestingOverlaySettling(): boolean {
   return settling;
+}
+function bindOverlayApi(api: OverlayApi): void {
+  if (typeof window === "undefined") return;
+  window.__protoAgentTestingOverlay = api;
+  window.__studioAgentTestingOverlay = api;
 }
 /**
  * On install: never restore a stale "testing" flag unless an explicit
@@ -462,15 +597,18 @@ export function installAgentTestingOverlayApi(): void {
     settling = false;
     settleReload = false;
     clearSettleTimer();
+    clearIdleTimer();
+    clearSafetyTimer();
   }
   const api: OverlayApi = {
     start: startAgentTestingOverlay,
     touch: touchAgentTestingOverlay,
     stop: (options) => stopAgentTestingOverlay(options),
+    forceClear: forceClearAgentTestingOverlay,
     log: logAgentTestingOverlay,
     isActive: isAgentTestingOverlayActive,
   };
-  window.__protoAgentTestingOverlay = api;
+  bindOverlayApi(api);
 }
 export function uninstallAgentTestingOverlayApi(): void {
   nest = 0;
@@ -480,9 +618,11 @@ export function uninstallAgentTestingOverlayApi(): void {
   logLines = [];
   reloadPending = false;
   clearSafetyTimer();
+  clearIdleTimer();
   clearSettleTimer();
   clearPersist();
   unbindBeforeUnload();
+  unbindVisibility();
   if (typeof document !== "undefined") {
     if (typeof document.getElementById === "function") {
       document.getElementById(ROOT_ID)?.remove();
@@ -491,11 +631,12 @@ export function uninstallAgentTestingOverlayApi(): void {
   }
   if (typeof window !== "undefined") {
     delete window.__protoAgentTestingOverlay;
+    delete window.__studioAgentTestingOverlay;
   }
 }
 declare global {
   interface Window {
     __protoAgentTestingOverlay?: OverlayApi;
+    __studioAgentTestingOverlay?: OverlayApi;
   }
 }
-

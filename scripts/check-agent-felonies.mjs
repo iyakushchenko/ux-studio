@@ -9,6 +9,7 @@
  *  3. data-proto-* attrs in src/app (engine) — use data-studio-*
  *  4. New docs/product/BOOTS_* files (thin Moved stubs allowlisted)
  *  5. studioRelease channel must be alpha|beta|rc|stable
+ *  6. version chip must track package.json (no hardcoded UI semver; JSON import present)
  *
  * Companion gates (also in npm test):
  *  - check:hygiene · check:links · check:version
@@ -142,6 +143,54 @@ if (!fs.existsSync(releasePath)) {
   }
 }
 
+// --- 6) version chip ↔ package.json (no drift / no hardcoded UI semver) ---
+const pkgVersion = (() => {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(ROOT, "package.json"), "utf8"))
+      .version;
+  } catch {
+    return null;
+  }
+})();
+if (!pkgVersion || !/^\d+\.\d+\.\d+$/.test(pkgVersion)) {
+  fail("package.json missing valid semver version");
+} else if (fs.existsSync(releasePath)) {
+  const releaseSrc = fs.readFileSync(releasePath, "utf8");
+  if (!/from\s+["'](?:\.\.\/)+package\.json["']/.test(releaseSrc)) {
+    fail(
+      "studioRelease.ts must import package.json (live semver for version chip)"
+    );
+  }
+  // Hardcoded ship numbers in release module (allow 0.0.0 fallback only).
+  const hardcoded = releaseSrc.match(/["'](\d+\.\d+\.\d+)["']/g) || [];
+  for (const hit of hardcoded) {
+    const n = hit.replace(/["']/g, "");
+    if (n !== "0.0.0") {
+      fail(
+        `studioRelease.ts must not hardcode ship semver ${hit} — use package.json`
+      );
+    }
+  }
+}
+const versionChipPath = path.join(
+  ROOT,
+  "src",
+  "app",
+  "nav",
+  "StudioNavVersionChip.tsx"
+);
+if (fs.existsSync(versionChipPath)) {
+  const chipSrc = fs.readFileSync(versionChipPath, "utf8");
+  if (!/getStudioRelease/.test(chipSrc)) {
+    fail("StudioNavVersionChip must call getStudioRelease()");
+  }
+  if (/["'`]\d+\.\d+\.\d+["'`]/.test(chipSrc) || /v\d+\.\d+\.\d+/.test(chipSrc)) {
+    fail(
+      "StudioNavVersionChip must not hardcode a version string — use getStudioRelease()"
+    );
+  }
+}
+
 if (errors.length) {
   console.error("[check:felonies] FAIL — agent felony gate:\n");
   for (const e of errors) console.error(`  • ${e}`);
@@ -152,5 +201,5 @@ if (errors.length) {
 }
 
 console.log(
-  "[check:felonies] OK — filenames, PANEL CSS, data-proto, BOOTS stubs, channel"
+  "[check:felonies] OK — filenames, PANEL CSS, data-proto, BOOTS stubs, channel, version chip"
 );

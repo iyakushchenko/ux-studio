@@ -5,9 +5,15 @@
  *
  * Public window API: prefer `__studio*` names; `__proto*` remain stable aliases
  * pointing at the **same** function/value.
+ *
+ * Titles stay clean ("AGENT TESTING") — never concatenate raw helper names
+ * (uppercase CSS turned `__studioEnsureCleanStudio` into garbled panel titles).
  */
 
-import { touchAgentTestingOverlay } from "@/app/shell/agentTestingOverlay";
+import {
+  logAgentTestingOverlay,
+  touchAgentTestingOverlay,
+} from "@/app/shell/agentTestingOverlay";
 
 const READ_ONLY_HELPER_SUFFIXES = new Set([
   "AgentTestingOverlay",
@@ -30,6 +36,9 @@ const READ_ONLY_HELPER_SUFFIXES = new Set([
   "ImportJourneyBundle",
   "QaHud",
   "SmokeRetreatChecks",
+  // Cleanup / abort manage overlay themselves — do not re-arm mid-reset.
+  "EnsureCleanStudio",
+  "AbortAll",
 ]);
 
 const ARMED_FLAG = "__studioOverlayArmed";
@@ -45,10 +54,16 @@ function isReadOnlySuffix(suffix: string): boolean {
   return READ_ONLY_HELPER_SUFFIXES.has(suffix);
 }
 
-function wrapHelper(name: string, fn: (...args: unknown[]) => unknown) {
+function wrapHelper(suffix: string, fn: (...args: unknown[]) => unknown) {
   if ((fn as { [ARMED_FLAG]?: boolean })[ARMED_FLAG]) return fn;
   const wrapped = (...args: unknown[]) => {
-    touchAgentTestingOverlay(`AGENT TESTING — ${name}`);
+    // Clean title only — log the helper name in the status list.
+    touchAgentTestingOverlay();
+    try {
+      logAgentTestingOverlay(`helper: __studio${suffix}`);
+    } catch {
+      /* ignore */
+    }
     return fn(...args);
   };
   (wrapped as { [ARMED_FLAG]?: boolean })[ARMED_FLAG] = true;
@@ -110,7 +125,7 @@ export function armOverlayOnStudioHelpers(): void {
     const raw = w[protoKey] ?? w[studioKey];
     if (typeof raw !== "function") continue;
     const wrapped = wrapHelper(
-      `__studio${suffix}`,
+      suffix,
       raw as (...args: unknown[]) => unknown,
     );
     w[protoKey] = wrapped;
