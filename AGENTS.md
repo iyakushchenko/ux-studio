@@ -41,8 +41,10 @@ Engine repo. **Boots Pharmacy** (`src/projects/boots-pharmacy/`) is the first re
 15. [docs/product/CI_ACTIONS_BUDGET.md](docs/product/CI_ACTIONS_BUDGET.md) — lean Actions; no marathon on every push
 16. [docs/product/VERSIONING.md](docs/product/VERSIONING.md) — local semver + CHANGELOG; no Release CI yet
 17. [docs/product/POST_CHANGE_CHECKLIST.md](docs/product/POST_CHANGE_CHECKLIST.md) — local gates before “done”
-18. [docs/uxds/README.md](docs/uxds/README.md) — UXDS Larkin (variables + components) · [DEVIATIONS.md](docs/uxds/DEVIATIONS.md)
-19. [docs/product/X_SUITE_INTEGRATION.md](docs/product/X_SUITE_INTEGRATION.md) — future Summarizer → Studio seam 
+18. [docs/product/LESSONS_LEARNED.md](docs/product/LESSONS_LEARNED.md) — progressive failure/win capture (read before UI close)
+19. [docs/product/NEXT_STEPS.md](docs/product/NEXT_STEPS.md) — living NOW/NEXT board
+20. [docs/uxds/README.md](docs/uxds/README.md) — UXDS Larkin (variables + components) · [DEVIATIONS.md](docs/uxds/DEVIATIONS.md)
+21. [docs/product/X_SUITE_INTEGRATION.md](docs/product/X_SUITE_INTEGRATION.md) — future Summarizer → Studio seam 
 
 ## Quick start
 

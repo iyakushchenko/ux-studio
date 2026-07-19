@@ -6,6 +6,22 @@ See also: [PLAYBACK.md](./PLAYBACK.md) (engine), [SHELL.md](./SHELL.md) (shell a
 
 ---
 
+## Agent testing overlay (MCP / `__protoRun*`)
+
+While agent-led MCP tests run, Studio shows a simple full-viewport banner: **AGENT TESTING IN PROGRESS**, plus a scrolling plain-text actions log. Pointer events to the page underneath are blocked so the PO can hide DevTools without polluting the run.
+
+```js
+window.__protoAgentTestingOverlay?.start("optional title")
+window.__protoAgentTestingOverlay?.log("clicked Book Step 2")
+window.__protoAgentTestingOverlay?.stop() // nest-aware
+window.__protoAgentTestingOverlay?.stop({ force: true }) // clear immediately
+window.__protoAgentTestingOverlay?.isActive()
+```
+
+Auto-shown for `__protoRunMcpSanityCheck` and any `__protoRun*` smoke that uses the MCP test session. `__protoAbortAll` force-clears it. Shell-only (`src/app/shell/protoAgentTestingOverlay.ts` + PANEL CSS) — not Boots page CSS.
+
+---
+
 ## Prerequisite: page interactivity first
 
 **Recording depends on page fidelity.** The REC deck and MCP helpers only capture what the user can actually do on the concept page.

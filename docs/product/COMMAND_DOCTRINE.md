@@ -32,8 +32,9 @@ While doing **anything** the PO asks, the agent must **spot issues or forecast t
 | Bad handoffs | Subagent “done” without verified chrome/mode/panel XOR (§6) |
 | Missing hover / focus | Flat dead controls vs Make parity |
 | Motion unused / wrong | `framer-motion` is default; no keyframe zoos ([FE_STANDARDS.md](./FE_STANDARDS.md) §9) |
-| REC / Studio chrome bugs | Duplicate STEPS, counter leaks, mode XOR broken; REC usable during AIR |
-| CI / smoke gaps | Untested playback or broken lean smoke path; Actions minute burn ([CI_ACTIONS_BUDGET.md](./CI_ACTIONS_BUDGET.md)) |
+| REC / Studio chrome bugs | Duplicate STEPS; **REC ⊗ CJM XOR** broken (not only AIR); REC usable during AIR/CJM |
+| Hybrid mount / nav remap | Make+React dual layout; progress Step 1 → wrong “tab1”; short grid rows right-shifted |
+| CI / smoke gaps | Untested playback; marathon smoke on every push ([CI_ACTIONS_BUDGET.md](./CI_ACTIONS_BUDGET.md)) |
 
 If a risk is real or likely, **fix or flag it in the same turn** — do not leave it for the PO to discover.
 
@@ -44,11 +45,13 @@ If a risk is real or likely, **fix or flag it in the same turn** — do not leav
 | Scan | Fail if… |
 |------|----------|
 | **AIR / browse locks** | REC mode / recording controls still usable while AIR; CJM/transport disable parity broken ([FE_UI_UX_AUDIT.md](./FE_UI_UX_AUDIT.md) G5) |
-| **Sibling links / CTAs** | Same role diverged (e.g. Learn more ≠ footer `.proto-link` / `.uxds-link` contract) |
+| **REC ⊗ CJM XOR** | CJM on but REC still enabled; REC on but CJM still on — gate `studioModeXor.ts` + sanity `rec-disabled-when-cjm-on` (audit **G6**) |
+| **Sibling links / CTAs** | Same role diverged (e.g. Learn more ≠ footer `.proto-link` / `.uxds-link` contract); `check:links` fail |
 | **Counters / labels** | Duplicate STEPS, wrong mode label, counter leak |
 | **Panel XOR** | Conflicting panels or mode decks both live |
+| **Grid / step tabs** | Short last rows right-shifted; Book progress/Studio Step N remaps to wrong screen (e.g. Home “tab1”) |
 
-Do not only verify the control you edited. Fix or flag blast-radius hits in the same turn.
+Do not only verify the control you edited. Fix or flag blast-radius hits in the same turn. Progressive lessons: [LESSONS_LEARNED.md](./LESSONS_LEARNED.md).
 
 ---
 
@@ -121,8 +124,9 @@ The PO may override with a clear product veto (“wrong priority for the busines
 3. ✅ Recording UI on the existing recording foundation (Studio REC deck + MCP).  
 4. ✅ Interaction fidelity doctrine locked — shared React/UXDS behavior library; build interactivity before expecting record ([INTERACTION_FIDELITY.md](./INTERACTION_FIDELITY.md)).  
 5. ✅ Thin UXDS code foundation — token CSS bridge (`src/uxds/`), interaction kits (accordion / disclosure / filter chip), Boots `styleguide/theme.css`, Availability Tool enrichment (mode B).  
-6. ✅ Pilot — one Boots screen rebuilt React + UXDS: **Book Step 1 — Location** (mode B; Make retired for child 7 only). See [BOOTS_REACT_SCREEN_PILOT.md](./BOOTS_REACT_SCREEN_PILOT.md).  
-7. **Next:** Book Step 2 (Date/Time) or PLP — second React screen; then scaffold command + broader rebuild; journey format open for X-Suite import; compiler recording → journey proposals later.
+6. ✅ Pilot — **Book Step 1 — Location** React + UXDS (child 7). See [BOOTS_REACT_SCREEN_PILOT.md](./BOOTS_REACT_SCREEN_PILOT.md).  
+7. ✅ **Book Step 2 — Date/Time** React + UXDS (child 4) + hotfixes (time-slot left-align; agentic browse Step 1 ≠ Home).  
+8. **Next:** **Book Step 3 — Confirmation** React + UXDS (child 3); then grow UXDS by page; journey/X-Suite seams later. Living board: [NEXT_STEPS.md](./NEXT_STEPS.md). Lessons: [LESSONS_LEARNED.md](./LESSONS_LEARNED.md).
 
 If the PO issues a product override, update §5 and the decisions log the same turn.
 
@@ -225,6 +229,8 @@ Use [FE_UI_UX_AUDIT.md](./FE_UI_UX_AUDIT.md) ruthlessly, plus [VISUAL_FIDELITY.m
 
 ## Related
 
+- [LESSONS_LEARNED.md](./LESSONS_LEARNED.md) — progressive agent knowledge (read before UI close)
+- [NEXT_STEPS.md](./NEXT_STEPS.md) — living NOW/NEXT board
 - [PRODUCT_OWNER_BRIEF.md](./PRODUCT_OWNER_BRIEF.md) — PO note: do not re-argue; decisions log
 - [../../AGENTS.md](../../AGENTS.md) — first bullets
 - [../../.cursor/rules/ux-studio-director.mdc](../../.cursor/rules/ux-studio-director.mdc) — always-applied Cursor rule

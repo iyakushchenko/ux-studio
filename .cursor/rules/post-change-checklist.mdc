@@ -7,14 +7,14 @@ alwaysApply: true
 
 After changes to **code**, **UI**, or **config**, before considering the task done:
 
-1. `npm test` (fix failures).
+1. `npm test` (fix failures) — includes `check:links`.
 2. `npm run build` (must stay green — Pages uses the same signal).
-3. Update authoritative docs if behavior changed (`docs/product/*`).
-4. UI-facing ships: strict FE audit **PROVEN** ([docs/product/FE_UI_UX_AUDIT.md](docs/product/FE_UI_UX_AUDIT.md)) — tests alone are BAD.
-5. Chrome / playback: local MCP helpers or lean `npm run smoke` — not full marathon in CI.
+3. Update authoritative docs if behavior changed (`docs/product/*`). Append durable lessons to [docs/product/LESSONS_LEARNED.md](docs/product/LESSONS_LEARNED.md).
+4. UI-facing ships: strict FE audit **PROVEN** ([docs/product/FE_UI_UX_AUDIT.md](docs/product/FE_UI_UX_AUDIT.md)) — tests alone are BAD; **browser proof** required for hybrid mounts / chrome.
+5. Chrome / playback: local MCP (`__protoRunMcpSanityCheck`, REC⊗CJM) or lean `npm run smoke` — not full marathon in CI. Agent runs should show `__protoAgentTestingOverlay`.
 6. User-visible / durable seams: `npm run notes:append -- --lane=<lane> --intent="…"`.
 7. Commit when coherent (and allowed). Do not leave a green coherent tree uncommitted without a reason.
 
-Full detail: [docs/product/POST_CHANGE_CHECKLIST.md](docs/product/POST_CHANGE_CHECKLIST.md) · versioning: [docs/product/VERSIONING.md](docs/product/VERSIONING.md) · Actions: [docs/product/CI_ACTIONS_BUDGET.md](docs/product/CI_ACTIONS_BUDGET.md).
+Full detail: [docs/product/POST_CHANGE_CHECKLIST.md](docs/product/POST_CHANGE_CHECKLIST.md) · lessons: [docs/product/LESSONS_LEARNED.md](docs/product/LESSONS_LEARNED.md) · versioning: [docs/product/VERSIONING.md](docs/product/VERSIONING.md) · Actions: [docs/product/CI_ACTIONS_BUDGET.md](docs/product/CI_ACTIONS_BUDGET.md).
 
 Do **not** add GitHub Actions jobs to replace these local gates.

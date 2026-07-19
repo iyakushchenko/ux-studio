@@ -112,6 +112,11 @@ import {
   mountBookStep2Screen,
   unmountBookStep2Screen,
 } from "@/projects/boots-pharmacy/screens/book-step2/mountBookStep2Screen";
+import {
+  isBookStep3ReactMounted,
+  mountBookStep3Screen,
+  unmountBookStep3Screen,
+} from "@/projects/boots-pharmacy/screens/book-step3/mountBookStep3Screen";
 
 
 /**
@@ -1471,6 +1476,39 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
 
   useEffect(() => {
     return () => unmountBookStep2Screen();
+  }, []);
+
+  // Book Step 3 — React + UXDS pilot (retires Make HTML for this screen only)
+  useLayoutEffect(() => {
+    if (SCREENS[current]?.childIndex !== 3) {
+      unmountBookStep3Screen();
+      return;
+    }
+
+    mountBookStep3Screen({
+      chosenLocation,
+      vaccineName: chosenVaccine.name,
+      recipient: chosenRecipient,
+      slot: chosenBookingSlot,
+      includeBoosterDose,
+      onExploreMore: () => setCurrent(PROTO_INDEX_PLP),
+      onOpenAppointments: () => setCurrent(PROTO_INDEX_APPOINTMENT_HISTORY),
+    });
+
+    setupProtoFooters({
+      onGoToPlp: () => goRef.current(PROTO_INDEX_PLP),
+    });
+  }, [
+    current,
+    chosenLocation,
+    chosenVaccine.name,
+    chosenRecipient,
+    chosenBookingSlot,
+    includeBoosterDose,
+  ]);
+
+  useEffect(() => {
+    return () => unmountBookStep3Screen();
   }, []);
 
   // Book – Step 1 (child 7): breadcrumb rewrite — Make path only
@@ -3226,8 +3264,10 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   }, [current]);
 
   // Book Step 3 — Advantage Card points block: rows left, card image right.
+  // Make path only — React Step 3 owns Advantage layout in-component.
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 3) return;
+    if (isBookStep3ReactMounted()) return;
     const screen = document.querySelector(
       ".proto-viewport > div > div:nth-child(3)"
     ) as HTMLElement | null;
@@ -3287,8 +3327,10 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   }, [current]);
 
   // Book Step 3 — Explore more vaccinations → PLP
+  // Make path only — React Step 3 wires Explore in-component.
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 3) return;
+    if (isBookStep3ReactMounted()) return;
     const screen = document.querySelector(
       ".proto-viewport > div > div:nth-child(3)"
     ) as HTMLElement | null;
@@ -3332,8 +3374,10 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   }, [current]);
 
   // Book Step 3 — Open Appointments link → Appointment History (tab 8)
+  // Make path only — React Step 3 owns `data-proto-open-appointment`.
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 3) return;
+    if (isBookStep3ReactMounted()) return;
     const screen = document.querySelector(
       ".proto-viewport > div > div:nth-child(3)"
     ) as HTMLElement | null;
@@ -3643,6 +3687,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       if (!screen) return;
 
       if (mode === "confirm") {
+        if (isBookStep3ReactMounted()) return;
         const summary = screen.querySelector<HTMLElement>(
           '[data-name="component.co.order.summary"]'
         );
@@ -3822,7 +3867,9 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     const childIndex = SCREENS[current]?.childIndex;
 
     // Confirmation — progress is read-only (no back-nav, all bars stay teal)
+    // Make path only when React Step 3 owns progress.
     if (childIndex === 3) {
+      if (isBookStep3ReactMounted()) return;
       const lockProgress = () => {
         const root = prototypeScrollElRef.current;
         const screen = root?.querySelector(

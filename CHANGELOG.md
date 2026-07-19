@@ -7,6 +7,9 @@
 - **docs:** Stamp Book Step 2 FE audit handoff SHA af50556
 - **docs:** NEXT_STEPS: Step 2 + Pages verify DONE; Book Step 3 is NOW
 - **project:** Book Step 2: left-align time-slot last rows; stop agentic browse snap from Step 1 tab to Home
+- **project:** Book Step 3 React Confirmation — host book-step-3; FE audit PROVEN localhost; Pages verify next
+- **shell:** Agent testing overlay (__protoAgentTestingOverlay) auto on MCP sanity / __protoRun*
+- **docs:** LESSONS_LEARNED + director/checklist/audit G7–G9 hard gates
 
 ## v0.0.1 - 190726
 

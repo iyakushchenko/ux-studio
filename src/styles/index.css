@@ -20,8 +20,9 @@
 /* ── THEME — optional project remaps (`src/projects/<id>/styleguide/theme.css`) */
 @import '../projects/boots-pharmacy/styleguide/theme.css';
 
-/* ── PANEL — engine chrome only (`src/app/nav/`; future `src/app/shell/`) ─── */
+/* ── PANEL — engine chrome only (`src/app/nav/`; `src/app/shell/`) ─── */
 @import '../app/nav/protoNavPanel.css';
+@import '../app/shell/proto-agent-testing-overlay.css';
 
 /* ── LEGACY — Make quarantine (`globals-*.css`); do not grow for React pages */
 @import './globals.css';

@@ -36,6 +36,7 @@ Agentic CJM still lands on Book Step 2 after Availability Tool; this pilot prove
 |--------|--------|
 | **Book Step 1 — Location** | **React + UXDS** (Make HTML hidden for this child only) |
 | **Book Step 2 — Date and Time** | **React + UXDS** (Make HTML hidden for Frame child **4** only) |
+| **Book Step 3 — Confirmation** | **React + UXDS** (Make HTML hidden for Frame child **3** only) |
 | All other Boots screens | Make wire (+ overlays/popups as before) |
 | Availability Tool | React overlay (prior enrichment) |
 

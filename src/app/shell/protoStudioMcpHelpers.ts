@@ -29,6 +29,13 @@ import {
   throwIfMcpTestAborted,
 } from "@/app/shell/protoMcpTestGuard";
 import { isRecordingActive } from "@/app/recording/protoRecordingSession";
+import {
+  installAgentTestingOverlayApi,
+  logAgentTestingOverlay,
+  startAgentTestingOverlay,
+  stopAgentTestingOverlay,
+  uninstallAgentTestingOverlayApi,
+} from "@/app/shell/protoAgentTestingOverlay";
 
 export type ProtoStudioMcpState = {
   diagnosticOpen: boolean;
@@ -296,9 +303,12 @@ async function withMcpTestSession<T>(
   }
   const id = beginMcpTestSession(label);
   enableCursorQaEyes();
+  startAgentTestingOverlay(`AGENT TESTING — ${label}`);
+  logAgentTestingOverlay(`session: ${label}`);
   try {
     return await run();
   } finally {
+    stopAgentTestingOverlay();
     disableCursorQaEyes();
     endMcpTestSession(id);
   }
@@ -590,6 +600,8 @@ export function registerProtoStudioMcpHelpers(options: {
 }): () => void {
   if (typeof window === "undefined") return () => {};
 
+  installAgentTestingOverlayApi();
+
   window.__protoDismissPlaybackDiagnostic = () => {
     if (!options.isDiagnosticOpen()) return false;
     options.dismissDiagnostic();
@@ -678,6 +690,7 @@ export function registerProtoStudioMcpHelpers(options: {
     options.abortAll?.();
     options.dismissDiagnostic();
     disableCursorQaEyes();
+    stopAgentTestingOverlay({ force: true });
     logControlPanel("qa:run", { source: "abort-all" });
     return window.__protoStudioState!();
   };
@@ -733,16 +746,25 @@ export function registerProtoStudioMcpHelpers(options: {
 
   window.__protoRunMcpSanityCheck = async () => {
     window.__protoAbortAll?.();
-    const baseline = runSmokeRetreatChecks();
-    const xor = await runRecCjmXorSanityChecks();
-    const checks = [...baseline.checks, ...xor.checks];
-    const pass = checks.every((check) => check.pass);
-    logControlPanel("qa:run", { source: "sanity-check", pass });
-    return {
-      pass,
-      checks,
-      state: window.__protoStudioState?.(),
-    };
+    startAgentTestingOverlay("AGENT TESTING — mcp-sanity");
+    logAgentTestingOverlay("sanity: start");
+    try {
+      logAgentTestingOverlay("sanity: retreat baseline");
+      const baseline = runSmokeRetreatChecks();
+      logAgentTestingOverlay("sanity: REC⊗CJM xor");
+      const xor = await runRecCjmXorSanityChecks();
+      const checks = [...baseline.checks, ...xor.checks];
+      const pass = checks.every((check) => check.pass);
+      logAgentTestingOverlay(`sanity: ${pass ? "PASS" : "FAIL"}`);
+      logControlPanel("qa:run", { source: "sanity-check", pass });
+      return {
+        pass,
+        checks,
+        state: window.__protoStudioState?.(),
+      };
+    } finally {
+      stopAgentTestingOverlay();
+    }
   };
 
   window.__protoSetOrchestraMode = (modeId) => {
@@ -1138,6 +1160,7 @@ export function registerProtoStudioMcpHelpers(options: {
     withMcpTestSession("robot-qa", runTraditionalControlRoomRobotQa);
 
   return () => {
+    uninstallAgentTestingOverlayApi();
     delete window.__protoDismissPlaybackDiagnostic;
     delete window.__protoStudioState;
     delete window.__protoEnsureCleanStudio;

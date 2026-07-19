@@ -26,20 +26,29 @@ Fix or flag in the same turn.
 
 Before calling a UI slice done, **scan adjacent chrome** — do not only test the pixel you touched (Summarizer post-change spirit):
 
-- AIR / browse disable states (REC locked when AIR; transport/CJM parity)
-- Sibling links / CTAs (same role → same pattern; Learn more ≡ footer text-link)
+- **REC ⊗ CJM XOR** (not only AIR): CJM on → REC disabled; REC on → CJM off; AIR locks both (`studioModeXor.ts`, audit G6)
+- Sibling links / CTAs (same role → same pattern; Learn more ≡ footer `.uxds-link` / `check:links`)
 - Counters / mode labels / panel XOR
 - Shared kits you remapped (theme + BASE)
+- Hybrid Make+React: Make handlers gated; no dual-layout; AIR `data-*` hooks preserved
 
-→ `docs/product/COMMAND_DOCTRINE.md` §0 · `docs/product/FE_UI_UX_AUDIT.md` G5
+→ `docs/product/COMMAND_DOCTRINE.md` §0 · `docs/product/FE_UI_UX_AUDIT.md` G5–G6 · `docs/product/LESSONS_LEARNED.md`
 
 ## Hard gates
 
 1. **CSS layers:** BASE → THEME → PANEL → LEGACY only. No dump into LEGACY for new React work. → `docs/product/CSS_BASE_THEME.md` · `docs/product/DS_STRICTNESS.md`
 2. **UI motion:** `framer-motion` (`AnimatePresence` / `motion.*`). No keyframe zoos unless DS deviation. → `docs/product/FE_STANDARDS.md` §9
-3. **Handoffs:** Subagent “done” is **BAD until proven** (chrome, modes, counters, panel XOR, page L&F). → doctrine §6
+3. **Handoffs:** Subagent “done” is **BAD until proven** (chrome, modes, counters, panel XOR, page L&F). Browser proof > chat claim. → doctrine §6
 4. **UI close:** Strict (“Nazi QA”) FE audit **PROVEN** under `docs/product/audits/` before PO green-light. Tests/build/smoke alone **cannot skip**. → doctrine §7 · `docs/product/FE_UI_UX_AUDIT.md`
-5. **Actions budget:** lean CI only — no marathon smoke on every push. → `docs/product/CI_ACTIONS_BUDGET.md`
+5. **Actions budget:** lean CI only — Playwright smoke on-demand (`workflow_dispatch` / local). → `docs/product/CI_ACTIONS_BUDGET.md`
+6. **Lessons:** Read + append `docs/product/LESSONS_LEARNED.md` when a failure/win is durable (grid left-align, tab≠tab1, near-dup links, hybrid gates).
+
+## Hybrid Make + React (Boots pilots)
+
+- Hide Make chrome when React host mounts (`data-proto-make-retired`); gate Make wire with `isBookStepNReactMounted()`.
+- Incomplete flex/grid rows → **left-align** (CSS grid columns), never short-row `space-between` with narrow pads.
+- Progress / Studio Step N must use `PROTO_INDEX_BOOK_STEP*` — never remap to wrong Make “tab1” via beat fallback while browsing (`shouldNavigateBeatTabOnEnter`).
+- After chrome ships: verify GitHub Pages host when relevant.
 
 ## DS / FE
 
