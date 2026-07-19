@@ -37,8 +37,8 @@ Do **not** invent a large unused component catalog ahead of pages.
 
 | Phase | What happens |
 |-------|----------------|
-| **Now** | Book Steps 1–3 React + shared kits: `BookAppointmentProgress`, `AppointmentSummaryPill` (+ ButtonPrimary / Availability / Login) |
-| **Next extract** | Only when a second screen needs it (e.g. tertiary CTA layer, breadcrumbs) — no speculative catalog |
+| **Now** | Book Steps 1–3 React + shared kits: `BookAppointmentProgress`, `AppointmentSummaryPill` (+ ButtonPrimary / Availability / Login); PDP `PromoMessageStrip` (logo + copy + TertiaryCta slot) |
+| **Next extract** | Only when a second screen needs it (e.g. breadcrumbs) — no speculative catalog |
 | **Ongoing** | Each migration adds 0–N real, used components — library grows as a **byproduct of shipping pages** |
 | **Never** | “Scaffold 40 unused DS components” as a milestone |
 
