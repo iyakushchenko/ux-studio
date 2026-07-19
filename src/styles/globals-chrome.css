@@ -479,6 +479,34 @@
   letter-spacing: -0.36px;
 }
 
+/*
+ * Soft mint tertiary — promo CTAs (Make GP “Find out more”).
+ * Registered: docs/uxds/DEVIATIONS.md DEV-20260719-tertiary-soft
+ */
+.studio-tertiary-cta.studio-tertiary-cta--soft {
+  color: #2e2e2e;
+  background: #e0fbf8 !important;
+  box-shadow: inset 0 0 0 2px #d4fef8 !important;
+}
+
+.studio-tertiary-cta.studio-tertiary-cta--soft svg path {
+  fill: var(--project-brand-cta-navy, #012169);
+}
+
+.studio-tertiary-cta.studio-tertiary-cta--soft:hover,
+.studio-tertiary-cta.studio-tertiary-cta--soft:active,
+.studio-tertiary-cta.studio-tertiary-cta--soft.proto-chat-cta--hover,
+.studio-tertiary-cta.studio-tertiary-cta--soft.proto-chat-cta--pressed {
+  color: var(--project-brand-cta-navy-hover, #01318f);
+  background: var(--uxds-surface-accent-soft) !important;
+  box-shadow: inset 0 0 0 2px var(--project-brand-primary-light, #afccca) !important;
+}
+
+.studio-tertiary-cta.studio-tertiary-cta--soft:hover svg path,
+.studio-tertiary-cta.studio-tertiary-cta--soft.proto-chat-cta--hover svg path {
+  fill: var(--project-brand-cta-navy-hover, #01318f);
+}
+
 .studio-tertiary-cta::before {
   content: none !important;
   display: none !important;

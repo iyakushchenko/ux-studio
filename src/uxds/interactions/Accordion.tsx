@@ -4,20 +4,36 @@ import {
   type ButtonHTMLAttributes,
   type HTMLAttributes,
   type ReactNode,
+  type SVGAttributes,
 } from "react";
 import { useAccordion, type UseAccordionOptions } from "./useAccordion";
+import "./accordion.css";
 
 type AccordionCtx = {
   isOpen: (id: string) => boolean;
   toggle: (id: string) => void;
 };
 
+type AccordionItemCtx = {
+  id: string;
+  open: boolean;
+};
+
 const Ctx = createContext<AccordionCtx | null>(null);
+const ItemCtx = createContext<AccordionItemCtx | null>(null);
 
 function useAccordionCtx(): AccordionCtx {
   const ctx = useContext(Ctx);
   if (!ctx) {
     throw new Error("Accordion.* must be used inside <Accordion>");
+  }
+  return ctx;
+}
+
+function useAccordionItemCtx(): AccordionItemCtx {
+  const ctx = useContext(ItemCtx);
+  if (!ctx) {
+    throw new Error("Accordion chevron/content helpers need <AccordionItem>");
   }
   return ctx;
 }
@@ -56,16 +72,19 @@ export function AccordionItem({
   className?: string;
 } & HTMLAttributes<HTMLDivElement>) {
   const { isOpen } = useAccordionCtx();
+  const open = isOpen(id);
   return (
-    <div
-      className={className}
-      data-name="uxds.interaction.accordion.item"
-      data-uxds-accordion-item={id}
-      data-state={isOpen(id) ? "open" : "closed"}
-      {...rest}
-    >
-      {children}
-    </div>
+    <ItemCtx.Provider value={{ id, open }}>
+      <div
+        className={className}
+        data-name="uxds.interaction.accordion.item"
+        data-uxds-accordion-item={id}
+        data-state={open ? "open" : "closed"}
+        {...rest}
+      >
+        {children}
+      </div>
+    </ItemCtx.Provider>
   );
 }
 
@@ -100,6 +119,35 @@ export function AccordionTrigger({
   );
 }
 
+/** Default down-chevron — muted when closed, brand-strong + rotated when open. */
+export function AccordionChevron({
+  className,
+  ...rest
+}: {
+  className?: string;
+} & SVGAttributes<SVGSVGElement>) {
+  useAccordionItemCtx();
+  return (
+    <span
+      className={className}
+      data-name="uxds.interaction.accordion.chevron"
+      aria-hidden
+    >
+      <svg width="16" height="10" viewBox="0 0 16 10" fill="none" {...rest}>
+        <path
+          d="M16 1.43879L8 10L0 1.43879L1.34448 0L8 7.12242L14.6555 0L16 1.43879Z"
+          fill="currentColor"
+        />
+      </svg>
+    </span>
+  );
+}
+
+/**
+ * Always-mounted panel — CSS grid-template-rows 0fr↔1fr (no height:auto measure).
+ * `data-studio-accordion-open` is stamped only while open (probe contract).
+ * Page `className` / `data-name` land on the inner panel (padding-safe).
+ */
 export function AccordionContent({
   id,
   children,
@@ -111,15 +159,37 @@ export function AccordionContent({
   className?: string;
 } & HTMLAttributes<HTMLDivElement>) {
   const { isOpen } = useAccordionCtx();
-  if (!isOpen(id)) return null;
+  const open = isOpen(id);
+  const {
+    "data-studio-accordion-open": _studioOpenIgnored,
+    ...panelRest
+  } = rest as HTMLAttributes<HTMLDivElement> & {
+    "data-studio-accordion-open"?: string;
+  };
+
   return (
     <div
-      className={className}
+      className="uxds-accordion-content"
       data-name="uxds.interaction.accordion.content"
-      data-state="open"
-      {...rest}
+      data-state={open ? "open" : "closed"}
+      data-studio-accordion-open={open ? id : undefined}
+      aria-hidden={!open}
     >
-      {children}
+      <div
+        className="uxds-accordion-content__clip"
+        data-name="uxds.interaction.accordion.content.clip"
+      >
+        <div
+          className={
+            className
+              ? `uxds-accordion-content__panel ${className}`
+              : "uxds-accordion-content__panel"
+          }
+          {...panelRest}
+        >
+          {children}
+        </div>
+      </div>
     </div>
   );
 }

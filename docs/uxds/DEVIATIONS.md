@@ -67,6 +67,19 @@ Copy this block for each deviation:
 | **Not for** | Teal DS primary buttons that should follow `surface-primary-solid` |
 | **Owner doc** | Boots [styleguide/README.md](../../src/projects/boots-pharmacy/styleguide/README.md) · [../product/DS_STRICTNESS.md](../product/DS_STRICTNESS.md) |
 
+### `.studio-tertiary-cta--soft`
+
+| Field | Value |
+|-------|--------|
+| **ID** | `DEV-20260719-tertiary-soft` |
+| **Status** | approved |
+| **Surfaces** | Boots PDP GP promo “Find out more” (Make Frame104 mint pill) |
+| **Why** | Promo CTA needs **soft mint fill + ring** while still using the shared tertiary icon+text kit (`TertiaryCta`); default tertiary stays transparent |
+| **Canonical class** | `.studio-tertiary-cta.studio-tertiary-cta--soft` (`TertiaryCta soft`) |
+| **Tokens used** | `--uxds-surface-accent-soft`, `--project-brand-cta-navy`, `--project-brand-cta-navy-hover`, `--project-brand-primary-light` (+ Make mint `#e0fbf8` / ring `#d4fef8`) |
+| **Not for** | Transparent tertiary links (Change location, Reset filters, near-me) |
+| **Owner doc** | [../product/FE_STANDARDS.md](../product/FE_STANDARDS.md) §1 · [../product/DS_STRICTNESS.md](../product/DS_STRICTNESS.md) |
+
 ---
 
 ## Retired

@@ -1,0 +1,74 @@
+/**
+ * UXDS Accordion kit defaults — chevron mute/open + grid-row expand/collapse.
+ * Pages own typography/padding on the panel (inner); kit owns motion shell.
+ */
+
+[data-uxds-kit="accordion"] [data-name="uxds.interaction.accordion.chevron"] {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  color: var(--uxds-icon-icon-accent-soft);
+  transition:
+    color 0.18s ease,
+    transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+[data-uxds-kit="accordion"]
+  [data-name="uxds.interaction.accordion.trigger"][data-state="open"]
+  [data-name="uxds.interaction.accordion.chevron"],
+[data-uxds-kit="accordion"]
+  [data-uxds-accordion-item][data-state="open"]
+  > [data-name="uxds.interaction.accordion.trigger"]
+  [data-name="uxds.interaction.accordion.chevron"] {
+  color: var(--uxds-icon-icon-accent-strong);
+  transform: rotate(180deg);
+}
+
+/*
+ * Smooth expand/collapse without height:auto measurement thrash.
+ * grid-template-rows 0fr ↔ 1fr + single clip child (grid-row span fix).
+ */
+.uxds-accordion-content {
+  display: grid;
+  grid-template-rows: 0fr;
+  align-items: start;
+  transition: grid-template-rows 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.uxds-accordion-content[data-state="open"] {
+  grid-template-rows: 1fr;
+}
+
+.uxds-accordion-content__clip {
+  /* Prevents mid-transition second-row stutter */
+  grid-row: 1 / span 2;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.uxds-accordion-content__panel {
+  opacity: 0;
+  pointer-events: none;
+  /* Fade out faster on close so text doesn’t thrash while the row shrinks */
+  transition: opacity 0.14s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.uxds-accordion-content[data-state="open"] .uxds-accordion-content__panel {
+  opacity: 1;
+  pointer-events: auto;
+  /* Slight delay so the row leads; open ease a touch longer */
+  transition:
+    opacity 0.22s cubic-bezier(0.22, 1, 0.36, 1) 0.04s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-uxds-kit="accordion"] [data-name="uxds.interaction.accordion.chevron"],
+  .uxds-accordion-content,
+  .uxds-accordion-content__panel {
+    transition: none !important;
+  }
+}

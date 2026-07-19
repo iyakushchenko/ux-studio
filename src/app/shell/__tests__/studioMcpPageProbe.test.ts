@@ -516,17 +516,33 @@ describe("runMcpPageProbe", () => {
       getAttribute: (name: string) =>
         name === "aria-expanded" ? String(faqHelpExpanded) : null,
     };
+    const faqNhsTrigger = {
+      tagName: "BUTTON",
+      getAttribute: (name: string) =>
+        name === "aria-expanded" ? "false" : null,
+    };
     const faqBody = {
       tagName: "DIV",
+      className: "uxds-accordion-content",
       textContent:
         "Chickenpox can affect any age, but complications are more likely in adults, pregnant women, newborn babies and people with a weakened immune system.",
+      getAttribute: (name: string) =>
+        name === "data-state" ? (faqExpanded ? "open" : "closed") : null,
     };
     const faqHelpBody = {
       tagName: "DIV",
+      className: "uxds-accordion-content",
       textContent:
         "Our private Chickenpox Vaccination Service is suitable for adults and children aged between one and 65 years. A full course consists of two doses given 4 to 6 weeks apart. Eligibility criteria apply and suitability will be checked before each vaccination is given.",
+      getAttribute: (name: string) =>
+        name === "data-state" ? (faqHelpExpanded ? "open" : "closed") : null,
     };
-    const faqResiduals = [{}, {}, {}];
+    const faqClosedShell = {
+      tagName: "DIV",
+      className: "uxds-accordion-content",
+      getAttribute: (name: string) => (name === "data-state" ? "closed" : null),
+    };
+    const faqResiduals: unknown[] = [];
     const downloadGuide = {
       tagName: "BUTTON",
       className: "pdp__pill",
@@ -706,11 +722,19 @@ describe("runMcpPageProbe", () => {
           return faqTrigger;
         if (sel.includes('data-studio-action="pdp-faq-how-can-boots-help"'))
           return faqHelpTrigger;
+        if (sel.includes('data-studio-action="pdp-faq-nhs-vaccination"'))
+          return faqNhsTrigger;
         if (sel.includes('data-studio-accordion-open="who-is-at-risk"')) {
           return faqExpanded ? faqBody : null;
         }
         if (sel.includes('data-studio-accordion-open="how-can-boots-help"')) {
           return faqHelpExpanded ? faqHelpBody : null;
+        }
+        if (
+          sel.includes('data-uxds-accordion-item="who-is-at-risk"') &&
+          sel.includes("uxds-accordion-content")
+        ) {
+          return faqExpanded ? faqBody : faqClosedShell;
         }
         if (sel.includes('data-studio-action="pdp-download-guide"'))
           return downloadGuide;

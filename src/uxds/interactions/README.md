@@ -6,7 +6,7 @@ Shared React behavior for common website patterns. Pages compose these kits; the
 
 | Kit | Modules | Role |
 |-----|---------|------|
-| **Accordion** | `Accordion.tsx`, `useAccordion.ts`, `accordionState.ts` | Multi-item expand/collapse; `single` or `multiple` |
+| **Accordion** | `Accordion.tsx`, `useAccordion.ts`, `accordionState.ts`, `accordion.css`, `accordionMotion.ts` | Multi-item expand/collapse; `single` or `multiple`; **default** CSS `grid-template-rows` 0fr↔1fr + opacity (no height:auto thrash) + muted closed / brand-strong open chevron (`AccordionChevron`) |
 | **Disclosure** | `Disclosure.tsx`, `useDisclosure.ts`, `disclosureState.ts` | One panel show/hide (hours, dropdown body) |
 | **Filter chip** | `FilterChipToggle.tsx`, `useFilterChipToggle.ts`, `filterChipState.ts` | Facet / quick-filter toggles |
 

@@ -121,21 +121,21 @@
     {
       "screenId": "pdp",
       "status": "proven",
-      "hardGreen": true,
+      "hardGreen": false,
       "stampedAt": {
         "sha": "c6e8931",
         "date": "2026-07-19",
-        "note": "Finn structure/naming + UXDS Accordion kit + ButtonPrimary Book now; header crumbs + main RTB/below; BEM pdp; data-studio-react-screen + make-retired; FAQ Make bodies + download tertiary unify + accordion focus-none. Restored after v0.0.28 polish NEEDS-REPROVE."
+        "note": "Structure stamp retained. PO polish after HARD-GREEN — full FAQ bodies + TertiaryCta soft Find out more + Accordion kit motion/muted chevrons. Quinn must re-prove MCP + Uma §0a before hardGreen again."
       },
       "mcpFinalPass": {
-        "status": "HARD-GREEN",
-        "pass": true,
+        "status": "NEEDS-REPROVE",
+        "pass": false,
         "stampedAt": {
           "sha": "c6e8931",
           "date": "2026-07-19",
           "version": "0.0.28",
-          "auditor": "Arch (Director) — Quinn MCP + Uma §0a",
-          "note": "Restored HARD-GREEN after v0.0.28 FAQ/CTA/focus polish. Quinn MCP 23/23 PASS @ bf59041 (prove 67a5b7c; tip c6e8931); Uma §0a PROVEN @ 8d80d5f; faq-help-body + download tertiary unify (no --bordered) + accordion focus-none; overlay-eyes + teardown clean. Evidence: FE_AUDIT_PDP_MCP + UMA_FIDELITY_PDP + FE_AUDIT_PDP_PAGE_FINAL_PASS."
+          "auditor": "Arch (Director) — demote after PO FAQ/CTA/Accordion polish",
+          "note": "Prior HARD-GREEN @ c6e8931 invalidated by full FAQ bodies (incl. Bea NHS/already-have/personal-data), TertiaryCta soft Find out more (strip .pdp__pill--mint), UXDS Accordion CSS grid-template-rows motion (no height:auto stutter) + muted closed chevrons. Do not false-PROVEN — re-run __studioRunMcpPageProbe({ screenId:\"pdp\", reload:false })."
         },
         "url": "http://127.0.0.1:5188/?project=boots-pharmacy&screen=pdp",
         "auditPath": "docs/projects/boots-pharmacy/audits/FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md",

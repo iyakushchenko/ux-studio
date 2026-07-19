@@ -4,6 +4,11 @@ type TertiaryCtaProps = {
   children: ReactNode;
   icon?: ReactNode;
   compact?: boolean;
+  /**
+   * Soft mint fill + ring (promo CTAs e.g. GP “Find out more”).
+   * Transparent tertiary remains the default icon+text pattern.
+   */
+  soft?: boolean;
   className?: string;
 } & Omit<
   ButtonHTMLAttributes<HTMLButtonElement>,
@@ -12,22 +17,25 @@ type TertiaryCtaProps = {
 
 /**
  * Tertiary icon + text CTA — transparent, no hover wash; icon→navy, label→black.
- * Styled via `.studio-tertiary-cta` in globals.css.
+ * Soft variant: mint fill for promo surfaces (Make GP CTA parity).
+ * Styled via `.studio-tertiary-cta` in globals-chrome.css.
  */
 export function TertiaryCta({
   children,
   icon,
   compact = false,
+  soft = false,
   className,
   type = "button",
   ...rest
 }: TertiaryCtaProps) {
   const sizeClass = compact ? " studio-tertiary-cta--compact" : "";
+  const softClass = soft ? " studio-tertiary-cta--soft" : "";
 
   return (
     <button
       type={type}
-      className={`studio-tertiary-cta${sizeClass}${className ? ` ${className}` : ""}`}
+      className={`studio-tertiary-cta${sizeClass}${softClass}${className ? ` ${className}` : ""}`}
       {...rest}
     >
       {icon ? <span className="studio-tertiary-cta__icon">{icon}</span> : null}

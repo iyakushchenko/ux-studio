@@ -30,7 +30,7 @@ describe("pdpContract", () => {
     expect(PDP_REACT_SCREEN_ID).toBe("pdp");
   });
 
-  it("locks below-fold Make copy for L16 / L18 / L19 (interactive accordion)", () => {
+  it("locks below-fold Make + Bea FAQ bodies for L16 / L18 / L19", () => {
     expect(PDP_INTRO_PARAGRAPHS).toHaveLength(2);
     expect(PDP_SERVICE_BLURB).toMatch(/private Chickenpox Vaccination Service/i);
     expect(PDP_APPOINTMENT_STRIP).toMatch(/15 minutes/i);
@@ -45,31 +45,51 @@ describe("pdpContract", () => {
     expect(PDP_ACCORDION_PANELS).toHaveLength(6);
     expect([...PDP_ACCORDION_DEFAULT_OPEN]).toEqual(["who-is-at-risk"]);
 
-    const withBody = PDP_ACCORDION_PANELS.filter((p) => p.body);
-    expect(withBody.map((p) => p.id)).toEqual([
+    expect(PDP_ACCORDION_PANELS.every((p) => p.body && p.id && p.title)).toBe(
+      true
+    );
+    expect(PDP_ACCORDION_PANELS.map((p) => p.id)).toEqual([
       "how-can-boots-help",
       "who-is-at-risk",
       "what-happens-at-appointment",
-    ]);
-    expect(
-      withBody.find((p) => p.id === "how-can-boots-help")?.body
-    ).toBe(PDP_SERVICE_BLURB);
-    expect(
-      withBody.find((p) => p.id === "who-is-at-risk")?.body
-    ).toMatch(/weakened immune system/);
-    expect(
-      withBody.find((p) => p.id === "what-happens-at-appointment")?.body
-    ).toMatch(/15 minutes/);
-    expect(
-      withBody.find((p) => p.id === "what-happens-at-appointment")?.body
-    ).toMatch(/upper arm or thigh/);
-
-    const residual = PDP_ACCORDION_PANELS.filter((p) => p.body == null);
-    expect(residual.map((p) => p.id)).toEqual([
       "nhs-vaccination",
       "already-have-chickenpox",
       "personal-data",
     ]);
-    expect(PDP_ACCORDION_PANELS.every((p) => p.id && p.title)).toBe(true);
+
+    const help = PDP_ACCORDION_PANELS.find((p) => p.id === "how-can-boots-help");
+    expect(help?.body).toContain(PDP_SERVICE_BLURB);
+    expect(help?.body).toMatch(/book online/i);
+    expect(help?.source).toBe("make+bea");
+
+    expect(
+      PDP_ACCORDION_PANELS.find((p) => p.id === "who-is-at-risk")?.body
+    ).toMatch(/weakened immune system/);
+
+    const appt = PDP_ACCORDION_PANELS.find(
+      (p) => p.id === "what-happens-at-appointment"
+    );
+    expect(appt?.body).toMatch(/15 minutes/);
+    expect(appt?.body).toMatch(/upper arm or thigh/);
+    expect(appt?.body).toMatch(/medical history/i);
+
+    const beaOnly = PDP_ACCORDION_PANELS.filter((p) => p.source === "bea");
+    expect(beaOnly.map((p) => p.id)).toEqual([
+      "nhs-vaccination",
+      "already-have-chickenpox",
+      "personal-data",
+    ]);
+    expect(beaOnly.every((p) => (p.body?.split(/[.!?]/).length ?? 0) >= 3)).toBe(
+      true
+    );
+    expect(
+      PDP_ACCORDION_PANELS.find((p) => p.id === "nhs-vaccination")?.body
+    ).toMatch(/not routinely offered on the NHS/i);
+    expect(
+      PDP_ACCORDION_PANELS.find((p) => p.id === "already-have-chickenpox")?.body
+    ).toMatch(/natural immunity/i);
+    expect(
+      PDP_ACCORDION_PANELS.find((p) => p.id === "personal-data")?.body
+    ).toMatch(/data protection/i);
   });
 });

@@ -820,7 +820,7 @@ function pdpProbeSteps(): ProbeStep[] {
       selector:
         '.pdp[data-studio-react-screen="pdp"] button[data-studio-action="pdp-faq-who-is-at-risk"]',
       action: "click",
-      settleMs: 350,
+      settleMs: 420,
       assert: () => {
         const trigger = document.querySelector<HTMLElement>(
           '.pdp[data-studio-react-screen="pdp"] button[data-studio-action="pdp-faq-who-is-at-risk"]'
@@ -829,12 +829,18 @@ function pdpProbeSteps(): ProbeStep[] {
         if (trigger.getAttribute("aria-expanded") !== "false") {
           return "expected Who is at risk? collapsed after toggle click";
         }
+        const shell = document.querySelector<HTMLElement>(
+          '.pdp[data-studio-react-screen="pdp"] [data-uxds-accordion-item="who-is-at-risk"] [data-name="uxds.interaction.accordion.content"], .pdp[data-studio-react-screen="pdp"] [data-uxds-accordion-item="who-is-at-risk"] .uxds-accordion-content'
+        );
         if (
           document.querySelector(
             '.pdp[data-studio-react-screen="pdp"] [data-studio-accordion-open="who-is-at-risk"]'
           )
         ) {
-          return "FAQ body still mounted while collapsed";
+          return "FAQ still stamped open while collapsed";
+        }
+        if (shell && shell.getAttribute("data-state") !== "closed") {
+          return "FAQ content shell data-state should be closed";
         }
         return true;
       },
@@ -844,7 +850,7 @@ function pdpProbeSteps(): ProbeStep[] {
       selector:
         '.pdp[data-studio-react-screen="pdp"] button[data-studio-action="pdp-faq-who-is-at-risk"]',
       action: "click",
-      settleMs: 350,
+      settleMs: 420,
       assert: () => {
         const trigger = document.querySelector<HTMLElement>(
           '.pdp[data-studio-react-screen="pdp"] button[data-studio-action="pdp-faq-who-is-at-risk"]'
@@ -861,13 +867,12 @@ function pdpProbeSteps(): ProbeStep[] {
         const helpBody = document.querySelector(
           '.pdp[data-studio-react-screen="pdp"] [data-studio-accordion-open="how-can-boots-help"]'
         );
-        // Default open is who-is-at-risk (single); help body mounts when opened.
-        // Assert Make RTB copy is wired on the help trigger’s panel contract via DOM residual check:
+        // All six FAQ panels now have bodies (PO ask) — no residual headers.
         const residual = document.querySelectorAll(
           '.pdp[data-studio-react-screen="pdp"] [data-studio-faq-residual]'
         );
-        if (residual.length !== 3) {
-          return `expected 3 Make-residual FAQ headers, got ${residual.length}`;
+        if (residual.length !== 0) {
+          return `expected 0 FAQ residual headers (all panels have bodies), got ${residual.length}`;
         }
         if (helpBody) {
           return "how-can-boots-help should be collapsed while who-is-at-risk is open (single)";
@@ -876,6 +881,12 @@ function pdpProbeSteps(): ProbeStep[] {
           '.pdp[data-studio-react-screen="pdp"] button[data-studio-action="pdp-faq-how-can-boots-help"]'
         );
         if (!helpTrigger) return "How can Boots help? trigger missing (body wired)";
+        const nhsTrigger = document.querySelector(
+          '.pdp[data-studio-react-screen="pdp"] button[data-studio-action="pdp-faq-nhs-vaccination"]'
+        );
+        if (!nhsTrigger) {
+          return "NHS FAQ trigger missing (Bea body must be expandable)";
+        }
         return true;
       },
     },
@@ -884,7 +895,7 @@ function pdpProbeSteps(): ProbeStep[] {
       selector:
         '.pdp[data-studio-react-screen="pdp"] button[data-studio-action="pdp-faq-how-can-boots-help"]',
       action: "click",
-      settleMs: 350,
+      settleMs: 420,
       assert: () => {
         const body = document.querySelector(
           '.pdp[data-studio-react-screen="pdp"] [data-studio-accordion-open="how-can-boots-help"]'

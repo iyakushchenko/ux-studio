@@ -1,10 +1,17 @@
 export {
   Accordion,
+  AccordionChevron,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "./Accordion";
 export type { AccordionProps } from "./Accordion";
+export {
+  ACCORDION_CONTENT_DURATION_S,
+  ACCORDION_EASE,
+  ACCORDION_PROBE_SETTLE_MS,
+  accordionContentTransition,
+} from "./accordionMotion";
 export {
   isAccordionItemOpen,
   toggleAccordionValue,

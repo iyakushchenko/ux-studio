@@ -2,16 +2,16 @@
 
 **Project:** `boots-pharmacy`  
 **Callsigns:** Bea (BA) owns register truth · Quinn (QA) owns prove · Finn/Uma restore gaps  
-**Updated:** 2026-07-19 (PO polish: FAQ Make bodies + download tertiary unify + accordion focus-none; Final Pass **HARD-GREEN** @ `c6e8931`)  
+**Updated:** 2026-07-19 (PO polish: full FAQ bodies + TertiaryCta soft Find out more + Accordion kit motion/muted chevrons; Final Pass **NEEDS-REPROVE**)  
 **Make source:** Frame child **8** (`PDP. Vaccine Details Page` / `BTS-PHRM.Product - Deal Details Page`, `screenId: "pdp"`) + `globals-screens` child-8 rules + `BootsPharmacyProjectView` wire + `frame/index.tsx`  
 **React target:** `src/projects/boots-pharmacy/screens/pdp/*`  
 **Refs:** [PDP_REACT.md](./PDP_REACT.md) · [PLP_MAKE_PARITY_REGISTER.md](./PLP_MAKE_PARITY_REGISTER.md) (format) · [URL.md](../../../shell/URL.md) (modal ids)  
-**Uma checklist:** [../../../product/UMA_FIDELITY_NOTES.md](../../../product/UMA_FIDELITY_NOTES.md) · **Uma stamp:** [../audits/UMA_FIDELITY_PDP_2026-07-19.md](../audits/UMA_FIDELITY_PDP_2026-07-19.md) (**PROVEN**)
+**Uma checklist:** [../../../product/UMA_FIDELITY_NOTES.md](../../../product/UMA_FIDELITY_NOTES.md) · **Uma stamp:** [../audits/UMA_FIDELITY_PDP_2026-07-19.md](../audits/UMA_FIDELITY_PDP_2026-07-19.md) (**re-prove after polish**)
 
 **Status legend:** Present · Partial · Missing · Fixed · N/A
 
 **Make column:** inventory truth from Frame + wire + LEGACY CSS (2026-07-19).  
-**React column:** L1–L20 mounted; FAQ = UXDS Accordion (3 Make-sourced bodies + 3 residual headers); download CTAs = matched tertiary `.pdp__pill` (no leaflet stub border); accordion focus ring removed (Make parity). Final Pass **HARD-GREEN** after Quinn 23/23 + Uma §0a + Arch restore.
+**React column:** L1–L20 mounted; FAQ = UXDS Accordion **6/6 bodies** (Make + Bea-sourced); GP CTA = `TertiaryCta soft` (no `.pdp__pill--mint`); Accordion kit owns expand/collapse motion + muted closed chevrons. Final Pass **NEEDS-REPROVE** after this polish.
 
 **Bea rule:** Every band before Finn codes — including loading/empty/updating as **P0** when Make has them. No invented bands.
 
@@ -50,18 +50,18 @@
 
 | Panel | Make source (searched) | React |
 |-------|------------------------|-------|
-| How can Boots help? | Accordion `Description` **absent**; **RTB service blurb** (same PDP Make page) answers the header | Body = `PDP_SERVICE_BLURB` |
-| Who is at risk? | Accordion `Description` paragraph | Default open + that Make body |
-| What happens at the appointment? | Accordion `Description` **absent**; **appt strip** + specs **Administration** | Body = strip + administration (Make strings only) |
-| Can I get vaccinated on the NHS? | Header only — no Description / journey / HTML body | **Residual** static header (no empty expand shell) |
-| What if I already have chickenpox? | Header only — same search miss | **Residual** static header |
-| How we use your personal data | Header only — same search miss | **Residual** static header |
+| How can Boots help? | Accordion `Description` **absent**; **RTB service blurb** (same PDP Make page) | Body = RTB blurb + short booking cue (`source: make+bea`) |
+| Who is at risk? | Accordion `Description` paragraph | Default open + Make body + brief context (`make+bea`) |
+| What happens at the appointment? | Accordion `Description` **absent**; **appt strip** + specs **Administration** | Body = strip + administration + visit flow (`make+bea`) |
+| Can I get vaccinated on the NHS? | Header only — no Description | **Bea-sourced** expandable body (Boots-plausible; no wild NHS claims) |
+| What if I already have chickenpox? | Header only | **Bea-sourced** expandable body |
+| How we use your personal data | Header only | **Bea-sourced** expandable body |
 
-**Search note (Bea):** `frame/index.tsx` `ComponentPdpAccordion`, register, journey `boots-pharmacy-sarah-jenkins.json`, repo HTML — only one accordion `Description`. No invent. Live Boots.com FAQ blocked (Incapsula); not used as copy source.
+**Search note (Bea):** Make export still has only one accordion `Description`. PO (2026-07-19) asked for real bodies on residual panels — Bea wrote concise Boots-plausible copy marked `source: "bea"` in `pdpContract.ts`. Live Boots.com FAQ blocked (Incapsula); not used as copy source.
 
-**I18 download CTAs:** Make Frame126 shows Guide at rest + Leaflet with `#c7e4ff` border + `.utility / cursor` = **Figma hover mock** (I20), not a second rest style. React: both `.pdp__pill` tertiary; GP “Find out more” stays mint.
+**I18 download CTAs:** Make Frame126 shows Guide at rest + Leaflet with `#c7e4ff` border + `.utility / cursor` = **Figma hover mock** (I20), not a second rest style. React: both `.pdp__pill` tertiary; GP “Find out more” = shared `TertiaryCta soft` (`.studio-tertiary-cta--soft`, DEV-20260719-tertiary-soft) — no page `.pdp__pill--mint`.
 
-**Accordion focus:** Make has no focus ring — PDP `.pdp__accordion-header` `outline: none` (keyboard expand kept via button + `aria-expanded`).
+**Accordion kit:** UXDS Accordion owns CSS `grid-template-rows` 0fr↔1fr expand/collapse (no height:auto thrash) + muted closed / brand-strong open chevron (`AccordionChevron`). PDP keeps layout/title CSS only. Focus ring still none (Make parity).
 
 ---
 

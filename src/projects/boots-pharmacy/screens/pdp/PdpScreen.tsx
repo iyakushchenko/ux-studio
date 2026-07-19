@@ -3,6 +3,7 @@ import productImage from "@/projects/boots-pharmacy/frame/ac6ed7db66adf30dd80e02
 import bodyFill from "@/projects/boots-pharmacy/frame/dbcd84d6da292330c6f57adefa32dd4b969ac8bd.png";
 import appointmentIcon from "@/projects/boots-pharmacy/frame/9d46d8f7966cc26795f1d8689d9132bdf6e13c15.png";
 import gpPromoLogo from "@/projects/boots-pharmacy/frame/61d74a3c817f3bb72471ea03403b2077aa2da40a.png";
+import { TertiaryCta } from "@/app/chrome/TertiaryCta";
 import {
   isInWishlist,
   PDP_WISHLIST_ID,
@@ -18,6 +19,7 @@ import {
 import { ButtonPrimary } from "@/uxds/components";
 import {
   Accordion,
+  AccordionChevron,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
@@ -46,10 +48,6 @@ const DOWNLOAD_GLYPH_BAR =
   "M14 12.2682H0V13.9999H14V12.2682Z";
 const DOWNLOAD_GLYPH_ARROW =
   "M6.26167 0L6.26167 7.92269L2.38333 4.5891L1.25667 5.90955L6.565 10.4554C6.89 10.7368 7.36667 10.7368 7.69167 10.4554L13 5.90955L11.8733 4.5891L7.995 7.92269L7.995 0.0216467L6.26167 0.0216465V0Z";
-
-/** Accordion chevron (down) — open state rotates 180° via CSS (PLP kit pattern). */
-const CHEVRON_DOWN =
-  "M16 1.43879L8 10L0 1.43879L1.34448 0L8 7.12242L14.6555 0L16 1.43879Z";
 
 export type PdpScreenProps = {
   includeBoosterDose: boolean;
@@ -139,14 +137,6 @@ function DownloadGlyph() {
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
       <path d={DOWNLOAD_GLYPH_BAR} fill="currentColor" />
       <path d={DOWNLOAD_GLYPH_ARROW} fill="currentColor" />
-    </svg>
-  );
-}
-
-function ChevronGlyph() {
-  return (
-    <svg width="16" height="10" viewBox="0 0 16 10" fill="none" aria-hidden>
-      <path d={CHEVRON_DOWN} fill="currentColor" />
     </svg>
   );
 }
@@ -247,58 +237,26 @@ function PdpBelowFold() {
               data-name="component.gse.accordion"
               data-studio-accordion-item={panel.id}
             >
-              {panel.body ? (
-                <>
-                  <AccordionTrigger
-                    id={panel.id}
-                    className="pdp__accordion-header"
-                    data-studio-action={`pdp-faq-${panel.id}`}
-                  >
-                    <span
-                      className="pdp__accordion-title-wrap"
-                      data-name="title wrapper"
-                    >
-                      <span className="pdp__accordion-title">{panel.title}</span>
-                    </span>
-                    <span
-                      className="pdp__accordion-chevron"
-                      data-name="icon / input / field"
-                      aria-hidden
-                    >
-                      <ChevronGlyph />
-                    </span>
-                  </AccordionTrigger>
-                  <AccordionContent
-                    id={panel.id}
-                    className="pdp__accordion-body"
-                    data-name="Description"
-                    data-studio-accordion-open={panel.id}
-                  >
-                    <p>{panel.body}</p>
-                  </AccordionContent>
-                </>
-              ) : (
-                /* Make header-only residual — no empty expand shell */
-                <div
-                  className="pdp__accordion-header pdp__accordion-header--static"
-                  data-name="wrapper"
-                  data-studio-faq-residual={panel.id}
+              <AccordionTrigger
+                id={panel.id}
+                className="pdp__accordion-header"
+                data-studio-action={`pdp-faq-${panel.id}`}
+              >
+                <span
+                  className="pdp__accordion-title-wrap"
+                  data-name="title wrapper"
                 >
-                  <span
-                    className="pdp__accordion-title-wrap"
-                    data-name="title wrapper"
-                  >
-                    <span className="pdp__accordion-title">{panel.title}</span>
-                  </span>
-                  <span
-                    className="pdp__accordion-chevron"
-                    data-name="icon / input / field"
-                    aria-hidden
-                  >
-                    <ChevronGlyph />
-                  </span>
-                </div>
-              )}
+                  <span className="pdp__accordion-title">{panel.title}</span>
+                </span>
+                <AccordionChevron />
+              </AccordionTrigger>
+              <AccordionContent
+                id={panel.id}
+                className="pdp__accordion-body"
+                data-name="Description"
+              >
+                <p>{panel.body}</p>
+              </AccordionContent>
             </AccordionItem>
           ))}
         </Accordion>
@@ -313,17 +271,19 @@ function PdpBelowFold() {
               height={48}
             />
             <p className="pdp__gp-copy">{GP_PROMO_COPY}</p>
-            <button
-              type="button"
-              className="pdp__pill pdp__pill--mint"
+            <TertiaryCta
+              compact
+              soft
               data-name="component.input.button"
               data-studio-action="pdp-gp-find-out-more"
+              icon={
+                <span data-name="icon=download">
+                  <DownloadGlyph />
+                </span>
+              }
             >
-              <span className="pdp__pill-icon" data-name="icon=download">
-                <DownloadGlyph />
-              </span>
-              <span className="pdp__pill-label">Find out more</span>
-            </button>
+              Find out more
+            </TertiaryCta>
           </div>
         </div>
       </div>
