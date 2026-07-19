@@ -77,9 +77,9 @@ function useRecordingUiSnapshot(): RecordingUiSnapshot {
   );
 }
 
-/** Live / last-session recorded-event count — Rec mode only (mounted only when journey STEPS is hidden). */
+/** Live / last-session recorded-event count — Rec mode only (never labeled STEPS). */
 export function formatRecordingEventCounter(eventCount: number): string {
-  return `STEPS: ${eventCount}`;
+  return `REC: ${eventCount}`;
 }
 
 /**
