@@ -2,7 +2,7 @@
 
 **Project:** `boots-pharmacy`  
 **Callsigns:** Bea (BA) · Finn (FE) · Uma (UI/UX) · Quinn (QA) · Pax (PO sim) · Arch (Director)  
-**Status:** scaffold mounted (not PROVEN / not Final Pass)  
+**Status:** L1–L20 mounted (not PROVEN / not Final Pass)  
 **Updated:** 2026-07-19  
 **Refs:** [BOOTS_REACT_SCREEN_PILOT.md](../BOOTS_REACT_SCREEN_PILOT.md) · [PDP_MAKE_PARITY_REGISTER.md](./PDP_MAKE_PARITY_REGISTER.md) · [PLP_REACT.md](./PLP_REACT.md) · [PAGE_FINAL_PASS.md](../../../product/PAGE_FINAL_PASS.md) · [NEXT_STEPS.md](../../../product/NEXT_STEPS.md) · Uma [../audits/UMA_FIDELITY_PDP_2026-07-19.md](../audits/UMA_FIDELITY_PDP_2026-07-19.md) · Quinn [../audits/QUINN_PDP_PROBE_CRITERIA_2026-07-19.md](../audits/QUINN_PDP_PROBE_CRITERIA_2026-07-19.md)
 
@@ -12,7 +12,7 @@
 
 Erase-Make **next page after PLP HARD-GREEN**. Vaccine PDP (`screenId: pdp`, Frame child **8**) is the Traditional CJM bridge between PLP and Book Step 1. Make truth: chickenpox single-SKU RTB + below-fold education bands. React mount follows Book Step 1 / PLP pilot pattern — UXDS + scoped CSS, Make child retired from view, no new LEGACY growth.
 
-**Gate:** PLP PAGE FINAL PASS **HARD-GREEN** satisfied (2026-07-19). React scaffold L1–L13 mounted; below-fold + Quinn MCP + Uma PROVEN still open.
+**Gate:** PLP PAGE FINAL PASS **HARD-GREEN** satisfied (2026-07-19). React L1–L20 mounted (RTB + below-fold); Quinn MCP + Uma PROVEN still open.
 
 ## Business logic
 
@@ -38,10 +38,11 @@ Erase-Make **next page after PLP HARD-GREEN**. Vaccine PDP (`screenId: pdp`, Fra
 - [x] URL `?project=boots-pharmacy&screen=pdp` restores tab; recording `kind: "screen"` `pdp` unchanged
 - [x] No new styles in `globals-screens` LEGACY for React path — `screens/pdp/*.css` + UXDS + theme only
 - [x] Scaffold P0 bands L1–L13 + interactions I5–I12, I8–I10 per register
+- [x] Below-fold P0 bands L14–L20 (static accordion B1; download/GP CTAs decorative)
 - [x] Modal URL sync: `login`, `choose-pharmacy` from PDP CTAs ([URL.md](../../../shell/URL.md)) — wire reuses existing modals
-- [ ] PAGE FINAL PASS: landmarks `header`+`main`, BEM=`pdp` present in scaffold; stamp + `check:page-final-pass` after Quinn MCP
-- [x] `npm test` green on scaffold; Uma audit **not PROVEN** until full matrix + below-fold bands
-- [ ] Honest residual: Make Frame child 8 in DOM until delete phase; accordion B1 if static-only; L14–L20 missing
+- [ ] PAGE FINAL PASS: landmarks `header`+`main`, BEM=`pdp` present; stamp + `check:page-final-pass` after Quinn MCP
+- [x] `npm test` green on L14–L20 contract; Uma audit **not PROVEN** until full matrix + Quinn MCP
+- [ ] Honest residual: Make Frame child 8 in DOM until delete phase; accordion B1 static-only until PO
 
 ## Chrome / fidelity (Uma)
 
@@ -82,7 +83,7 @@ Erase-Make **next page after PLP HARD-GREEN**. Vaccine PDP (`screenId: pdp`, Fra
 | Make Frame child 8 in bundle | Hidden + wire-gated until delete phase |
 | `globals-screens` child-8 rules | Dead while React mounted; shrink on Make delete |
 | Accordion no wire (B1) | Match static Figma until PO says otherwise |
-| Download / share CTAs | Decorative in Make — P1 |
+| Download / share / GP Find out more CTAs | Decorative in Make — P1 |
 | Single chickenpox SKU | CJM scope |
 
-**Parity P0 for first ship:** RTB mount, journey CTAs, booster + price, wishlist, modals URL, no invented loader — see register journey-critical table.
+**Parity P0 for full page L&F:** L1–L20 bands + journey CTAs + booster/price + wishlist + modals URL + no invented loader — see register.

@@ -2,7 +2,7 @@
 
 **Project:** `boots-pharmacy`  
 **Callsigns:** Bea (BA) owns register truth · Quinn (QA) owns prove · Finn/Uma restore gaps  
-**Updated:** 2026-07-19 (Finn scaffold L1–L13 mounted — below-fold + Quinn MCP open)  
+**Updated:** 2026-07-19 (Finn L14–L20 below-fold mounted — Quinn MCP + Uma PROVEN still open)  
 **Make source:** Frame child **8** (`PDP. Vaccine Details Page` / `BTS-PHRM.Product - Deal Details Page`, `screenId: "pdp"`) + `globals-screens` child-8 rules + `BootsPharmacyProjectView` wire + `frame/index.tsx`  
 **React target:** `src/projects/boots-pharmacy/screens/pdp/*`  
 **Refs:** [PDP_REACT.md](./PDP_REACT.md) · [PLP_MAKE_PARITY_REGISTER.md](./PLP_MAKE_PARITY_REGISTER.md) (format) · [URL.md](../../../shell/URL.md) (modal ids)  
@@ -11,7 +11,7 @@
 **Status legend:** Present · Partial · Missing · Fixed · N/A
 
 **Make column:** inventory truth from Frame + wire + LEGACY CSS (2026-07-19).  
-**React column:** L1–L13 + journey CTAs/booster/heart = **Present** (scaffold); L14–L20 + prove = still open.
+**React column:** L1–L20 mounted (RTB + below-fold static accordion); Quinn MCP prove + Uma PROVEN still open.
 
 **Bea rule:** Every band before Finn codes — including loading/empty/updating as **P0** when Make has them. No invented bands.
 
@@ -21,26 +21,26 @@
 
 | # | Make behavior | Make | React status | Evidence |
 |---|---------------|------|--------------|----------|
-| L1 | **1440 / 64 / 1312** content column — page `w-[1440px]`, body padding `64px` | **Present** | **Missing** | Frame `Body6` / `Body7` `px-[64px]`; RTB `max-width: 1440px` `globals-screens` L1239–1286 |
-| L2 | **Page bg fill** — white base + decorative PNG `@ opacity 0.41` under RTB band (`Body6`) | **Present** | **Missing** | `Body6` `imgBody1` + `opacity-41` (PLP L1 pattern) |
-| L3 | **Breadcrumbs** — Home → Health Services → Vaccination → Chickenpox (current crumb plain) | **Present** | **Missing** | `ModuleBreadcrumbs` `data-name="module.breadcrumbs"`; Vaccination crumb `data-studio-crumb="vaccination"` |
-| L4 | **RTB card stack** — white card + drop shadow `0px 5px 9.75px rgba(0,108,185,0.05)`; top radius 16px | **Present** | **Missing** | `Frame181` / `module.pdp.rtb` |
-| L5 | **Hero gallery** — 50/50 row, image wrapper **1:1** aspect, `object-fit: cover`, 48px inner gap | **Present** | **Missing** | `Frame127` + `component.product.image.basic`; CSS L1252–1270 |
-| L6 | **RTB column** (`component.pdp.rtb`) — white fill, 32px vertical gaps between blocks | **Present** | **Missing** | `ComponentPdpRtb`; CSS L1273–1278 |
-| L7 | **Product title + service ID** — “Chickenpox” 24px bold + “Service Identifier: BTS-PHM-VAR-00075” 13px grey | **Present** | **Missing** | `Frame128` |
-| L8 | **List price row** — `£75.00` 25px semibold + “Single dose price” 13px grey | **Present** | **Missing** | `Frame180` / `component.product.price` |
-| L9 | **Recipient toggle row** — Myself / Someone else pills + login disclaimer block (right of toggle) | **Present** | **Missing** | `Frame182` (`Units5`/`Units6` + `Frame183`) |
-| L10 | **Service blurb** — eligibility / two-dose copy paragraph (13px) | **Present** | **Missing** | `ComponentPdpRtb` intro `<p>` |
-| L11 | **Booster checkbox band** — label + helper copy; section bg forced white (no mint wash on row) | **Present** | **Missing** | `Units7`; wire `wireBoosterCheckbox` + CSS L1288–1297 |
-| L12 | **CTA row** — Book now (navy, min-width 230px, 48px) + Check availability (secondary) + wishlist + share icon hits | **Present** | **Missing** | `Frame179` / `Frame108` |
-| L13 | **Advantage Card promo bar** — mint `#c6e5e1` “Collect 3 points for every £1…” below RTB card, bottom radius 16px | **Present** | **Missing** | `component.gse.system.message` under `Frame181` (same pattern as PLP L5) |
-| L14 | **Below-fold body** (`Body7`) — white band, `py-[96px]`, `gap-[72px]` between major sections | **Present** | **Missing** | `Body7` |
-| L15 | **Content hero** — centered “Chickenpox” 39px + teal accent bar 14×3px | **Present** | **Missing** | `Frame107` |
-| L16 | **Intro copy** — two paragraphs, 864px max text width | **Present** | **Missing** | `Frame106` |
-| L17 | **Appointment time strip** — `#e5f1f8` pill “Typical appointment takes around 15 minutes” + icon | **Present** | **Missing** | `Frame185` |
-| L18 | **Laptop specs table** — bordered white card 864px; Vaccine / Course / Administration / Eligibility / Price / Availability rows + divider + download CTAs | **Present** | **Missing** | `component.laptop.specs.table` / `Frame125`–`Frame126` |
-| L19 | **FAQ accordion band** (`component.pdp.accordion`) — six `component.gse.accordion` headers; **static** “Who is at risk?” body visible | **Present** (static) | **Missing** | `ComponentPdpAccordion` — see [L19 notes](#l19--accordion-static-make) |
-| L20 | **GP online promo card** — mint `#c6e5e1` rounded 24px “Book your doctor appointment online…” + CTA | **Present** | **Missing** | `Week Schedule` / `Frame104` in `Body7` |
+| L1 | **1440 / 64 / 1312** content column — page `w-[1440px]`, body padding `64px` | **Present** | **Present** | `pdp__shell` max 1440 / pad 64 |
+| L2 | **Page bg fill** — white base + decorative PNG `@ opacity 0.41` under RTB band (`Body6`) | **Present** | **Present** | `pdp__body-fill` |
+| L3 | **Breadcrumbs** — Home → Health Services → Vaccination → Chickenpox (current crumb plain) | **Present** | **Present** | `pdp__crumbs` |
+| L4 | **RTB card stack** — white card + drop shadow `0px 5px 9.75px rgba(0,108,185,0.05)`; top radius 16px | **Present** | **Present** | `pdp__rtb-card` |
+| L5 | **Hero gallery** — 50/50 row, image wrapper **1:1** aspect, `object-fit: cover`, 48px inner gap | **Present** | **Present** | `pdp__media` / `pdp__product-image` |
+| L6 | **RTB column** (`component.pdp.rtb`) — white fill, 32px vertical gaps between blocks | **Present** | **Present** | `pdp__rtb-col` |
+| L7 | **Product title + service ID** — “Chickenpox” 24px bold + “Service Identifier: BTS-PHM-VAR-00075” 13px grey | **Present** | **Present** | `pdp__title-block` |
+| L8 | **List price row** — `£75.00` 25px semibold + “Single dose price” 13px grey | **Present** | **Present** | `pdp__price-row` |
+| L9 | **Recipient toggle row** — Myself / Someone else pills + login disclaimer block (right of toggle) | **Present** | **Present** | `pdp__recipient-row` |
+| L10 | **Service blurb** — eligibility / two-dose copy paragraph (13px) | **Present** | **Present** | `pdp__blurb` |
+| L11 | **Booster checkbox band** — label + helper copy; section bg forced white (no mint wash on row) | **Present** | **Present** | `pdp__booster-band` |
+| L12 | **CTA row** — Book now (navy, min-width 230px, 48px) + Check availability (secondary) + wishlist + share icon hits | **Present** | **Present** | `pdp__cta-row` |
+| L13 | **Advantage Card promo bar** — mint `#c6e5e1` “Collect 3 points for every £1…” below RTB card, bottom radius 16px | **Present** | **Present** | `pdp__advantage` |
+| L14 | **Below-fold body** (`Body7`) — white band, `py-[96px]`, `gap-[72px]` between major sections | **Present** | **Present** | React `pdp__below` (Make Body7 retired via mount) |
+| L15 | **Content hero** — centered “Chickenpox” 39px + teal accent bar 14×3px | **Present** | **Present** | `pdp__content-hero` |
+| L16 | **Intro copy** — two paragraphs, 864px max text width | **Present** | **Present** | `PDP_INTRO_PARAGRAPHS` / `pdp__intro` |
+| L17 | **Appointment time strip** — `#e5f1f8` pill “Typical appointment takes around 15 minutes” + icon | **Present** | **Present** | `pdp__appt-strip` |
+| L18 | **Laptop specs table** — bordered white card 864px; Vaccine / Course / Administration / Eligibility / Price / Availability rows + divider + download CTAs | **Present** | **Present** | `PDP_SPECS_ROWS` / `pdp__specs` (downloads static) |
+| L19 | **FAQ accordion band** (`component.pdp.accordion`) — six `component.gse.accordion` headers; **static** “Who is at risk?” body visible | **Present** (static) | **Present** (static) | `PDP_ACCORDION_PANELS` — B1 no click wire |
+| L20 | **GP online promo card** — mint `#c6e5e1` rounded 24px “Book your doctor appointment online…” + CTA | **Present** | **Present** | `pdp__gp-promo` (Find out more static) |
 | L21 | **Header / footer chrome** — `boots-pharmacy.module.header` + `boots-pharmacy.module.footer` (engine-mounted, not page-owned) | **N/A** (engine) | **N/A** | Frame child 8 includes them; React page owns `body` bands only per PAGE_BUILD_CONTRACT |
 
 ### L19 — Accordion (static Make)
