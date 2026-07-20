@@ -1785,6 +1785,7 @@ export function useJourneyPlayback({
   const scriptingActive = isScriptingNow();
   const animationBusy =
     scriptingActive ||
+    retreatSyncing ||
     playbackScrollBusy ||
     (onScreenFramesBeat && screenPlayback.isPausingBeforeReveal);
 
@@ -1792,7 +1793,7 @@ export function useJourneyPlayback({
     ? screenPlayback.isPlaying
     : isPlaying || scriptingActive;
 
-  /** Green diode + supervisors — live auto-play and manual step scripts / preludes. */
+  /** Green diode + supervisors — live auto-play, scripts, retreat, camera, preludes. */
   const isOnAir =
     animationBusy ||
     (onScreenFramesBeat ? screenPlayback.isPlaying : isPlaying);

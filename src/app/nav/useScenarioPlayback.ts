@@ -165,6 +165,12 @@ export function useScenarioPlayback({
   const [visibleCount, setVisibleCount] = useState(0);
   const [playbackMode, setPlaybackMode] = useState<PlaybackMode>("idle");
   const [isPausingBeforeReveal, setIsPausingBeforeReveal] = useState(false);
+  /**
+   * While beforeReveal thinking runs, engine visibleCount has not advanced yet.
+   * Still include the next frame in DOM visibility so React can paint the
+   * thinking bubble inside the reply slot (display:none hid thinking — PO).
+   */
+  const [preludeTargetCount, setPreludeTargetCount] = useState(0);
   const isPlaying = playbackMode === "playing";
 
   const onDiagnosticRef = useRef(onDiagnostic);
@@ -216,6 +222,7 @@ export function useScenarioPlayback({
     }
     pendingRevealRef.current = null;
     playbackStepHooks?.onPreludeAbort?.();
+    setPreludeTargetCount(0);
     setIsPausingBeforeReveal(false);
     bumpScenarioScrollGeneration();
   }, [playbackStepHooks]);
@@ -434,10 +441,13 @@ export function useScenarioPlayback({
       scrollPrototypeScrollToTop(scrollRootRef?.current, "instant");
     }
 
-    applyScenarioFrameVisibility(
-      frames,
-      bubbleVisibleCount(effectiveCount, frames.length)
+    const displayCount = Math.max(
+      bubbleVisibleCount(effectiveCount, frames.length),
+      preludeTargetCount > 0
+        ? bubbleVisibleCount(preludeTargetCount, frames.length)
+        : 0
     );
+    applyScenarioFrameVisibility(frames, displayCount);
 
     if (intent && intent.visibleCount === effectiveCount) {
       if (intent.timing === "after-init" && initialScrollDoneRef.current) {
@@ -460,7 +470,7 @@ export function useScenarioPlayback({
         initialScrollDoneRef.current = true;
       }
     }
-  }, [active, minVisibleFrames, scrollRootRef, visibleCount]);
+  }, [active, minVisibleFrames, preludeTargetCount, scrollRootRef, visibleCount]);
 
   useEffect(() => () => stopPlayback(), [stopPlayback]);
 
@@ -550,6 +560,7 @@ export function useScenarioPlayback({
         if (preludeGenerationRef.current !== generation) return;
         if (visibleCountRef.current !== fromCount) return;
 
+        setPreludeTargetCount(0);
         setIsPausingBeforeReveal(false);
         const revealSmooth =
           isPlayingRef.current &&
@@ -588,10 +599,17 @@ export function useScenarioPlayback({
           return;
         }
 
+        setPreludeTargetCount(next);
         setIsPausingBeforeReveal(true);
+        // Unhide the upcoming frame now so thinking can paint inside it.
+        applyScenarioFrameVisibility(
+          frames,
+          bubbleVisibleCount(Math.max(fromCount, next), frames.length)
+        );
         pendingRevealRef.current = () => revealFrame(generation);
         pauseCleanupRef.current = () => {
           playbackStepHooks?.onPreludeAbort?.();
+          setPreludeTargetCount(0);
           setIsPausingBeforeReveal(false);
         };
 

@@ -309,10 +309,17 @@
   gap: 16px;
 }
 
-/* Engine reveal bridge — keep mounted for collectFrames; never paint unrevealed. */
+/* Engine reveal bridge — keep mounted for collectFrames; never paint unrevealed.
+ * Exception: playback thinking lives IN the reply slot before revealed=true —
+ * must stay visible (LEFT/agent) or thinking is display:none forever (PO). */
 .chat__frame[hidden],
-.chat__frame[data-studio-chat-revealed="false"] {
+.chat__frame[data-studio-chat-revealed="false"]:not([data-studio-chat-thinking-slot="true"]) {
   display: none !important;
+}
+
+.chat__frame[data-studio-chat-thinking-slot="true"] {
+  display: flex !important;
+  align-items: flex-start;
 }
 
 .chat__bubble {

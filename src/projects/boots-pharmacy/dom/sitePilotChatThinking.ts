@@ -222,6 +222,14 @@ export function beginSitePilotChatPlaybackThinking(
     clearChatThinkingBridge();
   }
 
+  // Belt-and-suspenders: reply slot must be visible while thinking paints
+  // inside it (engine may still have display:none until preludeTargetCount).
+  if (anchorFrame) {
+    anchorFrame.style.display = "";
+    anchorFrame.classList.remove("proto-scenario-frame--hidden");
+    anchorFrame.dataset.studioScenarioVisible = "true";
+  }
+
   showThinkingBubble(
     summary,
     "playback",
