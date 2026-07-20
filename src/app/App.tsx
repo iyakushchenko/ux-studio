@@ -104,6 +104,7 @@ import {
   isDeletableRecordedJourneyId,
   removePersistedRecordedJourney,
 } from "@/app/journey/recordedJourneyPersist";
+import { getImportedJourneys } from "@/app/journey/journeyRuntimeStore";
 import {
   experienceToOrchestraModeId,
   orchestraModeToExperienceId,
@@ -864,24 +865,53 @@ export default function App() {
     [current, journeyPlayback, restartStudioJourney, scenarioPlayback, SCREENS]
   );
 
+  const pendingCjmPreviewJourneyIdRef = useRef<string | null>(null);
+
+  const resolveJourneyForOrchestraMode = useCallback(
+    (modeId: OrchestraModeId): JourneyDefinition | undefined => {
+      // Prefer runtime import store — Add as CJM notifies before React re-renders
+      // studioJourneys, so the closed-over catalog can miss the new rec-* id.
+      return (
+        getImportedJourneys().find((journey) => journey.id === modeId) ??
+        getJourneyForMode(studioJourneys, modeId)
+      );
+    },
+    [studioJourneys]
+  );
+
   const handleOrchestraModeChange = useCallback(
-    (next: OrchestraModeId) => {
+    (next: OrchestraModeId, options?: { previewCjm?: boolean }) => {
       resetStudioPlayback();
 
       if (next !== orchestraModeId) {
         setOrchestraModeId(next);
       }
 
-      applyJourneyStartTab(getJourneyForMode(studioJourneys, next));
+      applyJourneyStartTab(resolveJourneyForOrchestraMode(next));
+
+      if (options?.previewCjm) {
+        pendingCjmPreviewJourneyIdRef.current = next;
+      }
     },
     [
       applyJourneyStartTab,
       orchestraModeId,
       resetStudioPlayback,
+      resolveJourneyForOrchestraMode,
       setOrchestraModeId,
-      studioJourneys,
     ]
   );
+
+  // After Add as CJM: wait until orchestra id + activeJourney match, then CJM on
+  // at the start of the new playlist (stale chat STEPS / SF no-op cleared).
+  useEffect(() => {
+    const pending = pendingCjmPreviewJourneyIdRef.current;
+    if (!pending) return;
+    if (orchestraModeId !== pending) return;
+    if (activeJourney?.id !== pending) return;
+    pendingCjmPreviewJourneyIdRef.current = null;
+    handleStudioJourneyModeChangeRef.current(true);
+  }, [orchestraModeId, activeJourney?.id]);
 
   const handleStudioProjectChange = useCallback(
     (next: ProjectId) => {
@@ -1460,14 +1490,24 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    registerRecordingSnapshotProvider(() => ({
-      ...playbackSnapshotRef.current,
-      journeyMode: studioJourneyModeRef.current,
-      orchestraMode: orchestraModeId,
-      counter: document
-        .querySelector(".studio-nav-scenario__counter")
-        ?.textContent?.trim() ?? null,
-    }));
+    registerRecordingSnapshotProvider(() => {
+      const snap = playbackSnapshotRef.current;
+      // REC truth = live nav tab, not the parked journey beat's protoTab.
+      const navProtoTab =
+        snap.hubOpen || snap.currentTabIndex == null
+          ? null
+          : snap.currentTabIndex + 1;
+      return {
+        ...snap,
+        protoTab: navProtoTab,
+        journeyMode: studioJourneyModeRef.current,
+        orchestraMode: orchestraModeId,
+        counter:
+          document
+            .querySelector(".studio-nav-scenario__counter")
+            ?.textContent?.trim() ?? null,
+      };
+    });
     return () => registerRecordingSnapshotProvider(null);
   }, [orchestraModeId]);
 
@@ -1528,7 +1568,9 @@ export default function App() {
   const onRecordingAddedAsCjm = useCallback(
     (_s: unknown, saved?: { journeyId: string }) => {
       refreshJourneysAfterImport();
-      if (saved?.journeyId) handleOrchestraModeChange(saved.journeyId);
+      if (saved?.journeyId) {
+        handleOrchestraModeChange(saved.journeyId, { previewCjm: true });
+      }
     },
     [handleOrchestraModeChange, refreshJourneysAfterImport]
   );

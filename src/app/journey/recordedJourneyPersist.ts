@@ -11,12 +11,20 @@ import {
 } from "@/app/journey/journeyRuntimeStore";
 import type { JourneyFile } from "@/app/journey/journeyFile";
 import { isBuiltInOrchestraModeId } from "@/app/orchestra/orchestraModes";
+import { healRecordedJourneyNav } from "@/app/recording/recordedJourneyNavHeal";
 import type { PersonaId, ProjectId } from "@/projects/types";
 
 const STORAGE_PREFIX = "studio-recorded-cjm";
 
 function storageKey(projectId: string, personaId: string): string {
   return `${STORAGE_PREFIX}:${projectId}:${personaId}`;
+}
+
+function healPersistedJourney(
+  journey: JourneyDefinition,
+  projectId: ProjectId | string
+): JourneyDefinition {
+  return healRecordedJourneyNav(journey, projectId);
 }
 
 export function readPersistedRecordedJourneys(
@@ -29,9 +37,11 @@ export function readPersistedRecordedJourneys(
     if (!raw) return [];
     const parsed = JSON.parse(raw) as { journeys?: JourneyDefinition[] };
     if (!Array.isArray(parsed.journeys)) return [];
-    return parsed.journeys.filter(
-      (j) => j && typeof j.id === "string" && typeof j.label === "string"
-    );
+    return parsed.journeys
+      .filter(
+        (j) => j && typeof j.id === "string" && typeof j.label === "string"
+      )
+      .map((journey) => healPersistedJourney(journey, projectId));
   } catch {
     return [];
   }
@@ -62,9 +72,10 @@ export function persistRecordedJourneyFile(file: JourneyFile): void {
   const projectId = file.projectId;
   const personaId = file.personaId;
   if (!projectId || !personaId) return;
+  const journey = healPersistedJourney(file.journey, projectId);
   const existing = readPersistedRecordedJourneys(projectId, personaId);
-  const others = existing.filter((j) => j.id !== file.journey.id);
-  persistRecordedJourneys(projectId, personaId, [...others, file.journey]);
+  const others = existing.filter((j) => j.id !== journey.id);
+  persistRecordedJourneys(projectId, personaId, [...others, journey]);
 }
 
 /** Hydrate runtime catalog from localStorage (call on studio boot / persona change). */
@@ -73,6 +84,8 @@ export function hydrateRecordedJourneysFromStorage(
   personaId: PersonaId | string
 ): number {
   const journeys = readPersistedRecordedJourneys(projectId, personaId);
+  // Rewrite storage when heal stamps correct protoTabs (legacy all-1 journeys).
+  persistRecordedJourneys(projectId, personaId, journeys);
   for (const journey of journeys) {
     applyImportedJourneyFile({
       version: 1,

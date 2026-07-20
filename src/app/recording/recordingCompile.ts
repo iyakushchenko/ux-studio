@@ -27,6 +27,10 @@ import type {
   RecordingSession,
 } from "@/app/recording/recordingTypes";
 import { resolvePlaybackScriptKind } from "@/app/shell/playbackScriptRegistry";
+import {
+  healRecordedJourneyNav,
+  screenIdToProtoTab,
+} from "@/app/recording/recordedJourneyNavHeal";
 import type { PersonaId, ProjectId } from "@/projects/types";
 
 const BEAT_ACTIONS = new Set<JourneyBeatActionId>([
@@ -38,6 +42,7 @@ const BEAT_ACTIONS = new Set<JourneyBeatActionId>([
 
 const KNOWN_SCENARIO_BY_BEAT: Record<string, string> = {
   "agentic-chat": "site-pilot-chat",
+  chat: "site-pilot-chat",
 };
 
 export type CompileRecordingJourneyOptions = {
@@ -137,17 +142,41 @@ function isBeatAction(id: string): id is JourneyBeatActionId {
   return BEAT_ACTIONS.has(id as JourneyBeatActionId);
 }
 
-function readProtoTab(events: readonly RecordedEvent[]): number | undefined {
+function readScreenId(events: readonly RecordedEvent[]): string | undefined {
+  for (let i = events.length - 1; i >= 0; i -= 1) {
+    const event = events[i];
+    if (event?.kind === "screen" && event.screenId) return event.screenId;
+    const snapScreen = event?.snapshot?.screenId;
+    if (typeof snapScreen === "string" && snapScreen.trim()) return snapScreen;
+  }
+  return undefined;
+}
+
+/**
+ * Prefer live nav (`currentTabIndex`) + screenId over snapshot `protoTab`.
+ * During REC, `protoTab` was often the *journey beat* tab (stale) while the
+ * user browsed other screens — that compiled every beat as protoTab 1.
+ */
+function readProtoTab(
+  events: readonly RecordedEvent[],
+  projectId?: string
+): number | undefined {
+  const fromScreen = screenIdToProtoTab(projectId, readScreenId(events));
+  if (fromScreen != null) return fromScreen;
+
   for (let i = events.length - 1; i >= 0; i -= 1) {
     const snap = events[i]?.snapshot;
-    if (snap?.protoTab != null && Number.isFinite(snap.protoTab)) {
-      return snap.protoTab;
-    }
     if (
       snap?.currentTabIndex != null &&
       Number.isFinite(snap.currentTabIndex)
     ) {
       return snap.currentTabIndex + 1;
+    }
+  }
+  for (let i = events.length - 1; i >= 0; i -= 1) {
+    const snap = events[i]?.snapshot;
+    if (snap?.protoTab != null && Number.isFinite(snap.protoTab)) {
+      return snap.protoTab;
     }
   }
   return undefined;
@@ -205,7 +234,8 @@ function inferKind(beat: JourneyBeat): JourneyBeatKind {
 function compileSegmentToBeat(
   segment: CompiledBeatSegment,
   usedIds: Set<string>,
-  gaps: string[]
+  gaps: string[],
+  projectId?: string
 ): JourneyBeat {
   const baseId = uniqueBeatId(
     slugBeatId(segment.beatId ?? segment.touchpointKey),
@@ -274,16 +304,24 @@ function compileSegmentToBeat(
     }
   }
 
-  const protoTab = readProtoTab(segment.events);
+  const protoTab =
+    readProtoTab(segment.events, projectId) ??
+    screenIdToProtoTab(projectId, baseId) ??
+    screenIdToProtoTab(projectId, segment.beatId);
   if (protoTab != null) beat.protoTab = protoTab;
 
   const dwellMs = readDwellMs(segment.events);
   if (dwellMs != null) beat.dwellMs = dwellMs;
 
+  const scenarioKey = baseId.replace(/-\d+$/, "");
   const scenario =
     KNOWN_SCENARIO_BY_BEAT[baseId] ??
+    KNOWN_SCENARIO_BY_BEAT[scenarioKey] ??
     (segment.beatId ? KNOWN_SCENARIO_BY_BEAT[segment.beatId] : undefined);
-  if (scenario) beat.scenarioId = scenario;
+  // Only the first chat landing gets screen-frames — chat-2/chat-3 stay tab hops.
+  if (scenario && (baseId === "chat" || baseId === "agentic-chat")) {
+    beat.scenarioId = scenario;
+  }
 
   beat.kind = inferKind(beat);
   return beat;
@@ -297,7 +335,8 @@ function compileFallbackBeats(
   events: readonly RecordedEvent[],
   usedIds: Set<string>,
   gaps: string[],
-  warnings: string[]
+  warnings: string[],
+  projectId?: string
 ): JourneyBeat[] {
   warnings.push("no-touchpoint-markers");
   const beats: JourneyBeat[] = [];
@@ -313,7 +352,7 @@ function compileFallbackBeats(
       startedAtMs: pendingScreen.atMs,
       events: pendingScreen.events,
     };
-    beats.push(compileSegmentToBeat(segment, usedIds, gaps));
+    beats.push(compileSegmentToBeat(segment, usedIds, gaps, projectId));
     pendingScreen = null;
   };
 
@@ -356,7 +395,7 @@ function compileFallbackBeats(
           startedAtMs: event.atMs,
           events: [event],
         };
-        beats.push(compileSegmentToBeat(segment, usedIds, gaps));
+        beats.push(compileSegmentToBeat(segment, usedIds, gaps, projectId));
       }
       continue;
     }
@@ -386,13 +425,20 @@ export function compileRecordingToJourney(
   const warnings: string[] = [];
   const gaps: string[] = [];
   const usedIds = new Set<string>();
+  const projectId = session.projectId;
 
   let beats =
     timeline.segments.length > 0
       ? timeline.segments.map((segment) =>
-          compileSegmentToBeat(segment, usedIds, gaps)
+          compileSegmentToBeat(segment, usedIds, gaps, projectId)
         )
-      : compileFallbackBeats(session.events, usedIds, gaps, warnings);
+      : compileFallbackBeats(
+          session.events,
+          usedIds,
+          gaps,
+          warnings,
+          projectId
+        );
 
   if (beats.length === 0) {
     warnings.push("empty-journey");
@@ -415,11 +461,14 @@ export function compileRecordingToJourney(
     : flavor === "trad"
       ? `Recorded Traditional ${new Date().toLocaleString()}`
       : `Recorded Agentic ${new Date().toLocaleString()}`;
-  const journey: JourneyDefinition = {
-    id: journeyId,
-    label: options?.label?.trim() || defaultLabel,
-    beats,
-  };
+  const journey: JourneyDefinition = healRecordedJourneyNav(
+    {
+      id: journeyId,
+      label: options?.label?.trim() || defaultLabel,
+      beats,
+    },
+    projectId
+  );
 
   const uniqueGaps = [...new Set(gaps)];
   return { journey, timeline, warnings, gaps: uniqueGaps };

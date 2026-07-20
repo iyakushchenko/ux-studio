@@ -14,6 +14,7 @@
  */
 
 import type { OrchestraModeId } from "@/app/orchestra/types";
+import { isOrchestraModeId } from "@/app/orchestra/orchestraModes";
 import { runTraditionalControlRoomRobotQa } from "@/app/shell/controlRoomQaRunner";
 import { logControlPanel } from "@/app/shell/controlPanelLog";
 import {
@@ -290,11 +291,6 @@ export function isAvailRetreatJune25Selected(): boolean {
   const june25 = cells.find((el) => el.textContent?.trim() === "25");
   return june25?.classList.contains("proto-avail-cal-cell--selected") ?? false;
 }
-
-const ORCHESTRA_MODE_IDS: OrchestraModeId[] = [
-  "agentic-cjm",
-  "traditional-cjm",
-];
 
 function journeyModeSwitch(): HTMLElement | null {
   return document.querySelector<HTMLElement>(
@@ -855,7 +851,7 @@ export function registerStudioMcpHelpers(options: {
   window.__studioProveRoboCursorFeedback = proveRoboCursorFeedback;
 
   window.__protoSetOrchestraMode = (modeId) => {
-    if (!ORCHESTRA_MODE_IDS.includes(modeId)) return false;
+    if (!isOrchestraModeId(modeId)) return false;
     if (!options.setOrchestraMode) return false;
     logControlPanel("studio:orchestra-mode", { source: "mcp-helper", to: modeId });
     options.setOrchestraMode(modeId);

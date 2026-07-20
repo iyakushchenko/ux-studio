@@ -140,12 +140,14 @@ describe("compileRecordingToJourney", () => {
       version: 1,
       startedAt: "2026-07-19T12:00:00.000Z",
       journeyId: "traditional-cjm",
+      projectId: "boots-pharmacy",
       events: [
         {
           kind: "screen",
           screenId: "plp",
           atMs: 1,
-          snapshot: { currentTabIndex: 2 },
+          // Stale beat protoTab must NOT win over screenId / currentTabIndex.
+          snapshot: { protoTab: 1, currentTabIndex: 2 },
         },
         {
           kind: "director-script",
@@ -157,7 +159,7 @@ describe("compileRecordingToJourney", () => {
           kind: "screen",
           screenId: "pdp",
           atMs: 3,
-          snapshot: { protoTab: 4 },
+          snapshot: { protoTab: 1 },
         },
         {
           kind: "director-script",
@@ -179,6 +181,31 @@ describe("compileRecordingToJourney", () => {
       tabScript: "pdp-book-now",
       protoTab: 4,
     });
+  });
+
+  it("maps screen ids to protoTab when snapshots are missing or stale", () => {
+    const session: RecordingSession = {
+      id: "screen-map",
+      version: 1,
+      startedAt: "2026-07-20T12:00:00.000Z",
+      projectId: "boots-pharmacy",
+      orchestraMode: "agentic-cjm",
+      events: [
+        { kind: "screen", screenId: "site-pilot", atMs: 1 },
+        { kind: "screen", screenId: "chat", atMs: 2, snapshot: { protoTab: 1 } },
+        { kind: "screen", screenId: "book-step-2", atMs: 3 },
+        { kind: "screen", screenId: "plp", atMs: 4 },
+      ],
+    };
+
+    const { journey, warnings } = compileRecordingToJourney(session);
+    expect(warnings).toContain("no-touchpoint-markers");
+    expect(journey.beats.map((b) => [b.id, b.protoTab])).toEqual([
+      ["site-pilot", 1],
+      ["chat", 2],
+      ["book-step-2", 6],
+      ["plp", 3],
+    ]);
   });
 
   it("adds a new CJM id without overwriting built-in slots", () => {
