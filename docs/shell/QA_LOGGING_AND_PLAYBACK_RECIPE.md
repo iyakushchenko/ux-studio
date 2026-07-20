@@ -79,7 +79,9 @@ After fix: full Play **PASS 21/21**. Do not invent green past real timeouts.
 5. Mid-flight Save Log dumps may show **no RESULT** (Play still running) — read `sitrepLine` / `timeline` / `summaries` honestly.  
 6. **Save Log** stays enabled while capturing **and** after **Keep open → Complete**.  
 7. **ALWAYS CLEAR** before each prove (`forceClear` then `start`; smokes wipe too).  
-8. **Leave / return (HARD):** when the agent disconnects to Cursor chat / elsewhere, **pause** the QA session; on return **resume** and **read Message latch** before continuing. See § Agent leave / return below.
+8. **Leave / return (HARD):** when the agent disconnects to Cursor chat / elsewhere, **pause** the QA session; on return **resume** and **read Message latch** before continuing. See § Agent leave / return below.  
+9. **Dump-on-FAIL habit:** on Alarm / hard FAIL / chop / script-timeout — **Save Log** immediately (Keep open → Complete still allows Save Log). Do not invent green from memory.  
+10. **Friendly diag in chat:** mirrored playback-diag rows use human labels in the main QA sequence (not a cryptic side pane).
 
 ### Playback diag → QA chat (mirrored vs suppressed)
 
@@ -106,6 +108,19 @@ After fix: full Play **PASS 21/21**. Do not invent green past real timeouts.
 | Soft-fail | 2× `scroll-reversal` (eased Δ) | Open / watch — pull-up co-travel noise |
 | Helper spam | 52/80 log = peek/is-open polls | Agent poll noise (not product FAIL) |
 | script-timeout | **absent** in this dump | Separate prove: confirmation hang → cursor `stop()` fix |
+
+### Dump fingerprint (PO 2026-07-20T22:58:41Z — Traditional smoke)
+
+| Field | Value | Read as |
+|-------|-------|---------|
+| Mode | **traditional** · CJM **on** · session `traditional-play-smoke` | Primary Traditional smoothness evidence |
+| Peak | Play finished → journey start (PLP→…→details) | Playlist **completed**; sitrep at Save Log = post-reset **1/12** |
+| RESULT | **absent** | Smoke tears down overlay — use keep-overlay prove when available |
+| Clicks | Bookmark → Book now → PDP Book → Sign in → **21/15:30** → Reserve → Open Appts → View Details | No date/time re-click; location Continue not in click log |
+| Soft-fail | **3×** scroll-reversal (Δ−922 / Δ−1207 / Δ−88) | Camera origin yank — **not green** smoothness |
+| Type-in | 0 | Expected (no Traditional composer type-in) |
+
+Sitrep audit: [TRADITIONAL_CJM_UX_2026-07-21.md](../projects/boots-pharmacy/audits/TRADITIONAL_CJM_UX_2026-07-21.md).
 
 ---
 
@@ -141,6 +156,22 @@ http://localhost:5173/?project=boots-pharmacy&screen=home&persona=sarah-jenkins&
 8. Full Play should reach **21/21** without `script-timeout` on confirmation.  
 9. Poll `__studioConsumePoSignal?.()` each beat (R15) — do not invent green past Alarm/chop.  
 10. **Leave QA → `pauseForAgentLeave()`; return → `resumeForAgentReturn()`** (Message on arrival mandatory). **Guard rail:** if you forget, presence TTL (~8s) auto-pauses capture + Play.
+
+---
+
+## Prove recipe (Traditional CJM)
+
+**Smoke (tears down overlay):** `await window.__protoRunTraditionalPlaySmoke?.()` — Play → start assert; good for local smoke, **weak** for Save Log peak sitrep.
+
+**Manual / full Play:** ALWAYS CLEAR → arm QA keep-open → continuous Play on `experience=traditional&cjm=on` → Save Log on Complete (or dump-on-FAIL). Prefer a keep-overlay full prove helper when shipped (parity with `__studioRunAgenticFullPlayProve`).
+
+Example URL:
+
+```text
+http://localhost:5173/?project=boots-pharmacy&screen=plp&persona=sarah-jenkins&cjm=on&experience=traditional
+```
+
+Eyes: no already-selected date/time re-click; watch camera yanks on Reserve / history / details ([TRADITIONAL_CJM_UX_2026-07-21.md](../projects/boots-pharmacy/audits/TRADITIONAL_CJM_UX_2026-07-21.md)).
 
 ---
 

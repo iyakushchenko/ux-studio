@@ -1,7 +1,7 @@
 # CJM = guitar tabs (Record / Play / Edit)
 
 **Status:** Locked (PO 2026-07-21) · **Owners:** Arch · Bea · Finn · Quinn  
-**See also:** [RECORDING.md](./RECORDING.md) · [PLAYBACK.md](./PLAYBACK.md) · [QA_LOGGING_AND_PLAYBACK_RECIPE.md](./QA_LOGGING_AND_PLAYBACK_RECIPE.md)
+**See also:** [RECORDING.md](./RECORDING.md) · [PLAYBACK.md](./PLAYBACK.md) · [QA_LOGGING_AND_PLAYBACK_RECIPE.md](./QA_LOGGING_AND_PLAYBACK_RECIPE.md) · Traditional UX [TRADITIONAL_CJM_UX_2026-07-21.md](../projects/boots-pharmacy/audits/TRADITIONAL_CJM_UX_2026-07-21.md)
 
 CJM is **not** an imperative director novel. It is a **tab script**: targets from the page fidelity pool + timing.
 
@@ -12,6 +12,8 @@ CJM is **not** an imperative director novel. It is a **tab script**: targets fro
 | **Edit** | PO gives a **user story**. Agent changes the script by **swapping targets / timing / order** on beats (`recordedClick.selectorChain`, `dwellMs`, beat order) — **not** rewriting `book.ts` / director prose. |
 
 **Compile path:** REC events → `recordedClick` + `dwellMs` beats → same Play runners as Step.
+
+**Prove helpers:** Agentic keep-overlay = `__studioRunAgenticFullPlayProve`. Traditional smoke = `__protoRunTraditionalPlaySmoke` (teardown); keep-overlay Traditional full prove = TBD.
 
 ## Exceptions (deeper, keep thin)
 

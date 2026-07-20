@@ -1,9 +1,9 @@
 # UX Studio — next steps (living board)
 
-**Updated:** 2026-07-20  
+**Updated:** 2026-07-21  
 **Owner:** Arch (agents execute; human PO accept/reject + assets only; **Pax** sim for bump/push)  
 **Team:** [TEAM.md](./TEAM.md) · Forecast: [PRODUCT_FORECAST.md](./PRODUCT_FORECAST.md) · Painpoints: [PAINPOINTS.md](./PAINPOINTS.md) · [ARCHITECTURE.md](./ARCHITECTURE.md) · [HYGIENE.md](./HYGIENE.md)  
-**Refs:** [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) · [CI_ACTIONS_BUDGET.md](./CI_ACTIONS_BUDGET.md) · [NAMING.md](./NAMING.md) · [../shell/URL.md](../shell/URL.md)
+**Refs:** [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) · [CI_ACTIONS_BUDGET.md](./CI_ACTIONS_BUDGET.md) · [NAMING.md](./NAMING.md) · [../shell/URL.md](../shell/URL.md) · [../shell/CJM_RECORD_PLAY_EDIT.md](../shell/CJM_RECORD_PLAY_EDIT.md)
 
 ---
 
@@ -27,6 +27,8 @@ A screen is **DONE** only when **all** are true:
 0. [x] **Agent testing mid-flight QA shell (PP-10)** — `src/app/shell/agent-testing/`; R11 `:5173` mid-flight prove PASS 2026-07-20 (colors/names/timer/sitrep/alarm/cursor/scroll/timeline/START-END/dumps). Track: [PAINPOINTS.md](./PAINPOINTS.md).
 0a. [~] **QA overlay trust / dual-role self-test (PP-13)** — pack expanded 2026-07-20 (pause/capture, interactive-only, Session origin, fail-freeze, presence, RTT, STEPPED/PLAYBACK, RESULT seal, Message withhold, stale-green, diag mirror). Self-test: [`SELF_TEST.md`](../../src/app/shell/agent-testing/SELF_TEST.md) · `__studioRunQaSelfTestSmoke()`. Keep eyes until residuals rare.
 0b. [x] **Playback reliability / diag-first (PP-01…PP-08)** — 2026-07-20 wave: agentic Play→end + retreat + traditional Play **PASS** on `:5173`; PP-01/03/06/07 → **WATCH**. Keep PLAYBACK_DIAG; residuals stay eyes-on (not COMPLETE forever). See [PAINPOINTS.md](./PAINPOINTS.md).
+0c. [x] **CJM Record/Play/Edit = guitar tabs** — doctrine [CJM_RECORD_PLAY_EDIT.md](../shell/CJM_RECORD_PLAY_EDIT.md); Play≡Step; Edit-by-user-story; Book Step2 already-selected → **other** 24/16:30; agentic prove `__studioRunAgenticFullPlayProve`.
+0d. [ ] **Traditional CJM smoothness** — PO dump 2026-07-20T22:58:41Z: Play completes but **3× scroll-reversal** camera yanks (Reserve / Open Appointments / View Details). Sitrep: [TRADITIONAL_CJM_UX_2026-07-21.md](../projects/boots-pharmacy/audits/TRADITIONAL_CJM_UX_2026-07-21.md). **Not green** until camera ROI + re-dump.
 1. [x] **PLP React migration** — DONE by erase-Make definition. Brief: [PLP_REACT.md](../projects/boots-pharmacy/features/PLP_REACT.md) · audit [FE_AUDIT_PLP_2026-07-19.md](../projects/boots-pharmacy/audits/FE_AUDIT_PLP_2026-07-19.md).
 2. [x] **PLP Make parity restore** — register [PLP_MAKE_PARITY_REGISTER.md](../projects/boots-pharmacy/features/PLP_MAKE_PARITY_REGISTER.md); P0 gaps fixed (bg fill, hero shadow, listing wrapper, preloader, filter chips); audit PROVEN; patch `0.0.5`.
 2b. [x] **PLP fidelity rage fix** — Advantage bar, heart optimistic hover/click, Book now commerce hover, tile border removed, Reset Filters icon+text; Uma checklist + team-check harden; patch bump.

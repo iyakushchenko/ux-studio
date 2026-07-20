@@ -47,7 +47,7 @@
 |---|---------------|------|--------------|----------|
 | LE1 | **Playback thinking bubble** — dots before each `reply` frame reveal (~**1400ms** `SITE_PILOT_CHAT_PLAYBACK_THINK_MS`) | **Present** | **Partial** | React bridge + `@/uxds/motion` bubble — live only when mount ON |
 | LE2 | **Thinking fade-out** — exit class ~360ms before reply shows | **Present** | **Partial** | React `AnimatePresence` exit ~360ms via bridge |
-| LE3 | **Browse-mode reveal pause** — land on chat tab → thinking → jump to last frame | **Present** | **Partial** | Same `App.tsx` hooks; React summary when mounted |
+| LE3 | **Browse / CJM-off saved-chat load** — blank `STUDIO_CONTENT_LOAD_MS` interim → **full thread** → smooth scroll bottom (**not** creation thinking / progressive) | **Present** | **Present** | [CHAT_PAGE_RAILS.md](./CHAT_PAGE_RAILS.md) · `runChatBrowseEntryReveal` — do **not** invent thinking pause on `cjm=off` |
 | LE4 | **Send thinking** — user send → thinking bubble + send becomes **Stop** glyph | **Present** | **Partial** | `SitePilotComposer sendThinking` + bridge |
 | LE5 | **Ambient hint thinking** — frame 1 / after cancel → hint bubble before first reply | **Present** | **Partial** | Bridge publishes hint mode |
 | LE6 | **Page load spinner / empty thread** | **N/A** | **N/A** | Static scripted thread — **forbidden** invent full-page loader |

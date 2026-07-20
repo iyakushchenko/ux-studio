@@ -29,6 +29,8 @@
 | Doctrine | [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) | Locked tech + process |
 | **Motion standard** | [MOTION.md](./MOTION.md) | `framer-motion` via `@/uxds/motion`; CSS for trivial + Accordion |
 | **Chat page rails (CJM on/off)** | [CHAT_PAGE_RAILS.md](../projects/boots-pharmacy/features/CHAT_PAGE_RAILS.md) | CJM-off = saved-chat load + scroll bottom; CJM-on = progressive; QA prove load/scroll |
+| **CJM Record / Play / Edit (guitar tabs)** | [../shell/CJM_RECORD_PLAY_EDIT.md](../shell/CJM_RECORD_PLAY_EDIT.md) | Record targets+timing; Play≡Step; Edit by user-story swap — not director novels |
+| **QA logging & Play recipe** | [../shell/QA_LOGGING_AND_PLAYBACK_RECIPE.md](../shell/QA_LOGGING_AND_PLAYBACK_RECIPE.md) | ALWAYS CLEAR · auto-pause · leave/return · Save Log · dump-on-FAIL · PERF · `CHAT_LOADING_DUMP_ALL`=cjm=off |
 | Director rule | [../../.cursor/rules/ux-studio-director.mdc](../../.cursor/rules/ux-studio-director.mdc) | Always-on hard checklist |
 
 ---
@@ -94,7 +96,8 @@
 | Must re-read | Focus |
 |--------------|--------|
 | [../shell/PLAYBACK_DIAG.md](../shell/PLAYBACK_DIAG.md) · R13 | Type-in / step / retreat console prove before claiming CJM green |
-| [../shell/QA_LOGGING_AND_PLAYBACK_RECIPE.md](../shell/QA_LOGGING_AND_PLAYBACK_RECIPE.md) | Play ≡ Step; type-in REQUIRED; per-char QA FORBIDDEN; FM stop hang; thinking camera |
+| [../shell/QA_LOGGING_AND_PLAYBACK_RECIPE.md](../shell/QA_LOGGING_AND_PLAYBACK_RECIPE.md) | Play ≡ Step; type-in REQUIRED; per-char QA FORBIDDEN; ALWAYS CLEAR; Save Log; dump-on-FAIL; `CHAT_LOADING_DUMP_ALL`=cjm=off |
+| [../shell/CJM_RECORD_PLAY_EDIT.md](../shell/CJM_RECORD_PLAY_EDIT.md) | Guitar tabs; Book Step2 already-selected → **24/16:30**; agentic prove `__studioRunAgenticFullPlayProve` |
 | [../shell/RECORDING.md](../shell/RECORDING.md) — MCP / overlay / page probe | `__studioRunMcpPageProbe`, sitrep, stay-on-page |
 | LESSONS: overlay eyes, MCP matrix, **scroll-into-view**, **overlay visible every probe**, false PROVEN, **fixed localhost / reuse tab** | Prove fail classes |
 | [PARITY_RATCHETS.md](./PARITY_RATCHETS.md) · `check:parity-proven` | Gate honesty — no PROVEN without MCP log |
@@ -147,6 +150,12 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 - Ben (BE): <gate/version/CI> — applied: <script/check>
 - Pax (PO sim): <accept bar / bump call> — applied: <decision>
 ```
+
+**Knowledge improved** (2026-07-21 · stream: docs sound + Traditional UX dump sitrep · R12):
+- Arch (Director): Guitar-tabs + Traditional smoothness OPEN on board; no invent green — applied: NEXT_STEPS · CJM_RECORD_PLAY_EDIT · TEAM_KNOWLEDGE corpus
+- Bea (BA): CHAT_REACT / LE3 browse ≠ thinking pause — applied: CHAT_REACT · CHAT_MAKE_PARITY LE3 → rails
+- Quinn (QA): PO Traditional dump 22:58:41Z — 3× scroll-reversal primary smell — applied: TRADITIONAL_CJM_UX_2026-07-21 · QA recipe fingerprint
+- Pax (PO sim): Docs commit only; no push — applied: this ship
 
 **Knowledge improved** (2026-07-20 · stream: PO Alarm live latch · R15 · R12):
 - Arch (Director): Alarm = sequence mismatch; **live consume primary**, dump secondary; R15 Auto-Rule — applied: STUDIO_AUTO_RULES · PAINPOINTS · PLAYBACK_DIAG

@@ -30,6 +30,7 @@
 - **shell:** QA auto-pause on presence TTL (8s) as leave guard rail; avail after chat FPS: freeze chat underlay + drop scrim backdrop-filter
 - **shell:** Agentic full Play prove default timeoutMs 300_000 (was inherited 180s smoke; short budgets false-FAIL mid-playlist)
 - **shell:** CJM Record/Play/Edit guitar-tabs doctrine + Book Step2 REC cal-target bridge (pick-other compatible)
+- **docs:** Docs sound: guitar-tabs links + Traditional dump UX sitrep (scroll-reversal); CHAT LE3 rails fix; no invent green
 
 ## v0.0.100 - 200726
 - **shell:** PP-13 self-test expand + stale-green detector + PLAYBACK_DIAG mirror

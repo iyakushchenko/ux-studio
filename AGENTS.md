@@ -67,6 +67,8 @@ npm run smoke        # lean profile — local / on-demand CI only; PROTO_SMOKE_P
 
 **Full agentic continuous Play prove (HARD):** call only `await window.__studioRunAgenticFullPlayProve?.()` (alias `__protoRunAgenticFullPlayProve`; default `timeoutMs` **300_000**, override e.g. `{ timeoutMs: 600_000 }`) — not ad-hoc Play / not `__protoRunAgenticPlaySmoke` (tears down overlay). Returns `{ pass, peak, end, errors }`; keeps QA open for Save Log. → [QA_LOGGING_AND_PLAYBACK_RECIPE.md](docs/shell/QA_LOGGING_AND_PLAYBACK_RECIPE.md)
 
+**Traditional Play smoke:** `await window.__protoRunTraditionalPlaySmoke?.()` (tears down overlay). For Save Log peak / RESULT prefer keep-open manual Play until a keep-overlay Traditional full prove ships. → [QA_LOGGING_AND_PLAYBACK_RECIPE.md](docs/shell/QA_LOGGING_AND_PLAYBACK_RECIPE.md) · [TRADITIONAL_CJM_UX_2026-07-21.md](docs/projects/boots-pharmacy/audits/TRADITIONAL_CJM_UX_2026-07-21.md)
+
 **Studio URL params:** `project` · `screen` · `persona` · `cjm=on|off` · `experience=agentic|traditional` · `modal` — **not** `mode=agentic-cjm` (legacy alias only). Example: `http://localhost:5173/?project=boots-pharmacy&screen=chat&persona=sarah-jenkins&cjm=on&experience=agentic`. → [docs/shell/URL.md](docs/shell/URL.md)
 
 **Version chip:** top tabs row shows `v{package.json}` + channel (`alpha` default). Policy: [docs/product/VERSIONING.md](docs/product/VERSIONING.md). **Felony = test fail** — [COMMAND_DOCTRINE.md](docs/product/COMMAND_DOCTRINE.md).
@@ -97,6 +99,7 @@ npm run smoke        # lean profile — local / on-demand CI only; PROTO_SMOKE_P
 ```javascript
 window.__studioRunMcpSanityCheck?.()          // preferred — safe default, no transport
 window.__studioRunAgenticFullPlayProve?.()    // FULL agentic Play prove (keep QA overlay)
+window.__protoRunTraditionalPlaySmoke?.()     // Traditional Play smoke (tears down overlay)
 window.__studioExportJourneyBundle?.()        // journey.json
 window.__studioSaveRecordingAsJourney?.()     // REC → ephemeral CJM journey
 window.__studioApplyJourneyBundle?.(json)     // runtime import

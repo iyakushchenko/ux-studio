@@ -2,11 +2,11 @@
 
 **Project:** `boots-pharmacy`  
 **Callsigns:** Bea (BA) · Finn (FE) · Uma (UI/UX) · Quinn (QA) · Pax (PO sim) · Arch (Director)  
-**Status:** draft (kickoff — register only)  
-**Updated:** 2026-07-19  
-**Refs:** [CHAT_MAKE_PARITY_REGISTER.md](./CHAT_MAKE_PARITY_REGISTER.md) · [HOME_MAKE_PARITY_REGISTER.md](./HOME_MAKE_PARITY_REGISTER.md) · [NEXT_STEPS.md](../../../product/NEXT_STEPS.md) erase-Make · [PAGE_FINAL_PASS.md](../../../product/PAGE_FINAL_PASS.md)
+**Status:** **PAGE FINAL PASS HARD-GREEN** (2026-07-20) — keep rails honest  
+**Updated:** 2026-07-21  
+**Refs:** [CHAT_MAKE_PARITY_REGISTER.md](./CHAT_MAKE_PARITY_REGISTER.md) · [CHAT_PAGE_RAILS.md](./CHAT_PAGE_RAILS.md) · [HOME_MAKE_PARITY_REGISTER.md](./HOME_MAKE_PARITY_REGISTER.md) · [NEXT_STEPS.md](../../../product/NEXT_STEPS.md) erase-Make · [PAGE_FINAL_PASS.md](../../../product/PAGE_FINAL_PASS.md) · audit [FE_AUDIT_CHAT_PAGE_FINAL_PASS_2026-07-20.md](../audits/FE_AUDIT_CHAT_PAGE_FINAL_PASS_2026-07-20.md)
 
-**PO override (2026-07-19):** Chat documentation/migration **started** while **Site Pilot (`site-pilot`) is NOT PAGE FINAL PASS hard-green**. PDP **remains** HARD-GREEN — do not demote.
+**Rails (do not invent):** `cjm=off` = saved-chat load (blank interim → full thread → scroll bottom) — **no** creation “thinking pause”. `cjm=on` = progressive (thinking → staged bubbles). `CHAT_LOADING_DUMP_ALL` = **cjm=off only**. Type-in animation kept; no per-letter QA logs. → [CHAT_PAGE_RAILS.md](./CHAT_PAGE_RAILS.md) · [QA_LOGGING_AND_PLAYBACK_RECIPE.md](../../../shell/QA_LOGGING_AND_PLAYBACK_RECIPE.md)
 
 ---
 
