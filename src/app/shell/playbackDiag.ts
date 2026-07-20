@@ -200,6 +200,7 @@ export function playbackDiagBeat(options: {
   phase?: "enter" | "exit" | "advance" | "retreat";
 }): void {
   const screen = readScreenId();
+  const screenAfter = options.screenAfter ?? screen;
   push({
     kind: "beat",
     detail:
@@ -209,8 +210,17 @@ export function playbackDiagBeat(options: {
     beatKind: options.beatKind,
     mode: options.mode ?? resolvePlaybackDiagMode(),
     screenBefore: options.screenBefore ?? screen,
-    screenAfter: options.screenAfter ?? screen,
+    screenAfter,
   });
+  // Objective page-jiggle sample on beat enter/advance (rAF y/opacity).
+  if (options.phase === "enter" || options.phase === "advance" || !options.phase) {
+    const sid = screenAfter ?? screen;
+    if (sid && typeof requestAnimationFrame === "function") {
+      void import("./pageJiggleMonitor").then((m) => {
+        m.samplePageJiggle(sid);
+      });
+    }
+  }
 }
 
 export function playbackDiagTarget(options: {

@@ -11,7 +11,12 @@ import {
 } from "react";
 import { AnimatePresence, motion } from "@/uxds/motion";
 import { ButtonPrimary } from "@/uxds/components";
-import { CHAT_PULL_UP } from "./chatMotion";
+import {
+  CHAT_PULL_UP,
+  CHAT_PULL_UP_MS,
+  logChatBubbleMotion,
+  startChatBubbleMotionSample,
+} from "./chatMotion";
 import {
   endSitePilotChatThinking,
   isSitePilotChatSendThinking,
@@ -167,13 +172,10 @@ function AgentCta({ label, onClick }: { label: string; onClick?: () => void }) {
 const QUERY_FRAME_CLASSES = ["chat__frame", "chat__frame--query"];
 
 /**
- * Parent frames use `hidden` / `display:none` until revealed. Mounting
- * motion.div in that same commit skips enter (no layout frame for y:22).
- * Double-rAF: first paint at CHAT_PULL_UP.initial, then animate up.
- *
+ * Parent frames use `hidden` / `display:none` until revealed. On reveal the
+ * motion.div enters with framer-motion's normal initial→animate tween.
  * `shouldAnimate` gates the pull-up to one-at-a-time reveals only.
- * Batch reveals (scenario deactivate / browse init) skip to final position
- * so later bubbles don't jump/tear.
+ * Batch reveals skip to final position (no initial offset).
  */
 function useChatPullUpLive(
   revealed: boolean,
@@ -189,31 +191,134 @@ function useChatPullUpLive(
       setLive(true);
       return;
     }
+    // One rAF: parent `hidden` removal commits before Motion measures.
     setLive(false);
-    let inner = 0;
-    const outer = requestAnimationFrame(() => {
-      inner = requestAnimationFrame(() => setLive(true));
-    });
-    return () => {
-      cancelAnimationFrame(outer);
-      cancelAnimationFrame(inner);
-    };
+    const raf = requestAnimationFrame(() => setLive(true));
+    return () => cancelAnimationFrame(raf);
   }, [revealed, shouldAnimate]);
   return live;
+}
+
+/** Mount → animate-start → rAF frames → animate-end for chat-bubble-motion. */
+function useChatBubbleMotionDiag(
+  bubbleRef: RefObject<HTMLElement | null>,
+  options: {
+    id: string;
+    revealed: boolean;
+    shouldAnimate: boolean;
+    pullLive: boolean;
+    visibleCount?: number;
+  }
+): void {
+  const sampleCancelRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    if (!options.revealed || !options.shouldAnimate) {
+      sampleCancelRef.current?.();
+      sampleCancelRef.current = null;
+      return;
+    }
+    logChatBubbleMotion({
+      id: options.id,
+      phase: "mount",
+      y: CHAT_PULL_UP.initial.y,
+      opacity: CHAT_PULL_UP.initial.opacity,
+      layoutY: bubbleRef.current
+        ? Math.round(bubbleRef.current.getBoundingClientRect().top * 100) / 100
+        : null,
+      deltaY: 0,
+      shouldAnimate: true,
+      visibleCount: options.visibleCount ?? null,
+    });
+  }, [options.revealed, options.shouldAnimate, options.id, options.visibleCount, bubbleRef]);
+
+  useEffect(() => {
+    if (!options.revealed || !options.shouldAnimate || !options.pullLive) {
+      return;
+    }
+    logChatBubbleMotion({
+      id: options.id,
+      phase: "animate-start",
+      y: CHAT_PULL_UP.initial.y,
+      opacity: 0,
+      layoutY: bubbleRef.current
+        ? Math.round(bubbleRef.current.getBoundingClientRect().top * 100) / 100
+        : null,
+      deltaY: 0,
+      shouldAnimate: true,
+      visibleCount: options.visibleCount ?? null,
+    });
+    sampleCancelRef.current?.();
+    let cancelled = false;
+    const armSample = () => {
+      if (cancelled) return;
+      const el = bubbleRef.current;
+      if (!el) {
+        requestAnimationFrame(armSample);
+        return;
+      }
+      sampleCancelRef.current = startChatBubbleMotionSample({
+        id: options.id,
+        el,
+        shouldAnimate: true,
+        visibleCount: options.visibleCount,
+        durationMs: CHAT_PULL_UP_MS + 80,
+      });
+    };
+    armSample();
+    const endTimer = window.setTimeout(() => {
+      sampleCancelRef.current?.();
+      sampleCancelRef.current = null;
+      logChatBubbleMotion({
+        id: options.id,
+        phase: "animate-end",
+        y: 0,
+        opacity: 1,
+        layoutY: bubbleRef.current
+          ? Math.round(bubbleRef.current.getBoundingClientRect().top * 100) / 100
+          : null,
+        deltaY: 0,
+        shouldAnimate: true,
+        visibleCount: options.visibleCount ?? null,
+      });
+    }, CHAT_PULL_UP_MS + 40);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(endTimer);
+      sampleCancelRef.current?.();
+      sampleCancelRef.current = null;
+    };
+  }, [
+    options.revealed,
+    options.shouldAnimate,
+    options.pullLive,
+    options.id,
+    options.visibleCount,
+    bubbleRef,
+  ]);
 }
 
 function QueryFrame({
   frame,
   revealed,
   shouldAnimate,
+  visibleCount,
 }: {
   frame: Extract<ChatThreadFrame, { kind: "query" }>;
   revealed: boolean;
   shouldAnimate: boolean;
+  visibleCount?: number;
 }) {
   const ref = useStaticFrameClasses(QUERY_FRAME_CLASSES);
+  const bubbleRef = useRef<HTMLDivElement | null>(null);
   useChatFrameRevealPaint(ref, revealed);
   const pullLive = useChatPullUpLive(revealed, shouldAnimate);
+  useChatBubbleMotionDiag(bubbleRef, {
+    id: frame.id,
+    revealed,
+    shouldAnimate,
+    pullLive,
+    visibleCount,
+  });
   const bubble = (
     <>
       <div data-name="Subtotal">
@@ -221,6 +326,7 @@ function QueryFrame({
       </div>
     </>
   );
+
   return (
     <div
       ref={ref}
@@ -230,14 +336,20 @@ function QueryFrame({
       hidden={!revealed}
       aria-hidden={!revealed}
     >
-      {/* Outer frame stays plain div (engine reveal); Motion only on bubble. */}
       {revealed ? (
         <motion.div
+          ref={bubbleRef}
           className="chat__bubble chat__bubble--user"
           data-name="component.co.order.summary"
           data-studio-chat-pull-up={pullLive ? "up" : "start"}
-          initial={CHAT_PULL_UP.initial}
-          animate={pullLive ? CHAT_PULL_UP.animate : CHAT_PULL_UP.initial}
+          initial={shouldAnimate ? CHAT_PULL_UP.initial : false}
+          animate={
+            pullLive
+              ? CHAT_PULL_UP.animate
+              : shouldAnimate
+                ? CHAT_PULL_UP.initial
+                : CHAT_PULL_UP.animate
+          }
           transition={CHAT_PULL_UP.transition}
         >
           {bubble}
@@ -262,16 +374,26 @@ function ReplyFrame({
   shouldAnimate,
   onAgentCta,
   onProductLink,
+  visibleCount,
 }: {
   frame: Extract<ChatThreadFrame, { kind: "reply" }>;
   revealed: boolean;
   shouldAnimate: boolean;
   onAgentCta?: (label: string) => void;
   onProductLink?: (label: string) => void;
+  visibleCount?: number;
 }) {
   const ref = useStaticFrameClasses(REPLY_FRAME_CLASSES);
+  const bubbleRef = useRef<HTMLDivElement | null>(null);
   useChatFrameRevealPaint(ref, revealed);
   const pullLive = useChatPullUpLive(revealed, shouldAnimate);
+  useChatBubbleMotionDiag(bubbleRef, {
+    id: frame.id,
+    revealed,
+    shouldAnimate,
+    pullLive,
+    visibleCount,
+  });
   const onBodyClick = (e: MouseEvent<HTMLDivElement>) => {
     const t = e.target as HTMLElement | null;
     const link = t?.closest?.(".uxds-link, .chat__link");
@@ -311,14 +433,20 @@ function ReplyFrame({
       hidden={!revealed}
       aria-hidden={!revealed}
     >
-      {/* Pull-up replaces thinking: rise from below after think exit. */}
       {revealed ? (
         <motion.div
+          ref={bubbleRef}
           className="chat__bubble chat__bubble--agent"
           data-name="component.co.order.summary"
           data-studio-chat-pull-up={pullLive ? "up" : "start"}
-          initial={CHAT_PULL_UP.initial}
-          animate={pullLive ? CHAT_PULL_UP.animate : CHAT_PULL_UP.initial}
+          initial={shouldAnimate ? CHAT_PULL_UP.initial : false}
+          animate={
+            pullLive
+              ? CHAT_PULL_UP.animate
+              : shouldAnimate
+                ? CHAT_PULL_UP.initial
+                : CHAT_PULL_UP.animate
+          }
           transition={CHAT_PULL_UP.transition}
         >
           {bubbleBody}
@@ -388,7 +516,11 @@ function useChatComposerScrollPad(
       column.style.setProperty(CHAT_COMPOSER_PAD_VAR, `${nextPad}px`);
 
       if (prevPad === nextPad || !nearBottom) return;
+      // Skip pad scroll adjust while a bubble is mid pull-up — pad deltas
+      // cancel Motion transform (sitePilotChat: snap only before/after tween).
+      if (column.querySelector('[data-studio-chat-pull-up="start"]')) return;
       requestAnimationFrame(() => {
+        if (column.querySelector('[data-studio-chat-pull-up="start"]')) return;
         const newMax = Math.max(0, column.scrollHeight - column.clientHeight);
         const maxDelta = newMax - prevMax;
         if (maxDelta !== 0) {
@@ -511,40 +643,43 @@ export function ChatScreen({
   ): boolean => frameRevealed && pullUpAnimateIds.has(frameId);
 
   /**
-   * Pull chat up on every progressive reveal / thinking paint so the newest
-   * bubble clears above the sticky composer (CSS scroll-padding-bottom pad).
-   * Instant snap only — eased scrollIntoView raced pin/snap and tripped
-   * scroll-reversal (3× in 700ms) mid agentic SF on r3.
+   * Scroll chat down on progressive reveal so newest bubble clears above the
+   * sticky composer. Layout snap before paint + one post-tween settle
+   * (sitePilotChat: no mid-tween scrollIntoView / pad fight).
    */
-  useEffect(() => {
+  useLayoutEffect(() => {
     const column = columnRef.current;
     if (!column || !scenarioReveal.active) return;
-    const snapBottom = (tag: string) => {
+    const max = Math.max(0, column.scrollHeight - column.clientHeight);
+    if (column.scrollTop < max) {
       const scrollBefore = column.scrollTop;
-      const max = Math.max(0, column.scrollHeight - column.clientHeight);
-      if (column.scrollTop < max) column.scrollTop = max;
+      column.scrollTop = max;
       const delta = column.scrollTop - scrollBefore;
       if (delta !== 0) {
         console.info("[PLAYBACK_DIAG] chat-reveal-y-delta", {
-          tag,
+          tag: "reveal-snap",
           delta,
           visibleCount: revealedFrameCount,
           scrollTop: column.scrollTop,
           scrollMax: max,
         });
       }
-    };
-    snapBottom("reveal");
-    const pullUpMs = Math.round(CHAT_PULL_UP.transition.duration * 1000);
-    const tEarly = window.setTimeout(() => snapBottom("pull-up-early"), 160);
-    const tLate = window.setTimeout(
-      () => snapBottom("pull-up-settle"),
-      pullUpMs + 40
-    );
-    return () => {
-      window.clearTimeout(tEarly);
-      window.clearTimeout(tLate);
-    };
+    }
+  }, [
+    scenarioReveal.active,
+    revealedFrameCount,
+    thinking.mode,
+    thinking.generation,
+  ]);
+
+  useEffect(() => {
+    const column = columnRef.current;
+    if (!column || !scenarioReveal.active) return;
+    const tSettle = window.setTimeout(() => {
+      const settleMax = Math.max(0, column.scrollHeight - column.clientHeight);
+      if (column.scrollTop < settleMax) column.scrollTop = settleMax;
+    }, CHAT_PULL_UP_MS + 60);
+    return () => window.clearTimeout(tSettle);
   }, [
     scenarioReveal.active,
     revealedFrameCount,
@@ -691,6 +826,7 @@ export function ChatScreen({
           frame={frame}
           revealed={revealed}
           shouldAnimate={animate}
+          visibleCount={revealedFrameCount}
         />
       );
     } else {
@@ -702,6 +838,7 @@ export function ChatScreen({
           shouldAnimate={animate}
           onAgentCta={onAgentCta}
           onProductLink={onProductLink}
+          visibleCount={revealedFrameCount}
         />
       );
     }

@@ -1,8 +1,9 @@
 /**
- * Minimal screen-host blink forensics for React pilots (book-step-2/3).
- * Samples opacity/visibility + Motion presence under `.studio-react-screen-host`.
+ * Minimal screen-host blink/jiggle forensics for React pilots (book-step-2/3).
+ * Samples opacity/visibility + Motion presence; remount jiggle via pageJiggleMonitor.
  */
 import { playbackDiagScreenEnter } from "@/app/shell/playbackDiag";
+import { samplePageJiggle } from "@/app/shell/pageJiggleMonitor";
 
 function sampleHostPresence(host: HTMLElement | null): {
   opacity: number | null;
@@ -14,7 +15,6 @@ function sampleHostPresence(host: HTMLElement | null): {
   }
   const style = getComputedStyle(host);
   const opacity = Number.parseFloat(style.opacity);
-  // framer-motion leaves projection / appear markers when AnimatePresence/motion.* mounts.
   const motionPresence = Boolean(
     host.querySelector(
       "[data-projection-id], [data-framer-appear-id], [data-framer-component-type]"
@@ -58,4 +58,10 @@ export function noteReactScreenHostEnter(options: {
     motionPresence: sample.motionPresence,
     detail: `screen-enter ${options.screenId} remount=${options.remountCount} render=${options.renderCount} createdRoot=${options.createdRoot} hostOpacity=${sample.opacity ?? "?"} wireOpacity=${wireOpacity ?? "?"} visibility=${sample.visibility ?? "?"} motion=${sample.motionPresence ? "yes" : "no"}`,
   });
+  // True remount only — prop re-renders must not flood jiggle samples.
+  if (options.createdRoot) {
+    samplePageJiggle(options.screenId);
+  }
 }
+
+export { samplePageJiggle } from "@/app/shell/pageJiggleMonitor";

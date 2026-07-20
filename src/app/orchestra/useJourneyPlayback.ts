@@ -944,8 +944,10 @@ export function useJourneyPlayback({
       cancelDemoCursorJourneyEndFade();
       await parkDemoCursorAtRest({ animate: false });
       if (!retreatSyncRef.current && playback.syncDwellRetreat) {
+        // Instant snap always — eased date-section scroll on SF enter was
+        // page-jiggle deltaY≈148 (host y 178→30) while nav-cross settled.
         await playback.syncDwellRetreat(beat, {
-          instant: isPlayingRef.current,
+          instant: true,
         });
       }
     },
