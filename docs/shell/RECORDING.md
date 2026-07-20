@@ -199,6 +199,7 @@ Leaving Rec while a capture is live **pauses** the session (does not stop/destro
 | ↑ | Import a saved `.recording.json` |
 | ↺ | Replay last stopped or imported session (v3: transport + screen + demo/human-click + wire-intent + director-script + beat-enter + scroll + typed-text) |
 | + | **Add to project as CJM** — disabled while a recording is live/paused; after Stop, title popup → compile → **new** journey id (picker label). Separate from Download. |
+| 🗑 | **Delete recorded CJM** (REC mode only) — trash glyph (PLP reset filters); confirm popup DELETE/CANCEL. Built-in Agentic/Traditional hidden. Falls back to matching built-in path after delete. |
 | LED | Same playback diode chrome — **blinks red** while recording live; dim solid red when paused; idle graphite when REC ready / REC off restores green on-air |
 
 ### Product model — REC start + steps

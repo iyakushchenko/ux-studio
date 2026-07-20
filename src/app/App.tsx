@@ -96,6 +96,14 @@ import { replayRecordingSession } from "@/app/recording/recordingReplay";
 import { useRecordingReplayBridge } from "@/app/recording/useRecordingReplayBridge";
 import { registerJourneyMcpHelpers } from "@/app/journey/journeyMcpHelpers";
 import { summarizeJourney } from "@/app/journey/journeyFile";
+import {
+  isDeletableRecordedJourneyId,
+  removePersistedRecordedJourney,
+} from "@/app/journey/recordedJourneyPersist";
+import {
+  experienceToOrchestraModeId,
+  orchestraModeToExperienceId,
+} from "@/app/orchestra/orchestraModes";
 import { usePlaybackGuard } from "@/app/shell/usePlaybackGuard";
 import { usePlaybackScrollGuard } from "@/app/shell/usePlaybackScrollGuard";
 import { playbackScrollMonitor } from "@/app/shell/playbackScrollMonitor";
@@ -1473,6 +1481,45 @@ export default function App() {
     resetBeatIndex();
     transportActionsRef.current.jumpToStart();
   }, [resetBeatIndex]);
+
+  const handleDeleteRecordedCjm = useCallback(
+    (journeyId: OrchestraModeId) => {
+      if (!isDeletableRecordedJourneyId(journeyId)) return;
+      const removed = removePersistedRecordedJourney(
+        studioProjectId,
+        studioPersonaId,
+        journeyId
+      );
+      if (!removed) return;
+      refreshJourneysAfterImport();
+      if (orchestraModeId === journeyId) {
+        const fallback = experienceToOrchestraModeId(
+          orchestraModeToExperienceId(journeyId)
+        );
+        handleOrchestraModeChange(fallback);
+      }
+    },
+    [
+      handleOrchestraModeChange,
+      orchestraModeId,
+      refreshJourneysAfterImport,
+      studioPersonaId,
+      studioProjectId,
+    ]
+  );
+
+  const deleteRecordedCjmControl = useMemo(() => {
+    if (!isDeletableRecordedJourneyId(orchestraModeId)) return null;
+    const label =
+      orchestraModes.find((mode) => mode.id === orchestraModeId)?.label ??
+      orchestraModeId;
+    return {
+      journeyId: orchestraModeId,
+      label,
+      onConfirmDelete: () => handleDeleteRecordedCjm(orchestraModeId),
+    };
+  }, [handleDeleteRecordedCjm, orchestraModeId, orchestraModes]);
+
   const onRecordingAddedAsCjm = useCallback(
     (_s: unknown, saved?: { journeyId: string }) => {
       refreshJourneysAfterImport();
@@ -1747,6 +1794,7 @@ export default function App() {
                   />
                 </div>
               }
+              deleteRecordedCjm={deleteRecordedCjmControl}
               segmentLabel={
                 studioJourneyMode ? studioTouchpoint.label : undefined
               }

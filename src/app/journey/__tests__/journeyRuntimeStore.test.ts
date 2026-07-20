@@ -5,7 +5,9 @@ import {
 } from "@/projects/boots-pharmacy/personas/sarah-jenkins/journeys";
 import {
   applyImportedJourneyBundle,
+  applyImportedJourneyFile,
   clearImportedJourneys,
+  removeImportedJourney,
   resolveRuntimeJourneys,
   resetImportedJourneysForTests,
 } from "@/app/journey/journeyRuntimeStore";
@@ -53,5 +55,24 @@ describe("journeyRuntimeStore", () => {
     expect(resolveRuntimeJourneys([TRADITIONAL_CJM_JOURNEY])[0]?.label).toBe(
       TRADITIONAL_CJM_JOURNEY.label
     );
+  });
+
+  it("removes a single imported recorded journey by id", () => {
+    applyImportedJourneyFile({
+      version: 1,
+      exportedAt: "2026-07-19T00:00:00.000Z",
+      journey: {
+        id: "rec-trad-delete-me",
+        label: "Delete Me",
+        beats: [],
+      },
+    });
+    expect(removeImportedJourney("rec-trad-delete-me")).toBe(true);
+    expect(
+      resolveRuntimeJourneys([AGENTIC_CJM_JOURNEY, TRADITIONAL_CJM_JOURNEY]).map(
+        (j) => j.id
+      )
+    ).toEqual(["agentic-cjm", "traditional-cjm"]);
+    expect(removeImportedJourney("traditional-cjm")).toBe(false);
   });
 });

@@ -13,6 +13,7 @@ import {
   CONTROL_ROOM_TAP_MS,
   flashControlRoomButton,
 } from "@/app/nav/controlRoomTap";
+import { StudioNavDeleteRecordedCjm } from "@/app/nav/StudioNavDeleteRecordedCjm";
 import { StudioNavRecordingEventCounter } from "@/app/nav/StudioNavRecordingControls";
 import {
   STUDIO_LABEL_SHRINK_DELAY_S,
@@ -68,6 +69,15 @@ export type StudioNavScenarioControlsProps = {
   qaBeatLabel?: string | null;
   /** Optional recording deck (same session APIs as MCP helpers). */
   recordingControls?: ReactNode;
+  /**
+   * REC-mode only: delete the selected recorded CJM (hidden for built-ins).
+   * Parent supplies target when the current orchestra mode is deletable.
+   */
+  deleteRecordedCjm?: {
+    journeyId: string;
+    label: string;
+    onConfirmDelete: () => void;
+  } | null;
 };
 
 function CassettePauseIcon() {
@@ -223,6 +233,7 @@ export function StudioNavScenarioControls({
   qaBeatId,
   qaBeatLabel,
   recordingControls,
+  deleteRecordedCjm = null,
 }: StudioNavScenarioControlsProps) {
   const STEP_DIODE_MS = CONTROL_ROOM_TAP_MS;
   const CLICK_DIODE_MS = CONTROL_ROOM_TAP_MS;
@@ -506,6 +517,13 @@ export function StudioNavScenarioControls({
       role="group"
     >
       {studioMenus}
+      {recMode && !recModeLocked && deleteRecordedCjm ? (
+        <StudioNavDeleteRecordedCjm
+          journeyId={deleteRecordedCjm.journeyId}
+          label={deleteRecordedCjm.label}
+          onConfirmDelete={deleteRecordedCjm.onConfirmDelete}
+        />
+      ) : null}
       {segmentLabel ? (
         <StudioNavSegmentLabel
           label={segmentLabel}

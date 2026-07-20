@@ -67,6 +67,15 @@ export function clearImportedJourneys(): void {
   notify();
 }
 
+/** Remove one imported / recorded journey from the runtime catalog. */
+export function removeImportedJourney(journeyId: string): boolean {
+  const next = importedJourneys.filter((journey) => journey.id !== journeyId);
+  if (next.length === importedJourneys.length) return false;
+  importedJourneys = next;
+  notify();
+  return true;
+}
+
 export function resetImportedJourneysForTests(): void {
   importedJourneys = [];
   snapshotVersion = 0;

@@ -7,8 +7,10 @@ import type { JourneyDefinition } from "@/app/orchestra/types";
 import {
   applyImportedJourneyFile,
   getImportedJourneys,
+  removeImportedJourney,
 } from "@/app/journey/journeyRuntimeStore";
 import type { JourneyFile } from "@/app/journey/journeyFile";
+import { isBuiltInOrchestraModeId } from "@/app/orchestra/orchestraModes";
 import type { PersonaId, ProjectId } from "@/projects/types";
 
 const STORAGE_PREFIX = "studio-recorded-cjm";
@@ -87,5 +89,36 @@ export function hydrateRecordedJourneysFromStorage(
 export function listRuntimeRecordedJourneys(): JourneyDefinition[] {
   return getImportedJourneys().filter(
     (j) => j.id !== "agentic-cjm" && j.id !== "traditional-cjm"
+  );
+}
+
+/**
+ * Delete a user-recorded CJM from localStorage + runtime catalog.
+ * Built-in Agentic/Traditional slots are never removed.
+ */
+export function removePersistedRecordedJourney(
+  projectId: ProjectId | string,
+  personaId: PersonaId | string,
+  journeyId: string
+): boolean {
+  if (isBuiltInOrchestraModeId(journeyId)) return false;
+  const existing = readPersistedRecordedJourneys(projectId, personaId);
+  const next = existing.filter((j) => j.id !== journeyId);
+  const removedFromStorage = next.length !== existing.length;
+  if (removedFromStorage) {
+    persistRecordedJourneys(projectId, personaId, next);
+  }
+  const removedFromRuntime = removeImportedJourney(journeyId);
+  return removedFromStorage || removedFromRuntime;
+}
+
+/** True when the selected mode is a deletable recorded CJM (not built-in). */
+export function isDeletableRecordedJourneyId(
+  journeyId: string | null | undefined
+): boolean {
+  if (!journeyId || isBuiltInOrchestraModeId(journeyId)) return false;
+  return (
+    listRuntimeRecordedJourneys().some((j) => j.id === journeyId) ||
+    /^rec-[a-z0-9]/i.test(journeyId)
   );
 }
