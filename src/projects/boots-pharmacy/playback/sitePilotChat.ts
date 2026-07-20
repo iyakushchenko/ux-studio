@@ -1,6 +1,8 @@
 import {
   clearSimulatedClickRipples,
   delay,
+  holdDemoCursorAtLastClick,
+  isDemoCursorHeldAtLastClick,
   removeDemoCursor as removeSharedDemoCursor,
   simulateDemoPointerClick,
 } from "@/app/scenario/demoCursor";
@@ -8,6 +10,7 @@ import {
   pinScenarioScrollToBottomDuring,
   scrollPrototypeScrollToBottom,
 } from "@/app/scenario/scenarioEngine";
+import { animateScrollElementIntoView } from "@/app/scenario/playbackScroll";
 import {
   playbackDiagClick,
   playbackDiagLog,
@@ -36,7 +39,10 @@ import {
 import type { BeforeRevealContext } from "@/app/nav/useScenarioPlayback";
 import type { AvailOpenIntent } from "@/projects/boots-pharmacy/overlays/AvailabilityTool";
 import { logChatReveal } from "@/projects/boots-pharmacy/screens/chat/chatScenarioRevealBridge";
+import { CHAT_PULL_UP } from "@/projects/boots-pharmacy/screens/chat/chatMotion";
 import { CHAT_THREAD_FRAMES } from "@/projects/boots-pharmacy/screens/chat/chatThreadContent";
+
+const CHAT_PULL_UP_MS = Math.round(CHAT_PULL_UP.transition.duration * 1000);
 
 const AGENTIC_QUERY_LINE_PX = 24;
 const AGENTIC_QUERY_MAX_LINES = 5;
@@ -78,7 +84,9 @@ let preludeAborted = false;
 
 export function abortSitePilotChatPlaybackPrelude(): void {
   preludeAborted = true;
-  removeSharedDemoCursor({ immediate: true });
+  if (!isDemoCursorHeldAtLastClick()) {
+    removeDemoCursorImmediate();
+  }
   clearSimulatedClickRipples();
   endSitePilotChatThinking();
 }
@@ -175,8 +183,9 @@ function findCtaInAgentFrame(
   );
 }
 
-function removeDemoCursor(): void {
-  removeSharedDemoCursor({ fade: true });
+/** Abort path only — hard-remove. Post-click uses holdDemoCursorAtLastClick. */
+function removeDemoCursorImmediate(): void {
+  removeSharedDemoCursor({ immediate: true });
 }
 
 async function simulateSarahCtaClick(button: HTMLElement): Promise<void> {
@@ -200,7 +209,10 @@ async function simulateSarahCtaClick(button: HTMLElement): Promise<void> {
     selector: "chat-agent-cta",
     detail: ok ? "agentic CTA click ok" : "agentic CTA click FAIL",
   });
-  if (ok) await delay(CTA_PRESS_MS);
+  if (ok) {
+    holdDemoCursorAtLastClick();
+    await delay(CTA_PRESS_MS);
+  }
 }
 
 async function simulateSarahSendClick(sendBtn: HTMLElement): Promise<void> {
@@ -218,7 +230,10 @@ async function simulateSarahSendClick(sendBtn: HTMLElement): Promise<void> {
     selector: "chat-composer-send",
     detail: ok ? "composer send click ok" : "composer send click FAIL",
   });
-  if (ok) await delay(SEND_PAUSE_MS);
+  if (ok) {
+    holdDemoCursorAtLastClick();
+    await delay(SEND_PAUSE_MS);
+  }
 }
 
 async function pulseComposerSend(): Promise<void> {
@@ -321,7 +336,8 @@ export async function runSitePilotChatBeforeReveal(
   playbackScrollMonitor.noteRetreatSync();
 
   if (isSitePilotChatAgentReplyFrame(frame)) {
-    removeDemoCursor();
+    // Stay on last click point through thinking — do not fade/park-away.
+    holdDemoCursorAtLastClick();
     const screen = getChatScreen();
     const scrollEl = getChatScrollEl();
     // First agent reply (r0) MUST show thinking — never skip for frame 0/handoff.
@@ -345,15 +361,34 @@ export async function runSitePilotChatBeforeReveal(
     }
     if (scrollEl) {
       scrollChatToBottom(true);
+      // Think + pull-up settle — keep bottom pin so new reply never sits under dock.
       pinScenarioScrollToBottomDuring(
         scrollEl,
-        SITE_PILOT_CHAT_PLAYBACK_THINK_MS + 480
+        SITE_PILOT_CHAT_PLAYBACK_THINK_MS + CHAT_PULL_UP_MS + 160
       );
     }
     await delay(SITE_PILOT_CHAT_PLAYBACK_THINK_MS);
     if (!preludeAborted) {
       await fadeOutSitePilotChatThinking();
-      scrollChatToBottom();
+      scrollChatToBottom(true);
+      // Reply mounts after beforeReveal returns — schedule clearance then.
+      const clearAboveComposer = () => {
+        if (preludeAborted) return;
+        const col = getChatScrollEl();
+        const last = col?.querySelector<HTMLElement>(
+          `[data-studio-chat-frame="${anchorId}"]`
+        );
+        if (col && last) {
+          void animateScrollElementIntoView(last, {
+            scrollEl: col,
+            align: "end",
+          });
+        } else {
+          scrollChatToBottom(true);
+        }
+      };
+      window.setTimeout(clearAboveComposer, 80);
+      window.setTimeout(clearAboveComposer, CHAT_PULL_UP_MS + 40);
       logChatReveal({
         kind: "agent",
         index: zeroIndex,
@@ -421,7 +456,7 @@ export async function runSitePilotChatBeforeReveal(
   } else {
     await simulateSarahTypingInComposer(text);
   }
-  removeDemoCursor();
+  holdDemoCursorAtLastClick();
   // PO: Sarah send never shows thinking — clear any send-thinking the
   // composer click may have latched (React/wire). Agent thinking starts
   // only on the next beforeReveal for a reply frame.

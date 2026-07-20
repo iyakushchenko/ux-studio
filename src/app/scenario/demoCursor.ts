@@ -72,6 +72,11 @@ let activeHoverRoot: HTMLElement | null = null;
 let journeyModePinned = false;
 /** Manual CJM steps park after each interaction; cassette play leaves cursor on target. */
 let parkAfterInteraction = false;
+/**
+ * PO: after a scripted click, stay visible at the click point — suppress
+ * journey-park / idle park-away until the next travel or type-in park.
+ */
+let holdAtLastClick = false;
 let parkPromise: Promise<void> | null = null;
 let resizeParkListener: (() => void) | null = null;
 let parkGeneration = 0;
@@ -182,6 +187,7 @@ export function parkDemoCursorForTypeIn(
   options?: { force?: boolean }
 ): void {
   if (!journeyModePinned) return;
+  clearHoldAtLastClick();
   cancelDemoCursorJourneyEndFade();
   journeyEndCursorFaded = false;
   cancelDemoCursorTravel();
@@ -385,11 +391,28 @@ function resolveDemoCursorSeedPosition(): { x: number; y: number } {
   return { x: rest.left, y: rest.top };
 }
 
+function clearHoldAtLastClick(): void {
+  holdAtLastClick = false;
+}
+
+export function isDemoCursorHeldAtLastClick(): boolean {
+  return holdAtLastClick;
+}
+
 /** CJM idle pose — visible on the right, waiting for the next director call. */
 export function parkDemoCursorAtRest(options?: {
   animate?: boolean;
 }): Promise<void> {
   if (!journeyModePinned) {
+    return Promise.resolve();
+  }
+  // Post-click hold wins over idle journey-park (SF ends → parkAfterInteraction).
+  if (holdAtLastClick) {
+    retainDemoCursorInPlace();
+    notePlaybackCursorEvent("park", {
+      animated: false,
+      detail: "suppressed-hold-at-last-click",
+    });
     return Promise.resolve();
   }
   if (parkPromise) return parkPromise;
@@ -714,6 +737,36 @@ function retainDemoCursorInPlace(): void {
   if (pos) lastCursorPos = pos;
 }
 
+/**
+ * PO: after a CJM click, keep the robo-cursor visible at the click point —
+ * no fade, no park-away to journey rest. Next travel / type-in park may move it.
+ */
+export function holdDemoCursorAtLastClick(): void {
+  if (!journeyModePinned) return;
+  cancelDemoCursorTravel();
+  cancelDemoCursorJourneyEndFade();
+  cancelDemoCursorParkInFlight();
+  cursorFadeGeneration += 1;
+  holdAtLastClick = true;
+  const cursor = ensureDemoCursorElement();
+  const pos = readCursorPosition() ?? lastCursorPos;
+  if (pos) {
+    seedDemoCursorPosition(cursor, pos);
+    lastCursorPos = pos;
+  }
+  cursor.classList.remove(
+    DEMO_CURSOR_PARKED_CLASS,
+    "proto-chat-demo-cursor--exit",
+    "proto-chat-demo-cursor--tap"
+  );
+  cursor.style.opacity = "1";
+  setDemoCursorPointerMode(false);
+  cursorPosLocked = true;
+  notePlaybackCursorEvent("settle", {
+    detail: "hold-at-last-click",
+  });
+}
+
 function acquireDemoCursorElement(): HTMLElement {
   if (journeyModePinned) {
     const existing = document.querySelector<HTMLElement>(".proto-chat-demo-cursor");
@@ -881,6 +934,7 @@ function clearDemoCursorImmediate(): void {
   cancelDemoCursorParkInFlight();
   cursorFadeGeneration += 1;
   cursorPosLocked = false;
+  clearHoldAtLastClick();
   notePlaybackCursorEvent("remove", { detail: "immediate" });
   document
     .querySelectorAll<HTMLElement>(".proto-chat-demo-cursor")
@@ -921,10 +975,27 @@ export async function fadeOutDemoCursorInPlace(): Promise<void> {
 
 export function removeDemoCursor(options?: RemoveDemoCursorOptions): void {
   if (options?.immediate) {
+    // During post-click hold, abort-all from other modules should not rip cursor.
+    // Only explicit chat prelude abort (which checks hold first) or mode teardown clears.
+    if (holdAtLastClick && journeyModePinned) {
+      notePlaybackCursorEvent("settle", {
+        detail: "hold-at-last-click · immediate-suppressed",
+      });
+      return;
+    }
     clearDemoCursorImmediate();
     return;
   }
+  // Post-click hold: never fade/park-away from a soft remove.
+  if (holdAtLastClick && !options?.fade) {
+    retainDemoCursorInPlace();
+    notePlaybackCursorEvent("settle", {
+      detail: "hold-at-last-click · soft-remove-suppressed",
+    });
+    return;
+  }
   if (options?.fade) {
+    clearHoldAtLastClick();
     void fadeOutDemoCursorInPlace();
     return;
   }
@@ -941,6 +1012,13 @@ export function removeDemoCursor(options?: RemoveDemoCursorOptions): void {
 
 /** End of a director script — await before advancing beats in manual CJM. */
 export async function releaseDemoCursorAfterScript(): Promise<void> {
+  if (holdAtLastClick) {
+    retainDemoCursorInPlace();
+    notePlaybackCursorEvent("release", {
+      detail: "hold-at-last-click",
+    });
+    return;
+  }
   notePlaybackCursorEvent("release", {
     detail: parkAfterInteraction ? "park-after-script" : "retain-in-place",
   });
@@ -1208,6 +1286,8 @@ export async function moveDemoCursorTo(
 
   if (travelAborted()) return bail();
 
+  // New director travel supersedes post-click hold.
+  clearHoldAtLastClick();
   cancelDemoCursorParkInFlight();
 
   const interactionRoot = findDemoInteractionRoot(target);

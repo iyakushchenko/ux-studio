@@ -9,7 +9,7 @@ import {
   type ReactNode,
   type RefObject,
 } from "react";
-import { AnimatePresence, motion, MOTION_EASE_IN_OUT } from "@/uxds/motion";
+import { AnimatePresence, motion } from "@/uxds/motion";
 import { ButtonPrimary } from "@/uxds/components";
 import { CHAT_PULL_UP } from "./chatMotion";
 import {
@@ -22,6 +22,7 @@ import {
   STUDIO_SCROLL_OVERFLOW_CLASS,
   syncStudioScrollOverflowGutter,
 } from "@/app/scenario/studioScrollOverflow";
+import { animateScrollElementIntoView } from "@/app/scenario/playbackScroll";
 import { CHAT_REACT_SCREEN_ID } from "./chatContract";
 import { ChatSitePilotBar } from "./ChatSitePilotBar";
 import {
@@ -274,7 +275,7 @@ function ReplyFrame({
           data-name="component.co.order.summary"
           initial={CHAT_PULL_UP.initial}
           animate={CHAT_PULL_UP.animate}
-          transition={{ duration: 0.42, ease: MOTION_EASE_IN_OUT }}
+          transition={CHAT_PULL_UP.transition}
         >
           {bubbleBody}
         </motion.div>
@@ -414,6 +415,50 @@ export function ChatScreen({
     CHAT_THREAD_FRAMES.length,
     1
   );
+
+  /**
+   * Pull chat up on every progressive reveal / thinking paint so the newest
+   * bubble clears above the sticky composer (CSS scroll-padding-bottom pad).
+   * Re-run after Motion pull-up (~480ms) — early scroll races layout height.
+   */
+  useEffect(() => {
+    const column = columnRef.current;
+    if (!column || !scenarioReveal.active) return;
+    const run = () => {
+      const anchor =
+        column.querySelector<HTMLElement>("[data-studio-chat-thinking]") ??
+        [
+          ...column.querySelectorAll<HTMLElement>(
+            '[data-studio-chat-revealed="true"]'
+          ),
+        ].at(-1) ??
+        null;
+      if (!anchor) {
+        column.scrollTop = Math.max(
+          0,
+          column.scrollHeight - column.clientHeight
+        );
+        return;
+      }
+      void animateScrollElementIntoView(anchor, {
+        scrollEl: column,
+        align: "end",
+      });
+    };
+    run();
+    const pullUpMs = Math.round(CHAT_PULL_UP.transition.duration * 1000);
+    const tEarly = window.setTimeout(run, 160);
+    const tLate = window.setTimeout(run, pullUpMs + 40);
+    return () => {
+      window.clearTimeout(tEarly);
+      window.clearTimeout(tLate);
+    };
+  }, [
+    scenarioReveal.active,
+    revealedFrameCount,
+    thinking.mode,
+    thinking.generation,
+  ]);
 
   // Bridge owns send/playback thinking end (Play fade-out). Clear local stop latch.
   useEffect(() => {

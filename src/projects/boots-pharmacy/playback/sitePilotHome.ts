@@ -33,10 +33,14 @@ export const AGENTIC_HOME_DEMO_QUERY =
   "I need a full course of travel vaccinations for a three-week trip to Southeast Asia (Indonesia) starting next month, specifically looking to book and buy jabs as a bundle if possible.";
 
 let playbackAborted = false;
+let homeScriptInFlight = false;
 
 export function abortSitePilotHomePlayback(): void {
   playbackAborted = true;
-  removeDemoCursor({ immediate: true });
+  if (homeScriptInFlight) {
+    removeDemoCursor({ immediate: true });
+  }
+  homeScriptInFlight = false;
 }
 
 export function wasSitePilotHomePlaybackAborted(): boolean {
@@ -224,6 +228,7 @@ export async function runSitePilotHomeScript(
   options?: PlaybackScriptOptions
 ): Promise<PlaybackScriptResult> {
   playbackAborted = false;
+  homeScriptInFlight = true;
   if (options?.syncState) return scriptOk();
 
   switch (scriptId) {

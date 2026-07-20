@@ -35,7 +35,7 @@ const ALLOWLIST = {
   "src/app/shell/agent-testing/agentTestingOverlay.ts": 1620, // sitrep + journey-start teardown flags
   "src/app/nav/studioNavPanel.css": 1600, // PANEL chrome + version chip; keep one stylesheet
   "src/app/shell/studioMcpHelpers.ts": 1350, // MCP surface + R15 PO poll in step/play; extract stepForwardSmoke when next growth
-  "src/app/scenario/demoCursor.ts": 1560, // + type-in park/nudge DomState; extract demoCursorTypeIn next
+  "src/app/scenario/demoCursor.ts": 1620, // + hold-at-last-click suppress park; extract demoCursorTypeIn next
   "src/projects/boots-pharmacy/wire/BootsPharmacyProjectView.tsx": 4800, // hybrid Make wire; shrink by screen migrate
   "src/projects/boots-pharmacy/data/plpListing.ts": 2000, // Make PLP DOM; retire with PLP React
 };

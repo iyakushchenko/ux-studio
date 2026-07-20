@@ -24,10 +24,14 @@ import {
 const PLAYBACK_TARGET_DATE_DAY = 21;
 
 let playbackAborted = false;
+let availScriptInFlight = false;
 
 export function abortAvailabilityPlayback(): void {
   playbackAborted = true;
-  removeDemoCursor({ immediate: true });
+  if (availScriptInFlight) {
+    removeDemoCursor({ immediate: true });
+  }
+  availScriptInFlight = false;
   clearSimulatedClickRipples();
 }
 
@@ -416,6 +420,7 @@ export async function runAvailabilityScript(
   options?: PlaybackScriptOptions
 ): Promise<PlaybackScriptResult> {
   playbackAborted = false;
+  availScriptInFlight = true;
   if (options?.syncState) {
     return syncAvailScriptState(scriptId, options);
   }

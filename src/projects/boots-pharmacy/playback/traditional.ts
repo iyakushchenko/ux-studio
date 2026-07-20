@@ -40,12 +40,16 @@ const AVATAR_DOT_SHOWCASE_MS = 5000;
 let playbackAborted = false;
 let playbackGeneration = 0;
 let activeRunGeneration = 0;
+let traditionalScriptInFlight = false;
 
 export function abortTraditionalPlayback(): void {
   playbackGeneration += 1;
   playbackAborted = true;
   resetDemoCursorTravelOrigin();
-  removeDemoCursor({ immediate: true });
+  if (traditionalScriptInFlight) {
+    removeDemoCursor({ immediate: true });
+  }
+  traditionalScriptInFlight = false;
   clearSimulatedClickRipples();
 }
 
@@ -813,6 +817,7 @@ export async function runTraditionalScript(
 ): Promise<PlaybackScriptResult> {
   activeRunGeneration = playbackGeneration;
   playbackAborted = false;
+  traditionalScriptInFlight = true;
   if (options?.syncState) {
     return syncTraditionalTabState(scriptId, runtime, options);
   }

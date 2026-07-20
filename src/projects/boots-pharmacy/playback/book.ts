@@ -48,6 +48,7 @@ const PLAYBACK_TARGET_TIME = "15:30";
 let playbackAborted = false;
 let playbackGeneration = 0;
 let activeRunGeneration = 0;
+let bookScriptInFlight = false;
 
 type BookRunTelemetry = {
   syncState: boolean;
@@ -214,7 +215,10 @@ export function abortBookPlayback(): void {
   notePlaybackCursorEvent("abort", { abortReason: "book-playback-abort" });
   cancelPlaybackScroll("abort");
   resetDemoCursorTravelOrigin();
-  removeDemoCursor({ immediate: true });
+  if (bookScriptInFlight) {
+    removeDemoCursor({ immediate: true });
+  }
+  bookScriptInFlight = false;
   clearSimulatedClickRipples();
 }
 
@@ -676,6 +680,7 @@ export async function runBookScript(
 ): Promise<PlaybackScriptResult> {
   activeRunGeneration = playbackGeneration;
   playbackAborted = false;
+  bookScriptInFlight = true;
   resetBookRunTelemetry(Boolean(options?.syncState));
 
   const phase = resolveBookStep2CursorPhase({
