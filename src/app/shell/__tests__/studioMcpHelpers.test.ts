@@ -6,7 +6,9 @@ import {
 import {
   registerStudioMcpHelpers,
   parseStudioStepCounter,
+  chatRetreatCounterPass,
 } from "@/app/shell/studioMcpHelpers";
+import type { StudioMcpState } from "@/app/shell/studioMcpHelpers";
 
 describe("studioMcpHelpers", () => {
   afterEach(() => {
@@ -198,6 +200,30 @@ describe("studioMcpHelpers", () => {
       total: 25,
     });
     expect(parseStudioStepCounter("2 / 25").visible).toBe(2);
+  });
+
+  it("chatRetreatCounterPass accepts 21-beat chat mid-step, rejects 2/25 false land", () => {
+    const base = {
+      journeyMode: true,
+      scrollLock: true,
+      label: "Chat experience",
+      beatId: "agentic-chat",
+      availStep: null,
+    } as StudioMcpState;
+    expect(
+      chatRetreatCounterPass({ ...base, counter: "STEPS: 9 / 21" })
+    ).toBe(true);
+    expect(
+      chatRetreatCounterPass({ ...base, counter: "STEPS: 2 / 25" })
+    ).toBe(false);
+    expect(
+      chatRetreatCounterPass({
+        ...base,
+        beatId: "agentic-home",
+        label: "Agentic home",
+        counter: "STEPS: 12 / 21",
+      })
+    ).toBe(false);
   });
 
 });

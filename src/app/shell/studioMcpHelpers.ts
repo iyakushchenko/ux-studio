@@ -371,9 +371,17 @@ function isOnAgenticChatBeat(state: StudioMcpState): boolean {
   );
 }
 
-function chatRetreatCounterPass(state: StudioMcpState): boolean {
-  const { visible } = parseStudioStepCounter(state.counter);
-  return visible >= 10 && visible !== 2;
+/**
+ * Retreat landed on chat with an honest mid-journey STEPS counter.
+ * Historic false land was `STEPS: 2 / 25` after React Site Pilot/Chat — reject that.
+ * Do **not** hardcode `visible >= 10` (21-beat agentic playlist puts chat ~9/21).
+ */
+export function chatRetreatCounterPass(state: StudioMcpState): boolean {
+  if (!isOnAgenticChatBeat(state)) return false;
+  const { visible, total } = parseStudioStepCounter(state.counter);
+  if (visible === 2 && total === 25) return false;
+  // Chat is after home type-in (≥3 in handoff helper); reject start-only glitch.
+  return visible >= 3 && (total <= 0 || visible <= total);
 }
 
 function cursorFieldsForStudioState(): Pick<
@@ -962,7 +970,7 @@ export function registerStudioMcpHelpers(options: {
       pass: chatPass,
       detail: chatPass
         ? undefined
-        : `expected counter >= 10 and not 2/25, got ${chatState?.counter ?? "unknown"}`,
+        : `expected agentic-chat mid-journey STEPS (not 2/25 false land), got ${chatState?.counter ?? "unknown"} beat=${chatState?.beatId ?? "?"}`,
       state: chatState,
     });
 
