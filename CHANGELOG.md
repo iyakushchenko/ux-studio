@@ -32,6 +32,7 @@
 - **shell:** CJM Record/Play/Edit guitar-tabs doctrine + Book Step2 REC cal-target bridge (pick-other compatible)
 - **docs:** Docs sound: guitar-tabs links + Traditional dump UX sitrep (scroll-reversal); CHAT LE3 rails fix; no invent green
 - **engine:** Camera engine: no blind origin on CJM/play screen-enter; playbackScroll SSoT session + hold policy; QA soft-fail ignores target scrollIntoView
+- **shell:** Traditional keep-overlay prove + kind:camera dwell beat (Book Step 3 wait then scroll; step-back reverses); dump cal selectors + journey-reset dedupe; agentic peak 22/22 PASS
 
 ## v0.0.100 - 200726
 - **shell:** PP-13 self-test expand + stale-green detector + PLAYBACK_DIAG mirror
