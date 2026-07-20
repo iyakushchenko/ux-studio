@@ -53,6 +53,12 @@ export type PersonaDefinition = {
 export type RetreatSyncOptions = {
   /** Beat-enter / step-back sync — snap scroll and DOM with no eased camera moves. */
   instant?: boolean;
+  /**
+   * Forward Play book-step2 landing — preserve Avail handoff (June 21 + 15:30)
+   * so date/time beats can demo-change to a different slot. Step-back retreat
+   * omits this and restores the wire default baseline.
+   */
+  preserveHandoff?: boolean;
 };
 
 export type RetreatViewportGoal = {

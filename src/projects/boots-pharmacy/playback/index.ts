@@ -55,10 +55,13 @@ function abortAll(): void {
 
 async function syncDwellRetreat(
   beat: JourneyBeat,
-  options?: { instant?: boolean }
+  options?: { instant?: boolean; preserveHandoff?: boolean }
 ): Promise<void> {
   if (beat.id === "book-step2") {
-    await syncBookStep2LandingRetreat({ instant: options?.instant });
+    await syncBookStep2LandingRetreat({
+      instant: options?.instant,
+      preserveHandoff: options?.preserveHandoff,
+    });
   }
 }
 

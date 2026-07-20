@@ -2,7 +2,7 @@
 
 How the Proto Studio journey engine works, how to change scripts safely, and what to verify after every playback-related change.
 
-See also: [SHELL.md](./SHELL.md) (architecture), [PROJECTS.md](./PROJECTS.md) (registering projects/personas), **[PLAYBACK_DIAG.md](./PLAYBACK_DIAG.md)** (console type-in / step / retreat contract — Auto-Rule R13), **[QA_LOGGING_AND_PLAYBACK_RECIPE.md](./QA_LOGGING_AND_PLAYBACK_RECIPE.md)** (Play ≡ Step · type-in REQUIRED · per-char QA FORBIDDEN · FM `stop()` hang · thinking camera).
+See also: [SHELL.md](./SHELL.md) (architecture), [PROJECTS.md](./PROJECTS.md) (registering projects/personas), **[CJM_RECORD_PLAY_EDIT.md](./CJM_RECORD_PLAY_EDIT.md)** (Record/Play/Edit = guitar tabs), **[PLAYBACK_DIAG.md](./PLAYBACK_DIAG.md)** (console type-in / step / retreat contract — Auto-Rule R13), **[QA_LOGGING_AND_PLAYBACK_RECIPE.md](./QA_LOGGING_AND_PLAYBACK_RECIPE.md)** (Play ≡ Step · type-in REQUIRED · per-char QA FORBIDDEN · FM `stop()` hang · thinking camera).
 
 ---
 
@@ -355,9 +355,9 @@ After CJM **step back**, the viewport monitor waits ~520ms then evaluates projec
 | `avail-continue` | Availability date step, **June 25** selected |
 | `avail-time` | **June 21** selected, no time slot |
 | `avail-book` | **June 21** + **15:30** |
-| `book-step2` (dwell) | Book Step 2 **June 24** + wire default **16:30**, not playback **21/15:30** |
-| `book-step2-date` / `select-book-time` | Same as dwell default |
-| `book-step2-reserve` | Playback **June 21** + **15:30** |
+| `book-step2` (dwell) | Book Step 2 **June 24** + wire default **16:30**, not playback **21/15:30** (step-back). Forward Play after Avail **preserves** handoff **21/15:30** so Step2 can demo-change. |
+| `book-step2-date` / `select-book-time` | Same as dwell default on retreat. Forward: if primary **21/15:30** already selected → demo-change to **24/16:30**; else pick **21/15:30**. Never re-click the already-selected day/slot. |
+| `book-step2-reserve` | Playback **June 21** + **15:30** (retreat baseline). Forward reserve uses whatever Step2 demo lane settled. |
 
 Anomaly kinds (shell `playbackRetreatAnomalies.ts`):
 

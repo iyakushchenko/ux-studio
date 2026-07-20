@@ -42,9 +42,28 @@ import {
 export const BOOK_DEFAULT_DATE = BOOK_STEP2_RETREAT_DEFAULT_DATE;
 export const BOOK_DEFAULT_TIME = "16:30";
 
-/** Demo date/time picked during Book Step 2 journey playback. */
+/**
+ * Avail handoff / traditional Step2 demo pick (primary).
+ * When this slot is already selected on Book Step 2, directors demo-change to
+ * {@link BOOK_DEFAULT_DATE} / {@link BOOK_DEFAULT_TIME} instead of re-clicking.
+ */
 const PLAYBACK_TARGET_DATE = { month: "June", day: 21 } as const;
 const PLAYBACK_TARGET_TIME = "15:30";
+
+/** Alternate demo slot when primary is already selected (Avail handoff). */
+const DEMO_CHANGE_DATE = BOOK_DEFAULT_DATE;
+const DEMO_CHANGE_TIME = BOOK_DEFAULT_TIME;
+
+type BookDemoSlot = {
+  date: { month: string; day: number };
+  time: string;
+};
+
+/** Last resolved Step2 demo targets (date+time pair) for outcome / time prelude. */
+let lastResolvedBookDemoSlot: BookDemoSlot = {
+  date: { ...PLAYBACK_TARGET_DATE },
+  time: PLAYBACK_TARGET_TIME,
+};
 
 let playbackAborted = false;
 let playbackGeneration = 0;
@@ -134,6 +153,41 @@ export function isBookDefaultTimeSelected(): boolean {
   return screen ? isBookTimeCellSelected(screen, BOOK_DEFAULT_TIME) : false;
 }
 
+/**
+ * DEMO: if Avail (or prior) already left primary June 21 / 15:30 selected,
+ * Step2 date+time beats pick the alternate wire default (24 / 16:30) so the
+ * cursor shows a real change. Otherwise pick primary (traditional path).
+ * Target resolution only — compatible with REC → recordedClick story-edits
+ * (see docs/shell/CJM_RECORD_PLAY_EDIT.md). Do not add force-click policies.
+ */
+function resolveBookStep2DemoSlot(screen: HTMLElement): BookDemoSlot {
+  const primaryDateSelected = isBookDateCellSelected(
+    screen,
+    PLAYBACK_TARGET_DATE.month,
+    PLAYBACK_TARGET_DATE.day
+  );
+  const primaryTimeSelected = isBookTimeCellSelected(
+    screen,
+    PLAYBACK_TARGET_TIME
+  );
+  const slot: BookDemoSlot =
+    primaryDateSelected || primaryTimeSelected
+      ? { date: { ...DEMO_CHANGE_DATE }, time: DEMO_CHANGE_TIME }
+      : { date: { ...PLAYBACK_TARGET_DATE }, time: PLAYBACK_TARGET_TIME };
+  lastResolvedBookDemoSlot = slot;
+  return slot;
+}
+
+function isBookDemoDateSelected(screen: HTMLElement, slot?: BookDemoSlot): boolean {
+  const target = slot ?? lastResolvedBookDemoSlot;
+  return isBookDateCellSelected(screen, target.date.month, target.date.day);
+}
+
+function isBookDemoTimeSelected(screen: HTMLElement, slot?: BookDemoSlot): boolean {
+  const target = slot ?? lastResolvedBookDemoSlot;
+  return isBookTimeCellSelected(screen, target.time);
+}
+
 export function isAnyBookTimeSelectedOnScreen(screen?: HTMLElement | null): boolean {
   const target = screen ?? bookStep2Screen();
   if (!target) return false;
@@ -145,7 +199,8 @@ function buildBookDirectorOutcomeReport(
   syncState: boolean,
   screen: HTMLElement
 ): DirectorOutcomeReport {
-  const dateSelected = isBookPlaybackDateSelected();
+  const demoDateSelected = isBookDemoDateSelected(screen);
+  const demoTimeSelected = isBookDemoTimeSelected(screen);
   const timeSelected = isBookPlaybackTimeSelected();
   const defaultDateSelected = isBookDefaultDateSelected();
   const usedDemoCursor = bookRunTelemetry.directorCursorUsed;
@@ -155,15 +210,15 @@ function buildBookDirectorOutcomeReport(
     scriptId === "select-book-date"
       ? syncState
         ? defaultDateSelected
-        : dateSelected
+        : demoDateSelected
       : scriptId === "select-book-time"
         ? syncState
           ? defaultDateSelected &&
             isBookDefaultTimeSelected() &&
             !isBookPlaybackTimeSelected()
-          : timeSelected
+          : demoTimeSelected
         : scriptId === "reserve-appointment"
-          ? timeSelected
+          ? demoTimeSelected || timeSelected
           : undefined;
 
   if (syncState) {
@@ -269,10 +324,21 @@ async function clickBookCell(
 }
 
 async function findPreferredBookTimeCell(
-  screen: HTMLElement
+  screen: HTMLElement,
+  preferredTime: string = lastResolvedBookDemoSlot.time
 ): Promise<HTMLElement | null> {
-  const preferredTimes = [PLAYBACK_TARGET_TIME, "15:00", "16:15", "16:45"];
+  const preferredTimes = [
+    preferredTime,
+    PLAYBACK_TARGET_TIME,
+    DEMO_CHANGE_TIME,
+    "15:00",
+    "16:15",
+    "16:45",
+  ];
+  const seen = new Set<string>();
   for (const time of preferredTimes) {
+    if (seen.has(time)) continue;
+    seen.add(time);
     const cell = await findBookTimeCell(screen, time);
     if (cell) return cell;
   }
@@ -537,17 +603,24 @@ async function runSelectBookDate(options?: {
 
   if (!options?.skip && !options?.instant) await delay(320);
 
+  const slot = resolveBookStep2DemoSlot(screen);
   const dateCell = await findBookDateCell(
     screen,
-    PLAYBACK_TARGET_DATE.month,
-    PLAYBACK_TARGET_DATE.day
+    slot.date.month,
+    slot.date.day
   );
   if (!dateCell || shouldAbort()) return false;
 
-  // Director path always lands cursor on 21 — never treat pre-selected (avail
-  // handoff / retreat sync) as success without an on-target click prove.
-  // skip:true keeps direct cell.click for sync/time prelude only.
-  if (options?.skip && dateCell.dataset.studioCalSelected === "true") {
+  // DEMO: never re-click an already-selected day (Avail handoff or prior beat).
+  // skip:true keeps direct cell.click for sync/time prelude only when needed.
+  if (dateCell.dataset.studioCalSelected === "true") {
+    notePlaybackCursorEvent("click", {
+      target: describeCursorTarget(dateCell),
+      detail: options?.skip
+        ? "date-already-selected-skip"
+        : "date-already-selected-no-reclick",
+      instant: true,
+    });
     return !shouldAbort();
   }
 
@@ -566,22 +639,38 @@ async function runSelectBookTime(options?: {
   const screen = await waitForBookStep2Screen();
   if (!screen || shouldAbort()) return false;
 
-  const dateOk = await runSelectBookDate({ skip: true, instant: options?.instant });
+  // Stay on the date-beat lane when its date is already selected (e.g. handoff
+  // → clicked 24; time must go to 16:30, not re-resolve back to 21/15:30).
+  let slot = lastResolvedBookDemoSlot;
+  if (!isBookDemoDateSelected(screen, slot)) {
+    slot = resolveBookStep2DemoSlot(screen);
+  }
+  const dateOk = await ensureBookDemoDateSelected(screen, slot, {
+    skip: true,
+    instant: options?.instant,
+  });
   if (!dateOk || shouldAbort()) return false;
 
   if (!options?.skip && !options?.instant) await delay(280);
 
   const scrollOpts = { instant: options?.instant };
-  let timeCell = await findPreferredBookTimeCell(screen);
+  let timeCell = await findBookTimeCell(screen, slot.time);
   let didSectionScroll = false;
   if (!timeCell && !shouldAbort()) {
     await scrollBookStep2ToTimeSection(screen, scrollOpts);
     didSectionScroll = true;
-    timeCell = await findPreferredBookTimeCell(screen);
+    timeCell = await findPreferredBookTimeCell(screen, slot.time);
   }
   if (!timeCell || shouldAbort()) return false;
 
+  // DEMO: resolveBookStep2DemoSlot / sticky lane already steered off the prior
+  // Avail time — never no-op on 15:30 when that was the handoff selection.
   if (timeCell.dataset.studioCalSelected === "true") {
+    notePlaybackCursorEvent("click", {
+      target: describeCursorTarget(timeCell),
+      detail: "time-already-selected-no-reclick",
+      instant: true,
+    });
     if (!options?.skip && !options?.instant && !didSectionScroll) {
       await animateDemoTargetIntoView(timeCell, { shouldAbort });
       if (shouldAbort()) return false;
@@ -615,6 +704,21 @@ async function runSelectBookTime(options?: {
   }
 
   return !shouldAbort();
+}
+
+async function ensureBookDemoDateSelected(
+  screen: HTMLElement,
+  slot: BookDemoSlot,
+  options?: { skip?: boolean; instant?: boolean }
+): Promise<boolean> {
+  const dateCell = await findBookDateCell(
+    screen,
+    slot.date.month,
+    slot.date.day
+  );
+  if (!dateCell || shouldAbort()) return false;
+  if (dateCell.dataset.studioCalSelected === "true") return true;
+  return clickBookCell(dateCell, options);
 }
 
 async function runReserveAppointment(options?: {
@@ -653,15 +757,38 @@ function finishBookResult(ok: boolean, failStep: string): PlaybackScriptResult {
 
 /** CJM step-back onto Book Step 2 dwell — reset selections and scroll to the date block. */
 export async function syncBookStep2LandingRetreat(
-  options?: PlaybackScriptOptions
+  options?: PlaybackScriptOptions & { preserveHandoff?: boolean }
 ): Promise<void> {
+  const preserveHandoff = Boolean(options?.preserveHandoff);
   notePlaybackCursorEvent("dwell-sync", {
     beatId: "book-step2",
     phase: "dwell",
-    detail: "landing-retreat — scroll only, no director click",
+    detail: preserveHandoff
+      ? "landing-forward — preserve Avail handoff when primary selected"
+      : "landing-retreat — restore wire default, no director click",
   });
   const screen = await waitForBookStep2Screen();
   if (!screen || shouldAbort()) return;
+
+  const primaryHandoff =
+    isBookDateCellSelected(
+      screen,
+      PLAYBACK_TARGET_DATE.month,
+      PLAYBACK_TARGET_DATE.day
+    ) &&
+    (isBookTimeCellSelected(screen, PLAYBACK_TARGET_TIME) ||
+      isAnyBookTimeSelected(screen));
+
+  if (preserveHandoff && primaryHandoff) {
+    // Keep June 21 + 15:30 so date/time beats demo-change to 24 / 16:30.
+    await scrollBookStep2ToDateSection(screen, {
+      instant: options?.instant,
+      month: PLAYBACK_TARGET_DATE.month,
+      day: PLAYBACK_TARGET_DATE.day,
+    });
+    return;
+  }
+
   await restoreBookDefaultDate(screen);
   await scrollBookStep2ToDateSection(screen, {
     instant: options?.instant,

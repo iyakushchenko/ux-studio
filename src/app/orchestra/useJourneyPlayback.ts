@@ -1038,8 +1038,10 @@ export function useJourneyPlayback({
       if (!retreatSyncRef.current && playback.syncDwellRetreat) {
         // Instant snap always — eased date-section scroll on SF enter was
         // page-jiggle deltaY≈148 (host y 178→30) while nav-cross settled.
+        // preserveHandoff: keep Avail June 21 + 15:30 so Step2 demos a change.
         await playback.syncDwellRetreat(beat, {
           instant: true,
+          preserveHandoff: true,
         });
       }
     },

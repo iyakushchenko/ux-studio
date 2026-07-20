@@ -50,18 +50,30 @@ export function getRecordingSnapshot(): RecordingSnapshot | undefined {
 
 /** Build a selector chain from demo-click target for future replay. */
 export function buildPlaybackSelectorChain(el: HTMLElement): string[] {
-  // Prefer a unique studio action on the click target — ignore noisy ancestors
-  // (progress "Step N", breadcrumbs) that break nested resolve.
-  const selfAction = el.getAttribute("data-studio-action");
-  if (selfAction) {
-    return [`[data-studio-action="${selfAction}"]`];
+  // Unique calendar cells first — bare data-name / action climb is non-unique.
+  // Book Step 2 uses the same data-studio-cal-* attrs as the book director.
+  const bookDate = el.closest<HTMLElement>(
+    '[data-studio-cal-kind="date"][data-studio-cal-month][data-studio-cal-value]'
+  );
+  if (bookDate) {
+    const month = bookDate.getAttribute("data-studio-cal-month");
+    const day = bookDate.getAttribute("data-studio-cal-value");
+    if (month && day) {
+      return [
+        `[data-name="calendar. date. cell"][data-studio-cal-kind="date"][data-studio-cal-month="${month}"][data-studio-cal-value="${day}"]`,
+      ];
+    }
   }
-
-  // Climb to nearest studio action / avail date|time (glyph clicks inside CTAs).
-  const actionHost = el.closest<HTMLElement>("[data-studio-action]");
-  if (actionHost) {
-    const action = actionHost.getAttribute("data-studio-action");
-    if (action) return [`[data-studio-action="${action}"]`];
+  const bookTime = el.closest<HTMLElement>(
+    '[data-studio-cal-kind="time"][data-studio-cal-value]'
+  );
+  if (bookTime) {
+    const t = bookTime.getAttribute("data-studio-cal-value");
+    if (t) {
+      return [
+        `[data-name="calendar. date. cell"][data-studio-cal-kind="time"][data-studio-cal-value="${t}"]`,
+      ];
+    }
   }
   const availDate = el.closest<HTMLElement>("[data-studio-avail-date]");
   if (availDate) {
@@ -80,6 +92,20 @@ export function buildPlaybackSelectorChain(el: HTMLElement): string[] {
         `[data-studio-action="avail-select-time"][data-studio-avail-time="${t}"]`,
       ];
     }
+  }
+
+  // Prefer a unique studio action on the click target — ignore noisy ancestors
+  // (progress "Step N", breadcrumbs) that break nested resolve.
+  const selfAction = el.getAttribute("data-studio-action");
+  if (selfAction) {
+    return [`[data-studio-action="${selfAction}"]`];
+  }
+
+  // Climb to nearest studio action (glyph clicks inside CTAs).
+  const actionHost = el.closest<HTMLElement>("[data-studio-action]");
+  if (actionHost) {
+    const action = actionHost.getAttribute("data-studio-action");
+    if (action) return [`[data-studio-action="${action}"]`];
   }
   const availStore = el.closest<HTMLElement>("[data-studio-avail-store]");
   if (availStore) {

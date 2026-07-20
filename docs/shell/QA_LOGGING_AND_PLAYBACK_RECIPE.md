@@ -2,7 +2,7 @@
 
 **Status:** Locked (PO 2026-07-21)  
 **Owners:** Arch · Finn · Quinn · Bea  
-**Related:** [PLAYBACK.md](./PLAYBACK.md) · [PLAYBACK_DIAG.md](./PLAYBACK_DIAG.md) · [RECORDING.md](./RECORDING.md) · [CHAT_PAGE_RAILS.md](../projects/boots-pharmacy/features/CHAT_PAGE_RAILS.md) · [agent-testing/README.md](../../src/app/shell/agent-testing/README.md)
+**Related:** [PLAYBACK.md](./PLAYBACK.md) · [PLAYBACK_DIAG.md](./PLAYBACK_DIAG.md) · [RECORDING.md](./RECORDING.md) · [CJM_RECORD_PLAY_EDIT.md](./CJM_RECORD_PLAY_EDIT.md) (Record/Play/Edit = guitar tabs) · [CHAT_PAGE_RAILS.md](../projects/boots-pharmacy/features/CHAT_PAGE_RAILS.md) · [agent-testing/README.md](../../src/app/shell/agent-testing/README.md)
 
 **Purpose:** Stop agents from “fixing” QA/perf by killing product type-in — or flooding the QA overlay with one log line / sample per typed character. Also capture Play≡Step + known hang/camera rails.
 

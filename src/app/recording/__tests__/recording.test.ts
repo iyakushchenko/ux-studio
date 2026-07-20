@@ -1021,6 +1021,7 @@ describe("buildPlaybackSelectorChain", () => {
     const btn = {
       getAttribute: (name: string) =>
         name === "data-studio-action" ? "book-step-1-continue" : null,
+      closest: () => null,
       parentElement: {
         getAttribute: () => "Step 4",
         parentElement: null,
@@ -1033,6 +1034,53 @@ describe("buildPlaybackSelectorChain", () => {
 
     expect(buildPlaybackSelectorChain(btn)).toEqual([
       '[data-studio-action="book-step-1-continue"]',
+    ]);
+  });
+
+  it("captures unique Book Step 2 date/time cal cells for story-edit Play", () => {
+    const dateBtn = {
+      getAttribute: (name: string) =>
+        ({
+          "data-name": "calendar. date. cell",
+          "data-studio-cal-kind": "date",
+          "data-studio-cal-month": "June",
+          "data-studio-cal-value": "24",
+        })[name] ?? null,
+      closest: (sel: string) =>
+        sel.includes('data-studio-cal-kind="date"') ? dateBtn : null,
+      parentElement: null,
+      tagName: "BUTTON",
+      id: "",
+    } as unknown as HTMLElement;
+    const dateGlyph = {
+      getAttribute: () => null,
+      closest: (sel: string) =>
+        sel.includes('data-studio-cal-kind="date"') ? dateBtn : null,
+      parentElement: dateBtn,
+      tagName: "P",
+      id: "",
+    } as unknown as HTMLElement;
+
+    expect(buildPlaybackSelectorChain(dateGlyph)).toEqual([
+      '[data-name="calendar. date. cell"][data-studio-cal-kind="date"][data-studio-cal-month="June"][data-studio-cal-value="24"]',
+    ]);
+
+    const timeBtn = {
+      getAttribute: (name: string) =>
+        ({
+          "data-name": "calendar. date. cell",
+          "data-studio-cal-kind": "time",
+          "data-studio-cal-value": "16:30",
+        })[name] ?? null,
+      closest: (sel: string) =>
+        sel.includes('data-studio-cal-kind="time"') ? timeBtn : null,
+      parentElement: null,
+      tagName: "BUTTON",
+      id: "",
+    } as unknown as HTMLElement;
+
+    expect(buildPlaybackSelectorChain(timeBtn)).toEqual([
+      '[data-name="calendar. date. cell"][data-studio-cal-kind="time"][data-studio-cal-value="16:30"]',
     ]);
   });
 });

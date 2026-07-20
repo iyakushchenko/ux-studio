@@ -2,6 +2,8 @@
 
 Foundation + Studio shell UI for **record → export → replay → compile**. Events compile to the same beat/action model the playback engine uses.
 
+**Product rail (Record / Play / Edit = guitar tabs):** [CJM_RECORD_PLAY_EDIT.md](./CJM_RECORD_PLAY_EDIT.md) — PO edits by swapping targets/timing/order, not rewriting director novels.
+
 See also: [PLAYBACK.md](./PLAYBACK.md) (engine), [SHELL.md](./SHELL.md) (shell architecture).
 
 ---
@@ -402,7 +404,8 @@ Prefer stable selectors on interactive targets:
 - `data-name="…"` — primary wire target (Figma export names)
 - `data-studio-avail-store="…"` — availability store rows
 - `data-studio-action="…"` — **required** on product CTAs for REC → CJM (avail Choose/Continue/Book, near-me, book continue/reserve, etc.)
-- `data-studio-avail-date` / `data-studio-avail-time` — calendar + time cells
+- `data-studio-avail-date` / `data-studio-avail-time` — Availability Tool calendar + time cells
+- `data-studio-cal-kind` / `data-studio-cal-month` / `data-studio-cal-value` — Book Step 2 date/time cells (unique REC targets; same attrs the book director queries)
 - `data-studio-beat="…"` — beat-scoped controls (future)
 
 Demo clicks store a **selector chain** (nearest `data-studio-*` / `data-name` ancestors) for future replay targeting.
