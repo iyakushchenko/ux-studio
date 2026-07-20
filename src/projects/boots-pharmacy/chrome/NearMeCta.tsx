@@ -32,6 +32,7 @@ export function NearMeCta({
       className={classes}
       onClick={onClick}
       aria-label={ariaLabel}
+      data-studio-action="avail-near-me"
       icon={<img src={iconMapPin} alt="" width={16} height={16} />}
     >
       {NEAR_ME_CTA_LABEL}

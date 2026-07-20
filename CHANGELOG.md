@@ -2,6 +2,9 @@
 
 > _Append a bullet on coherent commits via `npm run notes:append -- --lane="<lane>" --intent="<text>"`. Preview with `npm run notes:preview`. On `npm run release:patch` this section is promoted to `## v<X.Y.Z> - DDMMYY` and a fresh empty `## Current` is re-inserted. Policy: `docs/product/VERSIONING.md`._
 
+## v0.0.65 - 200726
+- **shell:** REC→CJM core: stable avail/book hit targets; persist raw recording with Add as CJM; compile v2 recordedClick beats + SF demo cursor
+
 ## v0.0.64 - 200726
 - **shell:** REC STEPS honesty — coalesce click→screen; dedupe same-screen URL churn (no chat-2/3); ignore studio flips
 

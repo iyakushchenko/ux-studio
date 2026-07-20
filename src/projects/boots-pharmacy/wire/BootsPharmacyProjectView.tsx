@@ -2819,6 +2819,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     }
     if (nearMeBtn) {
       nearMeBtn.style.cursor = "pointer";
+      nearMeBtn.setAttribute("data-studio-action", "chat-avail-near-me");
       nearMeBtn.addEventListener("click", openNearMe);
     }
 

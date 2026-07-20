@@ -53,6 +53,44 @@ export function buildPlaybackSelectorChain(el: HTMLElement): string[] {
     return [`[data-studio-action="${selfAction}"]`];
   }
 
+  // Climb to nearest studio action / avail date|time (glyph clicks inside CTAs).
+  const actionHost = el.closest<HTMLElement>("[data-studio-action]");
+  if (actionHost) {
+    const action = actionHost.getAttribute("data-studio-action");
+    if (action) return [`[data-studio-action="${action}"]`];
+  }
+  const availDate = el.closest<HTMLElement>("[data-studio-avail-date]");
+  if (availDate) {
+    const day = availDate.getAttribute("data-studio-avail-date");
+    if (day) {
+      return [
+        `[data-studio-action="avail-select-date"][data-studio-avail-date="${day}"]`,
+      ];
+    }
+  }
+  const availTime = el.closest<HTMLElement>("[data-studio-avail-time]");
+  if (availTime) {
+    const t = availTime.getAttribute("data-studio-avail-time");
+    if (t) {
+      return [
+        `[data-studio-action="avail-select-time"][data-studio-avail-time="${t}"]`,
+      ];
+    }
+  }
+  const availStore = el.closest<HTMLElement>("[data-studio-avail-store]");
+  if (availStore) {
+    const storeId = availStore.getAttribute("data-studio-avail-store");
+    const choose = availStore.querySelector<HTMLElement>(
+      '[data-studio-action="avail-choose-location"]'
+    );
+    if (storeId && (choose === el || choose?.contains(el) || el === availStore)) {
+      return [
+        `[data-studio-avail-store="${storeId}"]`,
+        `[data-studio-action="avail-choose-location"]`,
+      ];
+    }
+  }
+
   const chain: string[] = [];
   let node: HTMLElement | null = el;
 
@@ -75,15 +113,37 @@ export function buildPlaybackSelectorChain(el: HTMLElement): string[] {
       );
     }
 
-    if (chain.length === 0 && tag) {
+    if (chain.length === 0 && tag && tag !== "html" && tag !== "body") {
       const id = node.id;
-      if (id) chain.unshift(`#${id}`);
+      // Never leave a lone #root — unusable for replay.
+      if (id && id !== "root") chain.unshift(`#${id}`);
     }
 
     node = node.parentElement;
   }
 
-  return [...new Set(chain)];
+  // Last resort: interactive leaf by aria-label / trimmed text (not #root).
+  if (
+    chain.length === 0 ||
+    (chain.length === 1 && chain[0] === "#root")
+  ) {
+    const aria = el.getAttribute("aria-label")?.trim();
+    const text = (el.textContent ?? "").replace(/\s+/g, " ").trim().slice(0, 48);
+    const tag = el.tagName.toLowerCase();
+    if (aria) {
+      const esc =
+        typeof CSS !== "undefined" && typeof CSS.escape === "function"
+          ? CSS.escape(aria)
+          : aria.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+      return [`${tag}[aria-label="${esc}"]`];
+    }
+    if (text && (tag === "button" || tag === "a")) {
+      return []; // resolve via element descriptor at replay — avoid fragile text CSS
+    }
+    return [];
+  }
+
+  return [...new Set(chain.filter((s) => s !== "#root"))];
 }
 
 type PlaybackSelectorRoot = Pick<ParentNode, "querySelector" | "querySelectorAll">;

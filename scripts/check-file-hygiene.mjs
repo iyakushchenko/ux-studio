@@ -30,8 +30,8 @@ const ALLOWLIST = {
   "src/styles/globals-chrome.css": 2600,
   "src/styles/globals-hub.css": 1400,
   // Engine / hybrid monsters — prefer domain split over bumping.
-  "src/app/orchestra/useJourneyPlayback.ts": 1870, // + retreat-sync SF queue / transport no-op retry; extract advance/retreat next
-  "src/app/App.tsx": 1980, // + REC Add-as-CJM preview sync (fresh rec-* journey + CJM on); extract next
+  "src/app/orchestra/useJourneyPlayback.ts": 2010, // + recordedClick SF/Play wiring; core play in recordedClickPlayback.ts
+  "src/app/App.tsx": 1990, // + embed persisted REC session on saved CJM Download
   "src/app/shell/agent-testing/agentTestingOverlay.ts": 1640, // sitrep + nav-clearance calls; helpers in agentTestingNavClearance.ts
   "src/app/nav/studioNavPanel.css": 1600, // PANEL chrome + version chip; keep one stylesheet
   "src/app/shell/studioMcpHelpers.ts": 1350, // MCP surface + R15 PO poll in step/play; extract stepForwardSmoke when next growth

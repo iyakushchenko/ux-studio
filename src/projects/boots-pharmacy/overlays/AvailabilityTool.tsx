@@ -380,6 +380,7 @@ function StoreCard({
         <div className="proto-avail-store__actions">
           <button
             type="button"
+            data-studio-action="avail-choose-location"
             className={
               chosen
                 ? "proto-avail-btn-secondary proto-avail-btn-secondary--sm proto-avail-btn-secondary--chosen"
@@ -465,6 +466,8 @@ function MonthGrid({
                   key={`${cell.month}-${cell.day}-${ci}`}
                   type="button"
                   disabled={!available}
+                  data-studio-action="avail-select-date"
+                  data-studio-avail-date={`${label}-${cell.day}`}
                   title={isToday ? TODAY_TOOLTIP : undefined}
                   aria-label={isToday ? TODAY_TOOLTIP : undefined}
                   className={[
@@ -510,6 +513,8 @@ function TimeSection({
             key={t}
             type="button"
             disabled={!ok}
+            data-studio-action="avail-select-time"
+            data-studio-avail-time={t}
             className={[
               "proto-avail-cal-cell proto-avail-cal-cell--time",
               !ok ? "proto-avail-cal-cell--disabled" : "",
@@ -1056,6 +1061,7 @@ export default function AvailabilityTool({
               <button
                 type="button"
                 className="proto-avail-btn-primary"
+                data-studio-action="avail-continue-location"
                 onClick={continueWithChosenStore}
               >
                 Continue
@@ -1203,6 +1209,7 @@ export default function AvailabilityTool({
               <button
                 type="button"
                 className="proto-avail-btn-primary"
+                data-studio-action="avail-continue-date"
                 onClick={() => setStep("time")}
               >
                 Continue
@@ -1275,6 +1282,7 @@ export default function AvailabilityTool({
               <button
                 type="button"
                 className="proto-avail-btn-primary"
+                data-studio-action="avail-book-now"
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();

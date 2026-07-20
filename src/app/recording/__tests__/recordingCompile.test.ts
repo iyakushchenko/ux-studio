@@ -247,6 +247,81 @@ describe("compileRecordingToJourney", () => {
     ]);
   });
 
+  it("compile v2 maps usable demo-clicks into recordedClick beats", () => {
+    const session: RecordingSession = {
+      id: "click-compile",
+      version: 1,
+      startedAt: "2026-07-20T12:00:00.000Z",
+      projectId: "boots-pharmacy",
+      personaId: "sarah-jenkins",
+      journeyId: "agentic-cjm",
+      orchestraMode: "agentic-cjm",
+      events: [
+        {
+          kind: "screen",
+          screenId: "chat",
+          atMs: 0,
+          snapshot: { currentTabIndex: 1, screenId: "chat" },
+        },
+        {
+          kind: "demo-click",
+          element: "See what's available near me",
+          selectorChain: ['[data-studio-action="chat-avail-near-me"]'],
+          atMs: 100,
+        },
+        {
+          kind: "screen",
+          screenId: "chat",
+          atMs: 200,
+          studioUrl: "?screen=chat&modal=choose-pharmacy",
+        },
+        {
+          kind: "demo-click",
+          element: "Choose Location",
+          selectorChain: ['[data-studio-action="avail-choose-location"]'],
+          atMs: 400,
+        },
+        {
+          kind: "screen",
+          screenId: "book-step-2",
+          atMs: 500,
+          snapshot: { currentTabIndex: 5, screenId: "book-step-2" },
+        },
+        {
+          kind: "demo-click",
+          element: "hollow",
+          selectorChain: ["#root"],
+          atMs: 800,
+        },
+      ],
+    };
+
+    const { journey, gaps } = compileRecordingToJourney(session);
+    const clickBeats = journey.beats.filter((b) => b.recordedClick);
+    expect(clickBeats.length).toBe(2);
+    expect(clickBeats[0]?.recordedClick?.selectorChain).toEqual([
+      '[data-studio-action="chat-avail-near-me"]',
+    ]);
+    expect(clickBeats[1]?.recordedClick?.selectorChain).toEqual([
+      '[data-studio-action="avail-choose-location"]',
+    ]);
+    expect(journey.beats.some((b) => b.id === "chat-2")).toBe(false);
+    expect(gaps).toContain("demo-click:unusable-selector");
+  });
+
+  it("persists raw recording session with Add as CJM", () => {
+    const session = sessionWithTouchpoints();
+    const saved = saveRecordingAsJourney(session, {
+      label: "PO prove persist",
+      projectId: "boots-pharmacy",
+      personaId: "sarah-jenkins",
+    });
+    expect(saved.file.recording?.id).toBe(session.id);
+    expect(saved.file.recording?.events.length).toBe(session.events.length);
+    expect(saved.json).toContain('"kind": "touchpoint"');
+    expect(saved.json).toContain('"recording"');
+  });
+
   it("adds a new CJM id without overwriting built-in slots", () => {
     const saved = saveRecordingAsJourney(sessionWithTouchpoints());
     expect(saved.summary.beatCount).toBe(3);

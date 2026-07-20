@@ -2,6 +2,7 @@ import type {
   JourneyBeat,
   JourneyBeatActionId,
   JourneyBeatKind,
+  JourneyBeatRecordedClick,
   JourneyDefinition,
   OrchestraModeId,
   AvailabilityScriptId,
@@ -33,6 +34,9 @@ import {
 } from "@/app/recording/recordedJourneyNavHeal";
 import type { PersonaId, ProjectId } from "@/projects/types";
 
+/** Match STEPS coalescing — screen after click is navigation, not a new beat. */
+const SCREEN_AFTER_CLICK_MS = 1000;
+
 const BEAT_ACTIONS = new Set<JourneyBeatActionId>([
   "open-availability-start",
   "open-availability-date-chat",
@@ -44,6 +48,8 @@ const KNOWN_SCENARIO_BY_BEAT: Record<string, string> = {
   "agentic-chat": "site-pilot-chat",
   chat: "site-pilot-chat",
 };
+
+const AVAIL_ACTION_RE = /^avail-|^chat-avail-/;
 
 export type CompileRecordingJourneyOptions = {
   /**
@@ -142,6 +148,15 @@ function isBeatAction(id: string): id is JourneyBeatActionId {
   return BEAT_ACTIONS.has(id as JourneyBeatActionId);
 }
 
+/** Usable for CJM replay — never lone `#root` / empty. */
+export function isUsablePlaybackSelectorChain(
+  chain: string[] | undefined
+): chain is string[] {
+  if (!chain?.length) return false;
+  const cleaned = chain.filter((s) => s && s !== "#root");
+  return cleaned.length > 0;
+}
+
 function readScreenId(events: readonly RecordedEvent[]): string | undefined {
   for (let i = events.length - 1; i >= 0; i -= 1) {
     const event = events[i];
@@ -226,9 +241,38 @@ function applyScriptToBeat(
 }
 
 function inferKind(beat: JourneyBeat): JourneyBeatKind {
+  if (beat.recordedClick) {
+    for (const sel of beat.recordedClick.selectorChain) {
+      const m = sel.match(/data-studio-action="([^"]+)"/);
+      if (m?.[1] && AVAIL_ACTION_RE.test(m[1])) return "overlay";
+    }
+  }
   if (beat.availScript && beat.protoTab == null) return "overlay";
   if (beat.scenarioId) return "screen-frames";
   return "tab-landing";
+}
+
+function recordedClickFromDemoEvent(
+  event: Extract<RecordedEvent, { kind: "demo-click" }>,
+  pendingScroll: Extract<RecordedEvent, { kind: "scroll" }> | null
+): JourneyBeatRecordedClick | null {
+  if (!isUsablePlaybackSelectorChain(event.selectorChain)) return null;
+  const click: JourneyBeatRecordedClick = {
+    selectorChain: event.selectorChain.filter((s) => s && s !== "#root"),
+    element: event.element,
+  };
+  if (
+    pendingScroll &&
+    isUsablePlaybackSelectorChain(pendingScroll.selectorChain)
+  ) {
+    click.cameraSelectorChain = pendingScroll.selectorChain.filter(
+      (s) => s && s !== "#root"
+    );
+    if (pendingScroll.anchorSelector) {
+      click.cameraAnchorSelector = pendingScroll.anchorSelector;
+    }
+  }
+  return click;
 }
 
 function compileSegmentToBeat(
@@ -249,6 +293,8 @@ function compileSegmentToBeat(
 
   let scriptApplied = false;
   let onEnterApplied = false;
+  let recordedClickApplied = false;
+  let pendingScroll: Extract<RecordedEvent, { kind: "scroll" }> | null = null;
 
   for (const event of segment.events) {
     if (event.kind === "director-script" && !scriptApplied) {
@@ -296,7 +342,25 @@ function compileSegmentToBeat(
     }
 
     if (event.kind === "scroll") {
-      gaps.push("scroll");
+      if (isUsablePlaybackSelectorChain(event.selectorChain)) {
+        pendingScroll = event;
+      } else {
+        gaps.push("scroll");
+      }
+    }
+
+    if (event.kind === "demo-click" && !recordedClickApplied && !scriptApplied) {
+      const click = recordedClickFromDemoEvent(event, pendingScroll);
+      if (click) {
+        beat.recordedClick = click;
+        recordedClickApplied = true;
+        pendingScroll = null;
+        if (event.element?.trim()) {
+          beat.label = event.element.trim().slice(0, 64);
+        }
+      } else {
+        gaps.push("demo-click:unusable-selector");
+      }
     }
 
     if (event.kind === "typed-text") {
@@ -328,8 +392,9 @@ function compileSegmentToBeat(
 }
 
 /**
- * Fallback when the session has no touchpoint markers — synthesize beats from
- * director-script / screen / wire-intent markers so REC → journey still works.
+ * Compile v2 fallback — human REC without touchpoint markers.
+ * Screen + director/wire stay one beat (legacy). Usable demo-clicks become
+ * `recordedClick` beats. Coalesces click→screen; skips same-screen URL churn.
  */
 function compileFallbackBeats(
   events: readonly RecordedEvent[],
@@ -340,8 +405,16 @@ function compileFallbackBeats(
 ): JourneyBeat[] {
   warnings.push("no-touchpoint-markers");
   const beats: JourneyBeat[] = [];
-  let pendingScreen: { screenId: string; atMs: number; events: RecordedEvent[] } | null =
-    null;
+  let pendingScreen: {
+    screenId: string;
+    atMs: number;
+    events: RecordedEvent[];
+  } | null = null;
+  let currentScreenId: string | undefined;
+  let currentProtoTab: number | undefined;
+  let lastClickAtMs: number | undefined;
+  let pendingScroll: Extract<RecordedEvent, { kind: "scroll" }> | null = null;
+  const landedScreens = new Set<string>();
 
   const flushPending = () => {
     if (!pendingScreen) return;
@@ -353,20 +426,127 @@ function compileFallbackBeats(
       events: pendingScreen.events,
     };
     beats.push(compileSegmentToBeat(segment, usedIds, gaps, projectId));
+    landedScreens.add(pendingScreen.screenId);
     pendingScreen = null;
   };
 
+  const contextProtoTab = (): number | undefined =>
+    currentProtoTab ??
+    screenIdToProtoTab(projectId, currentScreenId);
+
   for (const event of events) {
-    if (event.kind === "screen") {
-      // Consecutive same screen (URL churn) → one beat, not chat-2/chat-3.
-      if (pendingScreen?.screenId === event.screenId) {
-        pendingScreen.events.push(event);
+    if (event.kind === "scroll") {
+      if (isUsablePlaybackSelectorChain(event.selectorChain)) {
+        pendingScroll = event;
+      } else {
+        gaps.push("scroll");
+      }
+      continue;
+    }
+
+    if (event.kind === "demo-click") {
+      const click = recordedClickFromDemoEvent(event, pendingScroll);
+      pendingScroll = null;
+      if (!click) {
+        gaps.push("demo-click:unusable-selector");
         continue;
       }
       flushPending();
+      const fromSnap =
+        event.snapshot?.currentTabIndex != null
+          ? event.snapshot.currentTabIndex + 1
+          : event.snapshot?.protoTab;
+      if (fromSnap != null) currentProtoTab = fromSnap;
+      const snapScreen =
+        typeof event.snapshot?.screenId === "string"
+          ? event.snapshot.screenId
+          : undefined;
+      if (snapScreen) currentScreenId = snapScreen;
+
+      // Optional hollow landing only when we never landed this screen yet
+      // and the click beat needs a known protoTab from a prior screen event.
+      if (
+        currentScreenId &&
+        !landedScreens.has(currentScreenId) &&
+        contextProtoTab() != null
+      ) {
+        const landing: CompiledBeatSegment = {
+          touchpointKey: `screen:${currentScreenId}`,
+          beatId: currentScreenId,
+          label: currentScreenId,
+          startedAtMs: event.atMs,
+          events: [
+            {
+              kind: "screen",
+              screenId: currentScreenId,
+              atMs: event.atMs,
+              snapshot:
+                currentProtoTab != null
+                  ? { protoTab: currentProtoTab, screenId: currentScreenId }
+                  : { screenId: currentScreenId },
+            },
+          ],
+        };
+        beats.push(compileSegmentToBeat(landing, usedIds, gaps, projectId));
+        landedScreens.add(currentScreenId);
+      }
+
+      const actionMatch = click.selectorChain
+        .join(" ")
+        .match(/data-studio-action="([^"]+)"/);
+      const base =
+        actionMatch?.[1] ??
+        slugBeatId(event.element ?? "recorded-click");
+      const beatId = uniqueBeatId(slugBeatId(base), usedIds);
+      const beat: JourneyBeat = {
+        id: beatId,
+        label: (event.element ?? beatId).trim().slice(0, 64) || beatId,
+        kind: "tab-landing",
+        recordedClick: click,
+        protoTab: contextProtoTab(),
+      };
+      beat.kind = inferKind(beat);
+      beats.push(beat);
+      if (typeof event.atMs === "number") lastClickAtMs = event.atMs;
+      continue;
+    }
+
+    if (event.kind === "screen") {
+      const screenId = event.screenId;
+      const at = event.atMs;
+      const proto =
+        screenIdToProtoTab(projectId, screenId) ??
+        (event.snapshot?.currentTabIndex != null
+          ? event.snapshot.currentTabIndex + 1
+          : event.snapshot?.protoTab);
+
+      if (
+        lastClickAtMs != null &&
+        typeof at === "number" &&
+        at >= lastClickAtMs &&
+        at - lastClickAtMs <= SCREEN_AFTER_CLICK_MS
+      ) {
+        currentScreenId = screenId;
+        if (proto != null) currentProtoTab = proto;
+        // Stay on same screen (modal URL) — keep landed; new screen clears pending only.
+        if (pendingScreen && pendingScreen.screenId !== screenId) {
+          flushPending();
+        }
+        continue;
+      }
+
+      if (pendingScreen?.screenId === screenId) {
+        pendingScreen.events.push(event);
+        continue;
+      }
+
+      flushPending();
+      currentScreenId = screenId;
+      if (proto != null) currentProtoTab = proto;
+      lastClickAtMs = undefined;
       pendingScreen = {
-        screenId: event.screenId,
-        atMs: event.atMs,
+        screenId,
+        atMs: typeof at === "number" ? at : 0,
         events: [event],
       };
       continue;
@@ -405,10 +585,6 @@ function compileFallbackBeats(
       continue;
     }
 
-    if (event.kind === "scroll") {
-      gaps.push("scroll");
-    }
-
     if (event.kind === "typed-text") {
       gaps.push("typed-text");
     }
@@ -421,6 +597,7 @@ function compileFallbackBeats(
 /**
  * Compile a recording session into a JourneyDefinition the playback engine can play.
  * Touchpoint segments → beats; director-script / known wire-intent / dwell / protoTab map in.
+ * Compile v2: usable demo-clicks → `recordedClick` beats (playable via demo cursor).
  */
 export function compileRecordingToJourney(
   session: RecordingSession,
@@ -432,8 +609,15 @@ export function compileRecordingToJourney(
   const usedIds = new Set<string>();
   const projectId = session.projectId;
 
+  const hasUsableDemoClicks = session.events.some(
+    (e) =>
+      e.kind === "demo-click" && isUsablePlaybackSelectorChain(e.selectorChain)
+  );
+
+  // Prefer click-aware compile when usable demo-clicks exist (human REC path).
+  // Pure director/touchpoint sessions without clicks keep the segment mapper.
   let beats =
-    timeline.segments.length > 0
+    timeline.segments.length > 0 && !hasUsableDemoClicks
       ? timeline.segments.map((segment) =>
           compileSegmentToBeat(segment, usedIds, gaps, projectId)
         )
@@ -481,9 +665,10 @@ export function compileRecordingToJourney(
 
 /**
  * Compile + add as a **new** CJM under project/persona (runtime catalog +
- * localStorage). REC UI collects a title (`label`) separately from recording
- * JSON download. Does **not** overwrite the built-in agentic/traditional slots
- * unless `addAsNew: false`.
+ * localStorage). Persists the **full recording session** beside the journey so
+ * the event log is never discarded. REC UI collects a title (`label`) separately
+ * from recording JSON download. Does **not** overwrite the built-in
+ * agentic/traditional slots unless `addAsNew: false`.
  */
 export function saveRecordingAsJourney(
   session: RecordingSession,
@@ -502,6 +687,7 @@ export function saveRecordingAsJourney(
     projectId: (options?.projectId ?? session.projectId) as ProjectId | undefined,
     personaId: (options?.personaId ?? session.personaId) as PersonaId | undefined,
     journey: compiled.journey,
+    recording: session,
   };
   applyImportedJourneyFile(file);
   persistRecordedJourneyFile(file);
@@ -515,6 +701,7 @@ export function saveRecordingAsJourney(
       journey: compiled.journey,
       projectId: file.projectId,
       personaId: file.personaId,
+      recording: session,
     }),
   };
 }

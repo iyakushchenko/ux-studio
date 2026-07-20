@@ -102,6 +102,7 @@ import {
 } from "@/app/journey/journeyFile";
 import {
   isDeletableRecordedJourneyId,
+  readPersistedRecordingForJourney,
   removePersistedRecordedJourney,
 } from "@/app/journey/recordedJourneyPersist";
 import { getImportedJourneys } from "@/app/journey/journeyRuntimeStore";
@@ -1583,6 +1584,12 @@ export default function App() {
           activeJourney ?? getJourneyForMode(studioJourneys, orchestraModeId),
         projectId: studioProjectId,
         personaId: studioPersonaId,
+        recording: readPersistedRecordingForJourney(
+          studioProjectId,
+          studioPersonaId,
+          (activeJourney ?? getJourneyForMode(studioJourneys, orchestraModeId))
+            ?.id ?? ""
+        ),
       }),
     [
       activeJourney,

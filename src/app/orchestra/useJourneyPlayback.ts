@@ -57,6 +57,7 @@ import {
   cancelDemoCursorJourneyEndFade,
   parkDemoCursorAtRest,
 } from "@/app/scenario/demoCursor";
+import { playRecordedClick } from "@/app/orchestra/recordedClickPlayback";
 import {
   playbackDiagBeat,
   playbackDiagJourneyReset,
@@ -237,6 +238,7 @@ export function useJourneyPlayback({
   const lastBookAutoRunRef = useRef<string | null>(null);
   const lastTabAutoRunRef = useRef<string | null>(null);
   const lastHomeAutoRunRef = useRef<string | null>(null);
+  const lastRecordedClickAutoRunRef = useRef<string | null>(null);
   const isPlayingRef = useRef(false);
   /** Skip beat-enter tab nav on first mount so sessionStorage tab is preserved. */
   const suppressInitialBeatTabNavRef = useRef(true);
@@ -298,6 +300,7 @@ export function useJourneyPlayback({
     lastBookAutoRunRef.current = null;
     lastTabAutoRunRef.current = null;
     lastHomeAutoRunRef.current = null;
+    lastRecordedClickAutoRunRef.current = null;
   }, [playback, runtime, setScriptingActive, stopScrollPoll]);
 
   const stopJourneyPlay = useCallback(() => {
@@ -815,6 +818,70 @@ export function useJourneyPlayback({
     ]
   );
 
+  /** Compile v2 — REC demo-click → demo cursor + optional camera scroll. */
+  const runRecordedClickBeat = useCallback(
+    async (
+      beat: JourneyBeat,
+      options?: { skip?: boolean; manualStep?: boolean }
+    ) => {
+      const activeBeat = beats[beatIndexRef.current] ?? beat;
+      const click = activeBeat.recordedClick;
+      if (!click?.selectorChain?.length) return false;
+      const runId = `${beatIndexRef.current}:${activeBeat.id}`;
+      if (options?.manualStep && lastRecordedClickAutoRunRef.current === runId) {
+        setScriptingActive(true);
+        return advanceFromCompletedDirectorBeat(options);
+      }
+      noteDirectorScriptInteraction(activeBeat, options);
+      setScriptingActive(true);
+      try {
+        if (options?.skip) {
+          lastRecordedClickAutoRunRef.current = runId;
+          const next = advanceFrom(beatIndexRef.current);
+          if (next < beats.length) {
+            advanceBeatIndexForManualChain(
+              activeBeat,
+              beats[next],
+              next,
+              options
+            );
+          }
+          return true;
+        }
+
+        const { ok, failureStep, diagnosticSent } = await invokeBeatScript(
+          beatDirectorScriptLabel(activeBeat) ?? "recorded-click",
+          () => playRecordedClick(click, options),
+          options
+        );
+        if (!ok) {
+          lastRecordedClickAutoRunRef.current = null;
+          if (!options?.skip && !diagnosticSent) {
+            reportScriptFailure(activeBeat, { failureStep });
+          }
+          return false;
+        }
+        lastRecordedClickAutoRunRef.current = runId;
+        const next = advanceFrom(beatIndexRef.current);
+        if (next >= beats.length) return true;
+        const nextBeat = beats[next];
+        advanceBeatIndexForManualChain(activeBeat, nextBeat, next, options);
+        return true;
+      } finally {
+        setScriptingActive(false);
+      }
+    },
+    [
+      advanceBeatIndexForManualChain,
+      advanceFrom,
+      advanceFromCompletedDirectorBeat,
+      beats,
+      invokeBeatScript,
+      reportScriptFailure,
+      setScriptingActive,
+    ]
+  );
+
   useEffect(() => {
     transportStepAttemptRef.current = null;
   }, [beatIndex, screenPlayback.visibleCount]);
@@ -926,8 +993,20 @@ export function useJourneyPlayback({
     }
     if (beat.bookScript) {
       void runBookScriptBeat(beat, true, { skip: true, syncState: true });
+      return;
     }
-  }, [abortActiveScripts, beats, runAvailScriptBeat, runBookScriptBeat, runHomeScriptBeat, runTabScriptBeat]);
+    if (beat.recordedClick?.selectorChain?.length) {
+      void runRecordedClickBeat(beat, { skip: true });
+    }
+  }, [
+    abortActiveScripts,
+    beats,
+    runAvailScriptBeat,
+    runBookScriptBeat,
+    runHomeScriptBeat,
+    runRecordedClickBeat,
+    runTabScriptBeat,
+  ]);
 
   const navigateBeatTab = useCallback(
     (beat: JourneyBeat | undefined, options?: { instant?: boolean }) => {
@@ -1006,7 +1085,13 @@ export function useJourneyPlayback({
       playTimerRef.current = null;
     }
     const beat = beats[beatIndexRef.current];
-    if (isScreenFramesBeat(beat) || beat?.homeScript || beat?.bookScript || beat?.tabScript) {
+    if (
+      isScreenFramesBeat(beat) ||
+      beat?.homeScript ||
+      beat?.bookScript ||
+      beat?.tabScript ||
+      beat?.recordedClick?.selectorChain?.length
+    ) {
       return;
     }
     if (beat?.availScript) {
@@ -1073,6 +1158,7 @@ export function useJourneyPlayback({
     lastBookAutoRunRef.current = null;
     lastTabAutoRunRef.current = null;
     lastHomeAutoRunRef.current = null;
+    lastRecordedClickAutoRunRef.current = null;
     if (!scenarioBrowseMode) {
       setPlaybackCursorDiagnosticContext({
         beatId: currentBeat.id,
@@ -1249,6 +1335,34 @@ export function useJourneyPlayback({
   ]);
 
   useEffect(() => {
+    if (
+      !active ||
+      !isPlaying ||
+      isScripting ||
+      !currentBeat?.recordedClick?.selectorChain?.length
+    ) {
+      return;
+    }
+
+    const runId = `${beatIndex}:${currentBeat.id}`;
+    if (lastRecordedClickAutoRunRef.current === runId) return;
+
+    void (async () => {
+      const ok = await runRecordedClickBeat(currentBeat);
+      if (!ok) return;
+      if (!isPlayingRef.current) return;
+      scheduleDwellAdvanceRef.current();
+    })();
+  }, [
+    active,
+    beatIndex,
+    currentBeat,
+    isPlaying,
+    isScripting,
+    runRecordedClickBeat,
+  ]);
+
+  useEffect(() => {
     if (!active) {
       screenBeatReadyRef.current = null;
       return;
@@ -1350,6 +1464,7 @@ export function useJourneyPlayback({
     lastBookAutoRunRef.current = null;
     lastTabAutoRunRef.current = null;
     lastHomeAutoRunRef.current = null;
+    lastRecordedClickAutoRunRef.current = null;
     suppressInitialBeatTabNavRef.current = false;
     setBeatIndex(0);
     beatIndexRef.current = 0;
@@ -1369,6 +1484,7 @@ export function useJourneyPlayback({
     lastBookAutoRunRef.current = null;
     lastTabAutoRunRef.current = null;
     lastHomeAutoRunRef.current = null;
+    lastRecordedClickAutoRunRef.current = null;
     setBeatIndex(next);
     beatIndexRef.current = next;
     return true;
@@ -1392,12 +1508,16 @@ export function useJourneyPlayback({
       if (beat.availScript) {
         return runAvailScriptBeat(beat, advanceAfter, options);
       }
+      if (beat.recordedClick?.selectorChain?.length) {
+        return runRecordedClickBeat(beat, options);
+      }
       return false;
     },
     [
       runAvailScriptBeat,
       runBookScriptBeat,
       runHomeScriptBeat,
+      runRecordedClickBeat,
       runTabScriptBeat,
     ]
   );
@@ -1480,6 +1600,7 @@ export function useJourneyPlayback({
     lastBookAutoRunRef.current = null;
     lastTabAutoRunRef.current = null;
     lastHomeAutoRunRef.current = null;
+    lastRecordedClickAutoRunRef.current = null;
 
     runtime.closeAllPopups();
     runtime.closeAvailability();
@@ -1595,6 +1716,12 @@ export function useJourneyPlayback({
       void runBookScriptBeat(activeBeat, true, { manualStep: true });
       return;
     }
+    if (activeBeat?.recordedClick?.selectorChain?.length) {
+      setScriptingActive(true);
+      noteManualDirectorStep(activeBeat);
+      void runRecordedClickBeat(activeBeat, { manualStep: true });
+      return;
+    }
     if (isDwellLandingBeat(activeBeat)) {
       advanceFromDwellLanding(activeBeat);
       return;
@@ -1613,6 +1740,7 @@ export function useJourneyPlayback({
     runAvailScriptBeat,
     runBookScriptBeat,
     runHomeScriptBeat,
+    runRecordedClickBeat,
     runTabScriptBeat,
     screenPlayback,
     setScriptingActive,
@@ -1675,6 +1803,13 @@ export function useJourneyPlayback({
       isPlayingRef.current = true;
       setIsPlaying(true);
       lastTabAutoRunRef.current = null;
+      return;
+    }
+
+    if (beat?.recordedClick?.selectorChain?.length) {
+      isPlayingRef.current = true;
+      setIsPlaying(true);
+      lastRecordedClickAutoRunRef.current = null;
       return;
     }
 
@@ -1825,7 +1960,8 @@ export function useJourneyPlayback({
         : canAdvanceBeat) ||
       onOverlayBeat ||
       Boolean(currentBeat?.bookScript) ||
-      Boolean(currentBeat?.tabScript);
+      Boolean(currentBeat?.tabScript) ||
+      Boolean(currentBeat?.recordedClick?.selectorChain?.length);
 
   const canJumpToStart = isOnAir ? false : canStepBack;
   const canJumpToEnd = atPlaylistEnd || isOnAir ? false : canStepForward;

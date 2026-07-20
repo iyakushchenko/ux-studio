@@ -1,4 +1,5 @@
 import type { JourneyDefinition } from "@/app/orchestra/types";
+import type { RecordingSession } from "@/app/recording/recordingTypes";
 import type { PersonaId, ProjectId } from "@/projects/types";
 
 export const JOURNEY_FILE_VERSION = 1 as const;
@@ -9,6 +10,11 @@ export type JourneyFile = {
   projectId?: ProjectId;
   personaId?: PersonaId;
   journey: JourneyDefinition;
+  /**
+   * Full REC session (event log) when this CJM was compiled via Add as CJM.
+   * Optional — built-in / hand-authored journeys omit it.
+   */
+  recording?: RecordingSession;
 };
 
 export type JourneyBundleFile = {
@@ -47,6 +53,7 @@ export function serializeJourneyFile(options: {
   journey: JourneyDefinition;
   projectId?: ProjectId;
   personaId?: PersonaId;
+  recording?: RecordingSession;
 }): string {
   const payload: JourneyFile = {
     version: JOURNEY_FILE_VERSION,
@@ -54,6 +61,7 @@ export function serializeJourneyFile(options: {
     projectId: options.projectId,
     personaId: options.personaId,
     journey: options.journey,
+    ...(options.recording ? { recording: options.recording } : {}),
   };
   return JSON.stringify(payload, null, 2);
 }
@@ -63,6 +71,8 @@ export function buildSavedJourneyDownload(options: {
   journey: JourneyDefinition | null | undefined;
   projectId?: ProjectId;
   personaId?: PersonaId;
+  /** When present, embed the raw REC session so the event log is not lost. */
+  recording?: RecordingSession;
 }): { json: string; filename: string } | null {
   const journey = options.journey;
   if (!journey) return null;
@@ -70,6 +80,7 @@ export function buildSavedJourneyDownload(options: {
     journey,
     projectId: options.projectId,
     personaId: options.personaId,
+    recording: options.recording,
   });
   const safeId = journey.id.replace(/[^a-z0-9_-]+/gi, "-");
   return { json, filename: `${safeId}.journey.json` };

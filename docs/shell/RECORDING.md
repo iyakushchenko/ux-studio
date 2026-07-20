@@ -317,9 +317,15 @@ Prefer `__studio*`; `__proto*` aliases remain. Export / replay / compile fall ba
 5. Optional: export journey JSON via MCP `saved.json` / `__studioExportJourneyBundle()` — not conflated with REC Download.
 6. Clear runtime overlay: `__studioClearImportedJourneys()` (localStorage recorded CJMs re-hydrate on next load unless cleared from storage).
 
-**Mapped into beats:** touchpoint segments (or screen/director fallback), `director-script` → home/avail/book/tab scripts, known `wire-intent` / `beat-enter` → `onEnter`, `dwell` → `dwellMs`, snapshot `protoTab` / `currentTabIndex`.
+**Mapped into beats (compile v2):** touchpoint segments (or screen/director fallback), **usable `demo-click` → `recordedClick`** (SF/Play drives `simulateDemoPointerClick`), preceding `scroll` → optional `cameraSelectorChain` on that click beat, `director-script` → home/avail/book/tab scripts, known `wire-intent` / `beat-enter` → `onEnter`, `dwell` → `dwellMs`, snapshot `protoTab` / `currentTabIndex`. Click→screen within ~1s coalesces (no hollow nav beat). Consecutive same-screen URL/modal churn does not mint `chat-2` / `chat-3`.
 
-**Not compiled (honest gaps — use REC ↺ replay for fidelity):** `scroll` (target-based REC replay works; not mapped into JourneyBeat), `typed-text`, unknown wire intents / unknown beat-enter ids. Built-in persona `journeys.ts` is not auto-edited.
+**Persisted with Add as CJM:** the **full `.recording.json` session** is stored beside the compiled journey in localStorage (`studio-recorded-cjm:…` v2 `recordings` map) and embedded in Download `.journey.json` when available. Never discard the event log on compile (8.56 failure mode).
+
+**Not compiled (honest gaps — use REC ↺ replay for fidelity):** `demo-click` with unusable selectors (`#root` / empty — fix with `data-studio-action` on product CTAs), `typed-text`, unknown wire intents / unknown beat-enter ids, scroll without a following click. Built-in persona `journeys.ts` is not auto-edited.
+
+### Hit targets (capture)
+
+Avail overlay + book-critical CTAs must expose stable `data-studio-action` (and `data-studio-avail-date` / `data-studio-avail-time` / `data-studio-avail-store` where needed) so REC never stores `#root` as the click leaf. Prefer climbing to the nearest studio action when the pointer hits a glyph inside the CTA.
 
 ### Beat-enter + scroll + typed-text replay (v3)
 
@@ -337,11 +343,11 @@ Stable field selectors: `data-studio-action="avail-search-query"` / `agentic-hom
 
 | v3 (now) | Later |
 |----------|-------|
-| In-memory session + recording JSON download + **Add as CJM** (title + localStorage) | Auto-commit into persona `journeys.ts` / `data/journeys/` |
+| In-memory session + recording JSON download + **Add as CJM** (title + localStorage **journey + raw recording**) | Auto-commit into persona `journeys.ts` / `data/journeys/` |
 | Studio REC deck + MCP helpers | Nested scroll containers beyond prototype root |
 | Transport + screen + dwell + demo-click + human REC click + **beat-enter + scroll-to-target + typed-text** | Drag / contenteditable / rich form widgets |
 | Director-script + retreat-sync via shared script apply | — |
-| **Compile → new free CJM id** in picker (`rec-…`) | Compile scroll/typed into beats; edit `journeys.ts` source automatically |
+| **Compile v2 → free CJM id** with **playable `recordedClick` beats** (`rec-…`) | typed-text → beats; edit `journeys.ts` source automatically |
 
 ---
 
@@ -351,7 +357,8 @@ Prefer stable selectors on interactive targets:
 
 - `data-name="…"` — primary wire target (Figma export names)
 - `data-studio-avail-store="…"` — availability store rows
-- `data-studio-action="…"` — explicit playback actions (future)
+- `data-studio-action="…"` — **required** on product CTAs for REC → CJM (avail Choose/Continue/Book, near-me, book continue/reserve, etc.)
+- `data-studio-avail-date` / `data-studio-avail-time` — calendar + time cells
 - `data-studio-beat="…"` — beat-scoped controls (future)
 
 Demo clicks store a **selector chain** (nearest `data-studio-*` / `data-name` ancestors) for future replay targeting.

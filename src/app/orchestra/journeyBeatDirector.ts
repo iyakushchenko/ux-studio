@@ -34,7 +34,11 @@ export function directorScriptScrollsViewport(
 export function beatHasDirectorScript(beat: JourneyBeat | undefined): boolean {
   if (!beat) return false;
   return Boolean(
-    beat.bookScript ?? beat.tabScript ?? beat.homeScript ?? beat.availScript
+    beat.bookScript ??
+      beat.tabScript ??
+      beat.homeScript ??
+      beat.availScript ??
+      beat.recordedClick?.selectorChain?.length
   );
 }
 
@@ -59,6 +63,13 @@ export function beatDirectorScriptLabel(
   beat: JourneyBeat | undefined
 ): string | undefined {
   if (!beat) return undefined;
+  if (beat.recordedClick?.selectorChain?.length) {
+    return (
+      beat.recordedClick.element?.trim() ||
+      beat.recordedClick.selectorChain[0] ||
+      "recorded-click"
+    );
+  }
   return (
     beat.bookScript ??
     beat.tabScript ??

@@ -66,6 +66,15 @@ export function describeBeatScript(beat: JourneyBeat | undefined): {
   if (beat.availScript) return { kind: "avail", id: beat.availScript };
   if (beat.bookScript) return { kind: "book", id: beat.bookScript };
   if (beat.tabScript) return { kind: "tab", id: beat.tabScript };
+  if (beat.recordedClick?.selectorChain?.length) {
+    return {
+      kind: "tab",
+      id:
+        beat.recordedClick.element?.trim() ||
+        beat.recordedClick.selectorChain[0] ||
+        "recorded-click",
+    };
+  }
   if (beat.scenarioId) return { kind: "scenario", id: beat.scenarioId };
   if (beat.onEnter) return { kind: "beat-enter", id: beat.onEnter };
   return null;

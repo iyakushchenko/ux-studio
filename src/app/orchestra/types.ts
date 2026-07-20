@@ -32,6 +32,15 @@ export type TabScriptId =
   | "confirmation-open-appointments"
   | "history-view-details";
 
+/** Compiled from REC `demo-click` — CJM Step Forward runs demo cursor on the target. */
+export type JourneyBeatRecordedClick = {
+  selectorChain: string[];
+  element?: string;
+  /** Optional camera target from the preceding scroll event (not a separate STEPS beat). */
+  cameraSelectorChain?: string[];
+  cameraAnchorSelector?: string;
+};
+
 export type JourneyBeat = {
   id: string;
   label: string;
@@ -50,6 +59,11 @@ export type JourneyBeat = {
   bookScript?: BookScriptId;
   /** Traditional path — cursor-guided interaction on the active tab. */
   tabScript?: TabScriptId;
+  /**
+   * Recorded product click (compile v2). Prefer over hollow tab-landing when
+   * the session captured a usable `selectorChain`.
+   */
+  recordedClick?: JourneyBeatRecordedClick;
 };
 
 export type JourneyDefinition = {

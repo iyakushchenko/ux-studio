@@ -1,6 +1,9 @@
 /**
  * Durable recorded CJM catalog (project + persona) — localStorage + runtime import.
  * Complements download JSON / data/journeys files (browser cannot write the repo).
+ *
+ * v2 storage keeps the raw `.recording.json` session beside each compiled journey
+ * so Add as CJM never discards the event log (8.56 failure mode).
  */
 
 import type { JourneyDefinition } from "@/app/orchestra/types";
@@ -12,9 +15,18 @@ import {
 import type { JourneyFile } from "@/app/journey/journeyFile";
 import { isBuiltInOrchestraModeId } from "@/app/orchestra/orchestraModes";
 import { healRecordedJourneyNav } from "@/app/recording/recordedJourneyNavHeal";
+import type { RecordingSession } from "@/app/recording/recordingTypes";
 import type { PersonaId, ProjectId } from "@/projects/types";
 
 const STORAGE_PREFIX = "studio-recorded-cjm";
+
+type PersistedCatalogV2 = {
+  version: 2;
+  savedAt: string;
+  journeys: JourneyDefinition[];
+  /** journeyId → full REC session */
+  recordings?: Record<string, RecordingSession>;
+};
 
 function storageKey(projectId: string, personaId: string): string {
   return `${STORAGE_PREFIX}:${projectId}:${personaId}`;
@@ -27,47 +39,93 @@ function healPersistedJourney(
   return healRecordedJourneyNav(journey, projectId);
 }
 
+function readCatalogRaw(
+  projectId: ProjectId | string,
+  personaId: PersonaId | string
+): PersistedCatalogV2 | null {
+  if (typeof localStorage === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(storageKey(projectId, personaId));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as PersistedCatalogV2 & {
+      version?: number;
+      journeys?: JourneyDefinition[];
+      recordings?: Record<string, RecordingSession>;
+    };
+    if (!Array.isArray(parsed.journeys)) return null;
+    return {
+      version: 2,
+      savedAt:
+        typeof parsed.savedAt === "string"
+          ? parsed.savedAt
+          : new Date().toISOString(),
+      journeys: parsed.journeys,
+      recordings:
+        parsed.recordings && typeof parsed.recordings === "object"
+          ? parsed.recordings
+          : {},
+    };
+  } catch {
+    return null;
+  }
+}
+
 export function readPersistedRecordedJourneys(
   projectId: ProjectId | string,
   personaId: PersonaId | string
 ): JourneyDefinition[] {
-  if (typeof localStorage === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(storageKey(projectId, personaId));
-    if (!raw) return [];
-    const parsed = JSON.parse(raw) as { journeys?: JourneyDefinition[] };
-    if (!Array.isArray(parsed.journeys)) return [];
-    return parsed.journeys
-      .filter(
-        (j) => j && typeof j.id === "string" && typeof j.label === "string"
-      )
-      .map((journey) => healPersistedJourney(journey, projectId));
-  } catch {
-    return [];
-  }
+  const catalog = readCatalogRaw(projectId, personaId);
+  if (!catalog) return [];
+  return catalog.journeys
+    .filter(
+      (j) => j && typeof j.id === "string" && typeof j.label === "string"
+    )
+    .map((journey) => healPersistedJourney(journey, projectId));
+}
+
+/** Raw REC session persisted with a recorded CJM (Add as CJM), if any. */
+export function readPersistedRecordingForJourney(
+  projectId: ProjectId | string,
+  personaId: PersonaId | string,
+  journeyId: string
+): RecordingSession | undefined {
+  const catalog = readCatalogRaw(projectId, personaId);
+  const session = catalog?.recordings?.[journeyId];
+  if (!session || !Array.isArray(session.events)) return undefined;
+  return session;
 }
 
 export function persistRecordedJourneys(
   projectId: ProjectId | string,
   personaId: PersonaId | string,
-  journeys: readonly JourneyDefinition[]
+  journeys: readonly JourneyDefinition[],
+  recordings?: Record<string, RecordingSession>
 ): void {
   if (typeof localStorage === "undefined") return;
   try {
-    localStorage.setItem(
-      storageKey(projectId, personaId),
-      JSON.stringify({
-        version: 1,
-        savedAt: new Date().toISOString(),
-        journeys,
-      })
-    );
+    const prev = readCatalogRaw(projectId, personaId);
+    const nextRecordings: Record<string, RecordingSession> = {
+      ...(prev?.recordings ?? {}),
+      ...(recordings ?? {}),
+    };
+    // Drop recordings for journeys that were removed.
+    const keep = new Set(journeys.map((j) => j.id));
+    for (const id of Object.keys(nextRecordings)) {
+      if (!keep.has(id)) delete nextRecordings[id];
+    }
+    const payload: PersistedCatalogV2 = {
+      version: 2,
+      savedAt: new Date().toISOString(),
+      journeys: [...journeys],
+      recordings: nextRecordings,
+    };
+    localStorage.setItem(storageKey(projectId, personaId), JSON.stringify(payload));
   } catch {
     /* ignore quota */
   }
 }
 
-/** Merge one recorded journey into durable localStorage for project+persona. */
+/** Merge one recorded journey (+ optional raw REC) into durable localStorage. */
 export function persistRecordedJourneyFile(file: JourneyFile): void {
   const projectId = file.projectId;
   const personaId = file.personaId;
@@ -75,7 +133,11 @@ export function persistRecordedJourneyFile(file: JourneyFile): void {
   const journey = healPersistedJourney(file.journey, projectId);
   const existing = readPersistedRecordedJourneys(projectId, personaId);
   const others = existing.filter((j) => j.id !== journey.id);
-  persistRecordedJourneys(projectId, personaId, [...others, journey]);
+  const recordings: Record<string, RecordingSession> = {};
+  if (file.recording) {
+    recordings[journey.id] = file.recording;
+  }
+  persistRecordedJourneys(projectId, personaId, [...others, journey], recordings);
 }
 
 /** Hydrate runtime catalog from localStorage (call on studio boot / persona change). */
@@ -93,6 +155,11 @@ export function hydrateRecordedJourneysFromStorage(
       projectId: projectId as ProjectId,
       personaId: personaId as PersonaId,
       journey,
+      recording: readPersistedRecordingForJourney(
+        projectId,
+        personaId,
+        journey.id
+      ),
     });
   }
   return journeys.length;
