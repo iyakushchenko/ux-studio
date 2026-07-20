@@ -160,6 +160,15 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 - Quinn (QA): R11 `:5173` mid-flight prove PASS (coalesce×2, colors, sitrep, timeline, alarm/cursor, console END, dumps); Play engaged no SendGlyph fatal — applied: evaluate_script prove
 - Pax (PO sim): Overlay mid-flight QA shell accepted — PP-10 COMPLETE
 
+**Knowledge improved** (2026-07-20 · stream: Chat PAGE FINAL PASS HARD-GREEN · tip `acffdb6`/`56b56be` · v0.0.60):
+- Arch (Director): Site Pilot HARD-GREEN first → Chat Final Pass; no false PROVEN; History/Details unblocked; Reflex before next page — applied: NEXT_STEPS §5–6 · PAGE_FINAL_PASS.json
+- Uma (UI/UX): §0a/§0b PROVEN — MCP gap 40/864/64/438 + helpful/CTA/composer DS; thinking playback-owned not on send — applied: UMA_FIDELITY_CHAT · FE_AUDIT_CHAT_PAGE_FINAL_PASS
+- Quinn (QA): expanded chat probe 20/20 on `127.0.0.1:5173` reload:false; Site Pilot→Chat type-in diag PASS — applied: chatMcpProbeSteps · QUINN_CHAT_PROBE_CRITERIA
+- Finn (FE): Final Pass gates for `chat` (HEADER optional, ButtonPrimary CTAs, sources/mounts) — applied: check-page-final-pass · check-parity-proven
+- Ben (BE): R12 push tip `56b56be` no CI await — applied: peek only
+- Pax (PO sim): patch `0.0.60` coherent ship — applied: release:patch
+- Pain/Worked/Keep: premature STEPS-hold looked like CJM fail → use onAir + PLAYBACK_DIAG (PP-07); Keep §0b measure-before-PROVEN
+
 **Knowledge improved** (2026-07-19 · stream: CJM playback straighten — type-in + fade + PLAYBACK_DIAG · R12):
 - Arch (Director): R13 `playback-diag` Auto-Rule + PLAYBACK_DIAG contract; no false Chat PROVEN/Final Pass — applied: STUDIO_AUTO_RULES · PLAYBACK_DIAG.md
 - Finn (FE): Never skip Site Pilot type-in for prefilled default; restore Chat top + composer fade; wire diag events — applied: sitePilotHome · sitePilotChat · chat.css · playbackDiag
