@@ -20,7 +20,9 @@ export type AgentTestingLogKind =
   | "system"
   | "init"
   | "agent-prompt"
-  | "observe-escalate";
+  | "observe-escalate"
+  /** PLAYBACK_DIAG / diagnostic monitor rows (warn/error family). */
+  | "playback-diag";
 
 export type AgentTestingLogEntry = {
   atMs: number;

@@ -29,6 +29,8 @@ export type OpenQaLoggerOptions = {
   /** Keep log/ring when agent connects; default wipe → agent. */
   oversee?: boolean;
   title?: string;
+  /** Internal: page-refresh hydrate — keep restored log/ring + elapsed. */
+  hydrateRestore?: boolean;
 };
 
 export type QaHandoffOptions = {

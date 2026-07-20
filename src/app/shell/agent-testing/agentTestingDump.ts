@@ -13,6 +13,8 @@ import type { AgentTestingLogEntry } from "@/app/shell/agent-testing/agentTestin
 import type { AgentTestingPoSignal } from "@/app/shell/agent-testing/agentTestingPoSignal";
 import { getControlPanelLogEntries } from "@/app/shell/controlPanelLog";
 import { getPlaybackDiagBundle } from "@/app/shell/playbackDiag";
+import { getRecentDiagnosticFlashes } from "@/app/shell/playbackDiagnosticFlash";
+import { peekPlaybackDiagnostic } from "@/app/shell/playbackDiagQaBridge";
 import { readAgentTestingSitrep } from "@/app/shell/agent-testing/agentTestingSitrep";
 import { getQaDiagRing } from "@/app/shell/qaDiagGate";
 
@@ -62,6 +64,10 @@ export type AgentTestingDump = {
   timeline?: Array<{ key: string; outcome: string }>;
   /** Compact PLAYBACK_DIAG tail — kind/detail/beat/screen/t only. */
   recentPlaybackDiagEvents?: Array<Record<string, unknown>>;
+  /** PlaybackDiagnostic popup flashes — agents prefer this over the modal. */
+  diagnosticFlashes?: Array<Record<string, unknown>>;
+  /** Last ingested diagnostic (peek) — consume via `__studioConsumePlaybackDiagnostic`. */
+  lastPlaybackDiagnostic?: Record<string, unknown> | null;
   /** Full chat-bubble-motion frame series (gate-open) + jump summary. */
   chatBubbleMotion?: {
     samples: Array<Record<string, unknown>>;
@@ -220,6 +226,8 @@ export function buildAgentTestingDump(options: {
   mcp?: AgentTestingDump["mcp"];
 }): AgentTestingDump {
   let recentPlaybackDiagEvents: AgentTestingDump["recentPlaybackDiagEvents"];
+  let diagnosticFlashes: AgentTestingDump["diagnosticFlashes"];
+  let lastPlaybackDiagnostic: AgentTestingDump["lastPlaybackDiagnostic"];
   let chatBubbleMotion: AgentTestingDump["chatBubbleMotion"];
   let summaries: AgentTestingDump["summaries"];
   let controlPanel: unknown[] | undefined;
@@ -274,6 +282,22 @@ export function buildAgentTestingDump(options: {
     recentPlaybackDiagEvents = undefined;
     chatBubbleMotion = undefined;
     summaries = undefined;
+  }
+
+  try {
+    diagnosticFlashes = getRecentDiagnosticFlashes(8).map((f) => ({
+      id: f.id,
+      kind: f.kind,
+      message: clip(f.message),
+      beatId: f.beatId,
+      failureStep: f.failureStep,
+      durationMs: f.durationMs,
+      dismissedBy: f.dismissedBy,
+    }));
+    lastPlaybackDiagnostic = peekPlaybackDiagnostic();
+  } catch {
+    diagnosticFlashes = undefined;
+    lastPlaybackDiagnostic = undefined;
   }
 
   try {
@@ -332,6 +356,8 @@ export function buildAgentTestingDump(options: {
     },
     timeline: options.timeline,
     recentPlaybackDiagEvents,
+    diagnosticFlashes,
+    lastPlaybackDiagnostic,
     chatBubbleMotion,
     summaries,
     poSignal: options.poSignal ?? null,

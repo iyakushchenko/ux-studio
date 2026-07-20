@@ -78,7 +78,25 @@ window.__studioForceClearAgentTestingOverlay?.()
 
 **Session finale:** before teardown call `__studioAgentTestingOverlay.appendFinale("pass"|"fail", summary)` → `RESULT · PASS/FAIL — …` system line. Self-test smoke appends this automatically.
 
-**Refresh mid-CONTROL:** gate persist stores `sessionKind` + `awaitingReply`; boot reopens agent CONTROL (not manual) and re-arms PENDING when awaiting.
+**Refresh mid-CONTROL:** gate persist stores `sessionKind` + `awaitingReply` + **`elapsedAccumMs` / `sessionStartedAt`**; boot reopens agent CONTROL (not manual), re-arms PENDING when awaiting, **keeps elapsed clock**, and logs `page refresh · session restored`.
+
+**New agent / handoff wipe:** `__studioOpenQaLogger` / `__studioQaHandoff({ oversee:false })` / nest=1 `start` **always reset** the QA log (no stale). Only `hydrateRestore` / `oversee:true` keep history.
+
+### Console ↔ QA sanity (HARD)
+
+Agents **must** cross-check the same session:
+
+| Console | QA tool |
+|---------|---------|
+| `[PLAYBACK_DIAG]` events | Save Log `recentPlaybackDiagEvents` + ring `playback-diag` rows |
+| `[PLAYBACK_DIAG] clear` | amber `playback-diag · clear` log row |
+| click FAIL / OFF-TARGET | deep-red / fail outcome rows |
+| scroll-reversal Δ | soft-fail `playback-diag · scroll · scroll-reversal` |
+| PlaybackDiagnostic popup | dump `diagnosticFlashes` + `lastPlaybackDiagnostic`; `__studioConsumePlaybackDiagnostic()` |
+
+Mismatch = desync — fix bridge, do not trust vibes. See [PLAYBACK_DIAG.md](../../../../docs/shell/PLAYBACK_DIAG.md) § QA bridge.
+
+**Architect (PO 2026-07-20):** Prefer QA dump/ring over the diagnostic **popup** for agents. Popup stays for PO eyes; agents ingest via Save Log / `__studioConsumePlaybackDiagnostic` (dismisses modal + latch). Do **not** rebuild two monitors.
 
 ### MCP connection status
 

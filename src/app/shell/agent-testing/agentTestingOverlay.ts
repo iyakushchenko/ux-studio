@@ -367,6 +367,31 @@ function resetElapsedClock(running: boolean): void {
   elapsedAccumMs = 0;
   elapsedRunStartedAt = running ? Date.now() : 0;
   setElapsedLabel(formatElapsed(0));
+  persistElapsedToGate();
+}
+
+/** Restore elapsed across page refresh (same gate session). */
+function restoreElapsedClock(
+  accumMs: number,
+  startedAt: number,
+  running: boolean
+): void {
+  elapsedAccumMs = Math.max(0, accumMs);
+  sessionStartedAt = startedAt > 0 ? startedAt : Date.now();
+  elapsedRunStartedAt = running ? Date.now() : 0;
+  setElapsedLabel(formatElapsed(getElapsedMs()));
+  persistElapsedToGate();
+}
+
+function persistElapsedToGate(): void {
+  try {
+    setQaDiagSessionMeta({
+      elapsedAccumMs: getElapsedMs(),
+      sessionStartedAt: sessionStartedAt || Date.now(),
+    });
+  } catch {
+    /* hang-safe */
+  }
 }
 
 function pauseElapsedClock(): void {
@@ -375,6 +400,7 @@ function pauseElapsedClock(): void {
     elapsedRunStartedAt = 0;
   }
   setElapsedLabel(formatElapsed(elapsedAccumMs));
+  persistElapsedToGate();
 }
 
 function resumeElapsedClock(): void {
@@ -382,6 +408,7 @@ function resumeElapsedClock(): void {
     elapsedRunStartedAt = Date.now();
   }
   setElapsedLabel(formatElapsed(getElapsedMs()));
+  persistElapsedToGate();
 }
 
 function armElapsedTimer(): void {
@@ -390,6 +417,7 @@ function armElapsedTimer(): void {
   const tick = () => {
     if (!active || settling) return;
     setElapsedLabel(formatElapsed(getElapsedMs()));
+    persistElapsedToGate();
     refreshSitrepDom();
     refreshMcpStatusDom();
     if (!capturePaused) {
@@ -1764,7 +1792,8 @@ function pushLogEntry(entry: AgentTestingLogEntry): void {
     entry.kind !== "system" &&
     entry.kind !== "agent-prompt" &&
     entry.kind !== "observe-escalate" &&
-    entry.kind !== "alarm"
+    entry.kind !== "alarm" &&
+    entry.kind !== "playback-diag"
   ) {
     return;
   }
@@ -2630,6 +2659,7 @@ export function openAgentTestingLogger(
   }
   const opts: OpenQaLoggerOptions =
     typeof options === "string" ? { title: options } : options ?? {};
+  const hydrateRestore = opts.hydrateRestore === true;
   if (opts.oversee === true && active) {
     applyQaHandoff({
       oversee: true,
@@ -2649,14 +2679,9 @@ export function openAgentTestingLogger(
   setAwaitingUserReply(false);
   setQaDiagSessionMeta({ sessionKind: kind, awaitingReply: false });
   clearMcpPending();
-  // Fresh open (not oversee) — green field unless hydrate already restored rows.
-  if (!active) {
-    // Keep hydrate-restored logEntries; otherwise wipe leftovers after forceClear races.
-    if (logEntries.length === 0) {
-      timelineKeys = [];
-      lastStepAt = 0;
-    }
-  } else {
+  // Fresh open / handoff wipe — always reset QA log (no stale).
+  // Hydrate restore keeps ring-restored rows.
+  if (!hydrateRestore) {
     logEntries = [];
     timelineKeys = [];
     lastStepAt = 0;
@@ -2702,7 +2727,9 @@ export function openAgentTestingLogger(
     sessionStartedAt = Date.now();
     lastStepAt = sessionStartedAt;
   }
-  resetElapsedClock(!capturePaused);
+  if (!hydrateRestore) {
+    resetElapsedClock(!capturePaused);
+  }
   setActivityPhase(capturePaused ? "paused" : "running");
   syncSessionChrome();
   writePersist(resolved);
@@ -3086,7 +3113,23 @@ export function installAgentTestingOverlayApi(): void {
     restoreLoggerFromRing(hydrated.ring);
     const kind =
       hydrated.sessionKind ?? (hydrated.logger ? "manual" : "agent");
-    openAgentTestingLogger({ kind });
+    openAgentTestingLogger({ kind, hydrateRestore: true });
+    // Page refresh event — always visible in QA sequence for debug.
+    pushLogEntry({
+      atMs: Date.now(),
+      timeLabel: new Date().toLocaleTimeString("en-GB", { hour12: false }),
+      label: "page refresh · session restored",
+      outcome: "ok",
+      kind: "system",
+      count: 1,
+    });
+    if (hydrated.elapsedAccumMs > 0 || hydrated.sessionStartedAt > 0) {
+      restoreElapsedClock(
+        hydrated.elapsedAccumMs,
+        hydrated.sessionStartedAt,
+        kind !== "manual"
+      );
+    }
     if (hydrated.awaitingReply && kind === "agent") {
       setAwaitingUserReply(true);
       setQaDiagSessionMeta({ sessionKind: "agent", awaitingReply: true });
@@ -3107,7 +3150,6 @@ function restoreLoggerFromRing(events: QaDiagRingEvent[]): void {
         ? new Date(e.atIso).toLocaleTimeString("en-GB", { hour12: false })
         : new Date().toLocaleTimeString("en-GB", { hour12: false }),
       label: e.label || e.text || e.kind,
-      outcome: "ok",
       kind:
         e.kind === "user-message" || e.kind === "po-note"
           ? "user-message"
@@ -3117,11 +3159,20 @@ function restoreLoggerFromRing(events: QaDiagRingEvent[]): void {
               e.kind === "init" ||
               e.kind === "alarm" ||
               e.kind === "agent-prompt" ||
-              e.kind === "observe-escalate"
+              e.kind === "observe-escalate" ||
+              e.kind === "playback-diag" ||
+              e.kind === "scroll" ||
+              e.kind === "cursor"
             ? (e.kind as AgentTestingLogEntry["kind"])
             : e.kind === "capture-pause" || e.kind === "capture-start"
               ? "system"
               : "info",
+      outcome:
+        e.kind === "playback-diag" && /FAIL|DIAGNOSTIC|OFF-TARGET/i.test(e.label || e.text || "")
+          ? "fail"
+          : e.kind === "playback-diag"
+            ? "soft-fail"
+            : "ok",
     });
   }
   logEntries = restored.slice(-LOG_LIMIT);

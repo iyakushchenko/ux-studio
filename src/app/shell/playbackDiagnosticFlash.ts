@@ -1,5 +1,6 @@
 import type { PlaybackDiagnosticError } from "@/app/shell/playbackDiagnostic";
 import { logControlPanel } from "@/app/shell/controlPanelLog";
+import { ingestPlaybackDiagnosticToQa } from "@/app/shell/playbackDiagQaBridge";
 
 export type DiagnosticFlashRecord = {
   id: number;
@@ -43,6 +44,12 @@ export function recordPlaybackDiagnosticOpen(
     failureStep: record.failureStep,
     detail: error.context.detail,
   });
+  // Lean bridge — QA dump/ring is SSoT for agents; popup remains for PO eyes.
+  try {
+    ingestPlaybackDiagnosticToQa(error);
+  } catch {
+    /* hang-safe */
+  }
   return record;
 }
 

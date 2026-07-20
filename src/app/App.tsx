@@ -84,6 +84,7 @@ import {
   recordPlaybackDiagnosticDismiss,
   recordPlaybackDiagnosticOpen,
 } from "@/app/shell/playbackDiagnosticFlash";
+import { registerPlaybackDiagnosticDismiss } from "@/app/shell/playbackDiagQaBridge";
 import {
   logControlPanel,
   registerControlPanelSnapshotProvider,
@@ -1703,7 +1704,16 @@ export default function App() {
   useEffect(() => installStudioAuthSessionWindowApi(), []);
 
   useEffect(() => {
-    return registerStudioMcpHelpers({
+    registerPlaybackDiagnosticDismiss((source) => {
+      acknowledgePlaybackDiagnosticStop(
+        source === "consume" ? "consume-playback-diagnostic" : source
+      );
+      recordPlaybackDiagnosticDismiss(source);
+      cancelPlaybackScroll();
+      playbackScrollMonitor.reset();
+      setPlaybackDiagnostic(null);
+    });
+    const unregisterMcp = registerStudioMcpHelpers({
       dismissDiagnostic: (opts) => {
         if (opts?.acknowledgeStop !== false) {
           acknowledgePlaybackDiagnosticStop(opts?.note ?? "diagnostic-dismiss");
@@ -1765,6 +1775,10 @@ export default function App() {
         }
       },
     });
+    return () => {
+      registerPlaybackDiagnosticDismiss(null);
+      unregisterMcp();
+    };
   }, [orchestraModeId]);
 
   useEffect(() => {

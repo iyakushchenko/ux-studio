@@ -89,6 +89,26 @@ Jump thresholds: layout `|ΔY| > 10px` or transform `|Δy| > 4.5px` between rAF 
 
 Code: `playbackDiagChatBubbleMotion` · `chatMotion.ts` · dump: `agentTestingDump.ts`.
 
+### QA bridge (PLAYBACK_DIAG ↔ overlay) — Arch 2026-07-20
+
+**Decision:** One monitor path. Agents do **not** depend on the PlaybackDiagnostic **popup**. Capture lean monitor/error events into QA ring + overlay (`kind: playback-diag`, amber warn / deep-red fail) and Save Log (`recentPlaybackDiagEvents`, `diagnosticFlashes`, `lastPlaybackDiagnostic`). Popup remains for PO eyes; `__studioConsumePlaybackDiagnostic()` dismisses after ingest.
+
+| Event | Console | QA |
+|-------|---------|-----|
+| clear | `[PLAYBACK_DIAG] clear` | amber `playback-diag · clear` |
+| click FAIL / OFF-TARGET | click event | fail row |
+| unexpected scroll Δ↑ | scroll | soft-fail + `scroll-reversal` |
+| PlaybackDiagnostic open | control-panel + flash | fail `playback-diag · DIAGNOSTIC — …` + dump flashes |
+
+**Agents must** compare console filter `[PLAYBACK_DIAG]` vs Save Log / ring for the same session (SELF_TEST `console-qa-diag-sync`).
+
+```js
+window.__studioConsumePlaybackDiagnostic?.() // → { consumed, message, dismissed }
+window.__studioPeekPlaybackDiagnostic?.()
+```
+
+Code: `playbackDiagQaBridge.ts` · `playbackDiagnosticFlash.ts` · dump fields in `agentTestingDump.ts`.
+
 ```js
 window.__studioQaSessionKind?.()
 window.__studioOpenQaLogger?.({ kind: "observe" })

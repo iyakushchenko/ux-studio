@@ -858,7 +858,7 @@ export function ChatScreen({
         topUp = null;
         if (isChatPullUpScrollLocked()) return;
         const clearPx = measureComposerClearPx();
-        if (clearPx == null || clearPx >= 8) return;
+        if (clearPx == null || clearPx >= 16) return;
         const max = Math.max(0, column.scrollHeight - column.clientHeight);
         if (column.scrollTop >= max - 2) return;
         scrollCameraToHostEnd(column, {

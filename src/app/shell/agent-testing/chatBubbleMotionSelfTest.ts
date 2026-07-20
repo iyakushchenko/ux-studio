@@ -503,6 +503,30 @@ export async function runChatBubbleMotionSelfTest(options?: {
 
   await sleep(pace.settleMs);
 
+  // Final composer clearance — only if last content still under dock.
+  try {
+    const col = document.querySelector<HTMLElement>(
+      '[data-studio-react-screen="chat"] .chat__column, main.chat .chat__column'
+    );
+    const dock = document.querySelector<HTMLElement>(".chat__composer-dock");
+    const last = [
+      ...document.querySelectorAll(
+        '[data-studio-chat-frame][data-studio-chat-revealed="true"]'
+      ),
+    ].pop() as HTMLElement | undefined;
+    if (col && dock && last && !dock.hidden) {
+      const clearPx =
+        dock.getBoundingClientRect().top - last.getBoundingClientRect().bottom;
+      if (clearPx < 16) {
+        const max = Math.max(0, col.scrollHeight - col.clientHeight);
+        col.scrollTop = max;
+      }
+    }
+  } catch {
+    /* hang-safe */
+  }
+  await sleep(180);
+
   const result = assertChatBubbleMotionFromBundle(expectedIds);
   result.mode = "drive";
 

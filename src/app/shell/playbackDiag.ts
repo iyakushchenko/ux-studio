@@ -14,6 +14,12 @@
  */
 
 import { appendQaDiagRing, isQaDiagGateOpen } from "@/app/shell/qaDiagGate";
+import {
+  installPlaybackDiagQaBridgeApis,
+  mirrorPlaybackDiagClearToQa,
+  mirrorPlaybackDiagToQa,
+  uninstallPlaybackDiagQaBridgeApis,
+} from "@/app/shell/playbackDiagQaBridge";
 
 export type PlaybackDiagKind =
   | "type-in-start"
@@ -204,6 +210,12 @@ function push(event: Omit<PlaybackDiagEvent, "t">): PlaybackDiagEvent {
   if (isQaDiagGateOpen()) {
     console.info("[PLAYBACK_DIAG]", full.kind, consolePayload(full));
   }
+  // Lean QA mirror — monitor/error family rows (not every sample).
+  try {
+    mirrorPlaybackDiagToQa(full);
+  } catch {
+    /* hang-safe */
+  }
   return full;
 }
 
@@ -215,6 +227,11 @@ export function playbackDiagClear(): void {
   typeInActive = null;
   if (isQaDiagGateOpen()) {
     console.info("[PLAYBACK_DIAG]", "clear");
+  }
+  try {
+    mirrorPlaybackDiagClearToQa();
+  } catch {
+    /* hang-safe */
   }
 }
 
@@ -1276,6 +1293,7 @@ export function installPlaybackDiagWindowApis(): void {
   w.__protoPlaybackDiagClear = playbackDiagClear;
   w.__protoAssertTypeIn = assertPlaybackTypeIn;
   w.__protoAssertPlayEndedAtStart = assertPlaybackPlayEndedAtStart;
+  installPlaybackDiagQaBridgeApis();
 }
 
 export function uninstallPlaybackDiagWindowApis(): void {
@@ -1297,4 +1315,5 @@ export function uninstallPlaybackDiagWindowApis(): void {
   delete w.__protoPlaybackDiagClear;
   delete w.__protoAssertTypeIn;
   delete w.__protoAssertPlayEndedAtStart;
+  uninstallPlaybackDiagQaBridgeApis();
 }

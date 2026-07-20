@@ -33,6 +33,9 @@ type GatePersist = {
   sessionKind?: QaDiagGateSessionKind;
   /** Agent was awaiting PO reply (PENDING) when refreshed. */
   awaitingReply?: boolean;
+  /** Elapsed clock across refresh while session still active. */
+  elapsedAccumMs?: number;
+  sessionStartedAt?: number;
   updatedAt: number;
 };
 
@@ -42,6 +45,8 @@ type GateMemory = {
   ring: QaDiagRingEvent[];
   sessionKind: QaDiagGateSessionKind | null;
   awaitingReply: boolean;
+  elapsedAccumMs: number;
+  sessionStartedAt: number;
 };
 
 const MEMORY_KEY = "__studioQaDiagGateMemory";
@@ -61,6 +66,8 @@ function memory(): GateMemory {
         ring: [],
         sessionKind: null,
         awaitingReply: false,
+        elapsedAccumMs: 0,
+        sessionStartedAt: 0,
       };
     }
     return g[MEMORY_KEY]!;
@@ -73,6 +80,8 @@ function memory(): GateMemory {
       ring: [],
       sessionKind: null,
       awaitingReply: false,
+      elapsedAccumMs: 0,
+      sessionStartedAt: 0,
     };
   }
   return w[MEMORY_KEY]!;
@@ -104,6 +113,8 @@ function writePersist(): void {
       logger: m.logger,
       sessionKind: m.sessionKind ?? undefined,
       awaitingReply: m.awaitingReply || undefined,
+      elapsedAccumMs: m.elapsedAccumMs || undefined,
+      sessionStartedAt: m.sessionStartedAt || undefined,
       updatedAt: Date.now(),
     };
     sessionStorage.setItem(QA_DIAG_GATE_STORAGE_KEY, JSON.stringify(payload));
@@ -163,6 +174,8 @@ export function hydrateQaDiagGate(): {
   logger: boolean;
   sessionKind: QaDiagGateSessionKind | null;
   awaitingReply: boolean;
+  elapsedAccumMs: number;
+  sessionStartedAt: number;
   ring: QaDiagRingEvent[];
 } {
   const persist = readPersist();
@@ -172,6 +185,14 @@ export function hydrateQaDiagGate(): {
   m.logger = persist?.logger === true && m.open;
   m.sessionKind = m.open ? parseSessionKind(persist?.sessionKind) : null;
   m.awaitingReply = m.open && persist?.awaitingReply === true;
+  m.elapsedAccumMs =
+    m.open && typeof persist?.elapsedAccumMs === "number"
+      ? Math.max(0, persist.elapsedAccumMs)
+      : 0;
+  m.sessionStartedAt =
+    m.open && typeof persist?.sessionStartedAt === "number"
+      ? persist.sessionStartedAt
+      : 0;
   // Legacy gate-open without kind: logger → manual, else agent (CONTROL).
   if (m.open && !m.sessionKind) {
     m.sessionKind = m.logger ? "manual" : "agent";
@@ -181,6 +202,8 @@ export function hydrateQaDiagGate(): {
     logger: m.logger,
     sessionKind: m.sessionKind,
     awaitingReply: m.awaitingReply,
+    elapsedAccumMs: m.elapsedAccumMs,
+    sessionStartedAt: m.sessionStartedAt,
     ring: [...m.ring],
   };
 }
@@ -189,6 +212,8 @@ export function hydrateQaDiagGate(): {
 export function setQaDiagSessionMeta(meta: {
   sessionKind?: QaDiagGateSessionKind | null;
   awaitingReply?: boolean;
+  elapsedAccumMs?: number;
+  sessionStartedAt?: number;
 }): void {
   const m = memory();
   if (meta.sessionKind !== undefined) {
@@ -196,6 +221,12 @@ export function setQaDiagSessionMeta(meta: {
   }
   if (typeof meta.awaitingReply === "boolean") {
     m.awaitingReply = meta.awaitingReply;
+  }
+  if (typeof meta.elapsedAccumMs === "number") {
+    m.elapsedAccumMs = Math.max(0, meta.elapsedAccumMs);
+  }
+  if (typeof meta.sessionStartedAt === "number") {
+    m.sessionStartedAt = meta.sessionStartedAt;
   }
   if (m.open) writePersist();
 }

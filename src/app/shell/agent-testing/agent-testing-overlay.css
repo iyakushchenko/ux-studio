@@ -771,6 +771,28 @@
   font-weight: 700;
 }
 
+/* playback-diag / monitor — amber warn family (not muted body) */
+.studio-agent-testing-overlay__log li[data-kind="playback-diag"] .studio-agent-testing-overlay__log-body {
+  color: #ffb020 !important;
+  font-weight: 600;
+}
+
+.studio-agent-testing-overlay__log li[data-kind="playback-diag"][data-outcome="soft-fail"] .studio-agent-testing-overlay__log-body {
+  color: #ffb020 !important;
+  font-weight: 700;
+}
+
+.studio-agent-testing-overlay__log li[data-kind="playback-diag"][data-outcome="fail"] .studio-agent-testing-overlay__log-body {
+  color: #ff2a2a !important;
+  font-weight: 700;
+}
+
+.studio-agent-testing-overlay__log li[data-kind="helper"][data-outcome="soft-fail"] .studio-agent-testing-overlay__log-body,
+.studio-agent-testing-overlay__log li[data-kind="transport"] .studio-agent-testing-overlay__log-body {
+  color: #ffb020 !important;
+  font-weight: 600;
+}
+
 .studio-agent-testing-overlay__log li[data-kind="agent-prompt"] .studio-agent-testing-overlay__log-body {
   color: #b8a0ff !important;
   font-weight: 600;

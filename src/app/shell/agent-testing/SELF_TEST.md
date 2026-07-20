@@ -59,6 +59,8 @@ window.__studioForceClearAgentTestingOverlay?.()
 | save-log-live-snapshot | Y | Save Log while capturing → current log + selectors |
 | save-log-selector-depth | Y | Dump click rows include `selector` / `dataStudioAction` |
 | save-log-chat-bubble-motion | Y | QA open → SF chat reveals → Save Log `chatBubbleMotion.samples` has `phase` frames; healthy path `jumps≈0` / low `maxAbsDeltaY` |
+| console-qa-diag-sync | Y | Gate open → `__studioPlaybackDiagClear` → QA log amber `playback-diag · clear`; bundle.events ↔ Save Log `recentPlaybackDiagEvents` |
+| playback-diag-consume | Y | Open diagnostic (or ingest) → `__studioConsumePlaybackDiagnostic()` returns message + dismisses modal |
 | chat-bubble-motion-full | Y | `await __studioRunChatBubbleMotionSelfTest()` — all q0…r3; q0 may be entry-paint; r* thinking-handoff; jumps=0; continuous y |
 | duration-ms-sane | Y | After Pause/Alarm, durationMs ≤ 10min (no ~1.7e9s) |
 | cjm-beat-honesty | Y | Active `rec-*` → Beat n/3 not orchestra Steps 1/11 as Beat |
