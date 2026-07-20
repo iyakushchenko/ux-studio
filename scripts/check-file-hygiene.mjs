@@ -32,7 +32,7 @@ const ALLOWLIST = {
   // Engine / hybrid monsters — prefer domain split over bumping.
   "src/app/orchestra/useJourneyPlayback.ts": 2010, // + recordedClick SF/Play wiring; core play in recordedClickPlayback.ts
   "src/app/App.tsx": 2050, // + CREATE NEW ↔ REC guiding (controlled studioRecMode)
-  "src/app/shell/agent-testing/agentTestingOverlay.ts": 2950, // + MCP status chip / pending timeout wire
+  "src/app/shell/agent-testing/agentTestingOverlay.ts": 3100, // + MCP under compose / CAPTURE / Alarm agent / viewport border
   "src/app/nav/studioNavPanel.css": 1700, // + MCP status hint near version/bug
   "src/app/shell/studioMcpHelpers.ts": 1350, // MCP surface + R15 PO poll in step/play; extract stepForwardSmoke when next growth
   "src/app/scenario/demoCursor.ts": 1680, // on-target click gate; hit-test in demoCursorOnTarget.ts

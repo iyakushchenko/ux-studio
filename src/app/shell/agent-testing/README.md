@@ -45,16 +45,16 @@ Dump includes `sessionKind` (+ `gateMode` alias).
 
 ### MCP connection status
 
-Overlay header chip (primary) + short nav hint beside bug icon.
+Primary: under Message/Send compose (not header). Short nav hint beside bug icon.
 
-| Phase | Label | Color |
-|-------|-------|-------|
+| Phase | Label | Color / viewport |
+|-------|-------|------------------|
 | CONNECTING | `MCP — CONNECTING` | soft blue |
 | CONNECTED | `MCP — CONNECTED` | soft blue (brief) |
-| CONTROL | `MCP — CONTROL` | bright green (`sessionKind=agent`) |
-| OBSERVE | `MCP — OBSERVE` | bright fuchsia (`sessionKind=observe`) |
-| CONTROL · PENDING | `MCP — CONTROL · PENDING` | amber pulse (agent-prompt awaiting reply) |
-| ERROR | `MCP — ERROR: …` | red |
+| CONTROL | `MCP — CONTROL` | bright green + **3px gold** viewport border |
+| OBSERVE | `MCP — OBSERVE` | bright fuchsia |
+| CONTROL · PENDING | `MCP — CONTROL · PENDING` | system blue + **3px blue** border |
+| ERROR | `MCP — ERROR: …` | red + **3px red** border |
 | Idle | hidden | manual / no agent session |
 
 **PENDING timeout (default 60s):** auto-pause capture + log `MCP pending timed out (Ns) — paused; resume when ready`. Override: `window.__studioQaPendingTimeoutMs`. Clear on user Reply/Send.
@@ -64,11 +64,17 @@ __studioMcpConnectionStatus()
 __studioReportMcpConnectionError("latch fail")
 ```
 
+**Toolbar:** clock + CAPTURE|Pause|Resume + Reset + × + Save Log (same height). CAPTURE after reset/start; Resume only with paused progress. Reset disabled until log dirty.
+
+**Alarm:** agent mode only — halt Play + pause + latch investigate prompt (`agentPrompt` in dump).
+
+**Recent:** deleted (low-value clutter).
+
 ## Overlay CTAs (PO mid-flight)
 
 | CTA | Meaning | Latch code |
 |-----|---------|------------|
-| **Alarm** | Sequence / expected-steps mismatch | `ALARM_SEQUENCE_MISMATCH` |
+| **Alarm** | AGENT only — stop progress + investigate latch | `ALARM_SEQUENCE_MISMATCH` + `agentPrompt` |
 | **Cursor** | Cursor weird / invisible / wrong | `CURSOR_WEIRD_FLAG` (manual) · `CURSOR_HIDDEN_DURING_TYPEIN` (auto) |
 | **Scroll** | Scroll path / intoView issue | `SCROLL_ISSUE_REPORTED` (+ auto soft-logs) |
 

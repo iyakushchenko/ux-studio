@@ -36,6 +36,23 @@
   z-index: 1;
   pointer-events: auto;
   background: transparent;
+  box-sizing: border-box;
+}
+
+/* Viewport frame when MCP CONTROL (studio gold 3px). PENDING/ERROR reuse log colors. */
+.studio-agent-testing-overlay[data-mcp="control"]
+  .studio-agent-testing-overlay__capture {
+  box-shadow: inset 0 0 0 3px #e6b84d;
+}
+
+.studio-agent-testing-overlay[data-mcp="pending"]
+  .studio-agent-testing-overlay__capture {
+  box-shadow: inset 0 0 0 3px #8ec5ff;
+}
+
+.studio-agent-testing-overlay[data-mcp="error"]
+  .studio-agent-testing-overlay__capture {
+  box-shadow: inset 0 0 0 3px #ff8a8a;
 }
 
 /* DONE/SITREP: release click guard so PO can use the page while reading */
@@ -65,16 +82,68 @@
 
 .studio-agent-testing-overlay__header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
+}
+
+.studio-agent-testing-overlay__toolbar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.studio-agent-testing-overlay__mcp-status {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(16, 18, 24, 0.45);
+}
+
+.studio-agent-testing-overlay__mcp-status[hidden] {
+  display: none !important;
+}
+
+.studio-agent-testing-overlay__mcp-mode {
+  margin: 0;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.35;
+  color: rgba(180, 186, 198, 0.9);
+}
+
+.studio-agent-testing-overlay__mcp-mode[data-phase="control"] {
+  color: #3dff8a;
+}
+
+.studio-agent-testing-overlay__mcp-mode[data-phase="observe"] {
+  color: #ff4cf0;
+}
+
+.studio-agent-testing-overlay__mcp-mode[data-phase="pending"] {
+  color: #8ec5ff;
+}
+
+.studio-agent-testing-overlay__mcp-mode[data-phase="error"] {
+  color: #ff8a8a;
 }
 
 .studio-agent-testing-overlay__mcp {
   flex: 0 1 auto;
   margin: 0;
-  padding: 2px 8px;
+  padding: 0 8px;
+  height: 26px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
   border-radius: 4px;
   border: 1px solid rgba(255, 255, 255, 0.14);
   background: rgba(16, 18, 24, 0.55);
@@ -82,7 +151,7 @@
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.04em;
-  line-height: 1.35;
+  line-height: 1;
   white-space: nowrap;
   max-width: 100%;
 }
@@ -108,9 +177,9 @@
 }
 
 .studio-agent-testing-overlay__mcp[data-phase="pending"] {
-  color: #ffe08a;
-  border-color: rgba(255, 224, 138, 0.55);
-  background: rgba(40, 32, 8, 0.55);
+  color: #8ec5ff;
+  border-color: rgba(142, 197, 255, 0.55);
+  background: rgba(20, 36, 56, 0.55);
   animation: studio-agent-testing-activity-pulse 1.25s ease-in-out infinite;
 }
 
@@ -208,19 +277,24 @@
   align-items: center;
   gap: 4px;
   flex: 0 0 auto;
+  height: 26px;
 }
 
 .studio-agent-testing-overlay__elapsed {
   flex: 0 0 auto;
   margin: 0;
-  padding: 2px 6px;
+  padding: 0 8px;
+  height: 26px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
   border-radius: 4px;
   border: 1px solid rgba(255, 255, 255, 0.14);
   background: rgba(16, 18, 24, 0.75);
   font-size: 11px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  line-height: 1.3;
+  line-height: 1;
   color: #e8e8e8;
 }
 
@@ -236,16 +310,19 @@
 
 .studio-agent-testing-overlay__clock .studio-agent-testing-overlay__capture-toggle {
   margin: 0;
-  padding: 2px 8px;
-  height: auto;
-  min-height: 22px;
+  padding: 0 8px;
+  height: 26px;
+  min-height: 26px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
   border-radius: 4px;
   border: 1px solid rgba(230, 170, 60, 0.45);
   background: rgba(40, 28, 8, 0.45);
   color: #e6b84d;
   font-size: 10px;
   font-weight: 700;
-  line-height: 1.3;
+  line-height: 1;
   cursor: pointer;
 }
 
@@ -294,32 +371,43 @@
 }
 
 .studio-agent-testing-overlay__header-actions {
-  display: flex;
+  display: inline-flex;
   flex: 0 0 auto;
   align-items: center;
   gap: 4px;
+  height: 26px;
 }
 
-.studio-agent-testing-overlay__reset {
+.studio-agent-testing-overlay__reset,
+.studio-agent-testing-overlay__header-actions
+  .studio-agent-testing-overlay__dump {
   flex: 0 0 auto;
   margin: 0;
-  padding: 2px 7px;
+  padding: 0 8px;
+  height: 26px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 4px;
   background: transparent;
   color: #a8adb8;
   font-size: 10px;
   font-weight: 600;
-  line-height: 1.35;
+  line-height: 1;
   cursor: pointer;
 }
 
-.studio-agent-testing-overlay__reset:hover:not(:disabled) {
+.studio-agent-testing-overlay__reset:hover:not(:disabled),
+.studio-agent-testing-overlay__header-actions
+  .studio-agent-testing-overlay__dump:hover:not(:disabled) {
   color: #e8eaef;
   border-color: rgba(255, 255, 255, 0.35);
 }
 
-.studio-agent-testing-overlay__reset:disabled {
+.studio-agent-testing-overlay__reset:disabled,
+.studio-agent-testing-overlay__header-actions
+  .studio-agent-testing-overlay__dump:disabled {
   opacity: 0.35;
   cursor: not-allowed;
 }
@@ -328,8 +416,12 @@
   flex: 0 0 auto;
   margin: 0;
   padding: 0;
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 4px;
   background: transparent;
@@ -569,16 +661,24 @@
   font-weight: 600;
 }
 
+.studio-agent-testing-overlay__alarm[hidden] {
+  display: none !important;
+}
+
 .studio-agent-testing-overlay__capture-toggle {
   margin: 0;
-  padding: 3px 8px;
+  padding: 0 8px;
+  height: 26px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
   border-radius: 4px;
   border: 1px solid rgba(230, 170, 60, 0.45);
   background: rgba(40, 28, 8, 0.45);
   color: #e6b84d;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
-  line-height: 1.35;
+  line-height: 1;
   cursor: pointer;
 }
 
@@ -740,38 +840,6 @@
 .studio-agent-testing-overlay__log li[data-kind="alarm"] .studio-agent-testing-overlay__log-body,
 .studio-agent-testing-overlay__log li[data-kind="scroll"] .studio-agent-testing-overlay__log-body {
   font-weight: 600;
-}
-
-.studio-agent-testing-overlay__history {
-  margin: 0;
-  padding: 6px 8px;
-  border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(16, 18, 24, 0.65);
-}
-
-.studio-agent-testing-overlay__history-label {
-  margin: 0 0 4px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: #9aa0aa;
-}
-
-.studio-agent-testing-overlay__history ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.studio-agent-testing-overlay__history li {
-  margin: 0 0 2px;
-  font-size: 10px;
-  line-height: 1.35;
-  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
-  color: #b8bcc4;
-  word-break: break-word;
 }
 
 /* Belt-and-suspenders: disable main app while testing (released on settle).

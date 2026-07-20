@@ -127,11 +127,11 @@ export function titleForSessionKind(kind: AgentTestingSessionKind): string {
 export function hintForSessionKind(kind: AgentTestingSessionKind): string {
   switch (kind) {
     case "manual":
-      return "MANUAL TEST — Resume to capture; Pause freezes the clock.";
+      return "MANUAL TEST — CAPTURE to start; Pause freezes the clock.";
     case "observe":
-      return "OBSERVE — capturing clicks; Alarm escalates to agent lock.";
+      return "OBSERVE — capturing clicks; Close × to dismiss.";
     default:
-      return "AGENT TESTING — Pause freezes the clock; Message then Resume.";
+      return "AGENT TESTING — Pause freezes the clock; Alarm stops + investigates.";
   }
 }
 

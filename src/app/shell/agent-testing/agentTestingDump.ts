@@ -40,6 +40,8 @@ export type AgentTestingDump = {
   reason: AgentTestingDumpReason;
   /** Explicit machine code — Alarm = ALARM_SEQUENCE_MISMATCH. */
   code?: string;
+  /** Agent-facing instruction (Alarm / investigate). */
+  agentPrompt?: string;
   title: string;
   /** Who owns the overlay — manual | agent | observe. */
   gateMode: AgentTestingDumpGateMode;
@@ -163,6 +165,7 @@ export function buildAgentTestingDump(options: {
   poSignal?: AgentTestingPoSignal | null;
   gateMode?: AgentTestingDumpGateMode;
   capturePaused?: boolean;
+  agentPrompt?: string;
 }): AgentTestingDump {
   let recentPlaybackDiagEvents: AgentTestingDump["recentPlaybackDiagEvents"];
   let summaries: AgentTestingDump["summaries"];
@@ -239,6 +242,7 @@ export function buildAgentTestingDump(options: {
     atIso: new Date().toISOString(),
     reason: options.reason,
     code: options.code ?? reasonDefaultCode(options.reason),
+    agentPrompt: options.agentPrompt,
     title: options.title,
     gateMode,
     sessionKind: gateMode,

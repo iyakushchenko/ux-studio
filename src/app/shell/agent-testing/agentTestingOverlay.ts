@@ -133,11 +133,11 @@ const ELAPSED_TICK_MS = 250;
 /** Stale persist key - cleared on stop; never restored on load by default. */
 const PERSIST_KEY = "agentTestingOverlay";
 const CONTINUE_KEY = "protoAgentTestingOverlayContinue";
-const HISTORY_KEY = "protoAgentTestingOverlayHistory";
-const HISTORY_MAX = 5;
-const HISTORY_LINE_CAP = 12;
 const DEFAULT_TITLE = "AGENT TESTING";
 const PREPARE_TITLE = "AGENT TESTING - preparing...";
+/** Alarm dump + latch — agents consume via __studioConsumePoSignal. */
+const ALARM_AGENT_PROMPT =
+  "PO Alarm — investigate sequence/expected-steps mismatch. Call __studioConsumePoSignal(), inspect sitrep/timeline/diag, then fix or ask PO.";
 
 export type StopAgentTestingOverlayOptions = {
   force?: boolean;
@@ -209,16 +209,17 @@ type OverlayApi = {
   isActive: () => boolean;
 };
 
-type HistoryEntry = {
-  title: string;
-  endedAt: number;
-  lines: string[];
-};
-
 let active = false;
 let settling = false;
 /** Pause freezes capture + clock (all kinds). */
 let capturePaused = false;
+/**
+ * True after real capture progress in this session.
+ * False after reset / fresh open → Capture CTA shows CAPTURE (not Resume).
+ */
+let sessionHadProgress = false;
+/** True when log has events after last Reset (Reset CTA gated until dirty). */
+let logDirty = false;
 let logEntries: AgentTestingLogEntry[] = [];
 let sessionTitle = DEFAULT_TITLE;
 let nest = 0;
@@ -295,33 +296,12 @@ function shouldContinueFromPersist(): boolean {
   }
 }
 
-function readHistory(): HistoryEntry[] {
+function clearHistoryPersist(): void {
   try {
-    const raw = sessionStorage.getItem(HISTORY_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw) as unknown;
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter(
-      (e): e is HistoryEntry =>
-        !!e &&
-        typeof e === "object" &&
-        typeof (e as HistoryEntry).title === "string" &&
-        typeof (e as HistoryEntry).endedAt === "number" &&
-        Array.isArray((e as HistoryEntry).lines)
-    );
-  } catch {
-    return [];
-  }
-}
-
-function pushHistory(entry: HistoryEntry): HistoryEntry[] {
-  const next = [entry, ...readHistory()].slice(0, HISTORY_MAX);
-  try {
-    sessionStorage.setItem(HISTORY_KEY, JSON.stringify(next));
+    sessionStorage.removeItem("protoAgentTestingOverlayHistory");
   } catch {
     /* ignore */
   }
-  return next;
 }
 
 function clearSafetyTimer(): void {
@@ -516,7 +496,11 @@ function readScrollSnapshot(): {
 
 function saveDump(
   reason: "fail" | "alarm" | "cursor" | "scroll" | "manual",
-  extras?: { code?: string; poSignal?: AgentTestingPoSignal | null }
+  extras?: {
+    code?: string;
+    poSignal?: AgentTestingPoSignal | null;
+    agentPrompt?: string;
+  }
 ): void {
   try {
     const dump = buildAgentTestingDump({
@@ -526,6 +510,7 @@ function saveDump(
       sitrepLine: lastSitrepLine,
       log: logEntries,
       code: extras?.code,
+      agentPrompt: extras?.agentPrompt,
       timeline: timelineKeys.map((t) => ({
         key: t.key,
         outcome: String(t.outcome),
@@ -548,18 +533,23 @@ function saveDump(
 }
 
 /**
- * PO Alarm = sequence / expected-steps mismatch (not vague “something weird”).
- * Primary: latch `__studioAgentTestingTakeover` for mid-flight MCP poll.
- * Secondary: session dump for postmortem.
+ * PO Alarm = sequence / expected-steps mismatch (AGENT mode only).
+ * Stops progress (halt Play + pause capture) and latches investigate prompt for agents.
  */
 export function ringAgentTestingAlarm(note?: string): void {
+  if (getSessionKind() !== "agent" || !active || settling) return;
   // HARD: stop Play in the same turn as the click — do not wait for smoke poll.
   haltPlaybackForPoSignal("po-alarm");
+  if (!capturePaused) {
+    pauseElapsedClock();
+    capturePaused = true;
+    sessionHadProgress = true;
+  }
   const detail = note?.trim() ? ` — ${note.trim()}` : "";
   const signal = latchPoSignal({
     type: "alarm",
     code: "ALARM_SEQUENCE_MISMATCH",
-    note,
+    note: note?.trim() || ALARM_AGENT_PROMPT,
     sitrepLine: lastSitrepLine,
     timeline: timelineKeys,
   });
@@ -567,13 +557,20 @@ export function ringAgentTestingAlarm(note?: string): void {
     buildLogEntryFromStep({
       kind: "alarm",
       outcome: "soft-fail",
-      label: `ALARM · ALARM_SEQUENCE_MISMATCH${detail} · consume __studioConsumePoSignal()`,
+      label: `ALARM · ALARM_SEQUENCE_MISMATCH${detail} · investigate · consume __studioConsumePoSignal()`,
       beatId: signal.beat ?? undefined,
     })
   );
-  if (getSessionKind() === "observe") {
-    escalateObserveToAgentSession("alarm");
-  }
+  pushLogEntry({
+    atMs: performance.now(),
+    timeLabel: new Date().toLocaleTimeString("en-GB", { hour12: false }),
+    label: `Agent prompt: ${ALARM_AGENT_PROMPT}`,
+    outcome: "ok",
+    kind: "agent-prompt",
+  });
+  setActivityPhase("paused", "alarm");
+  syncCaptureWatch();
+  syncSessionChrome();
   try {
     console.warn(
       "[AGENT_TESTING] sequence / expected-steps mismatch",
@@ -584,12 +581,17 @@ export function ringAgentTestingAlarm(note?: string): void {
         beat: signal.beat,
         screen: signal.screen,
         counter: signal.counter,
+        agentPrompt: ALARM_AGENT_PROMPT,
       }
     );
   } catch {
     /* ignore */
   }
-  saveDump("alarm", { code: "ALARM_SEQUENCE_MISMATCH", poSignal: signal });
+  saveDump("alarm", {
+    code: "ALARM_SEQUENCE_MISMATCH",
+    poSignal: signal,
+    agentPrompt: ALARM_AGENT_PROMPT,
+  });
 }
 
 export function flagAgentTestingCursorWeird(note?: string): void {
@@ -939,19 +941,23 @@ function closeManualSession(reason: string): void {
   softCloseAgentTestingLogger(reason);
 }
 
-/** Instant clear of log / ring / timer — fresh session, one system line. */
+/** Instant clear of log / ring / timer — fresh session, CAPTURE CTA. */
 function resetManualSession(): void {
   if (!canUserDismissSession() && (active || settling)) return;
   if (!active) return;
+  if (!logDirty) return;
   logEntries = [];
   timelineKeys = [];
   lastStepAt = 0;
+  sessionHadProgress = false;
+  logDirty = false;
   try {
     replaceQaDiagRing([]);
   } catch {
     /* ignore */
   }
-  resetElapsedClock(!capturePaused);
+  capturePaused = true;
+  resetElapsedClock(false);
   armElapsedTimer();
   pushLogEntry({
     atMs: performance.now(),
@@ -960,8 +966,12 @@ function resetManualSession(): void {
     outcome: "ok",
     kind: "system",
   });
+  // Reset line alone does not re-enable Reset.
+  logDirty = false;
   renderTimeline();
   refreshSitrepDom();
+  setActivityPhase("paused");
+  syncCaptureWatch();
   syncSessionChrome();
 }
 
@@ -1101,39 +1111,13 @@ function setHint(text: string): void {
   if (el) el.textContent = text;
 }
 
-function renderHistory(entries: HistoryEntry[]): void {
+function renderHistory(): void {
   if (!hasDomQuery()) return;
-  const root = document.getElementById(ROOT_ID);
-  if (!root) return;
-  let box = root.querySelector<HTMLElement>(
-    ".studio-agent-testing-overlay__history"
-  );
-  const prior = entries.slice(1, HISTORY_MAX); // skip the just-pushed current
-  if (prior.length === 0) {
-    box?.remove();
-    return;
-  }
-  if (!box) {
-    box = document.createElement("div");
-    box.className = "studio-agent-testing-overlay__history";
-    const panel = root.querySelector(".studio-agent-testing-overlay__panel");
-    panel?.appendChild(box);
-  }
-  box.replaceChildren();
-  const label = document.createElement("p");
-  label.className = "studio-agent-testing-overlay__history-label";
-  label.textContent = "Recent";
-  box.appendChild(label);
-  const list = document.createElement("ul");
-  for (const entry of prior.slice(0, 4)) {
-    const li = document.createElement("li");
-    const when = new Date(entry.endedAt).toLocaleTimeString("en-GB", {
-      hour12: false,
-    });
-    li.textContent = `${when}  ${entry.title}`;
-    list.appendChild(li);
-  }
-  box.appendChild(list);
+  document
+    .getElementById(ROOT_ID)
+    ?.querySelector(".studio-agent-testing-overlay__history")
+    ?.remove();
+  clearHistoryPersist();
 }
 
 function setQaSessionLock(mode: AgentTestingSessionKind | null): void {
@@ -1174,10 +1158,13 @@ function syncSessionChrome(): void {
   );
   if (resetBtn) {
     resetBtn.hidden = locked;
-    resetBtn.disabled = locked || !active || settling;
+    const resetOk = !locked && active && !settling && logDirty;
+    resetBtn.disabled = !resetOk;
     resetBtn.title = locked
       ? "Agent session locked"
-      : "Reset session — clear log, ring, and timer";
+      : !logDirty
+        ? "Reset — available after new log events"
+        : "Reset session — clear log, ring, and timer";
   }
 
   const captureBtn = root.querySelector<HTMLButtonElement>(
@@ -1187,15 +1174,22 @@ function syncSessionChrome(): void {
     const show = active && !settling;
     captureBtn.hidden = !show;
     captureBtn.disabled = !show;
-    captureBtn.textContent = capturePaused ? "Resume" : "Pause";
-    captureBtn.title =
-      kind === "agent"
-        ? capturePaused
-          ? "Resume capture (does not auto-Play — transport stays stopped)"
-          : "Pause — freeze clock + halt Play; type Message, then Resume"
-        : capturePaused
-          ? "Resume capture + clock"
+    if (!capturePaused) {
+      captureBtn.textContent = "Pause";
+      captureBtn.title =
+        kind === "agent"
+          ? "Pause — freeze clock + halt Play; type Message, then Resume"
           : "Pause — freeze clock + stop capture";
+    } else if (sessionHadProgress) {
+      captureBtn.textContent = "Resume";
+      captureBtn.title =
+        kind === "agent"
+          ? "Resume capture (does not auto-Play — transport stays stopped)"
+          : "Resume capture + clock";
+    } else {
+      captureBtn.textContent = "CAPTURE";
+      captureBtn.title = "Start capture + clock";
+    }
   }
 
   const elapsed = root.querySelector<HTMLElement>(
@@ -1219,7 +1213,20 @@ function syncSessionChrome(): void {
       : "Pause capture or wait until idle to save log";
   }
 
+  const alarmBtn = root.querySelector<HTMLButtonElement>(
+    ".studio-agent-testing-overlay__alarm"
+  );
+  if (alarmBtn) {
+    const alarmOk = kind === "agent" && active && !settling;
+    alarmBtn.hidden = !alarmOk;
+    alarmBtn.disabled = !alarmOk;
+    alarmBtn.title = alarmOk
+      ? "Stop progress + latch investigate prompt for the agent"
+      : "Alarm — agent mode only";
+  }
+
   ensureMessageUnderLog(root);
+  ensureOverlayChrome(root);
   refreshMcpStatusDom();
 }
 
@@ -1239,19 +1246,50 @@ function refreshMcpStatusDom(): void {
   if (!hasDomQuery()) return;
   const status = readLiveMcpStatus();
   const root = document.getElementById(ROOT_ID);
+  const wrap = root?.querySelector<HTMLElement>(
+    ".studio-agent-testing-overlay__mcp-status"
+  );
   const chip = root?.querySelector<HTMLElement>(
     ".studio-agent-testing-overlay__mcp"
+  );
+  const mode = root?.querySelector<HTMLElement>(
+    ".studio-agent-testing-overlay__mcp-mode"
   );
   if (chip) {
     if (!status.label || status.phase === "idle") {
       chip.hidden = true;
       chip.textContent = "";
       delete chip.dataset.phase;
+      if (wrap) wrap.hidden = true;
+      if (mode) {
+        mode.hidden = true;
+        mode.textContent = "";
+      }
     } else {
       chip.hidden = false;
       chip.textContent = status.label;
       chip.dataset.phase = status.phase;
       chip.title = status.label;
+      if (wrap) wrap.hidden = false;
+      if (mode) {
+        mode.hidden = false;
+        const modeLine =
+          status.phase === "control"
+            ? "Connection · CONTROL (agent online)"
+            : status.phase === "observe"
+              ? "Connection · OBSERVE (user can interact)"
+              : status.phase === "pending"
+                ? "Connection · CONTROL · PENDING (awaiting reply)"
+                : status.phase === "error"
+                  ? `Connection · ERROR${status.error ? `: ${status.error}` : ""}`
+                  : status.phase === "connecting"
+                    ? "Connection · CONNECTING"
+                    : status.phase === "connected"
+                      ? "Connection · CONNECTED"
+                      : "";
+        mode.textContent = modeLine;
+        mode.dataset.phase = status.phase;
+      }
     }
   }
   if (root) {
@@ -1385,15 +1423,26 @@ function ensureOverlayChrome(root: HTMLElement): void {
     clock.appendChild(pauseBtn);
   }
 
-  if (!header.querySelector(".studio-agent-testing-overlay__mcp")) {
-    const mcp = document.createElement("span");
-    mcp.className = "studio-agent-testing-overlay__mcp";
-    mcp.hidden = true;
-    const titleEl = header.querySelector(".studio-agent-testing-overlay__title");
-    if (titleEl?.nextSibling) {
-      header.insertBefore(mcp, titleEl.nextSibling);
+  // MCP status lives under Message/Send — strip header leftovers
+  header.querySelectorAll(".studio-agent-testing-overlay__mcp").forEach((el) => {
+    el.remove();
+  });
+  let toolbar = header.querySelector<HTMLElement>(
+    ".studio-agent-testing-overlay__toolbar"
+  );
+  if (!toolbar) {
+    toolbar = document.createElement("div");
+    toolbar.className = "studio-agent-testing-overlay__toolbar";
+    const clockEl = header.querySelector(".studio-agent-testing-overlay__clock");
+    const actionsEl = header.querySelector(
+      ".studio-agent-testing-overlay__header-actions"
+    );
+    if (clockEl && actionsEl) {
+      clockEl.replaceWith(toolbar);
+      toolbar.appendChild(clockEl);
+      toolbar.appendChild(actionsEl);
     } else {
-      header.appendChild(mcp);
+      header.appendChild(toolbar);
     }
   }
 
@@ -1428,6 +1477,48 @@ function ensureOverlayChrome(root: HTMLElement): void {
     close.textContent = "×";
     close.addEventListener("click", () => closeManualSession("close-x"));
     headerActions.appendChild(close);
+  }
+  // Save Log inline on the right of the control row
+  const strayDump = panel.querySelector<HTMLButtonElement>(
+    ".studio-agent-testing-overlay__actions .studio-agent-testing-overlay__dump"
+  );
+  let dumpBtn = headerActions.querySelector<HTMLButtonElement>(
+    ".studio-agent-testing-overlay__dump"
+  );
+  if (!dumpBtn && strayDump) {
+    headerActions.appendChild(strayDump);
+    dumpBtn = strayDump;
+  } else if (!dumpBtn) {
+    dumpBtn = document.createElement("button");
+    dumpBtn.type = "button";
+    dumpBtn.className = "studio-agent-testing-overlay__dump";
+    dumpBtn.textContent = "Save Log";
+    dumpBtn.title = "Download lean dump JSON when paused or idle";
+    dumpBtn.addEventListener("click", () => {
+      if (isCaptureInProgress()) return;
+      downloadAgentTestingDump();
+    });
+    headerActions.appendChild(dumpBtn);
+  } else if (strayDump && strayDump !== dumpBtn) {
+    strayDump.remove();
+  }
+
+  // MCP status under compose
+  let mcpStatus = panel.querySelector<HTMLElement>(
+    ".studio-agent-testing-overlay__mcp-status"
+  );
+  if (!mcpStatus) {
+    mcpStatus = document.createElement("div");
+    mcpStatus.className = "studio-agent-testing-overlay__mcp-status";
+    mcpStatus.hidden = true;
+    mcpStatus.innerHTML =
+      '<span class="studio-agent-testing-overlay__mcp" data-phase="idle" hidden></span>' +
+      '<span class="studio-agent-testing-overlay__mcp-mode" hidden></span>';
+  }
+  const note = panel.querySelector(".studio-agent-testing-overlay__note");
+  if (note && mcpStatus.previousElementSibling !== note) {
+    if (note.nextSibling) panel.insertBefore(mcpStatus, note.nextSibling);
+    else panel.appendChild(mcpStatus);
   }
 
   if (!panel.querySelector(".studio-agent-testing-overlay__session")) {
@@ -1505,6 +1596,7 @@ function toggleCapturePause(): void {
     capturePaused = true;
   } else {
     capturePaused = false;
+    sessionHadProgress = true;
     resumeElapsedClock();
     pushLogEntry({
       atMs: performance.now(),
@@ -1514,9 +1606,11 @@ function toggleCapturePause(): void {
       kind: "system",
     });
   }
+  if (next) sessionHadProgress = true;
   armElapsedTimer();
   setActivityPhase(capturePaused ? "paused" : "running");
   syncCaptureWatch();
+  syncSessionChrome();
 }
 
 function ensureRoot(): HTMLElement | null {
@@ -1539,14 +1633,16 @@ function ensureRoot(): HTMLElement | null {
       <div class="studio-agent-testing-overlay__header">
         <p class="studio-agent-testing-overlay__badge" hidden></p>
         <p class="studio-agent-testing-overlay__title">${DEFAULT_TITLE}</p>
-        <span class="studio-agent-testing-overlay__mcp" data-phase="idle" hidden></span>
-        <div class="studio-agent-testing-overlay__clock">
-          <span class="studio-agent-testing-overlay__elapsed" title="Elapsed">0:00</span>
-          <button type="button" class="studio-agent-testing-overlay__capture-toggle" hidden title="Pause or resume">Pause</button>
-        </div>
-        <div class="studio-agent-testing-overlay__header-actions">
-          <button type="button" class="studio-agent-testing-overlay__reset" title="Reset session — clear log, ring, and timer">Reset</button>
-          <button type="button" class="studio-agent-testing-overlay__close" title="Close — stop capture" aria-label="Close">×</button>
+        <div class="studio-agent-testing-overlay__toolbar">
+          <div class="studio-agent-testing-overlay__clock">
+            <span class="studio-agent-testing-overlay__elapsed" title="Elapsed">0:00</span>
+            <button type="button" class="studio-agent-testing-overlay__capture-toggle" hidden title="Start capture">CAPTURE</button>
+          </div>
+          <div class="studio-agent-testing-overlay__header-actions">
+            <button type="button" class="studio-agent-testing-overlay__reset" title="Reset session — clear log, ring, and timer" disabled>Reset</button>
+            <button type="button" class="studio-agent-testing-overlay__close" title="Close — stop capture" aria-label="Close">×</button>
+            <button type="button" class="studio-agent-testing-overlay__dump" title="Download lean dump JSON when paused or idle">Save Log</button>
+          </div>
         </div>
       </div>
       <p class="studio-agent-testing-overlay__hint">Page visible — mid-flight QA below.</p>
@@ -1560,16 +1656,19 @@ function ensureRoot(): HTMLElement | null {
         <div class="studio-agent-testing-overlay__timeline" aria-label="Touchpoint progress"></div>
       </div>
       <div class="studio-agent-testing-overlay__actions">
-        <button type="button" class="studio-agent-testing-overlay__alarm" title="Sequence / expected-steps mismatch — latches live PO signal for the running agent">Alarm</button>
+        <button type="button" class="studio-agent-testing-overlay__alarm" hidden title="Alarm — agent mode only">Alarm</button>
         <button type="button" class="studio-agent-testing-overlay__cursor-flag" title="Flag cursor weird — latches live PO signal">Cursor</button>
         <button type="button" class="studio-agent-testing-overlay__scroll-flag" title="Flag scroll problem — latches live PO signal">Scroll</button>
-        <button type="button" class="studio-agent-testing-overlay__dump" title="Download lean dump JSON when paused or idle">Save Log</button>
       </div>
       <ol class="studio-agent-testing-overlay__log" data-empty="true"></ol>
       <form class="studio-agent-testing-overlay__note" autocomplete="off">
         <input type="text" class="studio-agent-testing-overlay__note-input" name="user-message" maxlength="280" placeholder="Message" aria-label="Message" />
         <button type="submit" class="studio-agent-testing-overlay__note-submit">Send</button>
       </form>
+      <div class="studio-agent-testing-overlay__mcp-status" hidden>
+        <span class="studio-agent-testing-overlay__mcp" data-phase="idle" hidden></span>
+        <span class="studio-agent-testing-overlay__mcp-mode" hidden></span>
+      </div>
     </div>
   `;
   const closeBtn = root.querySelector<HTMLButtonElement>(
@@ -1640,7 +1739,8 @@ function pushLogEntry(entry: AgentTestingLogEntry): void {
     entry.kind !== "po-note" &&
     entry.kind !== "system" &&
     entry.kind !== "agent-prompt" &&
-    entry.kind !== "observe-escalate"
+    entry.kind !== "observe-escalate" &&
+    entry.kind !== "alarm"
   ) {
     return;
   }
@@ -1698,6 +1798,17 @@ function pushLogEntry(entry: AgentTestingLogEntry): void {
   }
   if (logEntries.length > LOG_LIMIT) {
     logEntries = logEntries.slice(-LOG_LIMIT);
+  }
+  if (visible.label !== "Session reset") {
+    logDirty = true;
+    if (
+      visible.kind === "click" ||
+      visible.kind === "nav" ||
+      visible.kind === "alarm" ||
+      (!capturePaused && visible.kind !== "system")
+    ) {
+      sessionHadProgress = true;
+    }
   }
   if (visible.touchpointKey) {
     markAgentTestingTimeline(visible.touchpointKey, visible.outcome);
@@ -1997,12 +2108,7 @@ function enterSettle(options?: StopAgentTestingOverlayOptions): void {
   };
   tickHint();
   renderLog();
-  const history = pushHistory({
-    title: sessionTitle,
-    endedAt: Date.now(),
-    lines: logEntries.slice(-HISTORY_LINE_CAP).map(formatLogRowText),
-  });
-  renderHistory(history);
+  renderHistory();
   clearSettleTimer();
   settleCountdownTimer = setInterval(tickHint, SITREP_COUNTDOWN_TICK_MS);
   settleTimer = setTimeout(() => {
@@ -2027,6 +2133,8 @@ export function startAgentTestingOverlay(title?: string): void {
   setSessionKind("agent");
   setAwaitingUserReply(false);
   clearMcpPending();
+  sessionHadProgress = false;
+  logDirty = false;
   capturePaused = false;
   clearEnsureClearTimer();
   signalMcpConnect();
@@ -2463,6 +2571,8 @@ export function openAgentTestingLogger(
   setSessionKind(kind);
   setAwaitingUserReply(false);
   clearMcpPending();
+  sessionHadProgress = false;
+  logDirty = false;
   // Manual opens paused; observe/agent start capturing.
   capturePaused = kind === "manual";
   if (kind === "agent" || kind === "observe") {
