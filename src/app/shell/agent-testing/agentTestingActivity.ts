@@ -36,6 +36,19 @@ function meaningfulDetail(detail?: string): string | undefined {
   return trimmed;
 }
 
+/**
+ * Capture toggle label — CAPTURE (fresh/reset) vs Resume (paused with progress) vs Pause.
+ * Keep in sync with overlay `syncSessionChrome` (no invented third states).
+ */
+export function resolveCaptureToggleLabel(input: {
+  capturePaused: boolean;
+  sessionHadProgress: boolean;
+}): "CAPTURE" | "Pause" | "Resume" {
+  if (!input.capturePaused) return "Pause";
+  if (input.sessionHadProgress) return "Resume";
+  return "CAPTURE";
+}
+
 export function formatActivityStatus(
   phase: AgentTestingActivityPhase,
   detail?: string,

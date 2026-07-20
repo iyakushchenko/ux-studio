@@ -43,6 +43,35 @@ __studioQaSessionKind() // current kind
 
 Dump includes `sessionKind` (+ `gateMode` alias).
 
+## How agents should open / handoff / ask (lean)
+
+Prove only at **`http://127.0.0.1:5173/`** (or `localhost:5173` — same Vite). One tab; reuse via Chrome DevTools MCP `list_pages` → `select_page`.
+
+```js
+// 1) Open CONTROL session (wipe → green field)
+window.__studioOpenQaLogger?.({ kind: "agent" })
+// or handoff from manual without keeping notes:
+window.__studioQaHandoff?.({ oversee: false })
+
+// 2) Keep PO notes / ring when connecting
+window.__studioQaHandoff?.({ oversee: true, kind: "agent" }) // or "observe"
+
+// 3) Ask PO (→ PENDING + agent-prompt row; Reply via Message/Send)
+window.__studioAskUserInQa?.("Does Book now look right?")
+
+// 4) Poll mid-flight (primary). Dump / Save Log is secondary.
+window.__studioAgentTestingTakeover
+window.__studioConsumePoSignal?.()
+window.__studioMcpConnectionStatus?.() // CONTROL | OBSERVE | PENDING | …
+
+// 5) Cleanup
+window.__studioForceClearAgentTestingOverlay?.()
+```
+
+**Do not:** invent hover/loader chrome; click under open modal (overlay eyes); claim PROVEN without MCP probe; await CI on routine ships (R12).
+
+**Save Log:** disabled while capturing — Pause first. **Reset:** disabled until log dirty. Empty Message does not append.
+
 ### MCP connection status
 
 Primary: under Message/Send compose (not header). Short nav hint beside bug icon.

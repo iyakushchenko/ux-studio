@@ -40,6 +40,7 @@ import {
 import {
   formatActivityStatus,
   type AgentTestingActivityPhase,
+  resolveCaptureToggleLabel,
 } from "@/app/shell/agent-testing/agentTestingActivity";
 import {
   bugIconClosesSession,
@@ -1174,20 +1175,22 @@ function syncSessionChrome(): void {
     const show = active && !settling;
     captureBtn.hidden = !show;
     captureBtn.disabled = !show;
-    if (!capturePaused) {
-      captureBtn.textContent = "Pause";
+    const cta = resolveCaptureToggleLabel({
+      capturePaused,
+      sessionHadProgress,
+    });
+    captureBtn.textContent = cta;
+    if (cta === "Pause") {
       captureBtn.title =
         kind === "agent"
           ? "Pause — freeze clock + halt Play; type Message, then Resume"
           : "Pause — freeze clock + stop capture";
-    } else if (sessionHadProgress) {
-      captureBtn.textContent = "Resume";
+    } else if (cta === "Resume") {
       captureBtn.title =
         kind === "agent"
           ? "Resume capture (does not auto-Play — transport stays stopped)"
           : "Resume capture + clock";
     } else {
-      captureBtn.textContent = "CAPTURE";
       captureBtn.title = "Start capture + clock";
     }
   }
@@ -2816,14 +2819,15 @@ export function forceClearAgentTestingOverlay(): void {
     timelineKeys = [];
     lastStepAt = 0;
     sessionStartedAt = 0;
+    clearHistoryPersist();
+    unbindCaptureWatch();
+    // Close gate first (may append gate-close), then wipe ring — same as softClose.
+    closeQaDiagGate({ reason: "force-clear" });
     try {
       replaceQaDiagRing([]);
     } catch {
       /* ignore */
     }
-    clearHistoryPersist();
-    unbindCaptureWatch();
-    closeQaDiagGate({ reason: "force-clear" });
     setQaDiagLoggerMode(false);
     setQaSessionLock(null);
     cancelPendingReload();
@@ -2850,6 +2854,11 @@ export function forceClearAgentTestingOverlay(): void {
   } catch {
     try {
       closeQaDiagGate({ reason: "force-clear" });
+      try {
+        replaceQaDiagRing([]);
+      } catch {
+        /* ignore */
+      }
       cancelPendingReload();
       dismissRoboCursor();
       releaseClickGuard();
