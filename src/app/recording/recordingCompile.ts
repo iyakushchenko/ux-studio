@@ -358,6 +358,11 @@ function compileFallbackBeats(
 
   for (const event of events) {
     if (event.kind === "screen") {
+      // Consecutive same screen (URL churn) → one beat, not chat-2/chat-3.
+      if (pendingScreen?.screenId === event.screenId) {
+        pendingScreen.events.push(event);
+        continue;
+      }
       flushPending();
       pendingScreen = {
         screenId: event.screenId,

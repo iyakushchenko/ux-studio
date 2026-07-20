@@ -34,6 +34,7 @@ import {
   shouldCaptureRecordingTypedText,
   captureScroll,
   captureTypedText,
+  captureScreenChange,
   ensureRecordingDomCapture,
   registerRecordingSnapshotProvider,
   seedRecordingStartScreen,
@@ -203,6 +204,27 @@ describe("recordingSession", () => {
     expect(countRecordingSteps([{ kind: "scroll" }])).toBe(0);
   });
 
+  it("countRecordingSteps coalesces demo-click + following screen", () => {
+    expect(
+      countRecordingSteps([
+        { kind: "screen", atMs: 0 },
+        { kind: "demo-click", atMs: 100 },
+        { kind: "screen", atMs: 250 },
+        { kind: "scroll", atMs: 400 },
+      ])
+    ).toBe(2); // seed + click (screen after click ignored)
+  });
+
+  it("countRecordingSteps ignores studio chrome field events", () => {
+    expect(
+      countRecordingSteps([
+        { kind: "screen", atMs: 0 },
+        { kind: "studio", atMs: 10 },
+        { kind: "demo-click", atMs: 20 },
+      ])
+    ).toBe(2);
+  });
+
   it("clearStagedRecordingSession discards stopped session only", () => {
     startRecording();
     appendRecordingEvent({ kind: "transport", action: "play", atMs: 1 });
@@ -287,6 +309,29 @@ describe("recordingCapture bridge", () => {
       scriptKind: "home",
       beatId: "agentic-home",
       manual: false,
+    });
+  });
+
+  it("does not re-emit screen when only studioUrl params change", () => {
+    captureScreenChange({
+      screenId: "chat",
+      projectId: "boots-pharmacy",
+      studioUrl: "?project=boots-pharmacy&screen=chat&cjm=off",
+    });
+    captureScreenChange({
+      screenId: "chat",
+      projectId: "boots-pharmacy",
+      studioUrl: "?project=boots-pharmacy&screen=chat&cjm=off&experience=agentic",
+    });
+    captureScreenChange({
+      screenId: "chat",
+      projectId: "boots-pharmacy",
+      studioUrl: "?project=boots-pharmacy&screen=chat&modal=avail",
+    });
+    expect(getActiveRecordingSession()?.events).toHaveLength(1);
+    expect(getActiveRecordingSession()?.events[0]).toMatchObject({
+      kind: "screen",
+      screenId: "chat",
     });
   });
 

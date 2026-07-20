@@ -68,7 +68,8 @@ function eventDedupeKey(event: RecordedEvent): string {
     case "beat-enter":
       return `beat-enter:${event.actionId}:${event.beatId ?? ""}`;
     case "screen":
-      return `screen:${event.projectId ?? ""}:${event.screenId}:${event.studioUrl ?? ""}`;
+      // Same screen under different query strings is still one screen step.
+      return `screen:${event.projectId ?? ""}:${event.screenId}`;
     default:
       return "unknown";
   }
@@ -89,17 +90,47 @@ export function isRecordingActive(): boolean {
 }
 
 /**
- * Journey STEPS for REC UI — excludes `scroll` (engine replay targets only).
- * Screens / clicks / transport / … still count.
+ * Journey STEPS for REC UI.
+ * - Excludes `scroll` (engine replay targets only).
+ * - Excludes `studio` chrome field flips (not concept steps).
+ * - Coalesces demo-click → screen within {@link SCREEN_AFTER_CLICK_MS}
+ *   (one user nav action must not count as two STEPS).
  */
+const SCREEN_AFTER_CLICK_MS = 1000;
+
 export function countRecordingSteps(
-  events: ReadonlyArray<{ kind: string }> | undefined
+  events: ReadonlyArray<{ kind: string; atMs?: number }> | undefined
 ): number {
   if (!events?.length) return 0;
-  return events.reduce(
-    (n, event) => (event.kind === "scroll" ? n : n + 1),
-    0
-  );
+  let count = 0;
+  let lastDemoClickAt: number | undefined;
+  for (const event of events) {
+    if (event.kind === "scroll" || event.kind === "studio") continue;
+
+    if (event.kind === "demo-click") {
+      if (typeof event.atMs === "number") lastDemoClickAt = event.atMs;
+      count += 1;
+      continue;
+    }
+
+    if (event.kind === "screen") {
+      const at = event.atMs;
+      if (
+        lastDemoClickAt != null &&
+        typeof at === "number" &&
+        at >= lastDemoClickAt &&
+        at - lastDemoClickAt <= SCREEN_AFTER_CLICK_MS
+      ) {
+        // Screen change is the click's navigation consequence — already counted.
+        continue;
+      }
+      count += 1;
+      continue;
+    }
+
+    count += 1;
+  }
+  return count;
 }
 
 export function isRecordingPaused(): boolean {

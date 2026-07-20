@@ -305,7 +305,9 @@ export function captureScreenChange(options: {
   studioUrl?: string;
 }): void {
   if (!getActiveRecordingSession()) return;
-  const key = `${options.projectId ?? ""}|${options.screenId}|${options.studioUrl ?? ""}`;
+  // Dedupe on project + screen only — URL param churn (cjm/modal/journey/
+  // experience) must NOT re-emit the same screen (inflates STEPS + chat-2/3).
+  const key = `${options.projectId ?? ""}|${options.screenId}`;
   if (lastScreenKey === key) return;
   lastScreenKey = key;
 

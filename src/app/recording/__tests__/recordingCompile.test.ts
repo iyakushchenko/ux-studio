@@ -208,6 +208,45 @@ describe("compileRecordingToJourney", () => {
     ]);
   });
 
+  it("coalesces consecutive duplicate screen ids into one beat", () => {
+    const session: RecordingSession = {
+      id: "chat-churn",
+      version: 1,
+      startedAt: "2026-07-20T12:00:00.000Z",
+      projectId: "boots-pharmacy",
+      orchestraMode: "agentic-cjm",
+      events: [
+        { kind: "screen", screenId: "site-pilot", atMs: 1 },
+        {
+          kind: "screen",
+          screenId: "chat",
+          atMs: 2,
+          studioUrl: "?screen=chat&cjm=off",
+        },
+        {
+          kind: "screen",
+          screenId: "chat",
+          atMs: 3,
+          studioUrl: "?screen=chat&cjm=off&experience=agentic",
+        },
+        {
+          kind: "screen",
+          screenId: "chat",
+          atMs: 4,
+          studioUrl: "?screen=chat&modal=x",
+        },
+        { kind: "screen", screenId: "plp", atMs: 5 },
+      ],
+    };
+
+    const { journey } = compileRecordingToJourney(session);
+    expect(journey.beats.map((b) => b.id)).toEqual([
+      "site-pilot",
+      "chat",
+      "plp",
+    ]);
+  });
+
   it("adds a new CJM id without overwriting built-in slots", () => {
     const saved = saveRecordingAsJourney(sessionWithTouchpoints());
     expect(saved.summary.beatCount).toBe(3);
