@@ -58,8 +58,8 @@ export type RecordedScrollEvent = {
   /** Leaf / human-readable selector (diagnostic + simple querySelector fallback). */
   anchorSelector?: string;
   /**
-   * Legacy only — new captures omit this. Replay prefers selectorChain /
-   * anchorSelector; scrollTop is never required.
+   * Legacy only — new captures omit this. Replay **refuses** scrollTop-only
+   * (target-only forward). Prefer selectorChain / anchorSelector.
    */
   scrollTop?: number;
   atMs: number;
@@ -266,7 +266,7 @@ export type RecordingReplayOptions = {
     event: RecordingBeatEnterApplyInput
   ) => boolean | void | Promise<boolean | void>;
   /**
-   * v3 — engine scroll-to-target (selectorChain / anchor); scrollTop fallback.
+   * v3 — engine scroll-to-target (selectorChain / anchor). scrollTop-only → refuse.
    * When omitted, scroll events count as unsupported.
    */
   applyScroll?: (

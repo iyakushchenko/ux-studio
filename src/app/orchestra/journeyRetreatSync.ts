@@ -1,5 +1,5 @@
 import { dispatchRetreatSync } from "@/app/scenario/retreatBridge";
-import { snapDemoTargetIntoView } from "@/app/scenario/playbackScroll";
+import { scrollChatCamera, scrollCameraToTarget } from "@/app/scenario/playbackScroll";
 import {
   beatDirectorScriptLabel,
   isDwellLandingBeat,
@@ -100,27 +100,20 @@ export async function syncBeatRetreatState(
   playbackScrollMonitor.noteRetreatSync();
 
   const finishRetreatCamera = () => {
-    // Screen-frames chat: pin `.chat__column` to bottom. Snapping mid-thread
-    // `button.chat__cta` / composer fights resetToEnd + composer pad → scroll-reversal.
+    // Screen-frames chat: camera SSoT — last revealed frame / thinking (not raw max pin).
     if (beat.kind === "screen-frames") {
-      const chatCol =
+      const chatRoot =
         typeof document !== "undefined"
           ? document.querySelector<HTMLElement>(
-              '[data-studio-react-screen="chat"] .chat__column, main.chat .chat__column'
+              '[data-studio-react-screen="chat"], main.chat'
             )
           : null;
+      const chatCol = chatRoot?.querySelector<HTMLElement>(".chat__column");
       if (chatCol) {
-        const max = Math.max(0, chatCol.scrollHeight - chatCol.clientHeight);
-        const beforeTop = chatCol.scrollTop;
-        chatCol.scrollTop = max;
-        playbackDiagScroll({
-          beatId: beat.id,
-          detail: "retreat chat column pin bottom (no CTA snap)",
-          beforeTop,
-          afterTop: chatCol.scrollTop,
-          intoViewRequested: true,
-          intoViewDone: true,
+        scrollChatCamera(chatCol, {
+          instant: true,
           retreat: true,
+          align: "end",
         });
         return;
       }
@@ -137,7 +130,7 @@ export async function syncBeatRetreatState(
       });
       return;
     }
-    snapDemoTargetIntoView(target, { retreat: true });
+    void scrollCameraToTarget(target, { retreat: true, instant: true });
   };
 
   if (channel === "home" && beat.homeScript) {

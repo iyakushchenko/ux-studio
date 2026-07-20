@@ -17,6 +17,7 @@ import {
   getPrototypeScrollRoot,
   isDemoTargetInPrototypeView,
   revealDemoTargetForAgent,
+  scrollCameraToOrigin,
 } from "@/app/scenario/playbackScroll";
 import {
   DEFAULT_PREARM_MS,
@@ -1119,9 +1120,9 @@ async function runProbeStep(step: ProbeStep): Promise<McpPageProbeStepResult> {
 
   if (step.action === "reveal") {
     const scrollEl = getPrototypeScrollRoot(el);
-    // Park at top so a mid-list/last-tile target is honestly below-fold first.
+    // Park at origin so a mid-list target is honestly below-fold first (camera SSoT).
     if (scrollEl && scrollEl.scrollTop > 8) {
-      scrollEl.scrollTop = 0;
+      scrollCameraToOrigin(scrollEl, { instant: true });
       await delay(80);
     }
     const beforeInView = isDemoTargetInPrototypeView(el);

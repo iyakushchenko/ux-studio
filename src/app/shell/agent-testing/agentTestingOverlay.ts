@@ -964,7 +964,7 @@ function renderLog(): void {
     li.textContent = formatLogRowText(entry);
     list.appendChild(li);
   }
-  list.scrollTop = list.scrollHeight;
+  list.scrollTop = list.scrollHeight; // PRODUCT UI chrome — overlay sitrep list (not journey camera SSoT)
 }
 
 function setTitle(title: string): void {

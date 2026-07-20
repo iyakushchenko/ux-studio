@@ -12,8 +12,6 @@ import type { ManualTransportAction } from "@/app/shell/playbackInteractionConte
 import { simulateDemoPointerClick } from "@/app/scenario/demoCursor";
 import {
   animateScrollElementIntoView,
-  animateScrollTo,
-  getPrototypeScrollRoot,
 } from "@/app/scenario/playbackScroll";
 import {
   resolveClickTargetRespectingModal,
@@ -288,7 +286,7 @@ export function useRecordingReplayBridge(options: {
       anchorSelector?: string;
       selectorChain?: string[];
     }) => {
-      // Primary: engine eased scroll-to-target (selectorChain / anchorSelector).
+      // Target-only — REC model. Legacy scrollTop-only events are REFUSED.
       const fromChain = resolvePlaybackSelectorChain(
         event.selectorChain,
         document
@@ -308,14 +306,12 @@ export function useRecordingReplayBridge(options: {
         });
         return true;
       }
-      // Legacy recordings only — new captures never persist scrollTop.
-      if (event.scrollTop == null || !Number.isFinite(event.scrollTop)) {
-        return false;
+      if (event.scrollTop != null && Number.isFinite(event.scrollTop)) {
+        console.info(
+          "[REC] scroll refused — target-only (legacy scrollTop not replayed)"
+        );
       }
-      const root = getPrototypeScrollRoot();
-      if (!root) return false;
-      await animateScrollTo(root, event.scrollTop);
-      return true;
+      return false;
     },
     []
   );

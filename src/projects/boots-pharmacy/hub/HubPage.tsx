@@ -218,6 +218,7 @@ export default function HubPage({ onGoToTab }: Props) {
     };
   }, [sections]);
 
+  // PRODUCT UI chrome — Hub section carousel (not journey/REC camera SSoT).
   const scrollToTarget = (
     targetId: string,
     sectionIdForNav = targetId

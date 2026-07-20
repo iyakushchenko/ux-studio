@@ -276,23 +276,20 @@ async function scrollWithinAvailList(
 ): Promise<void> {
   const list = card.querySelector<HTMLElement>(".proto-avail-store-list");
   if (!list) {
-    if (options?.skip) {
-      target.scrollIntoView({ block: "center", behavior: "instant" });
-      return;
-    }
     await animateScrollElementIntoView(target, {
       align: "center",
       shouldAbort,
+      durationMs: options?.skip ? 0 : undefined,
     });
     return;
   }
 
   const targetTop = computeScrollTopForElement(list, target, "nearest", 28);
-  if (options?.skip) {
-    list.scrollTop = targetTop;
-    return;
-  }
-  await animateScrollTo(list, targetTop, { shouldAbort });
+  // Always engine — skip = duration 0 (instant), never raw list.scrollTop.
+  await animateScrollTo(list, targetTop, {
+    shouldAbort,
+    durationMs: options?.skip ? 0 : undefined,
+  });
 }
 
 function findChooseLocationButton(storeCard: HTMLElement): HTMLElement | null {

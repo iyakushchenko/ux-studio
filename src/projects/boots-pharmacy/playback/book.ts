@@ -11,6 +11,7 @@ import {
   animateDemoTargetIntoView,
   cancelPlaybackScroll,
   getPrototypeScrollRoot,
+  scrollCameraToOrigin,
   snapDemoTargetIntoView,
 } from "@/app/scenario/playbackScroll";
 import type { BookScriptId } from "@/app/orchestra/types";
@@ -497,12 +498,9 @@ async function scrollBookStep2ToDateSection(
     notePlaybackCursorEvent("scroll", {
       instant: options?.instant,
       animated: !options?.instant,
-      detail: "date-section-scroll-top",
+      detail: "date-section-scroll-origin",
     });
-    scrollEl.scrollTo({
-      top: 0,
-      behavior: options?.instant ? "instant" : "smooth",
-    });
+    scrollCameraToOrigin(scrollEl, { instant: !!options?.instant });
   }
 }
 

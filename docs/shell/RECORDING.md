@@ -235,7 +235,7 @@ UI and MCP share `recordingSession` + `replayRecordingSession` — no second ses
 | `beat-enter` | Beat onEnter via `notePlaybackBeatEnter` | Yes — known `JourneyBeatActionId` → `runBeatAction`; `sync-<bookScript>` → book script with `syncState` |
 | `wire-intent` | Retreat sync / `captureWireIntent` / beat actions | Yes — known `JourneyBeatActionId` via `runBeatAction`; `retreat-sync` → script runner with `syncState` when `scriptId` resolves |
 | `studio` | Journey/orchestra mode changes (manual API) | No |
-| `scroll` | Debounced active scroll host while REC — **targets only** (`selectorChain` / `anchorSelector`); no `scrollTop` written | Yes — **engine** eased scroll-to-target (`animateScrollElementIntoView`); legacy `scrollTop` accepted only for old files |
+| `scroll` | Debounced active scroll host while REC — **targets only** (`selectorChain` / `anchorSelector`); no `scrollTop` written | Yes — **engine** eased scroll-to-target (`animateScrollElementIntoView` / `scrollCameraToTarget`). **Legacy `scrollTop`-only events are refused** (target-only forward) |
 | `typed-text` | Debounced trusted `input`/`change` on text-like fields with selector chain | Yes — set value + dispatch `input`/`change` (modal eyes) |
 | `dwell` | Manual API or compiled pauses | Yes (delay) |
 
@@ -326,7 +326,7 @@ Prefer `__studio*`; `__proto*` aliases remain. Export / replay / compile fall ba
 | Kind | Capture | Replay |
 |------|---------|--------|
 | `beat-enter` | Flight recorder (`notePlaybackBeatEnter`) | `applyBeatEnter` → `runBeatAction` or `sync-*` book script |
-| `scroll` | Debounced scroll → **`selectorChain` / `anchorSelector`** (viewport target) + optional `scrollTop` diagnostic | `applyScroll` → engine `animateScrollElementIntoView` (eased); `scrollTop` fallback only |
+| `scroll` | Debounced scroll → **`selectorChain` / `anchorSelector`** (viewport target); `scrollTop` not persisted | `applyScroll` → engine `animateScrollElementIntoView`; **scrollTop-only refused** |
 | `typed-text` | Debounced trusted text field `input`/`change` (needs selector chain) | `applyTypedText` → native value + events |
 
 Stable field selectors: `data-studio-action="avail-search-query"` / `agentic-home-query` / `agentic-chat-query` / `avail-notify-email`. Password / checkbox / radio / file / chrome skipped.

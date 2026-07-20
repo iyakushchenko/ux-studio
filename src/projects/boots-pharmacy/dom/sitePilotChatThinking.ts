@@ -1,4 +1,4 @@
-import { animateScrollTo } from "@/app/scenario/playbackScroll";
+import { scrollChatCamera } from "@/app/scenario/playbackScroll";
 import { isChatReactMounted } from "@/projects/boots-pharmacy/screens/chat/chatContract";
 import {
   clearChatThinkingBridge,
@@ -117,12 +117,8 @@ function scrollChatToBottom(): void {
     document.querySelector<HTMLElement>(
       ".studio-scroll--prototype:not(.hidden)"
     );
-  if (!scrollEl) return;
-  const resolveBottom = () =>
-    Math.max(0, scrollEl.scrollHeight - scrollEl.clientHeight);
-  void animateScrollTo(scrollEl, resolveBottom(), {
-    resolveTargetTop: resolveBottom,
-  });
+  // Camera SSoT — target frame/thinking; host-end only if none.
+  scrollChatCamera(scrollEl, { instant: false });
 }
 
 function restartThinkingAnimation(bubble: HTMLElement): void {

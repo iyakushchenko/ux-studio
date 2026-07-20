@@ -55,6 +55,7 @@ import {
 import {
   cancelPlaybackScroll,
   getPrototypeScrollRoot,
+  scrollCameraToOrigin,
 } from "@/app/scenario/playbackScroll";
 import { useJourneyPlayback } from "@/app/orchestra/useJourneyPlayback";
 import {
@@ -1364,8 +1365,7 @@ export default function App() {
       // React Chat scrolls `.chat__column`; Make still uses prototype pane.
       const chatHost = getPrototypeScrollRoot(screen) ?? scrollEl;
       if (chatHost) {
-        chatHost.scrollTop = 0;
-        chatHost.scrollLeft = 0;
+        scrollCameraToOrigin(chatHost, { instant: true });
       }
     }
 
@@ -1656,6 +1656,7 @@ export default function App() {
   }, [orchestraModeId]);
 
   useEffect(() => {
+    // PRODUCT UI chrome — Studio tabs strip (not journey/REC camera SSoT).
     const btn = tabBtnRefs.current[current];
     const scroller = tabsScrollRef.current;
     if (!btn || !scroller) return;

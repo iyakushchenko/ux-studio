@@ -2,12 +2,13 @@
 
 import {
   animateScrollElementIntoView,
-  animateScrollTo,
   cancelPlaybackScroll,
-  computeScrollTopForElement,
   getPrototypeScrollRoot,
   isPlaybackScrollAnimating,
   registerPlaybackScrollCancelHook,
+  scrollCameraToHostEnd,
+  scrollCameraToOrigin,
+  scrollCameraToTarget,
 } from "@/app/scenario/playbackScroll";
 import { playbackScrollMonitor } from "@/app/shell/playbackScrollMonitor";
 
@@ -173,28 +174,12 @@ export function scenarioScrollTopBeforeCollapse(
   );
 }
 
-/** Scroll the prototype pane to top (e.g. jump-to-first-frame). */
+/** Scroll the prototype pane to top — camera SSoT `scrollCameraToOrigin`. */
 export function scrollPrototypeScrollToTop(
   scrollEl?: HTMLElement | null,
   behavior: ScrollBehavior = "instant"
 ): void {
-  const el = scrollEl ?? getPrototypeScrollRoot();
-  if (!el) return;
-
-  if (behavior === "smooth") {
-    void animateScrollTo(el, 0);
-    return;
-  }
-
-  const apply = () => {
-    el.scrollTop = 0;
-    el.scrollLeft = 0;
-    el.scrollTo({ top: 0, left: 0, behavior });
-  };
-
-  apply();
-  requestAnimationFrame(apply);
-  window.setTimeout(apply, 0);
+  scrollCameraToOrigin(scrollEl, { instant: behavior !== "smooth" });
 }
 
 export function scrollPrototypeScrollToTopAfterLayout(
@@ -207,23 +192,18 @@ export function scrollPrototypeScrollToTopAfterLayout(
   );
 }
 
-/** Scroll the prototype pane to the bottom (show latest chat bubbles above composer). */
+/**
+ * Scroll to host end — camera SSoT `scrollCameraToHostEnd`.
+ * Prefer frame/CTA targets via `scrollCameraToTarget` when a DOM node exists.
+ */
 export function scrollPrototypeScrollToBottom(
   scrollEl?: HTMLElement | null,
   behavior: ScrollBehavior = "instant"
 ): void {
-  const el = scrollEl ?? getPrototypeScrollRoot();
-  if (!el) return;
-
-  const top = Math.max(0, el.scrollHeight - el.clientHeight);
-  if (behavior === "smooth") {
-    void animateScrollTo(el, top, {
-      resolveTargetTop: () => Math.max(0, el.scrollHeight - el.clientHeight),
-    });
-    return;
-  }
-  el.scrollTop = top;
-  el.scrollTo({ top, left: 0, behavior });
+  scrollCameraToHostEnd(scrollEl, {
+    instant: behavior !== "smooth",
+    reason: "scenarioEngine scrollPrototypeScrollToBottom → SSoT host-end",
+  });
 }
 
 /** One-shot bottom scroll after layout settles (initial load / jump to end). */
@@ -243,13 +223,10 @@ export function scrollScenarioFrameIntoView(
   smooth = true
 ): void {
   if (!frame) return;
-  if (smooth) {
-    void animateScrollElementIntoView(frame, { align });
-    return;
-  }
-  const scrollEl = getPrototypeScrollRoot(frame);
-  if (!scrollEl) return;
-  scrollEl.scrollTop = computeScrollTopForElement(scrollEl, frame, align);
+  void scrollCameraToTarget(frame, {
+    align,
+    instant: !smooth,
+  });
 }
 
 export function scrollScenarioChatAnchor(
@@ -259,10 +236,8 @@ export function scrollScenarioChatAnchor(
   scrollEl?: HTMLElement | null,
   smooth = true
 ): void {
-  const behavior: ScrollBehavior = smooth ? "smooth" : "instant";
-
   if (align === "start") {
-    scrollPrototypeScrollToTop(scrollEl, behavior);
+    scrollPrototypeScrollToTop(scrollEl, smooth ? "smooth" : "instant");
     if (!smooth) {
       window.setTimeout(
         () => scrollPrototypeScrollToTop(scrollEl, "instant"),
@@ -273,26 +248,16 @@ export function scrollScenarioChatAnchor(
   }
 
   if (visibleCount > 0) {
-    const run = () => {
-      if (align === "end" && scrollEl) {
-        scrollPrototypeScrollToBottom(scrollEl, behavior);
-        return;
-      }
-      const lastFrame = frames[visibleCount - 1] ?? null;
-      if (lastFrame) {
-        if (smooth) {
-          void animateScrollElementIntoView(lastFrame, { align: "end" });
-        } else {
-          const root = resolveScrollEl(scrollEl);
-          if (root) {
-            root.scrollTop = computeScrollTopForElement(root, lastFrame, "end");
-          }
-        }
-        return;
-      }
-      scrollPrototypeScrollToBottom(scrollEl, behavior);
-    };
-    run();
+    const lastFrame = frames[visibleCount - 1] ?? null;
+    if (lastFrame) {
+      void scrollCameraToTarget(lastFrame, {
+        scrollEl: resolveScrollEl(scrollEl) ?? undefined,
+        align: "end",
+        instant: !smooth,
+      });
+      return;
+    }
+    scrollPrototypeScrollToBottom(scrollEl, smooth ? "smooth" : "instant");
     return;
   }
 
@@ -300,14 +265,11 @@ export function scrollScenarioChatAnchor(
     frames[0]?.closest<HTMLElement>('[data-name="component.appointment.summary"]') ??
     frames[0]?.parentElement;
   if (anchor) {
-    if (smooth) {
-      void animateScrollElementIntoView(anchor, { align: "start" });
-    } else {
-      const root = resolveScrollEl(scrollEl);
-      if (root) {
-        root.scrollTop = computeScrollTopForElement(root, anchor, "start");
-      }
-    }
+    void scrollCameraToTarget(anchor, {
+      scrollEl: resolveScrollEl(scrollEl) ?? undefined,
+      align: "start",
+      instant: !smooth,
+    });
   }
 }
 
@@ -406,29 +368,20 @@ function scrollFrameInRoot(
   scrollEl: HTMLElement,
   block: "start" | "end"
 ): void {
-  const frameRect = frame.getBoundingClientRect();
-  const rootRect = scrollEl.getBoundingClientRect();
-  const deltaTop = frameRect.top - rootRect.top;
-
-  if (block === "start") {
-    scrollEl.scrollTop += deltaTop;
-    return;
-  }
-
-  scrollEl.scrollTop += deltaTop - (scrollEl.clientHeight - frameRect.height);
-}
-
-function scrollBottomTop(scrollEl: HTMLElement): number {
-  return Math.max(0, scrollEl.scrollHeight - scrollEl.clientHeight);
+  void scrollCameraToTarget(frame, {
+    scrollEl,
+    align: block,
+    instant: true,
+  });
 }
 
 function animateScrollToBottom(
   scrollEl: HTMLElement,
-  durationMs?: number
+  _durationMs?: number
 ): void {
-  void animateScrollTo(scrollEl, scrollBottomTop(scrollEl), {
-    durationMs,
-    resolveTargetTop: () => scrollBottomTop(scrollEl),
+  scrollCameraToHostEnd(scrollEl, {
+    instant: _durationMs === 0,
+    reason: "scenarioEngine settle — host-end when no prefer-target path",
   });
 }
 
@@ -437,10 +390,8 @@ function isChatColumnScrollHost(el: HTMLElement): boolean {
 }
 
 /**
- * After a +1 frame reveal: tall bubbles normally scroll to start so the head
- * stays readable. React Chat also bottom-pins (thinking / composer pad /
- * ChatScreen snap) — start+pin fight → scroll-reversal Alarm (PO 2026-07-20
- * agentic-chat 4/9). Chat column = bottom only.
+ * After a +1 frame reveal: tall bubbles scroll to start so the head stays
+ * readable. Chat column = scrollCameraToTarget(lastFrame) (SSoT), not raw pin.
  */
 function settleScrollAfterForwardStep(
   frames: HTMLElement[],
@@ -453,8 +404,16 @@ function settleScrollAfterForwardStep(
   if (!el || !last) return;
 
   const chatColumn = isChatColumnScrollHost(el);
-  const tallBubble =
-    !chatColumn && last.offsetHeight > el.clientHeight * 0.4;
+  if (chatColumn) {
+    void scrollCameraToTarget(last, {
+      scrollEl: el,
+      align: "end",
+      instant: !smooth,
+      padding: 24,
+    });
+    return;
+  }
+  const tallBubble = last.offsetHeight > el.clientHeight * 0.4;
   if (smooth) {
     if (tallBubble) {
       void animateScrollElementIntoView(last, { scrollEl: el, align: "start" });
@@ -531,7 +490,7 @@ export function scheduleScenarioScroll(
 
   if (align === "start") {
     if (smooth && el) {
-      void animateScrollTo(el, 0);
+      scrollCameraToOrigin(el, { instant: false });
       return;
     }
     scrollPrototypeScrollToTop(scrollEl, "instant");

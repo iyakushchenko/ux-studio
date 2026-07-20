@@ -32,6 +32,25 @@ The shell **never** imports project script runners directly. It calls `project.p
 
 ---
 
+## Scroll camera SSoT (ONE engine)
+
+**Module:** `src/app/scenario/playbackScroll.ts`
+
+| API | Use |
+|-----|-----|
+| `scrollCameraToTarget(el)` | **Primary** — CJM clicks, director, retreat, REC replay, smoke reveal |
+| `scrollCameraToOrigin(host)` | Named host-top baseline (jump-to-start / tab reset / probe prep) |
+| `scrollCameraToHostEnd(host)` | Host-end **only** when no DOM frame/CTA target (chat latest thread) |
+| `scrollChatCamera(host)` | Chat — thinking → last revealed frame → else host-end |
+| `animateScrollElementIntoView` / `beginDemoTargetPageScroll` | Lower-level engine (same file) |
+
+**Ban:** new journey/director/smoke `scrollTop =` / `scrollTo({ top })` for camera.  
+**Not camera:** product UI chrome (Hub carousel, Studio tabs strip, overlay sitrep list) — local scroll with an explicit boundary comment.
+
+REC capture is **target-only**; legacy `scrollTop`-only replay is **refused**.
+
+---
+
 ## Beat kinds
 
 | Kind | Meaning | Typical fields |

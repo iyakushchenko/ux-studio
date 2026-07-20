@@ -638,6 +638,7 @@ export default function AvailabilityTool({
   }, [step]);
 
   useEffect(() => {
+    // PRODUCT UI — avail overlay list (not journey camera SSoT; director uses availability.ts engine).
     if (step !== "list") return;
 
     const storeId = pendingStoreScrollIdRef.current;

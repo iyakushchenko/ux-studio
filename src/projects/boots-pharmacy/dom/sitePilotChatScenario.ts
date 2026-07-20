@@ -159,6 +159,7 @@ function syncInPlaceGeometry(
     );
     const maxDelta = newMaxScroll - prevMaxScroll;
     if (maxDelta !== 0 && nearBottom) {
+      // LAYOUT SYNC (Make composer pad) — not journey camera SSoT.
       scrollHost.scrollTop = Math.max(0, prevTop + maxDelta);
     }
     playbackScrollMonitor.onPinApply(scrollHost.scrollTop);

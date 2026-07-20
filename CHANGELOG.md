@@ -2,6 +2,9 @@
 
 > _Append a bullet on coherent commits via `npm run notes:append -- --lane="<lane>" --intent="<text>"`. Preview with `npm run notes:preview`. On `npm run release:patch` this section is promoted to `## v<X.Y.Z> - DDMMYY` and a fresh empty `## Current` is re-inserted. Policy: `docs/product/VERSIONING.md`._
 
+## v0.0.62 - 200726
+- **shell:** Scroll camera SSoT: one engine for CJM/REC/director/smoke; target-only REC; refuse legacy scrollTop
+
 ## v0.0.61 - 200726
 - **shell:** Playback reliability: agentic Play→end + retreat + traditional Play/Retreat PASS; fix chat-retreat STEPS honesty (9/21 not >=10)
 

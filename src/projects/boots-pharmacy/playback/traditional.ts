@@ -16,7 +16,7 @@ import {
   simulateDemoPointerClick,
   simulateDemoPointerHover,
 } from "@/app/scenario/demoCursor";
-import { getPrototypeScrollRoot } from "@/app/scenario/playbackScroll";
+import { getPrototypeScrollRoot, scrollCameraToOrigin } from "@/app/scenario/playbackScroll";
 import { PROJECT_SCREENS } from "@/projects/boots-pharmacy/screens/screens";
 import {
   scriptAborted,
@@ -740,9 +740,9 @@ async function snapScreenScrollTop(
 ): Promise<void> {
   const scrollEl = getPrototypeScrollRoot(screen);
   if (!scrollEl) return;
-  scrollEl.scrollTo({
-    top: 0,
-    behavior: options?.instant === false ? "smooth" : "instant",
+  // Camera SSoT — named origin, not anonymous scrollTo({top:0}).
+  scrollCameraToOrigin(scrollEl, {
+    instant: options?.instant !== false,
   });
 }
 

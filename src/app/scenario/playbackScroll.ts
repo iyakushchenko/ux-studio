@@ -1,4 +1,16 @@
-/** Playback scroll — eased, awaitable scroll for studio scripts (not browser smooth). */
+/**
+ * Playback scroll — **journey / REC / director / smoke camera SSoT**.
+ *
+ * ONE engine for CJM + REC + director scripts + retreat + MCP reveal:
+ * prefer `scrollCameraToTarget` → `animateDemoTargetIntoView` /
+ * `snapDemoTargetIntoView` / `animateScrollElementIntoView`.
+ *
+ * Named host extents (`scrollCameraToOrigin`, `scrollCameraToHostEnd`) exist so
+ * call sites never write anonymous `scrollTop = 0` / `scrollTo({top})`.
+ *
+ * **Not** for product UI chrome (hub carousel, overlay sitrep list, nav tab
+ * strip) — those keep local scroll; comment the boundary at those call sites.
+ */
 
 import { playbackDiagScroll } from "@/app/shell/playbackDiag";
 import { playbackScrollMonitor } from "@/app/shell/playbackScrollMonitor";
@@ -570,6 +582,10 @@ export function animateScrollTo(
   externalSignal?.addEventListener("abort", onExternalAbort, { once: true });
 
   const duration = computeDuration(distance, options?.durationMs);
+  if (duration <= 0) {
+    scrollEl.scrollTop = top;
+    return Promise.resolve();
+  }
   const startTime = performance.now();
   const resolveTargetTop = options?.resolveTargetTop;
   let lastFrameTime = startTime;
@@ -673,5 +689,158 @@ export async function animateScrollElementIntoView(
     ...options,
     resolveTargetTop: () =>
       computeScrollTopForElement(scrollEl, target, align, padding),
+  });
+}
+
+// ── Journey / REC camera SSoT (route all CJM camera here) ───────────────────
+
+export type ScrollCameraOptions = PlaybackScrollOptions & {
+  scrollEl?: HTMLElement;
+  align?: PlaybackScrollAlign;
+  padding?: number;
+  instant?: boolean;
+  retreat?: boolean;
+};
+
+/**
+ * Primary camera API — scroll host so `target` is in view (REC model).
+ * Instant → snap; else eased demo camera.
+ */
+export async function scrollCameraToTarget(
+  target: HTMLElement,
+  options?: ScrollCameraOptions
+): Promise<void> {
+  if (!target?.isConnected) return;
+  if (options?.instant) {
+    snapDemoTargetIntoView(target, {
+      scrollEl: options.scrollEl,
+      align: options.align,
+      padding: options.padding,
+      retreat: options.retreat,
+    });
+    return;
+  }
+  await animateDemoTargetIntoView(target, options);
+}
+
+/**
+ * Named host-top baseline (jump-to-start / tab reset / probe prep).
+ * Call sites MUST use this instead of `scrollTop = 0`.
+ */
+export function scrollCameraToOrigin(
+  scrollEl?: HTMLElement | null,
+  options?: PlaybackScrollOptions & { instant?: boolean }
+): void {
+  const el = scrollEl ?? getPrototypeScrollRoot();
+  if (!el) return;
+  const beforeTop = el.scrollTop;
+  const instant = options?.instant !== false;
+  if (instant) {
+    cancelPlaybackScroll("replace");
+    el.scrollTop = 0;
+    el.scrollLeft = 0;
+    playbackDiagScroll({
+      detail: "scrollCameraToOrigin — host top (named SSoT)",
+      host: describeScrollHost(el),
+      beforeTop,
+      afterTop: 0,
+      intoViewRequested: true,
+      intoViewDone: true,
+    });
+    return;
+  }
+  void animateScrollTo(el, 0, options);
+}
+
+/**
+ * Host-end extent — ONLY when the product intent is “latest thread / list end”
+ * and no DOM frame/CTA target exists. Prefer `scrollCameraToTarget(lastFrame)`.
+ */
+export function scrollCameraToHostEnd(
+  scrollEl?: HTMLElement | null,
+  options?: PlaybackScrollOptions & { instant?: boolean; reason?: string }
+): void {
+  const el = scrollEl ?? getPrototypeScrollRoot();
+  if (!el) return;
+  const resolveBottom = () =>
+    Math.max(0, el.scrollHeight - el.clientHeight);
+  const beforeTop = el.scrollTop;
+  const instant = options?.instant !== false;
+  const reason = options?.reason ?? "host-end";
+  if (instant) {
+    cancelPlaybackScroll("replace");
+    el.scrollTop = resolveBottom();
+    playbackDiagScroll({
+      detail: `scrollCameraToHostEnd — ${reason}`,
+      host: describeScrollHost(el),
+      beforeTop,
+      afterTop: el.scrollTop,
+      intoViewRequested: true,
+      intoViewDone: true,
+    });
+    return;
+  }
+  void animateScrollTo(el, resolveBottom(), {
+    ...options,
+    resolveTargetTop: resolveBottom,
+  });
+}
+
+/** Thinking bubble → last revealed chat frame (target-first chat camera). */
+export function resolveChatCameraTarget(
+  root?: ParentNode | Document | null
+): HTMLElement | null {
+  const scope = root ?? (typeof document !== "undefined" ? document : null);
+  if (!scope) return null;
+  const thinking = scope.querySelector<HTMLElement>(
+    '[data-studio-chat-thinking="true"]'
+  );
+  if (thinking) return thinking;
+  const revealed = scope.querySelectorAll<HTMLElement>(
+    '[data-studio-chat-revealed="true"]'
+  );
+  if (revealed.length > 0) return revealed[revealed.length - 1]!;
+  const anyFrame = scope.querySelectorAll<HTMLElement>(
+    "[data-studio-chat-frame]"
+  );
+  if (anyFrame.length > 0) return anyFrame[anyFrame.length - 1]!;
+  return null;
+}
+
+/**
+ * Chat CJM camera — target frame/thinking when present; else host-end
+ * (documented: latest thread is the resolved “target”).
+ */
+export function scrollChatCamera(
+  scrollEl?: HTMLElement | null,
+  options?: ScrollCameraOptions
+): void {
+  const el =
+    scrollEl ??
+    (typeof document !== "undefined"
+      ? document.querySelector<HTMLElement>(
+          '[data-studio-react-screen="chat"] .chat__column, main.chat .chat__column'
+        )
+      : null) ??
+    getPrototypeScrollRoot();
+  const scope =
+    el?.closest<HTMLElement>(
+      'main.chat, [data-studio-react-screen="chat"]'
+    ) ?? (typeof document !== "undefined" ? document : null);
+  const target = resolveChatCameraTarget(scope);
+  if (target && el) {
+    void scrollCameraToTarget(target, {
+      ...options,
+      scrollEl: el,
+      align: options?.align ?? "end",
+      instant: options?.instant ?? true,
+      padding: options?.padding ?? 24,
+    });
+    return;
+  }
+  scrollCameraToHostEnd(el, {
+    instant: options?.instant ?? true,
+    reason:
+      "chat — no frame/thinking DOM target; host end = latest thread extent",
   });
 }

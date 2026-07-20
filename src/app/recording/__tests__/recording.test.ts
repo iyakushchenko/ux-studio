@@ -732,7 +732,7 @@ describe("replayRecordingSession", () => {
             beatId: "book-step2",
             atMs: 2,
           },
-          { kind: "scroll", scrollTop: 240, atMs: 3 },
+          { kind: "scroll", selectorChain: ['[data-name="units"]'], anchorSelector: '[data-name="units"]', atMs: 3 },
           {
             kind: "typed-text",
             value: "London",
@@ -757,9 +757,9 @@ describe("replayRecordingSession", () => {
       "sync-select-book-date",
     ]);
     expect(applyScroll).toHaveBeenCalledWith({
-      scrollTop: 240,
-      anchorSelector: undefined,
-      selectorChain: undefined,
+      scrollTop: undefined,
+      anchorSelector: '[data-name="units"]',
+      selectorChain: ['[data-name="units"]'],
     });
     expect(applyTypedText).toHaveBeenCalledWith(
       expect.objectContaining({ value: "London" })

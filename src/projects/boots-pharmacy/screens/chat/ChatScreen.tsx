@@ -27,6 +27,7 @@ import {
   STUDIO_SCROLL_OVERFLOW_CLASS,
   syncStudioScrollOverflowGutter,
 } from "@/app/scenario/studioScrollOverflow";
+import { scrollChatCamera } from "@/app/scenario/playbackScroll";
 import { CHAT_REACT_SCREEN_ID } from "./chatContract";
 import { ChatSitePilotBar } from "./ChatSitePilotBar";
 import {
@@ -569,6 +570,8 @@ function useChatComposerScrollPad(
         const newMax = Math.max(0, column.scrollHeight - column.clientHeight);
         const maxDelta = newMax - prevMax;
         if (maxDelta !== 0) {
+          // LAYOUT SYNC (composer pad height) — not journey camera SSoT.
+          // Keeps near-bottom position when dock pad grows; do not route via scrollCamera*.
           column.scrollTop = Math.max(0, prevTop + maxDelta);
         }
       });
@@ -714,7 +717,8 @@ export function ChatScreen({
     const max = Math.max(0, column.scrollHeight - column.clientHeight);
     if (column.scrollTop < max) {
       const scrollBefore = column.scrollTop;
-      column.scrollTop = max;
+      // Camera SSoT — target last revealed frame / thinking (not raw max pin).
+      scrollChatCamera(column, { instant: true, align: "end" });
       const delta = column.scrollTop - scrollBefore;
       if (delta !== 0) {
         console.info("[PLAYBACK_DIAG] chat-reveal-y-delta", {
@@ -739,7 +743,7 @@ export function ChatScreen({
     const tSettle = window.setTimeout(() => {
       const settleMax = Math.max(0, column.scrollHeight - column.clientHeight);
       const before = column.scrollTop;
-      if (column.scrollTop < settleMax) column.scrollTop = settleMax;
+      scrollChatCamera(column, { instant: true, align: "end" });
       const delta = column.scrollTop - before;
       if (delta !== 0) {
         console.info("[PLAYBACK_DIAG] chat-reveal-y-delta", {

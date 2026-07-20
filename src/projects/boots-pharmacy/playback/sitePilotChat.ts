@@ -8,8 +8,8 @@ import {
 } from "@/app/scenario/demoCursor";
 import {
   pinScenarioScrollToBottomDuring,
-  scrollPrototypeScrollToBottom,
 } from "@/app/scenario/scenarioEngine";
+import { scrollCameraToTarget, scrollChatCamera } from "@/app/scenario/playbackScroll";
 import {
   playbackDiagClick,
   playbackDiagLog,
@@ -107,8 +107,8 @@ function getChatScrollEl(): HTMLElement | null {
 }
 
 function scrollChatToBottom(instant = false): void {
-  const scrollEl = getChatScrollEl();
-  scrollPrototypeScrollToBottom(scrollEl, instant ? "instant" : "smooth");
+  // Camera SSoT — target thinking/last frame; host-end only if no DOM target.
+  scrollChatCamera(getChatScrollEl(), { instant });
 }
 
 function syncComposerHeight(ta: HTMLTextAreaElement): void {
@@ -189,9 +189,13 @@ function removeDemoCursorImmediate(): void {
 
 async function simulateSarahCtaClick(button: HTMLElement): Promise<void> {
   if (preludeAborted) return;
-  // Pin bottom first — then click with scroll:false so director scroll does not
-  // fight scenario scroll pins (scroll-path-deviation → diagnostic-on-step-N).
-  scrollChatToBottom(true);
+  // Camera SSoT — scroll to CTA target (not anonymous bottom-pin + scroll:false).
+  const scrollEl = getChatScrollEl();
+  await scrollCameraToTarget(button, {
+    scrollEl: scrollEl ?? undefined,
+    align: "center",
+    instant: true,
+  });
   await delay(80);
   playbackDiagTarget({
     selector: (button.textContent ?? "").replace(/\s+/g, " ").trim().slice(0, 64),
@@ -216,7 +220,12 @@ async function simulateSarahCtaClick(button: HTMLElement): Promise<void> {
 
 async function simulateSarahSendClick(sendBtn: HTMLElement): Promise<void> {
   if (preludeAborted) return;
-  scrollChatToBottom(true);
+  const scrollEl = getChatScrollEl();
+  await scrollCameraToTarget(sendBtn, {
+    scrollEl: scrollEl ?? undefined,
+    align: "center",
+    instant: true,
+  });
   await delay(80);
   sendBtn.classList.add("proto-agentic-send--sending");
   const ok = await simulateDemoPointerClick(sendBtn, {
@@ -360,7 +369,7 @@ export async function runSitePilotChatBeforeReveal(
     }
     if (scrollEl) {
       scrollChatToBottom(true);
-      // Think + pull-up settle — keep bottom pin so new reply never sits under dock.
+      // Keep latest frame in view while thinking grows (SSoT chat camera / host-end).
       pinScenarioScrollToBottomDuring(
         scrollEl,
         SITE_PILOT_CHAT_PLAYBACK_THINK_MS + CHAT_PULL_UP_MS + 160
@@ -369,8 +378,7 @@ export async function runSitePilotChatBeforeReveal(
     await delay(SITE_PILOT_CHAT_PLAYBACK_THINK_MS);
     if (!preludeAborted) {
       await fadeOutSitePilotChatThinking();
-      // Instant bottom snaps only (no eased scrollIntoView) — competing eases
-      // caused scroll-reversal diagnostic on r3 during agentic SF.
+      // Target-based chat camera (reply frame / thinking) — not competing eased zoos.
       scrollChatToBottom(true);
       window.setTimeout(() => {
         if (!preludeAborted) scrollChatToBottom(true);

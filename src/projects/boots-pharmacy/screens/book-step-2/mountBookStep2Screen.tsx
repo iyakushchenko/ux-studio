@@ -1,6 +1,6 @@
 import { createRoot, type Root } from "react-dom/client";
 import { noteReactScreenHostEnter } from "@/app/shell/screenHostDiag";
-import { getPrototypeScrollRoot } from "@/app/scenario/playbackScroll";
+import { getPrototypeScrollRoot, scrollCameraToOrigin } from "@/app/scenario/playbackScroll";
 import {
   BookStep2DateTimeScreen,
   type BookStep2DateTimeScreenProps,
@@ -101,7 +101,7 @@ export function mountBookStep2Screen(
   // scroll deep; landing date-section snap otherwise page-jiggle deltaY≫100.
   if (createdRoot) {
     const scrollEl = getPrototypeScrollRoot(page);
-    if (scrollEl) scrollEl.scrollTop = 0;
+    if (scrollEl) scrollCameraToOrigin(scrollEl, { instant: true });
   }
   renderCount += 1;
   root.render(<BookStep2DateTimeScreen {...props} />);
