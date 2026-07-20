@@ -39,7 +39,9 @@
   box-sizing: border-box;
 }
 
-/* Viewport frame when MCP CONTROL (studio gold 3px). PENDING/ERROR reuse log colors. */
+/* Viewport frame when MCP CONTROL (studio gold 3px). PENDING/ERROR reuse log colors.
+ * Painted on __capture (z above concept lightboxes ~10200) so the frame stays visible
+ * when Quick View / Availability / Advantage modals are open underneath. */
 .studio-agent-testing-overlay[data-mcp="control"]
   .studio-agent-testing-overlay__capture {
   box-shadow: inset 0 0 0 3px #e6b84d;

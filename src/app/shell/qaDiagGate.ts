@@ -23,9 +23,16 @@ export type QaDiagRingEvent = {
   label?: string;
 };
 
+/** Session kind mirrored for mid-flight refresh hydrate (CONTROL restore). */
+export type QaDiagGateSessionKind = "manual" | "agent" | "observe";
+
 type GatePersist = {
   open: boolean;
   logger?: boolean;
+  /** Who owned the overlay when gate opened — restore after refresh. */
+  sessionKind?: QaDiagGateSessionKind;
+  /** Agent was awaiting PO reply (PENDING) when refreshed. */
+  awaitingReply?: boolean;
   updatedAt: number;
 };
 
@@ -33,6 +40,8 @@ type GateMemory = {
   open: boolean;
   logger: boolean;
   ring: QaDiagRingEvent[];
+  sessionKind: QaDiagGateSessionKind | null;
+  awaitingReply: boolean;
 };
 
 const MEMORY_KEY = "__studioQaDiagGateMemory";
@@ -46,13 +55,25 @@ function memory(): GateMemory {
       [MEMORY_KEY]?: GateMemory;
     };
     if (!g[MEMORY_KEY]) {
-      g[MEMORY_KEY] = { open: false, logger: false, ring: [] };
+      g[MEMORY_KEY] = {
+        open: false,
+        logger: false,
+        ring: [],
+        sessionKind: null,
+        awaitingReply: false,
+      };
     }
     return g[MEMORY_KEY]!;
   }
   const w = window as Window & { [MEMORY_KEY]?: GateMemory };
   if (!w[MEMORY_KEY]) {
-    w[MEMORY_KEY] = { open: false, logger: false, ring: [] };
+    w[MEMORY_KEY] = {
+      open: false,
+      logger: false,
+      ring: [],
+      sessionKind: null,
+      awaitingReply: false,
+    };
   }
   return w[MEMORY_KEY]!;
 }
@@ -81,12 +102,18 @@ function writePersist(): void {
     const payload: GatePersist = {
       open: m.open,
       logger: m.logger,
+      sessionKind: m.sessionKind ?? undefined,
+      awaitingReply: m.awaitingReply || undefined,
       updatedAt: Date.now(),
     };
     sessionStorage.setItem(QA_DIAG_GATE_STORAGE_KEY, JSON.stringify(payload));
   } catch {
     /* private mode */
   }
+}
+
+function parseSessionKind(raw: unknown): QaDiagGateSessionKind | null {
+  return raw === "manual" || raw === "agent" || raw === "observe" ? raw : null;
 }
 
 function writeRing(): void {
@@ -134,6 +161,8 @@ function notify(): void {
 export function hydrateQaDiagGate(): {
   open: boolean;
   logger: boolean;
+  sessionKind: QaDiagGateSessionKind | null;
+  awaitingReply: boolean;
   ring: QaDiagRingEvent[];
 } {
   const persist = readPersist();
@@ -141,7 +170,34 @@ export function hydrateQaDiagGate(): {
   m.ring = readRing().slice(-QA_DIAG_RING_MAX);
   m.open = persist?.open === true;
   m.logger = persist?.logger === true && m.open;
-  return { open: m.open, logger: m.logger, ring: [...m.ring] };
+  m.sessionKind = m.open ? parseSessionKind(persist?.sessionKind) : null;
+  m.awaitingReply = m.open && persist?.awaitingReply === true;
+  // Legacy gate-open without kind: logger → manual, else agent (CONTROL).
+  if (m.open && !m.sessionKind) {
+    m.sessionKind = m.logger ? "manual" : "agent";
+  }
+  return {
+    open: m.open,
+    logger: m.logger,
+    sessionKind: m.sessionKind,
+    awaitingReply: m.awaitingReply,
+    ring: [...m.ring],
+  };
+}
+
+/** Mirror overlay session into gate persist (refresh mid-CONTROL restore). */
+export function setQaDiagSessionMeta(meta: {
+  sessionKind?: QaDiagGateSessionKind | null;
+  awaitingReply?: boolean;
+}): void {
+  const m = memory();
+  if (meta.sessionKind !== undefined) {
+    m.sessionKind = meta.sessionKind;
+  }
+  if (typeof meta.awaitingReply === "boolean") {
+    m.awaitingReply = meta.awaitingReply;
+  }
+  if (m.open) writePersist();
 }
 
 export function isQaDiagGateOpen(): boolean {
@@ -156,12 +212,16 @@ export function isQaDiagLoggerMode(): boolean {
 export function openQaDiagGate(options?: {
   logger?: boolean;
   reason?: string;
+  sessionKind?: QaDiagGateSessionKind;
 }): void {
   const m = memory();
   const nextLogger = options?.logger === true || m.logger;
   const changed = !m.open || m.logger !== nextLogger;
   m.open = true;
   m.logger = nextLogger;
+  if (options?.sessionKind) {
+    m.sessionKind = options.sessionKind;
+  }
   writePersist();
   if (changed) {
     appendQaDiagRing({
@@ -183,6 +243,8 @@ export function closeQaDiagGate(options?: { reason?: string }): void {
   });
   m.open = false;
   m.logger = false;
+  m.sessionKind = null;
+  m.awaitingReply = false;
   writePersist();
   notify();
 }
@@ -233,6 +295,8 @@ export function resetQaDiagGateForTests(): void {
   const m = memory();
   m.open = false;
   m.logger = false;
+  m.sessionKind = null;
+  m.awaitingReply = false;
   m.ring = [];
   listeners.clear();
   try {

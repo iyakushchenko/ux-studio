@@ -23,6 +23,7 @@ import {
   openQaDiagGate,
   replaceQaDiagRing,
   setQaDiagLoggerMode,
+  setQaDiagSessionMeta,
   type QaDiagRingEvent,
 } from "@/app/shell/qaDiagGate";
 import {
@@ -1341,10 +1342,12 @@ function onMcpPendingTimeout(): void {
   if (!active || settling) {
     clearMcpPending();
     setAwaitingUserReply(false);
+    setQaDiagSessionMeta({ awaitingReply: false });
     return;
   }
   setAwaitingUserReply(false);
   clearMcpPending();
+  setQaDiagSessionMeta({ awaitingReply: false });
   if (!capturePaused) {
     pauseElapsedClock();
     capturePaused = true;
@@ -2159,8 +2162,13 @@ export function startAgentTestingOverlay(title?: string): void {
   setResultBadge("neutral");
   setHint(hintForSessionKind("agent"));
   setActivityPhase("running");
-  openQaDiagGate({ logger: false, reason: "overlay-start" });
+  openQaDiagGate({
+    logger: false,
+    reason: "overlay-start",
+    sessionKind: "agent",
+  });
   setQaDiagLoggerMode(false);
+  setQaDiagSessionMeta({ sessionKind: "agent", awaitingReply: false });
   syncSessionChrome();
   writePersist(resolved);
   bindBeforeUnload();
@@ -2425,8 +2433,10 @@ function applyQaHandoff(options?: QaHandoffOptions): void {
   openQaDiagGate({
     logger: isLoggerStyleSession(target),
     reason: wipe ? "handoff-wipe" : "handoff-oversee",
+    sessionKind: target,
   });
   setQaDiagLoggerMode(isLoggerStyleSession(target));
+  setQaDiagSessionMeta({ sessionKind: target, awaitingReply: false });
   setAgentTestingHtmlFlag(shouldBlockPageClicks(target));
   setTitle(resolved);
   setResultBadge("neutral");
@@ -2483,6 +2493,7 @@ export function escalateObserveToAgentSession(reason = "escalate"): boolean {
     kind: "observe-escalate",
   });
   setActivityPhase("running", "escalated");
+  setQaDiagSessionMeta({ sessionKind: "agent", awaitingReply: false });
   syncSessionChrome();
   syncCaptureWatch();
   return true;
@@ -2508,6 +2519,7 @@ export function unlockObserveSession(): boolean {
     kind: "system",
   });
   setActivityPhase("running");
+  setQaDiagSessionMeta({ sessionKind: "observe", awaitingReply: false });
   syncSessionChrome();
   syncCaptureWatch();
   return true;
@@ -2527,11 +2539,16 @@ export function askUserInQa(prompt: string): boolean {
     applyQaHandoff({ oversee: true, kind: "agent" });
   }
   if (!isQaDiagGateOpen()) {
-    openQaDiagGate({ logger: false, reason: "agent-prompt" });
+    openQaDiagGate({
+      logger: false,
+      reason: "agent-prompt",
+      sessionKind: "agent",
+    });
   }
   const body =
     trimmed.length > 160 ? `${trimmed.slice(0, 158)}…` : trimmed;
   setAwaitingUserReply(true);
+  setQaDiagSessionMeta({ sessionKind: "agent", awaitingReply: true });
   armMcpPendingTimeout();
   pushLogEntry({
     atMs: performance.now(),
@@ -2569,10 +2586,12 @@ export function openAgentTestingLogger(
   openQaDiagGate({
     logger: isLoggerStyleSession(kind),
     reason: "version-chip",
+    sessionKind: kind,
   });
   setQaDiagLoggerMode(isLoggerStyleSession(kind));
   setSessionKind(kind);
   setAwaitingUserReply(false);
+  setQaDiagSessionMeta({ sessionKind: kind, awaitingReply: false });
   clearMcpPending();
   // Fresh open (not oversee) — green field unless hydrate already restored rows.
   if (!active) {
@@ -2740,6 +2759,7 @@ export function appendAgentTestingUserMessage(text: string): boolean {
   if (awaiting) {
     setAwaitingUserReply(false);
     clearMcpPending();
+    setQaDiagSessionMeta({ awaitingReply: false });
     setActivityPhase("running", "reply");
   } else if (!capturePaused) {
     setActivityPhase("running", "user-message");
@@ -2987,10 +3007,19 @@ export function installAgentTestingOverlayApi(): void {
       refreshMcpStatusDom();
     };
   }
-  // Quiet restore — no remount thrash; show panel if gate was open.
+  // Quiet restore — no remount thrash; reopen with persisted sessionKind (CONTROL).
   if (hydrated.open) {
     restoreLoggerFromRing(hydrated.ring);
-    openAgentTestingLogger({ kind: "manual" });
+    const kind =
+      hydrated.sessionKind ?? (hydrated.logger ? "manual" : "agent");
+    openAgentTestingLogger({ kind });
+    if (hydrated.awaitingReply && kind === "agent") {
+      setAwaitingUserReply(true);
+      setQaDiagSessionMeta({ sessionKind: "agent", awaitingReply: true });
+      armMcpPendingTimeout();
+      setActivityPhase("waiting", "reply");
+      syncSessionChrome();
+    }
   }
 }
 

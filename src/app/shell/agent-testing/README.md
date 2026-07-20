@@ -72,6 +72,8 @@ window.__studioForceClearAgentTestingOverlay?.()
 
 **Save Log:** disabled while capturing — Pause first. **Reset:** disabled until log dirty. Empty Message does not append.
 
+**Refresh mid-CONTROL:** gate persist stores `sessionKind` + `awaitingReply`; boot reopens agent CONTROL (not manual) and re-arms PENDING when awaiting.
+
 ### MCP connection status
 
 Primary: under Message/Send compose (not header). Short nav hint beside bug icon.
