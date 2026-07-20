@@ -382,7 +382,12 @@
   word-break: break-word;
 }
 
-/* Belt-and-suspenders: disable main app while testing (released on settle) */
+/* Belt-and-suspenders: disable main app while testing (released on settle).
+ * HARD (PO): re-enable Studio nav host so Step/Play/REC stay usable above lightboxes.
+ * Do not blanket `*` — playback-locked tabs must keep their pe:none. */
 html[data-studio-agent-testing="true"] #root {
   pointer-events: none !important;
+}
+html[data-studio-agent-testing="true"] #root .studio-nav-panel-host {
+  pointer-events: auto !important;
 }
