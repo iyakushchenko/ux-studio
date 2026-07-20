@@ -36,6 +36,7 @@ import {
 import {
   formatActivityStatus,
   type AgentTestingActivityPhase,
+  type AgentTestingSessionOwner,
 } from "@/app/shell/agent-testing/agentTestingActivity";
 import {
   buildAgentTestingDump,
@@ -99,6 +100,7 @@ const HISTORY_KEY = "protoAgentTestingOverlayHistory";
 const HISTORY_MAX = 5;
 const HISTORY_LINE_CAP = 12;
 const DEFAULT_TITLE = "AGENT TESTING";
+const MANUAL_TITLE = "MANUAL TEST";
 const PREPARE_TITLE = "AGENT TESTING - preparing...";
 
 export type StopAgentTestingOverlayOptions = {
@@ -167,6 +169,10 @@ let active = false;
 let settling = false;
 /** Free-form logger from version chip — page clicks allowed, soft dismiss. */
 let loggerSession = false;
+/** Who owns the live panel: manual (user) vs agent mid-flight. */
+let sessionOwner: AgentTestingSessionOwner = "agent";
+/** Manual capture pause — gate stays open; ring/log appends skip (except user-message). */
+let capturePaused = false;
 let logEntries: AgentTestingLogEntry[] = [];
 let sessionTitle = DEFAULT_TITLE;
 let nest = 0;
@@ -203,8 +209,9 @@ export function resolveAgentTestingOverlayTitle(title?: string): string {
   if (!raw) return DEFAULT_TITLE;
   if (/__(?:studio|proto)/i.test(raw)) return DEFAULT_TITLE;
   if (/ensureCleanStudio/i.test(raw)) return DEFAULT_TITLE;
-  // Allow short labels like "AGENT TESTING - mcp-sanity"
+  // Allow short labels like "AGENT TESTING - mcp-sanity" / "MANUAL TEST"
   if (/^AGENT TESTING\b/i.test(raw) && raw.length <= 48) return raw;
+  if (/^MANUAL TEST\b/i.test(raw) && raw.length <= 48) return raw;
   if (raw.length > 48) return DEFAULT_TITLE;
   return raw;
 }
@@ -431,6 +438,8 @@ function saveDump(
         outcome: String(t.outcome),
       })),
       poSignal: extras?.poSignal ?? peekPoSignal(),
+      gateMode: sessionOwner,
+      capturePaused,
     });
     pushAgentTestingDump(dump);
     console.info(
@@ -743,14 +752,21 @@ function refreshActivityDom(): void {
     ".studio-agent-testing-overlay__activity"
   );
   if (!el || !root) return;
-  const label = formatActivityStatus(activityPhase, activityDetail);
+  const label = formatActivityStatus(
+    activityPhase,
+    activityDetail,
+    sessionOwner
+  );
   el.textContent = label;
   el.dataset.phase = activityPhase;
   root.dataset.phase = activityPhase;
   const live =
     activityPhase === "preparing" ||
     activityPhase === "running" ||
-    activityPhase === "waiting";
+    activityPhase === "waiting" ||
+    (sessionOwner === "manual" &&
+      activityPhase === "running" &&
+      !capturePaused);
   el.dataset.live = live ? "true" : "false";
   const badge = root.querySelector<HTMLElement>(
     ".studio-agent-testing-overlay__badge"
@@ -925,12 +941,98 @@ function renderHistory(entries: HistoryEntry[]): void {
   box.appendChild(list);
 }
 
+function setQaSessionLock(mode: AgentTestingSessionOwner | null): void {
+  if (typeof document === "undefined") return;
+  const rootEl = document.documentElement;
+  if (!rootEl?.dataset) return;
+  if (mode === "agent" || mode === "manual") {
+    rootEl.dataset.studioQaLock = mode;
+  } else {
+    delete rootEl.dataset.studioQaLock;
+  }
+}
+
+/** Sync dismiss / capture / owner chrome after mode changes. */
+function syncSessionChrome(): void {
+  if (!hasDomQuery()) return;
+  const root = document.getElementById(ROOT_ID);
+  if (!root) return;
+  root.dataset.owner = sessionOwner;
+  root.dataset.capture = capturePaused ? "paused" : "on";
+  setQaSessionLock(active || settling ? sessionOwner : null);
+
+  const dismiss = root.querySelector<HTMLButtonElement>(
+    ".studio-agent-testing-overlay__dismiss"
+  );
+  if (dismiss) {
+    const locked = sessionOwner === "agent" && (active || settling);
+    dismiss.hidden = locked;
+    dismiss.disabled = locked;
+    dismiss.title = locked
+      ? "Agent session locked — cannot dismiss"
+      : "Dismiss";
+  }
+
+  const captureBtn = root.querySelector<HTMLButtonElement>(
+    ".studio-agent-testing-overlay__capture-toggle"
+  );
+  if (captureBtn) {
+    const show = sessionOwner === "manual" && active;
+    captureBtn.hidden = !show;
+    captureBtn.disabled = !show;
+    captureBtn.textContent = capturePaused ? "Start" : "Pause";
+    captureBtn.title = capturePaused
+      ? "Resume capture (append to log/ring)"
+      : "Pause capture (gate stays open; ring appends stop)";
+  }
+
+  ensureMessageUnderLog(root);
+}
+
+function ensureMessageUnderLog(root: HTMLElement): void {
+  const panel = root.querySelector(".studio-agent-testing-overlay__panel");
+  const log = root.querySelector(".studio-agent-testing-overlay__log");
+  const note = root.querySelector(".studio-agent-testing-overlay__note");
+  if (!panel || !log || !note) return;
+  if (log.nextElementSibling !== note) {
+    panel.appendChild(note);
+  }
+  const input = note.querySelector<HTMLInputElement>(
+    ".studio-agent-testing-overlay__note-input"
+  );
+  const submit = note.querySelector<HTMLButtonElement>(
+    ".studio-agent-testing-overlay__note-submit"
+  );
+  if (input) {
+    input.placeholder = "Message — Enter to send";
+    input.setAttribute("aria-label", "Message");
+    input.name = "user-message";
+  }
+  if (submit) submit.textContent = "Send";
+}
+
+function toggleManualCapture(): void {
+  if (sessionOwner !== "manual" || !active) return;
+  capturePaused = !capturePaused;
+  setActivityPhase(
+    capturePaused ? "paused" : "running",
+    capturePaused ? "capture off" : "capture on"
+  );
+  syncSessionChrome();
+  appendQaDiagRing({
+    kind: capturePaused ? "capture-pause" : "capture-start",
+    text: capturePaused ? "paused" : "resumed",
+    label: capturePaused ? "Capture paused" : "Capture resumed",
+  });
+}
+
 function ensureRoot(): HTMLElement | null {
   if (typeof document === "undefined") return null;
   if (typeof document.getElementById !== "function") return null;
   let root = document.getElementById(ROOT_ID);
   if (root) {
     syncAgentTestingNavClearance(ROOT_ID, root);
+    ensureMessageUnderLog(root);
     return root;
   }
   root = document.createElement("div");
@@ -951,23 +1053,24 @@ function ensureRoot(): HTMLElement | null {
       <p class="studio-agent-testing-overlay__sitrep">sitrep — waiting for control panel</p>
       <div class="studio-agent-testing-overlay__timeline" hidden aria-label="Script timeline"></div>
       <div class="studio-agent-testing-overlay__actions">
+        <button type="button" class="studio-agent-testing-overlay__capture-toggle" hidden title="Pause or resume capture">Pause</button>
         <button type="button" class="studio-agent-testing-overlay__alarm" title="Sequence / expected-steps mismatch — latches live PO signal for the running agent">Alarm</button>
         <button type="button" class="studio-agent-testing-overlay__cursor-flag" title="Flag cursor weird — latches live PO signal">Cursor</button>
         <button type="button" class="studio-agent-testing-overlay__scroll-flag" title="Flag scroll problem — latches live PO signal">Scroll</button>
         <button type="button" class="studio-agent-testing-overlay__dump" title="Download last dump JSON (secondary — prefer __studioConsumePoSignal)">Dump</button>
       </div>
-      <form class="studio-agent-testing-overlay__note" autocomplete="off">
-        <input type="text" class="studio-agent-testing-overlay__note-input" name="po-note" maxlength="280" placeholder="PO note — Enter to log" aria-label="PO note" />
-        <button type="submit" class="studio-agent-testing-overlay__note-submit">Note</button>
-      </form>
       <ol class="studio-agent-testing-overlay__log"></ol>
+      <form class="studio-agent-testing-overlay__note" autocomplete="off">
+        <input type="text" class="studio-agent-testing-overlay__note-input" name="user-message" maxlength="280" placeholder="Message — Enter to send" aria-label="Message" />
+        <button type="submit" class="studio-agent-testing-overlay__note-submit">Send</button>
+      </form>
     </div>
   `;
   const dismiss = root.querySelector<HTMLButtonElement>(
     ".studio-agent-testing-overlay__dismiss"
   );
   dismiss?.addEventListener("click", () => {
-    // Prefer window API so Vite HMR duplicate modules still close the live panel.
+    if (sessionOwner === "agent") return; // agent lock
     const api = window.__studioAgentTestingOverlay;
     if (loggerSession || isQaDiagLoggerMode() || api?.isActive?.()) {
       if (typeof api?.softClose === "function") {
@@ -981,6 +1084,13 @@ function ensureRoot(): HTMLElement | null {
       forceClearAgentTestingOverlay();
     }
   });
+  root
+    .querySelector<HTMLButtonElement>(
+      ".studio-agent-testing-overlay__capture-toggle"
+    )
+    ?.addEventListener("click", () => {
+      toggleManualCapture();
+    });
   const noteForm = root.querySelector<HTMLFormElement>(
     ".studio-agent-testing-overlay__note"
   );
@@ -991,7 +1101,7 @@ function ensureRoot(): HTMLElement | null {
     );
     const text = input?.value?.trim() ?? "";
     if (!text) return;
-    appendAgentTestingPoNote(text);
+    appendAgentTestingUserMessage(text);
     if (input) input.value = "";
   });
   root
@@ -1027,6 +1137,14 @@ function ensureRoot(): HTMLElement | null {
 
 function pushLogEntry(entry: AgentTestingLogEntry): void {
   if (!active && !settling) return;
+  // Manual pause: skip auto events; user-message still lands.
+  if (
+    capturePaused &&
+    entry.kind !== "user-message" &&
+    entry.kind !== "po-note"
+  ) {
+    return;
+  }
   const coalesced = coalesceLogEntry(logEntries[logEntries.length - 1], entry);
   if (coalesced) {
     logEntries[logEntries.length - 1] = coalesced;
@@ -1134,9 +1252,12 @@ function hideOverlayDom(): void {
     root.dataset.active = "false";
     root.dataset.settling = "false";
     delete root.dataset.result;
+    delete root.dataset.owner;
+    delete root.dataset.capture;
     root.querySelector(".studio-agent-testing-overlay__history")?.remove();
   }
   setAgentTestingHtmlFlag(false);
+  setQaSessionLock(null);
 }
 
 /** Hard-remove overlay root from the document (post-settle / forceClear). */
@@ -1145,6 +1266,7 @@ function removeOverlayDom(): void {
   if (typeof document.getElementById !== "function") return;
   document.getElementById(ROOT_ID)?.remove();
   setAgentTestingHtmlFlag(false);
+  setQaSessionLock(null);
 }
 
 function teardownDom(hard = false): void {
@@ -1279,6 +1401,7 @@ function enterSettle(options?: StopAgentTestingOverlayOptions): void {
       ? options.result
       : "neutral";
   settling = true;
+  syncSessionChrome();
   active = false;
   clearSafetyTimer();
   clearIdleTimer();
@@ -1337,6 +1460,9 @@ export function startAgentTestingOverlay(title?: string): void {
   active = true;
   settling = false;
   settleResult = "neutral";
+  loggerSession = false;
+  sessionOwner = "agent";
+  capturePaused = false;
   clearEnsureClearTimer();
   const resolved = resolveAgentTestingOverlayTitle(title);
   sessionTitle = resolved;
@@ -1345,6 +1471,7 @@ export function startAgentTestingOverlay(title?: string): void {
     root.dataset.active = "true";
     root.dataset.settling = "false";
     delete root.dataset.result;
+    delete root.dataset.logger;
     root.querySelector(".studio-agent-testing-overlay__history")?.remove();
     syncAgentTestingNavClearance(ROOT_ID, root);
   }
@@ -1352,12 +1479,12 @@ export function startAgentTestingOverlay(title?: string): void {
   setTitle(resolved);
   setResultBadge("neutral");
   setHint(
-    loggerSession
-      ? "QA logger — page clicks allowed. Notes + dump below."
-      : "Page visible - clicks blocked. Mid-flight QA below."
+    "AGENT TESTING — page clicks blocked. Alarm/Cursor/Scroll/Dump only."
   );
   setActivityPhase("running");
-  openQaDiagGate({ logger: loggerSession, reason: "overlay-start" });
+  openQaDiagGate({ logger: false, reason: "overlay-start" });
+  setQaDiagLoggerMode(false);
+  syncSessionChrome();
   writePersist(resolved);
   bindBeforeUnload();
   bindVisibility();
@@ -1377,6 +1504,7 @@ export function startAgentTestingOverlay(title?: string): void {
   refreshSitrepDom();
   // DOM visibility gate - re-stamp if ensureRoot raced / orphan teardown.
   ensureAgentTestingOverlayDomArmed(resolved);
+  syncSessionChrome();
 }
 
 /**
@@ -1529,6 +1657,24 @@ export function touchAgentTestingOverlay(title?: string): void {
   if (settling) {
     abandonSettleForRearch();
   }
+  // Agent touch takes ownership even if a manual logger was open.
+  if (active && sessionOwner === "manual") {
+    loggerSession = false;
+    sessionOwner = "agent";
+    capturePaused = false;
+    setAgentTestingHtmlFlag(true);
+    setHint(
+      "AGENT TESTING — page clicks blocked. Alarm/Cursor/Scroll/Dump only."
+    );
+    const agentTitle = resolveAgentTestingOverlayTitle(title ?? DEFAULT_TITLE);
+    sessionTitle = agentTitle;
+    setTitle(agentTitle);
+    if (hasDomQuery()) {
+      const root = document.getElementById(ROOT_ID);
+      if (root) delete root.dataset.logger;
+    }
+    syncSessionChrome();
+  }
   if (active) {
     noteActivity();
     const resolved = resolveAgentTestingOverlayTitle(title);
@@ -1540,22 +1686,28 @@ export function touchAgentTestingOverlay(title?: string): void {
     if (!isAgentTestingOverlayDomVisible()) {
       ensureAgentTestingOverlayDomArmed(resolved);
     }
+    syncSessionChrome();
     return;
   }
   startAgentTestingOverlay(title);
 }
 
 /**
- * Version-chip free-form logger — opens gate + overlay without remount flash.
- * Page clicks stay enabled (`data-logger`).
+ * Version-chip free-form logger — MANUAL TEST, page clicks allowed, soft dismiss.
  */
 export function openAgentTestingLogger(title?: string): void {
+  if (sessionOwner === "agent" && (active || settling)) {
+    // Agent lock — ignore manual open mid-flight.
+    return;
+  }
   openQaDiagGate({ logger: true, reason: "version-chip" });
   setQaDiagLoggerMode(true);
   loggerSession = true;
+  sessionOwner = "manual";
+  capturePaused = false;
   if (settling) abandonSettleForRearch();
   const resolved = resolveAgentTestingOverlayTitle(
-    title?.trim() || "QA LOGGER"
+    title?.trim() || MANUAL_TITLE
   );
   sessionTitle = resolved;
   const root = ensureRoot();
@@ -1572,8 +1724,11 @@ export function openAgentTestingLogger(title?: string): void {
   setAgentTestingHtmlFlag(false); // do not block page
   setTitle(resolved);
   setResultBadge("neutral");
-  setHint("QA logger — page clicks allowed. Notes + dump below.");
+  setHint(
+    "MANUAL TEST — page clicks allowed. Pause capture or Send a message below."
+  );
   setActivityPhase("running", "logger");
+  syncSessionChrome();
   writePersist(resolved);
   armElapsedTimer();
   if (!sessionStartedAt) {
@@ -1588,8 +1743,14 @@ export function openAgentTestingLogger(title?: string): void {
 
 /** Soft dismiss — close gate, hide panel, keep DOM (no remount flash next open). */
 export function softCloseAgentTestingLogger(reason = "soft-close"): void {
+  if (sessionOwner === "agent" && (active || settling)) {
+    // Agent lock — user cannot soft-dismiss.
+    return;
+  }
   closeQaDiagGate({ reason });
   loggerSession = false;
+  sessionOwner = "manual";
+  capturePaused = false;
   setQaDiagLoggerMode(false);
   nest = 0;
   active = false;
@@ -1605,32 +1766,46 @@ export function softCloseAgentTestingLogger(reason = "soft-close"): void {
   unbindVisibility();
   hideOverlayDom();
   const root = document.getElementById(ROOT_ID);
-  if (root) delete root.dataset.logger;
+  if (root) {
+    delete root.dataset.logger;
+    delete root.dataset.owner;
+  }
   setActivityPhase("idle");
+  syncSessionChrome();
 }
 
-/** PO free-text note → log + timeline + persisted ring. */
-export function appendAgentTestingPoNote(text: string): boolean {
+/**
+ * User free-text message → log + timeline + ring.
+ * Kind `user-message` — treat with grain of salt (manual note).
+ */
+export function appendAgentTestingUserMessage(text: string): boolean {
   const trimmed = text.trim();
   if (!trimmed) return false;
-  // If module `active` is stale (Vite HMR fork) but gate is open, re-show logger.
   if (!active) {
     openAgentTestingLogger();
   } else if (!isQaDiagGateOpen()) {
-    openQaDiagGate({ logger: true, reason: "po-note" });
+    openQaDiagGate({ logger: sessionOwner === "manual", reason: "user-message" });
   }
-  const label =
+  const body =
     trimmed.length > 120 ? `${trimmed.slice(0, 118)}…` : trimmed;
+  const label = `User message (manual note — treat with grain of salt): ${body}`;
   pushLogEntry({
     atMs: performance.now(),
     timeLabel: new Date().toLocaleTimeString("en-GB", { hour12: false }),
-    label: `PO: ${label}`,
+    label,
     outcome: "ok",
-    kind: "po-note",
+    kind: "user-message",
   });
-  markAgentTestingTimeline(`po-note:${Date.now()}`, "ok");
-  setActivityPhase("running", "po-note");
+  markAgentTestingTimeline(`user-message:${Date.now()}`, "ok");
+  if (!capturePaused) {
+    setActivityPhase("running", "user-message");
+  }
   return true;
+}
+
+/** @deprecated Prefer appendAgentTestingUserMessage */
+export function appendAgentTestingPoNote(text: string): boolean {
+  return appendAgentTestingUserMessage(text);
 }
 
 export function logAgentTestingOverlay(line: string): void {
@@ -1686,8 +1861,11 @@ export function forceClearAgentTestingOverlay(): void {
     settleReload = false;
     settleResult = "neutral";
     loggerSession = false;
+    sessionOwner = "agent";
+    capturePaused = false;
     closeQaDiagGate({ reason: "force-clear" });
     setQaDiagLoggerMode(false);
+    setQaSessionLock(null);
     cancelPendingReload();
     clearSafetyTimer();
     clearIdleTimer();
@@ -1789,7 +1967,7 @@ export function installAgentTestingOverlayApi(): void {
     forceClear: forceClearAgentTestingOverlay,
     openLogger: openAgentTestingLogger,
     softClose: softCloseAgentTestingLogger,
-    appendPoNote: appendAgentTestingPoNote,
+    appendPoNote: appendAgentTestingUserMessage,
     log: logAgentTestingOverlay,
     logStep: logAgentTestingStep,
     logHelper: logAgentTestingHelper,
@@ -1811,13 +1989,13 @@ export function installAgentTestingOverlayApi(): void {
     window.__protoDownloadAgentTestingDump = () => downloadAgentTestingDump();
     window.__studioOpenQaLogger = () => openAgentTestingLogger();
     window.__studioAppendPoNote = (text: string) =>
-      appendAgentTestingPoNote(String(text ?? ""));
+      appendAgentTestingUserMessage(String(text ?? ""));
     window.__studioQaDiagGateOpen = () => isQaDiagGateOpen();
   }
   // Quiet restore — no remount thrash; show panel if gate was open.
   if (hydrated.open) {
     restoreLoggerFromRing(hydrated.ring);
-    openAgentTestingLogger("QA LOGGER");
+    openAgentTestingLogger(MANUAL_TITLE);
   }
 }
 
@@ -1832,7 +2010,14 @@ function restoreLoggerFromRing(events: QaDiagRingEvent[]): void {
         : new Date().toLocaleTimeString("en-GB", { hour12: false }),
       label: e.label || e.text || e.kind,
       outcome: "ok",
-      kind: e.kind === "po-note" ? "po-note" : "info",
+      kind:
+        e.kind === "user-message" || e.kind === "po-note"
+          ? "user-message"
+          : e.kind === "capture-pause" || e.kind === "capture-start"
+            ? "info"
+            : e.kind === "po-note"
+              ? "user-message"
+              : "info",
     });
   }
   logEntries = restored.slice(-LOG_LIMIT);

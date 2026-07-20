@@ -14,11 +14,11 @@ Primary: `window.__studioAgentTestingTakeover` / `__studioConsumePoSignal()`. Du
 
 ## QA diag gate / free-form logger
 
-- Version-chip **QA** icon opens the overlay as a logger (`openLogger`) and sets **`qaDiagGateOpen`**.
-- `[PLAYBACK_DIAG]` console emit is **silent** while the gate is closed; open via icon / `touch` / `start`.
-- **Dismiss** closes the gate (logger soft-hides DOM — no remount flash on reopen).
-- PO note field → `po-note` in log + persisted ring (`sessionStorage`).
-- Gate + ring survive refresh when open.
+- Version-chip **amber BUG** icon opens the overlay as **MANUAL TEST** (`openLogger`) and sets **`qaDiagGateOpen`**.
+- Agent `touch` / `start` → **AGENT TESTING** framing; **agent lock** (no dismiss; header bug disabled via `html[data-studio-qa-lock=agent]`).
+- Manual: **Dismiss** works; **Pause/Start** pauses ring appends (gate stays open). Message field under the log → `user-message` (treat with grain of salt).
+- `[PLAYBACK_DIAG]` console emit is **silent** while the gate is closed.
+- Dump is lean-rich compact JSON (`gateMode`, mode/screen/beat, capped events) — not pretty-printed megabytes.
 
 See [PLAYBACK_DIAG.md](../../../../docs/shell/PLAYBACK_DIAG.md) § QA diag gate.
 

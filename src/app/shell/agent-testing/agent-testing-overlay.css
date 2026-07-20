@@ -353,9 +353,33 @@
   border-color: rgba(120, 190, 255, 0.7);
 }
 
-.studio-agent-testing-overlay__log li[data-kind="po-note"] {
+.studio-agent-testing-overlay__log li[data-kind="po-note"],
+.studio-agent-testing-overlay__log li[data-kind="user-message"] {
   color: #c8e0ff;
   font-weight: 600;
+}
+
+.studio-agent-testing-overlay__capture-toggle {
+  margin: 0;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(230, 170, 60, 0.45);
+  background: rgba(40, 28, 8, 0.45);
+  color: #e6b84d;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.35;
+  cursor: pointer;
+}
+
+.studio-agent-testing-overlay__capture-toggle:hover:not(:disabled) {
+  color: #ffd27a;
+  border-color: rgba(230, 170, 60, 0.75);
+}
+
+.studio-agent-testing-overlay[data-owner="agent"]
+  .studio-agent-testing-overlay__dismiss[hidden] {
+  display: none !important;
 }
 
 .studio-agent-testing-overlay__actions {

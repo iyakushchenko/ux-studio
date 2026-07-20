@@ -33,6 +33,7 @@ export {
   openAgentTestingLogger,
   softCloseAgentTestingLogger,
   appendAgentTestingPoNote,
+  appendAgentTestingUserMessage,
   scheduleAgentTestingOverlayEnsureClear,
   isAgentTestingOverlayActive,
   isAgentTestingOverlaySettling,

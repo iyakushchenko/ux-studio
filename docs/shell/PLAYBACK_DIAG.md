@@ -58,14 +58,18 @@ Filter DevTools console: `[PLAYBACK_DIAG]`.
 
 Console noise is **gated**. Detailed `[PLAYBACK_DIAG]` console emit runs **only while** `qaDiagGateOpen` is true.
 
-| Action | Gate |
-|--------|------|
-| Version-chip QA icon / `__studioOpenQaLogger()` | **Opens** gate + free-form logger overlay (page clicks allowed) |
-| Agent overlay `touch` / `start` | **Opens** gate |
-| Overlay **Dismiss** / `forceClear` / soft-close | **Closes** gate |
-| Refresh | Gate + capped event ring (`sessionStorage`, ~300) restored; logger reopens quietly if gate was open |
+| Action | Gate / UX |
+|--------|-----------|
+| Version-chip **amber BUG** / `__studioOpenQaLogger()` | **Opens** gate as **MANUAL TEST** (page clicks allowed; Pause/Start; Message/Send) |
+| Agent overlay `touch` / `start` | **Opens** gate as **AGENT TESTING** — **locked** (no dismiss; header bug disabled) |
+| Manual **Dismiss** / soft-close | **Closes** gate |
+| Manual **Pause** | Gate stays open; ring/log appends stop (except `user-message`) |
+| Agent `forceClear` / settle teardown | **Closes** gate + unlocks header |
+| Refresh | Gate + capped ring (~300) restored as MANUAL TEST if gate was open |
 
-PO notes: type in the overlay note field (Enter) or `__studioAppendPoNote("…")` → `po-note` rows in log/dump/timeline.
+Messages: `__studioAppendPoNote("…")` → `user-message` rows (manual note — treat with grain of salt).
+
+Dump: compact JSON with `gateMode`, mode/screen/beat, capped diag/ring/control-panel — no pretty megabyte spam.
 
 ```js
 window.__studioQaDiagGateOpen?.() // boolean

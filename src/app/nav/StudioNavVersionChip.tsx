@@ -3,7 +3,8 @@ import { openAgentTestingLogger } from "@/app/shell/agent-testing/agentTestingOv
 
 /**
  * Sticky right chip on the page-tabs row — version + channel.
- * QA icon opens the free-form agent-testing logger (diag gate).
+ * Amber BUG icon (Summarizer Cleaner glyph) opens MANUAL TEST logger.
+ * Disabled while an agent-locked mid-flight session owns the overlay.
  */
 export function StudioNavVersionChip() {
   const release = getStudioRelease();
@@ -19,11 +20,13 @@ export function StudioNavVersionChip() {
       <button
         type="button"
         className="studio-nav-version__qa"
-        title="Open QA logger (PLAYBACK_DIAG gate)"
-        aria-label="Open QA logger"
+        title="Open MANUAL TEST logger (PLAYBACK_DIAG gate)"
+        aria-label="Open MANUAL TEST logger"
         data-studio-qa-logger="true"
         onClick={() => {
-          // Prefer window API so Vite HMR cannot fork overlay `active` vs helpers.
+          if (document.documentElement.dataset.studioQaLock === "agent") {
+            return;
+          }
           if (typeof window.__studioOpenQaLogger === "function") {
             window.__studioOpenQaLogger();
           } else {
@@ -31,18 +34,29 @@ export function StudioNavVersionChip() {
           }
         }}
       >
+        {/* Summarizer `icon-cleaner` bug glyph */}
         <svg
-          className="studio-nav-version__qa-icon"
-          viewBox="0 0 16 16"
-          width="12"
-          height="12"
+          className="studio-nav-version__bug-icon"
+          viewBox="0 0 24 24"
+          width="14"
+          height="14"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
           aria-hidden="true"
           focusable="false"
         >
-          <path
-            fill="currentColor"
-            d="M8 1.5a6.5 6.5 0 1 0 4.03 11.6l1.68 1.68a.75.75 0 0 0 1.06-1.06l-1.68-1.68A6.5 6.5 0 0 0 8 1.5Zm0 1.5a5 5 0 1 1 0 10A5 5 0 0 1 8 3Zm-.75 2.25a.75.75 0 0 1 1.5 0v3.5a.75.75 0 0 1-1.5 0v-3.5ZM8 11.25a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z"
-          />
+          <g transform="rotate(45 12 12)">
+            <rect width="8" height="14" x="8" y="6" rx="4" />
+            <path d="m19 19-3-3" />
+            <path d="m5 19 3-3" />
+            <path d="m19 13-3-3" />
+            <path d="m5 13 3-3" />
+            <path d="m19 7-3 3" />
+            <path d="m5 7 3 3" />
+          </g>
         </svg>
       </button>
       <span className="studio-nav-version__semver">{release.label}</span>

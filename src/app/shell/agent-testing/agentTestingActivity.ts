@@ -5,13 +5,29 @@ export type AgentTestingActivityPhase =
   | "preparing"
   | "running"
   | "waiting"
-  | "settling";
+  | "settling"
+  | "paused";
+
+export type AgentTestingSessionOwner = "manual" | "agent";
 
 export function formatActivityStatus(
   phase: AgentTestingActivityPhase,
-  detail?: string
+  detail?: string,
+  owner: AgentTestingSessionOwner = "agent"
 ): string {
   const trimmed = detail?.trim();
+  if (owner === "manual") {
+    switch (phase) {
+      case "paused":
+        return trimmed ? `Paused — ${trimmed}` : "Paused — capture off";
+      case "running":
+        return trimmed ? `Logging… ${trimmed}` : "Logging…";
+      case "settling":
+        return trimmed ? `Settling… ${trimmed}` : "Settling…";
+      default:
+        return trimmed || "Manual idle";
+    }
+  }
   switch (phase) {
     case "preparing":
       return trimmed ? `Preparing… ${trimmed}` : "Preparing…";
@@ -21,6 +37,8 @@ export function formatActivityStatus(
       return trimmed ? `Waiting… ${trimmed}` : "Waiting…";
     case "settling":
       return trimmed ? `Settling… ${trimmed}` : "Settling sitrep…";
+    case "paused":
+      return trimmed ? `Paused… ${trimmed}` : "Paused…";
     default:
       return trimmed || "Idle";
   }
