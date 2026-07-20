@@ -22,6 +22,15 @@ vi.mock("@/app/shell/playbackDiag", () => ({
     playEnd: { count: 0 },
     journeyReset: { count: 0 },
     typeInActive: null,
+    chatBubbleMotion: {
+      samples: [],
+      count: 0,
+      jumps: 0,
+      maxAbsDeltaY: 0,
+      maxAbsDeltaTransformY: 0,
+      skippedPhaseNotes: [],
+      ids: [],
+    },
   }),
 }));
 

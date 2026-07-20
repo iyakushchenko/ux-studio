@@ -70,7 +70,7 @@ window.__studioForceClearAgentTestingOverlay?.()
 
 **Do not:** invent hover/loader chrome; click under open modal (overlay eyes); claim PROVEN without MCP probe; await CI on routine ships (R12).
 
-**Save Log:** snapshot anytime while session active (does **not** require Pause). Downloads **current** session dump (`reason: manual`, live `log[]` + selectors + `sessionKind` + `mcp`).
+**Save Log:** snapshot anytime while session active (does **not** require Pause). Downloads **current** session dump (`reason: manual`, live `log[]` + selectors + `sessionKind` + `mcp`). On chat SF with gate open, dump also includes **`chatBubbleMotion.samples`** (pull-up / thinking→reply y·opacity·deltaY frames + jump flags) — see [PLAYBACK_DIAG.md](../../../../docs/shell/PLAYBACK_DIAG.md) § Chat bubble motion.
 
 **OBSERVE + REC dual-use:** StartRecording preserves observe. Observe/manual: demo cursor **follows pointer** while capturing. Session Beat = selected journey (rec-* catalog); STEPS frames show as `Steps` when different.
 

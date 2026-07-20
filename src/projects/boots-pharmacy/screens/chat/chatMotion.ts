@@ -1,4 +1,5 @@
 import { MOTION_EASE_IN_OUT } from "@/uxds/motion";
+import { playbackDiagChatBubbleMotion } from "@/app/shell/playbackDiag";
 
 /**
  * Make / sitePilotChat pull-up for progressive bubbles.
@@ -44,10 +45,11 @@ export type ChatBubbleMotionPayload = {
 
 /**
  * Per-bubble motion diag — phase + rAF frame samples.
+ * Gate-open only → PLAYBACK_DIAG ring + QA Save Log (`chatBubbleMotion`).
  * Filter DevTools: `[PLAYBACK_DIAG] chat-bubble-motion`
  */
 export function logChatBubbleMotion(payload: ChatBubbleMotionPayload): void {
-  console.info("[PLAYBACK_DIAG] chat-bubble-motion", {
+  playbackDiagChatBubbleMotion({
     id: payload.id,
     phase: payload.phase,
     y: payload.y ?? null,

@@ -13,7 +13,7 @@
  *   window.__studioPlaybackDiagClear()
  */
 
-import { isQaDiagGateOpen } from "@/app/shell/qaDiagGate";
+import { appendQaDiagRing, isQaDiagGateOpen } from "@/app/shell/qaDiagGate";
 
 export type PlaybackDiagKind =
   | "type-in-start"
@@ -36,6 +36,8 @@ export type PlaybackDiagKind =
   | "screen-enter"
   | "nav-cross"
   | "info"
+  /** Chat bubble pull-up / thinking→reply motion samples (gate-open only). */
+  | "chat-bubble-motion"
   /** REC capture — demo-click / chrome-reject / screen seed */
   | "rec-capture"
   /** REC compile → journey summary */
@@ -107,7 +109,34 @@ export type PlaybackDiagEvent = {
   navCross?: boolean;
   sameTab?: boolean;
   instant?: boolean;
+  /** Chat bubble motion forensics (kind=chat-bubble-motion). */
+  bubble?: {
+    id: string;
+    phase: string;
+    y?: number | null;
+    opacity?: number | null;
+    layoutY?: number | null;
+    deltaY?: number | null;
+    deltaTransformY?: number | null;
+    shouldAnimate?: boolean;
+    visibleCount?: number | null;
+    note?: string | null;
+    jump?: boolean;
+    jumpReason?: string | null;
+  };
+  ok?: boolean;
 };
+
+/** Cap full bubble frame series for Save Log (gate-open sampling). */
+const MAX_BUBBLE_SAMPLES = 240;
+const bubbleSamples: PlaybackDiagEvent[] = [];
+/** Per-id phase set — detect skipped mount→start→end. */
+const bubblePhasesById = new Map<string, Set<string>>();
+/** Per-id last transform y for jump detection across frames. */
+const bubblePrevTransformY = new Map<string, number>();
+
+export const CHAT_BUBBLE_JUMP_LAYOUT_PX = 10;
+export const CHAT_BUBBLE_JUMP_TRANSFORM_PX = 4.5;
 
 const MAX_EVENTS = 400;
 const events: PlaybackDiagEvent[] = [];
@@ -162,6 +191,8 @@ function consolePayload(full: PlaybackDiagEvent): Record<string, unknown> {
     navCross: full.navCross,
     sameTab: full.sameTab,
     instant: full.instant,
+    bubble: full.bubble,
+    ok: full.ok,
   };
 }
 
@@ -178,6 +209,9 @@ function push(event: Omit<PlaybackDiagEvent, "t">): PlaybackDiagEvent {
 
 export function playbackDiagClear(): void {
   events.length = 0;
+  bubbleSamples.length = 0;
+  bubblePhasesById.clear();
+  bubblePrevTransformY.clear();
   typeInActive = null;
   if (isQaDiagGateOpen()) {
     console.info("[PLAYBACK_DIAG]", "clear");
@@ -602,7 +636,187 @@ export type PlaybackDiagBundle = {
     lastCompile?: PlaybackDiagEvent;
     lastReplay?: PlaybackDiagEvent;
   };
+  /** Gate-open chat bubble motion series + jump summary. */
+  chatBubbleMotion: {
+    samples: PlaybackDiagEvent[];
+    count: number;
+    jumps: number;
+    maxAbsDeltaY: number;
+    maxAbsDeltaTransformY: number;
+    skippedPhaseNotes: string[];
+    ids: string[];
+  };
 };
+
+/**
+ * Chat bubble pull-up / thinking→reply forensics.
+ * Records **only while QA gate open** (full frame series → dump; lean log lines).
+ */
+export function playbackDiagChatBubbleMotion(options: {
+  id: string;
+  phase: string;
+  y?: number | null;
+  opacity?: number | null;
+  layoutY?: number | null;
+  deltaY?: number | null;
+  shouldAnimate?: boolean;
+  visibleCount?: number | null;
+  note?: string | null;
+}): PlaybackDiagEvent | null {
+  if (!isQaDiagGateOpen()) return null;
+
+  const id = options.id;
+  const phase = options.phase;
+  const phases = bubblePhasesById.get(id) ?? new Set<string>();
+  phases.add(phase);
+  bubblePhasesById.set(id, phases);
+
+  let jump = false;
+  let jumpReason: string | null = null;
+  const deltaY = options.deltaY ?? null;
+  let deltaTransformY: number | null = null;
+
+  if (typeof options.y === "number" && Number.isFinite(options.y)) {
+    const prevY = bubblePrevTransformY.get(id);
+    if (prevY != null && phase === "frame") {
+      deltaTransformY = Math.round((options.y - prevY) * 100) / 100;
+      if (Math.abs(deltaTransformY) > CHAT_BUBBLE_JUMP_TRANSFORM_PX) {
+        jump = true;
+        jumpReason = `transform Δy=${deltaTransformY}`;
+      }
+    }
+    bubblePrevTransformY.set(id, options.y);
+  }
+
+  if (
+    typeof deltaY === "number" &&
+    Math.abs(deltaY) > CHAT_BUBBLE_JUMP_LAYOUT_PX
+  ) {
+    jump = true;
+    jumpReason = jumpReason
+      ? `${jumpReason}; layout ΔY=${deltaY}`
+      : `layout ΔY=${deltaY}`;
+  }
+
+  let skippedNote: string | null = null;
+  if (phase === "animate-end") {
+    if (!phases.has("animate-start") && !phases.has("mount")) {
+      skippedNote = `${id}: animate-end without mount/start`;
+    } else if (!phases.has("animate-start")) {
+      skippedNote = `${id}: animate-end without animate-start`;
+    }
+    bubblePrevTransformY.delete(id);
+  }
+  if (phase === "mount" || phase === "animate-start") {
+    /* keep tracking */
+  }
+
+  const detail =
+    jump
+      ? `Bubble JUMP ${id} ${phase} ΔY=${deltaY ?? "?"} ${jumpReason ?? ""}`.trim()
+      : phase === "frame"
+        ? `Bubble ${id} frame y=${options.y ?? "?"} op=${options.opacity ?? "?"}`
+        : phase === "thinking-handoff"
+          ? `Bubble ${id} thinking→reply`
+          : phase === "animate-start" || phase === "mount"
+            ? `Bubble ${id} pull-up`
+            : phase === "animate-end"
+              ? `Bubble ${id} settle`
+              : `Bubble ${id} ${phase}`;
+
+  const bubble = {
+    id,
+    phase,
+    y: options.y ?? null,
+    opacity: options.opacity ?? null,
+    layoutY: options.layoutY ?? null,
+    deltaY,
+    deltaTransformY,
+    shouldAnimate: options.shouldAnimate ?? true,
+    visibleCount: options.visibleCount ?? null,
+    note: options.note ?? skippedNote,
+    jump,
+    jumpReason,
+  };
+
+  const full: PlaybackDiagEvent = {
+    t: now(),
+    kind: "chat-bubble-motion",
+    surface: "chat",
+    detail,
+    screenAfter: readScreenId(),
+    ok: !jump && !skippedNote,
+    bubble,
+  };
+
+  // Full frame series → dedicated dump ring (not every rAF into main events).
+  bubbleSamples.push(full);
+  if (bubbleSamples.length > MAX_BUBBLE_SAMPLES) bubbleSamples.shift();
+
+  if (isQaDiagGateOpen()) {
+    console.info("[PLAYBACK_DIAG]", full.kind, consolePayload(full));
+  }
+
+  // Lean visible ring / overlay + main events: phase boundaries + jumps only.
+  const summarize =
+    jump ||
+    phase === "mount" ||
+    phase === "animate-start" ||
+    phase === "animate-end" ||
+    phase === "thinking-handoff" ||
+    phase === "exit" ||
+    !!skippedNote;
+
+  if (summarize) {
+    events.push(full);
+    if (events.length > MAX_EVENTS) events.shift();
+
+    const label = jump
+      ? `Bubble JUMP ΔY=${deltaY ?? "?"} (${id})`
+      : phase === "thinking-handoff"
+        ? `Bubble ${id} thinking→reply`
+        : phase === "animate-start" || phase === "mount"
+          ? `Bubble ${id} pull-up`
+          : phase === "animate-end"
+            ? `Bubble ${id} settle${skippedNote ? " · SKIP" : ""}`
+            : `Bubble ${id} ${phase}`;
+    try {
+      appendQaDiagRing({
+        kind: "chat-bubble-motion",
+        label,
+        text: detail,
+        screenId: readScreenId(),
+      });
+    } catch {
+      /* hang-safe */
+    }
+    try {
+      const api =
+        typeof window !== "undefined"
+          ? (
+              window as Window & {
+                __studioAgentTestingOverlay?: {
+                  logStep?: (input: {
+                    label?: string;
+                    outcome?: "ok" | "soft-fail" | "fail";
+                    kind?: string;
+                  }) => void;
+                };
+              }
+            ).__studioAgentTestingOverlay
+          : undefined;
+      api?.logStep?.({
+        kind: "sequence",
+        label,
+        outcome: jump || skippedNote ? "soft-fail" : "ok",
+      });
+    } catch {
+      /* hang-safe */
+    }
+  }
+
+  return full;
+}
 
 export function getPlaybackDiagBundle(): PlaybackDiagBundle {
   const typeStarts = events.filter((e) => e.kind === "type-in-start");
@@ -693,6 +907,45 @@ export function getPlaybackDiagBundle(): PlaybackDiagBundle {
         lastCapture: captures[captures.length - 1],
         lastCompile: compiles[compiles.length - 1],
         lastReplay: replays[replays.length - 1],
+      };
+    })(),
+    chatBubbleMotion: (() => {
+      const samples = [...bubbleSamples];
+      let jumps = 0;
+      let maxAbsDeltaY = 0;
+      let maxAbsDeltaTransformY = 0;
+      const ids = new Set<string>();
+      const skippedPhaseNotes: string[] = [];
+      for (const ev of samples) {
+        const b = ev.bubble;
+        if (!b) continue;
+        ids.add(b.id);
+        if (b.jump) jumps += 1;
+        if (typeof b.deltaY === "number") {
+          maxAbsDeltaY = Math.max(maxAbsDeltaY, Math.abs(b.deltaY));
+        }
+        if (typeof b.deltaTransformY === "number") {
+          maxAbsDeltaTransformY = Math.max(
+            maxAbsDeltaTransformY,
+            Math.abs(b.deltaTransformY)
+          );
+        }
+        if (
+          typeof b.note === "string" &&
+          b.note.includes("without") &&
+          !skippedPhaseNotes.includes(b.note)
+        ) {
+          skippedPhaseNotes.push(b.note);
+        }
+      }
+      return {
+        samples,
+        count: samples.length,
+        jumps,
+        maxAbsDeltaY,
+        maxAbsDeltaTransformY,
+        skippedPhaseNotes,
+        ids: [...ids],
       };
     })(),
   };

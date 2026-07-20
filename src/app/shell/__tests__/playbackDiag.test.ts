@@ -20,6 +20,7 @@ import {
   playbackDiagTypeInProgress,
   playbackDiagTypeInSkip,
   playbackDiagTypeInStart,
+  playbackDiagChatBubbleMotion,
 } from "@/app/shell/playbackDiag";
 import {
   openQaDiagGate,
@@ -36,6 +37,50 @@ describe("playbackDiag", () => {
     playbackDiagClear();
     resetQaDiagGateForTests();
     vi.restoreAllMocks();
+  });
+
+  it("records chat-bubble-motion samples only while gate open", () => {
+    vi.spyOn(console, "info").mockImplementation(() => {});
+    playbackDiagChatBubbleMotion({
+      id: "r0",
+      phase: "animate-start",
+      y: 14,
+      opacity: 0,
+      deltaY: 0,
+      shouldAnimate: true,
+    });
+    playbackDiagChatBubbleMotion({
+      id: "r0",
+      phase: "frame",
+      y: 10,
+      opacity: 0.3,
+      deltaY: 1,
+      shouldAnimate: true,
+    });
+    playbackDiagChatBubbleMotion({
+      id: "r0",
+      phase: "frame",
+      y: 0,
+      opacity: 1,
+      deltaY: 40,
+      shouldAnimate: true,
+    });
+    const bundle = getPlaybackDiagBundle();
+    expect(bundle.chatBubbleMotion.count).toBeGreaterThanOrEqual(3);
+    expect(bundle.chatBubbleMotion.jumps).toBeGreaterThanOrEqual(1);
+    expect(bundle.chatBubbleMotion.maxAbsDeltaY).toBeGreaterThanOrEqual(40);
+    expect(bundle.chatBubbleMotion.ids).toContain("r0");
+
+    playbackDiagClear();
+    resetQaDiagGateForTests();
+    playbackDiagChatBubbleMotion({
+      id: "r1",
+      phase: "animate-start",
+      y: 14,
+      opacity: 0,
+      shouldAnimate: true,
+    });
+    expect(getPlaybackDiagBundle().chatBubbleMotion.count).toBe(0);
   });
 
   it("records type-in progress and asserts PASS", () => {

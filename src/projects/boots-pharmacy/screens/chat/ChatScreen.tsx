@@ -192,10 +192,17 @@ function useChatPullUpLive(
       setLive(true);
       return;
     }
-    // One rAF: parent `hidden` removal commits before Motion measures.
+    // Double rAF: wait for `hidden` removal + layout paint before pull-up
+    // so Motion doesn't start mid-measure (choppy first frames).
     setLive(false);
-    const raf = requestAnimationFrame(() => setLive(true));
-    return () => cancelAnimationFrame(raf);
+    let raf2 = 0;
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => setLive(true));
+    });
+    return () => {
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+    };
   }, [revealed, shouldAnimate]);
   return live;
 }
@@ -471,9 +478,9 @@ function ReplyFrame({
       <motion.div
         className="chat__agent-slot"
         data-studio-chat-agent-slot={frame.id}
-        // Disable layout projection while thinking — layout="size" + opacity:0
-        // enter hid the LEFT dots before r0 (regression after user-slot Motion).
-        layout={showThinking ? false : "size"}
+        // Never layout-project here — layout="size" fought reply pull-up
+        // (layoutY jumps / choppy thinking→reply). Opacity+y only on bubbles.
+        layout={false}
         transition={CHAT_PULL_UP.transition}
       >
         <AnimatePresence mode="sync" initial={false}>
@@ -564,9 +571,19 @@ function useChatComposerScrollPad(
       if (prevPad === nextPad || !nearBottom) return;
       // Skip pad scroll adjust while a bubble is mid pull-up — pad deltas
       // cancel Motion transform (sitePilotChat: snap only before/after tween).
-      if (column.querySelector('[data-studio-chat-pull-up="start"]')) return;
+      if (
+        column.querySelector(
+          '[data-studio-chat-pull-up="start"], [data-studio-chat-pull-up="up"]'
+        )
+      )
+        return;
       requestAnimationFrame(() => {
-        if (column.querySelector('[data-studio-chat-pull-up="start"]')) return;
+        if (
+          column.querySelector(
+            '[data-studio-chat-pull-up="start"], [data-studio-chat-pull-up="up"]'
+          )
+        )
+          return;
         const newMax = Math.max(0, column.scrollHeight - column.clientHeight);
         const maxDelta = newMax - prevMax;
         if (maxDelta !== 0) {
@@ -694,8 +711,8 @@ export function ChatScreen({
   ): boolean => frameRevealed && pullUpAnimateIds.has(frameId);
 
   /**
-   * Scroll: snap on count/user reveals; on thinking→reply release defer to
-   * post pull-up settle only (sitePilotChat — mid-handoff snap = 200–300px jank).
+   * Scroll: never snap mid pull-up (layoutY JUMP vs Motion). Thinking→reply
+   * + progressive reveal defer to post settle only.
    */
   const prevThinkingModeRef = useRef(thinking.mode);
   useLayoutEffect(() => {
@@ -704,9 +721,12 @@ export function ChatScreen({
     const releasingThink =
       prevThinkingModeRef.current === "playback" && thinking.mode === "none";
     prevThinkingModeRef.current = thinking.mode;
-    if (releasingThink) {
+    const pullBusy = !!column.querySelector(
+      '[data-studio-chat-pull-up="start"], [data-studio-chat-pull-up="up"]'
+    );
+    if (releasingThink || pullBusy) {
       console.info("[PLAYBACK_DIAG] chat-reveal-y-delta", {
-        tag: "handoff-defer-snap",
+        tag: releasingThink ? "handoff-defer-snap" : "pull-up-defer-snap",
         delta: 0,
         visibleCount: revealedFrameCount,
         scrollTop: column.scrollTop,
@@ -754,7 +774,7 @@ export function ChatScreen({
           scrollMax: settleMax,
         });
       }
-    }, CHAT_PULL_UP_MS + 60);
+    }, CHAT_PULL_UP_MS + 80);
     return () => window.clearTimeout(tSettle);
   }, [
     scenarioReveal.active,

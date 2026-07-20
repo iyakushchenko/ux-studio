@@ -73,7 +73,21 @@ Console noise is **gated**. Detailed `[PLAYBACK_DIAG]` console emit runs **only 
 | Observe Alarm | Escalate → agent + `observe-escalate` log |
 | **Pause / Resume** | Freezes elapsed + capture. Status: `Paused` / `Capturing` (manual) — never “send a message” |
 | While capturing | `Click: …` + `Screen → …` |
-| Dump | Includes `sessionKind` (+ `gateMode` alias) |
+| Dump | Includes `sessionKind` (+ `gateMode` alias) + **`chatBubbleMotion`** frame series when sampled |
+
+### Chat bubble motion (gate-open)
+
+While the QA gate is open, chat pull-up / thinking→reply samples feed agents without DevTools:
+
+| Surface | What |
+|---------|------|
+| Console | `[PLAYBACK_DIAG] chat-bubble-motion` (phase + y / opacity / layoutY / deltaY) |
+| Overlay log | Lean lines: `Bubble r0 pull-up` · `Bubble r0 thinking→reply` · `Bubble JUMP ΔY=…` |
+| Save Log / dump | Full frame series under `chatBubbleMotion.samples` + `summaries.chatBubbleMotion` (`jumps`, `maxAbsDeltaY`, `maxAbsDeltaTransformY`) |
+
+Jump thresholds: layout `|ΔY| > 10px` or transform `|Δy| > 4.5px` between rAF frames → `bubble.jump` + soft-fail log (Alarm / investigate). Gate closed → **no** bubble samples (same lean gate as other diag console).
+
+Code: `playbackDiagChatBubbleMotion` · `chatMotion.ts` · dump: `agentTestingDump.ts`.
 
 ```js
 window.__studioQaSessionKind?.()
@@ -97,6 +111,7 @@ Code: `qaDiagGate.ts` · `agentTestingSession.ts` · `agentTestingMcpStatus.ts` 
 | `target` | `selector`, `found`, `bbox` | Before click/type |
 | `cursor` | `travelStart`/`End`, `onTarget`, `hoverApplied`, `press`/`release`, `graphicState`, `samples`, **`parked` + `parkReason`** | Travel / park / press — **park must be visible in console** |
 | `scroll` | `host`, `beforeTop`/`afterTop`, `intoViewRequested`/`Done`, `retreat` | Camera move + retreat scrollIntoView |
+| `chat-bubble-motion` | `bubble.{id,phase,y,opacity,layoutY,deltaY,jump…}` | Gate-open chat pull-up / thinking→reply (full series in dump `chatBubbleMotion`) |
 | `click` | `clickOk`, `selector`, `bbox` | Robo-cursor click result |
 | `type-in-*` | `chars`, `targetChars`, `typeOk` | Composer type-in |
 | `skip` | `skipReason` | Skipped beat / missing CTA / dwell-only |

@@ -62,6 +62,16 @@ export type AgentTestingDump = {
   timeline?: Array<{ key: string; outcome: string }>;
   /** Compact PLAYBACK_DIAG tail — kind/detail/beat/screen/t only. */
   recentPlaybackDiagEvents?: Array<Record<string, unknown>>;
+  /** Full chat-bubble-motion frame series (gate-open) + jump summary. */
+  chatBubbleMotion?: {
+    samples: Array<Record<string, unknown>>;
+    count: number;
+    jumps: number;
+    maxAbsDeltaY: number;
+    maxAbsDeltaTransformY: number;
+    skippedPhaseNotes: string[];
+    ids: string[];
+  };
   summaries?: {
     typeIn?: {
       starts: number;
@@ -76,6 +86,12 @@ export type AgentTestingDump = {
       lastParkReason: string | null;
     };
     click?: { ok: number; fail: number };
+    chatBubbleMotion?: {
+      count: number;
+      jumps: number;
+      maxAbsDeltaY: number;
+      maxAbsDeltaTransformY: number;
+    };
   };
   /** Copy of live latch at dump time (if any). */
   poSignal?: AgentTestingPoSignal | null;
@@ -159,9 +175,33 @@ function compactDiagEvent(ev: unknown): Record<string, unknown> | null {
   if (typeof e.detail === "string") out.detail = clip(e.detail, 120);
   if (e.beatId != null) out.beatId = e.beatId;
   if (e.screenId != null) out.screenId = e.screenId;
+  if (e.screenAfter != null) out.screenId = e.screenAfter;
   if (typeof e.ok === "boolean") out.ok = e.ok;
   if (typeof e.selector === "string") out.selector = clip(e.selector, 80);
+  if (e.bubble && typeof e.bubble === "object") {
+    const b = e.bubble as Record<string, unknown>;
+    out.bubble = {
+      id: b.id,
+      phase: b.phase,
+      y: b.y ?? null,
+      opacity: b.opacity ?? null,
+      layoutY: b.layoutY ?? null,
+      deltaY: b.deltaY ?? null,
+      deltaTransformY: b.deltaTransformY ?? null,
+      shouldAnimate: b.shouldAnimate ?? null,
+      visibleCount: b.visibleCount ?? null,
+      jump: b.jump === true,
+      jumpReason: b.jumpReason ?? null,
+      note: typeof b.note === "string" ? clip(b.note, 80) : null,
+    };
+  }
   return out;
+}
+
+function compactBubbleSample(ev: unknown): Record<string, unknown> | null {
+  const base = compactDiagEvent(ev);
+  if (!base || base.kind !== "chat-bubble-motion") return null;
+  return base;
 }
 
 export function buildAgentTestingDump(options: {
@@ -180,6 +220,7 @@ export function buildAgentTestingDump(options: {
   mcp?: AgentTestingDump["mcp"];
 }): AgentTestingDump {
   let recentPlaybackDiagEvents: AgentTestingDump["recentPlaybackDiagEvents"];
+  let chatBubbleMotion: AgentTestingDump["chatBubbleMotion"];
   let summaries: AgentTestingDump["summaries"];
   let controlPanel: unknown[] | undefined;
   let ring: Array<Record<string, unknown>> | undefined;
@@ -190,6 +231,18 @@ export function buildAgentTestingDump(options: {
       .slice(-AGENT_TESTING_DUMP_DIAG_EVENTS)
       .map(compactDiagEvent)
       .filter((e): e is Record<string, unknown> => !!e);
+    const bubble = bundle.chatBubbleMotion;
+    chatBubbleMotion = {
+      samples: bubble.samples
+        .map(compactBubbleSample)
+        .filter((e): e is Record<string, unknown> => !!e),
+      count: bubble.count,
+      jumps: bubble.jumps,
+      maxAbsDeltaY: bubble.maxAbsDeltaY,
+      maxAbsDeltaTransformY: bubble.maxAbsDeltaTransformY,
+      skippedPhaseNotes: bubble.skippedPhaseNotes,
+      ids: bubble.ids,
+    };
     summaries = {
       typeIn: {
         starts: bundle.typeIn.starts,
@@ -210,9 +263,16 @@ export function buildAgentTestingDump(options: {
         ok: bundle.click.ok,
         fail: bundle.click.fail,
       },
+      chatBubbleMotion: {
+        count: bubble.count,
+        jumps: bubble.jumps,
+        maxAbsDeltaY: bubble.maxAbsDeltaY,
+        maxAbsDeltaTransformY: bubble.maxAbsDeltaTransformY,
+      },
     };
   } catch {
     recentPlaybackDiagEvents = undefined;
+    chatBubbleMotion = undefined;
     summaries = undefined;
   }
 
@@ -272,6 +332,7 @@ export function buildAgentTestingDump(options: {
     },
     timeline: options.timeline,
     recentPlaybackDiagEvents,
+    chatBubbleMotion,
     summaries,
     poSignal: options.poSignal ?? null,
     log: options.log.map((e) => ({
