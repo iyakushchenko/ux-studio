@@ -9,3 +9,6 @@ scripts/playwright-out/
 !.cursor/rules/
 !.cursor/rules/**
 scripts/inspect-*.mjs
+
+# Local REC dumps (do not ship)
+recordings/
