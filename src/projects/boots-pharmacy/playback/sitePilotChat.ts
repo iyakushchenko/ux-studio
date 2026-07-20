@@ -382,6 +382,11 @@ export async function runSitePilotChatBeforeReveal(
           void animateScrollElementIntoView(last, {
             scrollEl: col,
             align: "end",
+          }).then(() => {
+            col.scrollTop = Math.max(
+              0,
+              col.scrollHeight - col.clientHeight
+            );
           });
         } else {
           scrollChatToBottom(true);
@@ -389,6 +394,7 @@ export async function runSitePilotChatBeforeReveal(
       };
       window.setTimeout(clearAboveComposer, 80);
       window.setTimeout(clearAboveComposer, CHAT_PULL_UP_MS + 40);
+      window.setTimeout(() => scrollChatToBottom(true), CHAT_PULL_UP_MS + 120);
       logChatReveal({
         kind: "agent",
         index: zeroIndex,

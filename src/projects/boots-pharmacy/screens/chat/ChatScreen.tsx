@@ -166,6 +166,31 @@ function AgentCta({ label, onClick }: { label: string; onClick?: () => void }) {
 
 const QUERY_FRAME_CLASSES = ["chat__frame", "chat__frame--query"];
 
+/**
+ * Parent frames use `hidden` / `display:none` until revealed. Mounting
+ * motion.div in that same commit skips enter (no layout frame for y:22).
+ * Double-rAF: first paint at CHAT_PULL_UP.initial, then animate up.
+ */
+function useChatPullUpLive(revealed: boolean): boolean {
+  const [live, setLive] = useState(false);
+  useLayoutEffect(() => {
+    if (!revealed) {
+      setLive(false);
+      return;
+    }
+    setLive(false);
+    let inner = 0;
+    const outer = requestAnimationFrame(() => {
+      inner = requestAnimationFrame(() => setLive(true));
+    });
+    return () => {
+      cancelAnimationFrame(outer);
+      cancelAnimationFrame(inner);
+    };
+  }, [revealed]);
+  return live;
+}
+
 function QueryFrame({
   frame,
   revealed,
@@ -175,6 +200,7 @@ function QueryFrame({
 }) {
   const ref = useStaticFrameClasses(QUERY_FRAME_CLASSES);
   useChatFrameRevealPaint(ref, revealed);
+  const pullLive = useChatPullUpLive(revealed);
   const bubble = (
     <>
       <div data-name="Subtotal">
@@ -196,8 +222,9 @@ function QueryFrame({
         <motion.div
           className="chat__bubble chat__bubble--user"
           data-name="component.co.order.summary"
+          data-studio-chat-pull-up={pullLive ? "up" : "start"}
           initial={CHAT_PULL_UP.initial}
-          animate={CHAT_PULL_UP.animate}
+          animate={pullLive ? CHAT_PULL_UP.animate : CHAT_PULL_UP.initial}
           transition={CHAT_PULL_UP.transition}
         >
           {bubble}
@@ -229,6 +256,7 @@ function ReplyFrame({
 }) {
   const ref = useStaticFrameClasses(REPLY_FRAME_CLASSES);
   useChatFrameRevealPaint(ref, revealed);
+  const pullLive = useChatPullUpLive(revealed);
   const onBodyClick = (e: MouseEvent<HTMLDivElement>) => {
     const t = e.target as HTMLElement | null;
     const link = t?.closest?.(".uxds-link, .chat__link");
@@ -273,8 +301,9 @@ function ReplyFrame({
         <motion.div
           className="chat__bubble chat__bubble--agent"
           data-name="component.co.order.summary"
+          data-studio-chat-pull-up={pullLive ? "up" : "start"}
           initial={CHAT_PULL_UP.initial}
-          animate={CHAT_PULL_UP.animate}
+          animate={pullLive ? CHAT_PULL_UP.animate : CHAT_PULL_UP.initial}
           transition={CHAT_PULL_UP.transition}
         >
           {bubbleBody}
@@ -424,6 +453,12 @@ export function ChatScreen({
   useEffect(() => {
     const column = columnRef.current;
     if (!column || !scenarioReveal.active) return;
+    const snapBottom = () => {
+      column.scrollTop = Math.max(
+        0,
+        column.scrollHeight - column.clientHeight
+      );
+    };
     const run = () => {
       const anchor =
         column.querySelector<HTMLElement>("[data-studio-chat-thinking]") ??
@@ -434,24 +469,24 @@ export function ChatScreen({
         ].at(-1) ??
         null;
       if (!anchor) {
-        column.scrollTop = Math.max(
-          0,
-          column.scrollHeight - column.clientHeight
-        );
+        snapBottom();
         return;
       }
       void animateScrollElementIntoView(anchor, {
         scrollEl: column,
         align: "end",
-      });
+      }).then(snapBottom);
     };
     run();
     const pullUpMs = Math.round(CHAT_PULL_UP.transition.duration * 1000);
     const tEarly = window.setTimeout(run, 160);
     const tLate = window.setTimeout(run, pullUpMs + 40);
+    // Hard bottom after Motion + helpful-strip height settle (r1/r2 were ~30px short).
+    const tSnap = window.setTimeout(snapBottom, pullUpMs + 120);
     return () => {
       window.clearTimeout(tEarly);
       window.clearTimeout(tLate);
+      window.clearTimeout(tSnap);
     };
   }, [
     scenarioReveal.active,

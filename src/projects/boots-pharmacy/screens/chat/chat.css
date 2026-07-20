@@ -188,7 +188,8 @@
   align-items: center;
   padding: 64px 64px 24px;
   padding-bottom: calc(var(--studio-chat-composer-h, 0px) + 24px);
-  scroll-padding-bottom: var(--studio-chat-composer-h, 0px);
+  /* Match pad+gutter so scrollIntoView/align:end clears helpful strip above dock. */
+  scroll-padding-bottom: calc(var(--studio-chat-composer-h, 0px) + 24px);
   box-sizing: border-box;
   scrollbar-width: thin;
   scrollbar-color: rgba(122, 125, 135, 0.32) transparent;
