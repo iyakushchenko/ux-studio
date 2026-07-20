@@ -6,7 +6,7 @@
 const OVERLAY_ROOT_ID = "agent-testing-overlay";
 const SCREEN_POLL_MS = 400;
 
-export type AgentTestingClickSurface = "product" | "chrome";
+export type AgentTestingClickSurface = "product" | "chrome" | "control-room";
 
 export type AgentTestingClickDetail = {
   /** Short visible label (no selector). */
@@ -43,20 +43,24 @@ function shortText(raw: string, max = 42): string {
   return t.length > max ? `${t.slice(0, max - 1)}…` : t;
 }
 
+function isControlRoom(el: Element): boolean {
+  if (typeof el.closest !== "function") return false;
+  return !!el.closest(
+    ".studio-nav-panel, .studio-nav-panel-host, .studio-nav-version, [data-studio-nav]"
+  );
+}
+
 function isStudioChrome(el: Element): boolean {
   if (typeof el.closest !== "function") return false;
   return !!el.closest(
-    ".studio-nav-panel, .studio-nav-panel-host, .studio-nav-version, [data-studio-nav], .studio-playback-diagnostic, .studio-playback-shield"
+    ".studio-playback-diagnostic, .studio-playback-shield"
   );
 }
 
 function isIgnoredTarget(el: Element | null): boolean {
   if (!el || typeof el.closest !== "function") return true;
   if (el.closest(`#${OVERLAY_ROOT_ID}`)) return true;
-  // Studio transport/nav — ignore (noise). Other chrome (bookmarks etc.) tags surface=chrome.
-  if (el.closest(".studio-nav-panel, .studio-nav-version, [data-studio-nav]")) {
-    return true;
-  }
+  // Control room / nav is part of the test surface — log it (manual Save Log).
   if (el.closest("[data-studio-agent-testing-ignore]")) return true;
   return false;
 }
@@ -168,10 +172,17 @@ export function buildClickDetail(el: Element): AgentTestingClickDetail | null {
     ) ?? (el as HTMLElement);
   const dataStudioAction =
     labelled.getAttribute?.("data-studio-action")?.trim() || undefined;
-  const surface: AgentTestingClickSurface = isStudioChrome(el)
-    ? "chrome"
-    : "product";
-  const prefix = surface === "chrome" ? "Chrome click" : "Click";
+  const surface: AgentTestingClickSurface = isControlRoom(el)
+    ? "control-room"
+    : isStudioChrome(el)
+      ? "chrome"
+      : "product";
+  const prefix =
+    surface === "control-room"
+      ? "Control room"
+      : surface === "chrome"
+        ? "Chrome click"
+        : "Click";
   return {
     label: `${prefix}: ${desc}`,
     selector: describeClickSelector(el),
@@ -202,11 +213,13 @@ export function bindAgentTestingCaptureWatch(
   let lastEmitAt = 0;
 
   const emitClick = (event: Event) => {
-    if (!handlers.isCapturing()) return;
     const target = event.target;
     if (!(target instanceof Element)) return;
     const detail = buildClickDetail(target);
     if (!detail) return;
+    // Product/chrome clicks only while CAPTURE on.
+    // Control room always — Manual Save Log must include nav/transport (PO A).
+    if (!handlers.isCapturing() && detail.surface !== "control-room") return;
     // Dedupe pointerdown→click same target within 40ms (not coalesce across seconds).
     const key = `${detail.surface}|${detail.selector}|${detail.label}`;
     const now = Date.now();

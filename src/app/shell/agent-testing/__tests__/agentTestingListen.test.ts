@@ -38,6 +38,14 @@ describe("agentTestingListen", () => {
         diagnosticOpen: true,
       })
     ).toBe(false);
+    expect(
+      shouldBlockQaPlay({
+        overlayActive: true,
+        capturePaused: false,
+        diagnosticOpen: false,
+        progressFrozen: true,
+      })
+    ).toBe(true);
   });
 
   it("builds cause-before-symptom priorityHints", () => {

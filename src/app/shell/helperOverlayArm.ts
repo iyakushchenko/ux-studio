@@ -48,9 +48,20 @@ const READ_ONLY_HELPER_SUFFIXES = new Set([
   "ReportMcpConnectionError",
   "AppendPoNote",
   "DownloadAgentTestingDump",
+  // FAIL handoff / freeze / RTT — MUST NOT touch-wrap (touch would confirm+clear freeze).
+  "IsQaProgressFrozen",
+  "BeginQaFailHandoff",
+  "ConfirmFailTakeover",
+  "QaMessageRttStats",
+  "BenchmarkQaMessageRtt",
+  "ConsumePoSignal",
+  "PeekPoSignal",
+  "AgentTestingTakeover",
   // Cleanup / abort manage overlay themselves — do not re-arm mid-reset.
   "EnsureCleanStudio",
   "AbortAll",
+  "StopAllPlayback",
+  "HaltPlaybackForPoSignal",
   "ForceClearAgentTestingOverlay",
   "SoftCloseQaLogger",
   // Page probe / sanity manage start+stop themselves — wrapping touch() nest-bumps

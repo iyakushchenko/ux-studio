@@ -768,8 +768,20 @@ export function scrollCameraToOrigin(
  */
 export function scrollCameraToHostEnd(
   scrollEl?: HTMLElement | null,
-  options?: PlaybackScrollOptions & { instant?: boolean; reason?: string }
+  options?: PlaybackScrollOptions & {
+    instant?: boolean;
+    reason?: string;
+    force?: boolean;
+  }
 ): void {
+  try {
+    const frozen = (
+      window as Window & { __studioIsQaProgressFrozen?: () => boolean }
+    ).__studioIsQaProgressFrozen?.();
+    if (frozen && !options?.force) return;
+  } catch {
+    /* hang-safe */
+  }
   const el = scrollEl ?? getPrototypeScrollRoot();
   if (!el) return;
   const resolveBottom = () =>
@@ -843,6 +855,14 @@ export function scrollChatCamera(
   scrollEl?: HTMLElement | null,
   options?: ScrollCameraOptions
 ): void {
+  try {
+    const frozen = (
+      window as Window & { __studioIsQaProgressFrozen?: () => boolean }
+    ).__studioIsQaProgressFrozen?.();
+    if (frozen && !options?.force) return;
+  } catch {
+    /* hang-safe */
+  }
   if (isChatPullUpScrollLocked() && !options?.force) {
     return;
   }

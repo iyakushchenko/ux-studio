@@ -102,7 +102,23 @@ import {
 import {
   beginFailHandoff,
   clearFailHandoff,
+  isFailHandoffPending,
 } from "@/app/shell/agent-testing/agentTestingFailHandoff";
+import {
+  clearQaProgressFreeze,
+  isQaProgressFrozen,
+  setQaProgressFreeze,
+} from "@/app/shell/agent-testing/agentTestingProgressFreeze";
+import {
+  noteQaMessageConsumed,
+  noteQaMessageSent,
+  getQaMessageRttStats,
+} from "@/app/shell/agent-testing/agentTestingMessageRtt";
+import {
+  armQaAgentPresenceHeartbeat,
+  clearQaAgentPresence,
+  touchQaAgentPresence,
+} from "@/app/shell/agent-testing/agentTestingPresence";
 import { registerQaDiagnosticOpenHandler } from "@/app/shell/playbackDiagQaBridge";
 import {
   clearStalePlaybackDiagnostic,
@@ -718,6 +734,7 @@ function dismissStaleDiagForSession(source: string): void {
 }
 
 function beginFailHandoffFromOverlay(reason: string): void {
+  setQaProgressFreeze(`fail-handoff:${reason}`);
   beginFailHandoff({
     reason,
     pause: (r) => {
@@ -746,14 +763,84 @@ function beginFailHandoffFromOverlay(reason: string): void {
       });
     },
   });
+  // Second belt — halt again after log so Play cannot sneak a frame.
+  try {
+    haltPlaybackForPoSignal(`fail-handoff-belt:${reason}`);
+  } catch {
+    /* hang-safe */
+  }
+}
+
+/**
+ * Agent takeover confirm → fresh CONTROL session (elapsed reset).
+ * Old manual/observe elapsed must not continue under agent.
+ */
+function startFreshAgentInterventionSession(source: string): void {
+  if (settling) abandonSettleForRearch();
+  try {
+    replaceQaDiagRing([]);
+  } catch {
+    /* ignore */
+  }
+  logEntries = [];
+  timelineKeys = [];
+  logDirty = false;
+  sessionHadProgress = false;
+  nest = Math.max(1, nest);
+  sessionStartedAt = Date.now();
+  lastStepAt = sessionStartedAt;
+  resetElapsedClock(true);
+  clearAgentTestingFinaleSeal();
+  setSessionKind("agent");
+  setAwaitingUserReply(false);
+  clearMcpPending();
+  signalMcpConnect();
+  touchQaAgentPresence(source);
+  armQaAgentPresenceHeartbeat(() => {
+    try {
+      refreshMcpStatusDom();
+    } catch {
+      /* hang-safe */
+    }
+  });
+  pushLogEntry({
+    atMs: Date.now(),
+    timeLabel: new Date().toLocaleTimeString("en-GB", { hour12: false }),
+    label: `AGENT SESSION · start (elapsed reset) · ${source}`,
+    outcome: "ok",
+    kind: "system",
+  });
+  setActivityPhase(capturePaused ? "paused" : "running", "agent-session");
+  setQaDiagSessionMeta({ sessionKind: "agent", awaitingReply: false });
+  renderLog();
+  refreshSitrepDom();
+  syncSessionChrome();
+  syncCaptureWatch();
 }
 
 function confirmAgentHandshake(source: string): boolean {
-  return confirmFailHandoffFromAgent(qaListenDeps(), source);
+  if (!isFailHandoffPending()) {
+    touchQaAgentPresence(source);
+    return false;
+  }
+  // Fresh agent session BEFORE confirm lines — Message/manual elapsed must not continue.
+  startFreshAgentInterventionSession(`takeover:${source}`);
+  const ok = confirmFailHandoffFromAgent(qaListenDeps(), source);
+  if (ok) {
+    // Unlock progress after confirm — freeze was only for "Handing off…".
+    clearQaProgressFreeze();
+    capturePaused = false;
+    resumeElapsedClock();
+    setActivityPhase("running", "fail-takeover-confirmed");
+    syncCaptureWatch();
+    syncSessionChrome();
+  }
+  return ok;
 }
 
 /** JUMP / diag paths outside overlay may call this. */
 export function beginQaFailHandoff(reason: string): void {
+  setQaProgressFreeze(`fail-handoff:${reason}`);
   if (!active || settling) {
     beginFailHandoff({
       reason,
@@ -766,6 +853,11 @@ export function beginQaFailHandoff(reason: string): void {
       },
       log: () => undefined,
     });
+    try {
+      haltPlaybackForPoSignal(`fail-handoff-belt:${reason}`);
+    } catch {
+      /* hang-safe */
+    }
     return;
   }
   beginFailHandoffFromOverlay(reason);
@@ -2077,6 +2169,13 @@ function toggleCapturePause(): void {
     capturePaused = false;
     sessionHadProgress = true;
     resumeElapsedClock();
+    try {
+      clearFailHandoffFromSession();
+      clearFailHandoff();
+      clearQaProgressFreeze();
+    } catch {
+      /* hang-safe */
+    }
     pushLogEntry({
       atMs: Date.now(),
       timeLabel: new Date().toLocaleTimeString("en-GB", { hour12: false }),
@@ -2232,7 +2331,8 @@ function pushLogEntry(entry: AgentTestingLogEntry): void {
   ) {
     return;
   }
-  // Manual pause: skip auto events; user-message + system control still land.
+  // Manual pause: skip auto product events; user-message + system control still land.
+  // Control-room clicks always land (PO A — Manual Save Log nav/transport).
   if (
     capturePaused &&
     entry.kind !== "user-message" &&
@@ -2242,7 +2342,8 @@ function pushLogEntry(entry: AgentTestingLogEntry): void {
     entry.kind !== "observe-escalate" &&
     entry.kind !== "alarm" &&
     entry.kind !== "playback-diag" &&
-    entry.kind !== "fail-handoff"
+    entry.kind !== "fail-handoff" &&
+    !(entry.kind === "click" && entry.surface === "control-room")
   ) {
     return;
   }
@@ -2959,6 +3060,14 @@ function applyQaHandoff(options?: QaHandoffOptions): void {
     sessionStartedAt = Date.now();
     lastStepAt = sessionStartedAt;
     resetElapsedClock(true);
+    touchQaAgentPresence("handoff-wipe");
+    armQaAgentPresenceHeartbeat(() => {
+      try {
+        refreshMcpStatusDom();
+      } catch {
+        /* hang-safe */
+      }
+    });
   }
 
   setSessionKind(target, { escalatedFromObserve: false });
@@ -3011,6 +3120,13 @@ function applyQaHandoff(options?: QaHandoffOptions): void {
       outcome: "ok",
       kind: "system",
     });
+    pushLogEntry({
+      atMs: Date.now(),
+      timeLabel: new Date().toLocaleTimeString("en-GB", { hour12: false }),
+      label: `AGENT SESSION · start (elapsed reset) · handoff-wipe`,
+      outcome: "ok",
+      kind: "system",
+    });
   }
   writePersist(resolved);
   bindBeforeUnload();
@@ -3029,6 +3145,7 @@ function applyQaHandoff(options?: QaHandoffOptions): void {
 /** Observe → agent lock (Alarm / anomaly). */
 export function escalateObserveToAgentSession(reason = "escalate"): boolean {
   if (!escalateObserveToAgent()) return false;
+  startFreshAgentInterventionSession(`escalate:${reason}`);
   capturePaused = false;
   clearMcpPending();
   signalMcpConnect();
@@ -3322,6 +3439,7 @@ export function appendAgentTestingUserMessage(text: string): boolean {
       ? `Reply received — progress paused · consume latch before proceed`
       : `Message received — progress paused · consume latch before proceed`
   );
+  noteQaMessageSent();
   try {
     latchPoSignal({
       type: "user-message",
@@ -3342,7 +3460,17 @@ export function appendAgentTestingUserMessage(text: string): boolean {
     outcome: "ok",
     kind: "user-message",
   });
+  pushLogEntry({
+    atMs: Date.now(),
+    timeLabel: new Date().toLocaleTimeString("en-GB", { hour12: false }),
+    label: awaiting
+      ? "Reply delivered · awaiting agent consume"
+      : "Message delivered · awaiting agent consume",
+    outcome: "ok",
+    kind: "system",
+  });
   markAgentTestingTimeline(`user-message:${Date.now()}`, "ok");
+  touchQaAgentPresence("message-sent");
   clearQaMessageDraft();
   try {
     const root = document.getElementById(ROOT_ID);
@@ -3419,6 +3547,8 @@ export function forceClearAgentTestingOverlay(): void {
     dismissStaleDiagForSession("force-clear");
     clearFailHandoffFromSession();
     clearFailHandoff();
+    clearQaProgressFreeze();
+    clearQaAgentPresence();
     clearAgentTestingFinaleSeal();
     nest = 0;
     active = false;
@@ -3582,7 +3712,25 @@ export function installAgentTestingOverlayApi(): void {
     peekPoSignal,
     consumePoSignal: () => {
       const signal = consumePoSignal();
-      if (signal) confirmAgentHandshake(`consume:${signal.code}`);
+      if (signal) {
+        confirmAgentHandshake(`consume:${signal.code}`);
+        if (signal.type === "user-message" || signal.code === "USER_MESSAGE_RECEIVED") {
+          const rtt = noteQaMessageConsumed();
+          touchQaAgentPresence("message-consumed");
+          pushLogEntry({
+            atMs: Date.now(),
+            timeLabel: new Date().toLocaleTimeString("en-GB", {
+              hour12: false,
+            }),
+            label:
+              rtt != null
+                ? `Message consumed · RTT ${rtt}ms`
+                : "Message consumed · agent ack",
+            outcome: "ok",
+            kind: "system",
+          });
+        }
+      }
       return signal;
     },
     setTimeline: setAgentTestingTimeline,
@@ -3595,6 +3743,13 @@ export function installAgentTestingOverlayApi(): void {
   };
   bindOverlayApi(api);
   installPoSignalWindowApis();
+  // Window consume must use overlay wrapper (RTT + fail-handoff confirm) — not raw latch.
+  try {
+    window.__studioConsumePoSignal = () => api.consumePoSignal();
+    window.__protoConsumePoSignal = () => api.consumePoSignal();
+  } catch {
+    /* hang-safe */
+  }
   installPoSignalPlaybackHaltWindowApis();
   ensureMcpPendingHandler();
   registerQaDiagnosticOpenHandler((error) =>
@@ -3604,9 +3759,17 @@ export function installAgentTestingOverlayApi(): void {
     const w = window as Window & {
       __studioBeginQaFailHandoff?: (reason: string) => void;
       __studioConfirmFailTakeover?: () => boolean;
+      __studioIsQaProgressFrozen?: () => boolean;
+      __studioQaMessageRttStats?: typeof getQaMessageRttStats;
+      __studioBenchmarkQaMessageRtt?: () => ReturnType<
+        typeof getQaMessageRttStats
+      >;
     };
     w.__studioBeginQaFailHandoff = beginQaFailHandoff;
     w.__studioConfirmFailTakeover = () => confirmAgentHandshake("window");
+    w.__studioIsQaProgressFrozen = isQaProgressFrozen;
+    w.__studioQaMessageRttStats = getQaMessageRttStats;
+    w.__studioBenchmarkQaMessageRtt = getQaMessageRttStats;
   } catch {
     /* hang-safe */
   }

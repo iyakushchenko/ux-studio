@@ -10,6 +10,7 @@ import {
   isFailHandoffPending,
   peekFailHandoff,
 } from "@/app/shell/agent-testing/agentTestingFailHandoff";
+import { isQaProgressFrozen } from "@/app/shell/agent-testing/agentTestingProgressFreeze";
 import type { PlaybackDiagnosticError } from "@/app/shell/playbackDiagnostic";
 import { getOpenDiagnosticFlash } from "@/app/shell/playbackDiagnosticFlash";
 import { latchPoSignal } from "@/app/shell/agent-testing/agentTestingPoSignal";
@@ -97,6 +98,7 @@ export function shouldBlockPlayNow(deps: QaListenDeps): boolean {
     overlayActive: deps.isActive() && !deps.isSettling(),
     capturePaused: deps.getCapturePaused(),
     diagnosticOpen: isDiagnosticOpenNow(deps),
+    progressFrozen: isQaProgressFrozen(),
   });
 }
 
@@ -104,9 +106,11 @@ export function noteBlockedPlayAttempt(deps: QaListenDeps): void {
   const now = Date.now();
   if (now - deps.getLastBlockedPlayLogAt() < 1200) return;
   deps.setLastBlockedPlayLogAt(now);
-  const why = isDiagnosticOpenNow(deps)
-    ? "Play ignored — playback diagnostic open (Ack/consume first)"
-    : "Play ignored — QA Pause (Resume first)";
+  const why = isQaProgressFrozen()
+    ? "Play/SF ignored — FAIL handoff (Handing off to agent…); confirm takeover first"
+    : isDiagnosticOpenNow(deps)
+      ? "Play ignored — playback diagnostic open (Ack/consume first)"
+      : "Play ignored — QA Pause (Resume first)";
   deps.pushLogEntry({
     atMs: now,
     timeLabel: new Date().toLocaleTimeString("en-GB", { hour12: false }),

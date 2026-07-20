@@ -1784,7 +1784,15 @@ export default function App() {
       setJourneyMode: (enabled) =>
         handleStudioJourneyModeChangeRef.current(enabled),
       triggerTransport: (action) => {
-        if (action === "play" && refusePlayIfQaBlocks()) return;
+        if (
+          (action === "play" ||
+            action === "step-forward" ||
+            action === "step-back" ||
+            action === "jump-to-end") &&
+          refusePlayIfQaBlocks()
+        ) {
+          return;
+        }
         switch (action) {
           case "play":
             notePlaybackTransport("play");
@@ -2020,6 +2028,7 @@ export default function App() {
                 }
               }}
               onStepBack={() => {
+                if (refusePlayIfQaBlocks()) return;
                 notePlaybackTransport("step-back");
                 playbackCursorMonitor.noteManualTransport("step-back");
                 playbackViewportMonitor.noteManualTransport("step-back");
@@ -2033,6 +2042,7 @@ export default function App() {
                 transport.play();
               }}
               onStepForward={() => {
+                if (refusePlayIfQaBlocks()) return;
                 notePlaybackTransport("step-forward");
                 playbackCursorMonitor.noteManualTransport("step-forward");
                 playbackViewportMonitor.noteManualTransport("step-forward");

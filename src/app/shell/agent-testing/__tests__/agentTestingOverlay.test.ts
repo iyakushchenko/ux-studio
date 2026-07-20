@@ -91,7 +91,8 @@ describe("agentTestingOverlay", () => {
     registerPoSignalPlaybackHalt(halt);
     startAgentTestingOverlay("alarm-latch");
     ringAgentTestingAlarm("progressive bubbles broken");
-    expect(halt).toHaveBeenCalledTimes(1);
+    // FAIL handoff belt: pause halt + second fail-handoff-belt halt (zero-progress lock).
+    expect(halt).toHaveBeenCalledTimes(2);
     expect(peekPoSignal()?.code).toBe("ALARM_SEQUENCE_MISMATCH");
     expect(window.__studioAgentTestingTakeover?.type).toBe("alarm");
     expect(

@@ -42,4 +42,13 @@ describe("click forensics", () => {
     expect(detail?.selector).toContain("book-now");
     expect(detail?.surface).toBe("product");
   });
+
+  it("logs Control room surface for nav panel clicks", () => {
+    document.body.innerHTML =
+      '<div class="studio-nav-panel"><button data-studio-action="play">Play</button></div>';
+    const btn = document.querySelector("button")!;
+    const detail = buildClickDetail(btn);
+    expect(detail?.surface).toBe("control-room");
+    expect(detail?.label).toMatch(/^Control room:/);
+  });
 });

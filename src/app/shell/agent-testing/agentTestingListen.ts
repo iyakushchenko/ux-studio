@@ -81,19 +81,26 @@ export function clearQaMessageDraft(): void {
   }
 }
 
-/** True when QA should refuse further Play (paused capture or open diagnostic). */
+/** True when QA should refuse further Play / SF / jump (paused, diag, or FAIL handoff). */
 export function shouldBlockQaPlay(input: {
   overlayActive: boolean;
   capturePaused: boolean;
   diagnosticOpen: boolean;
+  /** FAIL handoff / progress freeze — zero advance until confirm. */
+  progressFrozen?: boolean;
 }): boolean {
   if (!input.overlayActive) return false;
-  return input.capturePaused || input.diagnosticOpen;
+  return (
+    input.capturePaused ||
+    input.diagnosticOpen ||
+    input.progressFrozen === true
+  );
 }
 
 /**
- * App / MCP transport gate — refuse Play while QA Pause or diagnostic open.
- * Returns true when Play was blocked (caller must return early).
+ * App / MCP transport gate — refuse Play/SF/jump while QA Pause, diagnostic,
+ * or FAIL handoff freeze.
+ * Returns true when transport was blocked (caller must return early).
  */
 export function refusePlayIfQaBlocks(): boolean {
   if (typeof window === "undefined") return false;
@@ -101,8 +108,12 @@ export function refusePlayIfQaBlocks(): boolean {
     const w = window as Window & {
       __studioAgentTestingOverlay?: { shouldBlockPlay?: () => boolean };
       __studioNoteBlockedQaPlay?: () => void;
+      __studioIsQaProgressFrozen?: () => boolean;
     };
-    if (!w.__studioAgentTestingOverlay?.shouldBlockPlay?.()) return false;
+    const frozen = w.__studioIsQaProgressFrozen?.() === true;
+    const blocked =
+      frozen || w.__studioAgentTestingOverlay?.shouldBlockPlay?.() === true;
+    if (!blocked) return false;
     w.__studioNoteBlockedQaPlay?.();
     return true;
   } catch {

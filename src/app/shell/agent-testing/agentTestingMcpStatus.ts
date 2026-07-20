@@ -15,6 +15,12 @@ export const AGENT_LATCH_STATUS_TITLE =
 import type { AgentTestingSessionKind } from "@/app/shell/agent-testing/agentTestingSession";
 import type { AgentControlKind } from "@/app/shell/agent-testing/agentTestingControlKind";
 import { formatAgentControlKindSuffix } from "@/app/shell/agent-testing/agentTestingControlKind";
+import { messageAwarePendingFloorMs } from "@/app/shell/agent-testing/agentTestingMessageRtt";
+import {
+  formatPresenceSuffix,
+  peekQaAgentPresence,
+  clearQaAgentPresence,
+} from "@/app/shell/agent-testing/agentTestingPresence";
 
 export type McpConnectionPhase =
   | "idle"
@@ -86,7 +92,7 @@ export function getQaPendingTimeoutMs(): number {
       return Math.round(raw);
     }
   }
-  return DEFAULT_PENDING_MS;
+  return messageAwarePendingFloorMs(DEFAULT_PENDING_MS);
 }
 
 export function registerMcpPendingTimeoutHandler(
@@ -185,6 +191,11 @@ export function resetMcpStatusLatches(): void {
   m.connectingUntil = 0;
   m.connectedUntil = 0;
   m.error = null;
+  try {
+    clearQaAgentPresence();
+  } catch {
+    /* hang-safe */
+  }
 }
 
 export function formatMcpStatusLabel(
@@ -195,15 +206,15 @@ export function formatMcpStatusLabel(
   const kindSuffix = formatAgentControlKindSuffix(controlKind);
   switch (phase) {
     case "connecting":
-      return "AGENT — STARTING";
+      return `AGENT — STARTING${formatPresenceSuffix(peekQaAgentPresence().label)}`;
     case "connected":
-      return "AGENT — READY";
+      return `AGENT — READY${formatPresenceSuffix(peekQaAgentPresence().label)}`;
     case "control":
-      return `AGENT — CONTROL${kindSuffix}`;
+      return `AGENT — CONTROL${kindSuffix}${formatPresenceSuffix(peekQaAgentPresence().label)}`;
     case "observe":
-      return "AGENT — OBSERVE";
+      return `AGENT — OBSERVE${formatPresenceSuffix(peekQaAgentPresence().label)}`;
     case "pending":
-      return `AGENT — CONTROL · PENDING${kindSuffix}`;
+      return `AGENT — CONTROL · PENDING${kindSuffix}${formatPresenceSuffix(peekQaAgentPresence().label)}`;
     case "error":
       return `AGENT — ERROR: ${error?.trim() || "unknown"}`;
     default:

@@ -107,7 +107,13 @@ Action sitrep (Save Log / Pause / Close / Reset) stays visible — denser meanin
 
 **Save Log:** snapshot anytime while session active (does **not** require Pause). Downloads **current** session dump (`reason: manual`, live `log[]` + selectors + `sessionKind` + `mcp`). On chat SF with gate open, dump also includes **`chatBubbleMotion.samples`** — pull-up / thinking→reply frames with **TRACE** (`scrollTop`, `scrollMax`, `scrollLock`, `composerDockTop`, `bubbleBottom`, `clearPx`, `underComposer`, `deltaScrollTop`) + `jump` / `chop` flags. Read TRACE: filter samples by `phase=frame|trace`, look for `underComposer` / `chopReason` / camera tags `pull-up-settle` · `composer-clearance-topup`. See [PLAYBACK_DIAG.md](../../../../docs/shell/PLAYBACK_DIAG.md) § Chat bubble motion.
 
-**Message vs RESULT:** if PO Message latch (`USER_MESSAGE_RECEIVED`) is open, `appendFinale` **withholds** RESULT (logs soft-fail) so self-test PASS cannot overshadow Message. Consume latch first.
+**Control room (manual/observe):** clicks on `.studio-nav-panel` / transport land as `Control room: …` (`surface: control-room`) in Save Log — even while Manual CAPTURE is paused (product clicks stay gated).
+
+**Agent intervene:** takeover confirm / wipe handoff / observe escalate → **fresh AGENT SESSION** (elapsed reset + boundary log). Old manual elapsed does not continue.
+
+**FAIL handoff freeze:** while `Caught error. Handing off to agent….` is open, Play/SF/jump/camera are hard-frozen (`__studioIsQaProgressFrozen()`). Confirm takeover starts a new session **and lifts freeze** so agent can drive; Resume also clears any leftover freeze.
+
+**Message RTT:** Send → `Message delivered · awaiting agent consume`; consume → `Message consumed · RTT Nms`. PENDING timeout floors via measured RTT (`__studioQaMessageRttStats()`). Presence: `ONLINE · linked` / `seen Ns ago` on CONTROL status.
 
 **Full chat bubble motion (restartable):** `await window.__studioRunChatBubbleMotionSelfTest?.()` — opens QA, SF agentic q0…r3, asserts samples / thinking-handoff / jumps=0. See [SELF_TEST.md](./SELF_TEST.md).
 
