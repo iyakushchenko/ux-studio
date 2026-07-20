@@ -80,6 +80,19 @@ export function mountChatScreen(props: ChatScreenProps): void {
   if (!page) return;
 
   hideMakeChrome(page);
+  // Retire Make fixed-fade composer dock — React owns `.chat__composer-dock`.
+  page.querySelectorAll(".studio-chat-composer-portal-host").forEach((el) => {
+    el.remove();
+  });
+  page
+    .querySelectorAll(
+      ".proto-site-pilot-composer.proto-chat-composer-dock--in-place, .proto-chat-composer-disclaimer"
+    )
+    .forEach((el) => {
+      if (el instanceof HTMLElement && !el.closest(".studio-react-screen-host")) {
+        el.style.display = "none";
+      }
+    });
   const host = ensureHost(page);
   if (!root) root = createRoot(host);
   root.render(<ChatScreen {...props} />);

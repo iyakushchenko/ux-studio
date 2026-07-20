@@ -341,7 +341,14 @@ export function setSitePilotChatComposerDockSuppressed(suppressed: boolean): voi
 
 /** Mount / sync the fixed composer dock — same path for CJM on and browse. */
 export function mountSitePilotChatComposerDock(screen: HTMLElement): void {
-  if (isChatReactMounted()) return;
+  // React Chat owns `.chat__composer-dock` — strip Make portal + fixed fade leftovers.
+  if (isChatReactMounted()) {
+    teardownSitePilotChatComposerDock(screen);
+    screen
+      .querySelectorAll(".studio-chat-composer-portal-host")
+      .forEach((el) => el.remove());
+    return;
+  }
   ensureSitePilotChatComposerDock(screen);
   syncSitePilotChatComposerDock(screen);
   applyComposerDockSuppressed(screen);

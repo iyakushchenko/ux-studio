@@ -245,6 +245,9 @@ export function useJourneyPlayback({
   /** CJM step-back — snap DOM/scroll on beat enter, director script runs on step forward. */
   const retreatSyncRef = useRef(false);
   const [retreatSyncing, setRetreatSyncing] = useState(false);
+  /** SF clicked during retreat-sync — re-drive after sync lands (no Alarm no-op). */
+  const pendingStepForwardAfterRetreatRef = useRef(false);
+  const stepForwardRef = useRef<() => void>(() => {});
   const beginRetreatSync = useCallback(() => {
     retreatSyncRef.current = true;
     setRetreatSyncing(true);
@@ -252,6 +255,10 @@ export function useJourneyPlayback({
   const endRetreatSync = useCallback(() => {
     retreatSyncRef.current = false;
     setRetreatSyncing(false);
+    if (pendingStepForwardAfterRetreatRef.current) {
+      pendingStepForwardAfterRetreatRef.current = false;
+      queueMicrotask(() => stepForwardRef.current());
+    }
   }, []);
   const onScreenFramesRetreatEndRef = useRef(onScreenFramesRetreatEnd);
   onScreenFramesRetreatEndRef.current = onScreenFramesRetreatEnd;
@@ -833,7 +840,13 @@ export function useJourneyPlayback({
         transportStepAttemptRef.current = null;
         return;
       }
-      if (isScriptingNow()) return;
+      // Still scripting / retreat-syncing — keep watching; do not Alarm yet.
+      if (isScriptingNow() || retreatSyncRef.current) {
+        if (retry < 24) {
+          retryTimer = window.setTimeout(() => finishCheck(retry + 1), 600);
+        }
+        return;
+      }
       if (
         isScreenFramesBeat(beats[beatIndexRef.current]) &&
         screenPlayback.isPausingBeforeReveal &&
@@ -1515,6 +1528,11 @@ export function useJourneyPlayback({
 
   const stepForward = useCallback(() => {
     if (atPlaylistEndRef.current) return;
+    // Retreat-sync owns the beat — queue SF until sync restores home/composer.
+    if (retreatSyncRef.current) {
+      pendingStepForwardAfterRetreatRef.current = true;
+      return;
+    }
     const activeBeat = beats[beatIndexRef.current];
     const onAirNow =
       isScriptingNow() ||
@@ -1603,10 +1621,12 @@ export function useJourneyPlayback({
     stopAutoPlayOnly,
     stopJourneyPlay,
   ]);
+  stepForwardRef.current = stepForward;
 
   const stepBack = useCallback(() => {
     suppressInitialBeatTabNavRef.current = false;
     if (isScriptingNow()) return;
+    pendingStepForwardAfterRetreatRef.current = false;
     stopJourneyPlay();
     if (onScreenFramesBeat && screenPlayback.canStepBack) {
       screenPlayback.stepBack();

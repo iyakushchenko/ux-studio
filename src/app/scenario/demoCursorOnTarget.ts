@@ -27,9 +27,14 @@ export function hotspotIntersectsElement(
   );
 }
 
+/** Studio overlays that sit above targets but must not fail on-target click gates. */
+const ON_TARGET_PASS_THROUGH =
+  ".proto-chat-demo-cursor, .studio-playback-shield, .studio-playback-diagnostic, .studio-playback-diagnostic__card, .studio-agent-testing-overlay, [data-studio-agent-testing-overlay]";
+
 /**
  * True when cursor tip hotspot sits on `target` bbox (PO visual contract).
- * elementFromPoint rejects real content cover; ignores cursor/agent overlays.
+ * elementFromPoint rejects real content cover; ignores cursor / playback shield /
+ * agent overlays (shield is on-air during director scripts — must not cursor-off-target).
  */
 export function isDemoCursorHotspotOnTarget(
   cursor: HTMLElement,
@@ -43,12 +48,7 @@ export function isDemoCursorHotspotOnTarget(
   if (typeof document.elementFromPoint !== "function") return true;
   const hit = document.elementFromPoint(x, y);
   if (!hit) return true;
-  if (
-    hit.closest(".proto-chat-demo-cursor") ||
-    hit.closest(
-      ".studio-agent-testing-overlay, [data-studio-agent-testing-overlay]"
-    )
-  ) {
+  if (hit.closest(ON_TARGET_PASS_THROUGH)) {
     return true;
   }
   return hit === target || target.contains(hit);

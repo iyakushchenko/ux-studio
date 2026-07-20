@@ -229,12 +229,21 @@ export async function runSitePilotHomeScript(
 ): Promise<PlaybackScriptResult> {
   playbackAborted = false;
   homeScriptInFlight = true;
-  if (options?.syncState) return scriptOk();
+  try {
+    // Retreat-sync: restore composer to demo query (no type-in / no send).
+    // Bare `return scriptOk()` left home dirty and leaked homeScriptInFlight —
+    // next SF re-ran into a no-op Alarm (transport-step-no-op).
+    if (options?.syncState) {
+      return await runSarahQuerySubmit({ skip: true });
+    }
 
-  switch (scriptId) {
-    case "sarah-query-submit":
-      return runSarahQuerySubmit(options);
-    default:
-      return scriptFail(`unknown home script: ${String(scriptId)}`);
+    switch (scriptId) {
+      case "sarah-query-submit":
+        return await runSarahQuerySubmit(options);
+      default:
+        return scriptFail(`unknown home script: ${String(scriptId)}`);
+    }
+  } finally {
+    homeScriptInFlight = false;
   }
 }

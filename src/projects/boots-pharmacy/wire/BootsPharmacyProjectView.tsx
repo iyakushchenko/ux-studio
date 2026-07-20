@@ -2730,6 +2730,8 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   // Site Pilot Chat (child 10) — Frame337 microheader sticks below shared header.
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 10) return;
+    // React owns sticky via `.chat__site-pilot-bar` — skip Make child[1] stamp.
+    if (isChatReactMounted()) return;
 
     const SCREEN2_CHILD = 10;
     let microHeader: HTMLElement | null = null;

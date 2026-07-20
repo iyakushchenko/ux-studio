@@ -34,6 +34,19 @@ describe("chatScenarioRevealBridge", () => {
     expect(resolveChatRevealedFrameCount(4, 0, 1)).toBe(0);
   });
 
+  it("cold bridge (inactive count 0) stays at min — no full-thread flash", () => {
+    clearChatScenarioReveal();
+    expect(getChatScenarioRevealState()).toEqual({
+      active: false,
+      visibleCount: 0,
+    });
+    // ChatScreen maps inactive+0 → engine count 1 (q0 only).
+    expect(resolveChatRevealedFrameCount(1, 8, 1)).toBe(1);
+    // Explicit idle full-thread publish still paints all.
+    publishChatScenarioReveal({ active: false, visibleCount: 8 });
+    expect(resolveChatRevealedFrameCount(8, 8, 1)).toBe(8);
+  });
+
   it("holds agent reply paint while playback thinking is anchored", () => {
     const thinking = { mode: "playback", anchorFrameId: "r0" };
     expect(isChatReplyHeldForPlaybackThinking("r0", thinking)).toBe(true);

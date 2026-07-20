@@ -628,13 +628,16 @@ export function ChatScreen({
 
   /**
    * Engine visibleCount — progressive paint; default min until publish lands.
-   * When scenario is NOT active (overlay beat / browse idle), show the full
-   * thread so the chat never empties behind a modal (FIX-1).
+   * Cold / cleared bridge (active=false, count=0) → paint q0 only — never dump
+   * the full thread (PO flash of r0 on chat open). Explicit idle full-thread
+   * publish keeps visibleCount > 0 while inactive (overlay / browse).
    */
   const revealedFrameCount = resolveChatRevealedFrameCount(
     scenarioReveal.active
       ? scenarioReveal.visibleCount
-      : CHAT_THREAD_FRAMES.length,
+      : scenarioReveal.visibleCount > 0
+        ? scenarioReveal.visibleCount
+        : 1,
     CHAT_THREAD_FRAMES.length,
     1
   );
