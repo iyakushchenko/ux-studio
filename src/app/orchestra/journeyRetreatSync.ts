@@ -100,6 +100,32 @@ export async function syncBeatRetreatState(
   playbackScrollMonitor.noteRetreatSync();
 
   const finishRetreatCamera = () => {
+    // Screen-frames chat: pin `.chat__column` to bottom. Snapping mid-thread
+    // `button.chat__cta` / composer fights resetToEnd + composer pad → scroll-reversal.
+    if (beat.kind === "screen-frames") {
+      const chatCol =
+        typeof document !== "undefined"
+          ? document.querySelector<HTMLElement>(
+              '[data-studio-react-screen="chat"] .chat__column, main.chat .chat__column'
+            )
+          : null;
+      if (chatCol) {
+        const max = Math.max(0, chatCol.scrollHeight - chatCol.clientHeight);
+        const beforeTop = chatCol.scrollTop;
+        chatCol.scrollTop = max;
+        playbackDiagScroll({
+          beatId: beat.id,
+          detail: "retreat chat column pin bottom (no CTA snap)",
+          beforeTop,
+          afterTop: chatCol.scrollTop,
+          intoViewRequested: true,
+          intoViewDone: true,
+          retreat: true,
+        });
+        return;
+      }
+    }
+
     const target = resolveRetreatScrollTarget(beat);
     if (!target) {
       playbackDiagScroll({

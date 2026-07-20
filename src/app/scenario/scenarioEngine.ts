@@ -432,6 +432,16 @@ function animateScrollToBottom(
   });
 }
 
+function isChatColumnScrollHost(el: HTMLElement): boolean {
+  return el.classList.contains("chat__column");
+}
+
+/**
+ * After a +1 frame reveal: tall bubbles normally scroll to start so the head
+ * stays readable. React Chat also bottom-pins (thinking / composer pad /
+ * ChatScreen snap) — start+pin fight → scroll-reversal Alarm (PO 2026-07-20
+ * agentic-chat 4/9). Chat column = bottom only.
+ */
 function settleScrollAfterForwardStep(
   frames: HTMLElement[],
   visibleCount: number,
@@ -442,7 +452,9 @@ function settleScrollAfterForwardStep(
   const last = frames[visibleCount - 1];
   if (!el || !last) return;
 
-  const tallBubble = last.offsetHeight > el.clientHeight * 0.4;
+  const chatColumn = isChatColumnScrollHost(el);
+  const tallBubble =
+    !chatColumn && last.offsetHeight > el.clientHeight * 0.4;
   if (smooth) {
     if (tallBubble) {
       void animateScrollElementIntoView(last, { scrollEl: el, align: "start" });

@@ -10,6 +10,12 @@ Agents **must read** this file before claiming a UI or Studio-chrome slice done.
 
 ## 2026-07-20
 
+### Chat tall-bubble start-scroll fights bottom pin → scroll-reversal (PO / Finn + Quinn)
+
+- **Symptom / class:** PLAYBACK DIAGNOSTIC `scroll-reversal` on agentic-chat SF into frame 4/9 (tall r1); trigger often shows stale `retreat-sync` / `sarah-query-submit`.
+- **Root cause:** `settleScrollAfterForwardStep` scrolled tall bubbles to **start** while chat also bottom-pins (thinking / composer pad / ChatScreen) → down→up→down. Retreat into screen-frames also snapped mid-thread `button.chat__cta`.
+- **Gate:** Chat `.chat__column` forward settle = bottom only; screen-frames retreat camera pins chat column bottom (no CTA snap). Prove: UI Step forward through chat 4/9 + Step back — no scroll-reversal Alarm.
+
 ### Book Step 2/3 page blink on same-tab Step Forward (PO / Finn + Quinn)
 
 - **Symptom / class:** Book Step 2 (and Step 3 funnel) pages blink while in-page steps work; suspected transition leakage.
