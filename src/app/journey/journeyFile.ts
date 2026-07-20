@@ -58,6 +58,23 @@ export function serializeJourneyFile(options: {
   return JSON.stringify(payload, null, 2);
 }
 
+/** Control-room Download for a saved CJM picker entry → `.journey.json`. */
+export function buildSavedJourneyDownload(options: {
+  journey: JourneyDefinition | null | undefined;
+  projectId?: ProjectId;
+  personaId?: PersonaId;
+}): { json: string; filename: string } | null {
+  const journey = options.journey;
+  if (!journey) return null;
+  const json = serializeJourneyFile({
+    journey,
+    projectId: options.projectId,
+    personaId: options.personaId,
+  });
+  const safeId = journey.id.replace(/[^a-z0-9_-]+/gi, "-");
+  return { json, filename: `${safeId}.journey.json` };
+}
+
 export function serializeJourneyBundleFile(options: {
   journeys: JourneyDefinition[];
   projectId?: ProjectId;

@@ -95,7 +95,10 @@ import {
 import { replayRecordingSession } from "@/app/recording/recordingReplay";
 import { useRecordingReplayBridge } from "@/app/recording/useRecordingReplayBridge";
 import { registerJourneyMcpHelpers } from "@/app/journey/journeyMcpHelpers";
-import { summarizeJourney } from "@/app/journey/journeyFile";
+import {
+  buildSavedJourneyDownload,
+  summarizeJourney,
+} from "@/app/journey/journeyFile";
 import {
   isDeletableRecordedJourneyId,
   removePersistedRecordedJourney,
@@ -1530,6 +1533,24 @@ export default function App() {
     [handleOrchestraModeChange, refreshJourneysAfterImport]
   );
 
+  /** Saved-CJM Download — journey file JSON for the selected picker entry. */
+  const exportSavedJourneyDownload = useCallback(
+    () =>
+      buildSavedJourneyDownload({
+        journey:
+          activeJourney ?? getJourneyForMode(studioJourneys, orchestraModeId),
+        projectId: studioProjectId,
+        personaId: studioPersonaId,
+      }),
+    [
+      activeJourney,
+      orchestraModeId,
+      studioJourneys,
+      studioPersonaId,
+      studioProjectId,
+    ]
+  );
+
   const { replayRecordingOptions } = useRecordingReplayBridge({
     transportActionsRef,
     screenNav: {
@@ -1797,6 +1818,7 @@ export default function App() {
                   />
                 </div>
               }
+              createNewCjmSelected={createNewCjmSelected}
               deleteRecordedCjm={deleteRecordedCjmControl}
               segmentLabel={
                 studioJourneyMode ? studioTouchpoint.label : undefined
@@ -1864,6 +1886,7 @@ export default function App() {
                   }
                   onSaveAsJourney={onRecordingAddedAsCjm}
                   createNewCjmSelected={createNewCjmSelected}
+                  onExportSavedJourney={exportSavedJourneyDownload}
                 />
               }
             />
@@ -1878,6 +1901,7 @@ export default function App() {
                 }
                 onSaveAsJourney={onRecordingAddedAsCjm}
                 createNewCjmSelected={createNewCjmSelected}
+                onExportSavedJourney={exportSavedJourneyDownload}
               />
             </div>
           )

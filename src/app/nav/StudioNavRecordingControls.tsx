@@ -36,10 +36,12 @@ export type StudioNavRecordingControlsProps = {
   recModeLocked?: boolean;
   /**
    * CREATE NEW CJM path (idle selection or live REC forced).
-   * Gates Start / Pause / Stop / Purge / Import / + — hidden for saved CJMs.
-   * Download + Replay stay available on the REC panel for any picker state.
+   * Gates Start / Pause / Stop / Purge / Import / + / Replay — hidden for saved CJMs.
+   * Saved CJMs: Download exports the selected journey JSON (via onExportSavedJourney).
    */
   createNewCjmSelected?: boolean;
+  /** Export selected saved CJM as journey file JSON (saved-picker Download). */
+  onExportSavedJourney?: () => { json: string; filename: string } | null;
 };
 
 type RecordingUiSnapshot = {
@@ -259,6 +261,7 @@ export function StudioNavRecordingModeSlot({
   onSaveAsJourney,
   recModeLocked = false,
   createNewCjmSelected = false,
+  onExportSavedJourney,
 }: StudioNavRecordingControlsProps) {
   const [recMode, setRecMode] = useState(false);
 
@@ -313,7 +316,7 @@ export function StudioNavRecordingModeSlot({
           }}
         />
         <AnimatePresence initial={false} mode="popLayout">
-          {recMode && !recModeLocked ? (
+          {recMode && !recModeLocked && createNewCjmSelected ? (
             <motion.span
               key="rec-event-counter"
               className="studio-nav-scenario__panel-motion-inline"
@@ -343,6 +346,7 @@ export function StudioNavRecordingModeSlot({
                 onReplay={onReplay}
                 onSaveAsJourney={onSaveAsJourney}
                 createNewCjmSelected={createNewCjmSelected}
+                onExportSavedJourney={onExportSavedJourney}
               />
             </motion.div>
           ) : null}
@@ -362,6 +366,7 @@ export function StudioNavRecordingControls({
   onReplay,
   onSaveAsJourney,
   createNewCjmSelected = false,
+  onExportSavedJourney,
 }: StudioNavRecordingControlsProps) {
   const ui = useRecordingUiSnapshot();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -373,6 +378,9 @@ export function StudioNavRecordingControls({
   const [cjmTitle, setCjmTitle] = useState("");
   /** Start / Pause / Stop / Purge / + — CREATE NEW path only (live REC also forces CREATE NEW). */
   const showNewRecordingDeck = createNewCjmSelected || ui.hasLive;
+  const downloadDisabled = createNewCjmSelected
+    ? ui.hasLive || !ui.canExport || replaying
+    : replaying || !onExportSavedJourney;
 
   useEffect(() => {
     if (!statusNote) return;
@@ -454,13 +462,29 @@ export function StudioNavRecordingControls({
   };
 
   const handleDownload = (event: React.MouseEvent<HTMLButtonElement>) => {
-    // Live REC: Download locked (Stop first) — same idea as +.
+    flashTap(event.currentTarget);
+    // Saved CJM: export selected journey JSON (not the staged recording session).
+    if (!createNewCjmSelected) {
+      const exported = onExportSavedJourney?.() ?? null;
+      logControlPanel("recording:download", {
+        kind: "saved-journey",
+        blocked: !exported,
+      });
+      if (!exported) {
+        setStatusNote("EXPORT FAIL");
+        return;
+      }
+      downloadTextJson(exported.filename, exported.json);
+      setStatusNote("EXPORT");
+      return;
+    }
+    // CREATE NEW: Download locked while live (Stop first) — same idea as +.
     const target = ui.hasLive ? null : getLastRecordingSession();
     logControlPanel("recording:download", {
+      kind: "recording-session",
       blocked: !target || ui.hasLive,
       eventCount: target?.events.length ?? 0,
     });
-    flashTap(event.currentTarget);
     if (!target) return;
     downloadRecordingJson(target);
     setStatusNote("EXPORT");
@@ -620,14 +644,21 @@ export function StudioNavRecordingControls({
       <button
         type="button"
         className="studio-nav-step-btn studio-nav-scenario__btn"
-        aria-label="Download recording JSON"
-        title={
-          ui.hasLive
-            ? "Stop recording before downloading"
-            : "Download .recording.json"
+        aria-label={
+          createNewCjmSelected
+            ? "Download recording JSON"
+            : "Download journey JSON"
         }
-        disabled={ui.hasLive || !ui.canExport || replaying}
+        title={
+          createNewCjmSelected
+            ? ui.hasLive
+              ? "Stop recording before downloading"
+              : "Download .recording.json"
+            : "Download selected CJM as .journey.json"
+        }
+        disabled={downloadDisabled}
         onClick={handleDownload}
+        data-studio-recording-download=""
       >
         <DownloadIcon />
       </button>
@@ -644,16 +675,19 @@ export function StudioNavRecordingControls({
           <ImportIcon />
         </button>
       ) : null}
-      <button
-        type="button"
-        className="studio-nav-step-btn studio-nav-scenario__btn"
-        aria-label="Replay last recording"
-        title="Replay last / imported session"
-        disabled={!ui.canReplay || replaying}
-        onClick={handleReplay}
-      >
-        <ReplayIcon />
-      </button>
+      {createNewCjmSelected ? (
+        <button
+          type="button"
+          className="studio-nav-step-btn studio-nav-scenario__btn"
+          aria-label="Replay last recording"
+          title="Replay last / imported session"
+          disabled={!ui.canReplay || replaying}
+          onClick={handleReplay}
+          data-studio-recording-replay=""
+        >
+          <ReplayIcon />
+        </button>
+      ) : null}
       {showNewRecordingDeck ? (
         <span
           ref={addCjmRootRef}

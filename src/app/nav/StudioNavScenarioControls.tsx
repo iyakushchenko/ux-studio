@@ -70,6 +70,11 @@ export type StudioNavScenarioControlsProps = {
   /** Optional recording deck (same session APIs as MCP helpers). */
   recordingControls?: ReactNode;
   /**
+   * CREATE NEW CJM selected (or live REC forced). When false, hide REC STEPS
+   * counter — saved CJMs do not show a leftover recording session count.
+   */
+  createNewCjmSelected?: boolean;
+  /**
    * REC-mode only: delete the selected recorded CJM (hidden for built-ins).
    * Parent supplies target when the current orchestra mode is deletable.
    */
@@ -233,6 +238,7 @@ export function StudioNavScenarioControls({
   qaBeatId,
   qaBeatLabel,
   recordingControls,
+  createNewCjmSelected = false,
   deleteRecordedCjm = null,
 }: StudioNavScenarioControlsProps) {
   const STEP_DIODE_MS = CONTROL_ROOM_TAP_MS;
@@ -546,7 +552,9 @@ export function StudioNavScenarioControls({
               lockReason={recLockReason}
             />
             <AnimatePresence initial={false} mode="popLayout">
-              {recMode && !recModeLocked ? (
+              {recMode &&
+              !recModeLocked &&
+              (createNewCjmSelected || recordingArmed) ? (
                 <motion.span
                   key="rec-event-counter"
                   className="studio-nav-scenario__panel-motion-inline"

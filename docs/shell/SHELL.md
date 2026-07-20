@@ -13,6 +13,8 @@ Content (screens, scenarios, personas, DOM wiring) lives in **`src/projects/`** 
 | `src/app/nav/` | Tab strip, zoom, transport controls (cassette deck), studio dropdowns |
 | `src/app/orchestra/` | Journey playback engine, beat types, script dispatch |
 | `docs/shell/PLAYBACK.md` | How to change scripts + smoke checklist |
+| `docs/shell/RECORDING.md` | REC capture / replay / compile |
+| `docs/shell/AGENTIC_RECORDING.md` | Future agentic recording playbook (persona artifacts → CJM → record / UX CONCEPT gaps) |
 | `src/app/shell/` | Studio state (`useStudio`) — project / persona / CJM selection; URL sync ([URL.md](./URL.md)) |
 | `src/app/scenario/scenarioEngine.ts` | Generic frame-reveal scenario runner |
 | `src/app/scenario/demoCursor.ts` | Shared demo cursor + scroll helpers |

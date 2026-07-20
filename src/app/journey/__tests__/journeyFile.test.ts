@@ -7,6 +7,7 @@ import {
   deserializeJourneyBundleFile,
   deserializeJourneyFile,
   serializeJourneyBundleFile,
+  buildSavedJourneyDownload,
   serializeJourneyFile,
   summarizeJourney,
 } from "@/app/journey/journeyFile";
@@ -49,5 +50,16 @@ describe("journeyFile", () => {
         JSON.stringify({ version: 99, journey: AGENTIC_CJM_JOURNEY })
       )
     ).toThrow(/Unsupported journey file version/);
+  });
+
+  it("builds saved-journey Download payload", () => {
+    const exported = buildSavedJourneyDownload({
+      journey: AGENTIC_CJM_JOURNEY,
+      projectId: "boots-pharmacy",
+      personaId: "sarah-jenkins",
+    });
+    expect(exported?.filename).toBe("agentic-cjm.journey.json");
+    expect(exported?.json).toContain('"id": "agentic-cjm"');
+    expect(buildSavedJourneyDownload({ journey: null })).toBeNull();
   });
 });
