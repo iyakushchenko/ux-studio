@@ -112,6 +112,41 @@ describe("agentTesting wipe hygiene (forceClear / softClose)", () => {
     expect(getQaDiagRing()).toEqual([]);
   });
 
+  it("no ghost OBS/CTRL in header when popup closed", () => {
+    document.body.insertAdjacentHTML(
+      "beforeend",
+      `<span class="studio-nav-version__mcp" hidden data-studio-mcp-hint="true"></span>`
+    );
+    openAgentTestingLogger({ kind: "observe" });
+    const hint = document.querySelector<HTMLElement>(".studio-nav-version__mcp");
+    expect(hint).toBeTruthy();
+    // Live observe may flash connecting first — settle via status API
+    const live = (
+      window as Window & {
+        __studioMcpConnectionStatus?: () => { phase?: string };
+      }
+    ).__studioMcpConnectionStatus?.();
+    expect(["observe", "connecting", "connected"]).toContain(live?.phase);
+    if (hint && !hint.hidden) {
+      expect(["OBS", "…", "OK"]).toContain(hint.textContent);
+    }
+
+    softCloseAgentTestingLogger("ghost-check");
+    expect(isAgentTestingOverlayActive()).toBe(false);
+    expect(isQaDiagGateOpen()).toBe(false);
+    expect(hint?.hidden).toBe(true);
+    expect(hint?.textContent || "").toBe("");
+    expect(document.documentElement.dataset.studioMcpStatus).toBeUndefined();
+    expect(document.documentElement.dataset.studioQaLock).toBeUndefined();
+    const idle = (
+      window as Window & {
+        __studioMcpConnectionStatus?: () => { phase?: string; label?: string };
+      }
+    ).__studioMcpConnectionStatus?.();
+    expect(idle?.phase).toBe("idle");
+    expect(idle?.label || "").toBe("");
+  });
+
   it("handoff wipe → agent; oversee keeps gate open path", () => {
     openAgentTestingLogger({ kind: "manual" });
     appendQaDiagRing({ kind: "user-message", text: "pre-handoff" });

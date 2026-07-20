@@ -80,17 +80,17 @@ window.__studioForceClearAgentTestingOverlay?.()
 
 ### MCP connection status
 
-Primary: **lean muted status line** under Message/Send (no bordered chip / no duplicate “Connection · …” box). Short nav hint beside bug icon (CTRL / OBS / PENDING).
+Primary: **lean muted status line** under Message/Send with a **live connection diode** (same camera-lens LED language as playback/REC). Short nav hint beside bug icon (CTRL / OBS / PENDING) only while overlay is **actually open** (gate + `data-active`) — never ghost OBS when closed.
 
-| Phase | Label | Viewport |
-|-------|-------|----------|
-| CONNECTING | `MCP — CONNECTING` | — |
-| CONNECTED | `MCP — CONNECTED` | — (brief) |
-| CONTROL | `MCP — CONTROL` | **10px gold** viewport border |
-| OBSERVE | `MCP — OBSERVE` | — |
-| CONTROL · PENDING | `MCP — CONTROL · PENDING` | **10px blue** border |
-| ERROR | `MCP — ERROR: …` | **10px red** border |
-| Idle | hidden | manual / no agent session |
+| Phase | Label | Diode | Viewport |
+|-------|-------|-------|----------|
+| CONNECTING | `MCP — CONNECTING` | pulse cool | — |
+| CONNECTED | `MCP — CONNECTED` | pulse cool (brief) | — |
+| CONTROL | `MCP — CONTROL` | bright green | **10px gold** |
+| OBSERVE | `MCP — OBSERVE` | fuchsia | — |
+| CONTROL · PENDING | `MCP — CONTROL · PENDING` | blue pulse | **10px blue** |
+| ERROR | `MCP — ERROR: …` | red | **10px red** |
+| Idle / closed | hidden | off | none |
 
 **PENDING timeout (default 60s):** auto-pause capture + log `MCP pending timed out (Ns) — paused; resume when ready`. Override: `window.__studioQaPendingTimeoutMs`. Clear on user Reply/Send.
 

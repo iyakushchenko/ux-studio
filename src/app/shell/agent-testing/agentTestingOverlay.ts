@@ -66,11 +66,16 @@ import {
   type AgentTestingSessionKind,
 } from "@/app/shell/agent-testing/agentTestingSession";
 import {
+  clearNavMcpHintDom,
+  deriveLiveMcpStatus,
+  isMcpChromeLive as isMcpChromeLivePure,
+  paintMcpChromeDom,
+} from "@/app/shell/agent-testing/agentTestingMcpChrome";
+import {
   armMcpPendingTimeout,
   beginMcpConnecting,
   clearMcpConnectionError,
   clearMcpPending,
-  deriveMcpConnectionStatus,
   getQaPendingTimeoutMs,
   registerMcpPendingTimeoutHandler,
   reportMcpConnectionError,
@@ -528,11 +533,7 @@ function saveDump(
       capturePaused,
       mcp: (() => {
         try {
-          const s = deriveMcpConnectionStatus({
-            sessionKind: getSessionKind(),
-            overlayActive: active,
-            awaitingReply: isAwaitingUserReply(),
-          });
+          const s = readLiveMcpStatus();
           return {
             phase: s.phase,
             label: s.label,
@@ -1294,85 +1295,49 @@ function syncSessionChrome(): void {
   refreshMcpStatusDom();
 }
 
-function readLiveMcpStatus(): McpConnectionStatus {
-  return deriveMcpConnectionStatus({
-    overlayActive: active && !settling,
+/**
+ * MCP chrome (nav OBS/CTRL + panel line + viewport border) is live only when
+ * session is active, gate open, and overlay panel actually shown — never ghost.
+ */
+function mcpChromeInput() {
+  let gateOpen = false;
+  try {
+    gateOpen = isQaDiagGateOpen();
+  } catch {
+    gateOpen = false;
+  }
+  return {
+    active,
+    settling,
     sessionKind: getSessionKind(),
     awaitingReply: isAwaitingUserReply(),
-  });
+    gateOpen,
+    overlayDomVisible: isAgentTestingOverlayDomVisible(),
+    rootId: ROOT_ID,
+  };
+}
+
+function isMcpChromeLive(): boolean {
+  const i = mcpChromeInput();
+  return isMcpChromeLivePure(i);
+}
+
+function readLiveMcpStatus(): McpConnectionStatus {
+  return deriveLiveMcpStatus(mcpChromeInput());
 }
 
 export function getAgentTestingMcpConnectionStatus(): McpConnectionStatus {
   return readLiveMcpStatus();
 }
 
+function clearNavMcpHint(): void {
+  clearNavMcpHintDom();
+}
+
 function refreshMcpStatusDom(): void {
   if (!hasDomQuery()) return;
-  const status = readLiveMcpStatus();
-  const root = document.getElementById(ROOT_ID);
-  const wrap = root?.querySelector<HTMLElement>(
-    ".studio-agent-testing-overlay__mcp-status"
-  );
-  const chip = root?.querySelector<HTMLElement>(
-    ".studio-agent-testing-overlay__mcp"
-  );
-  // Strip legacy duplicate "Connection · …" line if present
-  root
-    ?.querySelectorAll(".studio-agent-testing-overlay__mcp-mode")
-    .forEach((el) => el.remove());
-  if (chip) {
-    if (!status.label || status.phase === "idle") {
-      chip.hidden = true;
-      chip.textContent = "";
-      delete chip.dataset.phase;
-      if (wrap) wrap.hidden = true;
-    } else {
-      chip.hidden = false;
-      chip.textContent = status.label;
-      chip.dataset.phase = status.phase;
-      chip.title = status.label;
-      if (wrap) wrap.hidden = false;
-    }
-  }
-  if (root) {
-    if (status.phase === "idle") delete root.dataset.mcp;
-    else root.dataset.mcp = status.phase;
-  }
-  const html = document.documentElement;
-  if (html?.dataset) {
-    if (status.phase === "idle") delete html.dataset.studioMcpStatus;
-    else html.dataset.studioMcpStatus = status.phase;
-  }
-  const navHint = document.querySelector<HTMLElement>(
-    ".studio-nav-version__mcp"
-  );
-  if (navHint) {
-    if (!status.label || status.phase === "idle") {
-      navHint.hidden = true;
-      navHint.textContent = "";
-      delete navHint.dataset.phase;
-    } else {
-      navHint.hidden = false;
-      // Short nav hint
-      const short =
-        status.phase === "pending"
-          ? "PENDING"
-          : status.phase === "control"
-            ? "CTRL"
-            : status.phase === "observe"
-              ? "OBS"
-              : status.phase === "connecting"
-                ? "…"
-                : status.phase === "connected"
-                  ? "OK"
-                  : status.phase === "error"
-                    ? "ERR"
-                    : "";
-      navHint.textContent = short;
-      navHint.dataset.phase = status.phase;
-      navHint.title = status.label;
-    }
-  }
+  const input = mcpChromeInput();
+  paintMcpChromeDom(input, deriveLiveMcpStatus(input));
 }
 
 /** PENDING timeout: auto-pause + log (user can Resume). */
@@ -1547,7 +1512,7 @@ function ensureOverlayChrome(root: HTMLElement): void {
     strayDump.remove();
   }
 
-  // Lean MCP status line under Message/Send (no bordered chrome)
+  // Lean MCP status line under Message/Send (diode + muted label)
   let mcpStatus = panel.querySelector<HTMLElement>(
     ".studio-agent-testing-overlay__mcp-status"
   );
@@ -1556,6 +1521,7 @@ function ensureOverlayChrome(root: HTMLElement): void {
     mcpStatus.className = "studio-agent-testing-overlay__mcp-status";
     mcpStatus.hidden = true;
     mcpStatus.innerHTML =
+      '<span class="studio-agent-testing-overlay__mcp-diode" data-phase="idle" hidden aria-hidden="true"></span>' +
       '<span class="studio-agent-testing-overlay__mcp" data-phase="idle" hidden></span>';
   } else {
     mcpStatus
@@ -1563,7 +1529,15 @@ function ensureOverlayChrome(root: HTMLElement): void {
       .forEach((el) => el.remove());
     if (!mcpStatus.querySelector(".studio-agent-testing-overlay__mcp")) {
       mcpStatus.innerHTML =
+        '<span class="studio-agent-testing-overlay__mcp-diode" data-phase="idle" hidden aria-hidden="true"></span>' +
         '<span class="studio-agent-testing-overlay__mcp" data-phase="idle" hidden></span>';
+    }
+    if (!mcpStatus.querySelector(".studio-agent-testing-overlay__mcp-diode")) {
+      const d = document.createElement("span");
+      d.className = "studio-agent-testing-overlay__mcp-diode";
+      d.setAttribute("aria-hidden", "true");
+      d.hidden = true;
+      mcpStatus.insertBefore(d, mcpStatus.firstChild);
     }
   }
   const note = panel.querySelector(".studio-agent-testing-overlay__note");
@@ -1717,6 +1691,7 @@ function ensureRoot(): HTMLElement | null {
         <button type="submit" class="studio-agent-testing-overlay__note-submit">Send</button>
       </form>
       <div class="studio-agent-testing-overlay__mcp-status" hidden>
+        <span class="studio-agent-testing-overlay__mcp-diode" data-phase="idle" hidden aria-hidden="true"></span>
         <span class="studio-agent-testing-overlay__mcp" data-phase="idle" hidden></span>
       </div>
     </div>
@@ -2789,6 +2764,8 @@ export function softCloseAgentTestingLogger(reason = "soft-close"): void {
   setQaSessionLock(null);
   setActivityPhase("idle");
   syncSessionChrome();
+  clearNavMcpHint();
+  refreshMcpStatusDom();
 }
 
 /**
@@ -2951,6 +2928,7 @@ export function forceClearAgentTestingOverlay(): void {
     // race during reset cannot leave a sticky BR panel after forceClear.
     safeResetStudio();
     teardownDom(true);
+    clearNavMcpHint();
     refreshMcpStatusDom();
   } catch {
     try {

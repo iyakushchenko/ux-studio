@@ -100,9 +100,11 @@
   margin-left: auto;
 }
 
-/* Lean status bar under Message — muted text only (no bordered chrome). */
+/* Lean status bar under Message — diode + muted label (SSoT phase). */
 .studio-agent-testing-overlay__mcp-status {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin: -2px 0 0;
   padding: 0;
   border: none;
@@ -115,6 +117,140 @@
   display: none !important;
 }
 
+/* Camera-lens diode — same language as playback/REC on-air LED */
+.studio-agent-testing-overlay__mcp-diode {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: linear-gradient(155deg, #5a5a5a 0%, #242424 52%, #383838 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.55),
+    0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.studio-agent-testing-overlay__mcp-diode::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 34% 28%,
+    #4a5568 0%,
+    #1a2030 36%,
+    #07090d 68%,
+    #151b28 100%
+  );
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.9);
+}
+
+.studio-agent-testing-overlay__mcp-diode[hidden] {
+  display: none !important;
+}
+
+.studio-agent-testing-overlay__mcp-diode[data-phase="connecting"]::before,
+.studio-agent-testing-overlay__mcp-diode[data-phase="connected"]::before {
+  background: radial-gradient(
+    circle at 38% 30%,
+    #c8d8f0 0%,
+    #8eb0e0 40%,
+    #5a84c4 100%
+  );
+  box-shadow:
+    0 0 4px rgba(140, 180, 240, 0.7),
+    0 0 8px rgba(140, 180, 240, 0.35);
+  animation: studio-agent-testing-mcp-diode-pulse 1.1s ease-out infinite;
+}
+
+.studio-agent-testing-overlay__mcp-diode[data-phase="control"]::before {
+  background: radial-gradient(
+    circle at 38% 30%,
+    #b8ffd8 0%,
+    #74ffb3 36%,
+    #3dd68c 64%,
+    #1f9f5c 100%
+  );
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.72),
+    0 0 5px rgba(93, 255, 138, 0.95),
+    0 0 11px rgba(93, 255, 138, 0.45);
+  animation: none;
+}
+
+.studio-agent-testing-overlay__mcp-diode[data-phase="observe"]::before {
+  background: radial-gradient(
+    circle at 38% 30%,
+    #ffb8f5 0%,
+    #ff6ae8 36%,
+    #e03fd0 64%,
+    #a01a98 100%
+  );
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.55),
+    0 0 5px rgba(255, 76, 240, 0.9),
+    0 0 11px rgba(255, 76, 240, 0.4);
+  animation: none;
+}
+
+.studio-agent-testing-overlay__mcp-diode[data-phase="pending"]::before {
+  background: radial-gradient(
+    circle at 38% 30%,
+    #d8ecff 0%,
+    #8ec5ff 40%,
+    #4a9ae0 100%
+  );
+  box-shadow:
+    0 0 5px rgba(142, 197, 255, 0.95),
+    0 0 10px rgba(142, 197, 255, 0.45);
+  animation: studio-agent-testing-mcp-diode-pulse-blue 1.15s ease-out infinite;
+}
+
+.studio-agent-testing-overlay__mcp-diode[data-phase="error"]::before {
+  background: radial-gradient(
+    circle at 38% 30%,
+    #ffd0d0 0%,
+    #ff8a8a 40%,
+    #e04545 100%
+  );
+  box-shadow:
+    0 0 5px rgba(255, 100, 100, 0.95),
+    0 0 10px rgba(255, 80, 80, 0.45);
+  animation: none;
+}
+
+.studio-agent-testing-overlay__mcp-diode[data-phase="idle"]::before {
+  animation: none;
+}
+
+@keyframes studio-agent-testing-mcp-diode-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(140, 180, 240, 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(140, 180, 240, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(140, 180, 240, 0);
+  }
+}
+
+@keyframes studio-agent-testing-mcp-diode-pulse-blue {
+  0% {
+    box-shadow: 0 0 0 0 rgba(142, 197, 255, 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(142, 197, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(142, 197, 255, 0);
+  }
+}
+
 /* Legacy duplicate mode line — hide if hydrate leaves stray DOM */
 .studio-agent-testing-overlay__mcp-mode {
   display: none !important;
@@ -122,6 +258,8 @@
 
 .studio-agent-testing-overlay__mcp {
   display: block;
+  flex: 1 1 auto;
+  min-width: 0;
   margin: 0;
   padding: 0;
   border: none;
