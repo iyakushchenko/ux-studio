@@ -142,6 +142,17 @@ export function describeClickSelector(el: Element): string {
   const action = labelled.getAttribute?.("data-studio-action")?.trim();
   if (action) return `[data-studio-action="${action}"]`;
 
+  // Calendar / book cells — stable cal attrs beat hover class soup.
+  const calKind = labelled.getAttribute?.("data-studio-cal-kind")?.trim();
+  if (calKind) {
+    const month = labelled.getAttribute?.("data-studio-cal-month")?.trim();
+    const value = labelled.getAttribute?.("data-studio-cal-value")?.trim();
+    let sel = `[data-studio-cal-kind="${calKind}"]`;
+    if (month) sel += `[data-studio-cal-month="${month}"]`;
+    if (value) sel += `[data-studio-cal-value="${value}"]`;
+    return sel;
+  }
+
   const screen = labelled.getAttribute?.("data-studio-screen")?.trim();
   if (screen) return `[data-studio-screen="${screen}"]`;
 

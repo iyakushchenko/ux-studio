@@ -30,11 +30,11 @@ const ALLOWLIST = {
   "src/styles/globals-chrome.css": 2600,
   "src/styles/globals-hub.css": 1400,
   // Engine / hybrid monsters — prefer domain split over bumping.
-  "src/app/orchestra/useJourneyPlayback.ts": 2020, // + book-step2 preserveHandoff forward landing; recordedClick SF/Play
+  "src/app/orchestra/useJourneyPlayback.ts": 2150, // + first-class camera beat play/auto/step/retreat wiring
   "src/app/App.tsx": 2130, // + playback camera session latch (CJM/play/AIR screen-enter policy)
   "src/app/shell/agent-testing/agentTestingOverlay.ts": 4500, // PP-13 expand + stale-green + diag mirror (landed past 4120)
   "src/app/nav/studioNavPanel.css": 1700, // + MCP status hint near version/bug
-  "src/app/shell/studioMcpHelpers.ts": 1360, // MCP surface + R15 PO poll; extract stepForwardSmoke when next growth
+  "src/app/shell/studioMcpHelpers.ts": 1380, // + Traditional keep-overlay full Play prove window API
   "src/app/scenario/demoCursor.ts": 1740, // FM stop≠settle hang-guard; on-target click gate; demoCursorOnTarget.ts
   "src/projects/boots-pharmacy/wire/BootsPharmacyProjectView.tsx": 4825, // + screen-enter camera gate (no blind origin on CJM tab change)
   "src/projects/boots-pharmacy/data/plpListing.ts": 2000, // Make PLP DOM; retire with PLP React

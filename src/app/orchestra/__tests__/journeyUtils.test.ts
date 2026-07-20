@@ -262,11 +262,25 @@ describe("resolveJourneyRetreatTarget", () => {
     }
   });
 
-  it("steps back from traditional confirmation to book-step2-reserve", () => {
+  it("steps back from traditional confirmation to book-step3-camera", () => {
     const target = resolveJourneyRetreatTarget({
       playlist,
       currentTouchpointKey: "beat:confirmation",
       currentBeatId: "confirmation",
+      beats: TRADITIONAL_CJM_JOURNEY.beats,
+      shouldSkipBeat: (beat) => shouldSkipTraditionalLoginBeat(beat, true),
+    });
+    expect(target?.kind).toBe("beat");
+    if (target?.kind === "beat") {
+      expect(target.beat.id).toBe("book-step3-camera");
+    }
+  });
+
+  it("steps back from book-step3-camera to book-step2-reserve", () => {
+    const target = resolveJourneyRetreatTarget({
+      playlist,
+      currentTouchpointKey: "beat:book-step3-camera",
+      currentBeatId: "book-step3-camera",
       beats: TRADITIONAL_CJM_JOURNEY.beats,
       shouldSkipBeat: (beat) => shouldSkipTraditionalLoginBeat(beat, true),
     });

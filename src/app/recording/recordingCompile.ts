@@ -499,6 +499,30 @@ function compileFallbackBeats(
       const base =
         actionMatch?.[1] ??
         slugBeatId(event.element ?? "recorded-click");
+
+      // First-class camera beat when REC captured scroll-before-click.
+      const camChain = click.cameraSelectorChain;
+      const camAnchor = click.cameraAnchorSelector;
+      if (camChain?.length || camAnchor) {
+        const camId = uniqueBeatId(
+          slugBeatId(`${base}-camera`),
+          usedIds
+        );
+        beats.push({
+          id: camId,
+          label: `Camera — ${(event.element ?? base).trim().slice(0, 48)}`,
+          kind: "camera",
+          protoTab: contextProtoTab(),
+          camera: {
+            dwellMs: 1200,
+            selectorChain: camChain,
+            anchorSelector: camAnchor,
+          },
+        });
+        delete click.cameraSelectorChain;
+        delete click.cameraAnchorSelector;
+      }
+
       const beatId = uniqueBeatId(slugBeatId(base), usedIds);
       const beat: JourneyBeat = {
         id: beatId,

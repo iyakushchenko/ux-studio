@@ -13,7 +13,7 @@ CJM is **not** an imperative director novel. It is a **tab script**: targets fro
 
 **Compile path:** REC events → `recordedClick` + `dwellMs` beats → same Play runners as Step.
 
-**Prove helpers:** Agentic keep-overlay = `__studioRunAgenticFullPlayProve`. Traditional smoke = `__protoRunTraditionalPlaySmoke` (teardown); keep-overlay Traditional full prove = TBD.
+**Prove helpers:** Agentic keep-overlay = `__studioRunAgenticFullPlayProve`. Traditional keep-overlay = `__studioRunTraditionalFullPlayProve` (smoke `__protoRunTraditionalPlaySmoke` tears down).
 
 ## Camera engine rails
 
@@ -22,6 +22,7 @@ Same camera for agentic / traditional / REC — see [PLAYBACK.md](./PLAYBACK.md)
 - Target-driven; no blind origin on screen-enter while CJM/play/AIR.
 - `playbackScroll.ts` is SSoT — wire must not snap origin on tab change during session.
 - Intentional origin (start/retreat/probe) uses `force: true` and honors post-click hold.
+- **Camera beat** (`kind: "camera"` + `camera: { dwellMs, selectorChain }`) — own STEPS slot: wait (show page) → eased scroll; step-back reverses to pre-scroll top. Edit = swap target / timing. Traditional Book Step 3 uses this before Open Appointments.
 
 ## Exceptions (deeper, keep thin)
 

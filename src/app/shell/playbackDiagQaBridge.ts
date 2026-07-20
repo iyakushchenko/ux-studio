@@ -358,10 +358,24 @@ export function labelForPlaybackDiagEvent(event: PlaybackDiagEvent): string {
 }
 
 /** Mirror a diag event into ring + overlay chat when gate open. */
+let lastMirroredJourneyResetAt = 0;
+const JOURNEY_RESET_DEDUPE_MS = 800;
+
 export function mirrorPlaybackDiagToQa(event: PlaybackDiagEvent): void {
   if (!isQaDiagGateOpen()) return;
   if (isAgentTestingFinaleSealed()) return;
   if (!shouldMirrorPlaybackDiagToQa(event)) return;
+
+  // Dedupe double journey-reset rows at play-end (play-end + 2× journey-reset).
+  if (event.kind === "journey-reset") {
+    const now =
+      typeof performance !== "undefined" ? performance.now() : Date.now();
+    if (now - lastMirroredJourneyResetAt < JOURNEY_RESET_DEDUPE_MS) {
+      return;
+    }
+    lastMirroredJourneyResetAt = now;
+  }
+
   const label = labelForPlaybackDiagEvent(event);
   const outcome = outcomeForPlaybackDiagEvent(event);
   try {

@@ -25,7 +25,7 @@ export type JourneyBundleFile = {
   journeys: JourneyDefinition[];
 };
 
-const BEAT_KINDS = new Set(["screen-frames", "tab-landing", "overlay"]);
+const BEAT_KINDS = new Set(["screen-frames", "tab-landing", "overlay", "camera"]);
 
 function assertJourneyDefinition(journey: unknown): JourneyDefinition {
   if (!journey || typeof journey !== "object") {

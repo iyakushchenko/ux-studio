@@ -72,7 +72,8 @@ describe("qaDiagGate", () => {
       info.mock.calls.some((c) => String(c[0]).includes("[PLAYBACK_DIAG]"))
     ).toBe(false);
     openQaDiagGate();
-    playbackDiagLog("info", "loud-when-open");
+    // Lean console: routine info is dump-only; FAIL/clear milestones still console.
+    playbackDiagLog("info", "FAIL loud-when-open");
     expect(
       info.mock.calls.some((c) => String(c[0]).includes("[PLAYBACK_DIAG]"))
     ).toBe(true);

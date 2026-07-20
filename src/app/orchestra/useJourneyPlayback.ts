@@ -24,10 +24,15 @@ import {
 } from "@/app/shell/playbackInteractionContext";
 import {
   beatDirectorScriptLabel,
+  beatHasCameraStep,
   isDwellLandingBeat,
   prepareBeatIndexAdvance,
   shouldChainManualDirectorStepOnAdvance,
 } from "@/app/orchestra/journeyBeatDirector";
+import {
+  clearCameraBeatUndo,
+  playCameraBeat,
+} from "@/app/orchestra/cameraBeatPlayback";
 import {
   shouldAdvanceCompletedDirectorStep,
   shouldSuppressTransportNoOpForBeat,
@@ -239,6 +244,7 @@ export function useJourneyPlayback({
   const lastTabAutoRunRef = useRef<string | null>(null);
   const lastHomeAutoRunRef = useRef<string | null>(null);
   const lastRecordedClickAutoRunRef = useRef<string | null>(null);
+  const lastCameraAutoRunRef = useRef<string | null>(null);
   const isPlayingRef = useRef(false);
   /** Skip beat-enter tab nav on first mount so sessionStorage tab is preserved. */
   const suppressInitialBeatTabNavRef = useRef(true);
@@ -301,6 +307,7 @@ export function useJourneyPlayback({
     lastTabAutoRunRef.current = null;
     lastHomeAutoRunRef.current = null;
     lastRecordedClickAutoRunRef.current = null;
+    lastCameraAutoRunRef.current = null;
   }, [playback, runtime, setScriptingActive, stopScrollPoll]);
 
   const stopJourneyPlay = useCallback(() => {
@@ -882,6 +889,68 @@ export function useJourneyPlayback({
     ]
   );
 
+  /** First-class camera dwell → eased scroll (own STEPS; reverse on step-back). */
+  const runCameraBeat = useCallback(
+    async (
+      beat: JourneyBeat,
+      options?: { skip?: boolean; manualStep?: boolean; instant?: boolean }
+    ) => {
+      const activeBeat = beats[beatIndexRef.current] ?? beat;
+      if (!beatHasCameraStep(activeBeat) || !activeBeat.camera) return false;
+      const runId = `${beatIndexRef.current}:${activeBeat.id}`;
+      if (options?.manualStep && lastCameraAutoRunRef.current === runId) {
+        setScriptingActive(true);
+        return advanceFromCompletedDirectorBeat(options);
+      }
+      noteDirectorScriptInteraction(activeBeat, options);
+      setScriptingActive(true);
+      try {
+        const { ok, failureStep, diagnosticSent } = await invokeBeatScript(
+          "camera",
+          async () => {
+            const result = await playCameraBeat(activeBeat.camera!, {
+              skip: options?.skip,
+              instant: options?.instant,
+              beatId: activeBeat.id,
+            });
+            if (!result.ok) {
+              return {
+                ok: false as const,
+                step: result.step ?? "camera-beat",
+              };
+            }
+            return { ok: true as const };
+          },
+          options
+        );
+        if (!ok) {
+          lastCameraAutoRunRef.current = null;
+          if (!options?.skip && !diagnosticSent) {
+            reportScriptFailure(activeBeat, { failureStep });
+          }
+          return false;
+        }
+        lastCameraAutoRunRef.current = runId;
+        const next = advanceFrom(beatIndexRef.current);
+        if (next >= beats.length) return true;
+        const nextBeat = beats[next];
+        advanceBeatIndexForManualChain(activeBeat, nextBeat, next, options);
+        return true;
+      } finally {
+        setScriptingActive(false);
+      }
+    },
+    [
+      advanceBeatIndexForManualChain,
+      advanceFrom,
+      advanceFromCompletedDirectorBeat,
+      beats,
+      invokeBeatScript,
+      reportScriptFailure,
+      setScriptingActive,
+    ]
+  );
+
   useEffect(() => {
     transportStepAttemptRef.current = null;
   }, [beatIndex, screenPlayback.visibleCount]);
@@ -1092,6 +1161,7 @@ export function useJourneyPlayback({
       beat?.homeScript ||
       beat?.bookScript ||
       beat?.tabScript ||
+      beatHasCameraStep(beat) ||
       beat?.recordedClick?.selectorChain?.length
     ) {
       return;
@@ -1161,6 +1231,7 @@ export function useJourneyPlayback({
     lastTabAutoRunRef.current = null;
     lastHomeAutoRunRef.current = null;
     lastRecordedClickAutoRunRef.current = null;
+    lastCameraAutoRunRef.current = null;
     if (!scenarioBrowseMode) {
       setPlaybackCursorDiagnosticContext({
         beatId: currentBeat.id,
@@ -1365,6 +1436,34 @@ export function useJourneyPlayback({
   ]);
 
   useEffect(() => {
+    if (
+      !active ||
+      !isPlaying ||
+      isScripting ||
+      !beatHasCameraStep(currentBeat)
+    ) {
+      return;
+    }
+
+    const runId = `${beatIndex}:${currentBeat!.id}`;
+    if (lastCameraAutoRunRef.current === runId) return;
+
+    void (async () => {
+      const ok = await runCameraBeat(currentBeat!);
+      if (!ok) return;
+      if (!isPlayingRef.current) return;
+      scheduleDwellAdvanceRef.current();
+    })();
+  }, [
+    active,
+    beatIndex,
+    currentBeat,
+    isPlaying,
+    isScripting,
+    runCameraBeat,
+  ]);
+
+  useEffect(() => {
     if (!active) {
       screenBeatReadyRef.current = null;
       return;
@@ -1480,6 +1579,7 @@ export function useJourneyPlayback({
     lastTabAutoRunRef.current = null;
     lastHomeAutoRunRef.current = null;
     lastRecordedClickAutoRunRef.current = null;
+    lastCameraAutoRunRef.current = null;
     suppressInitialBeatTabNavRef.current = false;
     setBeatIndex(0);
     beatIndexRef.current = 0;
@@ -1500,6 +1600,7 @@ export function useJourneyPlayback({
     lastTabAutoRunRef.current = null;
     lastHomeAutoRunRef.current = null;
     lastRecordedClickAutoRunRef.current = null;
+    lastCameraAutoRunRef.current = null;
     setBeatIndex(next);
     beatIndexRef.current = next;
     return true;
@@ -1523,6 +1624,9 @@ export function useJourneyPlayback({
       if (beat.availScript) {
         return runAvailScriptBeat(beat, advanceAfter, options);
       }
+      if (beatHasCameraStep(beat)) {
+        return runCameraBeat(beat, options);
+      }
       if (beat.recordedClick?.selectorChain?.length) {
         return runRecordedClickBeat(beat, options);
       }
@@ -1531,6 +1635,7 @@ export function useJourneyPlayback({
     [
       runAvailScriptBeat,
       runBookScriptBeat,
+      runCameraBeat,
       runHomeScriptBeat,
       runRecordedClickBeat,
       runTabScriptBeat,
@@ -1616,6 +1721,7 @@ export function useJourneyPlayback({
     lastTabAutoRunRef.current = null;
     lastHomeAutoRunRef.current = null;
     lastRecordedClickAutoRunRef.current = null;
+    lastCameraAutoRunRef.current = null;
 
     runtime.closeAllPopups();
     runtime.closeAvailability();
@@ -1737,6 +1843,12 @@ export function useJourneyPlayback({
       void runRecordedClickBeat(activeBeat, { manualStep: true });
       return;
     }
+    if (beatHasCameraStep(activeBeat)) {
+      setScriptingActive(true);
+      noteManualDirectorStep(activeBeat);
+      void runCameraBeat(activeBeat, { manualStep: true });
+      return;
+    }
     if (isDwellLandingBeat(activeBeat)) {
       advanceFromDwellLanding(activeBeat);
       return;
@@ -1754,6 +1866,7 @@ export function useJourneyPlayback({
     playbackScrollBusy,
     runAvailScriptBeat,
     runBookScriptBeat,
+    runCameraBeat,
     runHomeScriptBeat,
     runRecordedClickBeat,
     runTabScriptBeat,
@@ -1828,6 +1941,13 @@ export function useJourneyPlayback({
       return;
     }
 
+    if (beatHasCameraStep(beat)) {
+      isPlayingRef.current = true;
+      setIsPlaying(true);
+      lastCameraAutoRunRef.current = null;
+      return;
+    }
+
     isPlayingRef.current = true;
     setIsPlaying(true);
 
@@ -1859,6 +1979,7 @@ export function useJourneyPlayback({
     const fromBeat = beats[beatIndexRef.current];
     suppressInitialBeatTabNavRef.current = false;
     stopJourneyPlay();
+    clearCameraBeatUndo();
     beginRetreatSync();
     cancelDemoCursorJourneyEndFade();
     void parkDemoCursorAtRest({ animate: false });

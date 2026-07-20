@@ -30,9 +30,16 @@ export function directorScriptScrollsViewport(
   );
 }
 
+/** First-class camera dwell/scroll step (own STEPS slot). */
+export function beatHasCameraStep(beat: JourneyBeat | undefined): boolean {
+  if (!beat) return false;
+  return beat.kind === "camera" || Boolean(beat.camera);
+}
+
 /** Beat runs a cursor-guided playback script (not a dwell / screen-frames beat). */
 export function beatHasDirectorScript(beat: JourneyBeat | undefined): boolean {
   if (!beat) return false;
+  if (beatHasCameraStep(beat)) return true;
   return Boolean(
     beat.bookScript ??
       beat.tabScript ??
@@ -42,9 +49,10 @@ export function beatHasDirectorScript(beat: JourneyBeat | undefined): boolean {
   );
 }
 
-/** Tab/overlay landing beat with no script — camera-only or dwell frame. */
+/** Tab/overlay landing beat with no script — dwell frame (not camera step). */
 export function isDwellLandingBeat(beat: JourneyBeat | undefined): boolean {
   if (!beat || beat.kind === "screen-frames") return false;
+  if (beatHasCameraStep(beat)) return false;
   return !beatHasDirectorScript(beat);
 }
 
@@ -63,6 +71,13 @@ export function beatDirectorScriptLabel(
   beat: JourneyBeat | undefined
 ): string | undefined {
   if (!beat) return undefined;
+  if (beatHasCameraStep(beat)) {
+    return (
+      beat.camera?.selectorChain?.[0] ||
+      beat.camera?.anchorSelector ||
+      "camera"
+    );
+  }
   if (beat.recordedClick?.selectorChain?.length) {
     return (
       beat.recordedClick.element?.trim() ||

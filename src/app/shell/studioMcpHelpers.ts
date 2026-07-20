@@ -84,6 +84,11 @@ import {
   type AgenticFullPlayProveOptions,
   type AgenticFullPlayProveResult,
 } from "@/app/shell/agenticFullPlayProve";
+import {
+  runTraditionalFullPlayProve,
+  type TraditionalFullPlayProveOptions,
+  type TraditionalFullPlayProveResult,
+} from "@/app/shell/traditionalFullPlayProve";
 import type { AgentTestingPoSignal } from "@/app/shell/agent-testing/agentTestingPoSignal";
 import { pollSmokePoSignal } from "@/app/shell/smokePoSignalPoll";
 
@@ -241,6 +246,16 @@ declare global {
     __protoRunAgenticFullPlayProve?: (
       options?: AgenticFullPlayProveOptions
     ) => Promise<AgenticFullPlayProveResult>;
+    /**
+     * Full Traditional continuous Play prove (KEEP overlay for Save Log).
+     * Prefer over `__protoRunTraditionalPlaySmoke` for agent proves.
+     */
+    __studioRunTraditionalFullPlayProve?: (
+      options?: TraditionalFullPlayProveOptions
+    ) => Promise<TraditionalFullPlayProveResult>;
+    __protoRunTraditionalFullPlayProve?: (
+      options?: TraditionalFullPlayProveOptions
+    ) => Promise<TraditionalFullPlayProveResult>;
     /** Jump-to-end then step-back — traditional book / confirmation / browse baselines. */
     __protoRunTraditionalRetreatSmoke?: (options?: {
       timeoutMs?: number;
@@ -1178,9 +1193,13 @@ export function registerStudioMcpHelpers(options: {
       { resetToJourneyStart: true }
     );
 
-  // Prove path — forceClear + arm + Play + peak 21/21 + leave; keeps QA overlay.
+  // Prove path — forceClear + arm + Play + peak 22/22 + leave; keeps QA overlay.
   window.__studioRunAgenticFullPlayProve = runAgenticFullPlayProve;
   window.__protoRunAgenticFullPlayProve = runAgenticFullPlayProve;
+
+  // Traditional keep-overlay prove — peak 13 (or 12 when login skipped) + leave.
+  window.__studioRunTraditionalFullPlayProve = runTraditionalFullPlayProve;
+  window.__protoRunTraditionalFullPlayProve = runTraditionalFullPlayProve;
 
   window.__protoRunTraditionalRetreatSmoke = (smokeOptions) =>
     withMcpTestSession(
@@ -1335,6 +1354,8 @@ export function registerStudioMcpHelpers(options: {
     delete window.__protoRunAgenticPlaySmoke;
     delete window.__studioRunAgenticFullPlayProve;
     delete window.__protoRunAgenticFullPlayProve;
+    delete window.__studioRunTraditionalFullPlayProve;
+    delete window.__protoRunTraditionalFullPlayProve;
     delete window.__protoRunTraditionalRetreatSmoke;
     delete window.__protoRunTraditionalControlRoomRobotQa;
     delete window.__protoAbortAll;

@@ -60,11 +60,11 @@ describe("runAgenticFullPlayProve", () => {
     vi.mocked(runPlayJourneyToStartSmoke).mockReset();
   });
 
-  it("PASS when smoke peak 21/21 + play-end assert; keeps overlay; pauses leave", async () => {
+  it("PASS when smoke peak 22/22 + play-end assert; keeps overlay; pauses leave", async () => {
     vi.mocked(runPlayJourneyToStartSmoke).mockResolvedValue({
       pass: true,
-      peakVisible: 21,
-      peakCounter: "STEPS: 21 / 21",
+      peakVisible: 22,
+      peakCounter: "STEPS: 22 / 22",
       assert: {
         pass: true,
         beatId: "agentic-home",
@@ -81,23 +81,23 @@ describe("runAgenticFullPlayProve", () => {
     expect(result.pass).toBe(true);
     expect(result.errors).toEqual([]);
     expect(result.peak).toMatchObject({
-      visible: 21,
-      total: 21,
+      visible: 22,
+      total: 22,
     });
     expect(result.end?.pass).toBe(true);
     expect(result.leave?.ok).toBe(true);
     expect(result.leave?.capturePaused).toBe(true);
     expect(isAgentTestingOverlayActive()).toBe(true);
     expect(isAgentTestingOverlayDomPresent()).toBe(true);
-    expect(AGENTIC_FULL_PLAY_EXPECTED_PEAK).toBe(21);
+    expect(AGENTIC_FULL_PLAY_EXPECTED_PEAK).toBe(22);
     expect(AGENTIC_FULL_PLAY_PROVE_DEFAULT_TIMEOUT_MS).toBe(300_000);
   });
 
   it("passes default timeoutMs 300_000 into play smoke when omitted", async () => {
     vi.mocked(runPlayJourneyToStartSmoke).mockResolvedValue({
       pass: true,
-      peakVisible: 21,
-      peakCounter: "STEPS: 21 / 21",
+      peakVisible: 22,
+      peakCounter: "STEPS: 22 / 22",
       assert: {
         pass: true,
         beatId: "agentic-home",
@@ -115,11 +115,11 @@ describe("runAgenticFullPlayProve", () => {
     });
   });
 
-  it("FAIL honestly when peak short of 21/21 — no invent green", async () => {
+  it("FAIL honestly when peak short of 22/22 — no invent green", async () => {
     vi.mocked(runPlayJourneyToStartSmoke).mockResolvedValue({
       pass: true,
       peakVisible: 12,
-      peakCounter: "STEPS: 12 / 21",
+      peakCounter: "STEPS: 12 / 22",
       assert: {
         pass: true,
         beatId: "agentic-home",
@@ -133,7 +133,7 @@ describe("runAgenticFullPlayProve", () => {
     });
 
     expect(result.pass).toBe(false);
-    expect(result.errors.some((e) => e.startsWith("peak-not-21/21"))).toBe(
+    expect(result.errors.some((e) => e.startsWith("peak-not-22/22"))).toBe(
       true
     );
     expect(isAgentTestingOverlayActive()).toBe(true);
@@ -144,7 +144,7 @@ describe("runAgenticFullPlayProve", () => {
       pass: false,
       reason: "playback-diagnostic",
       peakVisible: 8,
-      peakCounter: "STEPS: 8 / 21",
+      peakCounter: "STEPS: 8 / 22",
       assert: { pass: false, reason: "not-at-start" },
     });
 

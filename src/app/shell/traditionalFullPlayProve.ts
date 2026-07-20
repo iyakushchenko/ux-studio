@@ -1,9 +1,9 @@
 /**
- * One prove entrypoint — full agentic continuous Play (CJM).
+ * One prove entrypoint — full Traditional continuous Play (CJM).
  *
- * Unlike `__protoRunAgenticPlaySmoke` (tears down overlay via withMcpTestSession),
- * this path ALWAYS forceClear → fresh arm → Play → assert peak 22/22 + play-end
- * at start → pauseForAgentLeave, and **keeps** QA overlay visible for Save Log.
+ * Unlike `__protoRunTraditionalPlaySmoke` (tears down overlay via withMcpTestSession),
+ * this path ALWAYS forceClear → fresh arm → Play → assert peak (playlist total) +
+ * play-end at start → pauseForAgentLeave, and **keeps** QA overlay visible for Save Log.
  */
 
 import {
@@ -32,41 +32,40 @@ import {
   type PlayJourneySmokeResult,
 } from "@/app/shell/playJourneySmoke";
 
-/** Agentic CJM playlist length (STEPS peak must reach this). */
-export const AGENTIC_FULL_PLAY_EXPECTED_PEAK = 22;
-
 /**
- * Default Play poll budget for full agentic prove.
- * Full 21-beat agentic Play commonly needs ~75–120s+ (type-in, thinking, settles);
- * 180s was borderline and short MCP/agent budgets caused false FAIL mid-playlist.
- * Agents may still pass a higher `timeoutMs` (e.g. 600_000).
+ * Full Traditional playlist with login beat present.
+ * Logged-in Sarah skips login → peak total is one less (assert vs smoke peak total).
  */
-export const AGENTIC_FULL_PLAY_PROVE_DEFAULT_TIMEOUT_MS = 300_000;
+export const TRADITIONAL_FULL_PLAY_EXPECTED_PEAK = 13;
 
-export type AgenticFullPlayProvePeak = {
+export const TRADITIONAL_FULL_PLAY_PROVE_DEFAULT_TIMEOUT_MS = 180_000;
+
+export type TraditionalFullPlayProvePeak = {
   visible: number;
   total: number;
   counter: string | null;
 };
 
-export type AgenticFullPlayProveResult = {
+export type TraditionalFullPlayProveResult = {
   pass: boolean;
-  peak: AgenticFullPlayProvePeak;
+  peak: TraditionalFullPlayProvePeak;
   end: PlayEndAtStartAssertResult | null;
   errors: string[];
-  /** Leave result — overlay stays open for Save Log. */
   leave?: AgentLeavePauseResult;
-  /** Raw smoke payload (debug; do not invent green from this alone). */
   smoke?: PlayJourneySmokeResult;
 };
 
-export type AgenticFullPlayProveOptions = {
-  /** Play poll budget — default {@link AGENTIC_FULL_PLAY_PROVE_DEFAULT_TIMEOUT_MS}. */
+export type TraditionalFullPlayProveOptions = {
   timeoutMs?: number;
   softFailPoAlarm?: boolean;
-  /** Default {@link AGENTIC_FULL_PLAY_EXPECTED_PEAK} (21). */
+  /**
+   * Expected STEPS peak total. Default {@link TRADITIONAL_FULL_PLAY_EXPECTED_PEAK}.
+   * When login is skipped, pass the observed smoke total (or omit and accept
+   * peak.visible >= peak.total && peak.total >= 12).
+   */
   expectedPeak?: number;
-  /** Override pre-arm countdown (tests may pass 0). */
+  /** When true (default), accept peak.total from smoke if ≥12 (login-skip safe). */
+  allowLoginSkipPeak?: boolean;
   preArmMs?: number;
   delay?: (ms: number) => Promise<void>;
 };
@@ -80,7 +79,7 @@ function delayMs(ms: number): Promise<void> {
 function parsePeak(
   counter: string | null | undefined,
   visibleFallback = 0
-): AgenticFullPlayProvePeak {
+): TraditionalFullPlayProvePeak {
   if (!counter) {
     return { visible: visibleFallback, total: 0, counter: null };
   }
@@ -96,21 +95,21 @@ function parsePeak(
 }
 
 /**
- * Full agentic continuous Play prove — agents MUST use this (not ad-hoc Play).
+ * Full Traditional continuous Play prove — keep-overlay path for Save Log.
  *
- * Window: `__studioRunAgenticFullPlayProve` / `__protoRunAgenticFullPlayProve`.
+ * Window: `__studioRunTraditionalFullPlayProve` / `__protoRunTraditionalFullPlayProve`.
  */
-export async function runAgenticFullPlayProve(
-  options?: AgenticFullPlayProveOptions
-): Promise<AgenticFullPlayProveResult> {
+export async function runTraditionalFullPlayProve(
+  options?: TraditionalFullPlayProveOptions
+): Promise<TraditionalFullPlayProveResult> {
   const expectedPeak =
-    options?.expectedPeak ?? AGENTIC_FULL_PLAY_EXPECTED_PEAK;
+    options?.expectedPeak ?? TRADITIONAL_FULL_PLAY_EXPECTED_PEAK;
+  const allowLoginSkip = options?.allowLoginSkipPeak !== false;
   const timeoutMs =
-    options?.timeoutMs ?? AGENTIC_FULL_PLAY_PROVE_DEFAULT_TIMEOUT_MS;
+    options?.timeoutMs ?? TRADITIONAL_FULL_PLAY_PROVE_DEFAULT_TIMEOUT_MS;
   const delay = options?.delay ?? delayMs;
   const errors: string[] = [];
 
-  // 1) ALWAYS CLEAR prior QA (mandatory).
   forceClearAgentTestingOverlay();
 
   const prior = getMcpTestSession();
@@ -118,12 +117,12 @@ export async function runAgenticFullPlayProve(
     requestMcpTestAbort("superseded");
     endMcpTestSession(prior.id);
   }
-  const sessionId = beginMcpTestSession("agentic-full-play-prove");
+  const sessionId = beginMcpTestSession("traditional-full-play-prove");
   enableCursorQaEyes();
 
   let smoke: PlayJourneySmokeResult | undefined;
   let leave: AgentLeavePauseResult | undefined;
-  let peak: AgenticFullPlayProvePeak = {
+  let peak: TraditionalFullPlayProvePeak = {
     visible: 0,
     total: 0,
     counter: null,
@@ -131,20 +130,18 @@ export async function runAgenticFullPlayProve(
   let end: PlayEndAtStartAssertResult | null = null;
 
   try {
-    // 2) Fresh QA arm — overlay usable; do NOT schedule ensure-clear teardown.
-    startAgentTestingOverlay("AGENT TESTING — agentic full play prove");
+    startAgentTestingOverlay("AGENT TESTING — traditional full play prove");
     await preArmAgentTestingOverlay({
       preArmMs: options?.preArmMs ?? DEFAULT_PREARM_MS,
       title: "AGENT TESTING — preparing…",
     });
-    touchAgentTestingOverlay("AGENT TESTING — agentic full play prove");
-    logAgentTestingOverlay("prove: agentic-full-play (keep overlay)");
+    touchAgentTestingOverlay("AGENT TESTING — traditional full play prove");
+    logAgentTestingOverlay("prove: traditional-full-play (keep overlay)");
 
-    // 3–5) Jump start + continuous Play + play-end assert (shared smoke core).
     smoke = await runPlayJourneyToStartSmoke({
-      orchestraMode: "agentic-cjm",
-      startBeatId: "agentic-home",
-      startScreenId: "site-pilot",
+      orchestraMode: "traditional-cjm",
+      startBeatId: "traditional-plp",
+      startScreenId: "plp",
       timeoutMs,
       softFailPoAlarm: options?.softFailPoAlarm,
       delay,
@@ -199,9 +196,14 @@ export async function runAgenticFullPlayProve(
     if (!smoke.pass) {
       errors.push(smoke.reason ?? "play-smoke-failed");
     }
-    if (peak.visible < expectedPeak || peak.total !== expectedPeak) {
+
+    const reachedEnd = peak.visible >= peak.total && peak.total > 0;
+    const peakOk = allowLoginSkip
+      ? reachedEnd && peak.total >= expectedPeak - 1
+      : peak.visible >= expectedPeak && peak.total === expectedPeak;
+    if (!peakOk) {
       errors.push(
-        `peak-not-${expectedPeak}/${expectedPeak}: got ${peak.visible}/${peak.total}` +
+        `peak-not-${expectedPeak}: got ${peak.visible}/${peak.total}` +
           (peak.counter ? ` (${peak.counter})` : "")
       );
     }
@@ -209,7 +211,6 @@ export async function runAgenticFullPlayProve(
       errors.push(end?.reason ?? "play-end-at-start-failed");
     }
 
-    // 6) Pause for agent leave — overlay stays open (Save Log usable).
     leave = pauseForAgentLeave();
     if (!leave.ok) {
       errors.push(`leave-failed:${leave.reason ?? "unknown"}`);
@@ -240,7 +241,6 @@ export async function runAgenticFullPlayProve(
     }
     return { pass: false, peak, end, errors, leave, smoke };
   } finally {
-    // Keep overlay — no stop() / forceClear / ensure-clear (unlike withMcpTestSession).
     try {
       disableCursorQaEyes();
     } catch {

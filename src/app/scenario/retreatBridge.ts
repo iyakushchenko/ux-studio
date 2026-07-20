@@ -3,7 +3,7 @@
  * listens and resets React/local state that DOM-only playback cannot reach.
  */
 
-export type RetreatChannel = "home" | "avail" | "book" | "tab" | "dwell";
+export type RetreatChannel = "home" | "avail" | "book" | "tab" | "dwell" | "camera";
 
 export type RetreatSyncDetail = {
   beatId: string;

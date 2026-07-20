@@ -676,8 +676,10 @@ async function runConfirmationOpenAppointments(
     return true;
   }
 
+  // Camera beat already framed the CTA — click without competing scroll.
   const clicked = await simulateDemoPointerClick(openBtn, {
     shouldAbort,
+    scroll: false,
   });
   if (!clicked || shouldAbort()) return false;
 

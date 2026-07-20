@@ -74,6 +74,7 @@ const READ_ONLY_HELPER_SUFFIXES = new Set([
   "RunMcpSanityCheck",
   // Full agentic Play prove — owns forceClear/arm/leave; must not double-touch wrap.
   "RunAgenticFullPlayProve",
+  "RunTraditionalFullPlayProve",
   // Auto-Rule agent-teardown-clean asserts — must not re-arm overlay while proving clear.
   "AssertAgentTeardownClean",
   "WaitAgentTeardownClean",

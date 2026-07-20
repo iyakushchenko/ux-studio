@@ -2,7 +2,24 @@
 export type BuiltInOrchestraModeId = "agentic-cjm" | "traditional-cjm";
 export type OrchestraModeId = BuiltInOrchestraModeId | (string & {});
 
-export type JourneyBeatKind = "screen-frames" | "tab-landing" | "overlay";
+export type JourneyBeatKind =
+  | "screen-frames"
+  | "tab-landing"
+  | "overlay"
+  /** First-class camera dwell + eased scroll (own STEPS slot; step-back reverses). */
+  | "camera";
+
+/**
+ * Camera step — wait to show the page, then ease to a target.
+ * Not buried in click `dwellMs` / `cameraSelectorChain` alone.
+ */
+export type JourneyBeatCamera = {
+  /** Wait at current scroll before moving (show the page). Default 1200. */
+  dwellMs?: number;
+  /** After dwell, ease camera to this target (long pages use camera engine pacing). */
+  selectorChain?: string[];
+  anchorSelector?: string;
+};
 
 export type JourneyBeatActionId =
   | "open-availability-start"
@@ -36,7 +53,10 @@ export type TabScriptId =
 export type JourneyBeatRecordedClick = {
   selectorChain: string[];
   element?: string;
-  /** Optional camera target from the preceding scroll event (not a separate STEPS beat). */
+  /**
+   * Legacy: camera target from preceding scroll (buried on click).
+   * Prefer a separate `kind: "camera"` beat — compile emits one when possible.
+   */
   cameraSelectorChain?: string[];
   cameraAnchorSelector?: string;
 };
@@ -64,6 +84,11 @@ export type JourneyBeat = {
    * the session captured a usable `selectorChain`.
    */
   recordedClick?: JourneyBeatRecordedClick;
+  /**
+   * First-class camera dwell / scroll step (`kind: "camera"`).
+   * Play: wait → eased scroll; step-back: reverse to pre-scroll top.
+   */
+  camera?: JourneyBeatCamera;
 };
 
 export type JourneyDefinition = {

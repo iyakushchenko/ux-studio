@@ -89,6 +89,22 @@ describe("Sarah Jenkins journeys — integrity", () => {
     expect(
       TRADITIONAL_CJM_JOURNEY.beats.some((b) => b.id === TRADITIONAL_LOGIN_BEAT_ID)
     ).toBe(true);
+    const camera = TRADITIONAL_CJM_JOURNEY.beats.find(
+      (b) => b.id === "book-step3-camera"
+    );
+    expect(camera?.kind).toBe("camera");
+    expect(camera?.camera?.selectorChain?.[0]).toContain(
+      "data-studio-open-appointment"
+    );
+    // Camera beat precedes confirmation click.
+    const camIdx = TRADITIONAL_CJM_JOURNEY.beats.findIndex(
+      (b) => b.id === "book-step3-camera"
+    );
+    const confIdx = TRADITIONAL_CJM_JOURNEY.beats.findIndex(
+      (b) => b.id === "confirmation"
+    );
+    expect(camIdx).toBeGreaterThanOrEqual(0);
+    expect(confIdx).toBe(camIdx + 1);
   });
 });
 

@@ -1,7 +1,9 @@
+import { reverseCameraBeat } from "@/app/orchestra/cameraBeatPlayback";
 import { dispatchRetreatSync } from "@/app/scenario/retreatBridge";
 import { scrollChatCamera, scrollCameraToTarget } from "@/app/scenario/playbackScroll";
 import {
   beatDirectorScriptLabel,
+  beatHasCameraStep,
   isDwellLandingBeat,
 } from "@/app/orchestra/journeyBeatDirector";
 import type { JourneyBeat, JourneyRuntime } from "@/app/orchestra/types";
@@ -62,6 +64,7 @@ export function beatRetreatScriptChannel(
 
 export function beatHasRetreatableState(beat: JourneyBeat): boolean {
   return (
+    beatHasCameraStep(beat) ||
     beatRetreatScriptChannel(beat) != null ||
     (isDwellLandingBeat(beat) && Boolean(beat.protoTab))
   );
@@ -78,6 +81,27 @@ export async function syncBeatRetreatState(
   runtime: JourneyRuntime,
   options?: RetreatSyncOptions
 ): Promise<void> {
+  // Camera beat — reverse scroll to pre-dwell top (own STEPS undo).
+  if (beatHasCameraStep(beat)) {
+    notePlaybackRetreatSync({
+      beatId: beat.id,
+      scriptId: "camera",
+      scriptKind: "camera",
+    });
+    playbackDiagLog("retreat-sync", `camera:camera`, { beatId: beat.id });
+    playbackScrollMonitor.noteRetreatSync();
+    await reverseCameraBeat({
+      instant: options?.instant === true,
+      beatId: beat.id,
+    });
+    dispatchRetreatSync({
+      beatId: beat.id,
+      channel: "camera",
+      scriptId: "camera",
+    });
+    return;
+  }
+
   const channel = beatRetreatScriptChannel(beat);
   const syncOptions = retreatScriptOptions(options?.instant);
   const scriptId =

@@ -195,6 +195,10 @@ describe("studioMcpHelpers", () => {
     expect(win.__protoRunAgenticFullPlayProve).toBe(
       win.__studioRunAgenticFullPlayProve
     );
+    expect(typeof win.__studioRunTraditionalFullPlayProve).toBe("function");
+    expect(win.__protoRunTraditionalFullPlayProve).toBe(
+      win.__studioRunTraditionalFullPlayProve
+    );
     expect(typeof win.__protoRunTraditionalRetreatSmoke).toBe("function");
   });
 

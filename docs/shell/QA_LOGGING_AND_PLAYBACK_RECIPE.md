@@ -66,7 +66,7 @@ Also: suppress `scroll-path-deviation` while chat pull-up holds `scrollLock` (`p
 | Travel `await` settles on `onComplete` / abort poll / ceiling — **never** rely on `stop()` alone | `demoCursor.ts` |
 | Skip `scroll-path-deviation` while chat pull-up `scrollLock` | `playbackScrollMonitor.ts` |
 
-After fix: full Play **PASS 21/21**. Do not invent green past real timeouts.
+After fix: full Play **PASS 22/22**. Do not invent green past real timeouts.
 
 ---
 
@@ -134,7 +134,7 @@ Sitrep audit: [TRADITIONAL_CJM_UX_2026-07-21.md](../projects/boots-pharmacy/audi
 await window.__studioRunAgenticFullPlayProve?.() // default timeoutMs 300_000
 // or: await window.__studioRunAgenticFullPlayProve?.({ timeoutMs: 600_000 })
 // alias: window.__protoRunAgenticFullPlayProve
-// → { pass, peak, end, errors } — forceClear + fresh arm + Play + assert peak 21/21
+// → { pass, peak, end, errors } — forceClear + fresh arm + Play + assert peak 22/22
 //   + play-end at start + pauseForAgentLeave; overlay STAYS open for Save Log.
 // Do NOT ad-hoc Play / do NOT prefer __protoRunAgenticPlaySmoke (tears down overlay).
 ```
@@ -153,7 +153,7 @@ http://localhost:5173/?project=boots-pharmacy&screen=home&persona=sarah-jenkins&
 5. **Eyes on QA log:** no one-line-per-letter spam; at most start + done for type-in. Dump `typeIn.samples` must not track every char as events.  
 6. Console: `[PLAYBACK_DIAG]` should not flood `type-in-progress` per char.  
 7. After type-in: `__studioAssertTypeIn?.()` still PASS (sparse in-memory samples).  
-8. Full Play should reach **21/21** without `script-timeout` on confirmation.  
+8. Full Play should reach **22/22** without `script-timeout` on confirmation.  
 9. Poll `__studioConsumePoSignal?.()` each beat (R15) — do not invent green past Alarm/chop.  
 10. **Leave QA → `pauseForAgentLeave()`; return → `resumeForAgentReturn()`** (Message on arrival mandatory). **Guard rail:** if you forget, presence TTL (~8s) auto-pauses capture + Play.
 
@@ -161,9 +161,19 @@ http://localhost:5173/?project=boots-pharmacy&screen=home&persona=sarah-jenkins&
 
 ## Prove recipe (Traditional CJM)
 
+**Full Traditional continuous Play prove (HARD — keep overlay):** agents MUST prefer:
+
+```js
+await window.__studioRunTraditionalFullPlayProve?.() // default timeoutMs 180_000
+// alias: window.__protoRunTraditionalFullPlayProve
+// → { pass, peak, end, errors } — forceClear + fresh arm + Play + peak
+//   (13 with login, or 12 when Sarah login-skipped) + play-end at start
+//   + pauseForAgentLeave; overlay STAYS open for Save Log.
+```
+
 **Smoke (tears down overlay):** `await window.__protoRunTraditionalPlaySmoke?.()` — Play → start assert; good for local smoke, **weak** for Save Log peak sitrep.
 
-**Manual / full Play:** ALWAYS CLEAR → arm QA keep-open → continuous Play on `experience=traditional&cjm=on` → Save Log on Complete (or dump-on-FAIL). Prefer a keep-overlay full prove helper when shipped (parity with `__studioRunAgenticFullPlayProve`).
+**Dump/log hygiene (2026-07-21):** click rows prefer `data-studio-action` / `data-studio-cal-*` selectors; consecutive duplicate `Journey reset to start` QA rows are deduped (~800ms).
 
 Example URL:
 
@@ -171,7 +181,7 @@ Example URL:
 http://localhost:5173/?project=boots-pharmacy&screen=plp&persona=sarah-jenkins&cjm=on&experience=traditional
 ```
 
-Eyes: no already-selected date/time re-click; watch camera yanks on Reserve / history / details ([TRADITIONAL_CJM_UX_2026-07-21.md](../projects/boots-pharmacy/audits/TRADITIONAL_CJM_UX_2026-07-21.md)).
+Eyes: no already-selected date/time re-click; Book Step 3 camera beat dwells then scrolls to Open Appointments; watch residual soft-fails on play-end rewind ([TRADITIONAL_CJM_UX_2026-07-21.md](../projects/boots-pharmacy/audits/TRADITIONAL_CJM_UX_2026-07-21.md)).
 
 ---
 

@@ -13,6 +13,16 @@ export function shouldSkipTraditionalLoginBeat(
 /** After confirmation — open appointments list, then first card details. */
 const POST_CONFIRMATION_BEATS: JourneyDefinition["beats"] = [
   {
+    id: "book-step3-camera",
+    label: "Book Step 3 — show page",
+    kind: "camera",
+    protoTab: 7,
+    camera: {
+      dwellMs: 1400,
+      selectorChain: ['[data-studio-open-appointment="true"]'],
+    },
+  },
+  {
     id: "confirmation",
     label: "Book — confirmed",
     kind: "tab-landing",

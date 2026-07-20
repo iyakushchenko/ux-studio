@@ -80,7 +80,9 @@ Smell this kills: Traditional Reserve→history→details `scroll-reversal` soft
 | `tab-landing` | Navigate to a prototype tab; optional cursor script | `protoTab`, `tabScript`, `bookScript`, `homeScript`, `dwellMs` |
 | `screen-frames` | Step through revealed frames on one screen | `protoTab`, `scenarioId` |
 | `overlay` | Availability tool or other overlay script | `availScript`, `onEnter` |
+| `camera` | Wait to show page, then eased scroll to target (own STEPS; step-back reverses) | `protoTab`, `camera: { dwellMs, selectorChain }` |
 
+**Camera beat:** do **not** bury page-show wait only in click `dwellMs` / legacy `recordedClick.cameraSelectorChain`. Use `kind: "camera"` so Play = dwell → `scrollCameraToTarget`, and step-back = `reverseCameraBeat` (restore pre-scroll top). Long pages inherit camera-engine pacing.
 **`protoTab`** is the **display tab number** (1–9), **not** `childIndex`. Map via `studioTabToIndex()` in the project's `screens/screens.ts`.
 
 ---

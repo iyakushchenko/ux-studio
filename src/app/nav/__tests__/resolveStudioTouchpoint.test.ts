@@ -73,8 +73,8 @@ describe("buildStudioTouchpointPlaylist", () => {
       }
     );
 
-    expect(fullPlaylist).toHaveLength(12);
-    expect(skippedPlaylist).toHaveLength(11);
+    expect(fullPlaylist).toHaveLength(13);
+    expect(skippedPlaylist).toHaveLength(12);
     expect(fullPlaylist.length).not.toBe(skippedPlaylist.length);
   });
 
@@ -86,7 +86,8 @@ describe("buildStudioTouchpointPlaylist", () => {
     );
 
     // 9 chat content frames only — no separate :thinking playlist slots.
-    expect(playlist).toHaveLength(21);
+    // +1 camera beat before confirmation (shared POST_CONFIRMATION).
+    expect(playlist).toHaveLength(22);
     expect(
       playlist.some((entry) => entry.key.includes(":thinking"))
     ).toBe(false);
@@ -109,13 +110,13 @@ describe("resolveStudioTouchpointProgress", () => {
   it("resolves traditional book-time against the full journey total", () => {
     expect(
       resolveStudioTouchpointProgress(traditionalPlaylist, "beat:book-step2-time")
-    ).toEqual({ visibleCount: 8, totalFrames: 12 });
+    ).toEqual({ visibleCount: 8, totalFrames: 13 });
   });
 
   it("maps popup:login to the traditional login beat in the playlist", () => {
     expect(
       resolveStudioTouchpointProgress(traditionalPlaylist, "popup:login")
-    ).toEqual({ visibleCount: 3, totalFrames: 12 });
+    ).toEqual({ visibleCount: 3, totalFrames: 13 });
   });
 
   it("anchors choose-location beat counter before availability popup sub-step", () => {
@@ -128,10 +129,10 @@ describe("resolveStudioTouchpointProgress", () => {
         "popup:availability:list",
         chooseLocationBeat
       )
-    ).toEqual({ visibleCount: 4, totalFrames: 12 });
+    ).toEqual({ visibleCount: 4, totalFrames: 13 });
     expect(
       resolveStudioTouchpointProgress(traditionalPlaylist, "popup:availability:list")
-    ).toEqual({ visibleCount: 5, totalFrames: 12 });
+    ).toEqual({ visibleCount: 5, totalFrames: 13 });
   });
 
   it("uses skipped-login playlist length for logged-in Sarah", () => {
@@ -148,7 +149,7 @@ describe("resolveStudioTouchpointProgress", () => {
         skippedPlaylist,
         "beat:appointment-details"
       )
-    ).toEqual({ visibleCount: 11, totalFrames: 11 });
+    ).toEqual({ visibleCount: 12, totalFrames: 12 });
   });
 
   it("resolves agentic chat frame 3 within the full journey total", () => {
@@ -157,7 +158,7 @@ describe("resolveStudioTouchpointProgress", () => {
         agenticPlaylist,
         "beat:agentic-chat:frame:3"
       )
-    ).toEqual({ visibleCount: 4, totalFrames: 21 });
+    ).toEqual({ visibleCount: 4, totalFrames: 22 });
   });
 
   it("maps legacy thinking keys onto the reply frame playlist slot", () => {
@@ -201,7 +202,7 @@ describe("resolveStudioTouchpointProgress", () => {
         agenticPlaylist,
         "popup:availability:start"
       )
-    ).toEqual({ visibleCount: 11, totalFrames: 21 });
+    ).toEqual({ visibleCount: 11, totalFrames: 22 });
   });
 
   it("anchors avail-time STEPS on popup:availability:time (not beat:avail-time)", () => {
