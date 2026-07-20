@@ -2,6 +2,13 @@
 
 > _Append a bullet on coherent commits via `npm run notes:append -- --lane="<lane>" --intent="<text>"`. Preview with `npm run notes:preview`. On `npm run release:patch` this section is promoted to `## v<X.Y.Z> - DDMMYY` and a fresh empty `## Current` is re-inserted. Policy: `docs/product/VERSIONING.md`._
 
+## v0.0.46 - 200726
+- **project:** Chat: thinking LEFT before every agent reply; restore after Motion layout thrash
+- **shell:** Playlist: one SF = one STEPS frame (drop :thinking playlist slots that jumped #2→#4)
+- **project:** Chat: user bubble enter uses shared CHAT_PULL_UP opacity+y (air ease, no height stepping)
+- **project:** Chat: keep full thread painted under avail overlay (hold scenario + reveal bridge)
+- **shell:** Playback: chat column bottom-pin only — stop tall-bubble scroll-reversal Alarms
+
 ## v0.0.45 - 200726
 - **shell:** R15 overlay STOP→(understand|ask PO)→FIX→reprove; type-in cursor park stays visible mid typed-text
 
