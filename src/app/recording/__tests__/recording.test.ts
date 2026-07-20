@@ -33,6 +33,8 @@ import {
   captureScroll,
   captureTypedText,
   ensureRecordingDomCapture,
+  registerRecordingSnapshotProvider,
+  seedRecordingStartScreen,
 } from "@/app/recording/recordingCapture";
 import { applyRecordingProjectScript } from "@/app/recording/recordingScriptApply";
 import { notePlaybackTransport } from "@/app/shell/playbackInteractionContext";
@@ -172,6 +174,38 @@ describe("recordingSession", () => {
     appendRecordingEvent({ kind: "transport", action: "step-forward", atMs: 250 });
 
     expect(getActiveRecordingSession()?.events).toHaveLength(2);
+  });
+
+  it("notifies subscribers when events append (STEPS counter)", () => {
+    startRecording();
+    const listener = vi.fn();
+    const unsubscribe = subscribeRecordingSession(listener);
+    listener.mockClear();
+
+    appendRecordingEvent({ kind: "transport", action: "step-forward", atMs: 10 });
+
+    expect(listener).toHaveBeenCalled();
+    expect(getActiveRecordingSession()?.events).toHaveLength(1);
+    unsubscribe();
+  });
+
+  it("seeds current screen as step 1 once per session", () => {
+    registerRecordingSnapshotProvider(() => ({
+      screenId: "pdp",
+      projectId: "boots-pharmacy",
+      studioUrl: "?project=boots-pharmacy&screen=pdp",
+    }));
+    startRecording({ projectId: "boots-pharmacy" });
+    seedRecordingStartScreen();
+    seedRecordingStartScreen();
+
+    const events = getActiveRecordingSession()?.events ?? [];
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({
+      kind: "screen",
+      screenId: "pdp",
+      projectId: "boots-pharmacy",
+    });
   });
 
   it("serializes and deserializes sessions", () => {

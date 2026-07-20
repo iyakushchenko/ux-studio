@@ -200,6 +200,12 @@ Leaving Rec while a capture is live **pauses** the session (does not stop/destro
 | ↺ | Replay last stopped or imported session (v3: transport + screen + demo/human-click + wire-intent + director-script + beat-enter + scroll + typed-text) |
 | + | **Add to project as CJM** — title popup (Studio nav chrome) → compile → **new** journey id under current project+persona (runtime catalog + localStorage + picker label). Does **not** overwrite built-in Agentic/Traditional slots. Separate from Download. |
 
+### Product model — REC start + steps
+
+1. **● Start** seeds the **current tab/screen** as event 1 (`kind: "screen"`) — journey starting point.
+2. Later on-page interactions (human clicks → `demo-click`, scroll, typed-text, navigations → `screen`) append as further events. Each carries `atMs`; Play holds **≥4s** per major step (see pacing below).
+3. REC **STEPS** counter = live `session.events.length` (not a filtered subset) — UI re-renders on every append.
+
 ### Auto-play pacing (REC ↺)
 
 **Was missing (pre-v0.0.50):** bridge/MCP forced `stepDelayMs: 200` (and processor defaulted ~400ms) — Play was an immediate burst. Capture `atMs` / `dwell` existed but were not enforced as a ≥4s floor.

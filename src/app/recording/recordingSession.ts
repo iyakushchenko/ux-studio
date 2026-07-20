@@ -165,6 +165,8 @@ export function appendRecordingEvent(
     return activeSession;
   }
   activeSession.events.push(event);
+  // STEPS counter + REC UI subscribe via useSyncExternalStore — must notify.
+  notifyRecordingListeners();
   return activeSession;
 }
 

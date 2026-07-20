@@ -65,7 +65,14 @@ export function buildPlaybackSelectorChain(el: HTMLElement): string[] {
     if (protoAction) chain.unshift(`[data-studio-action="${protoAction}"]`);
     if (protoBeat) chain.unshift(`[data-studio-beat="${protoBeat}"]`);
     if (protoAvail) chain.unshift(`[data-studio-avail-store="${protoAvail}"]`);
-    if (dataName) chain.unshift(`[data-name="${dataName}"]`);
+    if (dataName) {
+      const toggleIndex = node.getAttribute("data-toggle-index");
+      chain.unshift(
+        toggleIndex != null
+          ? `[data-name="${dataName}"][data-toggle-index="${toggleIndex}"]`
+          : `[data-name="${dataName}"]`
+      );
+    }
 
     if (chain.length === 0 && tag) {
       const id = node.id;
@@ -280,6 +287,8 @@ export function captureDwell(durationMs?: number): void {
 }
 
 let lastScreenKey: string | undefined;
+/** Session id that already received a start-screen seed (avoid re-seed on pause/resume). */
+let seededStartScreenSessionId: string | undefined;
 
 /** Ordered page/URL transition for replay deep-link restore. */
 export function captureScreenChange(options: {
@@ -297,6 +306,33 @@ export function captureScreenChange(options: {
     screenId: options.screenId,
     projectId: options.projectId,
     studioUrl: options.studioUrl,
+  });
+}
+
+/**
+ * Product model: REC ● start = current tab/screen as journey step 1.
+ * URL sync only appends `screen` on later navigations — seed once per session.
+ */
+export function seedRecordingStartScreen(options?: {
+  screenId?: string;
+  projectId?: string;
+  studioUrl?: string;
+}): void {
+  const session = getActiveRecordingSession();
+  if (!session) return;
+  if (seededStartScreenSessionId === session.id) return;
+
+  const snap = snapshotProvider?.();
+  const screenId = options?.screenId ?? snap?.screenId;
+  if (!screenId) return;
+
+  seededStartScreenSessionId = session.id;
+  // Allow same screen as a prior session's last key.
+  lastScreenKey = undefined;
+  captureScreenChange({
+    screenId,
+    projectId: options?.projectId ?? snap?.projectId,
+    studioUrl: options?.studioUrl ?? snap?.studioUrl,
   });
 }
 
@@ -434,7 +470,13 @@ function describeRecordingClickTarget(el: HTMLElement): string {
   const action = el.getAttribute("data-studio-action");
   if (action) return `data-studio-action="${action}"`;
   const dataName = el.getAttribute("data-name");
-  if (dataName) return `data-name="${dataName}"`;
+  if (dataName) {
+    const toggleIndex = el.getAttribute("data-toggle-index");
+    if (toggleIndex != null) {
+      return `data-name="${dataName}" data-toggle-index="${toggleIndex}"`;
+    }
+    return `data-name="${dataName}"`;
+  }
   const tag = el.tagName.toLowerCase();
   const text = (el.textContent ?? "").replace(/\s+/g, " ").trim().slice(0, 48);
   return text ? `<${tag}> text="${text}"` : `<${tag}>`;
@@ -565,6 +607,8 @@ function clearDomCaptureTimers(): void {
 function syncRecordingDomCaptureListeners(): void {
   if (typeof document === "undefined") return;
   const want = isRecordingActive();
+  // Seed current screen as step 1 when a new live session arms listeners.
+  seedRecordingStartScreen();
 
   if (want && !humanClickCaptureInstalled) {
     document.addEventListener("click", onRecordingHumanClick, true);
@@ -652,6 +696,7 @@ export function resetRecordingCaptureForTests(): void {
   snapshotProvider = null;
   lastTouchpointKey = undefined;
   lastScreenKey = undefined;
+  seededStartScreenSessionId = undefined;
   clearDomCaptureTimers();
   if (typeof document !== "undefined") {
     if (humanClickCaptureInstalled) {
