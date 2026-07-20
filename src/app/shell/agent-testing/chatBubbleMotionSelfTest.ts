@@ -402,14 +402,19 @@ export async function runChatBubbleMotionSelfTest(options?: {
       '[data-studio-chat-frame][data-studio-chat-revealed="true"]'
     ).length;
 
-  // Soft reset: retreat on chat only until zero reveals (do not leave chat beat).
-  for (let i = 0; i < 16 && onChat() && revealedCount() > 0; i++) {
+  // Soft reset: retreat until only q0 (or empty) so later frames re-pull-up with samples.
+  for (let i = 0; i < 20 && onChat() && revealedCount() > 1; i++) {
     transport("step-back");
     const btn = [...document.querySelectorAll("button")].find(
       (b) => b.getAttribute("aria-label") === "Step back"
     ) as HTMLButtonElement | undefined;
     if (btn && !btn.disabled) btn.click();
-    await sleep(280);
+    await sleep(300);
+  }
+  // One more back if still >1 (finale / sticky).
+  if (revealedCount() > 1) {
+    transport("step-back");
+    await sleep(400);
   }
   if (!onChat()) {
     // Fell off chat — hard URL fix (caller should have landed on chat).
@@ -429,6 +434,16 @@ export async function runChatBubbleMotionSelfTest(options?: {
       `[data-studio-chat-frame="${id}"]`
     ) as HTMLElement | null;
     return el?.getAttribute("data-studio-chat-revealed") === "true";
+  };
+
+  const sampleCountFor = (id: string) => {
+    try {
+      const bundle = getPlaybackDiagBundle();
+      return bundle.chatBubbleMotion.samples.filter((s) => s.bubble?.id === id)
+        .length;
+    } catch {
+      return 0;
+    }
   };
 
   const waitUntil = async (
@@ -476,19 +491,22 @@ export async function runChatBubbleMotionSelfTest(options?: {
         id === "q3" || id === "q2"
           ? pace.thinkMs + 8000
           : id.startsWith("r")
-            ? pace.thinkMs + 1800
+            ? pace.thinkMs + 4500
             : i === 0
               ? pace.stepMs + 1500
               : pace.thinkMs + 2800;
       let got = await waitUntil(() => isRevealed(id), maxWait);
-      if (!got && (id === "q2" || id === "q3")) {
-        // Retry once via transport only (prelude owns CTA).
+      if (!got && (id === "q2" || id === "q3" || id.startsWith("r"))) {
         transport("step-forward");
         const btn = [...document.querySelectorAll("button")].find(
           (b) => b.getAttribute("aria-label") === "Step forward"
         ) as HTMLButtonElement | undefined;
         if (btn && !btn.disabled) btn.click();
         got = await waitUntil(() => isRevealed(id), 8000);
+      }
+      // Wait until pull-up samples land (not only DOM revealed).
+      if (got && id !== "q0") {
+        await waitUntil(() => sampleCountFor(id) >= 4, CHAT_PULL_UP_SETTLE_MS + 600);
       }
       await sleep(CHAT_PULL_UP_SETTLE_MS);
       w.__studioAgentTestingOverlay?.logStep?.({

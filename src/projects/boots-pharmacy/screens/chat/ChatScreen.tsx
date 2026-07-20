@@ -28,7 +28,7 @@ import {
   STUDIO_SCROLL_OVERFLOW_CLASS,
   syncStudioScrollOverflowGutter,
 } from "@/app/scenario/studioScrollOverflow";
-import { scrollCameraToHostEnd, scrollChatCamera } from "@/app/scenario/playbackScroll";
+import { scrollCameraToHostEnd, scrollChatCamera, cancelPlaybackScroll } from "@/app/scenario/playbackScroll";
 import { CHAT_REACT_SCREEN_ID } from "./chatContract";
 import { ChatSitePilotBar } from "./ChatSitePilotBar";
 import {
@@ -259,23 +259,10 @@ function useChatBubbleMotionDiag(
     });
     sampleCancelRef.current?.();
     let cancelled = false;
-    const armSample = () => {
-      if (cancelled) return;
-      const el = bubbleRef.current;
-      if (!el) {
-        requestAnimationFrame(armSample);
-        return;
-      }
-      sampleCancelRef.current = startChatBubbleMotionSample({
-        id: options.id,
-        el,
-        shouldAnimate: true,
-        visibleCount: options.visibleCount,
-        durationMs: CHAT_PULL_UP_MS + 80,
-      });
-    };
-    armSample();
-    const endTimer = window.setTimeout(() => {
+    let ended = false;
+    const finishAnimateEnd = () => {
+      if (ended) return;
+      ended = true;
       sampleCancelRef.current?.();
       sampleCancelRef.current = null;
       logChatBubbleMotion({
@@ -290,19 +277,38 @@ function useChatBubbleMotionDiag(
         shouldAnimate: true,
         visibleCount: options.visibleCount ?? null,
       });
-    }, CHAT_PULL_UP_MS + 40);
+    };
+    const armSample = () => {
+      if (cancelled || ended) return;
+      const el = bubbleRef.current;
+      if (!el) {
+        requestAnimationFrame(armSample);
+        return;
+      }
+      // Sync cancel — prior settle ease must not move layoutY mid pull-up.
+      cancelPlaybackScroll("abort");
+      sampleCancelRef.current = startChatBubbleMotionSample({
+        id: options.id,
+        el,
+        shouldAnimate: true,
+        visibleCount: options.visibleCount,
+        durationMs: CHAT_PULL_UP_MS + 80,
+      });
+    };
+    armSample();
+    const endTimer = window.setTimeout(finishAnimateEnd, CHAT_PULL_UP_MS + 40);
     return () => {
       cancelled = true;
       window.clearTimeout(endTimer);
-      sampleCancelRef.current?.();
-      sampleCancelRef.current = null;
+      // Always emit animate-end if we started — visibleCount flaps must not starve assert.
+      if (!ended) finishAnimateEnd();
     };
   }, [
     options.revealed,
     options.shouldAnimate,
     options.pullLive,
     options.id,
-    options.visibleCount,
+    // intentionally omit visibleCount — must not restart mid pull-up
     bubbleRef,
   ]);
 }
@@ -574,6 +580,7 @@ function useChatComposerScrollPad(
       // Skip pad scroll adjust while a bubble is mid pull-up — pad deltas
       // cancel Motion transform (sitePilotChat: snap only before/after tween).
       if (
+        isChatPullUpScrollLocked() ||
         column.querySelector(
           '[data-studio-chat-pull-up="start"], [data-studio-chat-pull-up="up"]'
         )
@@ -581,6 +588,7 @@ function useChatComposerScrollPad(
         return;
       requestAnimationFrame(() => {
         if (
+          isChatPullUpScrollLocked() ||
           column.querySelector(
             '[data-studio-chat-pull-up="start"], [data-studio-chat-pull-up="up"]'
           )
@@ -768,9 +776,11 @@ export function ChatScreen({
     const releasingThink =
       prevThinkingModeRef.current === "playback" && thinking.mode === "none";
     prevThinkingModeRef.current = thinking.mode;
-    const pullBusy = !!column.querySelector(
-      '[data-studio-chat-pull-up="start"], [data-studio-chat-pull-up="up"]'
-    );
+    const pullBusy =
+      isChatPullUpScrollLocked() ||
+      !!column.querySelector(
+        '[data-studio-chat-pull-up="start"], [data-studio-chat-pull-up="up"]'
+      );
     if (releasingThink || pullBusy) {
       console.info("[PLAYBACK_DIAG] chat-reveal-y-delta", {
         tag: releasingThink ? "handoff-defer-snap" : "pull-up-defer-snap",
@@ -834,12 +844,12 @@ export function ChatScreen({
     const runSettleCamera = () => {
       const settleMax = Math.max(0, column.scrollHeight - column.clientHeight);
       const before = column.scrollTop;
-      // Life-like ease after pull-up; CSS scroll-padding-bottom owns composer inset
-      // (do not double-add pad into padding — underscroll + cancel races).
+      // Life-like ease after pull-up. Never force during lock — prior settle
+      // ease is aborted when the next bubble acquires the pull-up lock.
       scrollChatCamera(column, {
         instant: false,
         align: "end",
-        force: true,
+        force: false,
         padding: 24,
       });
       const delta = column.scrollTop - before;
@@ -873,7 +883,7 @@ export function ChatScreen({
           scrollTop: column.scrollTop,
           scrollMax: max,
         });
-      }, 520);
+      }, 560);
     };
 
     const tSettle = window.setTimeout(() => {
@@ -882,17 +892,17 @@ export function ChatScreen({
         poll = window.setInterval(() => {
           if (
             !isChatPullUpScrollLocked() ||
-            performance.now() - started > 900
+            performance.now() - started > 1200
           ) {
             if (poll != null) window.clearInterval(poll);
             poll = null;
-            runSettleCamera();
+            if (!isChatPullUpScrollLocked()) runSettleCamera();
           }
         }, 40);
         return;
       }
       runSettleCamera();
-    }, CHAT_PULL_UP_MS + 80);
+    }, CHAT_PULL_UP_MS + 120);
     return () => {
       window.clearTimeout(tSettle);
       if (topUp != null) window.clearTimeout(topUp);

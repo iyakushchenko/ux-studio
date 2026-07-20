@@ -633,6 +633,11 @@ export function animateScrollTo(
     playbackScrollAnimating = true;
 
     const tick = (now: number) => {
+      // Pull-up tween owns layoutY — abort camera mid-flight (prevents JUMP ΔY~500).
+      if (isChatPullUpScrollLocked()) {
+        finish(false);
+        return;
+      }
       if (isAborted(options) || controller.signal.aborted) {
         finish(false);
         return;
