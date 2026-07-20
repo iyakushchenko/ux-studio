@@ -308,7 +308,7 @@ export function useRecordingReplayBridge(options: {
         });
         return true;
       }
-      // Fallback diagnostic only — eased pixel restore on prototype host.
+      // Legacy recordings only — new captures never persist scrollTop.
       if (event.scrollTop == null || !Number.isFinite(event.scrollTop)) {
         return false;
       }

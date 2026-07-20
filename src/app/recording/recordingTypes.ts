@@ -57,7 +57,10 @@ export type RecordedScrollEvent = {
   selectorChain?: string[];
   /** Leaf / human-readable selector (diagnostic + simple querySelector fallback). */
   anchorSelector?: string;
-  /** Fallback / diagnostic only — prefer selectorChain / anchorSelector. */
+  /**
+   * Legacy only — new captures omit this. Replay prefers selectorChain /
+   * anchorSelector; scrollTop is never required.
+   */
   scrollTop?: number;
   atMs: number;
   snapshot?: RecordingSnapshot;

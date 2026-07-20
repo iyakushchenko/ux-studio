@@ -1,5 +1,11 @@
 import type { ReactNode } from "react";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { AnimatePresence, motion } from "@/uxds/motion";
 import { StudioJourneySwitch } from "@/app/nav/StudioJourneySwitch";
 import { StudioPlaybackRecSwitch } from "@/app/nav/StudioPlaybackRecSwitch";
@@ -13,8 +19,11 @@ import {
   studioPanelTransition,
 } from "@/app/nav/studioMotion";
 import {
+  getActiveRecordingSession,
   isRecordingActive,
+  isRecordingPaused,
   pauseRecording,
+  subscribeRecordingSession,
 } from "@/app/recording/recordingSession";
 import {
   logControlPanel,
@@ -224,6 +233,21 @@ export function StudioNavScenarioControls({
   const [stepBlinkToken, setStepBlinkToken] = useState(0);
   /** Session-only: left = playback transport, right = recording controls (mutually exclusive). */
   const [recMode, setRecMode] = useState(false);
+  const recordingArmed = useSyncExternalStore(
+    subscribeRecordingSession,
+    () => getActiveRecordingSession() != null,
+    () => false
+  );
+  const recordingLive = useSyncExternalStore(
+    subscribeRecordingSession,
+    () => isRecordingActive(),
+    () => false
+  );
+  const recordingPaused = useSyncExternalStore(
+    subscribeRecordingSession,
+    () => isRecordingPaused(),
+    () => false
+  );
   const prevPlaybackEndTokenRef = useRef(0);
   const stepBlinkTimerRef = useRef<number | null>(null);
   const clickBlinkTimerRef = useRef<number | null>(null);
@@ -469,6 +493,12 @@ export function StudioNavScenarioControls({
     clickBlinkActive && isOnAir && !showEndDiode && !playbackErrorActive
       ? " studio-nav-scenario__on-air--click"
       : "";
+  const diodeRecClass =
+    recordingLive && !playbackErrorActive
+      ? " studio-nav-scenario__on-air--rec"
+      : recordingArmed && recordingPaused && !playbackErrorActive
+        ? " studio-nav-scenario__on-air--rec-paused"
+        : "";
 
   return (
     <div
@@ -511,6 +541,23 @@ export function StudioNavScenarioControls({
                 </motion.span>
               ) : null}
             </AnimatePresence>
+            {recMode && !recModeLocked ? (
+              <div className="studio-nav-scenario__deck-led" aria-hidden>
+                <span
+                  className={`studio-nav-scenario__on-air${diodeRecClass}`}
+                  title={
+                    recordingLive
+                      ? "Recording"
+                      : recordingPaused
+                        ? "Recording paused"
+                        : "REC ready"
+                  }
+                >
+                  <span className="studio-nav-scenario__on-air-dot" />
+                  <span className="studio-nav-scenario__on-air-halo" />
+                </span>
+              </div>
+            ) : null}
           </span>
         ) : null}
         {/*

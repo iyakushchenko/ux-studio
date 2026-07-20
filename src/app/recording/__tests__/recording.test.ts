@@ -785,7 +785,11 @@ describe("recording scroll + typed-text capture", () => {
   });
 
   it("captures scroll and typed-text only while recording is active", () => {
-    captureScroll({ scrollTop: 50 });
+    captureScroll({
+      scrollTop: 50,
+      selectorChain: ['[data-name="units"]'],
+      anchorSelector: '[data-name="units"]',
+    });
     captureTypedText({
       value: "nope",
       selectorChain: ['[data-studio-action="avail-search-query"]'],
@@ -793,7 +797,11 @@ describe("recording scroll + typed-text capture", () => {
     expect(getActiveRecordingSession()).toBeNull();
 
     startRecording();
-    captureScroll({ scrollTop: 120 });
+    captureScroll({
+      scrollTop: 120,
+      selectorChain: ['[data-name="module.pdp"]', '[data-name="units"]'],
+      anchorSelector: '[data-name="units"]',
+    });
     captureTypedText({
       value: "London",
       selectorChain: ['[data-studio-action="avail-search-query"]'],
@@ -808,13 +816,20 @@ describe("recording scroll + typed-text capture", () => {
     ]);
     expect(session?.events[0]).toMatchObject({
       kind: "scroll",
-      scrollTop: 120,
-      // Direct captureScroll API may omit target; DOM flush fills selectorChain.
+      selectorChain: ['[data-name="module.pdp"]', '[data-name="units"]'],
+      anchorSelector: '[data-name="units"]',
     });
+    expect(session?.events[0]).not.toHaveProperty("scrollTop");
     expect(session?.events[1]).toMatchObject({
       kind: "typed-text",
       value: "London",
     });
+  });
+
+  it("rejects scrollTop-only capture (targets required)", () => {
+    startRecording();
+    captureScroll({ scrollTop: 999 });
+    expect(getActiveRecordingSession()?.events).toHaveLength(0);
   });
 
   it("rejects password / checkbox fields for typed-text", () => {

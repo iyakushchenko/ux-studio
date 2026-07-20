@@ -23,7 +23,8 @@ let typedTextCaptureInstalled = false;
 let domCaptureUnsubSession: (() => void) | null = null;
 let scrollCaptureTimer: ReturnType<typeof setTimeout> | null = null;
 let typedTextCaptureTimer: ReturnType<typeof setTimeout> | null = null;
-let lastCapturedScrollTop: number | undefined;
+/** Dedupe key for last emitted scroll **target** (not scrollTop). */
+let lastCapturedScrollTargetKey: string | undefined;
 
 const SCROLL_CAPTURE_DEBOUNCE_MS = 120;
 const TYPED_TEXT_CAPTURE_DEBOUNCE_MS = 280;
@@ -171,17 +172,24 @@ export function captureWireIntent(
   });
 }
 
+/**
+ * Capture a scroll **target** only. `scrollTop` is accepted for API compat but
+ * never written into the session (targets-only contract).
+ */
 export function captureScroll(options: {
+  /** @deprecated Ignored — not persisted. Prefer selectorChain / anchorSelector. */
   scrollTop?: number;
   anchorSelector?: string;
   selectorChain?: string[];
 }): void {
   if (!getActiveRecordingSession()) return;
+  const selectorChain = options.selectorChain?.filter(Boolean);
+  const anchorSelector = options.anchorSelector?.trim() || undefined;
+  if (!selectorChain?.length && !anchorSelector) return;
   captureRecordingEvent({
     kind: "scroll",
-    selectorChain: options.selectorChain,
-    anchorSelector: options.anchorSelector,
-    scrollTop: options.scrollTop,
+    selectorChain: selectorChain?.length ? selectorChain : undefined,
+    anchorSelector,
   });
 }
 
@@ -502,18 +510,16 @@ function flushRecordingScrollCapture(): void {
   if (!isRecordingActive()) return;
   const root = resolvePrototypeScrollRoot();
   if (!root) return;
-  const scrollTop = Math.round(root.scrollTop);
-  if (lastCapturedScrollTop === scrollTop) return;
-  lastCapturedScrollTop = scrollTop;
   const anchorEl = resolveScrollAnchorElement(root);
   const described = anchorEl ? describeScrollAnchor(anchorEl) : null;
-  // Primary = target (selectorChain / anchorSelector). scrollTop = diagnostic fallback.
+  // Targets only — skip position-only scrolls with no resolvable anchor.
+  if (!described?.selectorChain?.length && !described?.anchorSelector) return;
+  const targetKey = `${described.anchorSelector ?? ""}|${(described.selectorChain ?? []).join(">")}`;
+  if (lastCapturedScrollTargetKey === targetKey) return;
+  lastCapturedScrollTargetKey = targetKey;
   captureScroll({
-    selectorChain: described?.selectorChain?.length
-      ? described.selectorChain
-      : undefined,
-    anchorSelector: described?.anchorSelector,
-    scrollTop,
+    selectorChain: described.selectorChain,
+    anchorSelector: described.anchorSelector,
   });
 }
 
@@ -621,11 +627,11 @@ function syncRecordingDomCaptureListeners(): void {
   if (want && !scrollCaptureInstalled) {
     document.addEventListener("scroll", onRecordingScroll, true);
     scrollCaptureInstalled = true;
-    lastCapturedScrollTop = undefined;
+    lastCapturedScrollTargetKey = undefined;
   } else if (!want && scrollCaptureInstalled) {
     document.removeEventListener("scroll", onRecordingScroll, true);
     scrollCaptureInstalled = false;
-    lastCapturedScrollTop = undefined;
+    lastCapturedScrollTargetKey = undefined;
   }
 
   if (want && !typedTextCaptureInstalled) {
@@ -670,7 +676,7 @@ export function ensureRecordingDomCapture(): () => void {
       document.removeEventListener("change", onRecordingTypedTextChange, true);
       typedTextCaptureInstalled = false;
     }
-    lastCapturedScrollTop = undefined;
+    lastCapturedScrollTargetKey = undefined;
   };
 }
 
@@ -713,7 +719,7 @@ export function resetRecordingCaptureForTests(): void {
   humanClickCaptureInstalled = false;
   scrollCaptureInstalled = false;
   typedTextCaptureInstalled = false;
-  lastCapturedScrollTop = undefined;
+  lastCapturedScrollTargetKey = undefined;
   domCaptureUnsubSession?.();
   domCaptureUnsubSession = null;
 }

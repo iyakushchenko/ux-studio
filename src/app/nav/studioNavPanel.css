@@ -210,6 +210,10 @@
   opacity: 0.65;
 }
 
+/*
+ * Dropdown / popup graphite — darker than nav chrome `#2e2e2e` for contrast.
+ * Shared by CJM picker + sibling Studio-nav menus.
+ */
 .studio-nav-journey-menu__panel {
   position: absolute;
   top: calc(100% + 4px);
@@ -221,11 +225,11 @@
   min-width: 11.5rem;
   padding: 2px;
   border-radius: 4px;
-  background: rgba(0, 0, 0, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #141414;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 8px 20px rgba(0, 0, 0, 0.35);
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 10px 24px rgba(0, 0, 0, 0.55);
 }
 
 .studio-nav-journey-menu__option {
@@ -240,13 +244,13 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: rgba(255, 255, 255, 0.78);
-  background: linear-gradient(180deg, #5a5a5a 0%, #383838 48%, #242424 100%);
+  background: linear-gradient(180deg, #2c2c2c 0%, #1a1a1a 48%, #101010 100%);
   cursor: default;
 }
 
 .studio-nav-journey-menu__option:hover:not(.studio-nav-journey-menu__option--active) {
   color: rgba(255, 255, 255, 0.92);
-  background: linear-gradient(180deg, #4a4a4a 0%, #2e2e2e 48%, #1a1a1a 100%);
+  background: linear-gradient(180deg, #343434 0%, #1e1e1e 48%, #141414 100%);
 }
 
 .studio-nav-journey-menu__option--active {
@@ -1120,6 +1124,7 @@
       inset 0 -1px 1.5px rgba(0, 40, 90, 0.55),
       0 0 6px rgba(74, 158, 255, 0.85);
   }
+
 }
 
 .studio-nav-panel-host--playback-locked .studio-nav-tab,

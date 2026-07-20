@@ -198,7 +198,8 @@ Leaving Rec while a capture is live **pauses** the session (does not stop/destro
 | ↓ | **Download JSON** — export `.recording.json` only (recording file; not journey compile) |
 | ↑ | Import a saved `.recording.json` |
 | ↺ | Replay last stopped or imported session (v3: transport + screen + demo/human-click + wire-intent + director-script + beat-enter + scroll + typed-text) |
-| + | **Add to project as CJM** — title popup (Studio nav chrome) → compile → **new** journey id under current project+persona (runtime catalog + localStorage + picker label). Does **not** overwrite built-in Agentic/Traditional slots. Separate from Download. |
+| + | **Add to project as CJM** — disabled while a recording is live/paused; after Stop, title popup → compile → **new** journey id (picker label). Separate from Download. |
+| LED | Same playback diode chrome — **blinks red** while recording live; dim solid red when paused; idle graphite when REC ready / REC off restores green on-air |
 
 ### Product model — REC start + steps
 
@@ -228,7 +229,7 @@ UI and MCP share `recordingSession` + `replayRecordingSession` — no second ses
 | `beat-enter` | Beat onEnter via `notePlaybackBeatEnter` | Yes — known `JourneyBeatActionId` → `runBeatAction`; `sync-<bookScript>` → book script with `syncState` |
 | `wire-intent` | Retreat sync / `captureWireIntent` / beat actions | Yes — known `JourneyBeatActionId` via `runBeatAction`; `retreat-sync` → script runner with `syncState` when `scriptId` resolves |
 | `studio` | Journey/orchestra mode changes (manual API) | No |
-| `scroll` | Debounced active scroll host while REC — captures **target** (`selectorChain` / `anchorSelector`) nearest meaningful element in viewport; `scrollTop` diagnostic fallback only | Yes — **engine** eased scroll-to-target (`animateScrollElementIntoView`); pixel `scrollTop` only if target missing |
+| `scroll` | Debounced active scroll host while REC — **targets only** (`selectorChain` / `anchorSelector`); no `scrollTop` written | Yes — **engine** eased scroll-to-target (`animateScrollElementIntoView`); legacy `scrollTop` accepted only for old files |
 | `typed-text` | Debounced trusted `input`/`change` on text-like fields with selector chain | Yes — set value + dispatch `input`/`change` (modal eyes) |
 | `dwell` | Manual API or compiled pauses | Yes (delay) |
 

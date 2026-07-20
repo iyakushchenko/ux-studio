@@ -347,6 +347,10 @@ export function StudioNavRecordingControls({
   }, [statusNote]);
 
   useEffect(() => {
+    if (ui.hasLive && addCjmOpen) setAddCjmOpen(false);
+  }, [ui.hasLive, addCjmOpen]);
+
+  useEffect(() => {
     if (!addCjmOpen) return;
     const onPointerDown = (event: PointerEvent) => {
       const root = addCjmRootRef.current;
@@ -587,10 +591,14 @@ export function StudioNavRecordingControls({
           type="button"
           className="studio-nav-step-btn studio-nav-scenario__btn"
           aria-label="Add to project as CJM"
-          title="Add recording as a new CJM (title, then confirm)"
+          title={
+            ui.hasLive
+              ? "Stop recording before adding as CJM"
+              : "Add recording as a new CJM (title, then confirm)"
+          }
           aria-expanded={addCjmOpen}
           aria-haspopup="dialog"
-          disabled={!ui.canExport || replaying}
+          disabled={ui.hasLive || !ui.canExport || replaying}
           onClick={openAddCjmTitle}
         >
           <AddCjmPlusIcon />
