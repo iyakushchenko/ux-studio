@@ -443,6 +443,15 @@
   align-items: stretch;
 }
 
+/* Stable agent turn box — thinking/reply swap without layout Y collapse. */
+.chat__agent-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  min-height: 40px;
+}
+
 .chat__thinking-dots {
   display: inline-flex;
   gap: 4px;

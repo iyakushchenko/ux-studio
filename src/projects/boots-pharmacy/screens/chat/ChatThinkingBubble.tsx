@@ -19,9 +19,10 @@ export function ChatThinkingBubble({ mode, generation }: ChatThinkingBubbleProps
       data-studio-chat-thinking-side="agent"
       role="status"
       aria-live="polite"
+        // Enter pull-up OK; exit must not y-collapse — reply replaces in-slot.
       initial={CHAT_PULL_UP.initial}
       animate={CHAT_PULL_UP.animate}
-      exit={CHAT_PULL_UP.exit}
+      exit={{ opacity: 0, y: 0 }}
       transition={CHAT_PULL_UP.transition}
     >
       <div className="chat__thinking-inner">

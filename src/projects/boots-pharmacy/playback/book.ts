@@ -258,12 +258,13 @@ async function clickBookCell(
 
   bookRunTelemetry.directorCursorUsed = true;
   bookRunTelemetry.interactionPerformed = true;
-  await simulateDemoPointerClick(cell, {
+  const ok = await simulateDemoPointerClick(cell, {
     shouldAbort,
     scroll: options?.scroll,
   });
   await delay(300);
-  return !shouldAbort();
+  // Honor click gate — off-target / aborted must not count as selection.
+  return ok && !shouldAbort();
 }
 
 async function findPreferredBookTimeCell(
@@ -545,14 +546,17 @@ async function runSelectBookDate(options?: {
   );
   if (!dateCell || shouldAbort()) return false;
 
-  if (dateCell.dataset.studioCalSelected === "true") {
+  // Director path always lands cursor on 21 — never treat pre-selected (avail
+  // handoff / retreat sync) as success without an on-target click prove.
+  // skip:true keeps direct cell.click for sync/time prelude only.
+  if (options?.skip && dateCell.dataset.studioCalSelected === "true") {
     return !shouldAbort();
   }
 
   const clicked = await clickBookCell(dateCell, options);
   if (!clicked || shouldAbort()) return false;
 
-  return !shouldAbort();
+  return true;
 }
 
 async function runSelectBookTime(options?: {

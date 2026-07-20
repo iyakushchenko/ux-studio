@@ -253,11 +253,8 @@ const THINKING_EXIT_MS = 360;
 /** Fade thinking bubble out before the agent reply frame reveals (same motion language). */
 export async function fadeOutSitePilotChatThinking(): Promise<void> {
   if (isChatReactMounted()) {
-    // React `AnimatePresence` owns the exit tween (~360ms).
+    // React reply slot morphs thinking→reply in place (no exit wait / height gap).
     endSitePilotChatThinking();
-    await new Promise<void>((resolve) => {
-      window.setTimeout(resolve, THINKING_EXIT_MS);
-    });
     return;
   }
 

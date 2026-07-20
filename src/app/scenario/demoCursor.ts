@@ -17,6 +17,7 @@ import {
 } from "@/app/shell/playbackCursorDiagnostic";
 import {
   playbackDiagClick,
+  playbackDiagCursor,
   playbackDiagTarget,
 } from "@/app/shell/playbackDiag";
 import {
@@ -30,10 +31,17 @@ import {
   ensureDemoPseudoBridge,
 } from "@/app/scenario/demoCursorPseudoBridge";
 import {
+  CURSOR_HOTSPOT_X,
+  CURSOR_HOTSPOT_Y,
+  isDemoCursorHotspotOnTarget,
+} from "@/app/scenario/demoCursorOnTarget";
+import {
   animate,
   MOTION_EASE_IN_OUT,
   type AnimationPlaybackControls,
 } from "@/uxds/motion";
+
+export { isDemoCursorHotspotOnTarget } from "@/app/scenario/demoCursorOnTarget";
 
 const CURSOR_ARROW_SVG = `<img class="proto-chat-demo-cursor__graphic proto-chat-demo-cursor__graphic--arrow" src="${defaultCursorUrl}" width="22" height="26" alt="" aria-hidden="true" draggable="false" />`;
 
@@ -57,8 +65,6 @@ const CURSOR_PARK_TRAVEL_MS = 520;
  * Shared tip hotspot — hand graphic is CSS-shifted so fingertip lands here
  * (same as arrow tip). Switching arrow↔hand must not move left/top.
  */
-const CURSOR_HOTSPOT_X = 3;
-const CURSOR_HOTSPOT_Y = 1;
 
 export const DEMO_CLICK_EVENT = "studio-demo-click";
 export const DEMO_CURSOR_PARKED_CLASS = "proto-chat-demo-cursor--parked";
@@ -559,18 +565,21 @@ function cursorHotspotFromPos(left: number, top: number): { x: number; y: number
   return { x: left + CURSOR_HOTSPOT_X, y: top + CURSOR_HOTSPOT_Y };
 }
 
-function hotspotIntersectsElement(
-  hotspotX: number,
-  hotspotY: number,
-  element: HTMLElement
+/** Re-aim tip to target center; return whether hotspot is on target after write. */
+function snapDemoCursorHotspotToTarget(
+  cursor: HTMLElement,
+  target: HTMLElement
 ): boolean {
-  const rect = element.getBoundingClientRect();
-  return (
-    hotspotX >= rect.left &&
-    hotspotX <= rect.right &&
-    hotspotY >= rect.top &&
-    hotspotY <= rect.bottom
-  );
+  const end = cursorPositionForTarget(target);
+  writeDemoCursorPos(cursor, end.left, end.top, { force: true });
+  cursorPosLocked = true;
+  noteCursorPathSample("settle", end.left, end.top);
+  notePlaybackCursorEvent("settle", {
+    target: describeCursorTarget(target),
+    animated: false,
+    detail: "re-aim on-target before click",
+  });
+  return isDemoCursorHotspotOnTarget(cursor, target);
 }
 
 async function animateCursorTravel(
@@ -1518,8 +1527,36 @@ export async function simulateDemoPointerClick(
   }
 
   const interactionRoot = findDemoInteractionRoot(target);
-  const { x, y } = targetCenter(target);
   const dispatchEvents = options?.dispatchPointerEvents !== false;
+
+  // HARD: tip must be on target before any press/click. Re-aim once; else FAIL
+  // (never target.click() while visually off-cell — false selection path).
+  let onTarget = isDemoCursorHotspotOnTarget(cursor, target);
+  if (!onTarget) {
+    onTarget = snapDemoCursorHotspotToTarget(cursor, target);
+  }
+  if (!onTarget) {
+    notePlaybackCursorEvent("abort", {
+      target: describeCursorTarget(target),
+      abortReason: "cursor-off-target",
+      detail: "hotspot miss after travel + re-aim — click suppressed",
+    });
+    playbackDiagClick({
+      ok: false,
+      selector,
+      bbox,
+      detail: "click FAIL — cursor-off-target (no programmatic click)",
+    });
+    playbackDiagCursor({
+      detail: "OFF-TARGET — click suppressed",
+      onTarget: false,
+      parked: false,
+    });
+    await releaseDemoCursorAfterScript();
+    return false;
+  }
+
+  const { x, y } = targetCenter(target);
 
   // Hover class + enter/over/move events (CSS bridged via ensureDemoPseudoBridge).
   setDemoInteractionHover(interactionRoot, true, { x, y });
@@ -1540,6 +1577,26 @@ export async function simulateDemoPointerClick(
     return false;
   }
 
+  // Re-verify after hover dwell — scroll/layout can drift tip off cell.
+  if (!isDemoCursorHotspotOnTarget(cursor, target)) {
+    if (!snapDemoCursorHotspotToTarget(cursor, target)) {
+      setDemoInteractionHover(interactionRoot, false, { x, y });
+      notePlaybackCursorEvent("abort", {
+        target: describeCursorTarget(target),
+        abortReason: "cursor-off-target",
+        detail: "hotspot miss after hover dwell — click suppressed",
+      });
+      playbackDiagClick({
+        ok: false,
+        selector,
+        bbox,
+        detail: "click FAIL — cursor-off-target after hover",
+      });
+      await releaseDemoCursorAfterScript();
+      return false;
+    }
+  }
+
   const lockedLeft = Number.parseFloat(cursor.style.left);
   const lockedTop = Number.parseFloat(cursor.style.top);
   if (Number.isFinite(lockedLeft) && Number.isFinite(lockedTop)) {
@@ -1549,7 +1606,7 @@ export async function simulateDemoPointerClick(
   notePlaybackCursorEvent("press", {
     target: describeCursorTarget(interactionRoot),
     animated: true,
-    detail: "64ms",
+    detail: "64ms on-target",
   });
 
   // Native parity: :hover stays while :active — keep hover class during press.
@@ -1590,13 +1647,21 @@ export async function simulateDemoPointerClick(
   notePlaybackCursorEvent("click", {
     target: describeCursorTarget(interactionRoot),
     animated: true,
-    detail: options?.scroll === false ? "scroll-disabled" : "scroll-enabled",
+    detail:
+      options?.scroll === false
+        ? "scroll-disabled on-target"
+        : "scroll-enabled on-target",
   });
   playbackDiagClick({
     ok: true,
     selector,
     bbox,
-    detail: `click ok (${options?.scroll === false ? "scroll-disabled" : "scroll-enabled"})`,
+    detail: `click ok on-target (${options?.scroll === false ? "scroll-disabled" : "scroll-enabled"})`,
+  });
+  playbackDiagCursor({
+    detail: "click on-target",
+    onTarget: true,
+    parked: false,
   });
   // Default arrow after click — CSS tip-align keeps left/top (no tip teleport).
   settleDemoCursorAfterClick(cursor, interactionRoot);

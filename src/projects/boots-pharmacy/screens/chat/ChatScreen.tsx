@@ -368,9 +368,14 @@ function QueryFrame({
 
 const REPLY_FRAME_CLASSES = ["chat__frame", "chat__frame--reply"];
 
+/**
+ * Agent turn slot — thinking and reply share one frame so thinking teardown
+ * cannot collapse height (Y jump). Handoff = in-place replace, no pull-up y.
+ */
 function ReplyFrame({
   frame,
   revealed,
+  showThinking,
   shouldAnimate,
   onAgentCta,
   onProductLink,
@@ -378,6 +383,7 @@ function ReplyFrame({
 }: {
   frame: Extract<ChatThreadFrame, { kind: "reply" }>;
   revealed: boolean;
+  showThinking: boolean;
   shouldAnimate: boolean;
   onAgentCta?: (label: string) => void;
   onProductLink?: (label: string) => void;
@@ -385,15 +391,52 @@ function ReplyFrame({
 }) {
   const ref = useStaticFrameClasses(REPLY_FRAME_CLASSES);
   const bubbleRef = useRef<HTMLDivElement | null>(null);
-  useChatFrameRevealPaint(ref, revealed);
-  const pullLive = useChatPullUpLive(revealed, shouldAnimate);
+  const hadThinkingRef = useRef(false);
+  if (showThinking) hadThinkingRef.current = true;
+  // Thinking→reply: replace in place (opacity only). Fresh reply: pull-up.
+  const morphFromThinking = hadThinkingRef.current && revealed && !showThinking;
+  const pullAnimate = shouldAnimate && !morphFromThinking;
+  const paint = revealed || showThinking;
+  useChatFrameRevealPaint(ref, paint);
+  const pullLive = useChatPullUpLive(revealed && !showThinking, pullAnimate);
   useChatBubbleMotionDiag(bubbleRef, {
     id: frame.id,
-    revealed,
-    shouldAnimate,
+    revealed: revealed && !showThinking,
+    shouldAnimate: pullAnimate,
     pullLive,
     visibleCount,
   });
+
+  const loggedHandoffRef = useRef(false);
+  useEffect(() => {
+    if (!morphFromThinking || loggedHandoffRef.current) return;
+    loggedHandoffRef.current = true;
+    const layoutY = bubbleRef.current
+      ? Math.round(bubbleRef.current.getBoundingClientRect().top * 100) / 100
+      : null;
+    logChatBubbleMotion({
+      id: frame.id,
+      phase: "animate-start",
+      y: 0,
+      opacity: 0,
+      layoutY,
+      deltaY: 0,
+      shouldAnimate: false,
+      visibleCount: visibleCount ?? null,
+    });
+    console.info("[PLAYBACK_DIAG] chat-bubble-motion", {
+      id: frame.id,
+      phase: "thinking-handoff",
+      y: 0,
+      opacity: 1,
+      layoutY,
+      deltaY: 0,
+      shouldAnimate: false,
+      visibleCount: visibleCount ?? null,
+      note: "replace-in-place — no thinking unmount height loss",
+    });
+  }, [morphFromThinking, frame.id, visibleCount]);
+
   const onBodyClick = (e: MouseEvent<HTMLDivElement>) => {
     const t = e.target as HTMLElement | null;
     const link = t?.closest?.(".uxds-link, .chat__link");
@@ -430,36 +473,54 @@ function ReplyFrame({
       data-name="reply"
       data-studio-chat-frame={frame.id}
       data-studio-chat-revealed={revealed ? "true" : "false"}
-      hidden={!revealed}
-      aria-hidden={!revealed}
+      data-studio-chat-thinking-slot={showThinking ? "true" : undefined}
+      hidden={!paint}
+      aria-hidden={!paint}
     >
-      {revealed ? (
-        <motion.div
-          ref={bubbleRef}
-          className="chat__bubble chat__bubble--agent"
-          data-name="component.co.order.summary"
-          data-studio-chat-pull-up={pullLive ? "up" : "start"}
-          initial={shouldAnimate ? CHAT_PULL_UP.initial : false}
-          animate={
-            pullLive
-              ? CHAT_PULL_UP.animate
-              : shouldAnimate
-                ? CHAT_PULL_UP.initial
-                : CHAT_PULL_UP.animate
-          }
-          transition={CHAT_PULL_UP.transition}
-        >
-          {bubbleBody}
-        </motion.div>
-      ) : (
-        <div
-          className="chat__bubble chat__bubble--agent"
-          data-name="component.co.order.summary"
-        >
-          {bubbleBody}
-        </div>
-      )}
-      {frame.helpful ? <HelpfulStrip /> : null}
+      {/* Stable agent slot — thinking/reply swap without sibling unmount gap. */}
+      <div className="chat__agent-slot" data-studio-chat-agent-slot={frame.id}>
+        {showThinking ? (
+          <ChatThinkingBubble mode="playback" generation={0} />
+        ) : revealed ? (
+          <motion.div
+            ref={bubbleRef}
+            className="chat__bubble chat__bubble--agent"
+            data-name="component.co.order.summary"
+            data-studio-chat-pull-up={
+              morphFromThinking ? "handoff" : pullLive ? "up" : "start"
+            }
+            initial={
+              morphFromThinking
+                ? { opacity: 0, y: 0 }
+                : pullAnimate
+                  ? CHAT_PULL_UP.initial
+                  : false
+            }
+            animate={
+              morphFromThinking || pullLive
+                ? { opacity: 1, y: 0 }
+                : pullAnimate
+                  ? CHAT_PULL_UP.initial
+                  : CHAT_PULL_UP.animate
+            }
+            transition={
+              morphFromThinking
+                ? { duration: 0.22, ease: "easeInOut" }
+                : CHAT_PULL_UP.transition
+            }
+          >
+            {bubbleBody}
+          </motion.div>
+        ) : (
+          <div
+            className="chat__bubble chat__bubble--agent"
+            data-name="component.co.order.summary"
+          >
+            {bubbleBody}
+          </div>
+        )}
+      </div>
+      {frame.helpful && revealed && !showThinking ? <HelpfulStrip /> : null}
     </div>
   );
 }
@@ -802,22 +863,12 @@ export function ChatScreen({
       thinking
     );
 
-    // Playback thinking IMMEDIATELY before the held agent reply (r0 first).
-    // Null-anchor fallback holds/shows before r0 (home→chat handoff race).
-    if (
-      frame.kind === "reply" &&
-      isChatReplyHeldForPlaybackThinking(frame.id, thinking)
-    ) {
-      threadNodes.push(
-        <ChatThinkingBubble
-          key={`think-${thinking.generation}`}
-          mode="playback"
-          generation={thinking.generation}
-        />
-      );
-    }
-
     const animate = shouldAnimateFrame(frame.id, revealed);
+    // Playback thinking lives IN the reply slot (same frame) — no sibling
+    // unmount height collapse when thinking→reply handoff fires.
+    const showThinking =
+      frame.kind === "reply" &&
+      isChatReplyHeldForPlaybackThinking(frame.id, thinking);
 
     if (frame.kind === "query") {
       threadNodes.push(
@@ -835,6 +886,7 @@ export function ChatScreen({
           key={frame.id}
           frame={frame}
           revealed={revealed}
+          showThinking={showThinking}
           shouldAnimate={animate}
           onAgentCta={onAgentCta}
           onProductLink={onProductLink}
