@@ -3,19 +3,21 @@
 > _Append a bullet on coherent commits via `npm run notes:append -- --lane="<lane>" --intent="<text>"`. Preview with `npm run notes:preview`. On `npm run release:patch` this section is promoted to `## v<X.Y.Z> - DDMMYY` and a fresh empty `## Current` is re-inserted. Policy: `docs/product/VERSIONING.md`._
 
 ## v0.0.58 - 200726
-- **shell:** Saved CJM: Download journey JSON enabled, hide Replay; agentic recording playbook doc
+- **shell:** Saved CJM REC panel: Download **enabled** (`.journey.json`); hide Replay + STEPS; Start/Pause/Stop/X/+/Import stay hidden
+- **docs:** Future agentic recording playbook — `docs/shell/AGENTIC_RECORDING.md` (persona artifacts → CJM → record available screens / name UX CONCEPTs)
+- **shell:** Checkpoint `checkpoint-2026-07-20` moved to tip — REC control-room wave v0.0.49–v0.0.58
 
 ## v0.0.57 - 200726
-- **shell:** REC: hide Start/Pause/Stop/X/+ for saved CJMs
+- **shell:** REC: hide Start/Pause/Stop/X/+ for saved CJMs (CREATE NEW path only)
 
 ## v0.0.56 - 200726
-- **shell:** REC: Download/CJM locked while live; CREATE NEW CJM + Import visibility
+- **shell:** REC: Download + CJM picker locked while live; **CREATE NEW CJM** first option + separator; Import only on CREATE NEW
 
 ## v0.0.55 - 200726
-- **shell:** REC Stop→X purges staged recording session
+- **shell:** REC Stop→**X** purges staged recording session (STEPS 0; not a saved CJM)
 
 ## v0.0.54 - 200726
-- **shell:** REC live shows NEW CJM (gold); STEPS excludes scroll
+- **shell:** REC live shows gold NEW/CREATE NEW CJM; STEPS count excludes `scroll`
 
 ## v0.0.53 - 200726
 - **shell:** REC mode Delete recorded CJM (trash + confirm popup)
@@ -27,7 +29,7 @@
 - **shell:** REC seed current screen as step 1; notify STEPS on every append (PDP toggle capture UI)
 
 ## v0.0.50 - 200726
-- **shell:** REC replay ≥4s major-step hold + scroll settle; split Download vs + Add CJM title popup
+- **shell:** REC replay ≥4s major-step hold + scroll settle
 - **shell:** REC Download JSON (recording only) vs **+** Add as CJM with Studio-nav title popup (picker label)
 
 ## v0.0.49 - 200726
@@ -39,7 +41,7 @@
 - **shell:** CJM retreat: agentic avail list closes overlay before beat change (was jumping to chat/home while Choose Pharmacy stayed open)
 - **shell:** Suppress touchpoint-ahead-of-beat Alarm during retreatSync/scripting (one-tick wire/URL lag)
 - **shell:** Home retreat sync clears sticky Availability / popups (`sarah-query-submit` path)
-- **shell:** Checkpoint `checkpoint-2026-07-20` — tip ships nav-above-modals + chat thinking/STEPS/avail-hold wave + traditional REC disk prove
+- **shell:** Prior checkpoint note (tag now at v0.0.58 tip) — nav-above-modals + chat thinking/STEPS/avail-hold wave
 
 ## v0.0.47 - 200726
 - **shell:** Studio nav chrome z-index `11000` above avail/diagnostic lightboxes (`.studio-nav-panel-host`)
