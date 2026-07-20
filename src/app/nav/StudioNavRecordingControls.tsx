@@ -35,10 +35,11 @@ export type StudioNavRecordingControlsProps = {
   /** When true (AIR / play live), REC mode switch is locked — same gate as cassette transport. */
   recModeLocked?: boolean;
   /**
-   * Show Import only when CREATE NEW CJM is selected (idle).
-   * Hidden for saved CJMs; never shown while a live REC session is armed.
+   * CREATE NEW CJM path (idle selection or live REC forced).
+   * Gates Start / Pause / Stop / Purge / Import / + — hidden for saved CJMs.
+   * Download + Replay stay available on the REC panel for any picker state.
    */
-  importVisible?: boolean;
+  createNewCjmSelected?: boolean;
 };
 
 type RecordingUiSnapshot = {
@@ -257,7 +258,7 @@ export function StudioNavRecordingModeSlot({
   onReplay,
   onSaveAsJourney,
   recModeLocked = false,
-  importVisible = false,
+  createNewCjmSelected = false,
 }: StudioNavRecordingControlsProps) {
   const [recMode, setRecMode] = useState(false);
 
@@ -341,7 +342,7 @@ export function StudioNavRecordingModeSlot({
                 getStartOptions={getStartOptions}
                 onReplay={onReplay}
                 onSaveAsJourney={onSaveAsJourney}
-                importVisible={importVisible}
+                createNewCjmSelected={createNewCjmSelected}
               />
             </motion.div>
           ) : null}
@@ -360,7 +361,7 @@ export function StudioNavRecordingControls({
   getStartOptions,
   onReplay,
   onSaveAsJourney,
-  importVisible = false,
+  createNewCjmSelected = false,
 }: StudioNavRecordingControlsProps) {
   const ui = useRecordingUiSnapshot();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -370,6 +371,8 @@ export function StudioNavRecordingControls({
   const [statusNote, setStatusNote] = useState<string | null>(null);
   const [addCjmOpen, setAddCjmOpen] = useState(false);
   const [cjmTitle, setCjmTitle] = useState("");
+  /** Start / Pause / Stop / Purge / + — CREATE NEW path only (live REC also forces CREATE NEW). */
+  const showNewRecordingDeck = createNewCjmSelected || ui.hasLive;
 
   useEffect(() => {
     if (!statusNote) return;
@@ -566,47 +569,54 @@ export function StudioNavRecordingControls({
           {statusNote}
         </span>
       ) : null}
-      <button
-        type="button"
-        className="studio-nav-step-btn studio-nav-scenario__btn"
-        aria-label="Start recording"
-        title="Start recording"
-        disabled={ui.hasLive || replaying}
-        onClick={handleStart}
-      >
-        <RecDotIcon />
-      </button>
-      <button
-        type="button"
-        className="studio-nav-step-btn studio-nav-scenario__btn"
-        aria-label={ui.isPaused ? "Resume recording" : "Pause recording"}
-        title={ui.isPaused ? "Resume recording" : "Pause recording"}
-        disabled={!ui.hasLive || replaying}
-        onClick={handlePauseResume}
-      >
-        {ui.isPaused ? <PlayIcon /> : <PauseIcon />}
-      </button>
-      <button
-        type="button"
-        className="studio-nav-step-btn studio-nav-scenario__btn"
-        aria-label="Stop recording"
-        title="Stop recording"
-        disabled={!ui.hasLive || replaying}
-        onClick={handleStop}
-      >
-        <StopIcon />
-      </button>
-      <button
-        type="button"
-        className="studio-nav-step-btn studio-nav-scenario__btn"
-        aria-label="Discard recording"
-        title="Discard stopped recording (clears STEPS)"
-        disabled={!ui.canPurge || replaying}
-        onClick={handlePurge}
-        data-studio-recording-purge=""
-      >
-        <PurgeXIcon />
-      </button>
+      {showNewRecordingDeck ? (
+        <>
+          <button
+            type="button"
+            className="studio-nav-step-btn studio-nav-scenario__btn"
+            aria-label="Start recording"
+            title="Start recording"
+            disabled={ui.hasLive || replaying}
+            onClick={handleStart}
+            data-studio-recording-start=""
+          >
+            <RecDotIcon />
+          </button>
+          <button
+            type="button"
+            className="studio-nav-step-btn studio-nav-scenario__btn"
+            aria-label={ui.isPaused ? "Resume recording" : "Pause recording"}
+            title={ui.isPaused ? "Resume recording" : "Pause recording"}
+            disabled={!ui.hasLive || replaying}
+            onClick={handlePauseResume}
+            data-studio-recording-pause=""
+          >
+            {ui.isPaused ? <PlayIcon /> : <PauseIcon />}
+          </button>
+          <button
+            type="button"
+            className="studio-nav-step-btn studio-nav-scenario__btn"
+            aria-label="Stop recording"
+            title="Stop recording"
+            disabled={!ui.hasLive || replaying}
+            onClick={handleStop}
+            data-studio-recording-stop=""
+          >
+            <StopIcon />
+          </button>
+          <button
+            type="button"
+            className="studio-nav-step-btn studio-nav-scenario__btn"
+            aria-label="Discard recording"
+            title="Discard stopped recording (clears STEPS)"
+            disabled={!ui.canPurge || replaying}
+            onClick={handlePurge}
+            data-studio-recording-purge=""
+          >
+            <PurgeXIcon />
+          </button>
+        </>
+      ) : null}
       <button
         type="button"
         className="studio-nav-step-btn studio-nav-scenario__btn"
@@ -621,7 +631,7 @@ export function StudioNavRecordingControls({
       >
         <DownloadIcon />
       </button>
-      {importVisible && !ui.hasLive ? (
+      {createNewCjmSelected && !ui.hasLive ? (
         <button
           type="button"
           className="studio-nav-step-btn studio-nav-scenario__btn"
@@ -644,73 +654,75 @@ export function StudioNavRecordingControls({
       >
         <ReplayIcon />
       </button>
-      <span
-        ref={addCjmRootRef}
-        className="studio-nav-recording-add-cjm"
-        data-studio-recording-add-cjm=""
-      >
-        <button
-          type="button"
-          className="studio-nav-step-btn studio-nav-scenario__btn"
-          aria-label="Add to project as CJM"
-          title={
-            ui.hasLive
-              ? "Stop recording before adding as CJM"
-              : "Add recording as a new CJM (title, then confirm)"
-          }
-          aria-expanded={addCjmOpen}
-          aria-haspopup="dialog"
-          disabled={ui.hasLive || !ui.canExport || replaying}
-          onClick={openAddCjmTitle}
+      {showNewRecordingDeck ? (
+        <span
+          ref={addCjmRootRef}
+          className="studio-nav-recording-add-cjm"
+          data-studio-recording-add-cjm=""
         >
-          <AddCjmPlusIcon />
-        </button>
-        {addCjmOpen ? (
-          <div
-            className="studio-nav-recording-add-cjm__panel"
-            role="dialog"
-            aria-label="New CJM title"
+          <button
+            type="button"
+            className="studio-nav-step-btn studio-nav-scenario__btn"
+            aria-label="Add to project as CJM"
+            title={
+              ui.hasLive
+                ? "Stop recording before adding as CJM"
+                : "Add recording as a new CJM (title, then confirm)"
+            }
+            aria-expanded={addCjmOpen}
+            aria-haspopup="dialog"
+            disabled={ui.hasLive || !ui.canExport || replaying}
+            onClick={openAddCjmTitle}
           >
-            <label className="studio-nav-recording-add-cjm__field">
-              <span className="studio-nav-recording-add-cjm__field-label">
-                CJM title
-              </span>
-              <input
-                ref={titleInputRef}
-                className="studio-nav-recording-add-cjm__input"
-                type="text"
-                value={cjmTitle}
-                maxLength={80}
-                placeholder="Journey title"
-                onChange={(event) => setCjmTitle(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    event.preventDefault();
-                    confirmAddCjm();
-                  }
-                }}
-              />
-            </label>
-            <div className="studio-nav-recording-add-cjm__actions">
-              <button
-                type="button"
-                className="studio-nav-recording-add-cjm__action"
-                onClick={() => setAddCjmOpen(false)}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                className="studio-nav-recording-add-cjm__action studio-nav-recording-add-cjm__action--confirm"
-                disabled={!cjmTitle.trim()}
-                onClick={confirmAddCjm}
-              >
-                Add
-              </button>
+            <AddCjmPlusIcon />
+          </button>
+          {addCjmOpen ? (
+            <div
+              className="studio-nav-recording-add-cjm__panel"
+              role="dialog"
+              aria-label="New CJM title"
+            >
+              <label className="studio-nav-recording-add-cjm__field">
+                <span className="studio-nav-recording-add-cjm__field-label">
+                  CJM title
+                </span>
+                <input
+                  ref={titleInputRef}
+                  className="studio-nav-recording-add-cjm__input"
+                  type="text"
+                  value={cjmTitle}
+                  maxLength={80}
+                  placeholder="Journey title"
+                  onChange={(event) => setCjmTitle(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      event.preventDefault();
+                      confirmAddCjm();
+                    }
+                  }}
+                />
+              </label>
+              <div className="studio-nav-recording-add-cjm__actions">
+                <button
+                  type="button"
+                  className="studio-nav-recording-add-cjm__action"
+                  onClick={() => setAddCjmOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="studio-nav-recording-add-cjm__action studio-nav-recording-add-cjm__action--confirm"
+                  disabled={!cjmTitle.trim()}
+                  onClick={confirmAddCjm}
+                >
+                  Add
+                </button>
+              </div>
             </div>
-          </div>
-        ) : null}
-      </span>
+          ) : null}
+        </span>
+      ) : null}
       <input
         ref={fileInputRef}
         type="file"

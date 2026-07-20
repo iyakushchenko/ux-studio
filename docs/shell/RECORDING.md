@@ -192,16 +192,16 @@ Leaving Rec while a capture is live **pauses** the session (does not stop/destro
 
 | Control | Action |
 |---------|--------|
-| ● | Start recording (current project / persona / journey) |
-| ❚❚ / ► | Pause / resume |
-| ■ | Stop — keeps session for export / replay |
-| ✕ | Discard stopped session — clears STEPS / Download / + / CREATE NEW CJM (not a saved CJM) |
-| ↓ | **Download JSON** — export `.recording.json` only; **disabled while REC live** (Stop first) |
-| ↑ | Import a saved `.recording.json` — **visible only when CREATE NEW CJM** is selected (idle); hidden for saved CJMs |
-| ↺ | Replay last stopped or imported session (v3: transport + screen + demo/human-click + wire-intent + director-script + beat-enter + scroll + typed-text) |
-| + | **Add to project as CJM** — disabled while a recording is live/paused; after Stop, title popup → compile → **new** journey id (picker label). Separate from Download. |
+| ● | Start recording — **CREATE NEW CJM path only** (hidden for saved CJMs) |
+| ❚❚ / ► | Pause / resume — CREATE NEW / live NEW recording only |
+| ■ | Stop — CREATE NEW / live NEW recording only |
+| ✕ | Discard stopped session — CREATE NEW path only (not a saved CJM) |
+| ↓ | **Download JSON** — always on REC panel; **disabled while REC live** (Stop first) |
+| ↑ | Import — **CREATE NEW CJM idle only**; hidden for saved CJMs / while live |
+| ↺ | Replay — always on REC panel (last stopped / imported session) |
+| + | **Add as CJM** — CREATE NEW path only; disabled while live |
 
-CJM picker (Studio menus): first option **CREATE NEW CJM**, then a separator, then built-ins + recorded. Picker **disabled while REC live**. Download also **disabled while live**.
+CJM picker: first option **CREATE NEW CJM**, separator, then built-ins + recorded. Idle default stays saved journey. Picker + Download **disabled while REC live**. Saved CJM selected → REC panel shows only Download / Replay (no Start…+/Import).
 | 🗑 | **Delete recorded CJM** (REC mode only) — trash glyph (PLP reset filters); confirm popup DELETE/CANCEL. Built-in Agentic/Traditional hidden. Falls back to matching built-in path after delete. |
 | LED | Same playback diode chrome — **blinks red** while recording live; dim solid red when paused; idle graphite when REC ready / REC off restores green on-air |
 

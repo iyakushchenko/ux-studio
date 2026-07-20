@@ -1863,7 +1863,7 @@ export default function App() {
                     replayRecordingSession(session, replayRecordingOptions())
                   }
                   onSaveAsJourney={onRecordingAddedAsCjm}
-                  importVisible={createNewCjmSelected}
+                  createNewCjmSelected={createNewCjmSelected}
                 />
               }
             />
@@ -1877,7 +1877,7 @@ export default function App() {
                   replayRecordingSession(session, replayRecordingOptions())
                 }
                 onSaveAsJourney={onRecordingAddedAsCjm}
-                importVisible={createNewCjmSelected}
+                createNewCjmSelected={createNewCjmSelected}
               />
             </div>
           )
