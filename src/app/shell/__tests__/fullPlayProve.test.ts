@@ -123,6 +123,57 @@ describe("runFullPlayProve (universal)", () => {
     });
   });
 
+  it("rec-* asserts that journey playlist — not built-in traditional 13", async () => {
+    (
+      window as Window & {
+        __studioListJourneys?: () => Array<{
+          id: string;
+          beatCount: number;
+          beatIds: string[];
+        }>;
+      }
+    ).__studioListJourneys = () => [
+      {
+        id: "rec-trad-mrtzf6sz-xcs5",
+        beatCount: 4,
+        beatIds: ["plp", "scroll-stop-camera", "plp-book-now", "pdp"],
+      },
+    ];
+
+    vi.mocked(runPlayJourneyToStartSmoke).mockResolvedValue({
+      pass: true,
+      peakVisible: 4,
+      peakCounter: "STEPS: 4 / 4",
+      assert: {
+        pass: true,
+        beatId: "plp",
+        screenId: "plp",
+      },
+    });
+
+    const result = await runFullPlayProve({
+      journeyId: "rec-trad-mrtzf6sz-xcs5",
+      delay: async () => undefined,
+      preArmMs: 0,
+    });
+
+    expect(result.pass).toBe(true);
+    expect(result.journeyId).toBe("rec-trad-mrtzf6sz-xcs5");
+    expect(result.experience).toBe("traditional");
+    expect(vi.mocked(runPlayJourneyToStartSmoke).mock.calls[0]?.[0]).toMatchObject({
+      orchestraMode: "rec-trad-mrtzf6sz-xcs5",
+      startBeatId: "plp",
+      startScreenId: "plp",
+    });
+    // Must NOT demand traditional-plp / peak 13.
+    expect(result.errors.some((e) => e.includes("peak-not-13"))).toBe(false);
+    expect(result.peak.total).toBe(4);
+
+    delete (
+      window as Window & { __studioListJourneys?: unknown }
+    ).__studioListJourneys;
+  });
+
   it("thin aliases share the same core (no duplicated logic)", async () => {
     vi.mocked(runPlayJourneyToStartSmoke).mockResolvedValue({
       pass: true,

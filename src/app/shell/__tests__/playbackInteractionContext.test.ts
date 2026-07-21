@@ -47,7 +47,10 @@ describe("playbackInteractionContext", () => {
       "Robo-cursor click"
     );
     expect(formatPlaybackInteraction(getLastPlaybackInteraction())).toContain(
-      'aria-label="Book appointment"'
+      "Book appointment"
+    );
+    expect(formatPlaybackInteraction(getLastPlaybackInteraction())).not.toMatch(
+      /aria-label=/
     );
   });
 

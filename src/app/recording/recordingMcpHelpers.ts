@@ -26,6 +26,11 @@ import type { StartRecordingOptions } from "@/app/recording/recordingSession";
 import { armOverlayOnStudioHelpers } from "@/app/shell/helperOverlayArm";
 import { simulateDemoPointerClick } from "@/app/scenario/demoCursor";
 import { scrollCameraToTarget } from "@/app/scenario/playbackScroll";
+import {
+  logAgentTestingStep,
+} from "@/app/shell/agent-testing";
+import { resolveUsableDemoClickTarget } from "@/app/recording/recordingCapture";
+import { describeRecordingClickTarget } from "@/app/recording/recordingCapture";
 
 function resolveRecordingSession(
   session?: RecordingSession
@@ -124,10 +129,42 @@ export function registerRecordingMcpHelpers(options?: {
 
   window.__protoStartRecording = (startOptions) => {
     const defaults = options?.getDefaultStartOptions?.() ?? {};
-    return startRecording({ ...defaults, ...startOptions });
+    const session = startRecording({ ...defaults, ...startOptions });
+    const live = isRecordingActive();
+    try {
+      logAgentTestingStep({
+        kind: "rec",
+        action: "StartRecording",
+        label: live
+          ? `REC capture live · ${session.id}`
+          : `REC FAIL — start did not arm session`,
+        outcome: live ? "ok" : "fail",
+      });
+    } catch {
+      /* hang-safe */
+    }
+    if (!live) {
+      throw new Error("REC start failed — isRecordingActive() is false");
+    }
+    return session;
   };
 
-  window.__protoStopRecording = () => stopRecording();
+  window.__protoStopRecording = () => {
+    const session = stopRecording();
+    try {
+      logAgentTestingStep({
+        kind: "rec",
+        action: "StopRecording",
+        label: session
+          ? `REC stop · ${session.id} · events=${session.events.length}`
+          : "REC stop · no session",
+        outcome: session ? "ok" : "soft-fail",
+      });
+    } catch {
+      /* hang-safe */
+    }
+    return session;
+  };
 
   window.__protoClearRecording = () => clearStagedRecordingSession();
 
@@ -151,7 +188,31 @@ export function registerRecordingMcpHelpers(options?: {
   window.__protoSimulateDemoPointerClick = async (target, clickOpts) => {
     const el = resolveEl(target);
     if (!el) return false;
-    return simulateDemoPointerClick(el, {
+    const usable = resolveUsableDemoClickTarget(el);
+    if (!usable) {
+      try {
+        logAgentTestingStep({
+          kind: "rec",
+          action: "SimulateDemoPointerClick",
+          label: `REC/agent click FAIL — degraded target`,
+          outcome: "fail",
+        });
+      } catch {
+        /* hang-safe */
+      }
+      return false;
+    }
+    try {
+      logAgentTestingStep({
+        kind: "rec",
+        action: "SimulateDemoPointerClick",
+        label: `robo-cursor click · ${describeRecordingClickTarget(usable)}`,
+        outcome: "ok",
+      });
+    } catch {
+      /* hang-safe */
+    }
+    return simulateDemoPointerClick(usable, {
       scroll: clickOpts?.scroll !== false,
     });
   };
@@ -207,6 +268,11 @@ export function registerRecordingMcpHelpers(options?: {
     if (!target) {
       throw new Error("No recording session to save as journey");
     }
+    if (isRecordingActive()) {
+      throw new Error(
+        "REC still live — stop recording before Add as CJM (honesty)"
+      );
+    }
     const defaults = options?.getDefaultStartOptions?.() ?? {};
     const saved = saveRecordingAsJourney(target, {
       ...opts,
@@ -214,6 +280,16 @@ export function registerRecordingMcpHelpers(options?: {
       personaId: (target.personaId ?? defaults.personaId) as string | undefined,
     });
     options?.onJourneySaved?.();
+    try {
+      logAgentTestingStep({
+        kind: "rec",
+        action: "SaveRecordingAsJourney",
+        label: `REC Add as CJM · ${saved.journey.id} · beats=${saved.journey.beats.length}`,
+        outcome: "ok",
+      });
+    } catch {
+      /* hang-safe */
+    }
     return saved;
   };
 

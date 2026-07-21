@@ -1210,19 +1210,31 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   }, [hubOpen, restoreHubScroll]);
 
   // Browse-mode tab open: scroll top. Chat owns scroll (last frame / bottom).
-  // CJM / Play / AIR page land: always host top on screen change (camera beats
-  // then ease to targets). Cancel prior-screen ease so it cannot fight layout.
+  // CJM / Play / AIR page land: host top on *screen change* only (camera beats
+  // then ease to targets). Do NOT yank on isPlaying/journeyMode flips — that
+  // fights in-flight camera ease (scroll-reversal class).
   // Gate on journey/play directly (layout can race App's session latch useEffect).
+  const pageLandScreenRef = useRef<number | null>(null);
   useLayoutEffect(() => {
-    if (hubOpen) return;
-    if (SCREENS[current]?.childIndex === 10) return;
+    if (hubOpen) {
+      pageLandScreenRef.current = null;
+      return;
+    }
+    if (SCREENS[current]?.childIndex === 10) {
+      pageLandScreenRef.current = current;
+      return;
+    }
+    const screenChanged = pageLandScreenRef.current !== current;
+    pageLandScreenRef.current = current;
     if (studioJourneyMode || transport.isPlaying || transport.isOnAir) {
+      if (!screenChanged) return;
       cancelPlaybackScroll("abort");
       // Page land = top unless intentional camera beat owns the next move.
       resetPrototypeScroll({ force: true });
       return;
     }
     if (!shouldBlindOriginResetOnScreenEnter()) return;
+    if (!screenChanged) return;
     resetPrototypeScroll();
   }, [
     current,

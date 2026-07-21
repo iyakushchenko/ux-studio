@@ -34,6 +34,12 @@ import {
   healRecordedJourneyNav,
   screenIdToProtoTab,
 } from "@/app/recording/recordedJourneyNavHeal";
+import {
+  humanizeRecordingLabel,
+  humanizeScreenLabel,
+  isCoarseMakeModuleName,
+  isWeakScrollAnchorName,
+} from "@/app/recording/recordingLabels";
 import type { PersonaId, ProjectId } from "@/projects/types";
 import { playbackDiagRecCompile } from "@/app/shell/playbackDiag";
 
@@ -295,12 +301,31 @@ function cameraFromScrollStop(
     SCROLL_STOP_DWELL_MS,
     Math.round(event.durationMs ?? 0)
   );
-  const chain = event.selectorChain?.filter((s) => s && s !== "#root");
+  const chain = event.selectorChain
+    ?.filter((s) => s && s !== "#root")
+    .filter((s) => {
+      const m = /data-name="([^"]+)"/.exec(s);
+      if (!m) return true;
+      return !isWeakScrollAnchorName(m[1]) && !isCoarseMakeModuleName(m[1]);
+    });
   const usable = isUsablePlaybackSelectorChain(chain);
+  const anchorRaw = event.anchorSelector?.trim() || undefined;
+  const anchorName = anchorRaw
+    ? /data-name="([^"]+)"/.exec(anchorRaw)?.[1]
+    : undefined;
+  const anchorSelector =
+    anchorRaw &&
+    !isWeakScrollAnchorName(anchorName) &&
+    !isCoarseMakeModuleName(anchorName)
+      ? anchorRaw
+      : undefined;
   return {
     dwellMs,
     selectorChain: usable ? chain : undefined,
-    anchorSelector: event.anchorSelector?.trim() || undefined,
+    anchorSelector: anchorSelector || (usable ? chain?.[chain.length - 1] : undefined),
+    labelHint: humanizeRecordingLabel(
+      anchorSelector ?? chain?.[chain.length - 1] ?? "show page"
+    ),
   };
 }
 
@@ -308,13 +333,25 @@ function cameraFromPendingClickScroll(
   click: JourneyBeatRecordedClick,
   dwellMs?: number
 ): PendingCamera | null {
-  const camChain = click.cameraSelectorChain;
-  const camAnchor = click.cameraAnchorSelector;
+  const camChain = click.cameraSelectorChain?.filter((s) => {
+    const m = /data-name="([^"]+)"/.exec(s);
+    if (m && (isWeakScrollAnchorName(m[1]) || isCoarseMakeModuleName(m[1]))) {
+      return false;
+    }
+    return Boolean(s && s !== "#root");
+  });
+  let camAnchor = click.cameraAnchorSelector;
+  if (camAnchor) {
+    const m = /data-name="([^"]+)"/.exec(camAnchor);
+    if (m && (isWeakScrollAnchorName(m[1]) || isCoarseMakeModuleName(m[1]))) {
+      camAnchor = undefined;
+    }
+  }
   if (!camChain?.length && !camAnchor) return null;
   return {
     dwellMs: dwellMs ?? DEFAULT_CAMERA_DWELL_MS,
-    selectorChain: camChain,
-    anchorSelector: camAnchor,
+    selectorChain: camChain?.length ? camChain : undefined,
+    anchorSelector: camAnchor || camChain?.[camChain.length - 1],
     labelHint: click.element,
   };
 }
@@ -338,7 +375,7 @@ function pushCameraBeat(
   const label =
     options?.label?.trim() ||
     (pending.labelHint
-      ? `Camera — ${pending.labelHint.trim().slice(0, 48)}`
+      ? humanizeRecordingLabel(pending.labelHint, { camera: true })
       : "Camera — show page");
   beats.push({
     id,
@@ -361,7 +398,7 @@ function compileSegmentToBeat(
   );
   const beat: JourneyBeat = {
     id: baseId,
-    label: segment.label?.trim() || baseId,
+    label: humanizeRecordingLabel(segment.label) || segment.label?.trim() || baseId,
     kind: "tab-landing",
   };
 
@@ -449,7 +486,7 @@ function compileSegmentToBeat(
         recordedClickApplied = true;
         pendingScroll = null;
         if (event.element?.trim()) {
-          beat.label = event.element.trim().slice(0, 64);
+          beat.label = humanizeRecordingLabel(event.element) || event.element.trim().slice(0, 64);
         }
       } else {
         gaps.push("demo-click:unusable-selector");
@@ -517,7 +554,7 @@ function compileFallbackBeats(
     const segment: CompiledBeatSegment = {
       touchpointKey: `screen:${pendingScreen.screenId}`,
       beatId: pendingScreen.screenId,
-      label: pendingScreen.screenId,
+      label: humanizeScreenLabel(pendingScreen.screenId),
       startedAtMs: pendingScreen.atMs,
       events: pendingScreen.events,
     };
@@ -623,7 +660,7 @@ function compileFallbackBeats(
         const landing: CompiledBeatSegment = {
           touchpointKey: `screen:${currentScreenId}`,
           beatId: currentScreenId,
-          label: currentScreenId,
+          label: humanizeScreenLabel(currentScreenId),
           startedAtMs: event.atMs,
           events: [
             {
@@ -656,7 +693,7 @@ function compileFallbackBeats(
         pushCameraBeat(beats, usedIds, cameraPending, {
           protoTab: contextProtoTab(),
           idBase: `${base}-camera`,
-          label: `Camera — ${(event.element ?? base).trim().slice(0, 48)}`,
+          label: humanizeRecordingLabel(event.element ?? base, { camera: true }),
         });
         delete click.cameraSelectorChain;
         delete click.cameraAnchorSelector;
@@ -666,7 +703,10 @@ function compileFallbackBeats(
       const beatId = uniqueBeatId(slugBeatId(base), usedIds);
       const beat: JourneyBeat = {
         id: beatId,
-        label: (event.element ?? beatId).trim().slice(0, 64) || beatId,
+        label:
+          humanizeRecordingLabel(event.element ?? beatId) ||
+          (event.element ?? beatId).trim().slice(0, 64) ||
+          beatId,
         kind: "tab-landing",
         recordedClick: click,
         protoTab: contextProtoTab(),

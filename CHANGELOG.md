@@ -39,6 +39,8 @@
 - **engine:** Cursor engine: step parks / continuous Play stays at last click; never rest on composer submit (park-from-submit); early hand-on-edge; QA trackers park-on-step/stay-on-play/park-from-submit + REST-ON-SUBMIT FAIL
 - **shell:** QA: REC live pauses capture + frees product clicks; fullPlayProve prove-mode latch skips 8s auto-pause; camera-unusable human row; soft-fail/journey-reset dedupe; durable dump click.ok
 - **shell:** PO REC→Play wave: page-land top, ABRUPT-PARK red, concise touchpoint labels, scroll-stop coalesce, play-end reset, scrub Make copy, orange REC frame covering nav popups, QA log lean, agent REC robo-cursor + eased camera
+- **shell:** REC compile: human labels + content camera anchors + tile CTA clicks; prove asserts rec-* playlist (not traditional 13); page-land only on screen change.
+- **shell:** Honest REC: degrade container clicks FAIL; REC capture live vs Play journey prove QA labels; prove catalog from imported store.
 
 ## v0.0.100 - 200726
 - **shell:** PP-13 self-test expand + stale-green detector + PLAYBACK_DIAG mirror

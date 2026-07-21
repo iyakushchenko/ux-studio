@@ -94,6 +94,17 @@ const PRESERVE_LOGGER_HELPER_SUFFIXES = new Set([
   "ClearRecording",
 ]);
 
+/**
+ * These helpers log their own honest QA rows (REC live / Add CJM).
+ * Skip the generic helper:StartRecording spam that looked like REC
+ * when agents only armed chrome or played a journey.
+ */
+const SELF_LOGGED_HELPER_SUFFIXES = new Set([
+  "StartRecording",
+  "StopRecording",
+  "SaveRecordingAsJourney",
+]);
+
 const ARMED_FLAG = "__studioOverlayArmed";
 const STUDIO_WINDOW_API = /^__(?:proto|studio)[A-Z]/;
 
@@ -118,7 +129,9 @@ function wrapHelper(suffix: string, fn: (...args: unknown[]) => unknown) {
         : undefined
     );
     try {
-      logAgentTestingHelper(suffix);
+      if (!SELF_LOGGED_HELPER_SUFFIXES.has(suffix)) {
+        logAgentTestingHelper(suffix);
+      }
     } catch {
       /* ignore */
     }

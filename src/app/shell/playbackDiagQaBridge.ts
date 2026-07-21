@@ -475,10 +475,12 @@ export function labelForPlaybackDiagEvent(event: PlaybackDiagEvent): string {
         : "Camera wait after scroll";
     }
     if (/^scroll\s*→/i.test(detail) || event.beatKind === "scroll") {
-      return `Camera move — ${clip(detail.replace(/^scroll\s*→\s*/i, ""), 60)}`;
+      const target = detail.replace(/^scroll\s*→\s*/i, "").trim();
+      return `Camera move — ${clip(target, 60)}`;
     }
     if (/^demo-click\b/i.test(detail) || event.beatKind === "demo-click") {
-      return `REC click — ${clip(detail.replace(/^demo-click\s*(WEAK\s*)?/i, ""), 60)}`;
+      const rest = detail.replace(/^demo-click\s*(WEAK\s*)?/i, "").trim();
+      return `REC click — ${clip(rest, 60)}`;
     }
     if (/^screen\b/i.test(detail) || event.beatKind === "screen") {
       return `REC screen — ${clip(detail, 60)}`;

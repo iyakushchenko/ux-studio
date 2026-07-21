@@ -10,6 +10,20 @@ Agents **must read** this file before claiming a UI or Studio-chrome slice done.
 
 ## 2026-07-21
 
+### REC prove honesty — fake tiles click + Play logged as REC (PO fury)
+
+- **Symptom / class:** (1) Robo-click on `module.plp.tiles` reported success (auto-refined to first Book now). (2) QA showed Start REC while agent only ran `__studioRunFullPlayProve` on an existing CJM.
+- **Wrong fix:** Silent refine of coarse listing shells; generic helper log `start-recording` without verifying `isRecordingActive()`.
+- **Right fix:** Explicit coarse shell → click FAIL (no invent child CTA). StartRecording logs `REC capture live · <id>` only after live arm; FullPlayProve logs `Play journey prove (NOT REC)`. Prove catalog reads imported store for `rec-*`.
+- **Gate:** Live: `recAttr=live` + tiles click false + Book now `data-studio-action` + Add CJM + Play that id PASS.
+
+### REC prove / labels / camera bind (PO retest `rec-trad-*` FAIL)
+
+- **Symptom / class:** (1) STEPS/touchpoints empty or Make-ish (`data-name="module.plp.tiles"`, `component.plp…`). (2) Camera scroll-stop bound to hidden/filter checkbox. (3) Click degraded to tiles container. (4) `__studioRunFullPlayProve({ journeyId: "rec-trad-…" })` asserted traditional-plp / peak 13. (5) Scroll-reversal Δ~1k from page-land yank on `isPlaying` flip.
+- **Root causes:** `resolveExperience` used `id.includes("trad")` → matched `rec-trad-*`; scroll anchor scored nearest `[data-name]` (filters); click `closest("[data-name]")` climbed to module; page-land `force` top ran whenever play/journey deps flipped, not only on screen change; labels stored raw attr soup.
+- **Right fix:** Prove catalog lookup for `rec-*` (playlist length + start beat); `humanizeRecordingLabel` scrub at capture/compile; prefer title/content scroll anchors + drop weak filter chains; refine clicks to `data-studio-action` / tile CTA; page-land only when `current` screen changes.
+- **Gate:** Unit `recordingLabels` + compile human labels + `fullPlayProve` rec-* peak; live REC PLP→PDP → Play → `__studioRunFullPlayProve({ journeyId })` asserts that journey.
+
 ### REC continuous Play stalls on last recordedClick / camera (PO / Quinn + Finn)
 
 - **Symptom / class:** Continuous Play reaches last PDP `recordedClick` (or last `kind:camera`) then hangs → playback-stall ~22s / idle ~45s (often reported as script-timeout). Peak can show `N/N` but play never ends.

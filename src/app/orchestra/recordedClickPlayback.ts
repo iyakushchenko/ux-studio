@@ -1,9 +1,5 @@
-/**
- * Compile v2 — play a recorded demo-click beat via engine demo cursor + camera.
- */
-
 import {
-  resolvePlaybackSelectorChain,
+  resolveUsableDemoClickTarget,
 } from "@/app/recording/recordingCapture";
 import type { JourneyBeatRecordedClick } from "@/app/orchestra/types";
 import { simulateDemoPointerClick } from "@/app/scenario/demoCursor";
@@ -13,6 +9,9 @@ import {
   fromBool,
   type PlaybackScriptResult,
 } from "@/projects/playbackScriptResult";
+import { resolvePlaybackSelectorChain } from "@/app/recording/recordingCapture";
+import { isDegradedClickTarget } from "@/app/recording/recordingLabels";
+import { playbackDiagClick } from "@/app/shell/playbackDiag";
 
 export async function playRecordedClick(
   click: JourneyBeatRecordedClick,
@@ -29,18 +28,24 @@ export async function playRecordedClick(
       (click.cameraAnchorSelector
         ? document.querySelector<HTMLElement>(click.cameraAnchorSelector)
         : null);
-    if (cameraEl) {
+    if (cameraEl && !isDegradedClickTarget(cameraEl)) {
       await scrollCameraToTarget(cameraEl, { instant: false });
     }
   }
 
   const resolved = resolvePlaybackSelectorChain(click.selectorChain, document);
-  const target = resolveClickTargetRespectingModal(resolved, {
+  const modalResolved = resolveClickTargetRespectingModal(resolved, {
     resolveInModal: (modal) =>
       resolvePlaybackSelectorChain(click.selectorChain, modal),
   });
+  const target = resolveUsableDemoClickTarget(modalResolved);
   if (!target) {
-    return { ok: false, step: "recorded-click:target-missing" };
+    playbackDiagClick({
+      ok: false,
+      selector: click.selectorChain?.[0] ?? click.element ?? "?",
+      detail: "click FAIL — degraded/missing recorded target (no invent success)",
+    });
+    return { ok: false, step: "recorded-click:target-degraded" };
   }
 
   const clicked = await simulateDemoPointerClick(target, { scroll: true });

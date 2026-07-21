@@ -453,6 +453,87 @@ describe("compileRecordingToJourney", () => {
     expect(cameras[0]?.camera?.dwellMs).toBe(4000);
   });
 
+  it("emits concise human labels — not Make data-name soup", () => {
+    const session: RecordingSession = {
+      id: "human-labels",
+      version: 1,
+      startedAt: "2026-07-21T12:00:00.000Z",
+      projectId: "boots-pharmacy",
+      personaId: "sarah-jenkins",
+      journeyId: "traditional-cjm",
+      orchestraMode: "traditional-cjm",
+      events: [
+        {
+          kind: "screen",
+          screenId: "plp",
+          atMs: 0,
+          snapshot: { currentTabIndex: 2, screenId: "plp" },
+        },
+        {
+          kind: "scroll-stop",
+          durationMs: 2200,
+          selectorChain: ['[data-name="component.plp.tile.title"]'],
+          anchorSelector: '[data-name="component.plp.tile.title"]',
+          atMs: 2300,
+        },
+        {
+          kind: "demo-click",
+          element: 'data-name="module.plp.tiles"',
+          selectorChain: ['[data-studio-action="plp-book-now"]'],
+          atMs: 2500,
+          snapshot: { currentTabIndex: 2, screenId: "plp" },
+        },
+      ],
+    };
+
+    const { journey } = compileRecordingToJourney(session);
+    for (const beat of journey.beats) {
+      expect(beat.label).not.toMatch(/data-name=/i);
+      expect(beat.label).not.toMatch(/^module\./i);
+      expect(beat.label).not.toMatch(/^component\./i);
+    }
+    const click = journey.beats.find((b) => b.recordedClick);
+    expect(click?.label).toMatch(/tiles|book/i);
+    const land = journey.beats.find((b) => b.id === "plp" || b.label === "Vaccinations");
+    expect(land?.label).toBe("Vaccinations");
+  });
+
+  it("drops weak filter checkbox scroll-stop anchors at compile", () => {
+    const session: RecordingSession = {
+      id: "weak-filter-anchor",
+      version: 1,
+      startedAt: "2026-07-21T12:00:00.000Z",
+      projectId: "boots-pharmacy",
+      personaId: "sarah-jenkins",
+      journeyId: "traditional-cjm",
+      orchestraMode: "traditional-cjm",
+      events: [
+        {
+          kind: "screen",
+          screenId: "plp",
+          atMs: 0,
+          snapshot: { currentTabIndex: 2, screenId: "plp" },
+        },
+        {
+          kind: "scroll-stop",
+          durationMs: 2200,
+          selectorChain: [
+            '[data-name="component.plp.filter.checkbox.item"]',
+          ],
+          anchorSelector:
+            '[data-name="component.plp.filter.checkbox.item"]',
+          atMs: 2300,
+        },
+      ],
+    };
+
+    const { journey } = compileRecordingToJourney(session);
+    const cam = journey.beats.find((b) => b.kind === "camera");
+    expect(cam?.camera?.selectorChain).toBeUndefined();
+    expect(cam?.camera?.anchorSelector).toBeUndefined();
+    expect(cam?.label).toMatch(/^Camera/i);
+  });
+
   it("persists raw recording session with Add as CJM", () => {
     const session = sessionWithTouchpoints();
     const saved = saveRecordingAsJourney(session, {

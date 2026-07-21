@@ -35,8 +35,8 @@ const ALLOWLIST = {
   "src/app/shell/agent-testing/agentTestingOverlay.ts": 4650, // + REC orange frame + ABRUPT-PARK restore fail + __frame ensure
   "src/app/nav/studioNavPanel.css": 1700, // + MCP status hint near version/bug
   "src/app/shell/studioMcpHelpers.ts": 1380, // + Traditional keep-overlay full Play prove window API
-  "src/app/scenario/demoCursor.ts": 1920, // ratchet: already above prior 1800 (engine park/travel); split later
-  "src/projects/boots-pharmacy/wire/BootsPharmacyProjectView.tsx": 4835, // + CJM page-land force origin on tab change
+  "src/app/scenario/demoCursor.ts": 1980, // + degrade-container FAIL + early overlay guard
+  "src/projects/boots-pharmacy/wire/BootsPharmacyProjectView.tsx": 4840, // + page-land only on screen change (no isPlaying yank)
   "src/projects/boots-pharmacy/data/plpListing.ts": 2000, // Make PLP DOM; retire with PLP React
 };
 

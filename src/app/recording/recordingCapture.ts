@@ -11,6 +11,12 @@ import type {
 } from "@/app/recording/recordingTypes";
 import { isUsablePlaybackSelectorChain } from "@/app/recording/recordingCompile";
 import {
+  humanizeRecordingLabel,
+  isCoarseMakeModuleName,
+  isDegradedClickTarget,
+  isWeakScrollAnchorName,
+} from "@/app/recording/recordingLabels";
+import {
   SCROLL_STOP_DWELL_MS,
   createScrollStopTracker,
   noteScrollIdle,
@@ -316,21 +322,48 @@ export function captureScrollStop(options: {
 }
 
 const SCROLL_ANCHOR_CANDIDATE_SELECTOR = [
-  "[data-studio-action]",
-  "[data-studio-probe-below-fold]",
-  "[data-studio-avail-store]",
-  "[data-studio-beat]",
-  "[data-name]",
   "h1",
   "h2",
   "h3",
+  "[data-studio-probe-below-fold]",
+  '[data-name="component.plp.tile.title"]',
+  "[data-studio-action]",
+  "[data-studio-avail-store]",
+  "[data-studio-beat]",
   "article",
   '[role="article"]',
+  "[data-name]",
 ].join(", ");
+
+function scrollAnchorScore(el: HTMLElement, dist: number): number {
+  // Lower is better. Prefer titles/content; bury filters / coarse modules.
+  let score = dist;
+  const tag = el.tagName.toLowerCase();
+  if (tag === "h1" || tag === "h2" || tag === "h3") score -= 80;
+  if (el.hasAttribute("data-studio-probe-below-fold")) score -= 70;
+  const dataName = el.getAttribute("data-name");
+  if (dataName === "component.plp.tile.title") score -= 65;
+  if (el.getAttribute("data-studio-action")) score -= 40;
+  if (tag === "article" || el.getAttribute("role") === "article") score -= 30;
+  if (isWeakScrollAnchorName(dataName)) score += 400;
+  if (isCoarseMakeModuleName(dataName)) score += 180;
+  if (
+    el.matches?.(
+      'input[type="checkbox"], input[type="radio"], [role="checkbox"], [role="radio"]'
+    )
+  ) {
+    score += 500;
+  }
+  // Tiny filter rows near mid-viewport look "close" but are unusable cameras.
+  const r = el.getBoundingClientRect();
+  if (r.height > 0 && r.height < 28 && r.width < 280) score += 120;
+  return score;
+}
 
 /**
  * Pick the nearest meaningful element in the prototype scroll viewport
  * (prefer center band) for anchor-based REC scroll capture.
+ * Prefers visible titles/content over filter checkboxes / coarse modules.
  */
 export function resolveScrollAnchorElement(
   root: HTMLElement
@@ -340,16 +373,34 @@ export function resolveScrollAnchorElement(
   const midY = rootRect.top + rootRect.height * 0.42;
   const nodes = root.querySelectorAll<HTMLElement>(SCROLL_ANCHOR_CANDIDATE_SELECTOR);
   let best: HTMLElement | null = null;
-  let bestDist = Number.POSITIVE_INFINITY;
+  let bestScore = Number.POSITIVE_INFINITY;
   for (const el of nodes) {
     if (isRecordingChromeTarget(el)) continue;
+    const dataName = el.getAttribute("data-name");
+    if (isWeakScrollAnchorName(dataName)) continue;
+    if (isCoarseMakeModuleName(dataName)) continue;
+    if (
+      el.matches?.(
+        'input[type="checkbox"], input[type="radio"], [role="checkbox"], [role="radio"]'
+      )
+    ) {
+      continue;
+    }
     const r = el.getBoundingClientRect();
     if (r.height < 8 || r.width < 8) continue;
     if (r.bottom < rootRect.top + 4 || r.top > rootRect.bottom - 4) continue;
+    // Skip collapsed / off-layout filter ghosts.
+    try {
+      if (getComputedStyle(el).display === "none") continue;
+      if (getComputedStyle(el).visibility === "hidden") continue;
+    } catch {
+      /* ignore */
+    }
     const cy = r.top + r.height / 2;
     const dist = Math.abs(cy - midY);
-    if (dist < bestDist) {
-      bestDist = dist;
+    const score = scrollAnchorScore(el, dist);
+    if (score < bestScore) {
+      bestScore = score;
       best = el;
     }
   }
@@ -361,7 +412,22 @@ export function describeScrollAnchor(el: HTMLElement): {
   selectorChain: string[];
   anchorSelector?: string;
 } {
-  const selectorChain = buildPlaybackSelectorChain(el);
+  // Prefer title / action leaf over a weak filter checkbox that somehow scored.
+  let target = el;
+  if (isWeakScrollAnchorName(el.getAttribute("data-name"))) {
+    const better =
+      el
+        .closest("[data-studio-react-screen], .studio-scroll--prototype, body")
+        ?.querySelector<HTMLElement>(
+          "h1, h2, h3, [data-studio-probe-below-fold], [data-name='component.plp.tile.title'], [data-studio-action]"
+        ) ?? null;
+    if (better) target = better;
+  }
+  const selectorChain = buildPlaybackSelectorChain(target).filter((s) => {
+    // Drop weak filter leaves from the stored chain.
+    const m = /data-name="([^"]+)"/.exec(s);
+    return !m || !isWeakScrollAnchorName(m[1]);
+  });
   if (selectorChain.length === 0) {
     return { selectorChain: [] };
   }
@@ -530,30 +596,42 @@ export function notifyRecordingDemoClick(
   elementDescriptor: string
 ): void {
   if (!getActiveRecordingSession()) return;
+  const usable = resolveUsableDemoClickTarget(target);
+  if (!usable) {
+    playbackDiagRecCapture({
+      detail: `demo-click FAIL degraded ${elementDescriptor}`,
+      eventKind: "demo-click",
+      found: true,
+      usable: false,
+      clickOk: false,
+    });
+    return;
+  }
   const snapshot = snapshotProvider?.();
-  const selectorChain = buildPlaybackSelectorChain(target);
+  const selectorChain = buildPlaybackSelectorChain(usable);
   // Browse REC must not inherit parked CJM beatId — that lies on STEPS / compile.
   const journeyMode = snapshot?.journeyMode === true;
   const beatId = journeyMode ? snapshot?.beatId : undefined;
   const touchpointKey = journeyMode ? snapshot?.touchpointKey : undefined;
+  const label =
+    elementDescriptor.trim() || describeRecordingClickTarget(usable);
 
   captureRecordingEvent({
     kind: "demo-click",
-    element: elementDescriptor,
+    element: label,
     selectorChain,
     beatId,
     touchpointKey,
   });
 
-  const usable = isUsablePlaybackSelectorChain(selectorChain);
+  const chainOk = isUsablePlaybackSelectorChain(selectorChain);
   playbackDiagRecCapture({
-    detail: usable
-      ? `demo-click ${elementDescriptor}`
-      : `demo-click WEAK ${elementDescriptor}`,
+    detail: chainOk ? `demo-click ${label}` : `demo-click WEAK ${label}`,
     eventKind: "demo-click",
     selector: selectorChain[0] ?? null,
     found: true,
-    usable,
+    usable: chainOk,
+    clickOk: chainOk,
     beatId: beatId ?? null,
     screenId: snapshot?.screenId ?? null,
   });
@@ -569,7 +647,8 @@ const RECORDING_CHROME_SELECTOR = [
   ".studio-playback-shield",
 ].join(", ");
 
-const RECORDING_CLICK_TARGET_SELECTOR = [
+/** Prefer CTAs / links / actions — not coarse Make modules. */
+const RECORDING_CLICK_FIDELITY_SELECTOR = [
   "button",
   "a",
   '[role="button"]',
@@ -582,6 +661,13 @@ const RECORDING_CLICK_TARGET_SELECTOR = [
   "[data-studio-action]",
   "[data-studio-avail-store]",
   "[data-studio-beat]",
+  "[data-studio-plp-tile-id]",
+  '[data-name="component.plp.tile.title"]',
+  '[data-name="boots-pharmacy.service.tile"]',
+].join(", ");
+
+const RECORDING_CLICK_TARGET_SELECTOR = [
+  RECORDING_CLICK_FIDELITY_SELECTOR,
   "[data-name]",
 ].join(", ");
 
@@ -589,6 +675,66 @@ const RECORDING_CLICK_TARGET_SELECTOR = [
 export function isRecordingChromeTarget(el: Element | null): boolean {
   if (!el) return true;
   return Boolean(el.closest(RECORDING_CHROME_SELECTOR));
+}
+
+/**
+ * Prefer tile CTA / product link / data-studio-action over coarse
+ * `module.plp.tiles` containers when the click lands on padding/gap.
+ */
+export function refineRecordingClickTarget(el: HTMLElement): HTMLElement {
+  const tile = el.closest<HTMLElement>("[data-studio-plp-tile-id]");
+  if (tile) {
+    const book = tile.querySelector<HTMLElement>(
+      '[data-studio-action="plp-book-now"]'
+    );
+    const title = tile.querySelector<HTMLElement>(
+      '[data-name="component.plp.tile.title"], a.plp__tile-title-link, a'
+    );
+    // Click on the Book button / title itself — keep that leaf.
+    if (el.closest("[data-studio-action]")) {
+      return el.closest<HTMLElement>("[data-studio-action]") ?? el;
+    }
+    if (
+      el.closest("a") ||
+      el.closest('[data-name="component.plp.tile.title"]')
+    ) {
+      return (
+        el.closest<HTMLElement>("a, [data-name='component.plp.tile.title']") ??
+        el
+      );
+    }
+    // Padding / copy / price → prefer Book now, else title link.
+    if (book && (book === el || book.contains(el) || tile.contains(el))) {
+      // Heart / Quick View stay on their buttons.
+      if (
+        el.closest("[data-studio-wishlist-id], [data-studio-quick-view]")
+      ) {
+        return el.closest<HTMLElement>("button, [role='button']") ?? el;
+      }
+      return book;
+    }
+    if (title) return title;
+    return tile;
+  }
+
+  const action = el.closest<HTMLElement>("[data-studio-action]");
+  if (action) return action;
+
+  // Do NOT invent a click by picking the first CTA under a coarse module shell
+  // (module.plp.tiles). Padding-inside-tile is handled above via tile closest.
+  return el;
+}
+
+/** Resolve + refine; null when still a degraded container (must FAIL, not click). */
+export function resolveUsableDemoClickTarget(
+  raw: HTMLElement | null
+): HTMLElement | null {
+  if (!raw) return null;
+  // Explicit coarse shell (tiles/filters listing) → FAIL. Never invent child CTA.
+  if (isDegradedClickTarget(raw)) return null;
+  const refined = refineRecordingClickTarget(raw);
+  if (isDegradedClickTarget(refined)) return null;
+  return refined;
 }
 
 /** Nearest interactive / named target for human REC click capture. */
@@ -601,9 +747,19 @@ export function resolveRecordingHumanClickTarget(
   ) {
     return null;
   }
-  const el = (raw as Element).closest<HTMLElement>(RECORDING_CLICK_TARGET_SELECTOR);
-  if (!el || isRecordingChromeTarget(el)) return null;
-  return el;
+  const el = raw as Element;
+  // Prefer fidelity targets before bare [data-name] module climb.
+  const preferred =
+    el.closest<HTMLElement>(RECORDING_CLICK_FIDELITY_SELECTOR) ??
+    el.closest<HTMLElement>(RECORDING_CLICK_TARGET_SELECTOR);
+  if (!preferred || isRecordingChromeTarget(preferred)) return null;
+  const refined = refineRecordingClickTarget(preferred);
+  if (isRecordingChromeTarget(refined)) return null;
+  // Still reject coarse module leaves with no better child.
+  if (isDegradedClickTarget(refined)) {
+    return null;
+  }
+  return refined;
 }
 
 /**
@@ -616,26 +772,38 @@ export function shouldCaptureRecordingHumanClick(event: Event): boolean {
   return resolveRecordingHumanClickTarget(event.target) != null;
 }
 
-function describeRecordingClickTarget(el: HTMLElement): string {
-  // Concise human labels for STEPS / nav during Play — not long selectors.
-  const text = (el.textContent ?? "").replace(/\s+/g, " ").trim();
-  if (text && text.length <= 40) return text;
-  if (text) return `${text.slice(0, 37)}…`;
-
-  const aria = el.getAttribute("aria-label")?.trim();
-  if (aria && aria.length <= 40) return aria;
-  if (aria) return `${aria.slice(0, 37)}…`;
-
+/** Concise human labels for STEPS / nav — scrub Make-ish attr soup. */
+export function describeRecordingClickTarget(el: HTMLElement): string {
+  // Prefer action slug first (Book now CTA) over noisy button chrome text.
   const action = el.getAttribute("data-studio-action");
   if (action) {
-    // Prefer short action slug over quoted attr soup.
-    return action.replace(/[-_]+/g, " ").trim() || action;
+    return humanizeRecordingLabel(action) || action;
   }
+
+  // Prefer a short leaf title over the whole tile/module text dump.
+  const titleEl =
+    el.matches?.('[data-name="component.plp.tile.title"], a.plp__tile-title-link')
+      ? el
+      : el.querySelector?.<HTMLElement>(
+          '[data-name="component.plp.tile.title"] p, [data-name="component.plp.tile.title"], a.plp__tile-title-link'
+        );
+  const titleText = (titleEl?.textContent ?? "").replace(/\s+/g, " ").trim();
+  if (titleText && titleText.length <= 48) {
+    return humanizeRecordingLabel(titleText) || titleText;
+  }
+
+  const aria = el.getAttribute("aria-label")?.trim();
+  if (aria) return humanizeRecordingLabel(aria) || aria;
+
+  // Avoid concatenating every tile in module.plp.tiles.
+  if (!isCoarseMakeModuleName(el.getAttribute("data-name"))) {
+    const text = (el.textContent ?? "").replace(/\s+/g, " ").trim();
+    if (text && text.length <= 40) return text;
+    if (text && text.length <= 80) return `${text.slice(0, 37)}…`;
+  }
+
   const dataName = el.getAttribute("data-name");
-  if (dataName) {
-    const short = dataName.split(".").pop() || dataName;
-    return short.length <= 40 ? short : `${short.slice(0, 37)}…`;
-  }
+  if (dataName) return humanizeRecordingLabel(dataName) || dataName;
   return el.tagName.toLowerCase();
 }
 
@@ -707,7 +875,9 @@ function flushRecordingScrollCapture(): void {
     anchorSelector: described.anchorSelector,
   });
   playbackDiagRecCapture({
-    detail: `scroll → ${described.anchorSelector ?? described.selectorChain?.[0] ?? "?"}`,
+    detail: `scroll → ${humanizeRecordingLabel(
+      described.anchorSelector ?? described.selectorChain?.[0] ?? "?"
+    ) || described.anchorSelector || "?"}`,
     eventKind: "scroll",
     selector: described.anchorSelector ?? described.selectorChain?.[0] ?? null,
     found: true,
@@ -746,7 +916,13 @@ function flushRecordingScrollStop(): void {
     anchorSelector: described?.anchorSelector,
   });
   playbackDiagRecCapture({
-    detail: `scroll-stop ${signal.dwellMs}ms → ${described?.anchorSelector ?? described?.selectorChain?.[0] ?? "host"}`,
+    detail: `scroll-stop ${signal.dwellMs}ms → ${
+      humanizeRecordingLabel(
+        described?.anchorSelector ?? described?.selectorChain?.[0] ?? "host"
+      ) ||
+      described?.anchorSelector ||
+      "host"
+    }`,
     eventKind: "scroll-stop",
     selector: described?.anchorSelector ?? described?.selectorChain?.[0] ?? null,
     found: true,

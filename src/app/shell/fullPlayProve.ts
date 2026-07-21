@@ -37,6 +37,8 @@ import {
   runPlayJourneyToStartSmoke,
   type PlayJourneySmokeResult,
 } from "@/app/shell/playJourneySmoke";
+import { getImportedJourneys } from "@/app/journey/journeyRuntimeStore";
+import { logAgentTestingStep } from "@/app/shell/agent-testing";
 
 export type FullPlayProveExperience = "agentic" | "traditional";
 
@@ -168,6 +170,72 @@ function parsePeak(
   };
 }
 
+function isRecordedJourneyId(id: string): boolean {
+  return id.startsWith("rec-");
+}
+
+function isBuiltInTraditionalId(id: string): boolean {
+  return id === "traditional-cjm" || id === "traditional";
+}
+
+function isBuiltInAgenticId(id: string): boolean {
+  return id === "agentic-cjm" || id === "agentic";
+}
+
+type JourneyCatalogHit = {
+  id: string;
+  label?: string;
+  beatCount?: number;
+  beatIds?: string[];
+};
+
+/** Look up a rec-* / runtime journey for prove asserts (playlist length + start). */
+function lookupJourneyCatalog(journeyId: string): JourneyCatalogHit | null {
+  // Prefer imported store (sync after Add as CJM) over React-bound list helper.
+  try {
+    const imported = getImportedJourneys().find((j) => j.id === journeyId);
+    if (imported) {
+      return {
+        id: imported.id,
+        label: imported.label,
+        beatCount: imported.beats.length,
+        beatIds: imported.beats.map((b) => b.id),
+      };
+    }
+  } catch {
+    /* ignore */
+  }
+  if (typeof window === "undefined") return null;
+  try {
+    const w = window as Window & {
+      __studioListJourneys?: () => JourneyCatalogHit[];
+      __protoListJourneys?: () => JourneyCatalogHit[];
+    };
+    const list = w.__studioListJourneys?.() ?? w.__protoListJourneys?.();
+    const hit = list?.find((j) => j.id === journeyId);
+    return hit ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function inferStartScreenId(startBeatId: string): string {
+  const id = startBeatId.toLowerCase();
+  if (id.includes("site-pilot") || id.includes("home")) return "site-pilot";
+  if (id.includes("chat")) return "chat";
+  if (id.includes("pdp")) return "pdp";
+  if (id.includes("plp") || id.includes("vaccination")) return "plp";
+  if (id.includes("book-step-3") || id.includes("confirmation")) {
+    return "book-step-3";
+  }
+  if (id.includes("book-step-2")) return "book-step-2";
+  if (id.includes("book-step-1") || id.includes("location")) {
+    return "book-step-1";
+  }
+  // Traditional short REC usually starts on PLP.
+  return "plp";
+}
+
 function resolveExperience(
   options?: FullPlayProveOptions
 ): FullPlayProveExperience {
@@ -175,13 +243,13 @@ function resolveExperience(
     return options.experience;
   }
   const id = options?.journeyId ?? options?.orchestraMode ?? "";
-  if (
-    id === "traditional-cjm" ||
-    id === "traditional" ||
-    String(id).includes("trad")
-  ) {
-    return "traditional";
+  if (isRecordedJourneyId(id)) {
+    // Path flavor only — never treat rec-trad-* as built-in traditional-cjm.
+    if (/-trad(?:itional)?-|^rec-trad/i.test(id)) return "traditional";
+    return "agentic";
   }
+  if (isBuiltInTraditionalId(id)) return "traditional";
+  if (isBuiltInAgenticId(id)) return "agentic";
   return "agentic";
 }
 
@@ -189,6 +257,38 @@ function resolvePreset(options?: FullPlayProveOptions): FullPlayProvePreset {
   const experience = resolveExperience(options);
   const base = FULL_PLAY_PROVE_PRESETS[experience];
   const journeyId = options?.journeyId ?? base.journeyId;
+
+  // Recorded CJMs must assert THAT journey's playlist — not traditional 13 / agentic 22.
+  if (isRecordedJourneyId(journeyId)) {
+    const catalog = lookupJourneyCatalog(journeyId);
+    const beatIds = catalog?.beatIds?.filter(Boolean) ?? [];
+    const catalogPeak =
+      typeof catalog?.beatCount === "number" && catalog.beatCount > 0
+        ? catalog.beatCount
+        : beatIds.length > 0
+          ? beatIds.length
+          : 0;
+    // NEVER fall back to built-in traditional-plp / peak 13 for rec-*.
+    const startBeatId =
+      options?.startBeatId ?? beatIds[0] ?? "rec-start-unknown";
+    const expectedPeak = options?.expectedPeak ?? catalogPeak;
+    return {
+      ...base,
+      experience,
+      journeyId,
+      orchestraMode: options?.orchestraMode ?? journeyId,
+      startBeatId,
+      startScreenId:
+        options?.startScreenId ?? inferStartScreenId(startBeatId),
+      expectedPeak,
+      timeoutMs: options?.timeoutMs ?? base.timeoutMs,
+      // Accept smoke peak.total when the journey finished (login-skip style).
+      peakMode: options?.peakMode ?? "login-skip-safe",
+      overlayTitle: `AGENT TESTING — Play journey prove (${journeyId})`,
+      sessionName: "play-journey-prove",
+    };
+  }
+
   return {
     ...base,
     experience,
@@ -208,6 +308,17 @@ function assertPeak(
   peakMode: FullPlayProvePeakMode,
   allowLoginSkip: boolean
 ): string | null {
+  // Recorded journey with unknown catalog — assert reached end only.
+  if (expectedPeak <= 0) {
+    const reachedEnd = peak.visible >= peak.total && peak.total > 0;
+    if (!reachedEnd) {
+      return (
+        `peak-not-end: got ${peak.visible}/${peak.total}` +
+        (peak.counter ? ` (${peak.counter})` : "")
+      );
+    }
+    return null;
+  }
   if (peakMode === "login-skip-safe" && allowLoginSkip) {
     const reachedEnd = peak.visible >= peak.total && peak.total > 0;
     const peakOk = reachedEnd && peak.total >= expectedPeak - 1;
@@ -270,8 +381,18 @@ export async function runFullPlayProve(
       title: "AGENT TESTING — preparing…",
     });
     touchAgentTestingOverlay(preset.overlayTitle);
+    try {
+      logAgentTestingStep({
+        kind: "helper",
+        action: "RunFullPlayProve",
+        label: `Play journey prove · ${preset.journeyId} · peak ${preset.expectedPeak} (NOT REC)`,
+        outcome: "ok",
+      });
+    } catch {
+      /* hang-safe */
+    }
     logAgentTestingOverlay(
-      `prove: full-play ${preset.journeyId} (keep overlay · prove-mode latch)`
+      `prove: Play journey ${preset.journeyId} (NOT REC · keep overlay · prove-mode latch)`
     );
 
     // 3–5) Jump start + continuous Play + play-end assert (shared smoke core).

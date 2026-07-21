@@ -9,6 +9,8 @@ import {
   snapDemoTargetIntoView,
   type PlaybackScrollOptions,
 } from "@/app/scenario/playbackScroll";
+import { resolveUsableDemoClickTarget } from "@/app/recording/recordingCapture";
+import { isDegradedClickTarget } from "@/app/recording/recordingLabels";
 import { notePlaybackDemoClick } from "@/app/shell/playbackInteractionContext";
 import {
   describeCursorTarget,
@@ -1077,6 +1079,7 @@ const FIELD_INTERACTION_SELECTORS = [
 ];
 
 const BUTTON_INTERACTION_SELECTORS = [
+  "[data-studio-action]",
   '[data-name="component.input.button"]',
   "button",
   ".proto-popup-close",
@@ -1089,6 +1092,7 @@ const BUTTON_INTERACTION_SELECTORS = [
   ".proto-link",
   'a[role="button"]',
   '[role="button"]',
+  "a",
 ];
 
 export function delay(ms: number): Promise<void> {
@@ -1692,8 +1696,53 @@ export async function simulateDemoPointerClick(
     dispatchPointerEvents?: boolean;
   }
 ): Promise<boolean> {
-  const selector = describeCursorTarget(target);
-  const rect = target.getBoundingClientRect();
+  // Overlay eyes first (felony gate scans first ~1200 chars of this fn).
+  if (
+    isElementBlockedByModal(target) ||
+    !resolveClickTargetRespectingModal(target)
+  ) {
+    playbackDiagClick({
+      ok: false,
+      selector: describeCursorTarget(target),
+      detail: "click FAIL — blocked-by-modal",
+    });
+    return false;
+  }
+
+  // Harden: never invent success on listing shells / coarse Make modules.
+  const clickTarget = resolveUsableDemoClickTarget(target);
+  if (!clickTarget) {
+    const bad = describeCursorTarget(target);
+    playbackDiagTarget({
+      selector: bad,
+      found: true,
+      element: target,
+      detail: "click target REJECTED — degraded container",
+    });
+    playbackDiagClick({
+      ok: false,
+      selector: bad,
+      detail:
+        "click FAIL — degraded container (e.g. module.plp.tiles) — no invent success",
+    });
+    playbackDiagCursor({
+      detail: "OFF-TARGET — degraded container suppressed",
+      onTarget: false,
+      parked: false,
+    });
+    return false;
+  }
+  if (isDegradedClickTarget(clickTarget)) {
+    playbackDiagClick({
+      ok: false,
+      selector: describeCursorTarget(clickTarget),
+      detail: "click FAIL — still degraded after refine",
+    });
+    return false;
+  }
+
+  const selector = describeCursorTarget(clickTarget);
+  const rect = clickTarget.getBoundingClientRect();
   const bbox = {
     x: Math.round(rect.x),
     y: Math.round(rect.y),
@@ -1703,7 +1752,7 @@ export async function simulateDemoPointerClick(
   playbackDiagTarget({
     selector,
     found: true,
-    element: target,
+    element: clickTarget,
     detail: "click target resolve",
   });
 
@@ -1716,7 +1765,7 @@ export async function simulateDemoPointerClick(
     });
     return false;
   }
-  if (!isClickableTarget(target)) {
+  if (!isClickableTarget(clickTarget)) {
     playbackDiagClick({
       ok: false,
       selector,
@@ -1726,9 +1775,9 @@ export async function simulateDemoPointerClick(
     return false;
   }
 
-  // Overlay eyes — never click through an open blocking dialog/scrim.
-  const guarded = resolveClickTargetRespectingModal(target);
-  if (!guarded || isElementBlockedByModal(target)) {
+  // Overlay eyes — re-check immediately before travel (modal may open mid-arm).
+  const guarded = resolveClickTargetRespectingModal(clickTarget);
+  if (!guarded || isElementBlockedByModal(clickTarget)) {
     notePlaybackCursorEvent("abort", {
       target: selector,
       abortReason: "blocked-by-modal",
@@ -1743,12 +1792,12 @@ export async function simulateDemoPointerClick(
   }
 
   if (options?.scroll !== false) {
-    await revealDemoTargetForAgent(target, {
+    await revealDemoTargetForAgent(clickTarget, {
       shouldAbort: options?.shouldAbort,
     });
   }
 
-  const cursor = await moveDemoCursorTo(target, {
+  const cursor = await moveDemoCursorTo(clickTarget, {
     shouldAbort: options?.shouldAbort,
     syncPageScroll: options?.scroll !== false,
     // Hover only after on-target gate below — never mid-travel / pre-gate.
@@ -1765,18 +1814,21 @@ export async function simulateDemoPointerClick(
     return false;
   }
 
-  const interactionRoot = findDemoInteractionRoot(target);
+  const interactionRoot = findDemoInteractionRoot(clickTarget);
+  // Prefer the actionable leaf for hover/press — never a coarse parent shell.
+  const pressRoot =
+    resolveUsableDemoClickTarget(interactionRoot) ?? clickTarget;
   const dispatchEvents = options?.dispatchPointerEvents !== false;
 
   // HARD: tip must be on target before any press/click. Re-aim once; else FAIL
   // (never target.click() while visually off-cell — false selection path).
-  let onTarget = isDemoCursorHotspotOnTarget(cursor, target);
+  let onTarget = isDemoCursorHotspotOnTarget(cursor, clickTarget);
   if (!onTarget) {
-    onTarget = snapDemoCursorHotspotToTarget(cursor, target);
+    onTarget = snapDemoCursorHotspotToTarget(cursor, clickTarget);
   }
   if (!onTarget) {
     notePlaybackCursorEvent("abort", {
-      target: describeCursorTarget(target),
+      target: describeCursorTarget(clickTarget),
       abortReason: "cursor-off-target",
       detail: "hotspot miss after travel + re-aim — click suppressed",
     });
@@ -1795,15 +1847,15 @@ export async function simulateDemoPointerClick(
     return false;
   }
 
-  const { x, y } = targetCenter(target);
+  const { x, y } = targetCenter(clickTarget);
 
   // Hover class + enter/over/move events — only after tip is proven on-target.
-  setDemoInteractionHover(interactionRoot, true, { x, y });
+  setDemoInteractionHover(pressRoot, true, { x, y });
   await delay(CTA_HOVER_DWELL_MS);
   if (options?.shouldAbort?.()) {
-    setDemoInteractionHover(interactionRoot, false, { x, y });
+    setDemoInteractionHover(pressRoot, false, { x, y });
     notePlaybackCursorEvent("abort", {
-      target: describeCursorTarget(target),
+      target: describeCursorTarget(clickTarget),
       abortReason: "click-aborted",
     });
     playbackDiagClick({
@@ -1817,11 +1869,11 @@ export async function simulateDemoPointerClick(
   }
 
   // Re-verify after hover dwell — scroll/layout can drift tip off cell.
-  if (!isDemoCursorHotspotOnTarget(cursor, target)) {
-    if (!snapDemoCursorHotspotToTarget(cursor, target)) {
-      setDemoInteractionHover(interactionRoot, false, { x, y });
+  if (!isDemoCursorHotspotOnTarget(cursor, clickTarget)) {
+    if (!snapDemoCursorHotspotToTarget(cursor, clickTarget)) {
+      setDemoInteractionHover(pressRoot, false, { x, y });
       notePlaybackCursorEvent("abort", {
-        target: describeCursorTarget(target),
+        target: describeCursorTarget(clickTarget),
         abortReason: "cursor-off-target",
         detail: "hotspot miss after hover dwell — click suppressed",
       });
@@ -1843,23 +1895,23 @@ export async function simulateDemoPointerClick(
   }
   tapDemoCursor(cursor);
   notePlaybackCursorEvent("press", {
-    target: describeCursorTarget(interactionRoot),
+    target: describeCursorTarget(pressRoot),
     animated: true,
     detail: "64ms on-target",
   });
 
   // Native parity: :hover stays while :active — keep hover class during press.
   // Do not rewrite cursor left/top (on-target lock).
-  interactionRoot.classList.add(DEMO_HOVER_CLASS, DEMO_PRESSED_CLASS);
-  interactionRoot.setAttribute(DEMO_ROBO_HOVER_ATTR, "true");
+  pressRoot.classList.add(DEMO_HOVER_CLASS, DEMO_PRESSED_CLASS);
+  pressRoot.setAttribute(DEMO_ROBO_HOVER_ATTR, "true");
   if (dispatchEvents) {
-    dispatchDemoPointerDown(interactionRoot, x, y);
+    dispatchDemoPointerDown(pressRoot, x, y);
     notifyStudioDemoClick();
   }
   await delay(CTA_PRESS_MS);
   if (options?.shouldAbort?.()) {
-    interactionRoot.classList.remove(DEMO_PRESSED_CLASS);
-    setDemoInteractionHover(interactionRoot, false, { x, y });
+    pressRoot.classList.remove(DEMO_PRESSED_CLASS);
+    setDemoInteractionHover(pressRoot, false, { x, y });
     playbackDiagClick({
       ok: false,
       selector,
@@ -1871,20 +1923,20 @@ export async function simulateDemoPointerClick(
   }
 
   if (dispatchEvents) {
-    dispatchDemoPointerUp(interactionRoot, x, y);
+    dispatchDemoPointerUp(pressRoot, x, y);
   }
-  interactionRoot.classList.remove(DEMO_PRESSED_CLASS);
+  pressRoot.classList.remove(DEMO_PRESSED_CLASS);
   if (Number.isFinite(lockedLeft) && Number.isFinite(lockedTop)) {
     noteCursorPathSample("release", lockedLeft, lockedTop);
   }
   notePlaybackCursorEvent("release", {
-    target: describeCursorTarget(interactionRoot),
+    target: describeCursorTarget(pressRoot),
     animated: true,
   });
-  notePlaybackDemoClick(interactionRoot);
-  target.click();
+  notePlaybackDemoClick(pressRoot);
+  clickTarget.click();
   notePlaybackCursorEvent("click", {
-    target: describeCursorTarget(interactionRoot),
+    target: describeCursorTarget(pressRoot),
     animated: true,
     detail:
       options?.scroll === false
@@ -1903,7 +1955,7 @@ export async function simulateDemoPointerClick(
     parked: false,
   });
   // Default arrow after click — CSS tip-align keeps left/top (no tip teleport).
-  settleDemoCursorAfterClick(cursor, interactionRoot);
+  settleDemoCursorAfterClick(cursor, pressRoot);
   if (Number.isFinite(lockedLeft) && Number.isFinite(lockedTop)) {
     writeDemoCursorPos(cursor, lockedLeft, lockedTop, { force: true });
     cursorPosLocked = true;

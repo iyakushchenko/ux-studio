@@ -4,8 +4,10 @@
  */
 
 import {
+  describeRecordingClickTarget,
   notifyRecordingDemoClick,
   notifyRecordingFromInteraction,
+  resolveUsableDemoClickTarget,
 } from "@/app/recording/recordingCapture";
 import { playbackDiagLog } from "@/app/shell/playbackDiag";
 
@@ -155,13 +157,24 @@ export function describePlaybackElement(el: HTMLElement): string {
 }
 
 export function notePlaybackDemoClick(target: HTMLElement): void {
-  const element = describePlaybackElement(target);
+  // REC STEPS labels — same humanizer as trusted human clicks (not attr soup).
+  const usable = resolveUsableDemoClickTarget(target);
+  if (!usable) {
+    record({
+      kind: "demo-click",
+      label: "Robo-cursor click FAIL — degraded",
+      element: describePlaybackElement(target),
+    });
+    notifyRecordingDemoClick(target, describePlaybackElement(target));
+    return;
+  }
+  const element = describeRecordingClickTarget(usable);
   record({
     kind: "demo-click",
     label: "Robo-cursor click",
     element,
   });
-  notifyRecordingDemoClick(target, element);
+  notifyRecordingDemoClick(usable, element);
 }
 
 export function formatPlaybackInteraction(

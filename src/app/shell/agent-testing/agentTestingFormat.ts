@@ -12,7 +12,7 @@ const HELPER_ACTION_LABEL: Record<string, string> = {
   StepBack: "step-back",
   JumpToStart: "jump-to-start",
   JumpToEnd: "jump-to-end",
-  PlayJourney: "play",
+  PlayJourney: "Play journey",
   PauseJourney: "pause",
   SetOrchestraMode: "mode",
   SetJourneyMode: "cjm",
@@ -20,6 +20,16 @@ const HELPER_ACTION_LABEL: Record<string, string> = {
   GoToScreen: "go-to-screen",
   OpenHub: "hub",
   CloseHub: "close-hub",
+  // REC honesty — never confuse with Play journey prove.
+  StartRecording: "REC capture live",
+  StopRecording: "REC stop",
+  PauseRecording: "REC pause",
+  ResumeRecording: "REC resume",
+  SaveRecordingAsJourney: "REC Add as CJM",
+  ClearRecording: "REC clear",
+  RunFullPlayProve: "Play journey prove",
+  RunAgenticFullPlayProve: "Play journey prove (agentic)",
+  RunTraditionalFullPlayProve: "Play journey prove (traditional)",
 };
 
 export function timeLabelNow(at = Date.now()): string {
