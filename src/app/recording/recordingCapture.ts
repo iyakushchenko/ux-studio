@@ -30,6 +30,8 @@ import type {
   PlaybackInteractionRecord,
 } from "@/app/shell/playbackInteractionContext";
 import { playbackDiagRecCapture } from "@/app/shell/playbackDiag";
+import { parseStudioUrl } from "@/app/shell/studioUrl";
+import { trackStudioModalForQa } from "@/app/shell/qaModalTrack";
 
 let snapshotProvider: (() => RecordingSnapshot | undefined) | null = null;
 let lastTouchpointKey: string | undefined;
@@ -516,6 +518,16 @@ export function captureScreenChange(options: {
     studioUrl: options.studioUrl,
   });
 
+  // Lean QA modal open/close while REC is live (Play uses URL sync track too).
+  try {
+    trackStudioModalForQa({
+      modalId: modalKey || null,
+      screenId: options.screenId,
+      source: "rec",
+    });
+  } catch {
+    /* hang-safe */
+  }
   if (modalKey) {
     playbackDiagRecCapture({
       detail: `REC modal=${modalKey} · screen=${options.screenId}`,
@@ -524,25 +536,38 @@ export function captureScreenChange(options: {
       usable: true,
       screenId: options.screenId,
     });
+  }
+}
+
+/** Live screen at ● Start — snapshot first, URL `?screen=` fallback (HARD). */
+export function readLiveRecordingStartScreen(): {
+  screenId?: string;
+  projectId?: string;
+  studioUrl?: string;
+} {
+  const snap = snapshotProvider?.();
+  let screenId = snap?.screenId?.trim() || undefined;
+  let projectId = snap?.projectId?.trim() || undefined;
+  let studioUrl = snap?.studioUrl?.trim() || undefined;
+  if (typeof window !== "undefined") {
     try {
-      // Soft import — unit tests / early boot may lack overlay.
-      void import("@/app/shell/agent-testing").then((m) => {
-        m.logAgentTestingStep({
-          kind: "rec",
-          action: "RecModalOpen",
-          label: `REC captured modal=${modalKey} · screen=${options.screenId}`,
-          outcome: "ok",
-        });
-      });
+      const parsed = parseStudioUrl();
+      if (!screenId && parsed.screenId) screenId = parsed.screenId;
+      if (!projectId && parsed.projectId) projectId = parsed.projectId;
+      if (!studioUrl) {
+        studioUrl = window.location.search || undefined;
+      }
     } catch {
       /* hang-safe */
     }
   }
+  return { screenId, projectId, studioUrl };
 }
 
 /**
  * Product model: REC ● start = current tab/screen as journey step 1.
  * URL sync only appends `screen` on later navigations — seed once per session.
+ * HARD: URL fallback when snapshot lags; stamps metadata.startScreenId.
  */
 export function seedRecordingStartScreen(options?: {
   screenId?: string;
@@ -553,18 +578,52 @@ export function seedRecordingStartScreen(options?: {
   if (!session) return;
   if (seededStartScreenSessionId === session.id) return;
 
-  const snap = snapshotProvider?.();
-  const screenId = options?.screenId ?? snap?.screenId;
-  if (!screenId) return;
+  const live = readLiveRecordingStartScreen();
+  const screenId = options?.screenId?.trim() || live.screenId;
+  if (!screenId) {
+    try {
+      void import("@/app/shell/agent-testing").then((m) => {
+        m.logAgentTestingStep({
+          kind: "rec",
+          action: "RecStartScreenSeed",
+          label: "REC start screen seed FAIL — no screenId in snap or URL",
+          outcome: "fail",
+        });
+      });
+    } catch {
+      /* hang-safe */
+    }
+    return;
+  }
+
+  const projectId = options?.projectId ?? live.projectId;
+  const studioUrl = options?.studioUrl ?? live.studioUrl;
 
   seededStartScreenSessionId = session.id;
+  session.metadata = {
+    ...session.metadata,
+    startScreenId: screenId,
+    startStudioUrl: studioUrl,
+  };
   // Allow same screen as a prior session's last key.
   lastScreenKey = undefined;
   captureScreenChange({
     screenId,
-    projectId: options?.projectId ?? snap?.projectId,
-    studioUrl: options?.studioUrl ?? snap?.studioUrl,
+    projectId,
+    studioUrl,
   });
+  try {
+    void import("@/app/shell/agent-testing").then((m) => {
+      m.logAgentTestingStep({
+        kind: "rec",
+        action: "RecStartScreenSeed",
+        label: `REC start screen · ${screenId} (beat #1)`,
+        outcome: "ok",
+      });
+    });
+  } catch {
+    /* hang-safe */
+  }
 }
 
 /** Bridge from playbackInteractionContext — maps diagnostic records to recording events. */

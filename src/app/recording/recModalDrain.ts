@@ -10,6 +10,10 @@ import { logAgentTestingStep, touchAgentTestingOverlay } from "@/app/shell/agent
 import { parseStudioUrl } from "@/app/shell/studioUrl";
 import { STUDIO_MODAL } from "@/app/shell/studioModalGuard";
 import { recUserPace } from "@/app/recording/recUserPace";
+import {
+  trackStudioModalForQa,
+  trackStudioModalPickForQa,
+} from "@/app/shell/qaModalTrack";
 
 export type RecModalDrainResult = {
   ok: boolean;
@@ -91,6 +95,12 @@ async function pickChoosePharmacyStore(): Promise<{
     const storeHost = el.closest<HTMLElement>("[data-studio-avail-store]");
     const storeId =
       storeHost?.getAttribute("data-studio-avail-store") ?? undefined;
+    trackStudioModalPickForQa({
+      modalId: CHOOSE_PHARMACY,
+      storeId,
+      detail: "Choose Location",
+      source: "drain",
+    });
     logQaModal(
       "RecModalPharmacyPick",
       `choose-pharmacy · pick ${storeId ?? "store"} · ${sel.slice(0, 72)}`
@@ -109,10 +119,57 @@ async function pickChoosePharmacyStore(): Promise<{
   };
 }
 
+async function pickLoginSignIn(): Promise<{
+  ok: boolean;
+  reason?: string;
+}> {
+  const root =
+    document.querySelector<HTMLElement>('[data-studio-modal="login"]') ??
+    document.querySelector<HTMLElement>(".proto-login-card");
+  if (!root) {
+    return { ok: false, reason: "login modal DOM missing" };
+  }
+  const signIn =
+    root.querySelector<HTMLElement>(".proto-login-cta") ??
+    Array.from(root.querySelectorAll<HTMLElement>("button")).find((btn) =>
+      /^sign in$/i.test((btn.textContent ?? "").trim())
+    );
+  if (!signIn) {
+    return { ok: false, reason: "login Sign in button missing" };
+  }
+  trackStudioModalPickForQa({
+    modalId: STUDIO_MODAL.login,
+    detail: "Sign in",
+    source: "drain",
+  });
+  logQaModal("RecModalPharmacyPick", "login · Sign in");
+  await recUserPace("beforeCta");
+  const ok = await simulateDemoPointerClick(signIn, { scroll: true });
+  await recUserPace("modalPickSettle");
+  if (!ok) return { ok: false, reason: "login Sign in click failed" };
+  // Wait for modal to clear.
+  for (let i = 0; i < 20; i++) {
+    const still =
+      readUrlModalId() === STUDIO_MODAL.login ||
+      isBlockingModalOpenInDom(STUDIO_MODAL.login) ||
+      Boolean(document.querySelector(".proto-login-card"));
+    if (!still) return { ok: true };
+    await recUserPace("modalOpenWait");
+  }
+  const stillOpen =
+    readUrlModalId() === STUDIO_MODAL.login ||
+    isBlockingModalOpenInDom(STUDIO_MODAL.login);
+  if (stillOpen) {
+    return { ok: false, reason: "login still open after Sign in" };
+  }
+  return { ok: true };
+}
+
 /**
  * If a blocking modal is open (URL or DOM), drain it before the next REC beat.
- * choose-pharmacy → pick a real pharmacy (Choose Location). Other modals → FAIL
- * loudly so agents cannot ignore (Close alone is not a silent skip for prove).
+ * choose-pharmacy → pick a real pharmacy (Choose Location).
+ * login → Sign in (traditional Book path).
+ * Other modals → FAIL loudly so agents cannot ignore.
  */
 export async function drainBlockingModalIfOpen(): Promise<RecModalDrainResult> {
   const modalId =
@@ -126,10 +183,39 @@ export async function drainBlockingModalIfOpen(): Promise<RecModalDrainResult> {
     return { ok: true, modalId: null, drained: false };
   }
 
+  trackStudioModalForQa({
+    modalId,
+    source: "drain",
+  });
   logQaModal(
     "RecModalOpen",
     `URL/DOM modal=${modalId} — must handle before next beat`
   );
+
+  if (modalId === STUDIO_MODAL.login || modalId === "account") {
+    const ready = await waitForModal(STUDIO_MODAL.login);
+    if (!ready) {
+      return {
+        ok: false,
+        modalId,
+        drained: false,
+        reason: "login modal not visible",
+      };
+    }
+    const pick = await pickLoginSignIn();
+    if (!pick.ok) {
+      logQaModal("RecModalPharmacyPick", pick.reason ?? "login fail", "fail");
+      return {
+        ok: false,
+        modalId: STUDIO_MODAL.login,
+        drained: false,
+        reason: pick.reason,
+      };
+    }
+    trackStudioModalForQa({ modalId: null, source: "drain" });
+    logQaModal("RecModalPharmacyPick", "login drained · signed in");
+    return { ok: true, modalId: STUDIO_MODAL.login, drained: true };
+  }
 
   if (modalId === CHOOSE_PHARMACY || modalId === "avail") {
     const ready = await waitForModal(CHOOSE_PHARMACY);
@@ -143,6 +229,10 @@ export async function drainBlockingModalIfOpen(): Promise<RecModalDrainResult> {
       logQaModal("RecModalOpen", fail.reason!, "fail");
       return fail;
     }
+    trackStudioModalForQa({
+      modalId: CHOOSE_PHARMACY,
+      source: "drain",
+    });
     logQaModal(
       "RecModalOpen",
       `modal=choose-pharmacy visible · ${window.location.search}`
@@ -176,6 +266,10 @@ export async function drainBlockingModalIfOpen(): Promise<RecModalDrainResult> {
         reason: "choose-pharmacy still open after pick",
       };
     }
+    trackStudioModalForQa({
+      modalId: null,
+      source: "drain",
+    });
     logQaModal(
       "RecModalPharmacyPick",
       `choose-pharmacy drained · store=${pick.storeId ?? "?"}`

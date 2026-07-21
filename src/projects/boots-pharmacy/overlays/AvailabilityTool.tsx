@@ -37,6 +37,7 @@ import {
   formatAvailLocationCount,
   type AvailStore,
 } from "@/projects/boots-pharmacy/data/availStores";
+import { trackStudioModalPickForQa } from "@/app/shell/qaModalTrack";
 import {
   isInSavedLocations,
   SAVED_LOCATIONS_CHANGE_EVENT,
@@ -787,6 +788,12 @@ export default function AvailabilityTool({
 
   const chooseStore = (s: AvailStore) => {
     if (pickLocation) {
+      trackStudioModalPickForQa({
+        modalId: "choose-pharmacy",
+        storeId: s.id,
+        detail: s.name || "Choose Location",
+        source: "pick",
+      });
       onChooseLocation?.(s);
       onClose();
       return;

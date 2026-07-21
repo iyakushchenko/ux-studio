@@ -164,6 +164,13 @@ export type RecordingSessionMetadata = {
   userAgent?: string;
   recordedFrom?: "mcp" | "dev" | "ui";
   notes?: string;
+  /**
+   * Screen id at ● Start (seeded). Compile + Add as CJM assert first beat
+   * equals this — never a later camera/CTA hop.
+   */
+  startScreenId?: string;
+  /** Full studio search at ● Start (optional evidence). */
+  startStudioUrl?: string;
 };
 
 export type RecordingSession = {

@@ -8,9 +8,11 @@
  */
 
 import { selectCreateNewCjm } from "@/app/recording/createNewCjmApi";
+import { seedRecordingStartScreen } from "@/app/recording/recordingCapture";
 import {
   isRecordingActive,
   isRecordingPaused,
+  stopRecording,
 } from "@/app/recording/recordingSession";
 import {
   isStudioPlaybackPanelVisible,
@@ -266,6 +268,19 @@ export async function armRecCapture(
     return fail;
   }
 
+  // Stale live REC from a prior failed arm race — Stop so ● Start can arm cleanly.
+  if (isRecordingActive() || isRecordingPaused()) {
+    const stopBtn = stopRecordingButton();
+    if (stopBtn && !stopBtn.disabled) {
+      stopBtn.click();
+      await delay(settle);
+    }
+    if (isRecordingActive()) {
+      stopRecording();
+      await delay(settle);
+    }
+  }
+
   // 1) CJM off — real switch click (REC locked while CJM on).
   if (isCjmOnInDom()) {
     if (!clickCjmOff()) {
@@ -428,7 +443,14 @@ export async function armRecCapture(
       return fail;
     }
     startBtn.click();
-    await delay(settle);
+    // HARD: React Start handler must land before assert — poll, don't race 120ms.
+    for (
+      let i = 0;
+      i < 25 && !(isRecordingActive() || isRecordingPaused());
+      i += 1
+    ) {
+      await delay(Math.max(settle, 80));
+    }
   }
 
   const live = assertRecLive();
@@ -439,6 +461,12 @@ export async function armRecCapture(
           __protoGetRecording?: () => { id?: string } | null;
         }
       ).__protoGetRecording?.()?.id ?? undefined;
+    // Stamp / re-seed start screen if Start won the race after first seed miss.
+    try {
+      seedRecordingStartScreen();
+    } catch {
+      /* hang-safe */
+    }
     const ok: ArmRecCaptureResult = { ...live, sessionId, recModeVia };
     logArm(ok);
     return ok;

@@ -247,6 +247,39 @@ describe("compileRecordingToJourney", () => {
     ]);
   });
 
+  it("prepends start screen when first compiled beat would be a camera CTA", () => {
+    const session: RecordingSession = {
+      id: "start-screen-prepend",
+      version: 1,
+      startedAt: "2026-07-21T12:00:00.000Z",
+      projectId: "boots-pharmacy",
+      personaId: "sarah-jenkins",
+      orchestraMode: "traditional-cjm",
+      metadata: { startScreenId: "plp", recordedFrom: "ui" },
+      events: [
+        // No screen seed — only scroll-stop + click (the bug class from long REC).
+        {
+          kind: "scroll-stop",
+          dwellMs: 2400,
+          atMs: 50,
+        },
+        {
+          kind: "demo-click",
+          element: "Book now",
+          selectorChain: ['[data-studio-action="plp-book-now"]'],
+          atMs: 100,
+          // Intentionally omit screenId/protoTab so hollow landing cannot invent plp.
+        },
+      ],
+    };
+    const { journey, warnings } = compileRecordingToJourney(session);
+    expect(journey.beats[0]?.id).toBe("plp");
+    expect(
+      warnings.some((w) => w.startsWith("start-screen-prepended:plp")) ||
+        journey.beats.some((b) => b.id === "plp-book-now")
+    ).toBe(true);
+  });
+
   it("compile v2 maps usable demo-clicks into recordedClick beats", () => {
     const session: RecordingSession = {
       id: "click-compile",

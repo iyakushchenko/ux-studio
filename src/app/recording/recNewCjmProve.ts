@@ -26,6 +26,8 @@ import { isStudioRecModeOnInDom } from "@/app/recording/studioRecModeDom";
 import { afterRecClickDrainModal } from "@/app/recording/recModalDrain";
 import { recUserPace, REC_USER_PACE_MS } from "@/app/recording/recUserPace";
 import { getPrototypeScrollRoot } from "@/app/scenario/playbackScroll";
+import { assertFirstBeatMatchesStartScreen } from "@/app/recording/recStartScreenAssert";
+import { getLastRecordingSession } from "@/app/recording/recordingSession";
 
 export type RecNewCjmProveOptions = {
   experience?: "agentic" | "traditional";
@@ -262,11 +264,61 @@ export async function runRecNewCjmProve(
     } else {
       await pacedScrollStop(320);
       await pacedClick('[data-studio-action="pdp-book-now"]', "PDP Book now");
+      // Traditional: Book may open login first — drain Sign in, then Book again.
+      {
+        const screenNow = (() => {
+          try {
+            return new URL(window.location.href).searchParams.get("screen");
+          } catch {
+            return null;
+          }
+        })();
+        const loginGone = !document.querySelector(
+          '[data-studio-modal="login"], .proto-login-card'
+        );
+        if (screenNow === "pdp" && loginGone) {
+          await pacedClick(
+            '[data-studio-action="pdp-book-now"]',
+            "PDP Book now (after login)"
+          );
+        }
+      }
       await pacedClick(
         '[data-studio-action="book-step-1-continue"]',
         "Book Step 1 Continue"
       );
       // afterRecClickDrainModal inside pacedClick handles choose-pharmacy.
+      // After pick, book-step-1 still owns the page — Continue again → step 2.
+      const screenAfterPharmacy = (() => {
+        try {
+          return new URL(window.location.href).searchParams.get("screen");
+        } catch {
+          return null;
+        }
+      })();
+      if (screenAfterPharmacy === "book-step-1") {
+        await pacedClick(
+          '[data-studio-action="book-step-1-continue"]',
+          "Book Step 1 Continue (after pharmacy)"
+        );
+      }
+      // Onward as far as honest — Reserve when book-step-2 is up.
+      for (
+        let i = 0;
+        i < 20 &&
+        !document.querySelector('[data-studio-action="book-step-2-reserve"]');
+        i++
+      ) {
+        await delay(150);
+      }
+      if (
+        document.querySelector('[data-studio-action="book-step-2-reserve"]')
+      ) {
+        await pacedClick(
+          '[data-studio-action="book-step-2-reserve"]',
+          "Book Step 2 Reserve"
+        );
+      }
     }
   } catch (err) {
     errors.push(err instanceof Error ? err.message : String(err));
@@ -369,6 +421,31 @@ export async function runRecNewCjmProve(
   }
   if (!/^rec-/i.test(journeyId)) {
     errors.push(`journeyId not a new rec-* id: ${journeyId}`);
+    return failResult(errors, journeyId, recLive, peak);
+  }
+
+  // HARD: first beat must equal screen at ● Start.
+  const lastSession = getLastRecordingSession();
+  const beat0 =
+    (
+      afterList as Array<{ id: string; beatIds?: string[] }>
+    ).find((j) => j.id === journeyId)?.beatIds?.[0] ?? null;
+  if (lastSession) {
+    const startAssert = assertFirstBeatMatchesStartScreen(lastSession, {
+      id: journeyId,
+      label,
+      beats: beat0
+        ? [{ id: beat0, label: beat0, kind: "tab-landing" }]
+        : [],
+    });
+    if (!startAssert.ok) {
+      errors.push(startAssert.reason ?? "first beat ≠ start screen");
+      return failResult(errors, journeyId, recLive, peak);
+    }
+  } else if (beat0) {
+    errors.push(
+      `cannot assert start screen — no last recording session (beat0=${beat0})`
+    );
     return failResult(errors, journeyId, recLive, peak);
   }
 

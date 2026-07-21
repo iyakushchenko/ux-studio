@@ -15,6 +15,7 @@ import {
   touchAgentTestingOverlay,
 } from "@/app/shell/agent-testing";
 import { beginQaProveMode } from "@/app/shell/agent-testing/agentTestingPresence";
+import { resetQaModalTrackForTests } from "@/app/shell/qaModalTrack";
 
 export type FreshQaSessionResult = {
   ok: boolean;
@@ -38,6 +39,11 @@ export function requireFreshQaSession(
 
   // 1) ALWAYS CLEAR — wipe dirty session / latches / log.
   forceClearAgentTestingOverlay();
+  try {
+    resetQaModalTrackForTests();
+  } catch {
+    /* hang-safe */
+  }
 
   // 2) Fresh arm — visible overlay for the whole prove/REC.
   startAgentTestingOverlay(cleanTitle);

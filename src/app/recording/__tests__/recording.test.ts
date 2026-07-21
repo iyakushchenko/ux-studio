@@ -276,6 +276,25 @@ describe("recordingSession", () => {
       screenId: "pdp",
       projectId: "boots-pharmacy",
     });
+    expect(getActiveRecordingSession()?.metadata?.startScreenId).toBe("pdp");
+  });
+
+  it("seeds start screen from URL when snapshot lacks screenId", () => {
+    window.history.replaceState(
+      {},
+      "",
+      "/?project=boots-pharmacy&screen=plp&experience=traditional"
+    );
+    registerRecordingSnapshotProvider(() => ({
+      projectId: "boots-pharmacy",
+    }));
+    startRecording({ projectId: "boots-pharmacy" });
+    seedRecordingStartScreen();
+    expect(getActiveRecordingSession()?.metadata?.startScreenId).toBe("plp");
+    expect(getActiveRecordingSession()?.events[0]).toMatchObject({
+      kind: "screen",
+      screenId: "plp",
+    });
   });
 
   it("serializes and deserializes sessions", () => {

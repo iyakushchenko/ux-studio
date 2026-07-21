@@ -32,8 +32,13 @@ import type {
 import { resolvePlaybackScriptKind } from "@/app/shell/playbackScriptRegistry";
 import {
   healRecordedJourneyNav,
+  normalizeRecordedScreenKey,
   screenIdToProtoTab,
 } from "@/app/recording/recordedJourneyNavHeal";
+import {
+  assertFirstBeatMatchesStartScreen,
+  resolveRecordingStartScreenId,
+} from "@/app/recording/recStartScreenAssert";
 import {
   humanizeRecordingLabel,
   humanizeScreenLabel,
@@ -153,6 +158,37 @@ function uniqueBeatId(base: string, used: Set<string>): string {
   }
   used.add(id);
   return id;
+}
+
+/**
+ * HARD: first compiled beat = screen at ● Start.
+ * If scroll/camera beat landed first (missing seed), prepend landing screen.
+ */
+function ensureFirstBeatIsStartScreen(
+  session: RecordingSession,
+  beats: JourneyBeat[],
+  usedIds: Set<string>,
+  warnings: string[]
+): JourneyBeat[] {
+  const startScreenId = resolveRecordingStartScreenId(session);
+  if (!startScreenId || beats.length === 0) return beats;
+
+  const firstId = normalizeRecordedScreenKey(beats[0]?.id ?? "");
+  if (firstId === startScreenId) return beats;
+
+  warnings.push(`start-screen-prepended:${startScreenId}`);
+  usedIds.add(startScreenId);
+  const landing: JourneyBeat = {
+    id: startScreenId,
+    label: humanizeScreenLabel(startScreenId),
+    kind: "tab-landing",
+    protoTab: screenIdToProtoTab(session.projectId, startScreenId),
+    dwellMs: 4000,
+  };
+  const rest = beats.filter(
+    (b) => normalizeRecordedScreenKey(b.id) !== startScreenId
+  );
+  return [landing, ...rest];
 }
 
 function isBeatAction(id: string): id is JourneyBeatActionId {
@@ -865,6 +901,8 @@ export function compileRecordingToJourney(
           projectId
         );
 
+  beats = ensureFirstBeatIsStartScreen(session, beats, usedIds, warnings);
+
   if (beats.length === 0) {
     warnings.push("empty-journey");
     beats = [
@@ -895,13 +933,24 @@ export function compileRecordingToJourney(
     projectId
   );
 
+  const startAssert = assertFirstBeatMatchesStartScreen(session, journey);
+  const humanRec =
+    Boolean(session.metadata?.startScreenId) ||
+    session.metadata?.recordedFrom === "ui" ||
+    session.events.some((e) => e.kind === "demo-click");
+  if (!startAssert.ok && humanRec) {
+    warnings.push(`start-screen-assert-fail:${startAssert.reason ?? "unknown"}`);
+  }
+
   const uniqueGaps = [...new Set(gaps)];
   const result = { journey, timeline, warnings, gaps: uniqueGaps };
   const clickBeats = beats.filter(
     (b) => (b as JourneyBeatRecordedClick).recordedClick != null
   ).length;
   playbackDiagRecCompile({
-    detail: `compile ${journeyId} beats=${beats.length} clicks=${clickBeats} gaps=${uniqueGaps.length}`,
+    detail: `compile ${journeyId} beats=${beats.length} clicks=${clickBeats} gaps=${uniqueGaps.length}${
+      startAssert.ok ? "" : ` START_FAIL:${startAssert.reason ?? ""}`
+    }`,
     journeyId,
     beatCount: beats.length,
     clickBeats,
@@ -928,6 +977,22 @@ export function saveRecordingAsJourney(
     ...options,
     addAsNew: options?.addAsNew !== false,
   });
+  const startAssert = assertFirstBeatMatchesStartScreen(
+    session,
+    compiled.journey
+  );
+  if (!startAssert.ok) {
+    const humanRec =
+      Boolean(session.metadata?.startScreenId) ||
+      session.metadata?.recordedFrom === "ui" ||
+      session.events.some((e) => e.kind === "demo-click");
+    if (humanRec) {
+      throw new Error(
+        startAssert.reason ??
+          "Add as CJM refused — first beat ≠ screen at ● Start"
+      );
+    }
+  }
   const file: JourneyFile = {
     version: 1,
     exportedAt: new Date().toISOString(),

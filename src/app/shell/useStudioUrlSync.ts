@@ -9,6 +9,7 @@ import {
   type StudioUrlState,
 } from "@/app/shell/studioUrl";
 import { captureScreenChange } from "@/app/recording/recordingCapture";
+import { trackStudioModalForQa } from "@/app/shell/qaModalTrack";
 
 type ScreenRow = { screenId?: string; childIndex: number };
 
@@ -131,6 +132,16 @@ export function useStudioUrlSync(options: StudioUrlSyncOptions): void {
       modalId,
     };
     lastModalRef.current = modalId;
+    // Lean QA chat — modal open/close on REC + Play (URL is navigable state).
+    try {
+      trackStudioModalForQa({
+        modalId: modalId ?? null,
+        screenId,
+        source: "url",
+      });
+    } catch {
+      /* hang-safe */
+    }
     const search = writeStudioUrl(state, {
       push: modalChanged && Boolean(lastHrefRef.current),
     });
