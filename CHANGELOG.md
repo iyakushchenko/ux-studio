@@ -2,6 +2,8 @@
 
 > _Append a bullet on coherent commits via `npm run notes:append -- --lane="<lane>" --intent="<text>"`. Preview with `npm run notes:preview`. On `npm run release:patch` this section is promoted to `## v<X.Y.Z> - DDMMYY` and a fresh empty `## Current` is re-inserted. Policy: `docs/product/VERSIONING.md`._
 
+- **docs:** PP-14 reopen handoff + board 0e; docs-links gate + workflow/proof-router catalog
+
 ## v0.0.104 - 210726
 - **shell:** Chat bubble appear north star + co-travel scroll re-anchor; self-test 8/8 hard-green (PP-14)
 

@@ -2,6 +2,7 @@
 
 **Updated:** 2026-07-21  
 **Owner:** Arch (agents execute; human PO accept/reject + assets only; **Pax** sim for bump/push)  
+**Status authority:** This file is the **only mutable source of truth** for current priority, sequence, blockers, and completion. Forecasts, briefs, and feature registers may preserve historical context; when they disagree with this board, treat their status prose as historical. Evidence artifacts remain authoritative for the proof they record.  
 **Team:** [TEAM.md](./TEAM.md) · Forecast: [PRODUCT_FORECAST.md](./PRODUCT_FORECAST.md) · Painpoints: [PAINPOINTS.md](./PAINPOINTS.md) · [ARCHITECTURE.md](./ARCHITECTURE.md) · [HYGIENE.md](./HYGIENE.md)  
 **Refs:** [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) · [CI_ACTIONS_BUDGET.md](./CI_ACTIONS_BUDGET.md) · [NAMING.md](./NAMING.md) · [../shell/URL.md](../shell/URL.md) · [../shell/CJM_RECORD_PLAY_EDIT.md](../shell/CJM_RECORD_PLAY_EDIT.md)
 
@@ -29,6 +30,7 @@ A screen is **DONE** only when **all** are true:
 0b. [x] **Playback reliability / diag-first (PP-01…PP-08)** — 2026-07-20 wave: agentic Play→end + retreat + traditional Play **PASS** on `:5173`; PP-01/03/06/07 → **WATCH**. Keep PLAYBACK_DIAG; residuals stay eyes-on (not COMPLETE forever). See [PAINPOINTS.md](./PAINPOINTS.md).
 0c. [x] **CJM Record/Play/Edit = guitar tabs** — doctrine [CJM_RECORD_PLAY_EDIT.md](../shell/CJM_RECORD_PLAY_EDIT.md); Play≡Step; Edit-by-user-story; Book Step2 already-selected → **other** 24/16:30; agentic prove `__studioRunAgenticFullPlayProve`.
 0d. [ ] **Traditional CJM smoothness** — PO dump 2026-07-20T22:58:41Z: Play completes but **3× scroll-reversal** camera yanks (Reserve / Open Appointments / View Details). Sitrep: [TRADITIONAL_CJM_UX_2026-07-21.md](../projects/boots-pharmacy/audits/TRADITIONAL_CJM_UX_2026-07-21.md). **Not green** until camera ROI + re-dump.
+0e. [ ] **Chat bubble appear chop (PP-14 REOPEN)** — PO still sees choppy progressive/send bubbles after multi-agent waves (tip `7e0cce7` / v0.0.104 self-test 8/8 = **false-green risk**). Thorough clash investigation — [PAINPOINTS.md](./PAINPOINTS.md) PP-14. **Do not claim PROVEN from self-test alone.**
 1. [x] **PLP React migration** — DONE by erase-Make definition. Brief: [PLP_REACT.md](../projects/boots-pharmacy/features/PLP_REACT.md) · audit [FE_AUDIT_PLP_2026-07-19.md](../projects/boots-pharmacy/audits/FE_AUDIT_PLP_2026-07-19.md).
 2. [x] **PLP Make parity restore** — register [PLP_MAKE_PARITY_REGISTER.md](../projects/boots-pharmacy/features/PLP_MAKE_PARITY_REGISTER.md); P0 gaps fixed (bg fill, hero shadow, listing wrapper, preloader, filter chips); audit PROVEN; patch `0.0.5`.
 2b. [x] **PLP fidelity rage fix** — Advantage bar, heart optimistic hover/click, Book now commerce hover, tile border removed, Reset Filters icon+text; Uma checklist + team-check harden; patch bump.
@@ -36,14 +38,14 @@ A screen is **DONE** only when **all** are true:
 2d. [x] **PLP invent/dupe rage #3** — one loader label (no count duplicate), height lock, Make empty-heart navy hover (no fuchsia invent); MCP matrix mandatory; prior PROVEN revoked; `0.0.8`.
 2e. [x] **PLP PAGE FINAL PASS hard-green** — structure stamp + `check:page-final-pass` green; Quinn MCP `__studioRunMcpPageProbe({ screenId:"plp" })` full matrix PASS (overlay + scroll-into-view + landmarks); `mcpFinalPass: HARD-GREEN` @ tip `6358184` / v0.0.17. Audit: [FE_AUDIT_PLP_PAGE_FINAL_PASS_2026-07-19.md](../projects/boots-pharmacy/audits/FE_AUDIT_PLP_PAGE_FINAL_PASS_2026-07-19.md). **PDP unblocked.**
 3. [x] **PDP React migration** — DONE by erase-Make definition (2026-07-19). Register [PDP_MAKE_PARITY_REGISTER.md](../projects/boots-pharmacy/features/PDP_MAKE_PARITY_REGISTER.md) · brief [PDP_REACT.md](../projects/boots-pharmacy/features/PDP_REACT.md) · React `screens/pdp/*` (L1–L20) · Uma [UMA_FIDELITY_PDP_2026-07-19.md](../projects/boots-pharmacy/audits/UMA_FIDELITY_PDP_2026-07-19.md) **PROVEN** · Quinn [FE_AUDIT_PDP_MCP_2026-07-19.md](../projects/boots-pharmacy/audits/FE_AUDIT_PDP_MCP_2026-07-19.md) PASS · `PARITY_PROVEN` pdp proven.
-3e. [x] **PDP PAGE FINAL PASS hard-green** — structure `status=proven` + `check:page-final-pass` green; Quinn MCP `__studioRunMcpPageProbe({ screenId:"pdp", reload:false })` **23/23 PASS** ~27242ms on tip `f5f004f` / v0.0.38 (PromoMessageStrip + tip-stable cursor; after NEEDS-REPROVE demote); teardown clean stay `screen=pdp`; Arch restore `mcpFinalPass: HARD-GREEN` / `hardGreen: true` @ tip `53da33f`. Audit: [FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md](../projects/boots-pharmacy/audits/FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md). **Home still waits PO `+`.**
+3e. [x] **PDP PAGE FINAL PASS hard-green** — structure `status=proven` + `check:page-final-pass` green; Quinn MCP `__studioRunMcpPageProbe({ screenId:"pdp", reload:false })` **23/23 PASS** ~27242ms on tip `f5f004f` / v0.0.38 (PromoMessageStrip + tip-stable cursor; after NEEDS-REPROVE demote); teardown clean stay `screen=pdp`; Arch restore `mcpFinalPass: HARD-GREEN` / `hardGreen: true` @ tip `53da33f`. Audit: [FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md](../projects/boots-pharmacy/audits/FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md).
 4. [ ] **Versioning habit** — append notes on every user-visible ship; Pax decides patch; Ben executes ([VERSIONING.md](./VERSIONING.md)).
 
 ---
 
 ## NEXT (erase-Make sequence)
 
-**Gate:** each page starts only after the previous is **PAGE FINAL PASS hard-green** ([PAGE_FINAL_PASS.md](./PAGE_FINAL_PASS.md)). Parallel callsigns + Knowledge used still required. **Do not start Home without PO `+`.**
+**Gate:** each page starts only after the previous is **PAGE FINAL PASS hard-green** ([PAGE_FINAL_PASS.md](./PAGE_FINAL_PASS.md)). Parallel callsigns + Knowledge used still required.
 
 5. [x] **Site Pilot React migration** — **PAGE FINAL PASS HARD-GREEN** 2026-07-20 (`site-pilot`). Uma PROVEN · Quinn MCP 15/15 · audit [FE_AUDIT_SITE_PILOT_PAGE_FINAL_PASS_2026-07-20.md](../projects/boots-pharmacy/audits/FE_AUDIT_SITE_PILOT_PAGE_FINAL_PASS_2026-07-20.md). **Chat Final Pass unblocked.**
 6. [x] **Chat React migration** — **PAGE FINAL PASS HARD-GREEN** 2026-07-20 (`chat`). Uma PROVEN · Quinn MCP 20/20 · audit [FE_AUDIT_CHAT_PAGE_FINAL_PASS_2026-07-20.md](../projects/boots-pharmacy/audits/FE_AUDIT_CHAT_PAGE_FINAL_PASS_2026-07-20.md). Shared `SitePilotComposer`. **History/Details unblocked.**
@@ -87,7 +89,7 @@ A screen is **DONE** only when **all** are true:
 |------|------|
 | **Erase-Make DONE** | React mount + Make retired + wire gates + no LEGACY growth + honest residual + **PAGE FINAL PASS hard-green** |
 | **PAGE FINAL PASS** | **No new migrated page** until previous hard-green — stamp `PAGE_FINAL_PASS.json` + `check:page-final-pass` ([PAGE_FINAL_PASS.md](./PAGE_FINAL_PASS.md)); Arch enforces |
-| **Sequence** | PLP → PDP → Home → Chat → History/Details → delete Book Make children (each step gated by Final Pass) |
+| **Sequence** | PLP → PDP → Site Pilot (`screenId=site-pilot`) → Chat → History/Details → delete Book Make children (each step gated by Final Pass) |
 | **REC ⊗ CJM ⊗ AIR** | REC off when journey mode on; XOR; AIR locks both |
 | **No LEGACY growth** | New React page styles → screen CSS / UXDS / theme only |
 | **No new `.proto-*` / `data-proto-*`** | PANEL/chrome/attrs use `.studio-*` / `data-studio-*` |

@@ -2,7 +2,9 @@
 
 **Project:** `boots-pharmacy`  
 **Callsigns:** Bea (BA) owns register truth · Quinn (QA) owns prove · Finn/Uma restore gaps  
-**Updated:** 2026-07-19 (PO override kickoff — Site Pilot **not** Final Pass hard-green; Chat register only)  
+**Updated:** 2026-07-21 (truth label added; detailed table retains 2026-07-19 kickoff baseline)  
+**Overall proof status:** Chat PAGE FINAL PASS **HARD-GREEN** per [NEXT_STEPS.md](../../../product/NEXT_STEPS.md) and [FE_AUDIT_CHAT_PAGE_FINAL_PASS_2026-07-20.md](../audits/FE_AUDIT_CHAT_PAGE_FINAL_PASS_2026-07-20.md).  
+**Register interpretation:** The detailed columns and Missing P0 list preserve the kickoff baseline, including the period when the React mount was off. They are not current status. Use the audit/Final Pass evidence for closure; do not rewrite individual rows without row-level evidence. A newly discovered P0 reopens Final Pass and the board.
 **Make source:** Frame child **10** (`Agentic. Site Pilot. Chat`) — `Frame337` microheader + `Body9` in `frame/index.tsx` (`left-[1535px]` UX frame) · wire `BootsPharmacyProjectView` child-10 effects · `dom/sitePilotChatScenario.ts` · `dom/sitePilotChatThinking.ts` · `playback/sitePilotChat.ts` · orchestra `App.tsx` (`site-pilot-chat`)  
 **Public `screenId`:** `chat` (URL `?screen=chat`; scenario id `site-pilot-chat`)  
 **React target:** `src/projects/boots-pharmacy/screens/chat/*` — **live** (`CHAT_REACT_MOUNT_ENABLED=true`; Make child 10 `data-studio-make-retired`)  
@@ -11,7 +13,7 @@
 **Status legend:** Present · Partial · Missing · Fixed · N/A
 
 **Make column:** inventory from Frame `Body9` + `ComponentAppointmentSummary2` + wire/dom/playback (2026-07-19).  
-**React column:** kickoff — **Missing** / **Partial** only where Make wire still runs without React mount.
+**React column:** historical kickoff baseline, including the mount-off period; retained as migration traceability.
 
 **Bea rule:** Every band before Finn codes — **thinking / send-stop / browse-reveal** = **P0** (Make has them; not a page spinner). No invented bands. **Composer = same component as Site Pilot Home** — not a fork ([HOME_MAKE_PARITY_REGISTER.md](./HOME_MAKE_PARITY_REGISTER.md) L7).
 

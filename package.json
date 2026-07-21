@@ -9,7 +9,9 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite",
-    "check:links": "node scripts/check-text-link-contract.mjs",
+    "check:links": "node scripts/check-doc-links.mjs",
+    "check:docs-links": "node scripts/check-doc-links.mjs",
+    "check:text-link-contract": "node scripts/check-text-link-contract.mjs",
     "check:hygiene": "node scripts/check-file-hygiene.mjs",
     "check:felonies": "node scripts/check-agent-felonies.mjs",
     "check:parity-ratchets": "node scripts/check-parity-ratchets.mjs",

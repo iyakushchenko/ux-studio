@@ -7,7 +7,7 @@
 
 ---
 
-## 1. Locked layers
+## 1. Locked global layers
 
 | Layer | Path ownership | Rule |
 |-------|----------------|------|
@@ -16,8 +16,16 @@
 | **PANEL** | `src/app/nav/**/*.css` (+ future `src/app/shell/**/*.css` if extracted) | Engine chrome only — REC / CJM / cassette |
 | **LEGACY** | Make globals under `src/styles/globals*.css` | Quarantine; **no NEW React page styles here** |
 
-**Import order (mandatory):** BASE → THEME → PANEL → LEGACY  
+**Global entry import order (mandatory):** BASE → THEME → PANEL → LEGACY.  
 Enforced in [`src/styles/index.css`](../../src/styles/index.css).
+
+This order describes the global entry barrel, not every stylesheet emitted by Vite. React
+screen components import their colocated CSS from TSX, so that CSS participates in the
+bundle through the component graph and may be emitted after the global barrel. Treat
+screen CSS as **COMPOSITION ownership**, not as a fifth global layer. It must be scoped to
+its screen root and must not rely on beating a broad LEGACY selector by source order.
+When LEGACY leaks into a migrated screen, narrow/exclude the LEGACY selector or move the
+shared role into BASE; do not add `!important` or a later anonymous override.
 
 Preamble (fonts, Tailwind, `src/styles/theme.css` shadcn tokens) loads first for tooling. That file is **not** project THEME.
 
@@ -62,13 +70,17 @@ PANEL is imported from `index.css` (not only from components) so it sits **befor
 | `src/styles/globals-chrome.css` | Mixed Make + engine wire/scroll | No new React page styles; eventual PANEL/shell extract |
 | `src/styles/globals-screens.css` | Make screen monster CSS | Retire screen-by-screen |
 
-### React page CSS (not LEGACY)
+### React page CSS — COMPOSITION ownership (not a global layer)
 
 | Path | Owns |
 |------|------|
 | `src/projects/<id>/screens/**/*.css` | Colocated layout/structure for React screens (e.g. `book-step-1-location.css`) |
 
-Allowed for measured layout/structure. **Forbidden:** parallel palettes, near-duplicate control roles, dumping into LEGACY. Deviations → [`docs/uxds/DEVIATIONS.md`](../uxds/DEVIATIONS.md).
+Imported by the owning React component, not by `src/styles/index.css`. Allowed for
+screen-scoped measured layout, structure, and concept composition. **Forbidden:** global
+selectors, parallel palettes, near-duplicate control roles, source-order fights with
+LEGACY, or dumping into LEGACY. Deviations →
+[`docs/uxds/DEVIATIONS.md`](../uxds/DEVIATIONS.md).
 
 ---
 
@@ -79,7 +91,7 @@ Allowed for measured layout/structure. **Forbidden:** parallel palettes, near-du
 | New shared control / kit | BASE | `src/uxds/components/` (+ tokens if needed) |
 | Brand color / logo remap | THEME | `src/projects/<id>/styleguide/theme.css` |
 | REC / CJM / cassette / nav chrome | PANEL | `src/app/nav/**/*.css` |
-| New React concept page | Page CSS or BASE/THEME | `src/projects/<id>/screens/**` — **never** `globals-*.css` |
+| New React concept page | COMPOSITION or BASE/THEME | Component-imported `src/projects/<id>/screens/**`; scope under the screen root — **never** `globals-*.css` |
 | Touching unmigrated Make screen | LEGACY only if unavoidable | Prefer migrate that screen; do not grow the monster for React |
 
 ---

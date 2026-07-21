@@ -10,7 +10,7 @@
 
 Complete before calling the task **done** (including late in a long session):
 
-1. **`npm test`** — static contracts (`check:links` + `check:hygiene`) + Vitest. Fix failures.
+1. **`npm test`** — all ten static gates, then Vitest. The gates cover Markdown links/anchors, the text-link contract, hygiene, felonies, parity ratchets/proof, Page Final Pass, theme/brand, version/changelog sync, and UXDS inventory. Fix failures. Canonical command map: [DEVELOPER_WORKFLOW.md](./DEVELOPER_WORKFLOW.md).
 2. **`npm run build`** — Vite production build must stay green (same signal Pages uses; base `/ux-studio/` on deploy).
 3. **Behavior / docs** — if product behavior changed, update matching `docs/product/*` or `docs/projects/<id>/` the same turn. New files follow [NAMING.md](./NAMING.md).
 4. **UI-facing handoff** — strict FE audit per [FE_UI_UX_AUDIT.md](./FE_UI_UX_AUDIT.md) until **PROVEN** under `docs/projects/<id>/audits/` (doctrine §7). Green tests alone are not enough. Domain CSS renames → Nazi QA **light** on chrome. On Make→React: Uma signs off **loading/empty/updating** + **checkbox/radio hover**; Bea register has loading states as P0; Quinn proves filter-change loader in-band (blank+text alone = FAIL) — [UMA_FIDELITY_NOTES.md](./UMA_FIDELITY_NOTES.md).

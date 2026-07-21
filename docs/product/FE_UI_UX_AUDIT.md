@@ -2,7 +2,7 @@
 
 **Status:** Locked (PO directive, 2026-07-19)  
 **Audience:** Master / parent agents and **separate** audit subagents.  
-**Doctrine:** [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) §0 (Director + proactive) · §6–§7 (handoff + Nazi QA)  
+**Doctrine:** [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) §0 (Director + proactive) · §6–§7 (handoff + strict interface audit)
 **Always-on rule:** [`.cursor/rules/ux-studio-director.mdc`](../../.cursor/rules/ux-studio-director.mdc)  
 **Report template:** [templates/FE_AUDIT_RESULT.md](./templates/FE_AUDIT_RESULT.md)
 
@@ -10,7 +10,7 @@
 
 ## 1. Purpose
 
-**Strict (“Nazi QA”) interface audit.** Prove a UI-facing ship is done. Implementer “done” / “tests passed” is **BAD until this audit is PROVEN**. Master must not accept a UI handoff without it.
+**Strict interface audit.** Prove a UI-facing ship is done. Implementer “done” / “tests passed” is **BAD until this audit is PROVEN**. Master must not accept a UI handoff without it.
 
 Use after any concept page, shell chrome, kit CSS, or layout/CTA change that affects what the user sees or clicks. Fail on drift, duplicates, slop, near-duplicate styles, layout gaps, and lost L&F.
 
@@ -20,21 +20,25 @@ Use after any concept page, shell chrome, kit CSS, or layout/CTA change that aff
 
 1. Master spawns a **separate** audit pass (or performs it) — not the implementer’s self-signoff.  
 2. Open the surface (localhost preferred) **and** read the gate JSX/CSS for chrome/mode logic.  
-3. Fill every row below with **PASS** or **FAIL** (+ evidence).  
+3. Fill every row below with **PASS**, **FAIL**, or justified **N/A**, with evidence for every row.
 4. Copy results into [templates/FE_AUDIT_RESULT.md](./templates/FE_AUDIT_RESULT.md) (or paste the tables into the PR/handoff).  
 5. Overall **PROVEN** only if every applicable row is PASS (or N/A with reason). Any FAIL → reopen/fix; do not green-light the PO.
 
-### Evidence (required per FAIL; recommended per PASS)
+### Evidence (required for every applicable row)
 
-- Screenshot path or short description of viewport  
-- File:line or selector for the gate  
-- Concept / Make reference when claiming fidelity  
+- A **PASS without evidence is incomplete** and blocks overall PROVEN.
+- Visual/state rows: screenshot path or viewport description **plus** the concept / Make / UXDS reference.
+- Behavior/chrome rows: localhost/MCP observation **plus** the selector, helper result, or source gate.
+- N/A rows: explain why the changed surface cannot exercise the check; convenience is not an N/A reason.
+- Evidence may cover several rows when it names each stable row ID and proves each claim.
 
 ---
 
 ## 3. Checklist (pass / fail)
 
 Mark **N/A** only when the ship cannot touch that area (state why).
+
+Row IDs are stable contract identifiers. Audit reports and Page Final Pass notes should cite them rather than paraphrasing a parallel checklist.
 
 ### A. Visual fidelity to concept
 
@@ -77,6 +81,7 @@ Refs: [VISUAL_FIDELITY.md](./VISUAL_FIDELITY.md) · [INTERACTION_FIDELITY.md](./
 | D2 | `:focus-visible` (or equivalent) present on keyboard path | | |
 | D3 | Active / pressed / selected states match control family | | |
 | D4 | Disabled controls look and behave disabled | | |
+| D5 | Every UXDS control used (SearchField, Button, checkbox/radio, link) is checked against the kit + Make for hover, focus, active, and disabled; Quinn MCP-hovers at least one SearchField when present | | |
 
 ### E. Behavior parity
 
@@ -133,13 +138,28 @@ Refs: [DS_STRICTNESS.md](./DS_STRICTNESS.md) · [../uxds/DEVIATIONS.md](../uxds/
 | I3 | Page CSS is layout/structure — not anonymous one-off color/hover forks | | |
 | I4 | Intentional kit breaks are registered in DEVIATIONS.md | | |
 
+### J. Make → React state and real-user proof
+
+Refs: [UMA_FIDELITY_NOTES.md](./UMA_FIDELITY_NOTES.md) §0–§0b · [PARITY_RATCHETS.md](./PARITY_RATCHETS.md) · [../shell/PROOF_ROUTER.md](../shell/PROOF_ROUTER.md)
+
+These rows are mandatory for migrated screens. For other UI work, use N/A only with a surface-specific reason.
+
+| # | Check | PASS / FAIL / N/A | Evidence |
+|---|--------|-------------------|----------|
+| J1 | Loading, empty, and updating states match the source mechanism and copy; loading is in-band, tiles/content hide as intended, and loader/count copy is not duplicated | | |
+| J2 | Checkbox and radio controls preserve source hover, checked, focus, and disabled states; no invented hover chrome | | |
+| J3 | Section vertical rhythm is browser-measured against the source for the relevant stack (including price → CTA/recipient → body → booster); computed gaps/padding are recorded | | |
+| J4 | The Make-parity register has no unchecked P0 rows, including loading/empty/updating when the source has them | | |
+| J5 | Quinn’s localhost MCP matrix covers the changed hover/click/state paths and records the helper/result or step evidence; chat-only or stale-tip evidence is not accepted | | |
+| J6 | During every MCP page-probe step, the AGENT TESTING overlay remains visible, the target is scrolled into view when needed, and open overlays block click-through (“overlay eyes”) | | |
+
 ---
 
 ## 4. Overall verdict
 
 | Verdict | Meaning |
 |---------|---------|
-| **PROVEN** | All applicable rows PASS; master may tell PO the slice is good |
+| **PROVEN** | All applicable rows PASS **with evidence**; master may tell PO the slice is good |
 | **FAIL** | Any applicable FAIL; reopen/fix; do **not** green-light PO |
 | **BLOCKED** | Cannot audit (no localhost, missing concept ref); say what is blocked — still not PROVEN |
 
@@ -156,6 +176,7 @@ Unit tests, `npm run build`, and lean smoke alone **never** equal PROVEN for vis
 - [VISUAL_FIDELITY.md](./VISUAL_FIDELITY.md)  
 - [INTERACTION_FIDELITY.md](./INTERACTION_FIDELITY.md)  
 - [PAGE_BUILD_CONTRACT.md](./PAGE_BUILD_CONTRACT.md)  
+- [../shell/PROOF_ROUTER.md](../shell/PROOF_ROUTER.md) — choose the one canonical proof path for the task
 - [templates/FE_AUDIT_RESULT.md](./templates/FE_AUDIT_RESULT.md)  
 - Results store: project audits under [`docs/projects/<id>/audits/`](../projects/) · index stubs [audits/](./audits/)  
 

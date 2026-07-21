@@ -3,6 +3,8 @@
 **Project:** `boots-pharmacy`  
 **Callsigns:** Bea (BA) owns register truth · Quinn (QA) owns prove · Finn/Uma restore gaps  
 **Updated:** 2026-07-19 (PO polish: full FAQ bodies + TertiaryCta soft Find out more + Accordion kit motion/muted chevrons; Final Pass **HARD-GREEN** @ `48f2016`)  
+**Overall proof status:** PAGE FINAL PASS **HARD-GREEN** per [NEXT_STEPS.md](../../../product/NEXT_STEPS.md) and [FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md](../audits/FE_AUDIT_PDP_PAGE_FINAL_PASS_2026-07-19.md).  
+**Register interpretation:** The detailed Make/React columns preserve the kickoff baseline and implementation requirements; many `Missing` cells are historical, not current status. Use the audit and Final Pass evidence for closure. Do not rewrite an individual row to Present without row-level evidence; a newly discovered P0 reopens Final Pass and the board.
 **Make source:** Frame child **8** (`PDP. Vaccine Details Page` / `BTS-PHRM.Product - Deal Details Page`, `screenId: "pdp"`) + `globals-screens` child-8 rules + `BootsPharmacyProjectView` wire + `frame/index.tsx`  
 **React target:** `src/projects/boots-pharmacy/screens/pdp/*`  
 **Refs:** [PDP_REACT.md](./PDP_REACT.md) · [PLP_MAKE_PARITY_REGISTER.md](./PLP_MAKE_PARITY_REGISTER.md) (format) · [URL.md](../../../shell/URL.md) (modal ids)  

@@ -15,9 +15,33 @@ Agents **do not** offer A/B/C tech menus. They decide, document, build, report. 
 
 **Always-on Cursor rule:** [`.cursor/rules/ux-studio-director.mdc`](../.cursor/rules/ux-studio-director.mdc) · agent entry [AGENTS.md](../AGENTS.md)
 
-**Parent / tech-director agents:** subagent handoffs are **BAD until proven** — verify chrome/modes/counters/panels/migrated pages before telling the PO it’s fine ([product/COMMAND_DOCTRINE.md](./product/COMMAND_DOCTRINE.md) §6). After UI-facing ships, spawn/run a **strict (“Nazi QA”) FE audit** until **PROVEN** ([product/FE_UI_UX_AUDIT.md](./product/FE_UI_UX_AUDIT.md); doctrine §7) — **cannot skip** for “tests passed”; store project FE audits in [projects/<id>/audits/](./projects/) (Boots: [projects/boots-pharmacy/audits/](./projects/boots-pharmacy/audits/); stubs index [product/audits/](./product/audits/)).
+**Parent / tech-director agents:** subagent handoffs are **BAD until proven** — verify chrome/modes/counters/panels/migrated pages before telling the PO it’s fine ([product/COMMAND_DOCTRINE.md](./product/COMMAND_DOCTRINE.md) §6). After UI-facing ships, spawn/run a **strict interface audit** until **PROVEN** ([product/FE_UI_UX_AUDIT.md](./product/FE_UI_UX_AUDIT.md); doctrine §7) — **cannot skip** for “tests passed”; store project FE audits in [projects/<id>/audits/](./projects/) (Boots: [projects/boots-pharmacy/audits/](./projects/boots-pharmacy/audits/); stubs index [product/audits/](./product/audits/)).
 
-## Start here (reading order)
+## Start here
+
+### 10-minute orientation
+
+1. [product/UX_STUDIO_VISION.md](./product/UX_STUDIO_VISION.md) — what the product is.
+2. [product/ARCHITECTURE.md](./product/ARCHITECTURE.md) — where engine, projects, UXDS, and shell live.
+3. [product/NEXT_STEPS.md](./product/NEXT_STEPS.md) — the only current NOW / NEXT / LATER status board.
+4. [product/COMMAND_DOCTRINE.md](./product/COMMAND_DOCTRINE.md) + [product/TEAM.md](./product/TEAM.md) — how serious work is directed and checked.
+
+### Route by task
+
+| If you are… | Read next |
+|-------------|-----------|
+| Migrating or auditing a page | [PAGE_BUILD_CONTRACT](./product/PAGE_BUILD_CONTRACT.md) → [UMA fidelity](./product/UMA_FIDELITY_NOTES.md) → [strict audit](./product/FE_UI_UX_AUDIT.md) → [PAGE FINAL PASS](./product/PAGE_FINAL_PASS.md) |
+| Proving page, Play, REC, or a PO signal | [Proof router](./shell/PROOF_ROUTER.md) |
+| Changing shell URL / modal behavior | [URL](./shell/URL.md) + [recording/overlay](./shell/RECORDING.md) |
+| Changing CSS / UXDS | [CSS layers](./product/CSS_BASE_THEME.md) + [DS strictness](./product/DS_STRICTNESS.md) + [FE standards](./product/FE_STANDARDS.md) |
+| Closing any change | [Post-change checklist](./product/POST_CHANGE_CHECKLIST.md) |
+
+### Full reference reading order
+
+For implementation work, begin with the concise
+[developer workflow](./product/DEVELOPER_WORKFLOW.md), then follow its task-specific
+reading route. The catalog below is the full governance/reference set; it is not a demand
+to read all 26 entries before every change.
 
 1. [product/COMMAND_DOCTRINE.md](./product/COMMAND_DOCTRINE.md) — **composite role + proactive** + who decides + §6–§7 handoff + FE audit (read first every session)
 1b. [product/TEAM.md](./product/TEAM.md) — lean UX team callsigns + serious-work process (Pax bump/push)
@@ -31,6 +55,7 @@ Agents **do not** offer A/B/C tech menus. They decide, document, build, report. 
 3. [product/NAMING.md](./product/NAMING.md) — file/folder naming + domain CSS/attrs (no new `.proto-*`)
 4. [product/ARCHITECTURE.md](./product/ARCHITECTURE.md) · [product/HYGIENE.md](./product/HYGIENE.md) — engine folder map + LOC ratchet
 5. [product/POST_CHANGE_CHECKLIST.md](./product/POST_CHANGE_CHECKLIST.md) — local gates before “done”
+5b. [product/DEVELOPER_WORKFLOW.md](./product/DEVELOPER_WORKFLOW.md) — canonical setup, command map, task routes, definition of done
 6. [product/NEXT_STEPS.md](./product/NEXT_STEPS.md) — living NOW / NEXT / LATER board
 6b. [product/PAINPOINTS.md](./product/PAINPOINTS.md) — PO painpoints board (trackable COMPLETE)
 7. [product/SOLUTION_REQUIREMENTS.md](./product/SOLUTION_REQUIREMENTS.md) — readiness + locked defaults (proceed checklist)
@@ -41,7 +66,6 @@ Agents **do not** offer A/B/C tech menus. They decide, document, build, report. 
 12. [product/DS_STRICTNESS.md](./product/DS_STRICTNESS.md) — **no near-duplicates;** UXDS + theme only; deviations registered; no React growth in LEGACY
 13. [product/UX_STUDIO_VISION.md](./product/UX_STUDIO_VISION.md) — product north star
 14. [product/PAGE_BUILD_CONTRACT.md](./product/PAGE_BUILD_CONTRACT.md) — React + UXDS
-14b. [product/PAGE_FINAL_PASS.md](./product/PAGE_FINAL_PASS.md) — **mandatory final pass before NEXT page** (`check:page-final-pass`)
 15. [product/COMPONENT_LIBRARY.md](./product/COMPONENT_LIBRARY.md) — migrated pages = real React kits; grow by migration
 16. [product/VISUAL_FIDELITY.md](./product/VISUAL_FIDELITY.md) — **concept L&F mandatory**, no visual zoo, rebuild behavior parity
 17. [product/INTERACTION_FIDELITY.md](./product/INTERACTION_FIDELITY.md) — **recording needs interactive pages** + shared behavior library
@@ -53,7 +77,7 @@ Agents **do not** offer A/B/C tech menus. They decide, document, build, report. 
 23. [uxds/README.md](./uxds/README.md) — UXDS Larkin inventory · [uxds/DEVIATIONS.md](./uxds/DEVIATIONS.md) · [uxds/TOKEN_BRIDGE.md](./uxds/TOKEN_BRIDGE.md)
 24. [product/X_SUITE_INTEGRATION.md](./product/X_SUITE_INTEGRATION.md) — X-Suite export → analyze → build/reuse pages → REC new CJM (agent = seam until importer)
 25. [projects/boots-pharmacy/](./projects/boots-pharmacy/) — Boots design deltas, pilots, FE audits · **Chat rails:** [projects/boots-pharmacy/features/CHAT_PAGE_RAILS.md](./projects/boots-pharmacy/features/CHAT_PAGE_RAILS.md)
-26. [shell/SHELL.md](./shell/SHELL.md) · [shell/URL.md](./shell/URL.md) · [shell/PROJECTS.md](./shell/PROJECTS.md) · [shell/PLAYBACK.md](./shell/PLAYBACK.md) · [shell/RECORDING.md](./shell/RECORDING.md)
+26. [shell/PROOF_ROUTER.md](./shell/PROOF_ROUTER.md) · [shell/SHELL.md](./shell/SHELL.md) · [shell/URL.md](./shell/URL.md) · [shell/PROJECTS.md](./shell/PROJECTS.md) · [shell/PLAYBACK.md](./shell/PLAYBACK.md) · [shell/RECORDING.md](./shell/RECORDING.md)
 
 Agent entry: [../AGENTS.md](../AGENTS.md)
 
@@ -61,8 +85,8 @@ Agent entry: [../AGENTS.md](../AGENTS.md)
 
 | Path | Purpose |
 |------|---------|
-| [../AGENTS.md](../AGENTS.md) | First bullets: Director composite + proactive + handoff + Nazi QA |
-| [../.cursor/rules/ux-studio-director.mdc](../.cursor/rules/ux-studio-director.mdc) | Always-applied — hard checklist (blast-radius, XOR, Nazi QA, …) |
+| [../AGENTS.md](../AGENTS.md) | First bullets: Director composite + proactive + handoff + strict interface audit |
+| [../.cursor/rules/ux-studio-director.mdc](../.cursor/rules/ux-studio-director.mdc) | Always-applied — hard checklist (blast-radius, XOR, strict interface audit, …) |
 | [../.cursor/rules/naming.mdc](../.cursor/rules/naming.mdc) | New-file naming → [product/NAMING.md](./product/NAMING.md) |
 | [../.cursor/rules/ci-sitrep.mdc](../.cursor/rules/ci-sitrep.mdc) | Post-push `gh run list` (BE hat) |
 | [../.cursor/rules/post-change-checklist.mdc](../.cursor/rules/post-change-checklist.mdc) | Local gates before “done” |

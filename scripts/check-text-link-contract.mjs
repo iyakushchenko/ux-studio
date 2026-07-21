@@ -8,7 +8,7 @@
  *   - No competing rest-underline rules on `.uxds-link` outside hover
  *
  * Inspired by Summarizer `scripts/check-*.mjs` (cheap, no browser).
- * Wire: `npm run check:links` (also via `npm test`).
+ * Wire: `npm run check:text-link-contract` (also via `npm test`).
  */
 
 import fs from "node:fs";

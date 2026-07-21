@@ -1,6 +1,6 @@
 # Solution requirements — readiness & open alignments
 
-**Status:** Commander assessment 2026-07-19  
+**Status:** Locked readiness defaults; current delivery status lives in [NEXT_STEPS.md](./NEXT_STEPS.md)  
 **Purpose:** Single place that answers “do we have enough to proceed?” and locks remaining defaults so chat amnesia cannot erase them.
 
 ---
@@ -30,9 +30,9 @@
 
 These were thin in docs. I am deciding them so we do not stall.
 
-### 2.1 Definition of done for a Studio page
+### 2.1 Prototype-ready vs migration DONE
 
-A page is “done” for early Studio when:
+A page is **prototype-ready** for early Studio when:
 
 1. React screen under the project (not permanent Make HTML growth).  
 2. UXDS structure + project `styleguide/theme.css` applied.  
@@ -40,7 +40,9 @@ A page is “done” for early Studio when:
 4. Browse works; at least one journey beat can land on it if it is in a CJM.  
 5. Hypothesis under test is playable (happy path). Edge cases optional unless PO asks.
 
-Not required for v1 page done: production a11y audit, every viewport, real backend, pixel-match to messy Figma.
+Not required for prototype-ready: production a11y audit, every viewport, real backend, pixel-match to messy Figma.
+
+**Do not call prototype-ready “migration DONE.”** A Make→React migration is DONE only under the stricter [NEXT_STEPS.md](./NEXT_STEPS.md) erase-Make definition and [PAGE_FINAL_PASS.md](./PAGE_FINAL_PASS.md): Make retirement/wire gates, no LEGACY growth, honest residual, Uma audit, Quinn localhost proof, and PAGE FINAL PASS hard-green.
 
 ### 2.2 Viewport bar
 
@@ -110,7 +112,7 @@ Standing order remains:
 2. ✅ **Recording UI** (engine).  
 3. ✅ Thin **token bridge + Boots styleguide + interaction kits** (`src/uxds/`, Availability Tool mode-B enrichment).  
 4. ✅ First Boots **screen** rebuilt React + UXDS — Book Step 1 Location ([BOOTS_REACT_SCREEN_PILOT.md](../projects/boots-pharmacy/BOOTS_REACT_SCREEN_PILOT.md)).  
-5. **Next:** second screen (Book Step 2 or PLP) + grow kits by use.  
+5. ✅ Subsequent Boots migrations established the grow-by-use pattern. Current page sequence and status are maintained only in [NEXT_STEPS.md](./NEXT_STEPS.md).  
 
 If PO pastes “build this frame now,” that **overrides** and page pilot jumps the queue.
 

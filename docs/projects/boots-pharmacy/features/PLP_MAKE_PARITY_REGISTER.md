@@ -3,6 +3,8 @@
 **Project:** `boots-pharmacy`  
 **Callsigns:** Bea (BA) owns register truth · Quinn (QA) owns prove · Finn/Uma restore gaps  
 **Updated:** 2026-07-19 (PO — filter cascade: region → countries lost on React)  
+**Overall proof status:** PAGE FINAL PASS **HARD-GREEN** per [NEXT_STEPS.md](../../../product/NEXT_STEPS.md) and [FE_AUDIT_PLP_PAGE_FINAL_PASS_2026-07-19.md](../audits/FE_AUDIT_PLP_PAGE_FINAL_PASS_2026-07-19.md).  
+**Register interpretation:** This is a working/history register assembled across multiple restore waves. Row labels such as `Missing`, `Partial`, and “Still open” are point-in-time findings unless a later evidence artifact explicitly closes them. Do not infer current ship status from an old row; do not erase it without row-level evidence. Any newly discovered P0 reopens Final Pass and must be reconciled on the live board.
 **Make source:** Frame child **9** (`Product - Vaccination Listing Page`) + `globals-screens` `.proto-plp-*` + `data/plpListing.ts` wire  
 **React target:** `src/projects/boots-pharmacy/screens/plp/*`  
 **Refs:** [PLP_REACT.md](./PLP_REACT.md) · audit [../audits/FE_AUDIT_PLP_2026-07-19.md](../audits/FE_AUDIT_PLP_2026-07-19.md)  

@@ -1,8 +1,8 @@
 # UX Studio — product forecast (engine)
 
-**Updated:** 2026-07-19  
+**Updated:** 2026-07-21  
 **Owner:** Arch (decisive; not a menu for the PO) · Team OS: [TEAM.md](./TEAM.md)  
-**Board:** [NEXT_STEPS.md](./NEXT_STEPS.md) · Doctrine: [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md)  
+**Current-status authority:** [NEXT_STEPS.md](./NEXT_STEPS.md). This forecast describes direction and must not be used as a live backlog. · Doctrine: [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md)  
 **Map:** [ARCHITECTURE.md](./ARCHITECTURE.md) · [NAMING.md](./NAMING.md) · [HYGIENE.md](./HYGIENE.md)
 
 This is the engine-level map of what must exist before UX Studio is a real product — not a Boots page backlog.
@@ -13,7 +13,7 @@ This is the engine-level map of what must exist before UX Studio is a real produ
 
 Ship the **control room** first: deep-linkable screens, recordable interactions, clean agent chrome, slim CI, multi-project registry, domain-named surfaces. Concept pages (Boots) are the rabbit; they do not define the product ceiling.
 
-**Boots erase-Make program (Director lock):** migrate remaining Make screens to React in order **PLP → PDP → Home → Chat → History/Details**, then **delete Book Step 1–3 Make children**. Page DONE = React-mounted **and** Make child retired from view with wire gates; prefer delete when safe, else `data-studio-make-retired` + no LEGACY growth — document honest residual.
+**Boots erase-Make program (Director lock):** migration order is **PLP → PDP → Site Pilot (`screenId=site-pilot`) → Chat → History/Details**, then **delete Book Step 1–3 Make children**. PLP, PDP, Site Pilot, and Chat are landed; current state and blockers live only on [NEXT_STEPS.md](./NEXT_STEPS.md). Page DONE = React-mounted **and** Make child retired from view with wire gates; prefer delete when safe, else `data-studio-make-retired` + no LEGACY growth — document honest residual.
 
 ---
 
@@ -23,7 +23,8 @@ Ship the **control room** first: deep-linkable screens, recordable interactions,
 
 | Work | Why | Status |
 |------|-----|--------|
-| **PDP React migration** | Next erase-Make rabbit after PLP | **NOW** |
+| **Appointment History + Details** | Next open erase-Make page pair after Chat | **READY** — sequence/proof status on board |
+| **Traditional CJM smoothness** | Remove the three recorded camera scroll reversals | **OPEN** — acceptance evidence on board |
 | Versioning habit | notes + consider patch on named demos | Habit — every ship |
 | Post-agent clean slate | Sticky Choose Pharmacy after MCP sitrep/reload rage | **LANDED** |
 | Recording compile→journeys | Ephemeral Save as journey → CJM catalog | **LANDED (vertical)** |
@@ -33,8 +34,7 @@ Ship the **control room** first: deep-linkable screens, recordable interactions,
 
 | Work | Why |
 |------|-----|
-| **Home → Chat → History/Details** React | Continue erase-Make sequence ([NEXT_STEPS.md](./NEXT_STEPS.md)) |
-| **Delete Book 1–3 Make children** | Only after sequence above + CJM green |
+| **Delete Book 1–3 Make children** | Only after History/Details Final Pass + CJM green |
 | LEGACY retirement by screen | No LEGACY growth; shrink `globals-screens` + Make wire as React pages land |
 | Concept `.proto-*` class debt | Boots wire/footer/chat/avail cards still `.proto-*` in LEGACY — retire with page migrate |
 | Engine monster splits | `App.tsx` / `useJourneyPlayback.ts` — extract by domain when next touched |
@@ -120,7 +120,7 @@ Documented handshake ([X_SUITE_INTEGRATION.md](./X_SUITE_INTEGRATION.md)). Autom
 |------|------|
 | DONE | React mount + Make retired from view + wire gates + no LEGACY growth + honest residual |
 | Retire mode | Delete Make child when safe; else `data-studio-make-retired` |
-| Order | **PLP → PDP → Home → Chat → History/Details → delete Book 1–3 Make** |
+| Order | **PLP → PDP → Site Pilot → Chat → History/Details → delete Book 1–3 Make** |
 | Audit | Nazi QA under `docs/projects/boots-pharmacy/audits/` before PO |
 
 ---
@@ -149,7 +149,7 @@ Documented handshake ([X_SUITE_INTEGRATION.md](./X_SUITE_INTEGRATION.md)). Autom
 3. Domain CSS/attrs + hygiene — landed  
 4. Version chip + agent felony gate — landed  
 5. Recording compile→journeys vertical — landed  
-6. **Erase-Make: PLP landed → PDP (NOW) → Home → Chat → History/Details → delete Book Make children**  
+6. **Erase-Make: PLP → PDP → Site Pilot → Chat landed; History/Details next → delete Book Make children**  
 7. LEGACY shrink by screen + UXDS extract-on-second-use  
 8. Second project rabbit  
 9. Release CI + broader CSS contracts  

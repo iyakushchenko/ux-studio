@@ -60,6 +60,15 @@ This product is **UX Studio**, not a prototype nickname.
 
 **Hard rule:** folder name **equals** `PROJECT_SCREENS[].screenId` (and `data-studio-react-screen`).
 
+### Registered migration deviation
+
+| Surface | Current path | Canonical `screenId` | Rule |
+|---------|--------------|----------------------|------|
+| Boots Site Pilot home | `src/projects/boots-pharmacy/screens/home/` | `site-pilot` | Time-bounded legacy path. Do not copy it and do not add another exception. Rename the folder/BEM to `site-pilot` on the next cohesive touch that can update imports, tests, probes, and audit references together. Runtime hooks must continue to use `site-pilot`. |
+
+This deviation records existing implementation truth; it does not relax the hard rule for
+new screens.
+
 ---
 
 ## CSS layers ↔ file homes

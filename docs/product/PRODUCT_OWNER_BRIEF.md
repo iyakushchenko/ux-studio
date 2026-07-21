@@ -3,7 +3,8 @@
 **Audience:** Product Owner (you).  
 **Commander:** Cursor agent = **Tech Director + Architect + BA + UX + FE/UI** composite — **decides all tech direction and next steps**; forecasts risks proactively.  
 **Doctrine:** [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) §0–§2 · always-on rule [`.cursor/rules/ux-studio-director.mdc`](../../.cursor/rules/ux-studio-director.mdc)  
-**Last updated:** 2026-07-19
+**Last updated:** 2026-07-21  
+**Live delivery status:** [NEXT_STEPS.md](./NEXT_STEPS.md) is the only mutable source for NOW/NEXT/blockers. This brief explains the product and preserves durable PO decisions; it is not a sprint board.
 
 ### PO note — you don’t need to re-argue this
 
@@ -138,8 +139,9 @@ See [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) §5. Current order:
 4. ✅ Recording UI (engine).  
 5. ✅ Thin UXDS foundation + Boots theme + Availability Tool kit enrichment.  
 6. ✅ Visual fidelity doctrine + Book Step 1 React pilot (behavior parity with Make).  
-7. **Next:** continue Boots screen rebuilds React + UXDS.  
-8. Scale rebuild; later X-Suite import + compiler.
+7. ✅ PLP, PDP, Site Pilot, and Chat migrations reached PAGE FINAL PASS hard-green.  
+8. **Current:** use [NEXT_STEPS.md](./NEXT_STEPS.md) for the next open page and playback-quality blockers.  
+9. Scale rebuild; later X-Suite import + compiler.
 
 ---
 

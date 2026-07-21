@@ -44,6 +44,11 @@ Folders mimic **Studio verbs** people use — not a proto nickname.
 
 ## CSS layers
 
-BASE (`src/uxds`) → THEME (`projects/<id>/styleguide/theme.css`) → PANEL (`src/app/**` chrome) → LEGACY (`globals-*.css`) → page CSS under `screens/<screenId>/`.
+The global entry barrel is BASE (`src/uxds`) → THEME
+(`projects/<id>/styleguide/theme.css`) → PANEL (`src/app/**` chrome) → LEGACY
+(`globals-*.css`). Colocated screen CSS is **COMPOSITION ownership**, imported by its
+React component rather than appended as a fifth global layer. It must stay scoped to its
+screen root and must not depend on source order to override LEGACY. Full contract:
+[CSS_BASE_THEME.md](./CSS_BASE_THEME.md).
 
 Panel classes: `.studio-nav-*`, `.studio-*` mode switches, `.studio-agent-testing-*`. Concept Make leftovers may still say `.proto-*` until screen retirement.

@@ -25,7 +25,7 @@ _1–3 sentences: what was checked, what failed, what to reopen._
 
 ## Checklist results
 
-Copy rows from [FE_UI_UX_AUDIT.md](../FE_UI_UX_AUDIT.md); keep PASS/FAIL/N/A + evidence.
+Copy rows from [FE_UI_UX_AUDIT.md](../FE_UI_UX_AUDIT.md); keep PASS/FAIL/N/A + evidence. **Every applicable PASS requires evidence.** Preserve the stable row IDs.
 
 ### A. Visual fidelity
 
@@ -60,6 +60,7 @@ Copy rows from [FE_UI_UX_AUDIT.md](../FE_UI_UX_AUDIT.md); keep PASS/FAIL/N/A + e
 | D2 | | |
 | D3 | | |
 | D4 | | |
+| D5 | | Typical DS states + MCP SearchField hover when present |
 
 ### E. Behavior parity
 
@@ -86,6 +87,10 @@ Copy rows from [FE_UI_UX_AUDIT.md](../FE_UI_UX_AUDIT.md); keep PASS/FAIL/N/A + e
 | G3 | | |
 | G4 | | |
 | G5 | | AIR/browse: REC locked when AIR |
+| G6 | | |
+| G7 | | |
+| G8 | | |
+| G9 | | |
 
 ### H. Regressions
 
@@ -103,6 +108,17 @@ Copy rows from [FE_UI_UX_AUDIT.md](../FE_UI_UX_AUDIT.md); keep PASS/FAIL/N/A + e
 | I2 | | |
 | I3 | | |
 | I4 | | |
+
+### J. Make → React state and real-user proof
+
+| # | Result | Evidence |
+|---|--------|----------|
+| J1 | | Loading / empty / updating mechanism |
+| J2 | | Checkbox / radio state matrix |
+| J3 | | Computed vertical-rhythm measurements |
+| J4 | | Make register: no unchecked P0 |
+| J5 | | Quinn localhost MCP matrix |
+| J6 | | Overlay visible / scroll-into-view / overlay eyes |
 
 ---
 

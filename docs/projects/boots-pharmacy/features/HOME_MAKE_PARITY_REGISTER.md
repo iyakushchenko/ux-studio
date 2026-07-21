@@ -2,7 +2,9 @@
 
 **Project:** `boots-pharmacy`  
 **Callsigns:** Bea (BA) owns register truth · Quinn (QA) owns prove · Finn/Uma restore gaps  
-**Updated:** 2026-07-19 (PO `+` kickoff — scaffold mount live; fidelity Partial)  
+**Updated:** 2026-07-21 (truth label added; detailed table retains 2026-07-19 kickoff baseline)  
+**Overall proof status:** Site Pilot (`screenId=site-pilot`) PAGE FINAL PASS **HARD-GREEN** per [NEXT_STEPS.md](../../../product/NEXT_STEPS.md) and [FE_AUDIT_SITE_PILOT_PAGE_FINAL_PASS_2026-07-20.md](../audits/FE_AUDIT_SITE_PILOT_PAGE_FINAL_PASS_2026-07-20.md).  
+**Register interpretation:** File name and table preserve the original Home/Make migration vocabulary. The public screen id is `site-pilot`; `home` is reserved. Detailed `Partial`/`Missing` cells are the kickoff baseline and are not a current completion report. Use the audit/Final Pass evidence for closure; do not invent row-level proof.
 **Make source:** Frame child **11** (`Agentic. Site Pilot. Home`) — `Body10` + shell at `left-0` in `frame/index.tsx` · wire `BootsPharmacyProjectView` child-11 effects · `playback/sitePilotHome.ts`  
 **Public `screenId`:** `site-pilot` (URL `?screen=site-pilot`) — **not** `home` (`home` reserved for a future real Home page)  
 **React target:** `src/projects/boots-pharmacy/screens/home/*` (folder may lag public id until cheap rename)  
@@ -12,7 +14,7 @@
 **Status legend:** Present · Partial · Missing · Fixed · N/A
 
 **Make column:** inventory from Frame `Body10` + wire (2026-07-19).  
-**React column:** first visible mount this kickoff — structure Present/Partial; DS hover matrix still Missing.
+**React column:** historical first-visible-mount baseline; retained to show the original acceptance gaps.
 
 **Bea rule:** Every band before Finn codes deep fidelity — including loading/empty/updating as **P0** when Make has them. No invented bands.
 

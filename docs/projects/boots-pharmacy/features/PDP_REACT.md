@@ -77,7 +77,7 @@ Erase-Make **closed for PDP** after PLP HARD-GREEN. Vaccine PDP (`screenId: pdp`
 - [x] Resolve B1 accordion — PO go interactive (2026-07-19)
 - [x] Quinn re-prove MCP matrix (FAQ bodies / CTA unify / focus-none)
 - [x] Uma §0a re-PROVEN after polish
-- [x] Arch PAGE FINAL PASS HARD-GREEN — Home still waits PO `+`
+- [x] Arch PAGE FINAL PASS HARD-GREEN — Site Pilot was subsequently completed; live sequence is maintained in [NEXT_STEPS.md](../../../product/NEXT_STEPS.md)
 
 ## Honest residual (expected)
 
