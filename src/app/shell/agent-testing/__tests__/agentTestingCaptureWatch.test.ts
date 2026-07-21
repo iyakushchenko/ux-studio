@@ -96,6 +96,12 @@ describe("click forensics", () => {
     vi.useRealTimers();
   });
 
+  it("skips bare tag click labels", () => {
+    document.body.innerHTML = '<a href="#x"></a>';
+    const a = document.querySelector("a")!;
+    expect(buildClickDetail(a)).toBeNull();
+  });
+
   it("ignores empty-space control-room clicks", () => {
     document.body.innerHTML = `
       <div class="studio-nav-panel">

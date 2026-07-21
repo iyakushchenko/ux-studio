@@ -408,6 +408,26 @@ export function buildAgentTestingDump(options: {
   };
 }
 
+/** Download filename — session kind first (not dump reason). Save Log ≠ “agent” dump. */
+export function buildAgentTestingDumpFilename(dump: {
+  reason: string;
+  sessionKind?: string;
+  gateMode?: string;
+  atIso: string;
+}): string {
+  const kind = (dump.sessionKind || dump.gateMode || "qa").replace(
+    /[^a-z0-9_-]+/gi,
+    "-"
+  );
+  const stamp = dump.atIso.replace(/[:.]/g, "-");
+  // Save Log reason is always "manual" — do not put that in the filename.
+  if (dump.reason === "manual") {
+    return `qa-${kind}-${stamp}.json`;
+  }
+  const reason = String(dump.reason || "dump").replace(/[^a-z0-9_-]+/gi, "-");
+  return `qa-${kind}-${reason}-${stamp}.json`;
+}
+
 /** Download latest (or provided) dump as compact JSON — hang-safe. Secondary to live latch. */
 export function downloadAgentTestingDump(dump?: AgentTestingDump): boolean {
   if (typeof document === "undefined") return false;
@@ -421,8 +441,10 @@ export function downloadAgentTestingDump(dump?: AgentTestingDump): boolean {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `agent-testing-dump-${payload.reason}-${payload.atIso.replace(/[:.]/g, "-")}.json`;
+    a.download = buildAgentTestingDumpFilename(payload);
     a.rel = "noopener";
+    // Ephemeral download anchor — never appear as "Click: a" in QA capture.
+    a.setAttribute("data-studio-agent-testing-ignore", "true");
     document.body.appendChild(a);
     a.click();
     a.remove();

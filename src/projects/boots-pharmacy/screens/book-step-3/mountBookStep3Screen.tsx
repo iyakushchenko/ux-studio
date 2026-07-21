@@ -8,6 +8,10 @@ import {
   BOOK_STEP3_REACT_SCREEN_ID,
   BOOK_STEP3_SCREEN_SELECTOR,
 } from "./bookStep3Contract";
+import {
+  restoreMakeUnderPage,
+  retireMakeUnderPage,
+} from "../retireMakeUnderPage";
 
 const HOST_CLASS = "studio-react-screen-host";
 const HIDE_SELECTORS = [
@@ -54,27 +58,13 @@ function ensureHost(page: HTMLElement): HTMLElement {
 }
 
 function hideMakeChrome(page: HTMLElement): void {
-  for (const selector of HIDE_SELECTORS) {
-    page.querySelectorAll<HTMLElement>(selector).forEach((el) => {
-      if (el.classList.contains(HOST_CLASS)) return;
-      if (el.dataset.studioReactScreen === BOOK_STEP3_REACT_SCREEN_ID) return;
-      el.style.display = "none";
-      el.dataset.studioMakeRetired = BOOK_STEP3_REACT_SCREEN_ID;
-    });
-  }
-  page.dataset.studioReactScreen = BOOK_STEP3_REACT_SCREEN_ID;
+  retireMakeUnderPage(page, BOOK_STEP3_REACT_SCREEN_ID, {
+    hideSelectors: HIDE_SELECTORS,
+  });
 }
 
 function restoreMakeChrome(page: HTMLElement): void {
-  page
-    .querySelectorAll<HTMLElement>(
-      `[data-studio-make-retired="${BOOK_STEP3_REACT_SCREEN_ID}"]`
-    )
-    .forEach((el) => {
-      el.style.removeProperty("display");
-      delete el.dataset.studioMakeRetired;
-    });
-  delete page.dataset.studioReactScreen;
+  restoreMakeUnderPage(page, BOOK_STEP3_REACT_SCREEN_ID);
 }
 
 /** True when Book Step 3 Make wire has been retired for the React pilot. */

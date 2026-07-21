@@ -121,11 +121,11 @@ Visible chat log **does not** spam flash transitions. Log only:
 Code: `shouldLogMcpPhaseToChat` in `agentTestingQaListenBridge.ts`.  
 Action sitrep (Save Log / Pause / Close / Reset) stays visible — denser meaningful events, less chrome.
 
-**Vite HMR:** on `vite:beforeUpdate`, QA pauses capture/play and logs `vite-hmr` (lean).
+**QA chat lean (2026-07-21):** routine `Camera: wait` dwell is dump-only (not chat). Playback-diag mirrors via `logStep` only — no twin ring row (was the refresh restore ×2 source). Login drain: Modal open/pick/close only.
 
 **Do not:** invent hover/loader chrome; click under open modal (overlay eyes); claim PROVEN without MCP probe; await CI on routine ships (R12); DDOS yourself by re-reading the whole chat instead of consuming latches.
 
-**Save Log:** snapshot anytime while session active (does **not** require Pause). Downloads **current** session dump (`reason: manual`, live `log[]` + selectors + `sessionKind` + `mcp`). On chat SF with gate open, dump also includes **`chatBubbleMotion.samples`** — pull-up / thinking→reply frames with **TRACE** (`scrollTop`, `scrollMax`, `scrollLock`, `composerDockTop`, `bubbleBottom`, `clearPx`, `underComposer`, `deltaScrollTop`) + `jump` / `chop` flags. Read TRACE: filter samples by `phase=frame|trace`, look for `underComposer` / `chopReason` / camera tags `pull-up-settle` · `composer-clearance-topup`. See [PLAYBACK_DIAG.md](../../../../docs/shell/PLAYBACK_DIAG.md) § Chat bubble motion.
+**Save Log:** auto-pauses capture (halts Play) then downloads **current** session dump as `qa-{manual|agent|observe}-{iso}.json` (session kind in the name — not `agent-testing-dump-manual-…`). One timeline row.
 
 **Control room (manual/observe):** interactive controls only (buttons/toggles/tabs/inputs) → `Control room: …`. Empty-space nav clicks are ignored. Pause / CAPTURE off stops **all** interaction logging until Resume. One gesture → one line (click-canonical coalesce).
 

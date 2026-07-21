@@ -1,6 +1,5 @@
 import {
   clearStagedRecordingSession,
-  deserializeRecordingSession,
   getActiveRecordingSession,
   getLastRecordingSession,
   serializeRecordingSession,
@@ -11,6 +10,7 @@ import {
   isRecordingActive,
   stageRecordingSession,
 } from "@/app/recording/recordingSession";
+import { resolveRecordingSessionFromImportJson } from "@/app/recording/recordingImport";
 import type { RecordingSession } from "@/app/recording/recordingTypes";
 import {
   compileRecordingToJourney,
@@ -288,9 +288,9 @@ export function registerRecordingMcpHelpers(options?: {
   };
 
   window.__protoImportRecording = (json) => {
-    const imported = deserializeRecordingSession(json);
-    stageRecordingSession(imported);
-    return imported;
+    const resolved = resolveRecordingSessionFromImportJson(json);
+    stageRecordingSession(resolved.session);
+    return resolved.session;
   };
 
   window.__protoCompileRecording = (session) => {

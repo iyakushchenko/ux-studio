@@ -98,21 +98,30 @@ export function shouldBlockQaPlay(input: {
 }
 
 /**
- * App / MCP transport gate — refuse Play/SF/jump while QA Pause, diagnostic,
- * or FAIL handoff freeze.
+ * App / MCP transport gate — refuse Play/SF while diagnostic or FAIL freeze.
+ * QA Pause alone auto-resumes capture (PO: never "Play ignored — QA Pause" after Reset).
  * Returns true when transport was blocked (caller must return early).
  */
 export function refusePlayIfQaBlocks(): boolean {
   if (typeof window === "undefined") return false;
   try {
     const w = window as Window & {
-      __studioAgentTestingOverlay?: { shouldBlockPlay?: () => boolean };
+      __studioAgentTestingOverlay?: {
+        shouldBlockPlay?: () => boolean;
+        autoResumeCaptureForPlay?: () => boolean;
+      };
       __studioNoteBlockedQaPlay?: () => void;
       __studioIsQaProgressFrozen?: () => boolean;
     };
     const frozen = w.__studioIsQaProgressFrozen?.() === true;
+    if (frozen) {
+      w.__studioNoteBlockedQaPlay?.();
+      return true;
+    }
+    // Pause-only: lift capture so Play/SF proceed without a Resume click.
+    w.__studioAgentTestingOverlay?.autoResumeCaptureForPlay?.();
     const blocked =
-      frozen || w.__studioAgentTestingOverlay?.shouldBlockPlay?.() === true;
+      w.__studioAgentTestingOverlay?.shouldBlockPlay?.() === true;
     if (!blocked) return false;
     w.__studioNoteBlockedQaPlay?.();
     return true;

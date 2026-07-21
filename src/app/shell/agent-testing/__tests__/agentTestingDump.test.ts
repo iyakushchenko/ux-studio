@@ -1,8 +1,12 @@
 /**
  * @vitest-environment happy-dom
  */
-import { describe, expect, it } from "vitest";
-import { buildAgentTestingDump } from "@/app/shell/agent-testing/agentTestingDump";
+import { describe, expect, it, vi } from "vitest";
+import {
+  buildAgentTestingDump,
+  buildAgentTestingDumpFilename,
+  downloadAgentTestingDump,
+} from "@/app/shell/agent-testing/agentTestingDump";
 
 describe("buildAgentTestingDump lean-rich", () => {
   it("includes sessionKind, code, agentPrompt, compact log for agent parse", () => {
@@ -74,5 +78,49 @@ describe("buildAgentTestingDump lean-rich", () => {
     expect(dump.sessionKind).toBe("manual");
     expect(dump.code).toBeUndefined();
     expect(dump.poSignal).toBeNull();
+  });
+
+  it("names Save Log files by session kind (not reason=manual)", () => {
+    expect(
+      buildAgentTestingDumpFilename({
+        reason: "manual",
+        sessionKind: "manual",
+        atIso: "2026-07-21T04:32:49.874Z",
+      })
+    ).toBe("qa-manual-2026-07-21T04-32-49-874Z.json");
+    expect(
+      buildAgentTestingDumpFilename({
+        reason: "manual",
+        sessionKind: "agent",
+        atIso: "2026-07-21T04:32:49.874Z",
+      })
+    ).toBe("qa-agent-2026-07-21T04-32-49-874Z.json");
+    expect(
+      buildAgentTestingDumpFilename({
+        reason: "alarm",
+        sessionKind: "manual",
+        atIso: "2026-07-21T04:32:49.874Z",
+      })
+    ).toBe("qa-manual-alarm-2026-07-21T04-32-49-874Z.json");
+  });
+
+  it("marks ephemeral download anchor as capture-ignore", () => {
+    const appended: Element[] = [];
+    const orig = document.body.appendChild.bind(document.body);
+    vi.spyOn(document.body, "appendChild").mockImplementation((node: Node) => {
+      if (node instanceof Element) appended.push(node);
+      return orig(node);
+    });
+    const dump = buildAgentTestingDump({
+      reason: "manual",
+      title: "MANUAL TEST",
+      elapsedMs: 0,
+      gateMode: "manual",
+      log: [],
+    });
+    expect(downloadAgentTestingDump(dump)).toBe(true);
+    const a = appended.find((el) => el.tagName === "A");
+    expect(a?.getAttribute("data-studio-agent-testing-ignore")).toBe("true");
+    vi.restoreAllMocks();
   });
 });

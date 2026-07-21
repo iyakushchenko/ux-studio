@@ -36,6 +36,7 @@ import {
   touchAgentTestingOverlay,
 } from "@/app/shell/agent-testing";
 import { logControlPanel } from "@/app/shell/controlPanelLog";
+import { isMakeParkedForScreen } from "@/projects/boots-pharmacy/screens/retireMakeUnderPage";
 import {
   beginMcpTestSession,
   endMcpTestSession,
@@ -546,10 +547,8 @@ function pdpProbeSteps(): ProbeStep[] {
         if (document.querySelector('[data-studio-react-screen="pdp"]') == null) {
           return "missing React PDP host";
         }
-        if (
-          document.querySelector('[data-studio-make-retired="pdp"]') == null
-        ) {
-          return "Make leak: expected data-studio-make-retired=pdp on retired children";
+        if (!isMakeParkedForScreen("pdp")) {
+          return "Make leak: expected Make Frame children parked for pdp";
         }
         return true;
       },

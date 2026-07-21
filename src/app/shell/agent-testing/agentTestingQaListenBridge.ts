@@ -66,11 +66,14 @@ export function pauseCaptureAndHalt(
     /* hang-safe */
   }
   if (!deps.isActive() || deps.isSettling()) return;
-  if (!deps.getCapturePaused()) {
+  const wasPaused = deps.getCapturePaused();
+  if (!wasPaused) {
     deps.pauseElapsedClock();
     deps.setCapturePaused(true);
     deps.setSessionHadProgress(true);
   }
+  // Always push — identical consecutive system rows coalesce to ×N (HMR spam).
+  // Skip chrome churn when already paused (hot invalidate multi-fire).
   deps.pushLogEntry({
     atMs: Date.now(),
     timeLabel: new Date().toLocaleTimeString("en-GB", { hour12: false }),
@@ -79,6 +82,7 @@ export function pauseCaptureAndHalt(
       reason.includes("diag") || reason.includes("hmr") ? "soft-fail" : "ok",
     kind: "system",
   });
+  if (wasPaused && reason.includes("hmr")) return;
   deps.setActivityPhase("paused", reason);
   deps.armElapsedTimer();
   deps.syncCaptureWatch();
@@ -284,25 +288,59 @@ export function bindMessageListen(
   input.addEventListener("focus", onTyping);
 }
 
-export function installViteHmrListen(deps: QaListenDeps): void {
+/** Mutable deps so a single HMR listener stays current across overlay re-binds. */
+let viteHmrDeps: QaListenDeps | null = null;
+let viteHmrListenBound = false;
+
+type ViteHotApi = {
+  on: (event: string, cb: () => void) => void;
+  dispose?: (cb: () => void) => void;
+};
+
+/**
+ * One `vite:beforeUpdate` listener for the page lifetime.
+ * Re-calling only refreshes deps — never stacks handlers (×24 spam root cause).
+ * `hotApi` is for tests; production uses `import.meta.hot`.
+ */
+export function installViteHmrListen(
+  deps: QaListenDeps,
+  hotApi?: ViteHotApi | null
+): void {
+  viteHmrDeps = deps;
   try {
-    const hot = (
-      import.meta as ImportMeta & {
-        hot?: { on: (event: string, cb: () => void) => void };
-      }
-    ).hot;
+    const hot =
+      hotApi === undefined
+        ? (
+            import.meta as ImportMeta & {
+              hot?: ViteHotApi;
+            }
+          ).hot
+        : hotApi ?? undefined;
     if (!hot || typeof hot.on !== "function") return;
+    if (viteHmrListenBound) return;
+    viteHmrListenBound = true;
     hot.on("vite:beforeUpdate", () => {
-      if (!deps.isActive() || deps.isSettling()) return;
+      const d = viteHmrDeps;
+      if (!d || !d.isActive() || d.isSettling()) return;
       pauseCaptureAndHalt(
-        deps,
+        d,
         "vite-hmr",
         "vite-hmr · capture/play paused (hot invalidate)"
       );
     });
+    hot.dispose?.(() => {
+      viteHmrListenBound = false;
+      viteHmrDeps = null;
+    });
   } catch {
     /* follow-up if HMR API unavailable */
   }
+}
+
+/** Test helper — reset HMR bind latch. */
+export function resetViteHmrListenForTests(): void {
+  viteHmrListenBound = false;
+  viteHmrDeps = null;
 }
 
 /**

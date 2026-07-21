@@ -31,9 +31,7 @@ export function StudioNavVersionChip() {
         aria-label="Toggle MANUAL TEST logger"
         data-studio-qa-logger="true"
         onClick={() => {
-          if (document.documentElement.dataset.studioQaLock === "agent") {
-            return;
-          }
+          // PO always owns the bug chip — reclaim AGENT TESTING → MANUAL TEST.
           if (typeof window.__studioToggleQaLogger === "function") {
             window.__studioToggleQaLogger();
           } else {

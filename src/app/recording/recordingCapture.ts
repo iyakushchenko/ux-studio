@@ -200,6 +200,9 @@ type PlaybackSelectorRoot = Pick<ParentNode, "querySelector" | "querySelectorAll
  * Resolve a stored demo-click selector chain to a live element.
  * Prefers outer→inner nested matches (how the chain was built), then
  * most-specific unique fallback.
+ *
+ * HARD: prefer interactive React targets over Make retired divs with the same
+ * `data-name` (Book Step 1 location search = button; Make dump = non-clickable div).
  */
 export function resolvePlaybackSelectorChain(
   chain: string[] | undefined,
@@ -211,13 +214,14 @@ export function resolvePlaybackSelectorChain(
   let nested: HTMLElement | null = null;
   let nestedOk = true;
   for (const sel of chain) {
-    let el: HTMLElement | null = null;
+    let matches: NodeListOf<HTMLElement>;
     try {
-      el = scope.querySelector(sel);
+      matches = scope.querySelectorAll(sel);
     } catch {
       nestedOk = false;
       break;
     }
+    const el = pickBestPlaybackSelectorMatch(matches);
     if (!el) {
       nestedOk = false;
       break;
@@ -225,20 +229,101 @@ export function resolvePlaybackSelectorChain(
     nested = el;
     scope = el;
   }
-  if (nestedOk && nested) return nested;
+  if (nestedOk && nested) {
+    // Nested Make path can land on a non-button field; upgrade to React twin.
+    if (
+      !isInteractivePlaybackTarget(nested) &&
+      nested.getAttribute?.("data-name") === "component.input.field"
+    ) {
+      const twin = pickBestPlaybackSelectorMatch(
+        root.querySelectorAll('button[data-name="component.input.field"]')
+      );
+      if (twin) return twin;
+    }
+    return nested;
+  }
 
   for (let i = chain.length - 1; i >= 0; i -= 1) {
     const sel = chain[i];
-    let matches: NodeListOf<HTMLElement> | HTMLElement[];
+    let matches: NodeListOf<HTMLElement>;
     try {
       matches = root.querySelectorAll(sel);
     } catch {
       continue;
     }
-    if (matches.length === 1) return matches[0] ?? null;
+    if (matches.length === 1) {
+      const only = matches[0] ?? null;
+      if (only && isPlayablePlaybackTarget(only)) return only;
+      continue;
+    }
+    // Multi-match: accept only when exactly one interactive playable remains
+    // (Make div + React button → button).
+    const best = pickBestPlaybackSelectorMatch(matches);
+    if (!best) continue;
+    const interactive = Array.from(matches).filter(
+      (el) => isPlayablePlaybackTarget(el) && isInteractivePlaybackTarget(el)
+    );
+    if (interactive.length === 1) return interactive[0] ?? null;
   }
 
   return null;
+}
+
+const MAKE_RETIRED_SELECTOR = "[data-studio-make-retired]";
+
+function isInteractivePlaybackTarget(el: HTMLElement): boolean {
+  const tag = el.tagName;
+  if (!tag) return false;
+  if (
+    tag === "BUTTON" ||
+    tag === "A" ||
+    tag === "INPUT" ||
+    tag === "SELECT" ||
+    tag === "TEXTAREA"
+  ) {
+    return true;
+  }
+  const role = el.getAttribute?.("role");
+  if (role === "button" || role === "link" || role === "option") return true;
+  if (el.hasAttribute?.("data-studio-action")) return true;
+  return false;
+}
+
+function isPlayablePlaybackTarget(el: HTMLElement): boolean {
+  if (typeof el.closest === "function" && el.closest(MAKE_RETIRED_SELECTOR)) {
+    return false;
+  }
+  try {
+    if (
+      typeof window === "undefined" ||
+      typeof window.getComputedStyle !== "function"
+    ) {
+      return true;
+    }
+    const style = window.getComputedStyle(el);
+    if (style.display === "none" || style.visibility === "hidden") return false;
+    const opacity =
+      style.opacity === "" || style.opacity == null
+        ? 1
+        : Number(style.opacity);
+    if (Number.isFinite(opacity) && opacity === 0) return false;
+  } catch {
+    /* unit / detached */
+  }
+  return true;
+}
+
+/** Prefer button/input over Make div with the same data-name; skip retired. */
+export function pickBestPlaybackSelectorMatch(
+  matches: ArrayLike<HTMLElement> | Iterable<HTMLElement>
+): HTMLElement | null {
+  const list = Array.from(matches as ArrayLike<HTMLElement>);
+  if (!list.length) return null;
+  const playable = list.filter(isPlayablePlaybackTarget);
+  const pool = playable.length ? playable : list;
+  const interactive = pool.filter(isInteractivePlaybackTarget);
+  if (interactive.length) return interactive[0] ?? null;
+  return pool[0] ?? null;
 }
 
 export function captureRecordingEvent(
@@ -774,6 +859,32 @@ export function isRecordingChromeTarget(el: Element | null): boolean {
  * `module.plp.tiles` containers when the click lands on padding/gap.
  */
 export function refineRecordingClickTarget(el: HTMLElement): HTMLElement {
+  // Make dump often leaves a non-button `component.input.field` div; React Book
+  // Step 1 uses a real <button data-name="component.input.field">. Prefer button.
+  if (
+    el.getAttribute?.("data-name") === "component.input.field" &&
+    el.tagName !== "BUTTON"
+  ) {
+    const localScope =
+      el.closest?.('[data-name="chosen location"]') ??
+      el.closest?.("[data-studio-react-screen]") ??
+      el.parentElement ??
+      el;
+    const localBtn =
+      localScope.querySelector?.<HTMLElement>(
+        'button[data-name="component.input.field"]'
+      ) ?? null;
+    if (localBtn && isPlayablePlaybackTarget(localBtn)) return localBtn;
+    if (typeof document !== "undefined") {
+      const twin = pickBestPlaybackSelectorMatch(
+        document.querySelectorAll<HTMLElement>(
+          'button[data-name="component.input.field"]'
+        )
+      );
+      if (twin) return twin;
+    }
+  }
+
   const tile = el.closest<HTMLElement>("[data-studio-plp-tile-id]");
   if (tile) {
     const book = tile.querySelector<HTMLElement>(

@@ -593,11 +593,13 @@ export function useJourneyPlayback({
       const runId = ++homeScriptRunRef.current;
       setScriptingActive(true);
       try {
+        playbackDirectorMonitor.noteDirectorScriptStarted(beat.id);
         const { ok, failureStep, diagnosticSent } = await invokeBeatScript(
           beat.homeScript,
           () => playback.runHomeScript(beat.homeScript!, options),
           options
         );
+        playbackDirectorMonitor.noteDirectorScriptFinished(beat.id, ok);
         if (runId !== homeScriptRunRef.current) return false;
         if (!ok) {
           lastHomeAutoRunRef.current = null;
@@ -780,11 +782,13 @@ export function useJourneyPlayback({
       noteDirectorScriptInteraction(activeBeat, options);
       setScriptingActive(true);
       try {
+        playbackDirectorMonitor.noteDirectorScriptStarted(activeBeat.id);
         const { ok, failureStep, diagnosticSent } = await invokeBeatScript(
           activeBeat.tabScript,
           () => playback.runTabScript(activeBeat.tabScript!, runtime, options),
           options
         );
+        playbackDirectorMonitor.noteDirectorScriptFinished(activeBeat.id, ok);
         if (!ok) {
           lastTabAutoRunRef.current = null;
           if (!options?.skip && !diagnosticSent) {
@@ -868,6 +872,9 @@ export function useJourneyPlayback({
           return true;
         }
 
+        // Arm handoff watchdog: dwell → recordedClick must note start or Play
+        // false-fails at DIRECTOR_HANDOFF_CHECK_MS while cursor is still traveling.
+        playbackDirectorMonitor.noteDirectorScriptStarted(activeBeat.id);
         const { ok, failureStep, diagnosticSent } = await invokeBeatScript(
           beatDirectorScriptLabel(activeBeat) ?? "recorded-click",
           () =>
@@ -883,6 +890,7 @@ export function useJourneyPlayback({
             }),
           options
         );
+        playbackDirectorMonitor.noteDirectorScriptFinished(activeBeat.id, ok);
         if (!ok) {
           lastRecordedClickAutoRunRef.current = null;
           if (!options?.skip && !diagnosticSent) {
@@ -1240,8 +1248,15 @@ export function useJourneyPlayback({
         return;
       }
       const nextBeat = beats[next];
+      // Camera is not a director script — do not arm director-step-skipped (PO FAIL
+      // was firing on plp → plp-*-camera while camera dwell > handoff timer).
       const scriptLabel = beatDirectorScriptLabel(nextBeat);
-      if (fromBeat && scriptLabel && isDwellLandingBeat(fromBeat)) {
+      if (
+        fromBeat &&
+        scriptLabel &&
+        isDwellLandingBeat(fromBeat) &&
+        !beatHasCameraStep(nextBeat)
+      ) {
         playbackDirectorMonitor.scheduleDirectorHandoff({
           fromBeatId: fromBeat.id,
           toBeatId: nextBeat.id,
@@ -1704,13 +1719,20 @@ export function useJourneyPlayback({
       beatIndexRef.current = next;
 
       const scriptLabel = beatDirectorScriptLabel(nextBeat);
-      if (scriptLabel) {
+      const runNext =
+        Boolean(scriptLabel) ||
+        beatHasCameraStep(nextBeat) ||
+        Boolean(nextBeat.recordedClick?.selectorChain?.length);
+      if (runNext) {
         suppressBeatEnterSyncRef.current = true;
-        playbackDirectorMonitor.scheduleDirectorHandoff({
-          fromBeatId: landingBeat.id,
-          toBeatId: nextBeat.id,
-          scriptLabel,
-        });
+        // Only real director scripts arm the handoff watchdog (not camera).
+        if (scriptLabel && !beatHasCameraStep(nextBeat)) {
+          playbackDirectorMonitor.scheduleDirectorHandoff({
+            fromBeatId: landingBeat.id,
+            toBeatId: nextBeat.id,
+            scriptLabel,
+          });
+        }
         void runDirectorBeat(nextBeat, false).finally(() => {
           suppressBeatEnterSyncRef.current = false;
           playbackDirectorMonitor.clearDirectorHandoff(nextBeat.id);

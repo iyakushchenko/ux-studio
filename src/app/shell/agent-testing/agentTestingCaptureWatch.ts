@@ -279,6 +279,8 @@ export function buildClickDetail(el: Element): AgentTestingClickDetail | null {
   if (!resolved || !isInteractiveControl(resolved)) return null;
   const desc = describeClickTarget(el);
   if (!desc) return null;
+  // Bare tag fallbacks ("a", "button") are noise — skip.
+  if (/^(a|button|div|span|p|li|input|img|svg|path)$/i.test(desc)) return null;
   const dataStudioAction =
     resolved.getAttribute?.("data-studio-action")?.trim() || undefined;
   const surface: AgentTestingClickSurface = isControlRoom(el)

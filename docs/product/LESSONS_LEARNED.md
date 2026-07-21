@@ -10,6 +10,27 @@ Agents **must read** this file before claiming a UI or Studio-chrome slice done.
 
 ## 2026-07-21
 
+### QA chat spam — Camera wait ×N + ring twin restore (PO)
+
+- **Symptom / class:** Chat flooded with `Camera: wait` every beat; after refresh `Journey reset` / `Play finished` appeared twice; Save Log ring had detail+label twins.
+- **Root cause:** (1) Routine `chat-camera:wait` dwell mirrored to chat. (2) `mirrorPlaybackDiagToQa` appended ring **and** `logStep`→`pushLogEntry` appended ring again → hydrate restored doubles.
+- **Right fix:** Suppress dwell wait from chat; mirror only via `logStep`; restore coalesces consecutive playback-diag twins; lean login drain rows.
+- **Gate:** `playbackDiagQaBridge` unit — wait not mirrored; clear via logStep.
+
+### QA Reset must not auto-CAPTURE + HMR ×24 spam (PO)
+
+- **Symptom / class:** Reset wiped log then immediately capturing again. Vite file save flooded QA with dozens of identical `vite-hmr · capture/play paused` rows.
+- **Root cause:** Prior Play-gate hotfix left Reset with `capturePaused=false`. `installViteHmrListen` stacked a new `vite:beforeUpdate` handler on every overlay bind.
+- **Right fix:** Reset → capture **off** (`Session reset · capture off`); clear pause latch; Play still auto-resumes Pause-only. One HMR listener + mutable deps; identical system rows already coalesce to `×N`.
+- **Gate:** Unit `agentTestingViteHmr.test.ts` + format coalesce vite-hmr.
+
+### Make `display:none` ≠ gone — ghosts win querySelector / Play (PO)
+
+- **Symptom / class:** React-migrated page still clicks Make `div[data-name=…]` (not clickable / wrong node) while React `<button>` with same name exists. QA Save Log spam: `Save Log · export` + `Click: a` + download row; capture stayed ON.
+- **Root cause:** Retiring Make with `display:none` + `data-studio-make-retired` left nodes in the document → first-match selectors hit ghosts. Download used a bare `<a>.click()` while capture was live.
+- **Right fix:** `retireMakeUnderPage` **detaches** Make from the live tree (park + restore on unmount). Save Log **auto-pauses** (silent) then one timeline row; ephemeral download `<a>` stamped `data-studio-agent-testing-ignore`; bare-tag click labels dropped.
+- **Gate:** Unit `retireMakeUnderPage.test.ts`; parity / page-final-pass accept `retireMakeUnderPage(`; MCP probes use `isMakeParkedForScreen`.
+
 ### QA dump false FAIL — `jump-to-start` matched as bubble JUMP (PO dump 03:30Z)
 
 - **Symptom / class:** Play finished 23/23 + play-end ok, but QA painted `Scroll jumped the wrong way (Δ-96)` and `Cursor eased to rest` as **fail**. Also “Chat camera: wait” on traditional PDP/book; `RecModalPharmacyPick` on login Sign in.

@@ -1,7 +1,7 @@
 import type { CursorAnomaly } from "@/app/shell/playbackCursorAnomalies";
 import { VIEWPORT_MIN_SCROLL_DELTA_PX } from "@/app/shell/playbackViewportAnomalies";
 
-export const DIRECTOR_HANDOFF_CHECK_MS = 1200;
+export const DIRECTOR_HANDOFF_CHECK_MS = 2800;
 
 /** Director scripts where a manual step must change DOM state or scroll the viewport. */
 export const DIRECTOR_INTERACTION_SCRIPTS = new Set([

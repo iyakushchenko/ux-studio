@@ -8,6 +8,10 @@ import {
   CHAT_SCREEN_SELECTOR,
   isChatReactMounted,
 } from "./chatContract";
+import {
+  restoreMakeUnderPage,
+  retireMakeUnderPage,
+} from "../retireMakeUnderPage";
 
 export { CHAT_REACT_MOUNT_ENABLED, isChatReactMounted };
 
@@ -47,34 +51,15 @@ function ensureHost(page: HTMLElement): HTMLElement {
 }
 
 function hideMakeChrome(page: HTMLElement): void {
-  Array.from(page.children).forEach((node) => {
-    if (!(node instanceof HTMLElement)) return;
-    const classList = node.classList;
-    if (
-      [...KEEP_VISIBLE].some((cls) => classList.contains(cls)) ||
-      node.dataset.studioReactScreen === CHAT_REACT_SCREEN_ID
-    ) {
-      return;
-    }
-    // !important — globals force `display:flex !important` on Make Frame337
-    // (`:nth-child(2):not([data-studio-sticky-group])`), which resurrected a
-    // second SitePilot bar above React `.chat__site-pilot-bar`.
-    node.style.setProperty("display", "none", "important");
-    node.dataset.studioMakeRetired = CHAT_REACT_SCREEN_ID;
+  // Detach Make Frame children — display:none left ghosts for querySelector
+  // (and globals with display:flex !important resurrected Site Pilot bar).
+  retireMakeUnderPage(page, CHAT_REACT_SCREEN_ID, {
+    keepClassNames: KEEP_VISIBLE,
   });
-  page.dataset.studioReactScreen = CHAT_REACT_SCREEN_ID;
 }
 
 function restoreMakeChrome(page: HTMLElement): void {
-  page
-    .querySelectorAll<HTMLElement>(
-      `[data-studio-make-retired="${CHAT_REACT_SCREEN_ID}"]`
-    )
-    .forEach((el) => {
-      el.style.removeProperty("display");
-      delete el.dataset.studioMakeRetired;
-    });
-  delete page.dataset.studioReactScreen;
+  restoreMakeUnderPage(page, CHAT_REACT_SCREEN_ID);
 }
 
 export function mountChatScreen(props: ChatScreenProps): void {

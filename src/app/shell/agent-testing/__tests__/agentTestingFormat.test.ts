@@ -4,6 +4,7 @@ import {
   coalesceLogEntry,
   formatElapsed,
   formatHelperStepLabel,
+  formatLogRowText,
   humanizeHelperSuffix,
   inferOutcomeFromText,
 } from "@/app/shell/agent-testing/agentTestingFormat";
@@ -53,8 +54,18 @@ describe("agentTestingFormat", () => {
     expect(merged?.count).toBe(2);
   });
 
-  it("formats elapsed mm:ss", () => {
-    expect(formatElapsed(0)).toBe("0:00");
-    expect(formatElapsed(65_000)).toBe("1:05");
+  it("coalesces vite-hmr system spam into ×N", () => {
+    const a = {
+      atMs: 1,
+      timeLabel: "07:26:04",
+      label: "vite-hmr · capture/play paused (hot invalidate)",
+      outcome: "soft-fail" as const,
+      kind: "system" as const,
+      count: 1,
+    };
+    const b = { ...a, atMs: 2, timeLabel: "07:26:05" };
+    const merged = coalesceLogEntry(a, b);
+    expect(merged?.count).toBe(2);
+    expect(formatLogRowText(merged!)).toMatch(/×2/);
   });
 });

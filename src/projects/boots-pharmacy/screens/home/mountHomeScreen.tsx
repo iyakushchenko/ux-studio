@@ -1,6 +1,10 @@
 import { createRoot, type Root } from "react-dom/client";
 import { HomeScreen, type HomeScreenProps } from "./HomeScreen";
 import { HOME_REACT_SCREEN_ID, HOME_SCREEN_SELECTOR } from "./homeContract";
+import {
+  restoreMakeUnderPage,
+  retireMakeUnderPage,
+} from "../retireMakeUnderPage";
 
 const HOST_CLASS = "studio-react-screen-host";
 /** Keep Studio chrome mounts; retire every Make Frame child under Home. */
@@ -39,31 +43,13 @@ function ensureHost(page: HTMLElement): HTMLElement {
 }
 
 function hideMakeChrome(page: HTMLElement): void {
-  Array.from(page.children).forEach((node) => {
-    if (!(node instanceof HTMLElement)) return;
-    const classList = node.classList;
-    if (
-      [...KEEP_VISIBLE].some((cls) => classList.contains(cls)) ||
-      node.dataset.studioReactScreen === HOME_REACT_SCREEN_ID
-    ) {
-      return;
-    }
-    node.style.display = "none";
-    node.dataset.studioMakeRetired = HOME_REACT_SCREEN_ID;
+  retireMakeUnderPage(page, HOME_REACT_SCREEN_ID, {
+    keepClassNames: KEEP_VISIBLE,
   });
-  page.dataset.studioReactScreen = HOME_REACT_SCREEN_ID;
 }
 
 function restoreMakeChrome(page: HTMLElement): void {
-  page
-    .querySelectorAll<HTMLElement>(
-      `[data-studio-make-retired="${HOME_REACT_SCREEN_ID}"]`
-    )
-    .forEach((el) => {
-      el.style.removeProperty("display");
-      delete el.dataset.studioMakeRetired;
-    });
-  delete page.dataset.studioReactScreen;
+  restoreMakeUnderPage(page, HOME_REACT_SCREEN_ID);
 }
 
 /** True when Home Make wire has been retired for the React migration. */

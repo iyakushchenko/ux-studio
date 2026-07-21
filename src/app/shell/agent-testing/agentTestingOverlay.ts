@@ -321,6 +321,8 @@ type OverlayApi = {
   isActive: () => boolean;
   /** True when QA Pause or open diagnostic should refuse Play. */
   shouldBlockPlay: () => boolean;
+  /** Play gate: auto-lift Pause-only (not FAIL modal / freeze). */
+  autoResumeCaptureForPlay: () => boolean;
   isCapturePaused: () => boolean;
   isDiagnosticBlocking: () => boolean;
 };
@@ -782,27 +784,41 @@ function saveDump(
 /**
  * Save Log / agent parse — always the **current** session (not a stale Alarm dump).
  * Pushes to last-N store then downloads that payload.
- * ALWAYS logs the export into the QA timeline (PO sitrep blindness fix).
+ * HARD: auto-pauses capture (halts Play) before download — one lean timeline row.
  */
 export function downloadCurrentAgentTestingLog(): boolean {
-  logQaToolbarAction("Save Log · export");
+  const didAutoPause =
+    active && !settling && !capturePaused
+      ? (() => {
+          applyPoCapturePause(/* latchHalt */ true, { silent: true });
+          return true;
+        })()
+      : false;
+
   if (!active && logEntries.length === 0) {
     const ok = downloadAgentTestingDump();
     logQaToolbarAction(
-      ok ? "Save Log · downloaded (latest dump)" : "Save Log · export failed",
+      ok
+        ? didAutoPause
+          ? "Save Log · paused + downloaded (latest dump)"
+          : "Save Log · downloaded (latest dump)"
+        : "Save Log · download failed",
       ok ? "ok" : "fail"
     );
     return ok;
   }
   const dump = saveDump("manual");
   if (!dump) {
-    logQaToolbarAction("Save Log · export failed", "fail");
+    logQaToolbarAction("Save Log · download failed", "fail");
     return false;
   }
   const ok = downloadAgentTestingDump(dump);
+  const rows = dump.log?.length ?? 0;
   logQaToolbarAction(
     ok
-      ? `Save Log · downloaded (${dump.log?.length ?? 0} rows)`
+      ? didAutoPause
+        ? `Save Log · paused + downloaded (${rows} rows)`
+        : `Save Log · downloaded (${rows} rows)`
       : "Save Log · download failed",
     ok ? "ok" : "fail"
   );
@@ -837,6 +853,10 @@ function logQaToolbarAction(
   }
 }
 
+/**
+ * Quiet wipe of playback FAIL modal + QA transport blocks.
+ * Session Reset / jump-to-start / forceClear — PO must not need Ack to Play again.
+ */
 function dismissStaleDiagForSession(source: string): void {
   try {
     clearStalePlaybackDiagnostic(source);
@@ -848,6 +868,31 @@ function dismissStaleDiagForSession(source: string): void {
   } catch {
     /* ignore */
   }
+  try {
+    clearFailHandoffFromSession();
+    clearFailHandoff();
+  } catch {
+    /* hang-safe */
+  }
+  try {
+    clearQaProgressFreeze();
+  } catch {
+    /* hang-safe */
+  }
+  try {
+    syncDiagAckChrome();
+  } catch {
+    /* hang-safe */
+  }
+}
+
+/** Public — cassette Jump to start / QA Reset clear Play blocks without Ack. */
+export function clearQaPlaybackBlocksForReset(
+  source = "qa-journey-reset"
+): void {
+  dismissStaleDiagForSession(
+    source.startsWith("qa-") ? source : `qa-${source}`
+  );
 }
 
 function beginFailHandoffFromOverlay(reason: string): void {
@@ -932,6 +977,17 @@ function startFreshAgentInterventionSession(source: string): void {
 
 function confirmAgentHandshake(source: string): boolean {
   if (!isFailHandoffPending()) {
+    autoPausedForStalePresence = false;
+    touchQaAgentPresence(source);
+    return false;
+  }
+  // Soft touch must never steal PO MANUAL/OBSERVE into AGENT TESTING mid-Play.
+  // Explicit agent APIs (start / confirmFailTakeover / consume / ack) still take over.
+  const kind = getSessionKind();
+  if (
+    source === "touch" &&
+    (kind === "manual" || kind === "observe")
+  ) {
     autoPausedForStalePresence = false;
     touchQaAgentPresence(source);
     return false;
@@ -1454,12 +1510,19 @@ function closeManualSession(reason: string): void {
   softCloseAgentTestingLogger(reason);
 }
 
-/** Instant clear of log / ring / timer — fresh session, CAPTURE CTA. */
+/** Instant clear of log / ring / timer — fresh session; capture stays OFF until CAPTURE/Resume. */
 function resetManualSession(): void {
   if (!canUserDismissSession() && (active || settling)) return;
   if (!active) return;
   if (!logDirty) return;
   logQaToolbarAction("Reset · wipe log/ring/timer");
+  // Stale FAIL modal must not keep blocking Play after Session reset.
+  dismissStaleDiagForSession("qa-session-reset");
+  try {
+    clearPoSignal();
+  } catch {
+    /* hang-safe */
+  }
   logEntries = [];
   timelineKeys = [];
   lastStepAt = 0;
@@ -1470,13 +1533,15 @@ function resetManualSession(): void {
   } catch {
     /* ignore */
   }
+  // HARD: Reset must NOT auto-start capture (PO). Play still auto-resumes Pause-only.
+  pauseElapsedClock();
   capturePaused = true;
   resetElapsedClock(false);
   armElapsedTimer();
   pushLogEntry({
     atMs: Date.now(),
     timeLabel: new Date().toLocaleTimeString("en-GB", { hour12: false }),
-    label: "Session reset",
+    label: "Session reset · capture off",
     outcome: "ok",
     kind: "system",
   });
@@ -2308,7 +2373,10 @@ function toggleCapturePause(): void {
 }
 
 /** Shared pause path — PO Pause button latches; agent-leave does not. */
-function applyPoCapturePause(latchHalt: boolean): void {
+function applyPoCapturePause(
+  latchHalt: boolean,
+  options?: { silent?: boolean }
+): void {
   if (!active || settling) return;
   try {
     haltPlaybackForPoSignal(latchHalt ? "po-pause" : "agent-leave");
@@ -2339,20 +2407,22 @@ function applyPoCapturePause(latchHalt: boolean): void {
   } catch {
     /* hang-safe */
   }
-  const kind = getSessionKind();
-  const label =
-    kind === "agent" || kind === "observe"
-      ? "QA · Pause (Play halted)"
-      : sessionHadProgress
+  if (!options?.silent) {
+    const kind = getSessionKind();
+    const label =
+      kind === "agent" || kind === "observe"
         ? "QA · Pause (Play halted)"
-        : "QA · CAPTURE off";
-  pushLogEntry({
-    atMs: Date.now(),
-    timeLabel: new Date().toLocaleTimeString("en-GB", { hour12: false }),
-    label,
-    outcome: "ok",
-    kind: "system",
-  });
+        : sessionHadProgress
+          ? "QA · Pause (Play halted)"
+          : "QA · CAPTURE off";
+    pushLogEntry({
+      atMs: Date.now(),
+      timeLabel: new Date().toLocaleTimeString("en-GB", { hour12: false }),
+      label,
+      outcome: "ok",
+      kind: "system",
+    });
+  }
   armElapsedTimer();
   setActivityPhase("paused");
   syncCaptureWatch();
@@ -2389,6 +2459,19 @@ function applyCaptureResume(source: string): void {
   setActivityPhase("running");
   syncCaptureWatch();
   syncSessionChrome();
+}
+
+/**
+ * Play/SF gate helper — if the only block is Pause (not FAIL modal / freeze),
+ * auto-resume capture. Returns true when a resume was applied.
+ */
+export function autoResumeCaptureForPlay(): boolean {
+  if (!active || settling) return false;
+  if (!capturePaused) return false;
+  if (isDiagnosticOpenNow(qaListenDeps())) return false;
+  if (isQaProgressFrozen()) return false;
+  applyCaptureResume("auto-play");
+  return true;
 }
 
 /**
@@ -2933,7 +3016,7 @@ function pushLogEntry(entry: AgentTestingLogEntry): void {
   if (logEntries.length > LOG_LIMIT) {
     logEntries = logEntries.slice(-LOG_LIMIT);
   }
-  if (visible.label !== "Session reset") {
+  if (!visible.label.startsWith("Session reset")) {
     logDirty = true;
     if (
       visible.kind === "click" ||
@@ -3568,8 +3651,9 @@ export type TouchAgentTestingOverlayOptions = {
 /**
  * Ensure the BR panel is visible while an agent drives the tab.
  * Safe to call on every helper / DevTools evaluate - does not bump nest.
- * Default handoff: if manual/observe open without oversee → wipe → agent.
- * `preserveLogger: true` → note activity only (REC / soft product helpers).
+ * **PO MANUAL stays MANUAL** — soft touch never wipes → AGENT TESTING.
+ * Observe: `preserveLogger: true` keeps OBSERVE; otherwise wipe → agent.
+ * Idle → `startAgentTestingOverlay` (agent).
  */
 export function touchAgentTestingOverlay(
   title?: string,
@@ -3581,7 +3665,18 @@ export function touchAgentTestingOverlay(
     abandonSettleForRearch();
   }
   const kind = getSessionKind();
-  if (active && (kind === "manual" || kind === "observe")) {
+  // PO owns MANUAL — never steal title to AGENT TESTING on soft touch/helpers.
+  if (active && kind === "manual") {
+    noteActivity();
+    if (!isAgentTestingOverlayDomVisible()) {
+      ensureAgentTestingOverlayDomArmed(
+        resolveAgentTestingOverlayTitle(title ?? titleForSessionKind("manual"))
+      );
+    }
+    syncSessionChrome();
+    return;
+  }
+  if (active && kind === "observe") {
     if (options?.preserveLogger) {
       noteActivity();
       if (!isAgentTestingOverlayDomVisible()) {
@@ -4005,10 +4100,17 @@ export function softCloseAgentTestingLogger(reason = "soft-close"): void {
 
 /**
  * Bug-icon toggle: open MANUAL TEST, or close+stop when manual popup open.
- * Observe: calm chip — does not toggle-close (use Close ×). Agent lock: no-op.
+ * Observe: calm chip — does not toggle-close (use Close ×).
+ * Agent lock: **PO reclaim** — wipe AGENT TESTING → open MANUAL TEST (human owns bug).
  */
 export function toggleAgentTestingLogger(): void {
   if (isAgentLocked() && (active || settling)) {
+    try {
+      forceClearAgentTestingOverlay();
+    } catch {
+      /* hang-safe */
+    }
+    openAgentTestingLogger({ kind: "manual" });
     return;
   }
   if (active && bugIconClosesSession()) {
@@ -4409,6 +4511,7 @@ export function installAgentTestingOverlayApi(): void {
     downloadDump: () => downloadCurrentAgentTestingLog(),
     isActive: isAgentTestingOverlayActive,
     shouldBlockPlay: () => shouldBlockPlayNow(qaListenDeps()),
+    autoResumeCaptureForPlay: () => autoResumeCaptureForPlay(),
     isCapturePaused: () => capturePaused,
     isDiagnosticBlocking: () => isDiagnosticOpenNow(qaListenDeps()),
   };
@@ -4523,16 +4626,34 @@ function restoreLoggerFromRing(events: QaDiagRingEvent[]): void {
   const restored: AgentTestingLogEntry[] = [];
   for (const e of events) {
     if (e.kind === "gate-open" || e.kind === "gate-close") continue;
+    // Skip legacy double-ring twin (mirror detail row + pushLogEntry label row).
+    const label = e.label || e.text || e.kind;
+    const prev = restored[restored.length - 1];
+    if (
+      prev &&
+      prev.label === label &&
+      prev.kind ===
+        (e.kind === "playback-diag" ? "playback-diag" : prev.kind) &&
+      e.kind === "playback-diag" &&
+      prev.kind === "playback-diag"
+    ) {
+      prev.count = (prev.count ?? 1) + 1;
+      prev.atMs = e.atMs;
+      prev.timeLabel = e.atIso
+        ? new Date(e.atIso).toLocaleTimeString("en-GB", { hour12: false })
+        : prev.timeLabel;
+      continue;
+    }
     restored.push({
       atMs: e.atMs,
       timeLabel: e.atIso
         ? new Date(e.atIso).toLocaleTimeString("en-GB", { hour12: false })
         : new Date().toLocaleTimeString("en-GB", { hour12: false }),
-      label: e.label || e.text || e.kind,
+      label,
       kind:
         e.kind === "user-message" || e.kind === "po-note"
           ? "user-message"
-            : e.kind === "click" ||
+          : e.kind === "click" ||
               e.kind === "nav" ||
               e.kind === "system" ||
               e.kind === "init" ||
@@ -4553,8 +4674,9 @@ function restoreLoggerFromRing(events: QaDiagRingEvent[]): void {
         )
           ? "fail"
           : e.kind === "playback-diag"
-            ? "soft-fail"
+            ? "ok"
             : "ok",
+      count: 1,
     });
   }
   logEntries = restored.slice(-LOG_LIMIT);

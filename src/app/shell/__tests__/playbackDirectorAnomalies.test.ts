@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { JourneyBeat } from "@/app/orchestra/types";
 import {
+  beatDirectorScriptLabel,
   beatExpectsViewportFollow,
   beatExpectsViewportFollowAfterScript,
   beatHasDirectorScript,
@@ -88,6 +89,22 @@ describe("journeyBeatDirector", () => {
   it("detects director scripts from beat metadata", () => {
     expect(beatHasDirectorScript(bookDateBeat)).toBe(true);
     expect(beatHasDirectorScript(bookLandingBeat)).toBe(false);
+  });
+
+  it("does not treat camera beats as director scripts (handoff watchdog)", () => {
+    const cameraBeat: JourneyBeat = {
+      id: "plp-book-now-camera",
+      label: "Camera — Book Now",
+      kind: "camera",
+      protoTab: 3,
+      camera: {
+        dwellMs: 2030,
+        selectorChain: ['[data-name="boots-pharmacy.service.tile"]'],
+      },
+    };
+    expect(beatHasDirectorScript(cameraBeat)).toBe(false);
+    expect(beatDirectorScriptLabel(cameraBeat)).toBeUndefined();
+    expect(isDwellLandingBeat(cameraBeat)).toBe(false);
   });
 
   it("expects viewport follow for chained scroll steps on the same tab", () => {

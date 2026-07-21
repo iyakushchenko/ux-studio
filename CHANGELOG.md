@@ -2,6 +2,9 @@
 
 > _Append a bullet on coherent commits via `npm run notes:append -- --lane="<lane>" --intent="<text>"`. Preview with `npm run notes:preview`. On `npm run release:patch` this section is promoted to `## v<X.Y.Z> - DDMMYY` and a fresh empty `## Current` is re-inserted. Policy: `docs/product/VERSIONING.md`._
 
+## v0.0.102 - 210726
+- **shell:** QA chat lean: no Camera:wait dwell; fix playback-diag ring twin (refresh ×2); lean login drain; Save Log qa-{kind} filename; Reset capture-off; HMR one listener
+
 ## v0.0.101 - 210726
 - **shell:** One prove entrypoint `__studioRunAgenticFullPlayProve` — forceClear + arm + full agentic Play + peak 21/21 + play-end assert + pauseForAgentLeave; keeps QA overlay for Save Log (not smoke teardown)
 - **shell:** Global post-click camera hold (~480ms) before SSoT scroll so clicks do not yank camera (CJM on/off).

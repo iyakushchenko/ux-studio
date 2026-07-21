@@ -405,10 +405,11 @@ const REACT_MOUNT_FILES = [
     if (!src) continue;
     const stamps =
       /dataset\.studioMakeRetired\s*=/.test(src) ||
-      /data-studio-make-retired/.test(src);
+      /data-studio-make-retired/.test(src) ||
+      /retireMakeUnderPage\s*\(/.test(src);
     if (!stamps) {
       fail(
-        `RATCHET make-retired: ${rel} must set data-studio-make-retired / dataset.studioMakeRetired when retiring Make chrome`
+        `RATCHET make-retired: ${rel} must retire Make via retireMakeUnderPage (or stamp data-studio-make-retired)`
       );
     }
   }

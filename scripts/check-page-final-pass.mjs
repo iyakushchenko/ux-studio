@@ -238,13 +238,14 @@ for (const screenId of required) {
     );
   }
 
-  // Make-retired on mount
+  // Make-retired on mount (shared helper detaches + stamps data-studio-make-retired)
   if (
     !/dataset\.studioMakeRetired\s*=/.test(mount) &&
-    !/data-studio-make-retired/.test(mount)
+    !/data-studio-make-retired/.test(mount) &&
+    !/retireMakeUnderPage\s*\(/.test(mount)
   ) {
     fail(
-      `${screenId}: mount ${mountRel} must set data-studio-make-retired / dataset.studioMakeRetired`
+      `${screenId}: mount ${mountRel} must call retireMakeUnderPage (or stamp data-studio-make-retired)`
     );
   }
 

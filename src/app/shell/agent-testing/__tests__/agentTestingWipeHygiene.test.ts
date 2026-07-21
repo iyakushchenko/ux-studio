@@ -22,6 +22,8 @@ import {
   openAgentTestingLogger,
   softCloseAgentTestingLogger,
   startAgentTestingOverlay,
+  toggleAgentTestingLogger,
+  touchAgentTestingOverlay,
   uninstallAgentTestingOverlayApi,
 } from "@/app/shell/agent-testing";
 import {
@@ -99,6 +101,36 @@ describe("agentTesting wipe hygiene (forceClear / softClose)", () => {
     expect(timeoutFn).not.toHaveBeenCalled();
     delete (window as Window & { __studioQaPendingTimeoutMs?: number })
       .__studioQaPendingTimeoutMs;
+  });
+
+  it("soft touch keeps MANUAL title (no wipe → AGENT TESTING)", () => {
+    openAgentTestingLogger({ kind: "manual" });
+    expect(getSessionKind()).toBe("manual");
+    touchAgentTestingOverlay();
+    expect(getSessionKind()).toBe("manual");
+    expect(isAgentTestingOverlayActive()).toBe(true);
+  });
+
+  it("bug toggle reclaims AGENT TESTING → MANUAL TEST", () => {
+    openAgentTestingLogger({ kind: "agent" });
+    expect(getSessionKind()).toBe("agent");
+    toggleAgentTestingLogger();
+    expect(getSessionKind()).toBe("manual");
+    expect(isAgentTestingOverlayActive()).toBe(true);
+  });
+
+  it("clearQaPlaybackBlocksForReset lifts FAIL freeze (Play not stuck on Ack)", async () => {
+    const { clearQaPlaybackBlocksForReset, beginQaFailHandoff } = await import(
+      "@/app/shell/agent-testing/agentTestingOverlay"
+    );
+    const { isQaProgressFrozen } = await import(
+      "@/app/shell/agent-testing/agentTestingProgressFreeze"
+    );
+    openAgentTestingLogger({ kind: "manual" });
+    beginQaFailHandoff("unit-stale-diag");
+    expect(isQaProgressFrozen()).toBe(true);
+    clearQaPlaybackBlocksForReset("qa-session-reset");
+    expect(isQaProgressFrozen()).toBe(false);
   });
 
   it("softClose on agent lock forceClears (no ghost CONTROL)", () => {

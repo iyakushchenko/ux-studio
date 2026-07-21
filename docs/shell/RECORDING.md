@@ -201,7 +201,7 @@ Leaving Rec while a capture is live **pauses** the session (does not stop/destro
 | ■ | Stop — CREATE NEW / live NEW recording only |
 | ✕ | Discard stopped session — CREATE NEW path only (not a saved CJM) |
 | ↓ | **Download JSON** — CREATE NEW: `.recording.json` (disabled while live). **Saved CJM: enabled** → `.journey.json` for the selected journey |
-| ↑ | Import — **CREATE NEW CJM idle only**; hidden for saved CJMs / while live |
+| ↑ | Import — **CREATE NEW CJM idle only**; `.recording.json` **or** `.journey.json` **with embedded `recording`** (saved CJM Download). Stages session → unlocks Download / Replay / **+**. Hidden for saved CJMs / while live |
 | ↺ | Replay — **CREATE NEW path only** (hidden for saved CJMs) |
 | + | **Add as CJM** — CREATE NEW path only; disabled while live |
 
@@ -342,7 +342,7 @@ Prefer `__studio*`; `__proto*` aliases remain. Export / replay / compile fall ba
 
 ### Compile → journeys (PO path) — **Add as CJM**
 
-1. Record (or ↑ import a `.recording.json`). Use **Download JSON** only for the recording file.
+1. Record (or ↑ import a `.recording.json` **or** a saved `.journey.json` that embeds `recording`). Use **Download JSON** on CREATE NEW for the raw recording file; saved-CJM Download is `.journey.json` (often with embedded REC). After Import, **+** unlocks so you can add the staged session to the project.
 2. Stop ■ then **+** → enter a **CJM title** in the Studio nav popup → **Add** (or `__studioSaveRecordingAsJourney(session, { label })`).
 3. Studio mints a free id (`rec-trad-…` / `rec-agentic-…`), uses the title as journey `label` + picker text, merges into `journeyRuntimeStore`, persists in **localStorage** for that project+persona, and selects it in the nav CJM picker. **Recorded CJM titles are product-facing** (e.g. `Sarah · PLP→Book · HH:MM`) — never agent-test codenames (`REC prove`, `QA REC`, …).
 4. Turn **CJM** on and play/step — best-effort beats from the recording.

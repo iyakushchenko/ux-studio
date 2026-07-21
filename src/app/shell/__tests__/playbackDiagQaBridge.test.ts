@@ -1,3 +1,6 @@
+/**
+ * @vitest-environment happy-dom
+ */
 import { describe, expect, it, beforeEach, afterEach } from "vitest";
 import {
   labelForPlaybackDiagEvent,
@@ -226,17 +229,30 @@ describe("playbackDiagQaBridge", () => {
     );
   });
 
-  it("clear appends playback-diag ring row as neutral ok", () => {
+  it("clear logs via overlay (no double-ring)", () => {
+    const steps: string[] = [];
+    (
+      window as Window & {
+        __studioAgentTestingOverlay?: {
+          logStep?: (input: { label?: string }) => void;
+        };
+      }
+    ).__studioAgentTestingOverlay = {
+      logStep: (input) => {
+        if (input.label) steps.push(input.label);
+      },
+    };
     mirrorPlaybackDiagClearToQa();
-    const ring = getQaDiagRing();
-    expect(
-      ring.some(
-        (e) => e.kind === "playback-diag" && /cleared/i.test(e.label || "")
-      )
-    ).toBe(true);
+    expect(steps.some((l) => /cleared/i.test(l))).toBe(true);
+    // Must not also append a twin ring row (pushLogEntry owns ring when live).
   });
 
-  it("mirrors lean camera trackers with human labels (not Chat on traditional)", () => {
+  it("suppresses routine Camera: wait dwell from chat (dump-only)", () => {
+    expect(
+      shouldMirrorPlaybackDiagToQa(
+        ev({ kind: "scroll", detail: "chat-camera:wait — kind:camera dwell" })
+      )
+    ).toBe(false);
     expect(
       shouldMirrorPlaybackDiagToQa(
         ev({ kind: "scroll", detail: "chat-camera:thinking" })

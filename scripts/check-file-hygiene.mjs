@@ -30,9 +30,9 @@ const ALLOWLIST = {
   "src/styles/globals-chrome.css": 2600,
   "src/styles/globals-hub.css": 1400,
   // Engine / hybrid monsters — prefer domain split over bumping.
-  "src/app/orchestra/useJourneyPlayback.ts": 2200, // + jump-to-start landBeat + force origin (play-end PDP desync)
-  "src/app/App.tsx": 2135, // + REC arm hooks (setRecMode/setOrchestraMode → ArmRecCapture / RecNewCjmProve)
-  "src/app/shell/agent-testing/agentTestingOverlay.ts": 4650, // + REC orange frame + ABRUPT-PARK restore fail + __frame ensure
+  "src/app/orchestra/useJourneyPlayback.ts": 2230, // + director handoff + recordedClick note start
+  "src/app/App.tsx": 2140, // + Session reset capture-on + jump-to-start clear QA blocks
+  "src/app/shell/agent-testing/agentTestingOverlay.ts": 4800, // + Reset capture-off + ring restore coalesce + Save Log silent pause
   "src/app/nav/studioNavPanel.css": 1700, // + MCP status hint near version/bug
   "src/app/shell/studioMcpHelpers.ts": 1380, // + Traditional keep-overlay full Play prove window API
   "src/app/scenario/demoCursor.ts": 1980, // + degrade-container FAIL + early overlay guard

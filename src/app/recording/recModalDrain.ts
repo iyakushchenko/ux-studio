@@ -142,7 +142,6 @@ async function pickLoginSignIn(): Promise<{
     detail: "Sign in",
     source: "drain",
   });
-  logQaModal("RecModalPick", "login · Sign in");
   await recUserPace("beforeCta");
   const ok = await simulateDemoPointerClick(signIn, { scroll: true });
   await recUserPace("modalPickSettle");
@@ -186,11 +185,7 @@ export async function drainLoginModalIfOpen(): Promise<RecModalDrainResult> {
     modalId: STUDIO_MODAL.login,
     source: "drain",
   });
-  logQaModal(
-    "RecModalOpen",
-    "login modal open — Sign in before next recorded click / beat"
-  );
-  // URL/registry attr preferred; legacy `.proto-login-card` also counts.
+  // Lean: Modal open/close/pick rows only — no twin “login modal open — …” chatter.
   const ready =
     (await waitForModal(STUDIO_MODAL.login)) || isLoginModalOpenInDom();
   if (!ready) {
@@ -212,7 +207,6 @@ export async function drainLoginModalIfOpen(): Promise<RecModalDrainResult> {
     };
   }
   trackStudioModalForQa({ modalId: null, source: "drain" });
-  logQaModal("RecModalPick", "login drained · signed in");
   return { ok: true, modalId: STUDIO_MODAL.login, drained: true };
 }
 
@@ -242,14 +236,15 @@ export async function drainBlockingModalIfOpen(): Promise<RecModalDrainResult> {
     modalId,
     source: "drain",
   });
-  logQaModal(
-    "RecModalOpen",
-    `URL/DOM modal=${modalId} — must handle before next beat`
-  );
 
   if (modalId === STUDIO_MODAL.login || modalId === "account") {
     return drainLoginModalIfOpen();
   }
+
+  logQaModal(
+    "RecModalOpen",
+    `URL/DOM modal=${modalId} — must handle before next beat`
+  );
 
   if (modalId === CHOOSE_PHARMACY || modalId === "avail") {
     const ready = await waitForModal(CHOOSE_PHARMACY);

@@ -4,6 +4,7 @@ import { flashControlRoomButton } from "@/app/nav/controlRoomTap";
 import { StudioPlaybackRecSwitch } from "@/app/nav/StudioPlaybackRecSwitch";
 import { studioPanelTransition } from "@/app/nav/studioMotion";
 import { saveRecordingAsJourney } from "@/app/recording/recordingCompile";
+import { resolveRecordingSessionFromImportJson } from "@/app/recording/recordingImport";
 import {
   clearStagedRecordingSession,
   countRecordingSteps,
@@ -19,7 +20,6 @@ import {
   stopRecording,
   subscribeRecordingSession,
   type StartRecordingOptions,
-  deserializeRecordingSession,
 } from "@/app/recording/recordingSession";
 import type { RecordingSession } from "@/app/recording/recordingTypes";
 import { logControlPanel } from "@/app/shell/controlPanelLog";
@@ -376,6 +376,10 @@ export function StudioNavRecordingControls({
   const [statusNote, setStatusNote] = useState<string | null>(null);
   const [addCjmOpen, setAddCjmOpen] = useState(false);
   const [cjmTitle, setCjmTitle] = useState("");
+  /** Prefill + title after Import from `.journey.json` (embedded recording). */
+  const [importedLabelHint, setImportedLabelHint] = useState<string | null>(
+    null
+  );
   /** Start / Pause / Stop / Purge / + — CREATE NEW path only (live REC also forces CREATE NEW). */
   const showNewRecordingDeck = createNewCjmSelected || ui.hasLive;
   const downloadDisabled = createNewCjmSelected
@@ -458,6 +462,7 @@ export function StudioNavRecordingControls({
     if (!ui.canPurge || replaying) return;
     const cleared = clearStagedRecordingSession();
     setAddCjmOpen(false);
+    setImportedLabelHint(null);
     setStatusNote(cleared ? "PURGE" : null);
   };
 
@@ -504,9 +509,11 @@ export function StudioNavRecordingControls({
     if (!file) return;
     try {
       const text = await file.text();
-      const imported = deserializeRecordingSession(text);
-      stageRecordingSession(imported);
-      setStatusNote(`IMP · ${imported.events.length}`);
+      const resolved = resolveRecordingSessionFromImportJson(text);
+      stageRecordingSession(resolved.session);
+      setImportedLabelHint(resolved.suggestedLabel?.trim() || null);
+      // Unlock Download / Replay / + (canExport) for Add as CJM.
+      setStatusNote(`IMP · ${resolved.session.events.length}`);
     } catch (error) {
       console.warn("[ProtoRecording] import failed", error);
       setStatusNote("IMP FAIL");
@@ -542,7 +549,7 @@ export function StudioNavRecordingControls({
     flashTap(event.currentTarget);
     if (!session || replaying) return;
     const stamp = new Date().toISOString().slice(0, 16).replace("T", " ");
-    setCjmTitle(`Recorded ${stamp}`);
+    setCjmTitle(importedLabelHint?.trim() || `Recorded ${stamp}`);
     setAddCjmOpen(true);
   };
 
@@ -666,8 +673,8 @@ export function StudioNavRecordingControls({
         <button
           type="button"
           className="studio-nav-step-btn studio-nav-scenario__btn"
-          aria-label="Import recording JSON"
-          title="Import .recording.json into a new CJM path"
+          aria-label="Import recording or journey JSON"
+          title="Import .recording.json or .journey.json (with recording) — unlocks +"
           disabled={replaying}
           onClick={handleImportClick}
           data-studio-recording-import=""
@@ -701,12 +708,15 @@ export function StudioNavRecordingControls({
             title={
               ui.hasLive
                 ? "Stop recording before adding as CJM"
-                : "Add recording as a new CJM (title, then confirm)"
+                : ui.canExport
+                  ? "Add recording as a new CJM (title, then confirm)"
+                  : "Import or stop a recording first — then add as CJM"
             }
             aria-expanded={addCjmOpen}
             aria-haspopup="dialog"
             disabled={ui.hasLive || !ui.canExport || replaying}
             onClick={openAddCjmTitle}
+            data-studio-recording-add-cjm-btn=""
           >
             <AddCjmPlusIcon />
           </button>
@@ -760,7 +770,7 @@ export function StudioNavRecordingControls({
       <input
         ref={fileInputRef}
         type="file"
-        accept=".json,.recording.json,application/json"
+        accept=".json,.recording.json,.journey.json,application/json"
         className="studio-nav-recording__file"
         onChange={handleImportFile}
       />

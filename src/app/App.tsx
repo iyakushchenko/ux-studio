@@ -77,6 +77,7 @@ import {
 } from "@/app/shell/playbackStudioSnapshot";
 import { notePlaybackTransport } from "@/app/shell/playbackInteractionContext";
 import { refusePlayIfQaBlocks } from "@/app/shell/agent-testing/agentTestingListen";
+import { clearQaPlaybackBlocksForReset } from "@/app/shell/agent-testing";
 import { playbackDiagHubNav } from "@/app/shell/playbackDiag";
 import {
   disableCursorQaEyes,
@@ -2039,6 +2040,9 @@ export default function App() {
               canPlay={transport.canPlay}
               canJumpToEnd={transport.canJumpToEnd}
               onJumpToStart={() => {
+                // Jump-to-start = fresh cassette — clear stale FAIL modal / freeze
+                // so Play is not stuck on "Ack/consume first".
+                clearQaPlaybackBlocksForReset("qa-journey-reset");
                 notePlaybackTransport("jump-to-start");
                 playbackCursorMonitor.noteManualTransport("jump-to-start");
                 playbackViewportMonitor.noteManualTransport("jump-to-start");

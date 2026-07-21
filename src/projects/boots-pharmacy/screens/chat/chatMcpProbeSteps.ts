@@ -3,6 +3,7 @@
  * Expanded Final Pass matrix (layout / helpful / footer / CTA sweep).
  */
 
+import { isMakeParkedForScreen } from "../retireMakeUnderPage";
 import { assertChatComposerScrollPad } from "./chatComposerScrollPadProbe";
 
 export type ChatMcpProbeStep = {
@@ -55,10 +56,8 @@ export function chatMcpProbeSteps(): ChatMcpProbeStep[] {
       selector: hostSel,
       action: "assert",
       assert: () => {
-        if (
-          document.querySelector('[data-studio-make-retired="chat"]') == null
-        ) {
-          return "Make leak: expected data-studio-make-retired=chat on retired children";
+        if (!isMakeParkedForScreen("chat")) {
+          return "Make leak: expected Make Frame children parked for chat";
         }
         const liveSummaries = Array.from(
           document.querySelectorAll(

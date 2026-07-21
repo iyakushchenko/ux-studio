@@ -36,10 +36,13 @@ export function beatHasCameraStep(beat: JourneyBeat | undefined): boolean {
   return beat.kind === "camera" || Boolean(beat.camera);
 }
 
-/** Beat runs a cursor-guided playback script (not a dwell / screen-frames beat). */
+/**
+ * Beat runs a cursor-guided playback script (not dwell / screen-frames / camera).
+ * Camera is its own engine (`beatHasCameraStep`) — never a director handoff script.
+ */
 export function beatHasDirectorScript(beat: JourneyBeat | undefined): boolean {
   if (!beat) return false;
-  if (beatHasCameraStep(beat)) return true;
+  if (beatHasCameraStep(beat)) return false;
   return Boolean(
     beat.bookScript ??
       beat.tabScript ??
@@ -67,17 +70,27 @@ export function beatsShareProtoTab(
   );
 }
 
+/** Display / scroll-guard label for a camera beat (not a director script id). */
+export function beatCameraLabel(
+  beat: JourneyBeat | undefined
+): string | undefined {
+  if (!beatHasCameraStep(beat)) return undefined;
+  return (
+    beat!.camera?.selectorChain?.[0] ||
+    beat!.camera?.anchorSelector ||
+    "camera"
+  );
+}
+
+/**
+ * Director script id/label for handoff + outcome monitors.
+ * Camera-only beats return undefined (use `beatCameraLabel`).
+ */
 export function beatDirectorScriptLabel(
   beat: JourneyBeat | undefined
 ): string | undefined {
   if (!beat) return undefined;
-  if (beatHasCameraStep(beat)) {
-    return (
-      beat.camera?.selectorChain?.[0] ||
-      beat.camera?.anchorSelector ||
-      "camera"
-    );
-  }
+  if (beatHasCameraStep(beat)) return undefined;
   if (beat.recordedClick?.selectorChain?.length) {
     return (
       beat.recordedClick.element?.trim() ||

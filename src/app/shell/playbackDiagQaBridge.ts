@@ -200,8 +200,19 @@ export function shouldMirrorPlaybackDiagToQa(event: PlaybackDiagEvent): boolean 
     // Intentional host-top — dump-only (never soft-fail “wrong way”).
     if (isIntentionalScrollOrigin(detail)) return false;
     if (isScrollReversal(event)) return true;
-    // Lean camera trackers (deduped at emit) — not TRACE flood.
-    if (/^chat-camera:/i.test(detail)) return true;
+    // Routine camera dwell — dump-only (PO: chat spam before every click).
+    if (
+      /^chat-camera:wait\b/i.test(detail) &&
+      /kind:camera dwell|camera dwell/i.test(detail)
+    ) {
+      return false;
+    }
+    if (/^chat-camera:wait\b/i.test(detail)) return false;
+    // Lean camera trackers — thinking / target / skip signals only.
+    if (/^chat-camera:(thinking|pin-bottom|host-end|target|skip-)/i.test(detail)) {
+      return true;
+    }
+    if (/^chat-camera:/i.test(detail)) return false;
     if (
       /SCROLL_ISSUE|reversal|stutter|unexpected|JUMP|competing|interrupted|script-timeout/i.test(
         detail
@@ -615,18 +626,8 @@ export function mirrorPlaybackDiagToQa(event: PlaybackDiagEvent): void {
     lastMirroredSoftFailAt = now;
   }
 
-  try {
-    appendQaDiagRing({
-      kind: "playback-diag",
-      label,
-      text: event.detail ?? event.kind,
-      beatId: event.beatId,
-      screenId: event.screenAfter ?? event.screenBefore,
-      detail: event.kind,
-    });
-  } catch {
-    /* hang-safe */
-  }
+  // HARD: do NOT appendQaDiagRing here — logStep → pushLogEntry already rings.
+  // Double-ring was the restore/refresh duplicate source (detail row + label row).
   try {
     overlayApi()?.logStep?.({
       kind: "playback-diag",
@@ -643,11 +644,7 @@ export function mirrorPlaybackDiagClearToQa(): void {
   if (!isQaDiagGateOpen()) return;
   if (isAgentTestingFinaleSealed()) return;
   const label = "Playback diagnostics cleared";
-  try {
-    appendQaDiagRing({ kind: "playback-diag", label, text: "clear" });
-  } catch {
-    /* hang-safe */
-  }
+  // logStep → pushLogEntry rings once (no double appendQaDiagRing).
   try {
     overlayApi()?.logStep?.({
       kind: "playback-diag",
