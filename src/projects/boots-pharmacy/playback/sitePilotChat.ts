@@ -4,6 +4,7 @@ import {
   holdDemoCursorAtLastClick,
   isDemoCursorHeldAtLastClick,
   removeDemoCursor as removeSharedDemoCursor,
+  settleDemoCursorAfterInteraction,
   simulateDemoPointerClick,
 } from "@/app/scenario/demoCursor";
 import {
@@ -213,7 +214,7 @@ async function simulateSarahCtaClick(button: HTMLElement): Promise<void> {
     detail: ok ? "agentic CTA click ok" : "agentic CTA click FAIL",
   });
   if (ok) {
-    holdDemoCursorAtLastClick();
+    await settleDemoCursorAfterInteraction(button);
     await delay(CTA_PRESS_MS);
   }
 }
@@ -239,7 +240,8 @@ async function simulateSarahSendClick(sendBtn: HTMLElement): Promise<void> {
     detail: ok ? "composer send click ok" : "composer send click FAIL",
   });
   if (ok) {
-    holdDemoCursorAtLastClick();
+    // Composer submit — always park away (never rest on send), even continuous Play.
+    await settleDemoCursorAfterInteraction(sendBtn);
     await delay(SEND_PAUSE_MS);
   }
 }
@@ -454,7 +456,10 @@ export async function runSitePilotChatBeforeReveal(
   } else {
     await simulateSarahTypingInComposer(text);
   }
-  holdDemoCursorAtLastClick();
+  // Type-in/send or CTA already settled; keep stay-on-play hold if still holding.
+  if (!isDemoCursorHeldAtLastClick()) {
+    holdDemoCursorAtLastClick();
+  }
   // PO: Sarah send never shows thinking — clear any send-thinking the
   // composer click may have latched (React/wire). Agent thinking starts
   // only on the next beforeReveal for a reply frame.

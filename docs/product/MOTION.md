@@ -46,11 +46,12 @@ Never `from "framer-motion"` / `from "motion"` in new code. Shared timings: Acco
 
 ## Robo-cursor travel (shell)
 
-- **SSoT policy:** `demoCursorEngine.ts` — park = travel-to-rest; snap only via `force` / first-mount. See [PLAYBACK.md](../shell/PLAYBACK.md) § Cursor engine SSoT.
+- **SSoT policy:** `demoCursorEngine.ts` — park = travel-to-rest; snap only via `force` / first-mount; **step parks / Play stays** (+ forbidden submit rest). See [PLAYBACK.md](../shell/PLAYBACK.md) § Cursor engine SSoT.
 - **API:** `animate` from `@/uxds/motion` — progress `0 → 1`, `ease: "easeInOut"` (cubic ease-in / ease-out).
 - **Path:** straight-line lerp to target. **No** spring, back-ease, overshoot, arc jitter, or end-frame noise.
-- **Park:** `parkDemoCursorAtRest()` travels to rest (`CURSOR_ENGINE_PARK_TRAVEL_MS` ≈ 520). Legacy `animate: false` without `force` → coerced travel + ABRUPT-PARK QA.
-- **On-target:** settle → lock left/top → press 64ms → release → default arrow. No mid-travel hover, no post-settle re-aim, no tap scale bounce. Path samples via `__studioCursorDiagnostics()` / prove `path`.
+- **Park:** `parkDemoCursorAtRest()` travels to rest (`CURSOR_ENGINE_PARK_TRAVEL_MS` ≈ 520). Legacy `animate: false` without `force` → coerced travel + ABRUPT-PARK QA. Post-click: `settleDemoCursorAfterInteraction` (step / Play / submit).
+- **Early hand:** hand graphic when tip crosses interactive edge during travel (not center wait).
+- **On-target:** settle → lock left/top → press 64ms → release → default arrow. Path samples via `__studioCursorDiagnostics()` / prove `path`.
 - **Cancel:** `cancelDemoCursorTravel()` → `controls.stop()` + generation bump on `forceClear` / `removeDemoCursor` (Chrome hang guard — keep with hover-bridge caps). Travel `await` settles on onComplete / abort / ceiling — never `stop()` alone.
 - **Customizations:** PO will instruct later — keep the wrapper thin; do not invent “more human agility” bounce.
 

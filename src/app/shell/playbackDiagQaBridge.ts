@@ -151,10 +151,15 @@ export function shouldMirrorPlaybackDiagToQa(event: PlaybackDiagEvent): boolean 
     if (/HIDDEN|cursor-hidden|FAIL|OFF-TARGET|click suppressed/i.test(detail)) {
       return true;
     }
-    // Lean engine milestones (deduped at emit) — park-rest / type-in-hold / cancel
-    if (/^cursor-engine:(park-rest|park-force|type-in-hold|cancel-settle)\b/i.test(detail)) {
+    // Lean engine milestones (deduped at emit) — park / step-play / submit
+    if (
+      /^cursor-engine:(park-rest|park-force|type-in-hold|cancel-settle|park-on-step|stay-on-play|park-from-submit)\b/i.test(
+        detail
+      )
+    ) {
       return true;
     }
+    if (/REST-ON-SUBMIT|cursor-engine:rest-on-submit/i.test(detail)) return true;
     return false;
   }
 
@@ -251,7 +256,11 @@ export function outcomeForPlaybackDiagEvent(
     return "ok";
   }
   if (event.kind === "cursor") {
-    if (/ABRUPT-PARK|cursor-engine:abrupt-park|HIDDEN|cursor-hidden/i.test(detailOf(event))) {
+    if (
+      /ABRUPT-PARK|cursor-engine:abrupt-park|REST-ON-SUBMIT|cursor-engine:rest-on-submit|HIDDEN|cursor-hidden/i.test(
+        detailOf(event)
+      )
+    ) {
       return "fail";
     }
     // Cleared / parked / abort / engine milestones = info
@@ -294,8 +303,20 @@ export function labelForPlaybackDiagEvent(event: PlaybackDiagEvent): string {
     if (/ABRUPT-PARK|cursor-engine:abrupt-park/i.test(detail)) {
       return "Cursor teleported to park — FAIL";
     }
+    if (/REST-ON-SUBMIT|cursor-engine:rest-on-submit/i.test(detail)) {
+      return "Cursor left on submit — FAIL";
+    }
     if (/type-in-park|type-in park|cursor-engine:type-in-hold/i.test(detail)) {
       return "Cursor parked for typing";
+    }
+    if (/cursor-engine:park-from-submit/i.test(detail)) {
+      return "Cursor parked away from submit";
+    }
+    if (/cursor-engine:park-on-step/i.test(detail)) {
+      return "Cursor parked after step";
+    }
+    if (/cursor-engine:stay-on-play/i.test(detail)) {
+      return "Cursor stayed at last click (Play)";
     }
     if (/cursor-engine:park-rest/i.test(detail)) {
       return "Cursor eased to rest";

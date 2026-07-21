@@ -725,6 +725,8 @@ export default function App() {
   studioJourneyModeRef.current = studioJourneyMode;
 
   useEffect(() => {
+    // Step parks after interaction; continuous Play stays at last click
+    // (composer submit still parks via settleDemoCursorAfterInteraction).
     setDemoCursorJourneyMode(studioJourneyMode, {
       parkAfterInteraction: studioJourneyMode && !transport.isPlaying,
     });

@@ -83,9 +83,11 @@ Smell this kills: Traditional Reserve→history→details `scroll-reversal` soft
 | `parkDemoCursorAtRest({ reason? })` | **Primary** — travel-to-rest (Motion easeInOut). CJM idle, retreat, jump-to-start, post-script park |
 | `parkDemoCursorAtRest({ force: true, reason })` | Intentional hard snap — first remount / revive / resize / observe teardown |
 | `parkDemoCursorForTypeIn(target)` | Hold journey park pose during type-in (force seed only if pose missing) |
+| `settleDemoCursorAfterInteraction(target?)` | **Post-click settle** — step park / Play stay / always park from submit |
 | `cancelDemoCursorTravel()` | Abort mid-travel — settles via onComplete/abort poll (never `await stop()` alone) |
-| `resolveCursorParkDecision(...)` | Pure policy (tests / callers) |
-| `logCursorEngineTracker(tag)` | Lean QA rows: `park-rest` / `park-force` / `abrupt-park` / `type-in-hold` / `cancel-settle` |
+| `resolveCursorParkDecision(...)` | Pure travel-to-rest policy (tests / callers) |
+| `resolvePostInteractionPark(...)` | Pure step vs Play + forbidden-submit policy |
+| `logCursorEngineTracker(tag)` | Lean QA rows (see recipe) |
 
 ### Cursor engine rails
 
@@ -95,6 +97,11 @@ Smell this kills: Traditional Reserve→history→details `scroll-reversal` soft
 4. **Cancel mid-travel** settles cleanly (generation bump + `.stop()` + promise settle — hang lesson).
 5. **Type-in** — CJM cursor stays visible at journey park (`type-in-hold`); hidden → `CURSOR_HIDDEN_DURING_TYPEIN`.
 6. **Dual-cursor** — manual/observe = OS only; robo returns for CONTROL / CJM Play.
+7. **Park ONLY on stepped playback** — manual Step forward/back / stepped call → `park-on-step`. Continuous Play → **stay at last interaction** (`stay-on-play`) — do **not** ease-to-rest after each click.
+8. **Never rest on composer submit** — send/submit is a registered forbidden rest target → always `park-from-submit` (even during continuous Play). Left on submit → **`REST-ON-SUBMIT FAIL`**.
+9. **Early hand-on-edge** — hand graphic as soon as tip crosses interactive edge (button/link/input/CTA) during travel — not center-gated.
+
+Transport pin: `setDemoCursorJourneyMode(…, { parkAfterInteraction: cjm && !isPlaying })` (App shell). Directors prefer `settleDemoCursorAfterInteraction(target)` over raw hold/park.
 
 **Ban:** new journey/director paths that `seedDemoCursorPosition` / snap left/top to rest without going through `parkDemoCursorAtRest` / engine policy.
 

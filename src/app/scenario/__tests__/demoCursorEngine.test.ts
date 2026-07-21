@@ -5,9 +5,13 @@ import {
   parkDemoCursorAtRest,
   removeDemoCursor,
   setDemoCursorJourneyMode,
+  settleDemoCursorAfterInteraction,
 } from "@/app/scenario/demoCursor";
 import {
+  isForbiddenRestTarget,
   resolveCursorParkDecision,
+  resolveEarlyHandAtHotspot,
+  resolvePostInteractionPark,
   resetCursorEngineTrackerForTests,
 } from "@/app/scenario/demoCursorEngine";
 import { playbackDiagClear, getPlaybackDiagBundle } from "@/app/shell/playbackDiag";
@@ -90,5 +94,151 @@ describe("demoCursorEngine park policy", () => {
     expect(shouldMirrorPlaybackDiagToQa(abrupt[0]!)).toBe(true);
     expect(labelForPlaybackDiagEvent(abrupt[0]!)).toMatch(/teleported/i);
     expect(outcomeForPlaybackDiagEvent(abrupt[0]!)).toBe("fail");
+  });
+});
+
+describe("demoCursorEngine step vs play + forbidden submit", () => {
+  afterEach(() => {
+    cancelDemoCursorTravel();
+    setDemoCursorJourneyMode(false);
+    removeDemoCursor({ immediate: true });
+    resetCursorEngineTrackerForTests();
+    playbackDiagClear();
+    document.body.innerHTML = "";
+    vi.restoreAllMocks();
+  });
+
+  it("parks on stepped playback", () => {
+    const d = resolvePostInteractionPark({
+      transportMode: "step",
+      target: document.createElement("button"),
+    });
+    expect(d).toEqual({
+      park: true,
+      reason: "park-on-step",
+      forbiddenRest: false,
+    });
+  });
+
+  it("stays on continuous Play for normal targets", () => {
+    const d = resolvePostInteractionPark({
+      transportMode: "play",
+      target: document.createElement("button"),
+    });
+    expect(d).toEqual({
+      park: false,
+      reason: "stay-on-play",
+      forbiddenRest: false,
+    });
+  });
+
+  it("always parks from composer submit even during Play", () => {
+    const send = document.createElement("button");
+    send.setAttribute("data-studio-action", "agentic-chat-send");
+    send.className = "proto-agentic-send";
+    expect(isForbiddenRestTarget(send)).toBe(true);
+    const d = resolvePostInteractionPark({
+      transportMode: "play",
+      target: send,
+    });
+    expect(d).toEqual({
+      park: true,
+      reason: "park-from-submit",
+      forbiddenRest: true,
+    });
+  });
+
+  it("settleDemoCursorAfterInteraction parks from submit during Play", async () => {
+    vi.spyOn(console, "info").mockImplementation(() => {});
+    setDemoCursorJourneyMode(true, { parkAfterInteraction: false });
+    await new Promise((r) => setTimeout(r, 0));
+    const cursor = document.querySelector<HTMLElement>(".proto-chat-demo-cursor");
+    expect(cursor).not.toBeNull();
+    cursor!.classList.remove("proto-chat-demo-cursor--parked");
+    cursor!.style.left = "40px";
+    cursor!.style.top = "40px";
+
+    const send = document.createElement("button");
+    send.setAttribute("data-studio-action", "agentic-home-send");
+    send.className = "proto-agentic-send";
+    document.body.appendChild(send);
+    Object.defineProperty(send, "getBoundingClientRect", {
+      value: () => ({
+        left: 200,
+        top: 200,
+        right: 240,
+        bottom: 240,
+        width: 40,
+        height: 40,
+        x: 200,
+        y: 200,
+        toJSON() {},
+      }),
+    });
+
+    const decision = await settleDemoCursorAfterInteraction(send);
+    expect(decision.reason).toBe("park-from-submit");
+    expect(decision.park).toBe(true);
+
+    const events = getPlaybackDiagBundle().events;
+    const parkFromSubmit = events.filter((e) =>
+      /cursor-engine:park-from-submit/i.test(String(e.detail ?? ""))
+    );
+    expect(parkFromSubmit.length).toBeGreaterThan(0);
+    expect(shouldMirrorPlaybackDiagToQa(parkFromSubmit[0]!)).toBe(true);
+    expect(labelForPlaybackDiagEvent(parkFromSubmit[0]!)).toMatch(/submit/i);
+  });
+
+  it("settleDemoCursorAfterInteraction stays on Play for CTA", async () => {
+    vi.spyOn(console, "info").mockImplementation(() => {});
+    setDemoCursorJourneyMode(true, { parkAfterInteraction: false });
+    await new Promise((r) => setTimeout(r, 0));
+    const cursor = document.querySelector<HTMLElement>(".proto-chat-demo-cursor");
+    cursor!.classList.remove("proto-chat-demo-cursor--parked");
+    cursor!.style.left = "80px";
+    cursor!.style.top = "90px";
+
+    const cta = document.createElement("button");
+    cta.textContent = "Check availability";
+    document.body.appendChild(cta);
+
+    const decision = await settleDemoCursorAfterInteraction(cta);
+    expect(decision.reason).toBe("stay-on-play");
+    expect(decision.park).toBe(false);
+    expect(cursor!.classList.contains("proto-chat-demo-cursor--parked")).toBe(
+      false
+    );
+
+    const events = getPlaybackDiagBundle().events;
+    const stay = events.filter((e) =>
+      /cursor-engine:stay-on-play/i.test(String(e.detail ?? ""))
+    );
+    expect(stay.length).toBeGreaterThan(0);
+  });
+
+  it("early hand flips at interactive edge (not center-gated)", () => {
+    const btn = document.createElement("button");
+    document.body.appendChild(btn);
+    Object.defineProperty(btn, "getBoundingClientRect", {
+      value: () => ({
+        left: 100,
+        top: 100,
+        right: 200,
+        bottom: 140,
+        width: 100,
+        height: 40,
+        x: 100,
+        y: 100,
+        toJSON() {},
+      }),
+    });
+    // Tip just inside left edge — should hand.
+    expect(
+      resolveEarlyHandAtHotspot(102, 120, { destination: btn })
+    ).toBe(true);
+    // Tip clearly outside — no hand from destination.
+    expect(
+      resolveEarlyHandAtHotspot(10, 10, { destination: btn })
+    ).toBe(false);
   });
 });

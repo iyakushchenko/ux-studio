@@ -1,6 +1,7 @@
 import {
   delay,
   removeDemoCursor,
+  settleDemoCursorAfterInteraction,
   simulateDemoPointerClick,
 } from "@/app/scenario/demoCursor";
 import type { HomeScriptId } from "@/app/orchestra/types";
@@ -188,6 +189,10 @@ async function simulateSarahHomeTyping(text: string): Promise<boolean> {
   }
 
   const clicked = await simulateDemoPointerClick(sendBtn, { shouldAbort });
+  if (clicked) {
+    // Home composer submit — never leave cursor on send.
+    await settleDemoCursorAfterInteraction(sendBtn);
+  }
   playbackDiagTypeInEnd(clicked, clicked ? "typed + send" : "send click failed");
   return clicked;
 }

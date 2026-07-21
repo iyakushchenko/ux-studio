@@ -114,7 +114,7 @@ After fix: full Play **PASS 22/22**. Do not invent green past real timeouts.
 | Play finished / journey reset / hub-nav | Helper peek / is-open polls |
 | PO Alarm / diagnostic FAIL | (same — always mirror) |
 
-**Label examples:** `remove` → “Cursor cleared”; `type-in-park` → “Cursor parked for typing”; `ABRUPT-PARK` → “Cursor teleported to park — FAIL”; `cursor-engine:park-rest` → “Cursor eased to rest”; scroll-reversal → “Scroll jumped the wrong way”; bubble-chop → “Chat bubble motion cut short”. Machine `kind` stays on ring `detail` / data attrs.
+**Label examples:** `remove` → “Cursor cleared”; `type-in-park` → “Cursor parked for typing”; `ABRUPT-PARK` → “Cursor teleported to park — FAIL”; `REST-ON-SUBMIT` → “Cursor left on submit — FAIL”; `cursor-engine:park-rest` → “Cursor eased to rest”; `cursor-engine:stay-on-play` → “Cursor stayed at last click (Play)”; scroll-reversal → “Scroll jumped the wrong way”; bubble-chop → “Chat bubble motion cut short”. Machine `kind` stays on ring `detail` / data attrs.
 
 ### Cursor engine QA trackers (lean)
 
@@ -126,9 +126,13 @@ Mirrored into QA chat (deduped ~480ms — not park-spam flood):
 | `cursor-engine:park-force` | Cursor parked (force) |
 | `cursor-engine:type-in-hold` | Cursor parked for typing |
 | `cursor-engine:cancel-settle` | Cursor travel cancelled — settled |
+| `cursor-engine:park-on-step` | Cursor parked after step |
+| `cursor-engine:stay-on-play` | Cursor stayed at last click (Play) |
+| `cursor-engine:park-from-submit` | Cursor parked away from submit |
 | `ABRUPT-PARK` / `cursor-engine:abrupt-park` | Cursor teleported to park — FAIL |
+| `REST-ON-SUBMIT` / `cursor-engine:rest-on-submit` | Cursor left on submit — FAIL |
 
-Emit: `logCursorEngineTracker` in `demoCursorEngine.ts`. Mirror: `playbackDiagQaBridge`. Policy: [PLAYBACK.md](./PLAYBACK.md) § Cursor engine SSoT.
+Emit: `logCursorEngineTracker` in `demoCursorEngine.ts`. Mirror: `playbackDiagQaBridge`. Policy: [PLAYBACK.md](./PLAYBACK.md) § Cursor engine SSoT — **step parks / Play stays / never rest on submit**.
 
 ### Dump fingerprint (PO 2026-07-20T21:26:23Z manual)
 

@@ -42,18 +42,32 @@ import {
 } from "@/uxds/motion";
 import {
   CURSOR_ENGINE_PARK_TRAVEL_MS,
+  isForbiddenRestTarget,
   logCursorEngineTracker,
   resolveCursorParkDecision,
+  resolveEarlyHandAtHotspot,
+  resolvePostInteractionPark,
+  type CursorTransportMode,
+  type PostInteractionParkDecision,
 } from "@/app/scenario/demoCursorEngine";
 
 export { isDemoCursorHotspotOnTarget } from "@/app/scenario/demoCursorOnTarget";
 export {
   CURSOR_ENGINE_PARK_TRAVEL_MS,
   CURSOR_ENGINE_TRAVEL_MS,
+  FORBIDDEN_REST_TARGET_SELECTORS,
+  isForbiddenRestTarget,
+  isEarlyHandInteractiveTarget,
+  isHotspotOverInteractiveEdge,
   logCursorEngineTracker,
   resolveCursorParkDecision,
+  resolveEarlyHandAtHotspot,
+  resolvePostInteractionPark,
   type CursorParkDecision,
+  type CursorTransportMode,
+  type PostInteractionParkDecision,
   type ResolveCursorParkOptions,
+  type ResolvePostInteractionParkOptions,
 } from "@/app/scenario/demoCursorEngine";
 
 const CURSOR_ARROW_SVG = `<img class="proto-chat-demo-cursor__graphic proto-chat-demo-cursor__graphic--arrow" src="${defaultCursorUrl}" width="22" height="26" alt="" aria-hidden="true" draggable="false" />`;
@@ -145,6 +159,92 @@ export function isDemoCursorJourneyModePinned(): boolean {
 
 export function shouldParkDemoCursorAfterInteraction(): boolean {
   return journeyModePinned && parkAfterInteraction;
+}
+
+/** Step vs continuous Play — derived from `parkAfterInteraction` pin. */
+export function resolveDemoCursorTransportMode(): CursorTransportMode {
+  return parkAfterInteraction ? "step" : "play";
+}
+
+/** Pure settle policy for the current transport + optional last target. */
+export function resolveDemoCursorPostInteractionPark(
+  target?: Element | null
+): PostInteractionParkDecision {
+  return resolvePostInteractionPark({
+    transportMode: resolveDemoCursorTransportMode(),
+    target: target ?? null,
+  });
+}
+
+/**
+ * After a scripted click / interaction:
+ * - **step** → park to rest (`park-on-step`)
+ * - **continuous Play** → stay at last interaction (`stay-on-play`)
+ * - **composer submit** → always park away (`park-from-submit`), even during Play
+ *
+ * Prefer this over raw `holdDemoCursorAtLastClick` / `parkDemoCursorAtRest`
+ * at director call sites.
+ */
+export async function settleDemoCursorAfterInteraction(
+  target?: HTMLElement | null
+): Promise<PostInteractionParkDecision> {
+  const decision = resolveDemoCursorPostInteractionPark(target ?? null);
+
+  if (!journeyModePinned) {
+    if (decision.park) {
+      await fadeOutDemoCursorInPlace();
+    } else {
+      retainDemoCursorInPlace();
+    }
+    logCursorEngineTracker(decision.reason, {
+      reason: decision.reason,
+    });
+    return decision;
+  }
+
+  if (decision.park) {
+    clearHoldAtLastClick();
+    logCursorEngineTracker(decision.reason, {
+      reason: decision.reason,
+    });
+    await parkDemoCursorAtRest({
+      animate: true,
+      reason: decision.reason,
+    });
+    // Hard FAIL if still resting on submit after park attempt.
+    const cursorEl = document.querySelector<HTMLElement>(".proto-chat-demo-cursor");
+    if (
+      decision.forbiddenRest &&
+      target &&
+      cursorEl &&
+      isDemoCursorHotspotOnTarget(cursorEl, target)
+    ) {
+      logCursorEngineTracker("rest-on-submit", {
+        reason: "left-on-submit-after-park",
+      });
+    }
+    return decision;
+  }
+
+  holdDemoCursorAtLastClick();
+  logCursorEngineTracker("stay-on-play", { reason: "stay-on-play" });
+  // Continuous stay must never leave hotspot on submit (defense in depth).
+  if (target && isForbiddenRestTarget(target)) {
+    logCursorEngineTracker("rest-on-submit", {
+      reason: "stay-path-hit-submit",
+    });
+    clearHoldAtLastClick();
+    await parkDemoCursorAtRest({
+      animate: true,
+      reason: "park-from-submit",
+    });
+    return {
+      park: true,
+      reason: "park-from-submit",
+      forbiddenRest: true,
+    };
+  }
+  return decision;
 }
 
 export function isDemoCursorParked(): boolean {
@@ -678,6 +778,8 @@ async function animateCursorTravel(
   options?: {
     /** Re-read end position while page scroll is in progress (frozen near arrival). */
     trackTarget?: HTMLElement;
+    /** Destination for early hand-on-edge during travel. */
+    earlyHandTarget?: HTMLElement | null;
     shouldAbort?: () => boolean;
   }
 ): Promise<boolean> {
@@ -690,6 +792,9 @@ async function animateCursorTravel(
   let frozenEndX = endX;
   let frozenEndY = endY;
   let tracking = Boolean(options?.trackTarget);
+  const earlyHandDest = options?.earlyHandTarget ?? options?.trackTarget ?? null;
+  // Park travel → arrow; CTA travel may flip hand early on edge.
+  setDemoCursorPointerMode(false);
 
   const resolveEnd = () => {
     if (tracking && options?.trackTarget) {
@@ -738,6 +843,15 @@ async function animateCursorTravel(
         const y = startY + (end.y - startY) * progress;
         if (cursor.isConnected) writeDemoCursorPos(cursor, x, y, { force: true });
         noteCursorPathSample("travel", x, y);
+        // Early hand as soon as tip crosses interactive edge (CTA travel only).
+        if (earlyHandDest) {
+          const hx = x + CURSOR_HOTSPOT_X;
+          const hy = y + CURSOR_HOTSPOT_Y;
+          const hand = resolveEarlyHandAtHotspot(hx, hy, {
+            destination: earlyHandDest,
+          });
+          setDemoCursorPointerMode(hand);
+        }
       },
       onComplete: settle,
     });
@@ -859,9 +973,24 @@ function retainDemoCursorInPlace(): void {
 /**
  * PO: after a CJM click, keep the robo-cursor visible at the click point —
  * no fade, no park-away to journey rest. Next travel / type-in park may move it.
+ *
+ * Prefer `settleDemoCursorAfterInteraction(target)` at call sites — it applies
+ * step/play + forbidden-submit policy. This hold is the stay-on-play primitive.
+ * Passing a forbidden rest target redirects to park-from-submit.
  */
-export function holdDemoCursorAtLastClick(): void {
+export function holdDemoCursorAtLastClick(target?: HTMLElement | null): void {
   if (!journeyModePinned) return;
+  if (target && isForbiddenRestTarget(target)) {
+    clearHoldAtLastClick();
+    logCursorEngineTracker("park-from-submit", {
+      reason: "hold-redirect-submit",
+    });
+    void parkDemoCursorAtRest({
+      animate: true,
+      reason: "park-from-submit",
+    });
+    return;
+  }
   cancelDemoCursorTravel();
   cancelDemoCursorJourneyEndFade();
   cancelDemoCursorParkInFlight();
@@ -1130,26 +1259,21 @@ export function removeDemoCursor(options?: RemoveDemoCursorOptions): void {
 }
 
 /** End of a director script — await before advancing beats in manual CJM. */
-export async function releaseDemoCursorAfterScript(): Promise<void> {
-  if (holdAtLastClick) {
+export async function releaseDemoCursorAfterScript(
+  lastTarget?: HTMLElement | null
+): Promise<void> {
+  if (holdAtLastClick && !lastTarget) {
+    // Already holding from an explicit settle — do not re-park.
     retainDemoCursorInPlace();
     notePlaybackCursorEvent("release", {
       detail: "hold-at-last-click",
     });
     return;
   }
+  const decision = await settleDemoCursorAfterInteraction(lastTarget ?? null);
   notePlaybackCursorEvent("release", {
-    detail: parkAfterInteraction ? "park-after-script" : "retain-in-place",
+    detail: decision.reason,
   });
-  if (!journeyModePinned) {
-    await fadeOutDemoCursorInPlace();
-    return;
-  }
-  if (parkAfterInteraction) {
-    await parkDemoCursorAtRest({ animate: true });
-    return;
-  }
-  retainDemoCursorInPlace();
 }
 
 /**
@@ -1480,6 +1604,7 @@ export async function moveDemoCursorTo(
     {
       // Track only while a real page scroll is running; frozen ≥90% progress.
       trackTarget: syncPageScroll && scrollDurationMs > 0 ? target : undefined,
+      earlyHandTarget: interactionRoot,
       shouldAbort: () => travelAborted(),
     }
   );

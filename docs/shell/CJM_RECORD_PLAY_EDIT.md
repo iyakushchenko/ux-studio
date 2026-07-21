@@ -30,6 +30,8 @@ Same cursor for agentic / traditional / REC / chat — see [PLAYBACK.md](./PLAYB
 
 - **Travel** = Motion easeInOut; **park** = travel-to-rest (never hard-snap unless `force` / first-mount).
 - Policy: `demoCursorEngine.ts`; DOM: `demoCursor.ts`. Legacy `animate: false` without force → ABRUPT-PARK FAIL in QA.
+- **Step parks; continuous Play stays** at last interaction — except **composer submit** (always park away).
+- **Early hand** on interactive edge during travel.
 - Type-in holds journey park pose; cancel mid-travel settles (hang lesson).
 
 ## Exceptions (deeper, keep thin)
