@@ -36,6 +36,7 @@
 - **engine:** REC scroll-stop (≥2s, jiggle filter) → kind:camera beats; universal __studioRunFullPlayProve (agentic/traditional thin presets)
 - **shell:** Chat camera: yield dwell/ease (no always-pin fight); coTravel settle; lean chat-camera QA trackers; agentic full Play 22/22 PASS
 - **engine:** Cursor engine SSoT: travel-to-rest park default; force/first-mount snap only; ABRUPT-PARK QA FAIL mirrored; agentic 22/22 + traditional 12/12 prove, abrupt=0
+- **engine:** Cursor engine: step parks / continuous Play stays at last click; never rest on composer submit (park-from-submit); early hand-on-edge; QA trackers park-on-step/stay-on-play/park-from-submit + REST-ON-SUBMIT FAIL
 
 ## v0.0.100 - 200726
 - **shell:** PP-13 self-test expand + stale-green detector + PLAYBACK_DIAG mirror
