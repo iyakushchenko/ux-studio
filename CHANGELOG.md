@@ -34,6 +34,7 @@
 - **engine:** Camera engine: no blind origin on CJM/play screen-enter; playbackScroll SSoT session + hold policy; QA soft-fail ignores target scrollIntoView
 - **shell:** Traditional keep-overlay prove + kind:camera dwell beat (Book Step 3 wait then scroll; step-back reverses); dump cal selectors + journey-reset dedupe; agentic peak 22/22 PASS
 - **engine:** REC scroll-stop (≥2s, jiggle filter) → kind:camera beats; universal __studioRunFullPlayProve (agentic/traditional thin presets)
+- **shell:** Chat camera: yield dwell/ease (no always-pin fight); coTravel settle; lean chat-camera QA trackers; agentic full Play 22/22 PASS
 
 ## v0.0.100 - 200726
 - **shell:** PP-13 self-test expand + stale-green detector + PLAYBACK_DIAG mirror
