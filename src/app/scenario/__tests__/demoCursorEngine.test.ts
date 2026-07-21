@@ -236,9 +236,50 @@ describe("demoCursorEngine step vs play + forbidden submit", () => {
     expect(
       resolveEarlyHandAtHotspot(102, 120, { destination: btn })
     ).toBe(true);
-    // Tip clearly outside — no hand from destination.
+    // Tip clearly outside — no hand from destination (destinationOnly default).
     expect(
       resolveEarlyHandAtHotspot(10, 10, { destination: btn })
     ).toBe(false);
+  });
+
+  it("destinationOnly skips mid-path elementFromPoint thrash", () => {
+    const dest = document.createElement("button");
+    dest.textContent = "Dest";
+    const mid = document.createElement("a");
+    mid.href = "#";
+    mid.textContent = "Mid";
+    document.body.append(dest, mid);
+    Object.defineProperty(dest, "getBoundingClientRect", {
+      value: () => ({
+        left: 400,
+        top: 400,
+        right: 500,
+        bottom: 440,
+        width: 100,
+        height: 40,
+        x: 400,
+        y: 400,
+        toJSON() {},
+      }),
+    });
+    // Without destinationOnly=false, tip over a mid-path link must NOT hand.
+    const spy = vi
+      .spyOn(document, "elementFromPoint")
+      .mockReturnValue(mid);
+    expect(
+      resolveEarlyHandAtHotspot(50, 50, {
+        destination: dest,
+        destinationOnly: true,
+      })
+    ).toBe(false);
+    expect(spy).not.toHaveBeenCalled();
+    // Opt-in legacy fallthrough still sees mid-path interactive.
+    expect(
+      resolveEarlyHandAtHotspot(50, 50, {
+        destination: dest,
+        destinationOnly: false,
+      })
+    ).toBe(true);
+    spy.mockRestore();
   });
 });

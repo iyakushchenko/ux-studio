@@ -43,12 +43,13 @@ Engine repo. **Boots Pharmacy** (`src/projects/boots-pharmacy/`) is the first re
 
 **When the task touches that surface:**  
 CSS layers / DS → [CSS_BASE_THEME.md](docs/product/CSS_BASE_THEME.md) · [DS_STRICTNESS.md](docs/product/DS_STRICTNESS.md) · [FE_STANDARDS.md](docs/product/FE_STANDARDS.md) · [VISUAL_FIDELITY.md](docs/product/VISUAL_FIDELITY.md) · [FE_UI_UX_AUDIT.md](docs/product/FE_UI_UX_AUDIT.md)  
-Pages / kits → [PAGE_BUILD_CONTRACT.md](docs/product/PAGE_BUILD_CONTRACT.md) · [COMPONENT_LIBRARY.md](docs/product/COMPONENT_LIBRARY.md) · [INTERACTION_FIDELITY.md](docs/product/INTERACTION_FIDELITY.md) · [docs/uxds/README.md](docs/uxds/README.md)  
+Pages / kits → [PAGE_BUILD_CONTRACT.md](docs/product/PAGE_BUILD_CONTRACT.md) · [COMPONENT_LIBRARY.md](docs/product/COMPONENT_LIBRARY.md) · [INTERACTION_FIDELITY.md](docs/product/INTERACTION_FIDELITY.md) · [docs/uxds/UXDS_MAP.md](docs/uxds/UXDS_MAP.md) (HARD exhaustive inventory) · [docs/uxds/README.md](docs/uxds/README.md)  
 Chat (`screen=chat`, CJM on/off load/scroll) → [CHAT_PAGE_RAILS.md](docs/projects/boots-pharmacy/features/CHAT_PAGE_RAILS.md) · [MOTION.md](docs/product/MOTION.md)  
 Playback / QA overlay / type-in → [QA_LOGGING_AND_PLAYBACK_RECIPE.md](docs/shell/QA_LOGGING_AND_PLAYBACK_RECIPE.md) · [PLAYBACK.md](docs/shell/PLAYBACK.md) · [PLAYBACK_DIAG.md](docs/shell/PLAYBACK_DIAG.md)  
 CJM Record/Play/Edit (guitar tabs) → [CJM_RECORD_PLAY_EDIT.md](docs/shell/CJM_RECORD_PLAY_EDIT.md)  
 URL / REC / CI → [docs/shell/URL.md](docs/shell/URL.md) · [docs/shell/RECORDING.md](docs/shell/RECORDING.md) · [CI_ACTIONS_BUDGET.md](docs/product/CI_ACTIONS_BUDGET.md)  
 PO / intake → [PRODUCT_OWNER_BRIEF.md](docs/product/PRODUCT_OWNER_BRIEF.md) · [CONCEPT_INTAKE.md](docs/product/CONCEPT_INTAKE.md) · [SOLUTION_REQUIREMENTS.md](docs/product/SOLUTION_REQUIREMENTS.md)  
+X-Suite / Summarizer CJM export → [X_SUITE_INTEGRATION.md](docs/product/X_SUITE_INTEGRATION.md) · [DIRECTION_FROM_SUMMARIZER.md](docs/product/DIRECTION_FROM_SUMMARIZER.md) (analyze → pages → REC; ask for page prototypes)  
 Catalog → [docs/README.md](docs/README.md)
 
 ## Quick start

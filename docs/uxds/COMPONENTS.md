@@ -1,5 +1,7 @@
 # UXDS Components library
 
+**Exhaustive list:** [inventory/components.json](./inventory/components.json) (assembled from Figma; see [UXDS_MAP.md](./UXDS_MAP.md)).
+
 **Page:** `↳  01 Components` · node `12336:188269`  
 **URL:** https://www.figma.com/design/myqzp3KRc1pxKDOv8RfTsl/-UX--UXDS---Larkin?node-id=12336-188269
 

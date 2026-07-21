@@ -165,6 +165,7 @@ export function shouldMirrorPlaybackDiagToQa(event: PlaybackDiagEvent): boolean 
       return /OFF-TARGET|off-target|click suppressed|hotspot miss/i.test(detail);
     }
     if (/ABRUPT-PARK|cursor-engine:abrupt-park/i.test(detail)) return true;
+    if (/GRAPHIC-THRASH|cursor-engine:graphic-thrash/i.test(detail)) return true;
     if (/HIDDEN|cursor-hidden|FAIL|OFF-TARGET|click suppressed/i.test(detail)) {
       return true;
     }
@@ -184,9 +185,9 @@ export function shouldMirrorPlaybackDiagToQa(event: PlaybackDiagEvent): boolean 
     ) {
       return false;
     }
-    // Lean engine milestones (deduped at emit) — meaningful park / step-play / submit
+    // Lean engine milestones (deduped at emit) — meaningful park / step-play / submit / graphic
     if (
-      /^cursor-engine:(park-rest|type-in-hold|cancel-settle|park-on-step|stay-on-play|park-from-submit)\b/i.test(
+      /^cursor-engine:(park-rest|type-in-hold|cancel-settle|park-on-step|stay-on-play|park-from-submit|graphic-arrow|graphic-hand|graphic-carriage)\b/i.test(
         detail
       )
     ) {
@@ -342,7 +343,7 @@ export function outcomeForPlaybackDiagEvent(
   }
   if (event.kind === "cursor") {
     if (
-      /ABRUPT-PARK|cursor-engine:abrupt-park|REST-ON-SUBMIT|cursor-engine:rest-on-submit|HIDDEN|cursor-hidden/i.test(
+      /ABRUPT-PARK|cursor-engine:abrupt-park|REST-ON-SUBMIT|cursor-engine:rest-on-submit|GRAPHIC-THRASH|cursor-engine:graphic-thrash|HIDDEN|cursor-hidden/i.test(
         detailOf(event)
       )
     ) {
@@ -397,8 +398,20 @@ export function labelForPlaybackDiagEvent(event: PlaybackDiagEvent): string {
     if (/ABRUPT-PARK|cursor-engine:abrupt-park/i.test(detail)) {
       return "ABRUPT PARK — cursor teleported (FAIL)";
     }
+    if (/GRAPHIC-THRASH|cursor-engine:graphic-thrash/i.test(detail)) {
+      return "Cursor graphic thrash — FAIL (steady binary)";
+    }
     if (/REST-ON-SUBMIT|cursor-engine:rest-on-submit/i.test(detail)) {
       return "Cursor left on submit — FAIL";
+    }
+    if (/cursor-engine:graphic-carriage\b/i.test(detail)) {
+      return "Cursor → carriage (text)";
+    }
+    if (/cursor-engine:graphic-hand\b/i.test(detail)) {
+      return "Cursor → hand";
+    }
+    if (/cursor-engine:graphic-arrow\b/i.test(detail)) {
+      return "Cursor → arrow";
     }
     if (/type-in-park|type-in park|cursor-engine:type-in-hold/i.test(detail)) {
       return "Cursor held for typing";

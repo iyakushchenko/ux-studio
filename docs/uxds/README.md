@@ -1,8 +1,10 @@
 # UXDS — source of truth for UX Studio concept pages
 
+**HARD map (names, inventory, agent law):** [UXDS_MAP.md](./UXDS_MAP.md)
+
 **File:** `[UX] UXDS - Larkin`  
 **fileKey:** `myqzp3KRc1pxKDOv8RfTsl`  
-**Inspected:** 2026-07-19 via Figma Plugin API (`995` local variables, `6` collections)
+**Inspected / inventory regenerated:** 2026-07-21 via Figma Plugin API (`995` local variables, `6` collections, `222` component sets, `344` orphan components) — see [inventory/](./inventory/)
 
 | Surface | URL |
 |---------|-----|

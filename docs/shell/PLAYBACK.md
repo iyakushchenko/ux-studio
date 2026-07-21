@@ -95,11 +95,12 @@ Smell this kills: landing mid-PLP/PDP after a tab hop; Traditional Reserve→his
 2. **Park = travel-to-rest** by default. Hard snap **only** with `force: true` or **first-mount** (no start pose).
 3. **Ban** `animate: false` without `force` — coerced to travel + **`ABRUPT-PARK FAIL`** QA row (mirrored).
 4. **Cancel mid-travel** settles cleanly (generation bump + `.stop()` + promise settle — hang lesson).
-5. **Type-in** — CJM cursor stays visible at journey park (`type-in-hold`); hidden → `CURSOR_HIDDEN_DURING_TYPEIN`.
+5. **Type-in** — CJM cursor stays visible at journey park (`type-in-hold`); hidden → `CURSOR_HIDDEN_DURING_TYPEIN`. Carriage (I-beam) graphic while type-in latch / text focus.
 6. **Dual-cursor** — manual/observe = OS only; robo returns for CONTROL / CJM Play.
 7. **Park ONLY on stepped playback** — manual Step forward/back / stepped call → `park-on-step`. Continuous Play → **stay at last interaction** (`stay-on-play`) — do **not** ease-to-rest after each click.
 8. **Never rest on composer submit** — send/submit is a registered forbidden rest target → always `park-from-submit` (even during continuous Play). Left on submit → **`REST-ON-SUBMIT FAIL`**.
 9. **Early hand-on-edge** — hand graphic as soon as tip crosses interactive edge (button/link/input/CTA) during travel — not center-gated.
+10. **Graphics (steady binary)** — arrow (default) · hand (`--pointer`, destination-edge latch + CTA hover/press) · carriage (`--carriage`, type-in / fresh text focusin). All fill the **same large 37×37** demo box. **Bar:** mid-travel arrow until tip enters **destination** edge → **one** rising edge to hand (latched; never clear mid-travel; no mid-path `elementFromPoint` thrash) → stay hand through hover/press → **one** falling edge to arrow after leave. Settle keeps hand until hover attaches (no hand→arrow→hand blink). **QA:** `Cursor → arrow|hand|carriage`; **`GRAPHIC-THRASH FAIL`** if arrow↔hand A→B→A within 200ms. Carriage = type-in/focus only; hand wins over carriage.
 
 Transport pin: `setDemoCursorJourneyMode(…, { parkAfterInteraction: cjm && !isPlaying })` (App shell). Directors prefer `settleDemoCursorAfterInteraction(target)` over raw hold/park.
 

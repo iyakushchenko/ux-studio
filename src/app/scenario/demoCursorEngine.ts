@@ -562,6 +562,39 @@ export function isEarlyHandInteractiveTarget(
 
  */
 
+/**
+ * Text / search / contenteditable — carriage (I-beam) when focused.
+ * Excludes button-like input types.
+ */
+export function isTextEntryFocusTarget(
+  el: Element | null | undefined
+): boolean {
+  if (!el || !(el instanceof HTMLElement)) return false;
+  if (el.isContentEditable || el.getAttribute("contenteditable") === "true") {
+    return true;
+  }
+  if (el instanceof HTMLTextAreaElement) return true;
+  if (el instanceof HTMLInputElement) {
+    const t = (el.type || "text").toLowerCase();
+    if (
+      t === "button" ||
+      t === "submit" ||
+      t === "reset" ||
+      t === "checkbox" ||
+      t === "radio" ||
+      t === "file" ||
+      t === "color" ||
+      t === "range" ||
+      t === "hidden" ||
+      t === "image"
+    ) {
+      return false;
+    }
+    return true;
+  }
+  return false;
+}
+
 export function isHotspotOverInteractiveEdge(
 
   hotspotX: number,
@@ -601,56 +634,43 @@ export function isHotspotOverInteractiveEdge(
 
 
 /**
-
- * Hit-test under hotspot — prefer elementFromPoint; fall back to destination
-
- * edge test when provided (scroll/cover can lie during travel).
-
+ * Hit-test under hotspot for early hand during CTA travel.
+ * When `destination` is set, prefer destination-edge only (steady binary —
+ * do not flip hand over mid-path links via elementFromPoint).
+ * `destinationOnly` defaults true when destination is provided.
  */
-
 export function resolveEarlyHandAtHotspot(
-
   hotspotX: number,
-
   hotspotY: number,
-
-  options?: { destination?: Element | null }
-
+  options?: { destination?: Element | null; destinationOnly?: boolean }
 ): boolean {
-
+  const destination = options?.destination ?? null;
   if (
-
-    options?.destination &&
-
-    isHotspotOverInteractiveEdge(hotspotX, hotspotY, options.destination)
-
+    destination &&
+    isHotspotOverInteractiveEdge(hotspotX, hotspotY, destination)
   ) {
-
     return true;
-
   }
-
-  if (typeof document === "undefined" || typeof document.elementFromPoint !== "function") {
-
+  const destinationOnly =
+    options?.destinationOnly !== undefined
+      ? options.destinationOnly
+      : !!destination;
+  if (destinationOnly) {
     return false;
-
   }
-
+  if (
+    typeof document === "undefined" ||
+    typeof document.elementFromPoint !== "function"
+  ) {
+    return false;
+  }
   try {
-
     const hit = document.elementFromPoint(hotspotX, hotspotY);
-
     return isEarlyHandInteractiveTarget(hit);
-
   } catch {
-
     return false;
-
   }
-
 }
-
-
 
 /* -------------------------------------------------------------------------- */
 
@@ -682,9 +702,86 @@ export type CursorEngineTracker =
 
   /** FAIL — cursor left resting on composer submit / send. */
 
-  | "rest-on-submit";
+  | "rest-on-submit"
+
+  /** Graphic mode: arrow (default). */
+
+  | "graphic-arrow"
+
+  /** Graphic mode: hand (CTA hover). */
+
+  | "graphic-hand"
+
+  /** Graphic mode: carriage / I-beam (text + composer focus). */
+
+  | "graphic-carriage";
 
 
+
+export const CURSOR_GRAPHIC_THRASH_WINDOW_MS = 200;
+
+type GraphicModeSample = { mode: "arrow" | "pointer" | "carriage"; at: number };
+let recentGraphicModes: GraphicModeSample[] = [];
+/** Only arm during CTA travel — post-click arrow + next travel hand is intentional. */
+let graphicThrashWatchArmed = false;
+
+/** Start of animateCursorTravel — arm thrash watch + clear window. */
+export function beginCursorGraphicThrashWatch(): void {
+  recentGraphicModes = [];
+  graphicThrashWatchArmed = true;
+}
+
+/** End of travel (settle / abort) — disarm so leave→next-travel is not thrash. */
+export function endCursorGraphicThrashWatch(): void {
+  graphicThrashWatchArmed = false;
+  recentGraphicModes = [];
+}
+
+/**
+ * Note a graphic mode change; emit graphic-thrash FAIL on arrow↔hand A→B→A
+ * within CURSOR_GRAPHIC_THRASH_WINDOW_MS while travel watch is armed.
+ */
+export function noteCursorGraphicModeChange(
+  mode: "arrow" | "pointer" | "carriage"
+): void {
+  if (!graphicThrashWatchArmed) return;
+  const at =
+    typeof performance !== "undefined" ? performance.now() : Date.now();
+  recentGraphicModes.push({ mode, at });
+  recentGraphicModes = recentGraphicModes.filter(
+    (e) => at - e.at <= CURSOR_GRAPHIC_THRASH_WINDOW_MS
+  );
+  if (recentGraphicModes.length < 3) return;
+  const a = recentGraphicModes[recentGraphicModes.length - 3]!;
+  const b = recentGraphicModes[recentGraphicModes.length - 2]!;
+  const c = recentGraphicModes[recentGraphicModes.length - 1]!;
+  const binary =
+    (a.mode === "arrow" || a.mode === "pointer") &&
+    (b.mode === "arrow" || b.mode === "pointer") &&
+    (c.mode === "arrow" || c.mode === "pointer");
+  if (!binary) return;
+  if (a.mode === c.mode && a.mode !== b.mode) {
+    logCursorEngineTracker("graphic-thrash", {
+      reason: "steady-binary",
+      detail:
+        "cursor-engine:graphic-thrash — " +
+        a.mode +
+        "→" +
+        b.mode +
+        "→" +
+        c.mode +
+        " <" +
+        CURSOR_GRAPHIC_THRASH_WINDOW_MS +
+        "ms",
+    });
+  }
+}
+
+/** Test / prove reset — clear thrash sliding window. */
+export function resetCursorGraphicThrashWindow(): void {
+  recentGraphicModes = [];
+  graphicThrashWatchArmed = false;
+}
 
 let lastCursorEngineTrackerKey: string | null = null;
 
@@ -720,7 +817,10 @@ export function logCursorEngineTracker(
 
     typeof performance !== "undefined" ? performance.now() : Date.now();
 
-  const isFail = tag === "abrupt-park" || tag === "rest-on-submit";
+  const isFail =
+    tag === "abrupt-park" ||
+    tag === "rest-on-submit" ||
+    tag === "graphic-thrash";
 
   const dedupeMs = isFail ? 120 : CURSOR_ENGINE_TRACKER_DEDUPE_MS;
 
@@ -745,13 +845,11 @@ export function logCursorEngineTracker(
     playbackDiagCursor({
 
       detail: isFail
-
         ? tag === "rest-on-submit"
-
           ? `REST-ON-SUBMIT FAIL — ${detail}`
-
-          : `ABRUPT-PARK FAIL — ${detail}`
-
+          : tag === "graphic-thrash"
+            ? `GRAPHIC-THRASH FAIL — ${detail}`
+            : `ABRUPT-PARK FAIL — ${detail}`
         : detail,
 
       parked:

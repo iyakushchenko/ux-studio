@@ -1,0 +1,38 @@
+{
+  "atIso": "2026-07-21T09:56:00.000Z",
+  "fileKey": "myqzp3KRc1pxKDOv8RfTsl",
+  "kits": [
+    {
+      "reactModule": "src/uxds/components/SearchField.tsx",
+      "figmaNames": ["component.search.fullscreen.field", "component.support.center.search.field"]
+    },
+    {
+      "reactModule": "src/uxds/components/ButtonPrimary.tsx",
+      "figmaNames": ["component.bulk.order.add.to.cart.button"]
+    },
+    {
+      "reactModule": "src/uxds/components/BookAppointmentProgress.tsx",
+      "figmaNames": ["component.book.appointment.progress"]
+    },
+    {
+      "reactModule": "src/uxds/components/AppointmentSummaryPill.tsx",
+      "figmaNames": ["component.appointment.summary"]
+    },
+    {
+      "reactModule": "src/uxds/components/PromoMessageStrip.tsx",
+      "figmaNames": ["component.content.slot.promo.2", "component.gse.product.tile.promotion"]
+    },
+    {
+      "reactModule": "src/uxds/interactions/FilterChipToggle.tsx",
+      "figmaNames": ["component.plp.filter.text.item", "component.plp.filter.quick.view"]
+    },
+    {
+      "reactModule": "src/uxds/interactions/Disclosure.tsx",
+      "figmaNames": ["component.plp.filter.accordion", "component.footer.accordion.item"]
+    },
+    {
+      "reactModule": "src/uxds/interactions/Accordion.tsx",
+      "figmaNames": ["component.gse.accordion", "component.pdp.accordion"]
+    }
+  ]
+}

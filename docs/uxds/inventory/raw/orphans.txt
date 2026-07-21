@@ -1,0 +1,344 @@
+component.b2b.invoices.payment.pay.form
+component.b2b.invoices.payment.step.03
+component.b2b.ma.case.header.create.case
+component.b2b.ma.case.header.submitted
+component.b2b.ma.invoice.payment.heading
+component.b2b.pdp.pricing.table
+component.b2b.rfq.heading
+component.b2b.rfq.quote.details
+component.b2b.support.center.faq
+component.breadcrumbs
+component.bulk.order.heading
+component.bulk.search
+component.cart.empty.heading
+component.cart.mini.heading
+component.cart.mini.summary
+component.cart.product.listing.table.heading
+component.cart.product.tile.actions
+component.cart.product.tile.gift
+component.cart.product.tile.specs
+component.co.buyer.info.static
+component.co.footer.secure.statement
+component.co.form.create.account
+component.co.order.number.date.placed
+component.co.order.summary
+component.co.saved.addresses.toggle
+component.co.shipping.method
+component.co.step.4
+component.co.summary.info
+component.co.text.fields.stacks.personal.details
+component.compare.list
+component.compare.product.tile
+component.comparison.table.row.heading
+component.contact.us
+component.content.heading.accent
+component.content.slot.03
+component.content.slot.blog.c.x2
+component.content.slot.blog.c.x3
+component.content.slot.blog.d.x3
+component.content.slot.blog.x2
+component.content.slot.brands.v2
+component.content.slot.k
+component.content.slot.leadership.statements
+component.conveniences
+component.cp.accordion.content
+component.cp.form.contact.us
+component.cp.navigation.block
+component.cp.privacy.policy
+component.cs.content.slot.body
+component.cs.heading.no.results
+component.custom.slider
+component.email.greeting
+component.empty.page.content.slot
+component.errors.footer
+component.faq.question
+component.filter.parameter
+component.filter.price
+component.footer.accordion.item.collapse
+component.footer.accordion.item.expand
+component.footer.action.ctas
+component.footer.call.statement
+component.footer.copyright
+component.footer.information.slots
+component.footer.links
+component.footer.partner.1
+component.footer.partner.2
+component.form.book.appointment.step.1
+component.get.our.app.apple
+component.get.our.app.gplay
+component.gh.cs.content.slot.bottom
+component.gh.cs.content.slot.top
+component.gse.address.finder
+component.gse.article.image
+component.gse.breadcrumbs.delimiter
+component.gse.feefo.ad.line
+component.gse.feefo.like.link
+component.gse.feefo.main.block
+component.gse.feefo.review.at.a.glance
+component.gse.feefo.review.trusted.customer
+component.gse.feefo.share.link
+component.gse.feefo.standalone.review.large
+component.gse.feefo.stars.bar
+component.gse.feefo.stars.bar.and.score
+component.gse.google.review.customer.name
+component.gse.google.stars.bar
+component.gse.greyed.out
+component.gse.mega.menu.2.level.col.1
+component.gse.mega.menu.2.level.col.2
+component.gse.mega.menu.2.level.col.3
+component.gse.mega.menu.2.level.col.4
+component.gse.mega.menu.2.level.col.5
+component.gse.mega.menu.2.level.col.6
+component.gse.mega.menu.2.level.col.7
+component.gse.overlay.loading
+component.gse.pdp.system.message.added.to.cart
+component.gse.placeholder
+component.gse.popup.header
+component.gse.product.tile.price.in.tile.table.range.false
+component.gse.tabs.x4
+component.header.aux.nav.item
+component.header.mega.menu.flyout.content.asset
+component.header.mega.menu.flyout.promo
+component.header.mega.menu.flyout.standard
+component.header.sec.link
+component.header.sec.link.group.a
+component.header.sec.link.group.b
+component.images
+component.in.the.box.tile
+component.invoice.tile
+component.ma.address.book.address.form
+component.ma.address.book.set.address
+component.ma.benefits
+component.ma.cases.case.details
+component.ma.cases.case.details
+component.ma.cases.history
+component.ma.cases.reply.form
+component.ma.cases.submit.summary
+component.ma.form.card
+component.ma.form.forgot.password
+component.ma.form.reset.password
+component.ma.form.sign.in
+component.ma.form.track.my.order
+component.ma.form.track.order
+component.ma.invoice.confirmation.details
+component.ma.invoice.confirmation.summary
+component.ma.invoice.invoice.list
+component.ma.navigation.content.slot
+component.ma.navigation.menu
+component.ma.navigation.mobile.menu
+component.ma.navigation.profile.name.and.icon
+component.ma.no.addresses
+component.ma.no.items.in.my.list
+component.ma.no.payment.methods
+component.ma.order.details.popup.return.items
+component.ma.profile.delete.account
+component.ma.reset.password
+component.ma.return.step.1
+component.ma.return.step.2
+component.ma.return.step.3
+component.ma.return.steps
+component.ma.section.title.account
+component.ma.section.title.track.order
+component.options
+component.order.summary.cta
+component.pdp.attribute.selector.color
+component.pdp.attribute.selector.radio
+component.pdp.complete.the.look
+component.pdp.content.slot.rich.tab.bar
+component.pdp.key.benefits
+component.pdp.klarna
+component.pdp.reviews.and.link
+component.pdp.rich.slot.tab.bar.b
+component.pdp.rtb
+component.pdp.rtb.notify.step.1
+component.pdp.rtb.notify.step.2
+component.pdp.rtb.specs
+component.pdp.size.indicator
+component.pdp.sku.title.code
+component.plp.filter.applied.bar
+component.plp.filter.checkbox.item
+component.plp.filter.graphic
+component.plp.hero.bg
+component.plp.popup.filter.controls
+component.plp.popup.filter.header
+component.plp.ribbon.image.generic
+component.plp.sort
+component.plp.sub.categories
+component.popup.geo.ip.heading
+component.prd.image
+component.prd.img.indicator
+component.product.filter.applied.filter.tile
+component.product.filter.plp.swatch.a
+component.product.image.zoom.fullscreen.controls
+component.product.image.zoom.fullscreen.controls
+component.product.specifications.table
+component.product.tile.colors
+component.product.tile.swatches
+component.qo.product.tile
+component.recommendations
+component.request.for.quote.form
+component.reviews.google.single.review
+component.scs.estimated.total
+component.scs.payment.methods
+component.search.results.article.basic
+component.search.results.suggestions.product.listing
+component.search.results.suggestions.product.tile
+component.shared.carousel
+component.slot.tile.h
+component.sls.show.services.as
+component.sls.store.entity
+component.ss.initial.suggestions
+component.stock.link
+component.store.address.lookup.flyout
+component.store.address.lookup.flyout.item
+component.store.all.locations.group.label
+component.store.all.locations.navigation
+component.store.all.locations.store.address
+component.store.all.locations.stores.group.by.letter
+component.store.basic.card
+component.store.card
+component.store.image
+component.store.locator.no.results
+component.store.map.image
+component.store.map.popup
+component.store.promo.slot
+component.store.rating
+component.support.case.case.details
+component.support.case.form
+component.support.center.search.field
+component.te.bottom.line.link
+component.te.menu
+component.te.product.tile
+component.te.sc.image
+component.text.on.photo.2
+component.wish.list.product.tile
+icon / accent / account
+icon / accent / cart
+icon / accent / empty cart
+icon / accent / no results
+icon / accent / no store
+icon / accent / ok
+icon / accent / page error / global
+icon / accent / page error / heavy traffic
+icon / accent / page error / session expired
+icon / accent / payment success
+icon / accent / schedule
+icon / accent / store
+icon / accent / support
+icon / accent / track order
+icon / accent / wishlist empty
+icon / co / secure
+icon / editor / format_quote_24px
+icon / footer / social media
+icon / gse / close
+icon / gse / copy
+icon / gse / feefo
+icon / gse / feefo / comment
+icon / gse / feefo / like
+icon / gse / feefo / share
+icon / gse / feefo platinum
+icon / gse / hamburger
+icon / pdp / key benefits
+icon / pdp / key benefits
+icon / pdp / key benefits
+icon / plp / product tile / quick view
+icon / prd-img / zoom
+icon / slot / 12
+icon / slot / 12 / copyright
+icon / socials / apple
+icon / socials / email
+icon / socials / facebook
+icon / socials / google
+icon / socials / instagram
+icon / socials / link
+icon / socials / linkedin
+icon / socials / pinterest
+icon / socials / threads
+icon / socials / tiktok
+icon / socials / twitter
+icon / socials / whatsapp
+icon / socials / youtube
+icon / split screen
+icon / store / gps
+icon / store / map / current location
+icon / store / map / pin (active)
+icon / store / map / pin (default)
+icon / store / map / pin group
+icon / store / search by place
+module.blog.hero
+module.breadcrumbs
+module.breadcrumbs.pdp
+module.breadcrumbs.plp
+module.cart.content.slot
+module.cart.empty.content.slot
+module.cart.popup.remove.item
+module.cart.popup.select.bonus
+module.cart.summary.rtb
+module.checkout.step.2
+module.checkout.step.3
+module.checkout.step.4
+module.co.component.summary.products
+module.co.step.1
+module.content.asset.reviews.feefo
+module.content.slot.category.ribbon
+module.content.slot.product.show.case
+module.cp.navigation
+module.cs.heading.no.results
+module.errors.title
+module.header.flyout.cookie.acceptance
+module.header.mobile.menu.aux
+module.hp.benefits.bar
+module.ma.acc.overview.profile.details
+module.ma.form.add.credit.card
+module.ma.form.forgot.password
+module.ma.navigation
+module.ma.popup.address.verification.verify
+module.ma.popup.delete.account.step.1
+module.ma.popup.delete.account.step.2
+module.ma.popup.delete.account.step.3.deleted
+module.ma.popup.reset.password.email.sent
+module.ma.popup.reset.password.required
+module.ma.profile.logged.in.via
+module.ma.sign.in.sign.up
+module.mega.menu
+module.mega.menu
+module.order.summary.estimated.total
+module.payment.methods
+module.pdp.product.data.selector.capacity.volume
+module.pdp.product.data.selector.size.dimensions
+module.pdp.product.tile.secondary
+module.pdp.selector.color
+module.plp.filter.color.family
+module.plp.filter.price.range
+module.plp.filters
+module.plp.ribbon
+module.popup.product.item.remove
+module.popups.my.account.forgot.password
+module.product.tile.swatch.text
+module.quick.view
+module.review.popup
+module.reviews.google.bar
+module.scrollbar
+module.search.popup.no.refinement.combination
+module.search.tabs.x2
+module.slot.06
+module.slot.12
+module.slot.f
+module.slot.g
+module.ss.articles.list
+module.ss.couldnt.find.content.slot
+module.ss.couldnt.find.side.panel
+module.store.address.lookup.form.search
+module.store.address.lookup.nearby.stores
+module.store.content.slot.offers
+module.store.details.map
+module.store.nearest.stores
+module.support.center.header
+module.te.content.slot.a
+module.te.content.slot.b
+module.te.content.slot.c
+module.te.content.slot.d
+module.te.footer
+module.te.footer.info
+module.te.header
+module.te.header.system

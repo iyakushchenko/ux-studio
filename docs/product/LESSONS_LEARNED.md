@@ -10,6 +10,13 @@ Agents **must read** this file before claiming a UI or Studio-chrome slice done.
 
 ## 2026-07-21
 
+### Agentic prove flake — early path-deviation + stale DIAGNOSTIC_ACK_STOP (PO)
+
+- **Symptom / class:** `__studioRunAgenticFullPlayProve` FAIL at ~20/22 (`scroll-path-deviation` ~37px on `book-step3-camera`); immediate re-prove aborts 0/22 with `po-alarm:DIAGNOSTIC_ACK_STOP`. Agents buried FAIL in wrap-up sitrep.
+- **Root cause:** (1) `SCROLL_PATH_DEVIATION_PX=36` knife-edge + early easeOut frames lag before compositor catches up. (2) Session Reset cleared `clearPoSignal`, but `forceClearAgentTestingOverlay` / ALWAYS CLEAR did **not** — Ack/leave latch survived into next prove.
+- **Right fix:** Path grace `progress < 0.12` + threshold **48**; `forceClear` always `clearPoSignal()`. Report mid-prove FAIL immediately — do not invent green. History/Details Make (`data-name=Left`) still board #7 — out of this hotfix.
+- **Gate:** Units wipe-hygiene + playbackScrollAnomalies; MCP agentic 22/22 then immediate second prove without manual Ack.
+
 ### QA chat spam — Camera wait ×N + ring twin restore (PO)
 
 - **Symptom / class:** Chat flooded with `Camera: wait` every beat; after refresh `Journey reset` / `Play finished` appeared twice; Save Log ring had detail+label twins.

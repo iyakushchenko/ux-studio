@@ -20,6 +20,7 @@ import {
   mirrorPlaybackDiagToQa,
   uninstallPlaybackDiagQaBridgeApis,
 } from "@/app/shell/playbackDiagQaBridge";
+import { clearDemoCursorCarriageLatches } from "@/app/scenario/demoCursor";
 
 export type PlaybackDiagKind =
   | "type-in-start"
@@ -660,6 +661,12 @@ export function playbackDiagTypeInEnd(ok: boolean, detail?: string): void {
     completedTypeInSamples.push(...active.samples);
   }
   typeInActive = null;
+  // Drop carriage latch — sticky composer focus must not paint I-beam on later hover/click.
+  try {
+    clearDemoCursorCarriageLatches();
+  } catch {
+    /* hang-safe */
+  }
   push({
     kind: "type-in-end",
     surface: active?.surface,

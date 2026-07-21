@@ -83,7 +83,7 @@ See [PROJECTS.md](../shell/PROJECTS.md), [PLAYBACK.md](../shell/PLAYBACK.md), [R
 8. 🔲 **Agent testing mid-flight QA shell** — not a dull helper log; see [PAINPOINTS.md](./PAINPOINTS.md) PP-10
 9. 🔲 **Playback reliability + diag-first** — PLAYBACK_DIAG / CJM micro-fails / hub≠journey-start (PP-01…PP-08)
 10. 🔲 Figma → Project scaffold command
-11. 🔲 X-Suite import seam (persona / IA / CJM baseline → Studio journeys)
+11. 🔲 X-Suite → Studio: when PO shares export, agent analyzes → pages (UXDS/templates/names) → REC new CJM ([X_SUITE_INTEGRATION.md](./X_SUITE_INTEGRATION.md)); automated import later
 12. 🔲 Compiler: recording → journey beat proposals
 13. 🔲 Multi-project / persona packaging for client delivery
 

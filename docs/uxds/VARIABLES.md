@@ -1,5 +1,7 @@
 # UXDS variables structure
 
+**Exhaustive list:** [inventory/variables.json](./inventory/variables.json) (assembled from Figma; see [UXDS_MAP.md](./UXDS_MAP.md)).
+
 **Source:** live local variables in `myqzp3KRc1pxKDOv8RfTsl` (2026-07-19).  
 **Total:** 995 variables across 6 collections.
 

@@ -4308,6 +4308,13 @@ export function forceClearAgentTestingOverlay(): void {
     }
     logQaToolbarAction("forceClear · wipe session");
     dismissStaleDiagForSession("force-clear");
+    // ALWAYS CLEAR / requireFreshQaSession must wipe PO latch — else next prove
+    // aborts immediately on stale DIAGNOSTIC_ACK_STOP (PO prove 2026-07-21).
+    try {
+      clearPoSignal();
+    } catch {
+      /* hang-safe */
+    }
     clearFailHandoffFromSession();
     clearFailHandoff();
     clearQaProgressFreeze();

@@ -1,0 +1,300 @@
+IA/_parked variables/menu/2026-06-05-13-11-35Z/1 products/laptops/pro series/1_1_1_1
+IA/_parked variables/menu/2026-06-05-13-11-35Z/1 products/laptops/pro series/1_1_1_2
+IA/_parked variables/menu/2026-06-05-13-11-35Z/1 products/laptops/pro series/1_1_1_3
+IA/_parked variables/menu/2026-06-05-13-11-35Z/1 products/laptops/pro series/1_1_1_4
+IA/_parked variables/menu/2026-06-05-13-11-35Z/1 products/smartphones/flagship phones/1_2_1_1
+IA/alias/DO NOT EDIT
+IA/alias/breadcrumbs/clp/clp-current-page
+IA/alias/breadcrumbs/home/crumb-home
+IA/alias/breadcrumbs/pdp/pdp-current-page
+IA/alias/breadcrumbs/pdp/pdp-page-2
+IA/alias/breadcrumbs/pdp/pdp-page-3
+IA/alias/breadcrumbs/pdp/pdp-top-cat-home
+IA/alias/breadcrumbs/pdp/plp-page-4
+IA/alias/breadcrumbs/plp/plp-current-page
+IA/alias/breadcrumbs/plp/plp-page-2
+IA/alias/breadcrumbs/plp/plp-page-3
+IA/alias/breadcrumbs/plp/plp-page-4
+IA/alias/footer/custom section/footer-section 1_6
+IA/alias/footer/custom section/footer-section-description
+IA/alias/footer/custom section/footer-section-title
+IA/alias/footer/get our app/footer-section 1_7
+IA/alias/footer/get our app/footer-section-description
+IA/alias/footer/get our app/footer-section-title
+IA/alias/footer/newsletter/footer-section 1_5
+IA/alias/footer/newsletter/newsletter-description
+IA/alias/footer/newsletter/newsletter-title
+IA/alias/footer/section 1/footer-link 1_1_1
+IA/alias/footer/section 1/footer-link 1_1_10
+IA/alias/footer/section 1/footer-link 1_1_2
+IA/alias/footer/section 1/footer-link 1_1_3
+IA/alias/footer/section 1/footer-link 1_1_4
+IA/alias/footer/section 1/footer-link 1_1_5
+IA/alias/footer/section 1/footer-link 1_1_6
+IA/alias/footer/section 1/footer-link 1_1_7
+IA/alias/footer/section 1/footer-link 1_1_8
+IA/alias/footer/section 1/footer-link 1_1_9
+IA/alias/footer/section 1/footer-section 1_1
+IA/alias/footer/section 2/footer-link 1_2_1
+IA/alias/footer/section 2/footer-link 1_2_10
+IA/alias/footer/section 2/footer-link 1_2_2
+IA/alias/footer/section 2/footer-link 1_2_3
+IA/alias/footer/section 2/footer-link 1_2_4
+IA/alias/footer/section 2/footer-link 1_2_5
+IA/alias/footer/section 2/footer-link 1_2_6
+IA/alias/footer/section 2/footer-link 1_2_7
+IA/alias/footer/section 2/footer-link 1_2_8
+IA/alias/footer/section 2/footer-link 1_2_9
+IA/alias/footer/section 2/footer-section 1_2
+IA/alias/footer/section 3/footer-link 1_3_1
+IA/alias/footer/section 3/footer-link 1_3_10
+IA/alias/footer/section 3/footer-link 1_3_2
+IA/alias/footer/section 3/footer-link 1_3_3
+IA/alias/footer/section 3/footer-link 1_3_4
+IA/alias/footer/section 3/footer-link 1_3_5
+IA/alias/footer/section 3/footer-link 1_3_6
+IA/alias/footer/section 3/footer-link 1_3_7
+IA/alias/footer/section 3/footer-link 1_3_8
+IA/alias/footer/section 3/footer-link 1_3_9
+IA/alias/footer/section 3/footer-section 1_3
+IA/alias/footer/section 4/footer-link 1_4_1
+IA/alias/footer/section 4/footer-link 1_4_10
+IA/alias/footer/section 4/footer-link 1_4_2
+IA/alias/footer/section 4/footer-link 1_4_3
+IA/alias/footer/section 4/footer-link 1_4_4
+IA/alias/footer/section 4/footer-link 1_4_5
+IA/alias/footer/section 4/footer-link 1_4_6
+IA/alias/footer/section 4/footer-link 1_4_7
+IA/alias/footer/section 4/footer-link 1_4_8
+IA/alias/footer/section 4/footer-link 1_4_9
+IA/alias/footer/section 4/footer-section 1_4
+IA/alias/main product/bonus-item
+IA/alias/main product/bonus-item-sku
+IA/alias/main product/color/color-hex-1
+IA/alias/main product/color/color-hex-2
+IA/alias/main product/color/color-hex-3
+IA/alias/main product/color/color-name-1
+IA/alias/main product/color/color-name-2
+IA/alias/main product/color/color-name-3
+IA/alias/main product/description
+IA/alias/main product/name
+IA/alias/main product/price/price-base
+IA/alias/main product/price/price-discount-percent
+IA/alias/main product/price/price-was
+IA/alias/main product/sku
+IA/alias/mega menu/aux/header-aux-menu-WL-empty
+IA/alias/mega menu/aux/header-aux-menu-WL-full
+IA/alias/mega menu/aux/header-aux-menu-account
+IA/alias/mega menu/aux/header-aux-menu-default
+IA/alias/mega menu/aux/header-aux-menu-help
+IA/alias/mega menu/aux/header-aux-menu-search
+IA/alias/mega menu/aux/header-aux-menu-store
+IA/alias/mega menu/aux/mega-menu-cap-link
+IA/alias/mega menu/level 1/mega-menu-1_1
+IA/alias/mega menu/level 1/mega-menu-1_2
+IA/alias/mega menu/level 1/mega-menu-1_3
+IA/alias/mega menu/level 1/mega-menu-1_4
+IA/alias/mega menu/level 1/mega-menu-1_5
+IA/alias/mega menu/level 2/mega-menu-1_1_1
+IA/alias/mega menu/level 2/mega-menu-1_1_2
+IA/alias/mega menu/level 2/mega-menu-1_1_3
+IA/alias/mega menu/level 2/mega-menu-1_1_4
+IA/alias/mega menu/mega-menu-1
+IA/alias/mega menu/mega-menu-2
+IA/alias/mega menu/mega-menu-3
+IA/alias/mega menu/mega-menu-4
+IA/alias/mega menu/mega-menu-5
+IA/alias/mega menu/mega-menu-6
+IA/alias/plp/filter group/brands/group-title
+IA/alias/plp/filter group/brands/plp-filter-group-item-1
+IA/alias/plp/filter group/brands/plp-filter-group-item-10
+IA/alias/plp/filter group/brands/plp-filter-group-item-2
+IA/alias/plp/filter group/brands/plp-filter-group-item-3
+IA/alias/plp/filter group/brands/plp-filter-group-item-4
+IA/alias/plp/filter group/brands/plp-filter-group-item-5
+IA/alias/plp/filter group/brands/plp-filter-group-item-6
+IA/alias/plp/filter group/brands/plp-filter-group-item-7
+IA/alias/plp/filter group/brands/plp-filter-group-item-8
+IA/alias/plp/filter group/brands/plp-filter-group-item-9
+IA/alias/plp/filter group/category/group-title
+IA/alias/plp/filter group/category/plp-filter-group-item-1
+IA/alias/plp/filter group/category/plp-filter-group-item-2
+IA/alias/plp/filter group/quick/group-title
+IA/alias/plp/filter group/quick/plp-filter-group-item-1
+IA/alias/plp/filter group/quick/plp-filter-group-item-2
+IA/alias/plp/filter group/quick/plp-filter-group-item-3
+IA/alias/plp/filter group/quick/plp-filter-group-item-4
+IA/alias/plp/filter group/quick/plp-filter-group-item-5
+IA/alias/plp/filter group/quick/plp-filter-group-item-6
+IA/alias/plp/filter group/quick/plp-filter-group-item-7
+IA/alias/plp/filter group/quick/plp-filter-group-item-8
+IA/alias/plp/filter group/quick/plp-filter-group-item-9
+IA/alias/plp/plp-primary-category-description
+IA/alias/plp/ribbon/plp-ribbon-1
+IA/alias/plp/ribbon/plp-ribbon-10
+IA/alias/plp/ribbon/plp-ribbon-2
+IA/alias/plp/ribbon/plp-ribbon-3
+IA/alias/plp/ribbon/plp-ribbon-4
+IA/alias/plp/ribbon/plp-ribbon-5
+IA/alias/plp/ribbon/plp-ribbon-6
+IA/alias/plp/ribbon/plp-ribbon-7
+IA/alias/plp/ribbon/plp-ribbon-8
+IA/alias/plp/ribbon/plp-ribbon-9
+IA/alias/plp/ribbon/plp-ribbon-title
+IA/alias/search/content cat/cat-tech-how-to
+IA/alias/search/content cat/cat-tech-install
+IA/alias/search/content cat/cat-tech-maintenance
+IA/alias/search/content cat/cat-tech-title
+IA/alias/search/content cat/cat-tech-training
+IA/alias/search/content cat/cat-tech-warranty
+IA/alias/search/content cat/suggest/suggest-content-descr-1
+IA/alias/search/content cat/suggest/suggest-content-descr-2
+IA/alias/search/content cat/suggest/suggest-content-descr-3
+IA/alias/search/content cat/suggest/suggest-content-title-1
+IA/alias/search/content cat/suggest/suggest-content-title-2
+IA/alias/search/content cat/suggest/suggest-content-title-3
+IA/alias/search/prod cat/search-cat-title-1
+IA/alias/search/prod cat/search-cat-title-2
+IA/alias/search/prod cat/search-cat-title-3
+IA/alias/search/prod cat/search-cat-title-4
+IA/alias/search/prod cat/search-cat-title-5
+IA/alias/search/prod cat/search-cat-title-6
+IA/alias/search/query/search-query
+IA/alias/search/query/search-query-misspelled
+IA/alias/search/top level cat/cat-top-1
+IA/alias/search/top level cat/cat-top-2
+IA/alias/search/top level cat/cat-top-3
+IA/alias/search/top level cat/cat-top-4
+IA/alias/search/top level cat/cat-top-5
+IA/alias/store locator/store address/store-address-1
+IA/alias/store locator/store address/store-address-10
+IA/alias/store locator/store address/store-address-2
+IA/alias/store locator/store address/store-address-3
+IA/alias/store locator/store address/store-address-4
+IA/alias/store locator/store address/store-address-5
+IA/alias/store locator/store address/store-address-6
+IA/alias/store locator/store address/store-address-7
+IA/alias/store locator/store address/store-address-8
+IA/alias/store locator/store address/store-address-9
+IA/alias/store locator/store name/store-name-1
+IA/alias/store locator/store name/store-name-10
+IA/alias/store locator/store name/store-name-2
+IA/alias/store locator/store name/store-name-3
+IA/alias/store locator/store name/store-name-4
+IA/alias/store locator/store name/store-name-5
+IA/alias/store locator/store name/store-name-6
+IA/alias/store locator/store name/store-name-7
+IA/alias/store locator/store name/store-name-8
+IA/alias/store locator/store name/store-name-9
+IA/json/DO NOT EDIT
+IA/json/ia-json-02-26-2026-1
+IA/json/ia-json-02-26-2026-3
+IA/json/ia-json-05-14-2026-2
+IA/json/shuffle/ia-json-shuffle-1
+IA/json/shuffle/ia-json-shuffle-10
+IA/json/shuffle/ia-json-shuffle-100
+IA/json/shuffle/ia-json-shuffle-3
+IA/json/shuffle/ia-json-shuffle-4
+IA/json/shuffle/ia-json-shuffle-5
+IA/json/shuffle/ia-json-shuffle-6
+IA/json/shuffle/ia-json-shuffle-7
+IA/json/shuffle/ia-json-shuffle-8
+IA/json/shuffle/ia-json-shuffle-9
+IA/menu/0
+IA/menu/1 products/1
+IA/menu/1 products/audio/1_2
+IA/menu/1 products/audio/1_2_1
+IA/menu/1 products/laptops/1_1
+IA/menu/1 products/laptops/1_1_1
+IA/menu/1 products/laptops/pro series/1_1_2
+IA/menu/1 products/laptops/pro series/1_1_2_1
+IA/menu/1 products/laptops/pro series/1_1_2_2
+IA/menu/1 products/smartphones/1_3
+IA/menu/1 products/smartphones/flagship phones/1_3_1
+IA/menu/1 products/smartphones/flagship phones/1_3_1_1
+IA/menu/2 services & protection/2
+IA/menu/2 services & protection/2_2
+IA/menu/2 services & protection/extended warranty/2_1
+IA/menu/2 services & protection/extended warranty/2_1_1
+IA/menu/2 services & protection/extended warranty/2_1_2
+IA/menu/2 services & protection/repair services/2_3
+IA/menu/2 services & protection/repair services/2_3_1
+IA/menu/3 cart & checkout/3
+IA/menu/3 cart & checkout/checkout/3_2
+IA/menu/3 cart & checkout/checkout/3_2_1
+IA/menu/3 cart & checkout/checkout/3_2_2
+IA/menu/3 cart & checkout/checkout/3_2_3
+IA/menu/3 cart & checkout/checkout/3_2_4
+IA/menu/3 cart & checkout/shopping cart/3_1
+IA/menu/3 cart & checkout/shopping cart/3_1_1
+IA/menu/3 cart & checkout/shopping cart/3_1_2
+IA/menu/4 my account/4
+IA/menu/4 my account/4_1
+IA/menu/4 my account/my warranties/4_3
+IA/menu/4 my account/my warranties/4_3_1
+IA/menu/4 my account/my warranties/4_3_2
+IA/menu/4 my account/order history/4_2
+IA/menu/4 my account/order history/4_2_1
+IA/menu/5 support/5
+IA/menu/5 support/contact us/5_2
+IA/menu/5 support/contact us/5_2_1
+IA/menu/5 support/knowledge base/5_1
+IA/menu/5 support/knowledge base/5_1_1
+IA/menu/5 support/knowledge base/5_1_2
+IA/product/attributes/brand-manufacturer/attr-1
+IA/product/attributes/brand-manufacturer/attr-10
+IA/product/attributes/brand-manufacturer/attr-2
+IA/product/attributes/brand-manufacturer/attr-3
+IA/product/attributes/brand-manufacturer/attr-4
+IA/product/attributes/brand-manufacturer/attr-5
+IA/product/attributes/brand-manufacturer/attr-6
+IA/product/attributes/brand-manufacturer/attr-7
+IA/product/attributes/brand-manufacturer/attr-8
+IA/product/attributes/brand-manufacturer/attr-9
+IA/product/attributes/brand-manufacturer/group-title
+IA/product/attributes/capacity-volume/attr-1
+IA/product/attributes/capacity-volume/attr-10
+IA/product/attributes/capacity-volume/attr-2
+IA/product/attributes/capacity-volume/attr-3
+IA/product/attributes/capacity-volume/attr-4
+IA/product/attributes/capacity-volume/attr-5
+IA/product/attributes/capacity-volume/attr-6
+IA/product/attributes/capacity-volume/attr-7
+IA/product/attributes/capacity-volume/attr-8
+IA/product/attributes/capacity-volume/attr-9
+IA/product/attributes/capacity-volume/group-title
+IA/product/attributes/color-family/filter-color-family-1
+IA/product/attributes/color-family/filter-color-family-10
+IA/product/attributes/color-family/filter-color-family-2
+IA/product/attributes/color-family/filter-color-family-3
+IA/product/attributes/color-family/filter-color-family-4
+IA/product/attributes/color-family/filter-color-family-5
+IA/product/attributes/color-family/filter-color-family-6
+IA/product/attributes/color-family/filter-color-family-7
+IA/product/attributes/color-family/filter-color-family-8
+IA/product/attributes/color-family/filter-color-family-9
+IA/product/attributes/color-family/filter-color-family-hex-1
+IA/product/attributes/color-family/filter-color-family-hex-10
+IA/product/attributes/color-family/filter-color-family-hex-2
+IA/product/attributes/color-family/filter-color-family-hex-3
+IA/product/attributes/color-family/filter-color-family-hex-4
+IA/product/attributes/color-family/filter-color-family-hex-5
+IA/product/attributes/color-family/filter-color-family-hex-6
+IA/product/attributes/color-family/filter-color-family-hex-7
+IA/product/attributes/color-family/filter-color-family-hex-8
+IA/product/attributes/color-family/filter-color-family-hex-9
+IA/product/attributes/color-family/group-title
+IA/product/attributes/color/group-title
+IA/product/attributes/color/product-color-1
+IA/product/attributes/color/product-color-10
+IA/product/attributes/color/product-color-2
+IA/product/attributes/color/product-color-3
+IA/product/attributes/color/product-color-4
+IA/product/attributes/color/product-color-5
+IA/product/attributes/color/product-color-6
+IA/product/attributes/color/product-color-7
+IA/product/attributes/color/product-color-8
+IA/product/attributes/color/product-color-9
+IA/product/attributes/color/product-color-hex-1
+IA/product/attributes/color/product-color-hex-10
+IA/product/attributes/color/product-color-hex-2

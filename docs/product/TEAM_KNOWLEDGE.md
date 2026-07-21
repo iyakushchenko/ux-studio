@@ -151,6 +151,12 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 - Pax (PO sim): <accept bar / bump call> — applied: <decision>
 ```
 
+**Knowledge improved** (2026-07-21 · stream: prove FAIL camera flake + PO latch wipe · local):
+- Arch (Director): Mid-prove FAIL must escalate immediately — not wrap-up only — applied: this ship · LESSONS
+- Finn (FE): forceClear clears PO latch; path-deviation grace 0.12 + threshold 48 — applied: agentTestingOverlay · playbackScrollAnomalies
+- Quinn (QA): Agentic 22/22 + immediate re-prove no DIAGNOSTIC_ACK_STOP — applied: `:5173` MCP
+- Pax (PO sim): History/Details Make stay board #7 — applied: NEXT_STEPS · no invent migrate
+
 **Knowledge improved** (2026-07-21 · stream: long REC Play login interstitial · no push):
 - Arch (Director): Read QA first when FAIL already logged; login interstitial ≠ invent green — applied: LESSONS · this ship
 - Finn (FE): `playRecordedClick` drains login (not choose-pharmacy) before retry / after Book Now — applied: recordedClickPlayback · recModalDrain

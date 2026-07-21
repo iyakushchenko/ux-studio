@@ -27,7 +27,7 @@ const MAX_LINES = 1600;
 const ALLOWLIST = {
   // LEGACY Make dumps — do not grow; retirement is screen-by-screen.
   "src/styles/globals-screens.css": 3200,
-  "src/styles/globals-chrome.css": 2600,
+  "src/styles/globals-chrome.css": 2650, // + carriage OS cursor CSS (large demo I-beam)
   "src/styles/globals-hub.css": 1400,
   // Engine / hybrid monsters — prefer domain split over bumping.
   "src/app/orchestra/useJourneyPlayback.ts": 2230, // + director handoff + recordedClick note start
@@ -35,7 +35,7 @@ const ALLOWLIST = {
   "src/app/shell/agent-testing/agentTestingOverlay.ts": 4800, // + Reset capture-off + ring restore coalesce + Save Log silent pause
   "src/app/nav/studioNavPanel.css": 1700, // + MCP status hint near version/bug
   "src/app/shell/studioMcpHelpers.ts": 1380, // + Traditional keep-overlay full Play prove window API
-  "src/app/scenario/demoCursor.ts": 1980, // + degrade-container FAIL + early overlay guard
+  "src/app/scenario/demoCursor.ts": 2200, // + steady binary latch / thrash watch / carriage graphic
   "src/projects/boots-pharmacy/wire/BootsPharmacyProjectView.tsx": 4840, // + page-land only on screen change (no isPlaying yank)
   "src/projects/boots-pharmacy/data/plpListing.ts": 2000, // Make PLP DOM; retire with PLP React
 };

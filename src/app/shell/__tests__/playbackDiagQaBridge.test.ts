@@ -193,6 +193,29 @@ describe("playbackDiagQaBridge", () => {
     ).toBe(true);
   });
 
+  it("mirrors cursor graphic thrash as FAIL", () => {
+    const e = ev({
+      kind: "cursor",
+      detail:
+        "GRAPHIC-THRASH FAIL — cursor-engine:graphic-thrash — arrow→pointer→arrow <200ms",
+    });
+    expect(shouldMirrorPlaybackDiagToQa(e)).toBe(true);
+    expect(outcomeForPlaybackDiagEvent(e)).toBe("fail");
+    expect(labelForPlaybackDiagEvent(e)).toMatch(/thrash/i);
+  });
+
+  it("mirrors cursor graphic changes (arrow / hand / carriage)", () => {
+    for (const [detail, label] of [
+      ["cursor-engine:graphic-arrow — arrow", "Cursor → arrow"],
+      ["cursor-engine:graphic-hand — pointer", "Cursor → hand"],
+      ["cursor-engine:graphic-carriage — carriage", "Cursor → carriage (text)"],
+    ] as const) {
+      const e = ev({ kind: "cursor", detail });
+      expect(shouldMirrorPlaybackDiagToQa(e)).toBe(true);
+      expect(labelForPlaybackDiagEvent(e)).toBe(label);
+    }
+  });
+
   it("ignores small upward camera nudge", () => {
     const nudge = ev({
       kind: "scroll",

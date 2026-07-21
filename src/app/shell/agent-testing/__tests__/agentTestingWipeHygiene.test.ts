@@ -44,6 +44,12 @@ import {
   hydrateQaDiagGate,
   isQaDiagGateOpen,
 } from "@/app/shell/qaDiagGate";
+import {
+  latchPoSignal,
+  peekPoSignal,
+} from "@/app/shell/agent-testing/agentTestingPoSignal";
+import { requireFreshQaSession } from "@/app/shell/requireFreshQaSession";
+import { acknowledgePlaybackDiagnosticStop } from "@/app/shell/agent-testing/agentTestingPlaybackHalt";
 
 describe("agentTesting wipe hygiene (forceClear / softClose)", () => {
   beforeEach(() => {
@@ -101,6 +107,25 @@ describe("agentTesting wipe hygiene (forceClear / softClose)", () => {
     expect(timeoutFn).not.toHaveBeenCalled();
     delete (window as Window & { __studioQaPendingTimeoutMs?: number })
       .__studioQaPendingTimeoutMs;
+  });
+
+  it("forceClear wipes DIAGNOSTIC_ACK_STOP so next prove is not aborted", () => {
+    acknowledgePlaybackDiagnosticStop("overlay-cancel");
+    expect(peekPoSignal()?.code).toBe("DIAGNOSTIC_ACK_STOP");
+    forceClearAgentTestingOverlay();
+    expect(peekPoSignal()).toBeNull();
+  });
+
+  it("requireFreshQaSession ALWAYS CLEAR wipes stale DIAGNOSTIC_ACK_STOP", () => {
+    latchPoSignal({
+      type: "alarm",
+      code: "DIAGNOSTIC_ACK_STOP",
+      note: "stale from prior prove",
+    });
+    expect(peekPoSignal()?.code).toBe("DIAGNOSTIC_ACK_STOP");
+    const qa = requireFreshQaSession("AGENT TESTING — prove latch wipe");
+    expect(qa.ok).toBe(true);
+    expect(peekPoSignal()).toBeNull();
   });
 
   it("soft touch keeps MANUAL title (no wipe → AGENT TESTING)", () => {

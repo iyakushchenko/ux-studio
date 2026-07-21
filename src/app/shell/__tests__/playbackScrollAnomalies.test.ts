@@ -72,6 +72,36 @@ describe("playbackScrollAnomalies", () => {
     expect(anomaly?.kind).toBe("scroll-path-deviation");
   });
 
+  it("skips early-frame path deviation (book-step3-camera prove flake)", () => {
+    // Prove FAIL: progress≈0.03 expected≈115 actual≈78 → 37px vs old 36px threshold.
+    // Reconstruct: easeOutCubic(0.03)≈0.087 → travel≈115/0.087≈1320.
+    const duration = 1000;
+    const now = 30; // progress 0.03 < MIN 0.12
+    expect(
+      detectScrollPathDeviation({
+        startTop: 0,
+        targetTop: 1320,
+        duration,
+        startTime: 0,
+        actualTop: 78,
+        now,
+      })
+    ).toBeNull();
+  });
+
+  it("still FAILS mid-path large lag after grace", () => {
+    expect(
+      detectScrollPathDeviation({
+        startTop: 0,
+        targetTop: 400,
+        duration: 800,
+        startTime: 0,
+        actualTop: 80,
+        now: 400, // progress 0.5
+      })?.kind
+    ).toBe("scroll-path-deviation");
+  });
+
   it("does not false-positive plp-open-pdp eased scroll at early progress", () => {
     const startTop = 0;
     const targetTop = 290;

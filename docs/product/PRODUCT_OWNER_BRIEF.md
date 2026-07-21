@@ -189,6 +189,7 @@ Avoid:
 | 2026-07-19 | Next build: recording UI, then UXDS inventory, then one Boots React pilot |
 | 2026-07-19 | UXDS Larkin links delivered (styleguide + components); variables inventoried in `docs/uxds/` |
 | 2026-07-19 | X-Suite (Summarizer) will later feed personas/CJMs/IA into Studio for semi-automated agentic CJMs — see X_SUITE_INTEGRATION.md |
+| 2026-07-21 | **X-Suite CJM path (HARD):** PO exports persona CJM from X-Suite → shares with agent → agent **analyzes** → ensures project has **all pages** → pages on Studio templates + UXDS styleguide/components + naming for cursor/camera → **ask PO for coarse concept / UXDS page prototype reference** → **reuse existing React pages** (no drift/dupes) → **REC a new CJM** in Studio (`source: x-suite`). Automated importer later. See X_SUITE_INTEGRATION.md |
 | 2026-07-19 | Studio intake = often messy early concepts; agent upgrades to React+UXDS. Structured UXDS pages rare as feed. Make container `32452:19405` = typical class. See CONCEPT_INTAKE.md |
 | 2026-07-19 | Concepts bring own brand colors/logos → project styleguide DELTA + small theme.css so brands don’t all look the same. See PROJECT_STYLEGUIDE.md |
 | 2026-07-19 | Remaining solution defaults locked (page DoD, desktop-first, fake data OK, Boots screen-by-screen). See SOLUTION_REQUIREMENTS.md — comfortable to proceed |

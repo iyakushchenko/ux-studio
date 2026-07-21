@@ -1,5 +1,6 @@
 import defaultCursorUrl from "@/assets/default-cursor.svg";
 import handIndexCursorUrl from "@/assets/hand-index-cursor.svg";
+import carriageCursorUrl from "@/assets/carriage-cursor.svg";
 import {
   beginDemoTargetPageScroll,
   isDemoTargetInPrototypeView,
@@ -45,7 +46,11 @@ import {
 import {
   CURSOR_ENGINE_PARK_TRAVEL_MS,
   isForbiddenRestTarget,
+  isTextEntryFocusTarget,
   logCursorEngineTracker,
+  noteCursorGraphicModeChange,
+  beginCursorGraphicThrashWatch,
+  endCursorGraphicThrashWatch,
   resolveCursorParkDecision,
   resolveEarlyHandAtHotspot,
   resolvePostInteractionPark,
@@ -57,11 +62,17 @@ export { isDemoCursorHotspotOnTarget } from "@/app/scenario/demoCursorOnTarget";
 export {
   CURSOR_ENGINE_PARK_TRAVEL_MS,
   CURSOR_ENGINE_TRAVEL_MS,
+  CURSOR_GRAPHIC_THRASH_WINDOW_MS,
   FORBIDDEN_REST_TARGET_SELECTORS,
   isForbiddenRestTarget,
   isEarlyHandInteractiveTarget,
   isHotspotOverInteractiveEdge,
+  isTextEntryFocusTarget,
   logCursorEngineTracker,
+  noteCursorGraphicModeChange,
+  resetCursorGraphicThrashWindow,
+  beginCursorGraphicThrashWatch,
+  endCursorGraphicThrashWatch,
   resolveCursorParkDecision,
   resolveEarlyHandAtHotspot,
   resolvePostInteractionPark,
@@ -76,7 +87,15 @@ const CURSOR_ARROW_SVG = `<img class="proto-chat-demo-cursor__graphic proto-chat
 
 const CURSOR_HAND_SVG = `<img class="proto-chat-demo-cursor__graphic proto-chat-demo-cursor__graphic--hand" src="${handIndexCursorUrl}" width="24" height="37" alt="" aria-hidden="true" draggable="false" />`;
 
-const DEMO_CURSOR_MARKUP = `${CURSOR_ARROW_SVG}${CURSOR_HAND_SVG}`;
+/** I-beam / caret — text entry + chat composer focus (and type-in park).
+ * Intrinsic size matches demo box (tall like arrow/hand — not tiny 7×22). */
+const CURSOR_CARRIAGE_SVG = `<img class="proto-chat-demo-cursor__graphic proto-chat-demo-cursor__graphic--carriage" src="${carriageCursorUrl}" width="14" height="44" alt="" aria-hidden="true" draggable="false" />`;
+
+const DEMO_CURSOR_MARKUP = `${CURSOR_ARROW_SVG}${CURSOR_HAND_SVG}${CURSOR_CARRIAGE_SVG}`;
+
+export type DemoCursorGraphicMode = "arrow" | "pointer" | "carriage";
+export const DEMO_CURSOR_CARRIAGE_CLASS = "proto-chat-demo-cursor--carriage";
+export const DEMO_CURSOR_POINTER_CLASS = "proto-chat-demo-cursor--pointer";
 
 const CTA_TRAVEL_MS = 780;
 /** Native-feel press: down → brief dwell → up → click (not instant synthetic). */
@@ -136,6 +155,19 @@ let cursorPosLocked = false;
 const SYNTHETIC_MOVE_MIN_MS = 48;
 let lastSyntheticMoveAt = 0;
 let lastSyntheticMoveKey = "";
+/**
+ * Type-in park forces carriage until next travel / CTA hover / remove.
+ * Do NOT key off bare document.activeElement — focus often sticks on the
+ * composer after type-in while Play continues hover/click elsewhere (stale I-beam).
+ */
+let typeInCarriageLatch = false;
+/** Set on text-field focusin; cleared on blur, travel, or non-text CTA hover. */
+let textFocusCarriageLatch = false;
+/** Mid-travel early hand-on-edge (setDemoCursorPointerMode alone is SSoT via sync). */
+let travelPointerHint = false;
+let textEntryFocusWatchBound = false;
+/** Last applied graphic — QA logs only on change. */
+let lastAppliedGraphicMode: DemoCursorGraphicMode | null = null;
 
 function writeDemoCursorPos(
   cursor: HTMLElement,
@@ -314,6 +346,8 @@ export function parkDemoCursorForTypeIn(
   cancelDemoCursorJourneyEndFade();
   journeyEndCursorFaded = false;
   cancelDemoCursorTravel();
+  typeInCarriageLatch = true;
+  ensureTextEntryFocusWatch();
   const cursor = ensureDemoCursorElement();
   // Hold journey park pose — no slide as typed text lands.
   if (
@@ -321,6 +355,7 @@ export function parkDemoCursorForTypeIn(
     parkedRestAnchor
   ) {
     applyDemoCursorParkedState(cursor);
+    syncDemoCursorGraphicMode();
     logCursorEngineTracker("type-in-hold", { reason: "type-in-park" });
     notePlaybackCursorEvent("park", {
       detail: "type-in-park",
@@ -333,6 +368,7 @@ export function parkDemoCursorForTypeIn(
   const rest = resolveDemoCursorRestPosition();
   seedDemoCursorPosition(cursor, { x: rest.left, y: rest.top });
   applyDemoCursorParkedState(cursor);
+  syncDemoCursorGraphicMode();
   logCursorEngineTracker("park-force", { reason: "type-in-park" });
   notePlaybackCursorEvent("park", {
     detail: "type-in-park",
@@ -488,13 +524,21 @@ function prepareDemoCursorForTravel(cursor: HTMLElement): { x: number; y: number
 }
 
 function ensureDemoCursorElement(): HTMLElement {
+  ensureTextEntryFocusWatch();
   const existing = document.querySelector<HTMLElement>(".proto-chat-demo-cursor");
-  if (existing) return existing;
+  if (existing) {
+    if (!existing.querySelector(".proto-chat-demo-cursor__graphic--carriage")) {
+      existing.innerHTML = DEMO_CURSOR_MARKUP;
+    }
+    syncDemoCursorGraphicMode();
+    return existing;
+  }
 
   const cursor = document.createElement("div");
   cursor.className = "proto-chat-demo-cursor";
   cursor.innerHTML = DEMO_CURSOR_MARKUP;
   document.body.appendChild(cursor);
+  syncDemoCursorGraphicMode();
   return cursor;
 }
 
@@ -503,11 +547,12 @@ function applyDemoCursorParkedState(cursor: HTMLElement): void {
   cursor.classList.remove(
     "proto-chat-demo-cursor--exit",
     "proto-chat-demo-cursor--tap",
-    "proto-chat-demo-cursor--pointer"
+    DEMO_CURSOR_POINTER_CLASS,
+    DEMO_CURSOR_CARRIAGE_CLASS
   );
   cursor.classList.add(DEMO_CURSOR_PARKED_CLASS);
   cursor.style.opacity = "1";
-  setDemoCursorPointerMode(false);
+  syncDemoCursorGraphicMode();
 }
 
 function seedDemoCursorPosition(
@@ -691,8 +736,11 @@ export function setDemoCursorJourneyMode(
     cancelDemoCursorJourneyEndFade();
     journeyEndCursorFaded = false;
     parkedRestAnchor = null;
+    clearTypeInCarriageLatch();
     return;
   }
+
+  ensureTextEntryFocusWatch();
 
   if (!wasActive) {
     parkedRestAnchor = null;
@@ -782,6 +830,8 @@ async function animateCursorTravel(
     trackTarget?: HTMLElement;
     /** Destination for early hand-on-edge during travel. */
     earlyHandTarget?: HTMLElement | null;
+    /** Keep hand hint through settle until hover root attaches (no blink). */
+    keepPointerHintOnSettle?: boolean;
     shouldAbort?: () => boolean;
   }
 ): Promise<boolean> {
@@ -795,7 +845,9 @@ async function animateCursorTravel(
   let frozenEndY = endY;
   let tracking = Boolean(options?.trackTarget);
   const earlyHandDest = options?.earlyHandTarget ?? options?.trackTarget ?? null;
-  // Park travel → arrow; CTA travel may flip hand early on edge.
+  // Park travel → arrow; CTA travel may flip hand early on edge (monotonic latch).
+  travelPointerHint = false;
+  beginCursorGraphicThrashWatch();
   setDemoCursorPointerMode(false);
 
   const resolveEnd = () => {
@@ -809,7 +861,10 @@ async function animateCursorTravel(
 
   cursor.style.transition = "none";
   noteCursorPathSample("travel", startX, startY);
-  if (aborted()) return false;
+  if (aborted()) {
+    endCursorGraphicThrashWatch();
+    return false;
+  }
 
   // HARD: FM `controls.stop()` does NOT settle `await controls` (hangs forever).
   // Abort mid-travel stranded scripts until 45s timeout (confirmation-open-appointments).
@@ -845,14 +900,18 @@ async function animateCursorTravel(
         const y = startY + (end.y - startY) * progress;
         if (cursor.isConnected) writeDemoCursorPos(cursor, x, y, { force: true });
         noteCursorPathSample("travel", x, y);
-        // Early hand as soon as tip crosses interactive edge (CTA travel only).
-        if (earlyHandDest) {
+        // Steady binary: destination-edge only; latch hand once (never clear mid-travel).
+        if (earlyHandDest && !travelPointerHint) {
           const hx = x + CURSOR_HOTSPOT_X;
           const hy = y + CURSOR_HOTSPOT_Y;
           const hand = resolveEarlyHandAtHotspot(hx, hy, {
             destination: earlyHandDest,
+            destinationOnly: true,
           });
-          setDemoCursorPointerMode(hand);
+          if (hand) {
+            travelPointerHint = true;
+            setDemoCursorPointerMode(true);
+          }
         }
       },
       onComplete: settle,
@@ -878,7 +937,10 @@ async function animateCursorTravel(
     }, travelMs + 80);
   });
 
-  if (aborted()) return false;
+  if (aborted()) {
+    endCursorGraphicThrashWatch();
+    return false;
+  }
 
   const finalEnd = resolveEnd();
   if (cursor.isConnected) {
@@ -886,6 +948,10 @@ async function animateCursorTravel(
   }
   lastCursorPos = { x: finalEnd.x, y: finalEnd.y };
   cursorPosLocked = true;
+  // Keep hand through settle when hover will attach next — avoid hand→arrow→hand blink.
+  if (!options?.keepPointerHintOnSettle) {
+    travelPointerHint = false;
+  }
   noteCursorPathSample("settle", finalEnd.x, finalEnd.y);
   notePlaybackCursorEvent("settle", {
     target: options?.trackTarget
@@ -894,6 +960,8 @@ async function animateCursorTravel(
     animated: true,
     detail: "on-target-lock",
   });
+  syncDemoCursorGraphicMode();
+  endCursorGraphicThrashWatch();
   return true;
 }
 
@@ -1040,6 +1108,7 @@ function acquireDemoCursorElement(): HTMLElement {
   if (journeyModePinned) {
     seedDemoCursorPosition(cursor, resolveDemoCursorSeedPosition());
   }
+  syncDemoCursorGraphicMode();
   return cursor;
 }
 
@@ -1118,15 +1187,124 @@ export function clearDemoCtaStates(): void {
 }
 
 function setDemoCursorPointerMode(active: boolean): void {
-  document.querySelectorAll<HTMLElement>(".proto-chat-demo-cursor").forEach((cursor) => {
-    cursor.classList.toggle("proto-chat-demo-cursor--pointer", active);
-  });
+  // `active` is driven by hover root; graphic resolution is SSoT in sync.
+  void active;
+  syncDemoCursorGraphicMode();
+}
+
+function isTextEntryFocused(): boolean {
+  if (typeof document === "undefined") return false;
+  return isTextEntryFocusTarget(document.activeElement);
+}
+
+/**
+ * Graphic SSoT:
+ * 1) CTA hover / travel early-hand → hand (never I-beam mid click path)
+ * 2) type-in latch or fresh text focusin latch → carriage
+ * 3) else arrow
+ * Bare sticky focus after type-in does NOT keep carriage (Play hover/click).
+ */
+function resolveDemoCursorGraphicMode(): DemoCursorGraphicMode {
+  if (activeHoverRoot || travelPointerHint) return "pointer";
+  if (typeInCarriageLatch || textFocusCarriageLatch) return "carriage";
+  return "arrow";
+}
+
+function applyDemoCursorGraphicMode(mode: DemoCursorGraphicMode): void {
+  if (typeof document === "undefined") return;
+  document
+    .querySelectorAll<HTMLElement>(".proto-chat-demo-cursor")
+    .forEach((cursor) => {
+      cursor.classList.toggle(DEMO_CURSOR_POINTER_CLASS, mode === "pointer");
+      cursor.classList.toggle(DEMO_CURSOR_CARRIAGE_CLASS, mode === "carriage");
+    });
+}
+
+function graphicModeTrackerTag(
+  mode: DemoCursorGraphicMode
+): "graphic-arrow" | "graphic-hand" | "graphic-carriage" {
+  if (mode === "carriage") return "graphic-carriage";
+  if (mode === "pointer") return "graphic-hand";
+  return "graphic-arrow";
+}
+
+/** Recompute arrow | hand | carriage from focus + hover + type-in latch. */
+export function syncDemoCursorGraphicMode(): void {
+  const mode = resolveDemoCursorGraphicMode();
+  applyDemoCursorGraphicMode(mode);
+  const hasCursor =
+    typeof document !== "undefined" &&
+    !!document.querySelector(".proto-chat-demo-cursor");
+  if (!hasCursor) {
+    lastAppliedGraphicMode = null;
+    return;
+  }
+  if (mode === lastAppliedGraphicMode) return;
+  lastAppliedGraphicMode = mode;
+  try {
+    noteCursorGraphicModeChange(mode);
+    logCursorEngineTracker(graphicModeTrackerTag(mode), {
+      reason: `graphic:${mode}`,
+      detail: `cursor-engine:${graphicModeTrackerTag(mode)} — ${mode}`,
+    });
+  } catch {
+    /* hang-safe */
+  }
+}
+
+function ensureTextEntryFocusWatch(): void {
+  if (textEntryFocusWatchBound || typeof document === "undefined") return;
+  textEntryFocusWatchBound = true;
+  document.addEventListener(
+    "focusin",
+    (ev) => {
+      const t = ev.target;
+      if (t instanceof Element && isTextEntryFocusTarget(t)) {
+        textFocusCarriageLatch = true;
+      }
+      syncDemoCursorGraphicMode();
+    },
+    true
+  );
+  document.addEventListener(
+    "focusout",
+    () => {
+      queueMicrotask(() => {
+        if (!isTextEntryFocused()) {
+          textFocusCarriageLatch = false;
+        }
+        syncDemoCursorGraphicMode();
+      });
+    },
+    true
+  );
+}
+
+function clearTypeInCarriageLatch(): void {
+  typeInCarriageLatch = false;
+  textFocusCarriageLatch = false;
+}
+
+/** End type-in / force arrow|hand — clears both carriage latches + resyncs. */
+export function clearDemoCursorCarriageLatches(): void {
+  clearTypeInCarriageLatch();
+  syncDemoCursorGraphicMode();
 }
 
 /** QA / MCP — true when robo-cursor shows hand/pointer graphic. */
 export function isDemoCursorPointerMode(): boolean {
   const cursor = document.querySelector<HTMLElement>(".proto-chat-demo-cursor");
-  return cursor?.classList.contains("proto-chat-demo-cursor--pointer") ?? false;
+  return cursor?.classList.contains(DEMO_CURSOR_POINTER_CLASS) ?? false;
+}
+
+/** QA / MCP — true when robo-cursor shows carriage (I-beam) graphic. */
+export function isDemoCursorCarriageMode(): boolean {
+  const cursor = document.querySelector<HTMLElement>(".proto-chat-demo-cursor");
+  return cursor?.classList.contains(DEMO_CURSOR_CARRIAGE_CLASS) ?? false;
+}
+
+export function getDemoCursorGraphicMode(): DemoCursorGraphicMode {
+  return resolveDemoCursorGraphicMode();
 }
 
 function leaveDemoInteractionRoot(
@@ -1172,6 +1350,11 @@ function setDemoInteractionHover(
   const c = coords ?? targetCenter(root);
   const already = activeHoverRoot === root && root.classList.contains(DEMO_HOVER_CLASS);
   activeHoverRoot = root;
+  // Non-text CTA hover must not leave a stale carriage latch for after leave.
+  if (!isTextEntryFocusTarget(root)) {
+    typeInCarriageLatch = false;
+    textFocusCarriageLatch = false;
+  }
   setDemoCursorPointerMode(true);
   root.classList.add(DEMO_HOVER_CLASS);
   root.setAttribute(DEMO_ROBO_HOVER_ATTR, "true");
@@ -1187,6 +1370,9 @@ function clearDemoCursorImmediate(): void {
   cursorFadeGeneration += 1;
   cursorPosLocked = false;
   clearHoldAtLastClick();
+  clearTypeInCarriageLatch();
+  travelPointerHint = false;
+  lastAppliedGraphicMode = null;
   notePlaybackCursorEvent("remove", { detail: "immediate" });
   document
     .querySelectorAll<HTMLElement>(".proto-chat-demo-cursor")
@@ -1536,6 +1722,7 @@ export async function moveDemoCursorTo(
   // New director travel supersedes post-click hold + prior CTA hover
   // (never leave previous target looking hovered while tip is mid-flight).
   clearHoldAtLastClick();
+  clearTypeInCarriageLatch();
   cancelDemoCursorParkInFlight();
   clearDemoCtaStates();
 
@@ -1609,6 +1796,7 @@ export async function moveDemoCursorTo(
       // Track only while a real page scroll is running; frozen ≥90% progress.
       trackTarget: syncPageScroll && scrollDurationMs > 0 ? target : undefined,
       earlyHandTarget: interactionRoot,
+      keepPointerHintOnSettle: applyHover,
       shouldAbort: () => travelAborted(),
     }
   );
@@ -1624,6 +1812,12 @@ export async function moveDemoCursorTo(
   // Hover after settle — native light-touch; no mid-travel re-aim from layout shift.
   if (applyHover) {
     setDemoInteractionHover(interactionRoot, true);
+    // Hover root owns hand now — drop travel latch without arrow blink.
+    travelPointerHint = false;
+    syncDemoCursorGraphicMode();
+  } else {
+    travelPointerHint = false;
+    syncDemoCursorGraphicMode();
   }
   await delay(32);
   if (travelAborted()) return bail();

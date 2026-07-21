@@ -2,6 +2,14 @@
 
 > _Append a bullet on coherent commits via `npm run notes:append -- --lane="<lane>" --intent="<text>"`. Preview with `npm run notes:preview`. On `npm run release:patch` this section is promoted to `## v<X.Y.Z> - DDMMYY` and a fresh empty `## Current` is re-inserted. Policy: `docs/product/VERSIONING.md`._
 
+## v0.0.103 - 210726
+- **docs:** X-Suite CJM path: PO export → agent analyze → full page set (UXDS/templates/names) → REC new CJM; ask for prototypes; reuse React
+- **shell:** forceClear wipes DIAGNOSTIC_ACK_STOP; scroll-path-deviation grace 0.12 + threshold 48 (agentic prove flake)
+- **shell:** Cursor engine carriage I-beam graphic on text/composer focus + OS CSS in studio-viewport
+- **shell:** QA logger mirrors cursor graphic changes (arrow/hand/carriage); keep large 37px demo cursor size for all graphics
+- **shell:** Fix stale carriage cursor: hand wins over I-beam on hover/click; clear carriage latches on type-in-end/travel (not sticky composer focus)
+- **shell:** Steady binary cursor: destination-only early-hand latch + settle handoff; GRAPHIC-THRASH FAIL in QA
+
 ## v0.0.102 - 210726
 - **shell:** QA chat lean: no Camera:wait dwell; fix playback-diag ring twin (refresh ×2); lean login drain; Save Log qa-{kind} filename; Reset capture-off; HMR one listener
 

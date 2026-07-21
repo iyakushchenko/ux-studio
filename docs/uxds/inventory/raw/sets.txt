@@ -1,0 +1,222 @@
+component.address.group
+component.appointment.summary
+component.aux.nav.cart.amount
+component.b2b.ma.invoice.select.and.filter.list
+component.b2b.pdp.pricing.table.row
+component.book.appointment.progress
+component.book.appointment.step.02.location.card
+component.brand.logo
+component.bulk.added.products.list
+component.bulk.csv.or.xls
+component.bulk.order.add.to.cart.button
+component.bulk.order.choice.add.to.cart
+component.bulk.order.full.width.search
+component.cart.popup.select.bonus.product.tile
+component.case.priority
+component.case.status
+component.checkout.form.store.pickup
+component.checkout.step.2
+component.checkout.store
+component.co.address.form
+component.co.form.payment.types
+component.co.login
+component.co.payment.billing.address
+component.co.payment.card.block
+component.co.payment.methods.bank
+component.co.payment.methods.credit.debit
+component.co.payment.methods.paypal
+component.co.product.in.this.order
+component.co.product.summary
+component.co.shipping.address.block
+component.co.shipping.options
+component.co.shipping.pickup.stores
+component.co.step.3
+component.co.step.accordion
+component.co.step.title
+component.comparison.table
+component.content.slot.blog.a
+component.content.slot.blog.b
+component.content.slot.blog.c
+component.content.slot.blog.x3
+component.content.slot.contact.us
+component.content.slot.hp.hero
+component.content.slot.members
+component.content.slot.new.season
+component.content.slot.promo.2
+component.content.slot.rich.tile
+component.content.slot.rich.tile.grid
+component.content.slot.supply.updates
+component.filter.controls
+component.footer.accordion.item
+component.footer.accordion.section.1
+component.footer.accordion.section.2
+component.footer.accordion.section.3
+component.footer.accordion.section.4
+component.footer.misc.subscription
+component.gse.accordion
+component.gse.availability.status
+component.gse.delimiter
+component.gse.header.ma.flyout
+component.gse.load.more
+component.gse.product.tile.promotion
+component.gse.quantity.stepper
+component.gse.scrollbar.zero.width.offset
+component.gse.system.message
+component.gse.tab.basic
+component.gse.tooltip
+component.header.aux.nav.icon.cart
+component.header.hamburger.menu.item
+component.header.mega.menu.navigation.folders
+component.header.misc.hamburger.menu.header
+component.laptop.specs.table
+component.ma.acc.overview.address
+component.ma.acc.overview.default.payment
+component.ma.acc.overview.marketing.prefs
+component.ma.acc.overview.my.list
+component.ma.acc.overview.profile.details
+component.ma.acc.overview.recent.order
+component.ma.address.item
+component.ma.form.sign.up
+component.ma.invoice.item
+component.ma.navigation.menu.item
+component.ma.order.details.refund.summary
+component.ma.order.details.return.item.tile
+component.ma.payment.method.card
+component.ma.payment.method.card.tile
+component.ma.sign.in.sign.up
+component.ma.social.auth
+component.mega.menu.item
+component.pdp.accordion
+component.pdp.content.slot.rich
+component.pdp.content.slot.rich.tab
+component.pdp.content.slot.rich.tile
+component.pdp.set.sub.variant
+component.pdp.sticky.add.to.cart
+component.pdp.stock.status
+component.pdp.swatch.color
+component.pdp.swatch.color.tile
+component.pdp.swatch.text
+component.plp.cat.1.level
+component.plp.cat.2.level
+component.plp.filter.accordion
+component.plp.filter.brands
+component.plp.filter.category
+component.plp.filter.color.family
+component.plp.filter.color.family
+component.plp.filter.custom
+component.plp.filter.graphic.item
+component.plp.filter.price.range
+component.plp.filter.quick.view
+component.plp.filter.ribbon
+component.plp.filter.text.item
+component.plp.ribbon.tile
+component.plp.swatch.color.family
+component.plp.tile.rating
+component.prd.badge
+component.prd.image.thumbs
+component.product.filter.swatch.variations
+component.product.image.basic
+component.product.image.zoom.carousel
+component.product.image.zoom.fullscreen
+component.product.image.zoom.thumbnail
+component.product.price
+component.product.tile
+component.product.tile.image
+component.product.tile.swatch.text.item
+component.qty.add.to.cart
+component.scs.co.badge
+component.scs.coupon.on.cart
+component.search.form
+component.search.fullscreen.field
+component.service.menu.cat.1.level
+component.service.menu.cat.2.level
+component.service.menu.categories
+component.shipment.address.option
+component.slot.13
+component.slot.16
+component.slot.a
+component.slot.b
+component.slot.c
+component.slot.categories.ribbon
+component.slot.clp.hero
+component.slot.d
+component.slot.e
+component.slot.find.a.store
+component.store.address.cta
+component.store.all.locations.letter
+component.store.opening.hours
+component.store.service.list
+component.store.service.tile
+component.stores.filters
+component.tabs.shipment
+component.wishlist.share.option
+hp. benefits. icon
+icon / checkout / tabs
+icon / content slot / category ribbon
+icon / file
+icon / gse / feefo / star
+icon / gse / flag
+icon / gse / flags
+icon / gse / google / star
+icon / gse / product tile / promotion
+icon / header / aux
+icon / message
+icon / payment / provider
+icon / pdp / misc / specs table / control
+icon / prd-img / wl
+icon / product image / carousel / fullscreen
+icon / qty / controls
+icon / share
+icon / social login
+icon / store / service
+icon / te / bottom line
+icon / xe / req-type
+module.book.appointment.step.2.list.and.map
+module.bulk.order.upload.form.csv
+module.bulk.order.upload.form.xls
+module.carousel.you.may.also.like
+module.cart.mini.flyout
+module.cart.popup.added.to.cart
+module.cart.product.listing
+module.cart.product.tile.details
+module.co.order.confirmation.hero
+module.comparison.bucket
+module.content.asset.reviews.feefo
+module.content.slot.03
+module.cp.navigation
+module.custom.slider.image
+module.footer
+module.header
+module.header.checkout
+module.header.mobile.menu
+module.header.sticky
+module.in.the.box
+module.laptop.accessories
+module.laptop.specs
+module.ma.popup.address.verification.wrong.not.found
+module.ma.profile.linked.accounts
+module.pdp.carousels
+module.pdp.content.slot.rich.a
+module.pdp.content.slot.rich.b
+module.pdp.hero.block.rtb
+module.pdp.product.main.image
+module.pdp.rtb
+module.plp.filter.category
+module.plp.filter.text
+module.plp.hero
+module.plp.listing
+module.plp.popup.filter
+module.popup.geo.ip
+module.popup.wishlist.share
+module.product.image.overlay.zoom
+module.product.specifications.table
+module.slot.04.carousel.new.arrivals
+module.slot.05.carousel.spotlight
+module.slot.h
+module.store.address.lookup.search.by.place
+module.store.all.locations.listing
+module.store.list.map.no.results
+module.store.listing.tile
+module.store.map.popup
+module.store.services
+module.wishlist.grid

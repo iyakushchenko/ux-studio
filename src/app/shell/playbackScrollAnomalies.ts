@@ -24,7 +24,10 @@ export const SCROLL_REVERSAL_MIN_COUNT = 3;
 export const SCROLL_JUMP_OUTSIDE_ANIM_PX = 52;
 export const SCROLL_STUTTER_FRAME_MS = 50;
 export const SCROLL_STUTTER_MIN_FRAMES = 3;
-export const SCROLL_PATH_DEVIATION_PX = 36;
+/** Mid-path lag threshold — knife-edge 36 false-FAILed book-step3-camera (37px). */
+export const SCROLL_PATH_DEVIATION_PX = 48;
+/** Skip early easeOut frames — first samples lag before compositor catches up. */
+export const SCROLL_PATH_DEVIATION_MIN_PROGRESS = 0.12;
 
 /** After a viewport director script ends — extra eased scrolls in this window are suspicious. */
 export const SCROLL_BURST_POST_SCRIPT_MS = 1400;
@@ -166,6 +169,8 @@ export function detectScrollPathDeviation(options: {
   if (duration <= 0) return null;
   const progress = Math.min(1, Math.max(0, (now - startTime) / duration));
   if (progress >= 1) return null;
+  // Early easeOut samples are noisy (prove: progress≈0.03 · 37px vs old 36px).
+  if (progress < SCROLL_PATH_DEVIATION_MIN_PROGRESS) return null;
   const expected = startTop + (targetTop - startTop) * easeOutCubic(progress);
   const deviation = Math.abs(actualTop - expected);
   if (deviation < SCROLL_PATH_DEVIATION_PX) return null;

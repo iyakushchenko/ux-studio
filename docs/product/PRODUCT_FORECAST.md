@@ -49,7 +49,7 @@ Ship the **control room** first: deep-linkable screens, recordable interactions,
 | Release / tag CI | When versioning habit is stable + Actions budget |
 | Broader CSS contracts | More `check-*.mjs`, not more Playwright on every push |
 | Optional `beat` query | Only when CJM-on and non-noisy |
-| X-Suite handshake | Summarizer → Studio journey JSON seam only |
+| X-Suite handshake | Summarizer → Studio: PO shares CJM export → agent analyze + pages + REC ([X_SUITE_INTEGRATION.md](./X_SUITE_INTEGRATION.md)); automated import later |
 | **Real-user persona (X-Suite CJM)** | End-user persona from Summarizer/CJM as product-truth input beside **Pax** — **stub only; do not implement now** ([TEAM.md](./TEAM.md), [X_SUITE_INTEGRATION.md](./X_SUITE_INTEGRATION.md)) |
 
 ---
@@ -110,9 +110,9 @@ BR **AGENT TESTING** + invisible click guard; `touch()`; MCP `stop({ reload: tru
 
 Local notes + CHANGELOG. Release CI later. Version chip must match `package.json` (felony if lie).
 
-### 12. X-Suite — SEAM ONLY
+### 12. X-Suite — SEAM + MANUAL AGENT PATH
 
-Documented handshake; do not build a second studio inside Summarizer.
+Documented handshake ([X_SUITE_INTEGRATION.md](./X_SUITE_INTEGRATION.md)). Automated importer later. **Now:** when PO shares an X-Suite persona/CJM export, agent analyzes → builds/reuses project pages (UXDS + Studio templates + `data-studio-*` names) → **RECs a new CJM** in Studio. Do not build a second studio inside Summarizer. Ask PO for coarse concept / UXDS page prototype references before new pages.
 
 ### 13. Erase-Make (Boots rabbit) — PROGRAM
 

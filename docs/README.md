@@ -51,7 +51,7 @@ Agents **do not** offer A/B/C tech menus. They decide, document, build, report. 
 21. [product/VERSIONING.md](./product/VERSIONING.md) — local semver + CHANGELOG (no Release CI yet)
 22. [product/PRODUCT_FORECAST.md](./product/PRODUCT_FORECAST.md) — engine product map (URL, REC, UXDS, CI, overlay, X-Suite)
 23. [uxds/README.md](./uxds/README.md) — UXDS Larkin inventory · [uxds/DEVIATIONS.md](./uxds/DEVIATIONS.md) · [uxds/TOKEN_BRIDGE.md](./uxds/TOKEN_BRIDGE.md)
-24. [product/X_SUITE_INTEGRATION.md](./product/X_SUITE_INTEGRATION.md) — Summarizer / X-Suite → Studio seam
+24. [product/X_SUITE_INTEGRATION.md](./product/X_SUITE_INTEGRATION.md) — X-Suite export → analyze → build/reuse pages → REC new CJM (agent = seam until importer)
 25. [projects/boots-pharmacy/](./projects/boots-pharmacy/) — Boots design deltas, pilots, FE audits · **Chat rails:** [projects/boots-pharmacy/features/CHAT_PAGE_RAILS.md](./projects/boots-pharmacy/features/CHAT_PAGE_RAILS.md)
 26. [shell/SHELL.md](./shell/SHELL.md) · [shell/URL.md](./shell/URL.md) · [shell/PROJECTS.md](./shell/PROJECTS.md) · [shell/PLAYBACK.md](./shell/PLAYBACK.md) · [shell/RECORDING.md](./shell/RECORDING.md)
 

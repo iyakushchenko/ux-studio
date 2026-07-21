@@ -1,0 +1,298 @@
+IA/product/attributes/color/product-color-hex-3
+IA/product/attributes/color/product-color-hex-4
+IA/product/attributes/color/product-color-hex-5
+IA/product/attributes/color/product-color-hex-6
+IA/product/attributes/color/product-color-hex-7
+IA/product/attributes/color/product-color-hex-8
+IA/product/attributes/color/product-color-hex-9
+IA/product/attributes/fit-occasion/attr-1
+IA/product/attributes/fit-occasion/attr-10
+IA/product/attributes/fit-occasion/attr-2
+IA/product/attributes/fit-occasion/attr-3
+IA/product/attributes/fit-occasion/attr-4
+IA/product/attributes/fit-occasion/attr-5
+IA/product/attributes/fit-occasion/attr-6
+IA/product/attributes/fit-occasion/attr-7
+IA/product/attributes/fit-occasion/attr-8
+IA/product/attributes/fit-occasion/attr-9
+IA/product/attributes/fit-occasion/group-title
+IA/product/attributes/material-surface/attr-1
+IA/product/attributes/material-surface/attr-10
+IA/product/attributes/material-surface/attr-2
+IA/product/attributes/material-surface/attr-3
+IA/product/attributes/material-surface/attr-4
+IA/product/attributes/material-surface/attr-5
+IA/product/attributes/material-surface/attr-6
+IA/product/attributes/material-surface/attr-7
+IA/product/attributes/material-surface/attr-8
+IA/product/attributes/material-surface/attr-9
+IA/product/attributes/material-surface/group-title
+IA/product/attributes/size-dimensions/attr-1
+IA/product/attributes/size-dimensions/attr-10
+IA/product/attributes/size-dimensions/attr-2
+IA/product/attributes/size-dimensions/attr-3
+IA/product/attributes/size-dimensions/attr-4
+IA/product/attributes/size-dimensions/attr-5
+IA/product/attributes/size-dimensions/attr-6
+IA/product/attributes/size-dimensions/attr-7
+IA/product/attributes/size-dimensions/attr-8
+IA/product/attributes/size-dimensions/attr-9
+IA/product/attributes/size-dimensions/group-title
+IA/product/base/bonus/associated-bonus-product-name
+IA/product/base/bonus/bonus-item-sku
+IA/product/base/description/agent-instruction
+IA/product/base/description/group-title
+IA/product/base/description/product-description-1
+IA/product/base/description/product-description-10
+IA/product/base/description/product-description-2
+IA/product/base/description/product-description-3
+IA/product/base/description/product-description-4
+IA/product/base/description/product-description-5
+IA/product/base/description/product-description-6
+IA/product/base/description/product-description-7
+IA/product/base/description/product-description-8
+IA/product/base/description/product-description-9
+IA/product/base/name/group-title
+IA/product/base/name/product-name-1
+IA/product/base/name/product-name-10
+IA/product/base/name/product-name-2
+IA/product/base/name/product-name-3
+IA/product/base/name/product-name-4
+IA/product/base/name/product-name-5
+IA/product/base/name/product-name-6
+IA/product/base/name/product-name-7
+IA/product/base/name/product-name-8
+IA/product/base/name/product-name-9
+IA/product/base/price/group-title
+IA/product/base/price/price-discount-percent-1
+IA/product/base/price/price-discount-percent-10
+IA/product/base/price/price-discount-percent-2
+IA/product/base/price/price-discount-percent-3
+IA/product/base/price/price-discount-percent-4
+IA/product/base/price/price-discount-percent-5
+IA/product/base/price/price-discount-percent-6
+IA/product/base/price/price-discount-percent-7
+IA/product/base/price/price-discount-percent-8
+IA/product/base/price/price-discount-percent-9
+IA/product/base/price/price-product-1
+IA/product/base/price/price-product-10
+IA/product/base/price/price-product-2
+IA/product/base/price/price-product-3
+IA/product/base/price/price-product-4
+IA/product/base/price/price-product-5
+IA/product/base/price/price-product-6
+IA/product/base/price/price-product-7
+IA/product/base/price/price-product-8
+IA/product/base/price/price-product-9
+IA/product/base/price/price-was-1
+IA/product/base/price/price-was-10
+IA/product/base/price/price-was-2
+IA/product/base/price/price-was-3
+IA/product/base/price/price-was-4
+IA/product/base/price/price-was-5
+IA/product/base/price/price-was-6
+IA/product/base/price/price-was-7
+IA/product/base/price/price-was-8
+IA/product/base/price/price-was-9
+IA/product/base/sku/group-title
+IA/product/base/sku/product-sku-1
+IA/product/base/sku/product-sku-10
+IA/product/base/sku/product-sku-2
+IA/product/base/sku/product-sku-3
+IA/product/base/sku/product-sku-4
+IA/product/base/sku/product-sku-5
+IA/product/base/sku/product-sku-6
+IA/product/base/sku/product-sku-7
+IA/product/base/sku/product-sku-8
+IA/product/base/sku/product-sku-9
+IA/product/category/product-a-cat-market-cta
+IA/product/category/product-a-cat-market-desc
+IA/product/category/product-a-cat-market-title
+IA/product/category/product-a-category-id
+IA/product/custom/connectivity/custom-attr-1
+IA/product/custom/connectivity/custom-attr-10
+IA/product/custom/connectivity/custom-attr-2
+IA/product/custom/connectivity/custom-attr-3
+IA/product/custom/connectivity/custom-attr-4
+IA/product/custom/connectivity/custom-attr-5
+IA/product/custom/connectivity/custom-attr-6
+IA/product/custom/connectivity/custom-attr-7
+IA/product/custom/connectivity/custom-attr-8
+IA/product/custom/connectivity/custom-attr-9
+IA/product/custom/connectivity/group-title
+IA/product/custom/cpu/custom-attr-1
+IA/product/custom/cpu/custom-attr-10
+IA/product/custom/cpu/custom-attr-2
+IA/product/custom/cpu/custom-attr-3
+IA/product/custom/cpu/custom-attr-4
+IA/product/custom/cpu/custom-attr-5
+IA/product/custom/cpu/custom-attr-6
+IA/product/custom/cpu/custom-attr-7
+IA/product/custom/cpu/custom-attr-8
+IA/product/custom/cpu/custom-attr-9
+IA/product/custom/cpu/group-title
+IA/subsystem/account-overview
+IA/subsystem/bulk-order
+IA/subsystem/change-password
+IA/subsystem/marketing-prefs
+IA/subsystem/my-address-book
+IA/subsystem/my-invoices
+IA/subsystem/my-list
+IA/subsystem/my-payment-methods
+IA/subsystem/my-quotes
+IA/subsystem/my-support-cases
+IA/subsystem/order-history
+IA/subsystem/profile-details
+IA/subsystem/search-results
+IA/subsystem/shopping-cart
+IA/subsystem/store-locator
+IA/subsystem/support-center
+brand/brand-city
+brand/brand-copyright
+brand/brand-currency
+brand/brand-email
+brand/brand-hours
+brand/brand-name
+brand/brand-phone
+brand/brand-url
+brand/brand-zip-post-code
+persona/DO NOT EDIT
+persona/Persona A/about
+persona/Persona A/accent
+persona/Persona A/additional-context-1
+persona/Persona A/additional-context-2
+persona/Persona A/additional-context-3
+persona/Persona A/additional-context-4
+persona/Persona A/additional-context-5
+persona/Persona A/age
+persona/Persona A/ai-fields
+persona/Persona A/audience
+persona/Persona A/brand-name
+persona/Persona A/doing
+persona/Persona A/email
+persona/Persona A/full-name
+persona/Persona A/gains
+persona/Persona A/gender
+persona/Persona A/happy-path
+persona/Persona A/happy-path-json
+persona/Persona A/hearing
+persona/Persona A/jtbd
+persona/Persona A/jtbd-primary-goal
+persona/Persona A/jtbd-secondary-goal
+persona/Persona A/lastname
+persona/Persona A/name
+persona/Persona A/nickname
+persona/Persona A/pains
+persona/Persona A/persona-story
+persona/Persona A/primary-persona
+persona/Persona A/role
+persona/Persona A/seeing
+persona/Persona A/thinking
+persona/Persona B/about
+persona/Persona B/accent
+persona/Persona B/additional-context-1
+persona/Persona B/additional-context-2
+persona/Persona B/additional-context-3
+persona/Persona B/additional-context-4
+persona/Persona B/additional-context-5
+persona/Persona B/age
+persona/Persona B/ai-fields
+persona/Persona B/audience
+persona/Persona B/brand-name
+persona/Persona B/doing
+persona/Persona B/email
+persona/Persona B/full-name
+persona/Persona B/gains
+persona/Persona B/gender
+persona/Persona B/happy-path
+persona/Persona B/happy-path-json
+persona/Persona B/hearing
+persona/Persona B/jtbd
+persona/Persona B/jtbd-primary-goal
+persona/Persona B/jtbd-secondary-goal
+persona/Persona B/last-update
+persona/Persona B/lastname
+persona/Persona B/name
+persona/Persona B/nickname
+persona/Persona B/pains
+persona/Persona B/persona-cjm
+persona/Persona B/persona-story
+persona/Persona B/role
+persona/Persona B/seeing
+persona/Persona B/thinking
+persona/Persona C/about
+persona/Persona C/accent
+persona/Persona C/additional-context-1
+persona/Persona C/additional-context-2
+persona/Persona C/additional-context-3
+persona/Persona C/additional-context-4
+persona/Persona C/additional-context-5
+persona/Persona C/age
+persona/Persona C/ai-fields
+persona/Persona C/audience
+persona/Persona C/brand-name
+persona/Persona C/doing
+persona/Persona C/email
+persona/Persona C/full-name
+persona/Persona C/gains
+persona/Persona C/gender
+persona/Persona C/happy-path
+persona/Persona C/happy-path-json
+persona/Persona C/hearing
+persona/Persona C/jtbd
+persona/Persona C/jtbd-primary-goal
+persona/Persona C/jtbd-secondary-goal
+persona/Persona C/last-update
+persona/Persona C/lastname
+persona/Persona C/name
+persona/Persona C/nickname
+persona/Persona C/pains
+persona/Persona C/persona-story
+persona/Persona C/role
+persona/Persona C/seeing
+persona/Persona C/thinking
+project/DO NOT EDIT
+project/assignee list/assignee-name-1
+project/assignee list/assignee-name-2
+project/assignee list/assignee-name-3
+project/assignee list/assignee-name-4
+project/assignee list/assignee-name-5
+project/assignee list/assignee-name-6
+project/current-year
+project/full-date
+project/full-date-time
+project/other/project-case-study-link
+project/other/project-uxbp-link
+project/other/project-uxds-link
+project/other/project-uxsf-link
+project/page status/project-archived
+project/page status/project-archived-color
+project/page status/project-client-approved
+project/page status/project-client-approved-color
+project/page status/project-client-review
+project/page status/project-client-review-color
+project/page status/project-complete
+project/page status/project-complete-color
+project/page status/project-cr-in-progress
+project/page status/project-cr-in-progress-color
+project/page status/project-in-progress
+project/page status/project-in-progress-color
+project/page status/project-internal-review
+project/page status/project-internal-review-color
+project/page status/project-not-started
+project/page status/project-not-started-color
+project/page status/project-postponed
+project/page status/project-postponed-color
+project/project status/project-archived
+project/project status/project-archived-color
+project/project status/project-complete
+project/project status/project-complete-color
+project/project status/project-in-progress
+project/project status/project-in-progress-color
+project/project status/project-not-started
+project/project status/project-not-started-color
+project/project status/project-postponed
+project/project status/project-postponed-color
+project/project-assignee
+project/project-status
+project/uxds-version

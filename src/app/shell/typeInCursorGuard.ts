@@ -7,6 +7,7 @@
 import {
   parkDemoCursorForTypeIn,
   readDemoCursorDomState,
+  clearDemoCursorCarriageLatches,
 } from "@/app/scenario/demoCursor";
 import { latchPoSignal } from "@/app/shell/agent-testing/agentTestingPoSignal";
 import { playbackDiagCursor } from "@/app/shell/playbackDiag";
@@ -15,6 +16,12 @@ let hiddenLatchedForActiveTypeIn = false;
 
 export function resetTypeInCursorGuard(): void {
   hiddenLatchedForActiveTypeIn = false;
+}
+
+/** Type-in finished / aborted — drop carriage latch so Play hover/click is hand|arrow. */
+export function endTypeInCursorGuard(): void {
+  resetTypeInCursorGuard();
+  clearDemoCursorCarriageLatches();
 }
 
 /** Hold journey park rest at type-in start; log visibility. */

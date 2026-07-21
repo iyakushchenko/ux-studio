@@ -1,7 +1,7 @@
 {
   "name": "ux-studio",
   "private": true,
-  "version": "0.0.102",
+  "version": "0.0.103",
   "type": "module",
   "engines": {
     "node": ">=22"
@@ -17,6 +17,7 @@
     "check:page-final-pass": "node scripts/check-page-final-pass.mjs",
     "check:theme-brand": "node scripts/check-theme-brand.mjs",
     "check:version": "node scripts/check-release-version-changelog-sync.mjs",
+    "check:uxds-inventory": "node scripts/check-uxds-inventory.mjs",
     "notes": "node scripts/release-notes.mjs list",
     "notes:list": "node scripts/release-notes.mjs list",
     "notes:append": "node scripts/release-notes.mjs append",

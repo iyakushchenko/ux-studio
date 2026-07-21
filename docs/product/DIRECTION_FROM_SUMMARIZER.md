@@ -51,7 +51,7 @@ UX Studio should feel like that **as a product operating system**, while remaini
 **Yes — as governance and design-system discipline.**  
 **No — as a structural clone of a Figma plugin.**
 
-**Also yes — as a future product seam:** X-Suite outputs (personas, CJMs, IA) become baselines for semi-automated agentic CJMs in Studio. See [X_SUITE_INTEGRATION.md](./X_SUITE_INTEGRATION.md). UXDS is the shared spine.
+**Also yes — as a future product seam:** X-Suite outputs (personas, CJMs, IA) become baselines for agentic CJMs in Studio. **PO path:** export CJM from X-Suite → share with agent → analyze → ensure project pages (UXDS + templates + engine names) → **REC a new CJM** in Studio. See [X_SUITE_INTEGRATION.md](./X_SUITE_INTEGRATION.md). UXDS is the shared spine.
 
 The closest structural analogy in UX Studio is already correct:
 
