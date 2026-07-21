@@ -317,20 +317,19 @@ When `applyWireIntent` is wired (App / MCP):
 
 **HARD:** `startRecording` / `__studioStartRecording` **throw** unless nav REC switch is ON (`aria-label="REC on"` + `aria-checked="true"`). Use `__studioArmRecCapture()` (clicks REC switch → Orchestra CREATE NEW → ● Start) — never silent session while playback chrome shows.
 
+**ALWAYS CLEAR is code law** (not a reminder): `__studioArmRecCapture`, `__studioRunRecNewCjmProve`, and `__studioRunFullPlayProve` call `requireFreshQaSession()` first — `forceClear` + fresh `start` with **no skip flag**. If arm is bypassed, `startRecording` also ensures QA overlay is active (or forceClears + starts).
+
+**Human pace is code law:** agent REC / `__studioRunRecNewCjmProve` use `REC_USER_PACE_MS` (`src/app/recording/recUserPace.ts`) — read after screen change, before CTA, after click, scroll-stop ≥2.4s. Not optional.
+
+**Modal `&modal=` is code law:** if URL has `modal=choose-pharmacy` (or any blocking modal), drain before the next beat (`recModalDrain.ts` / `afterRecClickDrainModal`). Book Step 1 Continue with no location opens choose-pharmacy — pick a pharmacy (`avail-choose-location`); never rush past. REC captures modal open; Play stamps `recordedClick.modalId` and re-opens before click.
+
 ```javascript
 window.__studioEnsureCleanStudio?.()
 window.__studioStartRecording?.()          // FAILS if REC switch off
-await window.__studioArmRecCapture?.()     // typical-user: REC switch → CREATE NEW → ● Start
+await window.__studioArmRecCapture?.()     // ALWAYS CLEAR QA → REC switch → CREATE NEW → ● Start
 window.__studioAssertRecLive?.()           // { ok, recMode, recording, … } — FAIL if switch or session missing
 await window.__studioRunRecNewCjmProve?.({ experience: "traditional" })
-// REC robustness = NEW random CJM only → Play that journeyId (not built-in / old rec-*)
-window.__studioTriggerTransport?.('step-forward')
-// … navigate freely …
-window.__studioStopRecording?.()
-window.__studioExportRecording?.()         // JSON string — copy to file
-window.__studioCompileRecording?.()        // beat segments from touchpoint markers
-window.__studioCompileRecordingToJourney?.() // JourneyDefinition (no catalog write)
-window.__studioSaveRecordingAsJourney?.()  // compile + apply into runtime catalog
+// REC robustness = human-paced NEW CJM + modal drain → Play that journeyId
 ```
 
 Import a saved session:

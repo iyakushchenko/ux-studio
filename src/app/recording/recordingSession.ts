@@ -9,6 +9,7 @@ import {
   isStudioRecModeOnInDom,
   REC_MODE_OFF_REFUSE_MESSAGE,
 } from "@/app/recording/studioRecModeDom";
+import { ensureQaSessionForRecCapture } from "@/app/shell/requireFreshQaSession";
 
 const SESSION_VERSION = 1 as const;
 const DEDUPE_WINDOW_MS = 80;
@@ -73,10 +74,20 @@ function eventDedupeKey(event: RecordedEvent): string {
       return `director:${event.scriptId}:${event.beatId ?? ""}:${event.manual ? "m" : "a"}`;
     case "beat-enter":
       return `beat-enter:${event.actionId}:${event.beatId ?? ""}`;
-    case "screen":
-      // Same screen under different query strings is still one screen step.
-      return `screen:${event.projectId ?? ""}:${event.screenId}`;
-    default:
+    case "screen": {
+      // Same screen under cjm/experience churn is one step; modal open/close is not.
+      let modal = "";
+      if (event.studioUrl) {
+        try {
+          const raw = event.studioUrl.trim();
+          const q = raw.startsWith("?") ? raw.slice(1) : raw;
+          modal = new URLSearchParams(q).get("modal")?.trim() ?? "";
+        } catch {
+          modal = "";
+        }
+      }
+      return `screen:${event.projectId ?? ""}:${event.screenId}:${modal}`;
+    }    default:
       return "unknown";
   }
 }
@@ -162,6 +173,13 @@ export function startRecording(options: StartRecordingOptions = {}): RecordingSe
   // Same DOM truth the PO sees — no silent capture / fake orange frame.
   if (typeof document !== "undefined" && !isStudioRecModeOnInDom()) {
     throw new Error(REC_MODE_OFF_REFUSE_MESSAGE);
+  }
+  // ALWAYS CLEAR bypass guard — if arm skipped QA reset, force it here.
+  if (typeof document !== "undefined") {
+    const qa = ensureQaSessionForRecCapture();
+    if (qa && !qa.ok) {
+      throw new Error(qa.reason ?? "QA overlay required before REC capture");
+    }
   }
   activeSession = {
     id: newSessionId(),

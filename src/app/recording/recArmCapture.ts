@@ -18,6 +18,7 @@ import {
   readStudioRecSwitch,
 } from "@/app/recording/studioRecModeDom";
 import { logAgentTestingStep } from "@/app/shell/agent-testing";
+import { requireFreshQaSession } from "@/app/shell/requireFreshQaSession";
 
 export type RecLiveAssert = {
   ok: boolean;
@@ -239,12 +240,31 @@ export function assertRecLive(): RecLiveAssert {
 
 /**
  * Arm REC the typical-user way: click REC switch → CREATE NEW → ● Start.
+ * ALWAYS CLEAR QA first (code law — no skip).
  */
 export async function armRecCapture(
   hooks: RecArmCaptureHooks
 ): Promise<ArmRecCaptureResult> {
   const settle = hooks.settleMs ?? 120;
   let recModeVia: ArmRecCaptureResult["recModeVia"] = "failed";
+
+  // 0) UNSKIPPABLE — ALWAYS CLEAR QA then fresh visible session.
+  const qa = requireFreshQaSession("AGENT TESTING — REC capture");
+  if (!qa.ok) {
+    const fail: ArmRecCaptureResult = {
+      ok: false,
+      recMode: isStudioRecModeOnInDom(),
+      recording: false,
+      createNew: false,
+      startVisible: false,
+      overlayRecLive: overlayRecLive(),
+      playbackPanel: isStudioPlaybackPanelVisible(),
+      reason: qa.reason ?? "QA ALWAYS CLEAR failed",
+      recModeVia: "failed",
+    };
+    logArm(fail);
+    return fail;
+  }
 
   // 1) CJM off — real switch click (REC locked while CJM on).
   if (isCjmOnInDom()) {

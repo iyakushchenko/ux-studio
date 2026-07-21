@@ -16,14 +16,16 @@ import {
 import { resolveUsableDemoClickTarget } from "@/app/recording/recordingCapture";
 import { describeRecordingClickTarget } from "@/app/recording/recordingCapture";
 import {
-  forceClearAgentTestingOverlay,
   logAgentTestingStep,
-  startAgentTestingOverlay,
   touchAgentTestingOverlay,
 } from "@/app/shell/agent-testing";
+import { requireFreshQaSession } from "@/app/shell/requireFreshQaSession";
 import { runFullPlayProve, type FullPlayProvePeak } from "@/app/shell/fullPlayProve";
 import { simulateDemoPointerClick } from "@/app/scenario/demoCursor";
 import { isStudioRecModeOnInDom } from "@/app/recording/studioRecModeDom";
+import { afterRecClickDrainModal } from "@/app/recording/recModalDrain";
+import { recUserPace, REC_USER_PACE_MS } from "@/app/recording/recUserPace";
+import { getPrototypeScrollRoot } from "@/app/scenario/playbackScroll";
 
 export type RecNewCjmProveOptions = {
   experience?: "agentic" | "traditional";
@@ -65,14 +67,19 @@ function mintDemoJourneyLabel(experience: "agentic" | "traditional"): string {
 /** Honest click targets — never coarse shell / tiles container. */
 const PROVE_CLICK_SELECTORS = [
   '[data-studio-action="plp-book-now"]',
+  '[data-studio-action="pdp-book-now"]',
+  '[data-studio-action="book-step-1-continue"]',
   '[data-studio-action="plp-quick-view"]',
   'a[href*="pdp"]',
   'button[data-studio-action]',
   '[data-studio-action]',
 ] as const;
 
-function pickHonestClickTarget(): HTMLElement | null {
-  for (const sel of PROVE_CLICK_SELECTORS) {
+function pickHonestClickTarget(
+  preferred?: readonly string[]
+): HTMLElement | null {
+  const list = preferred ?? PROVE_CLICK_SELECTORS;
+  for (const sel of list) {
     const nodes = document.querySelectorAll<HTMLElement>(sel);
     for (const node of nodes) {
       if (!node.isConnected) continue;
@@ -83,6 +90,48 @@ function pickHonestClickTarget(): HTMLElement | null {
     }
   }
   return null;
+}
+
+async function pacedClick(sel: string, label: string): Promise<boolean> {
+  await recUserPace("beforeCta");
+  const target =
+    pickHonestClickTarget([sel]) ??
+    document.querySelector<HTMLElement>(sel);
+  if (!target) return false;
+  const usable = resolveUsableDemoClickTarget(target) ?? target;
+  try {
+    logAgentTestingStep({
+      kind: "rec",
+      action: "RecNewCjmCaptureClick",
+      label: `robo-cursor · ${label} · ${describeRecordingClickTarget(usable)}`,
+      outcome: "ok",
+    });
+  } catch {
+    /* hang-safe */
+  }
+  const ok = await simulateDemoPointerClick(usable, { scroll: true });
+  await recUserPace("afterClick");
+  // HARD: never rush past a blocking modal (choose-pharmacy after Continue).
+  const drain = await afterRecClickDrainModal();
+  if (!drain.ok) {
+    throw new Error(drain.reason ?? `modal drain failed (${drain.modalId})`);
+  }
+  await recUserPace("afterScreenChange");
+  return ok;
+}
+
+async function pacedScrollStop(deltaPx: number): Promise<void> {
+  const host = getPrototypeScrollRoot();
+  if (!host) return;
+  host.scrollBy({ top: deltaPx, behavior: "instant" as ScrollBehavior });
+  host.dispatchEvent(new Event("scroll", { bubbles: true }));
+  await recUserPace("betweenBeats");
+  host.scrollBy({
+    top: Math.sign(deltaPx) * 60,
+    behavior: "instant" as ScrollBehavior,
+  });
+  host.dispatchEvent(new Event("scroll", { bubbles: true }));
+  await recUserPace("scrollStopSettle");
 }
 
 function goPlpViaUrlOrTab(): void {
@@ -115,8 +164,10 @@ function goPlpViaUrlOrTab(): void {
 }
 
 /**
- * ALWAYS CLEAR → arm REC (CREATE NEW) → short random path → Add as CJM →
- * Play THAT new journey. FAIL if rec never live or journeyId missing.
+ * ALWAYS CLEAR → arm REC (CREATE NEW) → human-paced path (modal drain) →
+ * Add as CJM → Play THAT new journey. FAIL if rec never live or journeyId missing.
+ *
+ * Pace = {@link REC_USER_PACE_MS} (not optional). Modal `&modal=` = drain before next beat.
  */
 export async function runRecNewCjmProve(
   hooks: RecNewCjmProveHooks,
@@ -129,9 +180,12 @@ export async function runRecNewCjmProve(
   let recLive = false;
   let peak: FullPlayProvePeak | null = null;
 
-  // 1) ALWAYS CLEAR prior QA.
-  forceClearAgentTestingOverlay();
-  startAgentTestingOverlay("AGENT TESTING — REC new CJM prove");
+  // 1) UNSKIPPABLE ALWAYS CLEAR QA (code law).
+  const qa = requireFreshQaSession("AGENT TESTING — REC new CJM prove");
+  if (!qa.ok) {
+    errors.push(qa.reason ?? "QA ALWAYS CLEAR failed");
+    return failResult(errors, journeyId, recLive, peak);
+  }
   touchAgentTestingOverlay("AGENT TESTING — REC new CJM prove");
 
   try {
@@ -151,11 +205,10 @@ export async function runRecNewCjmProve(
   hooks.setOrchestraMode?.(seedMode);
   await delay(settle);
 
-  // Land on PLP for a short traditional capture path.
+  // Land on PLP for traditional capture path.
   goPlpViaUrlOrTab();
-  await delay(settle * 4);
-  // Wait briefly for Book now / action targets to mount.
-  for (let i = 0; i < 20 && !pickHonestClickTarget(); i++) {
+  await recUserPace("afterScreenChange");
+  for (let i = 0; i < 20 && !pickHonestClickTarget(['[data-studio-action="plp-book-now"]']); i++) {
     await delay(150);
   }
 
@@ -173,32 +226,53 @@ export async function runRecNewCjmProve(
     return failResult(errors, journeyId, false, peak);
   }
 
-  // 3) Short NEW random path — honest robo-cursor target.
-  const target = pickHonestClickTarget();
-  if (!target) {
-    errors.push("no honest click target (data-studio-action) on page");
-    if (isRecordingActive()) stopRecording();
-    return failResult(errors, journeyId, recLive, peak);
-  }
-
+  // 3) Human-paced NEW path — scroll-stops + Book + modal drain (not a 1-click stub).
   try {
     logAgentTestingStep({
       kind: "rec",
-      action: "RecNewCjmCaptureClick",
-      label: `robo-cursor · ${describeRecordingClickTarget(target)}`,
+      action: "RecNewCjmCapturePath",
+      label: `human pace · afterClick=${REC_USER_PACE_MS.afterClick}ms · scrollStop=${REC_USER_PACE_MS.scrollStopSettle}ms`,
       outcome: "ok",
     });
   } catch {
     /* hang-safe */
   }
 
-  const clickOk = await simulateDemoPointerClick(target, { scroll: true });
-  if (!clickOk) {
-    errors.push("robo-cursor click failed / degraded target");
+  try {
+    await pacedScrollStop(480);
+    await pacedScrollStop(360);
+    if (!(await pacedClick('[data-studio-action="plp-book-now"]', "PLP Book now"))) {
+      // Fallback: any honest target once — still paced + modal-drained.
+      const fallback = pickHonestClickTarget();
+      if (!fallback) {
+        errors.push("no honest click target (data-studio-action) on page");
+        if (isRecordingActive()) stopRecording();
+        return failResult(errors, journeyId, recLive, peak);
+      }
+      await recUserPace("beforeCta");
+      const ok = await simulateDemoPointerClick(fallback, { scroll: true });
+      if (!ok) {
+        errors.push("robo-cursor click failed / degraded target");
+        if (isRecordingActive()) stopRecording();
+        return failResult(errors, journeyId, recLive, peak);
+      }
+      await recUserPace("afterClick");
+      const drain = await afterRecClickDrainModal();
+      if (!drain.ok) errors.push(drain.reason ?? "modal drain failed");
+    } else {
+      await pacedScrollStop(320);
+      await pacedClick('[data-studio-action="pdp-book-now"]', "PDP Book now");
+      await pacedClick(
+        '[data-studio-action="book-step-1-continue"]',
+        "Book Step 1 Continue"
+      );
+      // afterRecClickDrainModal inside pacedClick handles choose-pharmacy.
+    }
+  } catch (err) {
+    errors.push(err instanceof Error ? err.message : String(err));
     if (isRecordingActive()) stopRecording();
     return failResult(errors, journeyId, recLive, peak);
   }
-  await delay(settle * 3);
 
   // 4) ■ Stop via REC deck, then + Add as CJM via real UI (product title).
   if (!isRecordingActive()) {

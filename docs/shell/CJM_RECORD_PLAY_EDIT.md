@@ -17,10 +17,10 @@ CJM is **not** an imperative director novel. It is a **tab script**: targets fro
 
 | Prove | API | Rule |
 |-------|-----|------|
-| **REC robustness** | `__studioRunRecNewCjmProve({ experience?, label? })` | **ALWAYS NEW random CJM** — arm REC for real → capture → Add as CJM → Play **that** `journeyId`. **FORBIDDEN:** only playing `agentic-cjm` / `traditional-cjm` or an old `rec-*` and calling REC prove done. |
-| **Play journey** | `__studioRunFullPlayProve({ journeyId \| experience })` | ALWAYS CLEAR → arm → full Play → peak assert → leave pause. Thin presets: `__studioRunAgenticFullPlayProve` / `__studioRunTraditionalFullPlayProve`. Smoke `__protoRunTraditionalPlaySmoke` tears down overlay. |
+| **REC robustness** | `__studioRunRecNewCjmProve({ experience?, label? })` | **ALWAYS CLEAR** → **human pace** (`REC_USER_PACE_MS`) → arm REC → capture (scroll-stops + CTAs) → **modal drain** if `&modal=` (e.g. choose-pharmacy) → Add as CJM → Play **that** `journeyId`. **FORBIDDEN:** built-in Play as REC prove; skipping open modals; 50ms spam clicks. |
+| **Play journey** | `__studioRunFullPlayProve({ journeyId \| experience })` | **ALWAYS CLEAR** (`requireFreshQaSession`, no skip) → full Play → peak assert → leave pause. Thin presets: `__studioRunAgenticFullPlayProve` / `__studioRunTraditionalFullPlayProve`. Smoke `__protoRunTraditionalPlaySmoke` tears down overlay. |
 
-**REC arm (agents only):** `__studioArmRecCapture()` — CJM off → REC mode ON → CREATE NEW CJM → ● Start. Latch: `__studioAssertRecLive()` (`{ ok, recMode, recording, … }`). Never log “REC live” from `__studioStartRecording` alone without this arm + assert.
+**REC arm (agents only):** `__studioArmRecCapture()` — **ALWAYS CLEAR QA first** → CJM off → REC mode ON → CREATE NEW CJM → ● Start. Latch: `__studioAssertRecLive()`. **ALWAYS CLEAR + human pace + modal drain are code law** — not reminders. URL `modal=` is navigable state — never ignore.
 
 ## Camera engine rails
 

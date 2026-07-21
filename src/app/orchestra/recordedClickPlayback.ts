@@ -15,9 +15,35 @@ import { playbackDiagClick } from "@/app/shell/playbackDiag";
 
 export async function playRecordedClick(
   click: JourneyBeatRecordedClick,
-  options?: { skip?: boolean }
+  options?: {
+    skip?: boolean;
+    /** Open blocking lightbox before resolving modal-scoped targets. */
+    applyStudioModal?: (modalId: string | undefined) => void;
+  }
 ): Promise<PlaybackScriptResult> {
   if (options?.skip) return { ok: true };
+
+  // Play must honor REC `&modal=` — open before resolving clicks inside lightbox.
+  if (click.modalId && options?.applyStudioModal) {
+    try {
+      options.applyStudioModal(click.modalId);
+    } catch {
+      /* hang-safe */
+    }
+    await new Promise((r) => setTimeout(r, 350));
+  } else if (click.modalId) {
+    // Fallback: journey runtime may not be wired — try window bridge.
+    try {
+      (
+        window as Window & {
+          __studioApplyStudioModal?: (id: string | undefined) => void;
+        }
+      ).__studioApplyStudioModal?.(click.modalId);
+    } catch {
+      /* hang-safe */
+    }
+    await new Promise((r) => setTimeout(r, 350));
+  }
 
   const cameraChain =
     click.cameraSelectorChain ??

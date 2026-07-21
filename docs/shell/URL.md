@@ -56,7 +56,7 @@ Auto-Rule: [STUDIO_AUTO_RULES.md](../product/STUDIO_AUTO_RULES.md) **`fixed-loca
 
 | `experience` | optional | `agentic` \| `traditional` | Which CJM journey path (orchestra slot) |
 
-| `modal` | optional | Blocking lightbox id (below) | Topmost registered dialog |
+| `modal` | optional | Blocking lightbox id (below) | Topmost registered dialog — **navigable state**; agents MUST read `&modal=` and interact (never ignore / rush past Continue into an open lightbox) |
 
 
 

@@ -273,6 +273,28 @@ function recordedClickFromDemoEvent(
     selectorChain: event.selectorChain.filter((s) => s && s !== "#root"),
     element: event.element,
   };
+  const studioUrl = event.snapshot?.studioUrl;
+  if (studioUrl) {
+    try {
+      const q = studioUrl.startsWith("?") ? studioUrl : `?${studioUrl}`;
+      const modalId = new URLSearchParams(q).get("modal");
+      if (modalId) click.modalId = modalId;
+    } catch {
+      /* hang-safe */
+    }
+  }
+  // Infer choose-pharmacy for avail targets even if snapshot URL lagged.
+  if (
+    !click.modalId &&
+    click.selectorChain.some(
+      (s) =>
+        /data-studio-action="avail-|data-studio-avail-|data-studio-modal="choose-pharmacy"/i.test(
+          s
+        )
+    )
+  ) {
+    click.modalId = "choose-pharmacy";
+  }
   if (
     pendingScroll &&
     isUsablePlaybackSelectorChain(pendingScroll.selectorChain)

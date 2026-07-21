@@ -54,6 +54,11 @@ export type JourneyBeatRecordedClick = {
   selectorChain: string[];
   element?: string;
   /**
+   * Blocking lightbox that must be open before this click (from REC `&modal=`).
+   * Play applies via `applyStudioModal` before resolving the target.
+   */
+  modalId?: string;
+  /**
    * Legacy: camera target from preceding scroll (buried on click).
    * Prefer a separate `kind: "camera"` beat — compile emits one when possible.
    */

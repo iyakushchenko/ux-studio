@@ -80,6 +80,11 @@ const READ_ONLY_HELPER_SUFFIXES = new Set([
   "ArmRecCapture",
   "AssertRecLive",
   "RunRecNewCjmProve",
+  "RecNewCjmCapturePath",
+  "RecNewCjmCaptureClick",
+  "RecModalOpen",
+  "RecModalPharmacyPick",
+  "RequireFreshQaSession",
   // Auto-Rule agent-teardown-clean asserts — must not re-arm overlay while proving clear.
   "AssertAgentTeardownClean",
   "WaitAgentTeardownClean",

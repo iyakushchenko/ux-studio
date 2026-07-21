@@ -493,9 +493,19 @@ export function captureScreenChange(options: {
   studioUrl?: string;
 }): void {
   if (!getActiveRecordingSession()) return;
-  // Dedupe on project + screen only — URL param churn (cjm/modal/journey/
-  // experience) must NOT re-emit the same screen (inflates STEPS + chat-2/3).
-  const key = `${options.projectId ?? ""}|${options.screenId}`;
+  // Dedupe screen + blocking modal. cjm/experience churn alone must NOT
+  // re-emit — but `&modal=` open/close MUST (Play honors modal=; agents drain).
+  let modalKey = "";
+  if (options.studioUrl) {
+    try {
+      const raw = options.studioUrl.trim();
+      const q = raw.startsWith("?") ? raw.slice(1) : raw;
+      modalKey = new URLSearchParams(q).get("modal")?.trim() ?? "";
+    } catch {
+      modalKey = "";
+    }
+  }
+  const key = `${options.projectId ?? ""}|${options.screenId}|${modalKey}`;
   if (lastScreenKey === key) return;
   lastScreenKey = key;
 
@@ -505,6 +515,29 @@ export function captureScreenChange(options: {
     projectId: options.projectId,
     studioUrl: options.studioUrl,
   });
+
+  if (modalKey) {
+    playbackDiagRecCapture({
+      detail: `REC modal=${modalKey} · screen=${options.screenId}`,
+      eventKind: "screen",
+      found: true,
+      usable: true,
+      screenId: options.screenId,
+    });
+    try {
+      // Soft import — unit tests / early boot may lack overlay.
+      void import("@/app/shell/agent-testing").then((m) => {
+        m.logAgentTestingStep({
+          kind: "rec",
+          action: "RecModalOpen",
+          label: `REC captured modal=${modalKey} · screen=${options.screenId}`,
+          outcome: "ok",
+        });
+      });
+    } catch {
+      /* hang-safe */
+    }
+  }
 }
 
 /**

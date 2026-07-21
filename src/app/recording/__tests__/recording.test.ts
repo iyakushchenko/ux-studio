@@ -336,7 +336,7 @@ describe("recordingCapture bridge", () => {
     });
   });
 
-  it("does not re-emit screen when only studioUrl params change", () => {
+  it("does not re-emit screen when only cjm/experience churn (no modal)", () => {
     captureScreenChange({
       screenId: "chat",
       projectId: "boots-pharmacy",
@@ -347,15 +347,35 @@ describe("recordingCapture bridge", () => {
       projectId: "boots-pharmacy",
       studioUrl: "?project=boots-pharmacy&screen=chat&cjm=off&experience=agentic",
     });
-    captureScreenChange({
-      screenId: "chat",
-      projectId: "boots-pharmacy",
-      studioUrl: "?project=boots-pharmacy&screen=chat&modal=avail",
-    });
     expect(getActiveRecordingSession()?.events).toHaveLength(1);
     expect(getActiveRecordingSession()?.events[0]).toMatchObject({
       kind: "screen",
       screenId: "chat",
+    });
+  });
+
+  it("re-emits screen when blocking modal= opens or closes", () => {
+    captureScreenChange({
+      screenId: "book-step-1",
+      projectId: "boots-pharmacy",
+      studioUrl: "?project=boots-pharmacy&screen=book-step-1",
+    });
+    captureScreenChange({
+      screenId: "book-step-1",
+      projectId: "boots-pharmacy",
+      studioUrl:
+        "?project=boots-pharmacy&screen=book-step-1&modal=choose-pharmacy",
+    });
+    captureScreenChange({
+      screenId: "book-step-1",
+      projectId: "boots-pharmacy",
+      studioUrl: "?project=boots-pharmacy&screen=book-step-1",
+    });
+    expect(getActiveRecordingSession()?.events).toHaveLength(3);
+    expect(getActiveRecordingSession()?.events[1]).toMatchObject({
+      kind: "screen",
+      screenId: "book-step-1",
+      studioUrl: expect.stringContaining("modal=choose-pharmacy"),
     });
   });
 

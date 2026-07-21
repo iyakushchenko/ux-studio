@@ -96,7 +96,7 @@ After fix: full Play **PASS 22/22**. Do not invent green past real timeouts.
 4. **Do not invent green.** Bubble-chop, script-timeout, Alarm, cursor-hidden-during-type-in, scroll-reversal soft-fails are **real** until fixed. Tests alone ≠ PROVEN.  
 5. Mid-flight Save Log dumps may show **no RESULT** (Play still running) — read `sitrepLine` / `timeline` / `summaries` honestly.  
 6. **Save Log** stays enabled while capturing **and** after **Keep open → Complete**.  
-7. **ALWAYS CLEAR** before each prove (`forceClear` then `start`; smokes wipe too).  
+7. **ALWAYS CLEAR is code law** — `requireFreshQaSession(title)` (`forceClear` + `start`, **no skip flag**). ArmRecCapture / RecNewCjmProve / FullPlayProve call it first; `startRecording` re-asserts if bypassed. Smokes wipe too.  
 8. **Leave / return (HARD):** when the agent disconnects to Cursor chat / elsewhere, **pause** the QA session; on return **resume** and **read Message latch** before continuing. See § Agent leave / return below.  
 9. **Dump-on-FAIL habit:** on Alarm / hard FAIL / chop / script-timeout — **Save Log** immediately (Keep open → Complete still allows Save Log). Do not invent green from memory.  
 10. **Friendly diag in chat:** mirrored playback-diag rows use human labels in the main QA sequence (not a cryptic side pane).
@@ -204,7 +204,9 @@ Example URL:
 http://localhost:5173/?project=boots-pharmacy&screen=home&persona=sarah-jenkins&cjm=on&experience=agentic
 ```
 
-0. **Reset QA before each test (ALWAYS CLEAR)** — mandatory. Wipe prior session first (`forceClear` / `__studioForceClearAgentTestingOverlay`), then arm fresh (`start` + `keepOpen` as needed). Overlay `start` and smoke `withMcpTestSession` also wipe on fresh arm so agents cannot skip clear. Never reuse a dirty overlay. **Full Play prove:** the helper above does forceClear + arm for you — still do not invent a parallel ad-hoc Play path.  
+0. **Reset QA before each test (ALWAYS CLEAR = code law)** — `requireFreshQaSession(title)` = `forceClear` + fresh `start` (**no skip flag**). Entry points: `__studioArmRecCapture`, `__studioRunRecNewCjmProve`, `__studioRunFullPlayProve`. Bypass guard: `startRecording` → `ensureQaSessionForRecCapture`. Smoke `withMcpTestSession` also wipes. Never reuse a dirty overlay. **Do not invent** a parallel ad-hoc Play/REC path that skips this.  
+0b. **URL `modal=` is navigable state** — if Continue opens `modal=choose-pharmacy`, drain (pick pharmacy) before the next beat; QA logs `RecModalOpen` / `RecModalPharmacyPick`. Never rush past.  
+0c. **Human REC pace** — `REC_USER_PACE_MS` (read / before CTA / after click / scroll-stop ≥2.4s). Prove helper enforces; not optional.  
 1. Open QA logger / agent overlay (gate open) — only after step 0.  
 2. Start **continuous Play** (same path as Step).  
 3. **Eyes on composer:** Home then Chat type-in must animate letter-by-letter.  

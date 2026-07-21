@@ -1,8 +1,8 @@
 /**
  * Universal full Play prove — one engine for any CJM.
  *
- * ALWAYS: forceClear → fresh arm → full Play → peak assert → leave pause
- * (keeps QA overlay for Save Log).
+ * ALWAYS: requireFreshQaSession (forceClear + start, no skip) → full Play →
+ * peak assert → leave pause (keeps QA overlay for Save Log).
  *
  * Prefer `__studioRunFullPlayProve({ journeyId | experience })`.
  * Agentic / Traditional helpers are thin presets only.
@@ -10,14 +10,13 @@
 
 import {
   DEFAULT_PREARM_MS,
-  forceClearAgentTestingOverlay,
   logAgentTestingOverlay,
   pauseForAgentLeave,
   preArmAgentTestingOverlay,
-  startAgentTestingOverlay,
   touchAgentTestingOverlay,
   type AgentLeavePauseResult,
 } from "@/app/shell/agent-testing";
+import { requireFreshQaSession } from "@/app/shell/requireFreshQaSession";
 import {
   beginQaProveMode,
   endQaProveMode,
@@ -352,8 +351,18 @@ export async function runFullPlayProve(
   const delay = options?.delay ?? delayMs;
   const errors: string[] = [];
 
-  // 1) ALWAYS CLEAR prior QA (mandatory).
-  forceClearAgentTestingOverlay();
+  // 1) UNSKIPPABLE ALWAYS CLEAR QA (code law — no skip flag).
+  const qa = requireFreshQaSession(preset.overlayTitle);
+  if (!qa.ok) {
+    return {
+      pass: false,
+      peak: { visible: 0, total: 0, counter: null },
+      end: null,
+      errors: [qa.reason ?? "QA ALWAYS CLEAR failed"],
+      journeyId: preset.journeyId,
+      experience: preset.experience,
+    };
+  }
 
   const prior = getMcpTestSession();
   if (prior) {
@@ -374,8 +383,8 @@ export async function runFullPlayProve(
   let end: PlayEndAtStartAssertResult | null = null;
 
   try {
-    // 2) Fresh QA arm — overlay usable; do NOT schedule ensure-clear teardown.
-    startAgentTestingOverlay(preset.overlayTitle);
+    // Fresh session already started by requireFreshQaSession — keep title + pre-arm.
+    touchAgentTestingOverlay(preset.overlayTitle);
     await preArmAgentTestingOverlay({
       preArmMs: options?.preArmMs ?? DEFAULT_PREARM_MS,
       title: "AGENT TESTING — preparing…",

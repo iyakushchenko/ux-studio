@@ -114,8 +114,13 @@ export function useStudioUrlSync(options: StudioUrlSyncOptions): void {
   // Reflect nav + modal + cjm/experience → address bar + recording screen markers.
   useEffect(() => {
     if (applyingUrlRef.current) return;
-    // Post-agent clean slate owns the bar until reload / lock expiry.
-    if (isStudioPostAgentResetSyncLocked()) return;
+    // Post-agent clean slate owns the bar until reload / lock expiry —
+    // BUT intentional modal OPEN (Continue → choose-pharmacy) must still stamp
+    // `&modal=` so REC + agents can see navigable state (never ignore).
+    const modalChanged = lastModalRef.current !== modalId;
+    if (isStudioPostAgentResetSyncLocked()) {
+      if (!(modalChanged && Boolean(modalId))) return;
+    }
     const screenId = resolveScreenIdFromNav({ hubOpen, current, screens });
     const state: StudioUrlState = {
       projectId,
@@ -125,9 +130,10 @@ export function useStudioUrlSync(options: StudioUrlSyncOptions): void {
       cjm: journeyMode,
       modalId,
     };
-    const modalChanged = lastModalRef.current !== modalId;
     lastModalRef.current = modalId;
-    const search = writeStudioUrl(state, { push: modalChanged && Boolean(lastHrefRef.current) });
+    const search = writeStudioUrl(state, {
+      push: modalChanged && Boolean(lastHrefRef.current),
+    });
     const href = search || "?";
     if (href !== lastHrefRef.current) {
       const prev = lastHrefRef.current;

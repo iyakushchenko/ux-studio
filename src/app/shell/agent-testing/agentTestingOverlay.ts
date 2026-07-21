@@ -117,6 +117,7 @@ import {
 import {
   armQaAgentPresenceHeartbeat,
   clearQaAgentPresence,
+  endQaProveMode,
   isQaAgentPresenceStaleForAutoPause,
   isQaProveModeActive,
   peekQaAgentPresence,
@@ -1508,6 +1509,18 @@ function softShowOverlayPanel(root: HTMLElement | null): void {
 function armSafetyTimer(): void {
   clearSafetyTimer();
   safetyTimer = setTimeout(() => {
+    // Long REC / prove must not be force-killed at MAX_MS — re-arm instead.
+    if (isRecordingActive() || isQaProveModeActive()) {
+      try {
+        logAgentTestingOverlay(
+          "overlay safety timeout deferred — REC/prove still live"
+        );
+      } catch {
+        /* hang-safe */
+      }
+      armSafetyTimer();
+      return;
+    }
     try {
       logAgentTestingOverlay("overlay auto-stop: safety timeout");
     } catch {
@@ -1524,7 +1537,14 @@ function armIdleTimer(): void {
     if (!active || settling) return;
     // Journey/play smokes run minutes — never idle-kill an active MCP session.
     // Free-form QA logger stays open while the diag gate is open.
-    if (getMcpTestSession() || isQaDiagLoggerMode() || isLoggerStyleSession()) {
+    // REC live / prove latch: ALWAYS CLEAR sessions must stay visible (code law).
+    if (
+      getMcpTestSession() ||
+      isQaDiagLoggerMode() ||
+      isLoggerStyleSession() ||
+      isRecordingActive() ||
+      isQaProveModeActive()
+    ) {
       armIdleTimer();
       return;
     }
@@ -4190,6 +4210,11 @@ export function forceClearAgentTestingOverlay(): void {
     clearFailHandoff();
     clearQaProgressFreeze();
     clearQaAgentPresence();
+    try {
+      endQaProveMode();
+    } catch {
+      /* hang-safe */
+    }
     try {
       disarmQaChatLoadingWatch();
     } catch {

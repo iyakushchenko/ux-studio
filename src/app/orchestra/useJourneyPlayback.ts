@@ -870,7 +870,17 @@ export function useJourneyPlayback({
 
         const { ok, failureStep, diagnosticSent } = await invokeBeatScript(
           beatDirectorScriptLabel(activeBeat) ?? "recorded-click",
-          () => playRecordedClick(click, options),
+          () =>
+            playRecordedClick(click, {
+              ...options,
+              applyStudioModal: (modalId) => {
+                try {
+                  runtime.applyStudioModal?.(modalId);
+                } catch {
+                  /* hang-safe */
+                }
+              },
+            }),
           options
         );
         if (!ok) {
@@ -909,6 +919,7 @@ export function useJourneyPlayback({
       completeJourneyPlay,
       invokeBeatScript,
       reportScriptFailure,
+      runtime,
       setScriptingActive,
     ]
   );
