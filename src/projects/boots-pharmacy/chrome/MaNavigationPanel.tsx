@@ -6,11 +6,12 @@ import "./maNavigationPanel.css";
  * Used by appointment-history + appointment-details; keep in sync with
  * that Figma node rather than re-inlining per screen.
  *
- * Items only become real interactive links when their target page
- * exists in this project (no dead/invented hrefs) — see
- * `MA_NAV_LINKED_LABELS`. Non-linked items stay plain text, same as
- * before. "Current page" can be the exact screen OR its logical
- * parent section (e.g. Appointment Details highlights "Appointment
+ * Every item is a real interactive button (DS hover/focus states) —
+ * only *navigation* is gated by `MA_NAV_LINKED_LABELS` so we never
+ * invent a target for a page that doesn't exist in this project yet;
+ * un-shipped items are still hoverable/focusable, just a no-op click.
+ * "Current page" can be the exact screen OR its logical parent
+ * section (e.g. Appointment Details highlights "Appointment
  * history") — callers pass that via `activeItem`.
  */
 export type MaNavigationPanelProps = {
@@ -77,31 +78,18 @@ export function MaNavigationPanel({
             ? "ma-navigation-panel__menu-item ma-navigation-panel__menu-item--active"
             : "ma-navigation-panel__menu-item";
 
-          if (linked) {
-            return (
-              <button
-                key={label}
-                type="button"
-                className={className}
-                data-name="component.ma.navigation.menu.item"
-                data-studio-ma-nav-link="true"
-                aria-current={active ? "page" : undefined}
-                onClick={() => onNavigate?.(label)}
-              >
-                {label}
-              </button>
-            );
-          }
-
           return (
-            <div
+            <button
               key={label}
+              type="button"
               className={className}
               data-name="component.ma.navigation.menu.item"
+              data-studio-ma-nav-link={linked ? "true" : undefined}
               aria-current={active ? "page" : undefined}
+              onClick={linked ? () => onNavigate?.(label) : undefined}
             >
               {label}
-            </div>
+            </button>
           );
         })}
       </nav>

@@ -6,6 +6,18 @@
  * Cancel: no invent hover (#c96b6b forbidden).
  */
 
+/* Host must stretch full width like every other migrated screen —
+   the Figma-generated ancestor uses items-center, which shrink-wraps
+   an unstretched host to its content width (same fix as plp/book-step). */
+.studio-react-screen-host[data-studio-react-screen="appointment-details"] {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 1200px;
+  align-self: stretch;
+}
+
 .appointment-details {
   display: flex;
   flex-direction: column;
@@ -224,6 +236,29 @@
   letter-spacing: -0.36px;
   white-space: nowrap;
   cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+/* Hover/focus — same tertiary icon+text language as PLP Quick View
+   (.plp__tertiary): no background wash, label -> #000, icon -> link
+   color. Reusing that exact treatment, not inventing a new one. */
+.appointment-details__icon-btn:hover,
+.appointment-details__icon-btn:active {
+  background: transparent;
+  color: #000;
+}
+
+.appointment-details__icon-btn:hover [data-name="icon=edit"] svg path {
+  fill: var(--uxds-text-link-link);
+}
+
+.appointment-details__icon-btn:hover [data-name="icon=cancel"] svg path {
+  stroke: var(--uxds-text-link-link);
+}
+
+.appointment-details__icon-btn:focus-visible {
+  outline: 2px solid var(--uxds-border-border-focus, var(--uxds-text-link-link));
+  outline-offset: 2px;
 }
 
 /* Make wire icon-text: no invent Cancel hover — under-match OK */

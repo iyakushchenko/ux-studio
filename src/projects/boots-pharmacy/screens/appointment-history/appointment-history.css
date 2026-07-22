@@ -4,6 +4,18 @@
  *   active #5b8fc9 · completed #4a9b72 · cancelled #d4a03a
  */
 
+/* Host must stretch full width like every other migrated screen —
+   the Figma-generated ancestor uses items-center, which shrink-wraps
+   an unstretched host to its content width (same fix as plp/book-step). */
+.studio-react-screen-host[data-studio-react-screen="appointment-history"] {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 1200px;
+  align-self: stretch;
+}
+
 .appointment-history {
   display: flex;
   flex-direction: column;
@@ -301,11 +313,33 @@
   letter-spacing: -0.36px;
   white-space: nowrap;
   cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-/* Make wire icon-text: no hover color invent — under-match OK */
 .appointment-history__icon-btn--cancel {
   color: #5c5c5c;
+}
+
+/* Hover/focus — same tertiary icon+text language as PLP Quick View
+   (.plp__tertiary): no background wash, label -> #000, icon -> link
+   color. Reusing that exact treatment, not inventing a new one. */
+.appointment-history__icon-btn:hover,
+.appointment-history__icon-btn:active {
+  background: transparent;
+  color: #000;
+}
+
+.appointment-history__icon-btn:hover [data-name="icon=edit"] svg path {
+  fill: var(--uxds-text-link-link);
+}
+
+.appointment-history__icon-btn:hover [data-name="icon=cancel"] svg path {
+  stroke: var(--uxds-text-link-link);
+}
+
+.appointment-history__icon-btn:focus-visible {
+  outline: 2px solid var(--uxds-border-border-focus, var(--uxds-text-link-link));
+  outline-offset: 2px;
 }
 
 .appointment-history__icon {
@@ -359,6 +393,8 @@
   background: #012169;
 }
 
+/* Typical secondary CTA — same tokens/hover as PDP .pdp__secondary
+   (Check availability), not a bespoke palette. */
 .appointment-history__load-more-btn {
   display: inline-flex;
   align-items: center;
@@ -368,15 +404,34 @@
   min-width: 230px;
   height: 48px;
   padding: 12px 24px;
-  border: 1px solid #afccca;
-  border-radius: 4px;
-  background: #fff;
-  color: #5c5c5c;
+  border: 1px solid var(--uxds-input-button-border-border-secondary);
+  border-radius: 360px;
+  background: var(--uxds-input-button-surface-surface-secondary-solid);
+  color: var(--uxds-text-text-secondary);
   font-family: inherit;
   font-size: 16px;
   font-weight: 600;
   line-height: 16px;
   letter-spacing: -0.32px;
   white-space: nowrap;
-  cursor: default;
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+
+.appointment-history__load-more-btn:hover {
+  background: var(--uxds-surface-accent-soft);
+  border-color: var(--uxds-surface-accent-soft);
+}
+
+.appointment-history__load-more-btn:focus-visible {
+  outline: 2px solid var(--uxds-border-border-focus);
+  outline-offset: 2px;
+}
+
+.appointment-history__load-more-btn [data-name="icon=plus"] svg path {
+  transition: fill 0.18s ease;
+}
+
+.appointment-history__load-more-btn:hover [data-name="icon=plus"] svg path {
+  fill: var(--project-brand-cta-navy-hover);
 }

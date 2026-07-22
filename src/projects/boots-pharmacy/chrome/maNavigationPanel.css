@@ -11,6 +11,16 @@
   gap: 24px;
   width: 304px;
   flex-shrink: 0;
+  /* Sticky within the left rail while the (taller) content column
+     scrolls — same pattern as the Hub sidebar TOC (globals-hub.css
+     .proto-hub-page__sidebar). --sticky-top tracks the live header
+     height (BootsPharmacyProjectView), default 64px; +24px keeps the
+     panel from touching the sticky header edge once it clamps. */
+  position: sticky;
+  top: calc(var(--sticky-top, 64px) + 24px);
+  align-self: flex-start;
+  max-height: calc(100vh - var(--sticky-top, 64px) - 48px);
+  overflow-y: auto;
 }
 
 .ma-navigation-panel__profile {
@@ -63,32 +73,53 @@
   background: var(--uxds-surface-subtle, #f5f5f5);
 }
 
-/* Interactive items — only rendered as <button> when a real page target
-   exists (MA_NAV_LINKED_LABELS). Rest/hover/focus/active per DS text-link
-   family tokens, not invented colors. */
+/* Every item is a real <button> (hoverable/focusable) so the whole list
+   reads as one interactive DS pattern — only *navigation* is gated by
+   MA_NAV_LINKED_LABELS (unshipped pages stay a no-op click, never an
+   invented target). Current page keeps its bold + filled wrapper
+   unaffected by hover; other items: rest = no bg/brand text-primary,
+   hover = stays transparent, text turns brand primary. */
 button.ma-navigation-panel__menu-item {
   display: block;
   width: 100%;
   border: none;
   background: none;
-  font: inherit;
+  /* font-family only — `font: inherit` would also reset size/weight/
+     line-height set by .menu-item / .menu-item--active below. */
+  font-family: inherit;
   text-align: left;
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-button.ma-navigation-panel__menu-item:hover {
-  background: var(--uxds-filter-chip-surface-hover, #f0f5f4);
+/* Doubled class beats the plain `button.menu-item` reset above on
+   specificity, regardless of source order — current page's bold text
+   + filled wrapper must never lose to the button reset. */
+button.ma-navigation-panel__menu-item.ma-navigation-panel__menu-item--active {
+  font-weight: 600;
+  background: var(--uxds-surface-subtle, #f5f5f5);
+}
+
+/* Current page hover — fill shifts to the same lighter-primary token
+   already used for the Edit/Cancel icon rest color (#AFCCCA =
+   --project-brand-primary-light) instead of the neutral grey fill. */
+button.ma-navigation-panel__menu-item.ma-navigation-panel__menu-item--active:hover {
+  background: var(--project-brand-primary-light, #afccca);
+}
+
+button.ma-navigation-panel__menu-item:not(.ma-navigation-panel__menu-item--active):hover {
+  background: transparent;
+  color: var(--project-brand-primary, #467672);
+}
+
+button.ma-navigation-panel__menu-item:not(.ma-navigation-panel__menu-item--active):active {
+  color: var(--project-brand-primary-darkest, #305854);
 }
 
 button.ma-navigation-panel__menu-item:focus-visible {
   outline: 2px solid var(--uxds-text-link-link, #305854);
   outline-offset: 2px;
-}
-
-button.ma-navigation-panel__menu-item:active {
-  background: var(--uxds-surface-subtle, #f5f5f5);
 }
 
 .ma-navigation-panel__service {
