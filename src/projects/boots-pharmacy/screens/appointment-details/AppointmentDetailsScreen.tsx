@@ -13,6 +13,7 @@ import {
   computeOrderPricing,
   formatGbp,
 } from "@/projects/boots-pharmacy/data/orderPricing";
+import { MaNavigationPanel } from "@/projects/boots-pharmacy/chrome/MaNavigationPanel";
 import {
   Accordion,
   AccordionChevron,
@@ -107,25 +108,6 @@ function CancelIcon() {
         />
       </svg>
     </span>
-  );
-}
-
-function AccountAvatar() {
-  return (
-    <div
-      className="appointment-details__avatar"
-      data-name="icon / accent / account"
-      aria-hidden
-    >
-      <svg viewBox="0 0 24 28" fill="none">
-        <path
-          fillRule="evenodd"
-          clipRule="evenodd"
-          d="M12 14c3.314 0 6-2.686 6-6s-2.686-6-6-6-6 2.686-6 6 2.686 6 6 6zm0 2c-4.418 0-12 2.239-12 6.667V28h24v-5.333C24 18.239 16.418 16 12 16z"
-          fill="#5C5C5C"
-        />
-      </svg>
-    </div>
   );
 }
 
@@ -416,69 +398,12 @@ export function AppointmentDetailsScreen({
       <div className="appointment-details__body">
         <div className="appointment-details__shell">
           <div className="appointment-details__shell-inner appointment-details__layout">
-            <aside
-              className="appointment-details__nav"
-              data-name="module.ma.navigation"
-            >
-              <div
-                className="appointment-details__profile"
-                data-name="component.ma.navigation.profile.name.and.icon"
-              >
-                <AccountAvatar />
-                <p className="appointment-details__profile-text">
-                  <span>{APPOINTMENT_DETAILS_PROFILE_HELLO}</span>{" "}
-                  <span>{APPOINTMENT_DETAILS_PROFILE_NAME}</span>
-                </p>
-              </div>
-
-              <nav
-                className="appointment-details__menu"
-                data-name="component.ma.navigation.menu"
-                aria-label="My Account"
-              >
-                {APPOINTMENT_DETAILS_NAV_ITEMS.map((label) => {
-                  const active = label === APPOINTMENT_DETAILS_NAV_ACTIVE;
-                  return (
-                    <div
-                      key={label}
-                      className={
-                        active
-                          ? "appointment-details__menu-item appointment-details__menu-item--active"
-                          : "appointment-details__menu-item"
-                      }
-                      data-name="component.ma.navigation.menu.item"
-                      aria-current={active ? "page" : undefined}
-                    >
-                      {label}
-                    </div>
-                  );
-                })}
-              </nav>
-
-              <div
-                className="appointment-details__service"
-                data-name="component.ma.navigation.content.slot"
-              >
-                <p className="appointment-details__service-title">
-                  Customer Service
-                </p>
-                <p className="appointment-details__service-line">
-                  Monday – Friday: 9:00 am – 12:00 pm
-                </p>
-                <p className="appointment-details__service-line">
-                  Saturday: 9:00 am – 12:00 am
-                </p>
-                <p className="appointment-details__service-line">
-                  Sunday: Closed
-                </p>
-                <p className="appointment-details__service-line">
-                  Got a question or need help with your account?
-                </p>
-                <span className="appointment-details__service-contact">
-                  Contact us
-                </span>
-              </div>
-            </aside>
+            <MaNavigationPanel
+              helloLabel={APPOINTMENT_DETAILS_PROFILE_HELLO}
+              profileName={APPOINTMENT_DETAILS_PROFILE_NAME}
+              navItems={APPOINTMENT_DETAILS_NAV_ITEMS}
+              activeItem={APPOINTMENT_DETAILS_NAV_ACTIVE}
+            />
 
             <div
               className="appointment-details__content"
