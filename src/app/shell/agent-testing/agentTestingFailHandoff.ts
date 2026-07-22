@@ -23,7 +23,7 @@ export type FailHandoffState = {
   handshakeAtMs: number | null;
 };
 
-type LogFn = (label: string, outcome?: "ok" | "soft-fail" | "fail") => void;
+type LogFn = (label: string, outcome?: "ok" | "notice" | "fail") => void;
 type PauseFn = (reason: string) => void;
 
 const MEMORY_KEY = "__studioQaFailHandoffMemory";

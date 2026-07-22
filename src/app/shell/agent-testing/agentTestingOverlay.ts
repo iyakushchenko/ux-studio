@@ -9,7 +9,7 @@ import { getPrototypeScrollRoot } from "@/app/scenario/playbackScroll";
 import { getControlPanelSnapshot } from "@/app/shell/controlPanelLog";
 import { getCursorDiagnosticState } from "@/app/shell/playbackCursorDiagnostic";
 import { getMcpTestSession } from "@/app/shell/mcpTestGuard";
-import { getPlaybackDiagBundle, playbackDiagScroll } from "@/app/shell/playbackDiag";
+import { getPlaybackDiagBundle } from "@/app/shell/playbackDiag";
 import { getRecentDiagnosticFlashes } from "@/app/shell/playbackDiagnosticFlash";
 import {
   appendQaDiagRing,
@@ -280,9 +280,6 @@ type OverlayApi = {
   logHelper: (suffix: string) => void;
   /** PO: sequence / expected-steps mismatch — latches live takeover signal. */
   ringAlarm: (note?: string) => void;
-  flagCursorWeird: (note?: string) => void;
-  /** PO mid-flight scroll problem report (amber + live latch + dump). */
-  flagScrollIssue: (note?: string) => void;
   /** Peek live PO latch (does not clear). */
   peekPoSignal: () => AgentTestingPoSignal | null;
   /** Consume + clear live PO latch. */
@@ -341,6 +338,7 @@ let autoPausedForStalePresence = false;
 let recPausedQaCapture = false;
 let selectedQaSuiteId = "";
 let qaSuiteStatusListenerBound = false;
+const QA_SUITE_SELECTION_KEY = "studioQaSuiteSelectionV1";
 /** Unsubscribe for REC session XOR with QA capture. */
 let recordingSessionUnsub: (() => void) | null = null;
 /**
@@ -350,6 +348,33 @@ let recordingSessionUnsub: (() => void) | null = null;
 let sessionHadProgress = false;
 /** True when log has events after last Reset (Reset CTA gated until dirty). */
 let logDirty = false;
+
+function persistQaSuiteSelection(): void {
+  try {
+    sessionStorage.setItem(QA_SUITE_SELECTION_KEY, selectedQaSuiteId);
+  } catch {
+    /* storage optional */
+  }
+}
+
+function restoreQaSuiteSelection(): void {
+  if (selectedQaSuiteId) return;
+  try {
+    const saved = sessionStorage.getItem(QA_SUITE_SELECTION_KEY) ?? "";
+    if (getQaSuiteDefinition(saved)) selectedQaSuiteId = saved;
+  } catch {
+    /* storage optional */
+  }
+}
+
+function syncQaSuiteSelectionFromStatus(event: Event): void {
+  const suiteId = (event as CustomEvent<{ suiteId?: unknown }>).detail?.suiteId;
+  if (typeof suiteId === "string" && getQaSuiteDefinition(suiteId)) {
+    selectedQaSuiteId = suiteId;
+    persistQaSuiteSelection();
+  }
+  syncSessionChrome();
+}
 let logEntries: AgentTestingLogEntry[] = [];
 /** Coalesce rapid log pushes into one DOM rebuild per animation frame. */
 let logDomFlushRaf = 0;
@@ -381,7 +406,7 @@ let settleResult: AgentTestingOverlayResult = "neutral";
 let settleHeld = false;
 let timelineKeys: AgentTestingTimelineKey[] = [];
 let lastUnexpectedDwellCount = 0;
-/** Latch auto scroll soft-fails so we do not spam amber rows. */
+/** Latch auto scroll notices so we do not spam amber rows. */
 let lastAutoScrollFlagKey = "";
 let lastSitrepLine = "";
 /** Last MCP phase logged to QA timeline (avoid spam). */
@@ -581,7 +606,7 @@ function refreshStaleGreenAndDiagMirror(): void {
         atMs: Date.now(),
         timeLabel: new Date().toLocaleTimeString("en-GB", { hour12: false }),
         label: noted.logLabel,
-        outcome: "soft-fail",
+        outcome: "notice",
         kind: "system",
       });
     }
@@ -639,6 +664,37 @@ function renderTimeline(): void {
     chip.textContent = item.key.length > 18 ? `${item.key.slice(0, 16)}…` : item.key;
     strip.appendChild(chip);
   }
+}
+
+/** Keep the QA console honest about both outer tests and nested CJM/page work. */
+function syncQaSuiteProgress(root: HTMLElement): void {
+  const status = getAutonomousQaSuiteStatus();
+  const count = root.querySelector<HTMLElement>(".studio-agent-testing-overlay__suite-progress-count");
+  const title = root.querySelector<HTMLElement>(".studio-agent-testing-overlay__timeline-wrap .studio-agent-testing-overlay__bar-title");
+  if (!status.suiteId || status.phase === "idle") {
+    count?.setAttribute("hidden", "");
+    root.removeAttribute("data-suite-phase");
+    root.style.removeProperty("--qa-suite-progress");
+    return;
+  }
+  const scope = status.scope;
+  const total = Math.max(1, scope?.total ?? status.total);
+  const current = Math.min(total, scope?.current ?? (status.phase === "passed" ? total : status.index + 1));
+  const label = scope?.label ?? "Tests";
+  if (count) {
+    count.hidden = false;
+    count.textContent = `${label} ${current}/${total}`;
+    count.title = `${current} of ${total} ${label.toLowerCase()} checked`;
+  }
+  if (title && scope) title.textContent = `Touchpoints · ${label} ${current}/${total}`;
+  if (scope?.items) {
+    timelineKeys = scope.items.map((item) => ({ key: item.label, outcome: item.outcome }));
+    renderTimeline();
+  }
+  root.dataset.suitePhase = status.phase;
+  // The bar is drawn by the panel (a sibling of the viewport frame), so keep
+  // this custom property on their common root where CSS inheritance reaches it.
+  root.style.setProperty("--qa-suite-progress", `${(current / total) * 100}%`);
 }
 
 export function setAgentTestingTimeline(keys: string[]): void {
@@ -700,6 +756,22 @@ function saveDump(
   },
 ): AgentTestingDump | null {
   try {
+    const suiteStatus = getAutonomousQaSuiteStatus();
+    const suite = suiteStatus.suiteId
+      ? {
+          suiteId: suiteStatus.suiteId,
+          phase: suiteStatus.phase,
+          playbackProfile: suiteStatus.playbackProfile,
+          startedAtIso: suiteStatus.startedAtIso,
+          finishedAtIso: suiteStatus.finishedAtIso,
+          elapsedMs: suiteStatus.elapsedMs,
+          index: suiteStatus.index,
+          total: suiteStatus.total,
+          current: suiteStatus.current,
+          completed: suiteStatus.completed.map((row) => ({ ...row })),
+          failure: suiteStatus.failure ? { ...suiteStatus.failure } : null,
+        }
+      : undefined;
     const dump = buildAgentTestingDump({
       reason,
       title: sessionTitle,
@@ -715,6 +787,7 @@ function saveDump(
       poSignal: extras?.poSignal ?? peekPoSignal(),
       gateMode: getSessionKind(),
       capturePaused,
+      suite,
       mcp: (() => {
         try {
           const s = readLiveMcpStatus();
@@ -780,7 +853,7 @@ export function downloadCurrentAgentTestingLog(): boolean {
 }
 
 /** Visible QA toolbar / lifecycle row — never silent. */
-function logQaToolbarAction(label: string, outcome: "ok" | "soft-fail" | "fail" = "ok"): void {
+function logQaToolbarAction(label: string, outcome: "ok" | "notice" | "fail" = "ok"): void {
   const entry = {
     atMs: Date.now(),
     timeLabel: new Date().toLocaleTimeString("en-GB", { hour12: false }),
@@ -992,7 +1065,7 @@ export function appendAgentTestingSessionFinale(result: "pass" | "fail", summary
         atMs: Date.now(),
         timeLabel: new Date().toLocaleTimeString("en-GB", { hour12: false }),
         label: "RESULT withheld — consume USER_MESSAGE latch first (Message stays open)",
-        outcome: "soft-fail",
+        outcome: "notice",
         kind: "system",
       });
       console.warn("[AGENT_TESTING] RESULT withheld — USER_MESSAGE pending", pending.note);
@@ -1047,7 +1120,7 @@ export function ringAgentTestingAlarm(note?: string): void {
   pushLogEntry(
     buildLogEntryFromStep({
       kind: "alarm",
-      outcome: "soft-fail",
+      outcome: "notice",
       label: `ALARM · ALARM_SEQUENCE_MISMATCH${detail} · investigate · consume __studioConsumePoSignal()`,
       beatId: signal.beat ?? undefined,
     }),
@@ -1085,89 +1158,6 @@ export function ringAgentTestingAlarm(note?: string): void {
   });
 }
 
-export function flagAgentTestingCursorWeird(note?: string): void {
-  haltPlaybackForPoSignal("po-cursor");
-  const detail = note?.trim() ? ` — ${note.trim()}` : "";
-  const signal = latchPoSignal({
-    type: "cursor",
-    code: "CURSOR_WEIRD_FLAG",
-    note,
-    sitrepLine: lastSitrepLine,
-    timeline: timelineKeys,
-  });
-  pushLogEntry(
-    buildLogEntryFromStep({
-      kind: "cursor",
-      outcome: "soft-fail",
-      label: `cursor issue detected · CURSOR_WEIRD_FLAG${detail} · consume __studioConsumePoSignal()`,
-      beatId: signal.beat ?? undefined,
-    }),
-  );
-  try {
-    console.warn(
-      "[AGENT_TESTING] cursor issue detected",
-      "CURSOR_WEIRD_FLAG",
-      "→ window.__studioConsumePoSignal() (primary)",
-      note ?? "",
-    );
-  } catch {
-    /* ignore */
-  }
-  saveDump("cursor", { code: "CURSOR_WEIRD_FLAG", poSignal: signal });
-}
-
-export function flagAgentTestingScrollIssue(note?: string): void {
-  haltPlaybackForPoSignal("po-scroll");
-  const detail = note?.trim() ? ` — ${note.trim()}` : "";
-  const snap = readScrollSnapshot();
-  const snapLabel = snap.host != null ? ` · host=${snap.host} scrollTop=${snap.scrollTop ?? "?"}` : " · host=none";
-  const signal = latchPoSignal({
-    type: "scroll",
-    code: "SCROLL_ISSUE_REPORTED",
-    note,
-    sitrepLine: lastSitrepLine,
-    timeline: timelineKeys,
-  });
-  pushLogEntry(
-    buildLogEntryFromStep({
-      kind: "scroll",
-      outcome: "soft-fail",
-      label: `scroll issue detected · SCROLL_ISSUE_REPORTED${detail}${snapLabel} · consume __studioConsumePoSignal()`,
-      beatId: signal.beat ?? undefined,
-    }),
-  );
-  try {
-    playbackDiagScroll({
-      detail: `SCROLL_ISSUE_REPORTED${detail}`,
-      host: snap.host,
-      beforeTop: snap.scrollTop,
-      afterTop: snap.scrollTop,
-      intoViewRequested: false,
-      intoViewDone: false,
-    });
-  } catch {
-    /* hang-safe */
-  }
-  try {
-    console.warn(
-      "[AGENT_TESTING] scroll issue detected",
-      "SCROLL_ISSUE_REPORTED",
-      "→ window.__studioConsumePoSignal() (primary)",
-      snap,
-      note ?? "",
-    );
-    console.warn("[PLAYBACK_DIAG]", "scroll", {
-      code: "SCROLL_ISSUE_REPORTED",
-      host: snap.host,
-      scrollTop: snap.scrollTop,
-      note: note ?? "",
-    });
-  } catch {
-    /* ignore */
-  }
-  saveDump("scroll", { code: "SCROLL_ISSUE_REPORTED", poSignal: signal });
-}
-
 function maybeAutoFlagCursorIssue(): void {
   if (!active || settling) return;
   try {
@@ -1178,7 +1168,7 @@ function maybeAutoFlagCursorIssue(): void {
       pushLogEntry(
         buildLogEntryFromStep({
           kind: "cursor",
-          outcome: "soft-fail",
+          outcome: "notice",
           label: "cursor issue detected · CURSOR_UNEXPECTED_DWELL · see __studioPlaybackDiag",
           beatId: state.lastCursorBeatId ?? undefined,
         }),
@@ -1217,7 +1207,7 @@ function maybeAutoFlagScrollIssue(): void {
       pushLogEntry(
         buildLogEntryFromStep({
           kind: "scroll",
-          outcome: "soft-fail",
+          outcome: "notice",
           label: `scroll issue detected · ${code} · see __studioPlaybackDiag`,
           beatId: flash.beatId,
         }),
@@ -1247,7 +1237,7 @@ function maybeAutoFlagScrollIssue(): void {
       pushLogEntry(
         buildLogEntryFromStep({
           kind: "scroll",
-          outcome: "soft-fail",
+          outcome: "notice",
           label: "scroll issue detected · SCROLL_INTO_VIEW_FAIL · see __studioPlaybackDiag",
           beatId: ev.beatId ?? undefined,
         }),
@@ -1726,6 +1716,9 @@ function syncSessionChrome(): void {
   setQaSessionLock(active || settling ? kind : null);
   syncClickGuard();
   syncDiagAckChrome();
+  // The suite runner is authoritative. Repaint its state with every chrome
+  // sync so a live test can never expose a second runnable CTA.
+  syncQaSuiteProgress(root);
 
   const locked = isAgentLocked() && (active || settling);
   const closeBtn = root.querySelector<HTMLButtonElement>(".studio-agent-testing-overlay__close");
@@ -1776,6 +1769,12 @@ function syncSessionChrome(): void {
     }
   }
 
+  const suiteSelect = root.querySelector<HTMLSelectElement>(".studio-agent-testing-overlay__suite-select");
+  if (suiteSelect && suiteSelect.value !== selectedQaSuiteId) {
+    suiteSelect.value = selectedQaSuiteId;
+  }
+  syncQaSuiteProgress(root);
+
   const elapsed = root.querySelector<HTMLElement>(".studio-agent-testing-overlay__elapsed");
   if (elapsed) {
     elapsed.dataset.live = active && !settling && !capturePaused ? "true" : "false";
@@ -1796,19 +1795,6 @@ function syncSessionChrome(): void {
           ? "Download lean dump JSON (current session)"
           : "Snapshot dump while capturing (does not pause)"
       : "Open a QA session to save log";
-  }
-
-  const alarmBtn = root.querySelector<HTMLButtonElement>(".studio-agent-testing-overlay__alarm");
-  if (alarmBtn) {
-    // Observe: escalate + latch; agent: latch only. Manual: hidden.
-    const alarmOk = (kind === "agent" || kind === "observe") && active && !settling;
-    alarmBtn.hidden = !alarmOk;
-    alarmBtn.disabled = !alarmOk;
-    alarmBtn.title = alarmOk
-      ? kind === "observe"
-        ? "Escalate to agent + latch investigate prompt"
-        : "Stop progress + latch investigate prompt for the agent"
-      : "Alarm — observe or agent mode";
   }
 
   ensureMessageUnderLog(root);
@@ -1988,6 +1974,14 @@ function ensureOverlayChrome(root: HTMLElement): void {
   const panel = root.querySelector(".studio-agent-testing-overlay__panel");
   const header = root.querySelector(".studio-agent-testing-overlay__header");
   if (!panel || !header) return;
+
+  const suitePicker = header.querySelector<HTMLElement>(".studio-agent-testing-overlay__suite-picker");
+  if (suitePicker && !suitePicker.querySelector(".studio-agent-testing-overlay__suite-progress-count")) {
+    const count = document.createElement("span");
+    count.className = "studio-agent-testing-overlay__suite-progress-count";
+    count.hidden = true;
+    suitePicker.appendChild(count);
+  }
 
   let clock = header.querySelector<HTMLElement>(".studio-agent-testing-overlay__clock");
   const elapsed = header.querySelector<HTMLElement>(".studio-agent-testing-overlay__elapsed");
@@ -2606,8 +2600,9 @@ function consumePoSignalWithAck(): AgentTestingPoSignal | null {
 function ensureRoot(): HTMLElement | null {
   if (typeof document === "undefined") return null;
   if (typeof document.getElementById !== "function") return null;
+  restoreQaSuiteSelection();
   if (!qaSuiteStatusListenerBound && typeof window !== "undefined") {
-    window.addEventListener("studio:qa-suite-status", syncSessionChrome);
+    window.addEventListener("studio:qa-suite-status", syncQaSuiteSelectionFromStatus);
     qaSuiteStatusListenerBound = true;
   }
   let root = document.getElementById(ROOT_ID);
@@ -2635,6 +2630,7 @@ function ensureRoot(): HTMLElement | null {
               <option value="">Select test</option>
               ${QA_SUITE_COLLECTION.map((suite) => `<option value="${suite.id}">${suite.label}</option>`).join("")}
             </select>
+            <span class="studio-agent-testing-overlay__suite-progress-count" hidden></span>
           </label>
           <div class="studio-agent-testing-overlay__clock">
             <span class="studio-agent-testing-overlay__elapsed" title="Elapsed">0:00</span>
@@ -2665,9 +2661,6 @@ function ensureRoot(): HTMLElement | null {
         <ol class="studio-agent-testing-overlay__diag-mirror" data-empty="true" aria-label="Recent playback diagnostics"></ol>
       </div>
       <div class="studio-agent-testing-overlay__actions">
-        <button type="button" class="studio-agent-testing-overlay__alarm" hidden title="Alarm — observe or agent">Alarm</button>
-        <button type="button" class="studio-agent-testing-overlay__cursor-flag" title="Flag cursor weird — latches live PO signal">Cursor</button>
-        <button type="button" class="studio-agent-testing-overlay__scroll-flag" title="Flag scroll problem — latches live PO signal">Scroll</button>
         <button type="button" class="studio-agent-testing-overlay__diag-ack" hidden title="Ack playback diagnostic — consume latch + clear">Ack diag</button>
       </div>
       <ul class="studio-agent-testing-overlay__log" data-empty="true"></ul>
@@ -2697,6 +2690,7 @@ function ensureRoot(): HTMLElement | null {
     ?.addEventListener("click", () => {
       const suite = getQaSuiteDefinition(selectedQaSuiteId);
       if (suite) {
+        if (getAutonomousQaSuiteStatus().phase === "running") return;
         window.__studioStartQaSuite?.([...suite.tests], { suiteId: suite.id });
         syncSessionChrome();
         return;
@@ -2708,6 +2702,7 @@ function ensureRoot(): HTMLElement | null {
     suiteSelect.value = selectedQaSuiteId;
     const applySuiteSelection = () => {
       selectedQaSuiteId = suiteSelect.value;
+      persistQaSuiteSelection();
       syncSessionChrome();
     };
     suiteSelect.addEventListener("input", applySuiteSelection);
@@ -2721,15 +2716,6 @@ function ensureRoot(): HTMLElement | null {
     if (!text) return;
     appendAgentTestingUserMessage(text);
     if (input) input.value = "";
-  });
-  root.querySelector<HTMLButtonElement>(".studio-agent-testing-overlay__alarm")?.addEventListener("click", () => {
-    ringAgentTestingAlarm();
-  });
-  root.querySelector<HTMLButtonElement>(".studio-agent-testing-overlay__cursor-flag")?.addEventListener("click", () => {
-    flagAgentTestingCursorWeird();
-  });
-  root.querySelector<HTMLButtonElement>(".studio-agent-testing-overlay__scroll-flag")?.addEventListener("click", () => {
-    flagAgentTestingScrollIssue();
   });
   root.querySelector<HTMLButtonElement>(".studio-agent-testing-overlay__dump")?.addEventListener("click", () => {
     downloadCurrentAgentTestingLog();
@@ -3208,6 +3194,13 @@ export function startAgentTestingOverlay(title?: string): void {
     }
     try {
       clearFailHandoffFromSession();
+    } catch {
+      /* hang-safe */
+    }
+    // A fresh QA arm is an absolute boundary. Page probes may legitimately
+    // dismiss a diagnostic; its old stop latch must never poison the next suite.
+    try {
+      clearPoSignal();
     } catch {
       /* hang-safe */
     }
@@ -3956,14 +3949,14 @@ export function appendAgentTestingUserMessage(text: string): boolean {
       atMs: Date.now(),
       timeLabel: new Date().toLocaleTimeString("en-GB", { hour12: false }),
       label: "Agent unavailable · progress paused. Copy the resume card to reconnect.",
-      outcome: "soft-fail",
+      outcome: "notice",
       kind: "system",
     });
     pushLogEntry({
       atMs: Date.now(),
       timeLabel: new Date().toLocaleTimeString("en-GB", { hour12: false }),
       label: `Resume · ${card.studioUrl}`,
-      outcome: "soft-fail",
+      outcome: "notice",
       kind: "system",
     });
     try {
@@ -4272,8 +4265,6 @@ export function installAgentTestingOverlayApi(): void {
     logStep: logAgentTestingStep,
     logHelper: logAgentTestingHelper,
     ringAlarm: ringAgentTestingAlarm,
-    flagCursorWeird: flagAgentTestingCursorWeird,
-    flagScrollIssue: flagAgentTestingScrollIssue,
     peekPoSignal,
     consumePoSignal: () => consumePoSignalWithAck(),
     pauseForAgentLeave,

@@ -29,6 +29,8 @@ describe("agentTestingStaleGreen", () => {
   });
 
   it("logs once per mismatch key", () => {
+    let now = 1_000;
+    vi.spyOn(Date, "now").mockImplementation(() => now);
     registerControlPanelSnapshotProvider(() => ({
       screenId: "plp",
       journeyMode: true,
@@ -37,11 +39,16 @@ describe("agentTestingStaleGreen", () => {
     const search =
       "?project=boots-pharmacy&screen=chat&cjm=off&experience=agentic";
     const a = noteStaleGreenIfChanged(search);
-    expect(a.amber).toBe(true);
-    expect(a.logLabel).toMatch(/stale-green/);
+    expect(a.amber).toBe(false);
+    expect(a.logLabel).toBeNull();
+    now += 351;
     const b = noteStaleGreenIfChanged(search);
     expect(b.amber).toBe(true);
-    expect(b.logLabel).toBeNull();
-    expect(formatStaleGreenLabel(a.mismatches)).toContain("screen");
+    expect(b.logLabel).toMatch(/stale-green/);
+    const c = noteStaleGreenIfChanged(search);
+    expect(c.amber).toBe(true);
+    expect(c.logLabel).toBeNull();
+    expect(formatStaleGreenLabel(b.mismatches)).toContain("screen");
+    vi.restoreAllMocks();
   });
 });

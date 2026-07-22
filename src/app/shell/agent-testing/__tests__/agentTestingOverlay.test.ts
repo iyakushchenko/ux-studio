@@ -11,7 +11,6 @@ vi.mock("@/app/scenario/playbackScroll", () => ({
 
 import {
   DEFAULT_SETTLE_MS,
-  flagAgentTestingScrollIssue,
   forceClearAgentTestingOverlay,
   formatPreArmHint,
   formatSitrepHint,
@@ -109,21 +108,6 @@ describe("agentTestingOverlay", () => {
     expect(consumed?.code).toBe("ALARM_SEQUENCE_MISMATCH");
     expect(peekPoSignal()).toBeNull();
     registerPoSignalPlaybackHalt(null);
-    stopAgentTestingOverlay({ force: true });
-  });
-
-  it("flagScrollIssue soft-fails with SCROLL_ISSUE_REPORTED when active", () => {
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-    startAgentTestingOverlay("scroll-flag");
-    expect(() => flagAgentTestingScrollIssue("mid-flight")).not.toThrow();
-    expect(
-      warn.mock.calls.some(
-        (c) =>
-          String(c[0]).includes("[AGENT_TESTING]") &&
-          String(c[1]).includes("SCROLL_ISSUE_REPORTED")
-      )
-    ).toBe(true);
-    expect(peekPoSignal()?.code).toBe("SCROLL_ISSUE_REPORTED");
     stopAgentTestingOverlay({ force: true });
   });
 

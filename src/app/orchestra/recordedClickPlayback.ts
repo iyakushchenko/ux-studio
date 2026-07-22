@@ -23,7 +23,7 @@ import {
   drainLoginModalIfOpen,
   isLoginModalOpenInDom,
 } from "@/app/recording/recModalDrain";
-import { playbackMs } from "@/app/shell/playbackTiming";
+import { isFastPlayback, playbackMs } from "@/app/shell/playbackTiming";
 
 function resolveRecordedClickTarget(
   click: JourneyBeatRecordedClick
@@ -34,6 +34,16 @@ function resolveRecordedClickTarget(
       resolvePlaybackSelectorChain(click.selectorChain, modal),
   });
   return resolveUsableDemoClickTarget(modalResolved);
+}
+
+function isLoginRecordedAction(click: JourneyBeatRecordedClick | undefined): boolean {
+  return Boolean(
+    click &&
+      (click.modalId === "login" ||
+        click.selectorChain.some((selector) =>
+          /data-studio-action=["']login-sign-in["']/.test(selector)
+        ))
+  );
 }
 
 /** React/filter updates may replace a matching node between resolve and click. */
@@ -71,19 +81,31 @@ export async function playRecordedClick(
     skip?: boolean;
     /** Open blocking lightbox before resolving modal-scoped targets. */
     applyStudioModal?: (modalId: string | undefined) => void;
+    /**
+     * The next recorded beat owns the login CTA. Preserve its modal instead of
+     * consuming the action early, so every recorded intent plays exactly once.
+     */
+    nextRecordedClick?: JourneyBeatRecordedClick;
   }
 ): Promise<PlaybackScriptResult> {
   if (options?.skip) return { ok: true };
 
   // Play must honor REC `&modal=` — open before resolving clicks inside lightbox.
-  if (click.modalId && options?.applyStudioModal) {
+  // A preceding recorded action may already have opened this modal. Reopening
+  // it races the URL bridge / exit animation and can detach the real CTA while
+  // the cursor is travelling. A recorded click always acts on the live modal.
+  const modalAlreadyOpen =
+    click.modalId === "login" && isLoginModalOpenInDom();
+  const isLoginAction = isLoginRecordedAction(click);
+  const nextBeatOwnsLogin = isLoginRecordedAction(options?.nextRecordedClick);
+  if (click.modalId && !modalAlreadyOpen && options?.applyStudioModal) {
     try {
       options.applyStudioModal(click.modalId);
     } catch {
       /* hang-safe */
     }
     await new Promise((r) => setTimeout(r, playbackMs(350)));
-  } else if (click.modalId) {
+  } else if (click.modalId && !modalAlreadyOpen) {
     // Fallback: journey runtime may not be wired — try window bridge.
     try {
       (
@@ -113,7 +135,7 @@ export async function playRecordedClick(
 
   let target = await waitForStableRecordedClickTarget(click);
   if (!target && isLoginModalOpenInDom()) {
-    const drain = await drainLoginModalIfOpen();
+    const drain = await drainLoginModalIfOpen({ fast: isFastPlayback() });
     if (!drain.ok) {
       playbackDiagClick({
         ok: false,
@@ -166,8 +188,12 @@ export async function playRecordedClick(
   // PDP Book Now (logged out) opens login — sign in so later beats can proceed.
   // Brief wait so React can paint the modal before we look for it.
   await new Promise((r) => setTimeout(r, playbackMs(200)));
-  if (isLoginModalOpenInDom()) {
-    const drain = await drainLoginModalIfOpen();
+  if (
+    isLoginModalOpenInDom() &&
+    !nextBeatOwnsLogin &&
+    !isLoginAction
+  ) {
+    const drain = await drainLoginModalIfOpen({ fast: isFastPlayback() });
     if (!drain.ok) {
       playbackDiagClick({
         ok: false,

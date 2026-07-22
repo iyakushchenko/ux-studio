@@ -164,6 +164,7 @@ import {
   syncSitePilotChatThinkingHint,
 } from "@/projects/boots-pharmacy/dom/sitePilotChatThinking";
 import { usePublishChatScenarioReveal } from "@/projects/boots-pharmacy/screens/chat/usePublishChatScenarioReveal";
+import { CHAT_PULL_UP_MS } from "@/projects/boots-pharmacy/screens/chat/chatMotion";
 import {
   installStudioAuthSessionWindowApi,
   isStudioLoggedIn,
@@ -470,6 +471,10 @@ export default function App() {
   const sitePilotChatPlaybackHooks = useMemo<PlaybackStepHooks>(
     () => ({
       beforeReveal: runSitePilotChatBeforeReveal,
+      // Includes Chat's double-rAF start + diagnostic/clearance settle tail.
+      // The next scripted click must never begin while this frame still owns
+      // the camera, including in fast QA mode.
+      minimumAutoAdvanceMs: CHAT_PULL_UP_MS + 180,
       revealScrollSmooth: () => true,
       onPreludeAbort: abortSitePilotChatPlaybackPrelude,
       onFinale: async () => {

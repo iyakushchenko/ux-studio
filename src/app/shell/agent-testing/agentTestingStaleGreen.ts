@@ -17,20 +17,39 @@ export type StaleGreenMismatch = {
 type Memory = {
   lastKey: string;
   lastAtMs: number;
+  candidateKey: string;
+  candidateAtMs: number;
   active: boolean;
 };
+
+// URL and the control-room store deliberately update on adjacent frames during
+// route/CJM transitions. Do not turn that expected hand-off into an amber QA
+// line; only surface a mismatch that survives a short settling window.
+const SETTLE_MS = 350;
 
 function memory(): Memory {
   if (typeof window === "undefined") {
     const g = globalThis as typeof globalThis & { [MEMORY_KEY]?: Memory };
     if (!g[MEMORY_KEY]) {
-      g[MEMORY_KEY] = { lastKey: "", lastAtMs: 0, active: false };
+      g[MEMORY_KEY] = {
+        lastKey: "",
+        lastAtMs: 0,
+        candidateKey: "",
+        candidateAtMs: 0,
+        active: false,
+      };
     }
     return g[MEMORY_KEY]!;
   }
   const w = window as Window & { [MEMORY_KEY]?: Memory };
   if (!w[MEMORY_KEY]) {
-    w[MEMORY_KEY] = { lastKey: "", lastAtMs: 0, active: false };
+      w[MEMORY_KEY] = {
+        lastKey: "",
+        lastAtMs: 0,
+        candidateKey: "",
+        candidateAtMs: 0,
+        active: false,
+      };
   }
   return w[MEMORY_KEY]!;
 }
@@ -118,15 +137,27 @@ export function noteStaleGreenIfChanged(
   if (mismatches.length === 0) {
     m.active = false;
     m.lastKey = "";
+    m.candidateKey = "";
+    m.candidateAtMs = 0;
     return { amber: false, logLabel: null, mismatches };
   }
   const key = formatStaleGreenKey(mismatches);
+  const now = Date.now();
+  if (key !== m.candidateKey) {
+    m.candidateKey = key;
+    m.candidateAtMs = now;
+    m.active = false;
+    return { amber: false, logLabel: null, mismatches };
+  }
+  if (now - m.candidateAtMs < SETTLE_MS) {
+    return { amber: false, logLabel: null, mismatches };
+  }
   m.active = true;
   if (key === m.lastKey) {
     return { amber: true, logLabel: null, mismatches };
   }
   m.lastKey = key;
-  m.lastAtMs = Date.now();
+  m.lastAtMs = now;
   return {
     amber: true,
     logLabel: formatStaleGreenLabel(mismatches),
@@ -143,4 +174,6 @@ export function resetStaleGreenForTests(): void {
   m.active = false;
   m.lastKey = "";
   m.lastAtMs = 0;
+  m.candidateKey = "";
+  m.candidateAtMs = 0;
 }

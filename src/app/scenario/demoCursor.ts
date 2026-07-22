@@ -224,12 +224,11 @@ export async function settleDemoCursorAfterInteraction(
   const decision = resolveDemoCursorPostInteractionPark(target ?? null);
 
   if (!journeyModePinned) {
-    if (decision.park) {
-      await fadeOutDemoCursorInPlace();
-    } else {
-      retainDemoCursorInPlace();
-    }
-    logCursorEngineTracker(decision.reason, {
+    // A simulated pointer must never vanish between type-in and its next
+    // director instruction.  The old legacy branch faded it after a composer
+    // submit, producing a visible one-frame disappearance on Site Pilot Home.
+    retainDemoCursorInPlace();
+    logCursorEngineTracker("stay-visible-nonjourney", {
       reason: decision.reason,
     });
     return decision;
@@ -636,6 +635,9 @@ export function parkDemoCursorAtRest(options?: {
       instant: !decision.animate,
       detail: decision.reason,
     });
+    // A park may begin inside the residual press-flash window. Clear that
+    // visual cue now: resting is not a second click.
+    cursor.classList.remove("proto-chat-demo-cursor--tap");
 
     if (alreadyParked && hasStart && !options?.force) {
       applyDemoCursorParkedState(cursor);
@@ -814,6 +816,22 @@ function snapDemoCursorHotspotToTarget(
     animated: false,
     detail: "re-aim on-target before click",
   });
+  return isDemoCursorHotspotOnTarget(cursor, target);
+}
+
+/**
+ * Cards and modal rows can shift for one or two paint frames after camera
+ * movement. Re-aim against the live box before press; never click mid-air.
+ */
+async function settleDemoCursorHotspotOnTarget(
+  cursor: HTMLElement,
+  target: HTMLElement
+): Promise<boolean> {
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    if (isDemoCursorHotspotOnTarget(cursor, target)) return true;
+    snapDemoCursorHotspotToTarget(cursor, target);
+    await delay(16);
+  }
   return isDemoCursorHotspotOnTarget(cursor, target);
 }
 
@@ -1658,9 +1676,9 @@ function dispatchDemoPointerLeave(target: HTMLElement, x: number, y: number): vo
 }
 
 function tapDemoCursor(cursor: HTMLElement): void {
+  // A normal pointer does not pulse or blink after pressing. The press is
+  // already conveyed by the target's native active state and resulting UI.
   cursor.classList.remove("proto-chat-demo-cursor--tap");
-  void cursor.offsetWidth;
-  cursor.classList.add("proto-chat-demo-cursor--tap");
 }
 
 export function isClickableTarget(target: HTMLElement): boolean {
@@ -2023,10 +2041,7 @@ export async function simulateDemoPointerClick(
 
   // HARD: tip must be on target before any press/click. Re-aim once; else FAIL
   // (never target.click() while visually off-cell — false selection path).
-  let onTarget = isDemoCursorHotspotOnTarget(cursor, clickTarget);
-  if (!onTarget) {
-    onTarget = snapDemoCursorHotspotToTarget(cursor, clickTarget);
-  }
+  const onTarget = await settleDemoCursorHotspotOnTarget(cursor, clickTarget);
   if (!onTarget) {
     notePlaybackCursorEvent("abort", {
       target: describeCursorTarget(clickTarget),
@@ -2037,7 +2052,7 @@ export async function simulateDemoPointerClick(
       ok: false,
       selector,
       bbox,
-      detail: "click FAIL — cursor-off-target (no programmatic click)",
+      detail: `click FAIL — cursor-off-target · ${describeCursorTarget(clickTarget)} (no programmatic click)`,
     });
     playbackDiagCursor({
       detail: "OFF-TARGET — click suppressed",
@@ -2100,7 +2115,7 @@ export async function simulateDemoPointerClick(
 
   // Re-verify after hover dwell — scroll/layout can drift tip off cell.
   if (!isDemoCursorHotspotOnTarget(cursor, clickTarget)) {
-    if (!snapDemoCursorHotspotToTarget(cursor, clickTarget)) {
+    if (!(await settleDemoCursorHotspotOnTarget(cursor, clickTarget))) {
       setDemoInteractionHover(pressRoot, false, { x, y });
       notePlaybackCursorEvent("abort", {
         target: describeCursorTarget(clickTarget),
@@ -2111,7 +2126,7 @@ export async function simulateDemoPointerClick(
         ok: false,
         selector,
         bbox,
-        detail: "click FAIL — cursor-off-target after hover",
+        detail: `click FAIL — cursor-off-target after hover · ${describeCursorTarget(clickTarget)}`,
       });
       await releaseDemoCursorAfterScript();
       return false;

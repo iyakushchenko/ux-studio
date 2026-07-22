@@ -28,7 +28,7 @@ export type QaListenLogEntry = {
   atMs: number;
   timeLabel: string;
   label: string;
-  outcome: "ok" | "soft-fail" | "fail";
+  outcome: "ok" | "notice" | "fail";
   kind: string;
 };
 
@@ -79,7 +79,7 @@ export function pauseCaptureAndHalt(
     timeLabel: new Date().toLocaleTimeString("en-GB", { hour12: false }),
     label: logLabel,
     outcome:
-      reason.includes("diag") || reason.includes("hmr") ? "soft-fail" : "ok",
+      reason.includes("diag") || reason.includes("hmr") ? "notice" : "ok",
     kind: "system",
   });
   if (wasPaused && reason.includes("hmr")) return;
@@ -119,7 +119,7 @@ export function noteBlockedPlayAttempt(deps: QaListenDeps): void {
     atMs: now,
     timeLabel: new Date().toLocaleTimeString("en-GB", { hour12: false }),
     label: why,
-    outcome: "soft-fail",
+    outcome: "notice",
     kind: "system",
   });
 }
@@ -404,7 +404,7 @@ export function maybeLogMcpPhaseChange(
     input.setLastLoggedPhase(phase);
     if (shouldLog) {
       const outcome =
-        phase === "error" ? "fail" : phase === "pending" ? "soft-fail" : "ok";
+        phase === "error" ? "fail" : phase === "pending" ? "notice" : "ok";
       deps.pushLogEntry({
         atMs: Date.now(),
         timeLabel: new Date().toLocaleTimeString("en-GB", { hour12: false }),

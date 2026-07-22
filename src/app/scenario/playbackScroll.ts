@@ -583,6 +583,10 @@ export function snapDemoTargetIntoView(
   }
 
   const beforeTop = scrollEl.scrollTop;
+  // A snap is a camera ownership transfer. Leaving the prior rAF alive lets
+  // it move the target after cursor travel has begun, producing a mid-air
+  // click even though the target was correct when resolved.
+  if (isPlaybackScrollAnimating()) cancelPlaybackScroll("replace");
   const align = options?.align ?? DEMO_TARGET_SCROLL_ALIGN;
   const padding = options?.padding ?? demoScrollPadding();
   const targetTop = computeScrollTopForElement(scrollEl, target, align, padding);
@@ -860,7 +864,13 @@ export function animateScrollTo(
   const onExternalAbort = () => controller.abort();
   externalSignal?.addEventListener("abort", onExternalAbort, { once: true });
 
-  const duration = computeDuration(distance, options?.durationMs);
+  // Fast QA compresses waits, not coupled UI motion. Chat co-travel must keep
+  // the same duration as the Framer bubble; collapsing only the camera to the
+  // 32ms fast floor creates a visible snap and false jump/chop diagnostics.
+  const duration =
+    options?.coTravel && options.durationMs != null
+      ? Math.max(1, options.durationMs)
+      : computeDuration(distance, options?.durationMs);
   if (duration <= 0) {
     scrollEl.scrollTop = top;
     return Promise.resolve();

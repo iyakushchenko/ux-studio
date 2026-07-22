@@ -11,7 +11,7 @@ import {
   peekPoSignal,
   uninstallPoSignalWindowApis,
 } from "@/app/shell/agent-testing/agentTestingPoSignal";
-import { playbackDiagClear } from "@/app/shell/playbackDiag";
+import { getPlaybackDiagBundle, playbackDiagClear } from "@/app/shell/playbackDiag";
 import {
   beginTypeInCursorGuard,
   reportTypeInCursorVisibility,
@@ -84,5 +84,6 @@ describe("typeInCursorGuard", () => {
     const visible = reportTypeInCursorVisibility("progress");
     expect(visible).toBe(false);
     expect(peekPoSignal()?.code).toBe("CURSOR_HIDDEN_DURING_TYPEIN");
+    expect(getPlaybackDiagBundle().cursor.hidden).toBe(1);
   });
 });

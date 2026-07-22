@@ -32,12 +32,12 @@ export type SmokePoPollOptions = {
    * When true, Alarm logs + continues instead of aborting.
    * Default false — PO process: stop on Alarm.
    */
-  softFailAlarm?: boolean;
+  continueOnAlarm?: boolean;
   /**
    * When true, Cursor/Scroll log + continue.
    * Default false — PO process: stop on Cursor/Scroll too (fix→reprove).
    */
-  softFailCursorScroll?: boolean;
+  continueOnCursorScroll?: boolean;
   /** Pause Play transport before abort (toggle play while on-air). */
   pausePlay?: () => void;
   /** Label for diag / console (e.g. step index or play-smoke). */
@@ -65,8 +65,8 @@ export function pollSmokePoSignal(
   const reason = `po-${signal.type}:${signal.code}`;
   const soft =
     signal.type === "alarm"
-      ? !!options.softFailAlarm
-      : !!options.softFailCursorScroll;
+      ? !!options.continueOnAlarm
+      : !!options.continueOnCursorScroll;
 
   try {
     options.pausePlay?.();
@@ -94,7 +94,7 @@ export function pollSmokePoSignal(
   if (soft) {
     try {
       console.warn(
-        "[PLAYBACK_DIAG] PO signal soft-fail (continuing — session still owns fix)",
+        "[PLAYBACK_DIAG] PO signal notice (continuing — session still owns fix)",
         reason,
         ctx
       );

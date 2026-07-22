@@ -212,7 +212,7 @@ Deep links stay on that origin, e.g. `http://localhost:5173/?project=boots-pharm
 
 1. Code lives under `src/app/shell/agent-testing/` (compat re-export OK).
 2. Helper arm uses coalesced/readable rows (beat/touchpoint when snapshot available).
-3. Outcome colors: fail red-ish · soft-fail amber · ok default.
+3. Outcome colors: fail red-ish · notice amber · ok default.
 4. Elapsed timer + control-panel sitrep line visible while active.
 5. Alarm = **sequence / expected-steps mismatch** (`ALARM_SEQUENCE_MISMATCH`). Alarm + Cursor + Scroll latch **live** `__studioAgentTestingTakeover` / `__studioConsumePoSignal` (**primary**); dump secondary. PO click = **STOP → understand (ask PO if unclear) → FIX → reprove that issue**.
 6. Probe sets script timeline strip; chips update by outcome.

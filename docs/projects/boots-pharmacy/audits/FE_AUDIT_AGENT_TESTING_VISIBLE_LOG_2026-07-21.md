@@ -27,7 +27,7 @@ No broad rerun was performed, per the focused re-audit instruction.
 |------|--------|----------|
 | Outcome hierarchy / terminal truth | **PASS** | Full continuous localhost path completed and its visible chronology was extracted; completion remains distinct from current capture/pause state. |
 | Human terminology | **PASS** | Known journey actions use accurate action-specific verbs rather than the prior generic selection verb. |
-| Routine vs exception hierarchy | **PASS** | `isRoutineTechnicalLogEntry` suppresses routine cursor/camera/settle rows while explicitly preserving fail, soft-fail, and pass outcomes. |
+| Routine vs exception hierarchy | **PASS** | `isRoutineTechnicalLogEntry` suppresses routine cursor/camera/settle rows while explicitly preserving fail, notice, and pass outcomes. |
 | Failure visibility | **PASS** | Failure outcomes remain exempt from routine suppression and retain their diagnostic detail. |
 | Timing semantics | **PASS** | `durationKind: "since-previous"` prevents inferred gaps from rendering as operation duration. |
 | Type-in durable counts | **PASS** | Dedicated start/end/skip tallies survive capped event-ring rotation; focused unit coverage is present. |

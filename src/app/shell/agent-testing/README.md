@@ -147,7 +147,7 @@ Action sitrep (Save Log / Pause / Close / Reset) stays visible — denser meanin
 
 **Message RTT:** Send → `Message delivered · awaiting agent consume`; consume → `Message consumed · RTT Nms`. PENDING timeout floors via measured RTT (`__studioQaMessageRttStats()`). **Presence XOR:** `ONLINE` when agent recently touched (≤8s) **or** `Last seen Ns ago` when stale — never both. Green diode only when `data-presence=online`. **Auto-pause guard rail:** stale ≥8s → pause capture + halt Play (same as leave, no `QA_PAUSE_HALT`); return via `resumeForAgentReturn()`.
 
-**QA chat colors (industry norms):** red = hard FAIL / chop / script-timeout / Play-stopping alarms; amber = soft-fail attention; neutral = routine milestones (journey reset, play-end, typing started, cursor cleared, stepped notes); green = explicit `RESULT · PASS` only. Timestamps only — no 1/2/3 list numbering.
+**QA chat colors (industry norms):** red = hard FAIL / chop / script-timeout / Play-stopping alarms; amber = notice attention; neutral = routine milestones (journey reset, play-end, typing started, cursor cleared, stepped notes); green = explicit `RESULT · PASS` only. Timestamps only — no 1/2/3 list numbering.
 
 **Full chat bubble motion (restartable):** `await window.__studioRunChatBubbleMotionSelfTest?.()` — opens QA, SF agentic q0…r3, asserts samples / thinking-handoff / jumps=0. See [SELF_TEST.md](./SELF_TEST.md).
 
@@ -181,7 +181,7 @@ Agents **must** cross-check the same session:
 | `[PLAYBACK_DIAG]` events | Save Log `recentPlaybackDiagEvents` + ring `playback-diag` rows |
 | `[PLAYBACK_DIAG] clear` | amber `playback-diag · clear` log row |
 | click FAIL / OFF-TARGET | deep-red / fail outcome rows |
-| scroll-reversal Δ | soft-fail `playback-diag · scroll · scroll-reversal` |
+| scroll-reversal Δ | notice `playback-diag · scroll · scroll-reversal` |
 | PlaybackDiagnostic popup | dump `diagnosticFlashes` + `lastPlaybackDiagnostic`; `__studioConsumePlaybackDiagnostic()` |
 
 Mismatch = desync — fix bridge, do not trust vibes. See [PLAYBACK_DIAG.md](../../../../docs/shell/PLAYBACK_DIAG.md) § QA bridge.

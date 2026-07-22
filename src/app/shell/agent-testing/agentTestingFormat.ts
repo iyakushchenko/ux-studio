@@ -101,7 +101,7 @@ export function humanizeQaLogLabel(label: string): string {
 
 /** Routine engine choreography stays in raw evidence, not the primary human log. */
 export function isRoutineTechnicalLogEntry(entry: AgentTestingLogEntry): boolean {
-  if (entry.outcome === "fail" || entry.outcome === "soft-fail" || entry.outcome === "pass") return false;
+  if (entry.outcome === "fail" || entry.outcome === "notice" || entry.outcome === "pass") return false;
   return (
     /^Cursor → (?:hand|arrow|carriage)/i.test(entry.label) ||
     /^Cursor stayed at last click/i.test(entry.label) ||
@@ -134,26 +134,26 @@ export function inferOutcomeFromText(text: string): AgentTestingStepOutcome {
     t.includes("cursor issue detected") ||
     t.includes("scroll issue detected")
   ) {
-    if (t.includes("soft-fail") || t.includes("warn")) {
-      return "soft-fail";
+    if (t.includes("notice") || t.includes("warn")) {
+      return "notice";
     }
     if (
       t.includes("cursor issue") ||
       t.includes("scroll issue") ||
       t.includes("soft")
     ) {
-      return "soft-fail";
+      return "notice";
     }
     return "fail";
   }
   if (
-    t.includes("soft-fail") ||
+    t.includes("notice") ||
     t.includes("unexpected") ||
     t.includes("warn") ||
     t.includes("stale") ||
     t.includes("scroll_issue")
   ) {
-    return "soft-fail";
+    return "notice";
   }
   return "ok";
 }

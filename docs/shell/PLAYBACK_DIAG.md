@@ -100,14 +100,14 @@ Code: `playbackDiagChatBubbleMotion` · `chatMotion.ts` · dump: `agentTestingDu
 
 ### QA bridge (PLAYBACK_DIAG ↔ overlay) — Arch 2026-07-20
 
-**Decision:** One monitor path. Agents do **not** depend on the PlaybackDiagnostic **popup**. Capture lean monitor/error events into QA ring + overlay (`kind: playback-diag`; color from outcome: neutral info / amber soft-fail / deep-red fail) and Save Log (`recentPlaybackDiagEvents`, `diagnosticFlashes`, `lastPlaybackDiagnostic`). Popup remains for PO eyes; `__studioConsumePlaybackDiagnostic()` dismisses after ingest.
+**Decision:** One monitor path. Agents do **not** depend on the PlaybackDiagnostic **popup**. Capture lean monitor/error events into QA ring + overlay (`kind: playback-diag`; color from outcome: neutral info / amber notice / deep-red fail) and Save Log (`recentPlaybackDiagEvents`, `diagnosticFlashes`, `lastPlaybackDiagnostic`). Popup remains for PO eyes; `__studioConsumePlaybackDiagnostic()` dismisses after ingest.
 
 | Event | Console | QA |
 |-------|---------|-----|
 | clear | `[PLAYBACK_DIAG] clear` | neutral `playback-diag · clear` |
 | journey-reset / play-end / type-in-start | diag event | neutral info row |
 | click FAIL / OFF-TARGET | click event | fail row |
-| unexpected scroll Δ↑ | scroll | soft-fail + `scroll-reversal` |
+| unexpected scroll Δ↑ | scroll | notice + `scroll-reversal` |
 | PlaybackDiagnostic open | control-panel + flash | fail `playback-diag · DIAGNOSTIC — …` + dump flashes |
 
 **Agents must** compare console filter `[PLAYBACK_DIAG]` vs Save Log / ring for the same session (SELF_TEST `console-qa-diag-sync`).
@@ -211,7 +211,7 @@ Filter: `[PLAYBACK_DIAG] rec-capture` · `rec-compile` · `rec-replay`.
 | `__studioDownloadAgentTestingDump` | Dump JSON (secondary — persistence/postmortem; last-N sessionStorage) |
 | `__studioCursorDiagnostics` + scroll reveal | Camera / scroll host |
 
-**Overlay ↔ diag:** PO **Alarm** = sequence / expected-steps mismatch (`ALARM_SEQUENCE_MISMATCH`). **Alarm / Cursor / Scroll** latch a live takeover signal first; dump is secondary. Auto `CURSOR_UNEXPECTED_DWELL` / optional scrollIntoView·path-deviation soft-fails log here. Scroll CTA code: `SCROLL_ISSUE_REPORTED`. Filter: `[PLAYBACK_DIAG]` + `[AGENT_TESTING]`. Painpoints: [PAINPOINTS.md](../product/PAINPOINTS.md) PP-10.
+**Overlay ↔ diag:** PO **Alarm** = sequence / expected-steps mismatch (`ALARM_SEQUENCE_MISMATCH`). **Alarm / Cursor / Scroll** latch a live takeover signal first; dump is secondary. Auto `CURSOR_UNEXPECTED_DWELL` / optional scrollIntoView·path-deviation notices log here. Scroll CTA code: `SCROLL_ISSUE_REPORTED`. Filter: `[PLAYBACK_DIAG]` + `[AGENT_TESTING]`. Painpoints: [PAINPOINTS.md](../product/PAINPOINTS.md) PP-10.
 
 **Mid-smoke poll (Quinn/Finn — mandatory):**
 
@@ -246,7 +246,7 @@ On `type:'alarm'|'cursor'|'scroll'`: pause Play → **fail** result with `reason
 4. **RESTART** the test and **prove that exact issue is gone**.
 5. Continue journey until next PO signal or green end.
 
-Smokes cannot auto-fix; orchestrator session owns the loop. Opt-in soft continue: `{ softFailPoAlarm: true }` / `{ softFailCursorScroll: true }` — still not “ignore.” Type-in: CJM cursor must stay visible (`type-in-park`); hidden → `CURSOR_HIDDEN_DURING_TYPEIN` + `[PLAYBACK_DIAG] cursor`.
+Smokes cannot auto-fix; orchestrator session owns the loop. Opt-in soft continue: `{ continueOnPoAlarm: true }` / `{ continueOnCursorScroll: true }` — still not “ignore.” Type-in: CJM cursor must stay visible (`type-in-park`); hidden → `CURSOR_HIDDEN_DURING_TYPEIN` + `[PLAYBACK_DIAG] cursor`.
 
 **Note:** `__protoTriggerTransport` requires an active MCP session (`__protoRun*` / recording). UI Step buttons always work; for console step use a smoke runner or click the nav button. Helper arm coalesces identical transport rows on the overlay (no monotonous spam).
 

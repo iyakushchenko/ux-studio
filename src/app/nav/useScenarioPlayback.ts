@@ -36,6 +36,12 @@ type Options = {
 export type PlaybackStepHooks = {
   /** Async prelude before a frame is revealed (thinking, typing, CTA clicks). */
   beforeReveal?: (ctx: BeforeRevealContext) => Promise<void>;
+  /**
+   * UI-motion floor after reveal before continuous Play advances again.
+   * Fast QA may compress narrative dwell, but never overlap a transition
+   * which the current screen declares as still visually in flight.
+   */
+  minimumAutoAdvanceMs?: number;
   /** When false, snap scroll on reveal (e.g. agent replies above fixed composer). */
   revealScrollSmooth?: (frame: HTMLElement) => boolean;
   /** After the last frame is visible — e.g. exit CTA opens another surface. */
@@ -495,8 +501,11 @@ export function useScenarioPlayback({
       if (!advanceOneFrameRef.current(scheduleNext)) {
         completePlayback();
       }
-    }, playbackMs(playbackStepMs));
-  }, [completePlayback, playbackStepMs]);
+    }, Math.max(
+      playbackMs(playbackStepMs),
+      playbackStepHooks?.minimumAutoAdvanceMs ?? 0
+    ));
+  }, [completePlayback, playbackStepHooks?.minimumAutoAdvanceMs, playbackStepMs]);
 
   const advanceOneFrameRef = useRef<
     (onRevealed?: () => void, options?: AdvanceOptions) => boolean

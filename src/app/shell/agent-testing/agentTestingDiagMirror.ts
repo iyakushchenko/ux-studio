@@ -25,7 +25,7 @@ const DEFAULT_LIMIT = 6;
 export function severityForDiagEvent(ev: PlaybackDiagEvent): DiagMirrorSeverity {
   const outcome = outcomeForPlaybackDiagEvent(ev);
   if (outcome === "fail") return "fail";
-  if (outcome === "soft-fail") return "warn";
+  if (outcome === "notice") return "warn";
   if (ev.kind === "hub-nav" || ev.kind === "skip") return "warn";
   return "ok";
 }

@@ -21,7 +21,11 @@ export function resetTypeInCursorGuard(): void {
 /** Type-in finished / aborted — drop carriage latch so Play hover/click is hand|arrow. */
 export function endTypeInCursorGuard(): void {
   resetTypeInCursorGuard();
+  // Split-frame disappearance after the last typed character used to be
+  // cleared before QA could see it. Audit both sides of latch cleanup.
+  reportTypeInCursorVisibility("end");
   clearDemoCursorCarriageLatches();
+  requestAnimationFrame(() => reportTypeInCursorVisibility("post-end-frame"));
 }
 
 /** Hold journey park rest at type-in start; log visibility. */
@@ -45,9 +49,10 @@ export function tickTypeInCursorGuard(target: HTMLElement, chars: number): void 
     !existing ||
     existing.classList.contains("proto-chat-demo-cursor--exit")
   ) {
+    // Report before recovery. Reporting only after re-park falsely said the
+    // cursor was healthy when it had vanished for a frame.
+    reportTypeInCursorVisibility("hidden-before-repark", target, chars);
     parkDemoCursorForTypeIn(target);
-    // Log only when we had to re-park (cursor was gone) — not every typed char.
-    reportTypeInCursorVisibility("repark", target, chars);
   } else if (!existing.classList.contains("proto-chat-demo-cursor--parked")) {
     // Restore parked class without reseeding (parkDemoCursorForTypeIn holds pose).
     parkDemoCursorForTypeIn(target);

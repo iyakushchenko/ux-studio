@@ -41,6 +41,32 @@
   box-sizing: border-box;
 }
 
+/* Suite progress belongs to the QA console itself, never the viewport. */
+.studio-agent-testing-overlay__panel::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: var(--qa-suite-progress, 0%);
+  height: 4px;
+  border-radius: 8px 0 0 0;
+  background: #69d391;
+  box-shadow: 0 1px 10px rgba(105, 211, 145, 0.72);
+  transition: width 180ms ease-out, background-color 140ms ease-out;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.studio-agent-testing-overlay[data-suite-phase="running"] .studio-agent-testing-overlay__panel::before {
+  background: #8ec5ff;
+  box-shadow: 0 1px 8px rgba(142, 197, 255, 0.58);
+}
+
+.studio-agent-testing-overlay[data-suite-phase="paused-failure"] .studio-agent-testing-overlay__panel::before {
+  background: #ff6b6b;
+  box-shadow: 0 1px 8px rgba(255, 107, 107, 0.58);
+}
+
 .studio-agent-testing-overlay[data-mcp="control"]:not([data-rec="live"]) .studio-agent-testing-overlay__frame {
   box-shadow: inset 0 0 0 10px #e6b84d;
 }
@@ -93,7 +119,7 @@
   position: absolute;
   right: max(16px, env(safe-area-inset-right));
   bottom: max(16px, env(safe-area-inset-bottom));
-  z-index: 2;
+  z-index: 4;
   width: min(400px, calc(100vw - 32px));
   /* Hug content — log scrolls internally; do not clip status/compose */
   max-height: calc(100dvh - var(--studio-agent-testing-nav-clearance, 0px) - 32px);
@@ -151,9 +177,21 @@
 
 .studio-agent-testing-overlay__suite-picker {
   display: inline-flex;
+  align-items: center;
+  gap: 5px;
   flex: 1 1 auto;
   min-width: 0;
   max-width: none;
+}
+
+.studio-agent-testing-overlay__suite-progress-count {
+  flex: 0 0 auto;
+  color: #9aa0aa;
+  font-size: 9px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
 }
 
 .studio-agent-testing-overlay__suite-select {
@@ -836,7 +874,7 @@
   border-color: #3da86a;
 }
 
-.studio-agent-testing-overlay__timeline-chip[data-outcome="soft-fail"] {
+.studio-agent-testing-overlay__timeline-chip[data-outcome="notice"] {
   color: #1a1400;
   background: #e6b84d;
   border-color: #c9982e;
@@ -937,7 +975,7 @@
 }
 
 .studio-agent-testing-overlay__log
-  li[data-kind="playback-diag"][data-outcome="soft-fail"]
+  li[data-kind="playback-diag"][data-outcome="notice"]
   .studio-agent-testing-overlay__log-body {
   color: var(--qa-fg-warning) !important;
   font-weight: 700;
@@ -951,20 +989,20 @@
 }
 
 .studio-agent-testing-overlay__log
-  li[data-kind="helper"][data-outcome="soft-fail"]
+  li[data-kind="helper"][data-outcome="notice"]
   .studio-agent-testing-overlay__log-body {
   color: var(--qa-fg-warning) !important;
   font-weight: 600;
 }
 
-/* transport / stepped playback notes — neutral unless soft-fail/fail */
+/* transport / stepped playback notes — neutral unless notice/fail */
 .studio-agent-testing-overlay__log li[data-kind="transport"] .studio-agent-testing-overlay__log-body {
   color: rgba(210, 214, 222, 0.88) !important;
   font-weight: 400;
 }
 
 .studio-agent-testing-overlay__log
-  li[data-kind="transport"][data-outcome="soft-fail"]
+  li[data-kind="transport"][data-outcome="notice"]
   .studio-agent-testing-overlay__log-body {
   color: var(--qa-fg-warning) !important;
   font-weight: 600;
@@ -1009,7 +1047,7 @@
 }
 
 .studio-agent-testing-overlay__log
-  li[data-kind="scroll"][data-outcome="soft-fail"]
+  li[data-kind="scroll"][data-outcome="notice"]
   .studio-agent-testing-overlay__log-body {
   color: var(--qa-fg-warning) !important;
   font-weight: 600;
@@ -1018,10 +1056,6 @@
 .studio-agent-testing-overlay__log li[data-kind="scroll"][data-outcome="fail"] .studio-agent-testing-overlay__log-body {
   color: var(--qa-fg-critical) !important;
   font-weight: 700;
-}
-
-.studio-agent-testing-overlay__alarm[hidden] {
-  display: none !important;
 }
 
 .studio-agent-testing-overlay__capture-toggle {
@@ -1058,9 +1092,6 @@
   flex: 0 0 auto;
 }
 
-.studio-agent-testing-overlay__alarm,
-.studio-agent-testing-overlay__cursor-flag,
-.studio-agent-testing-overlay__scroll-flag,
 .studio-agent-testing-overlay__dump {
   margin: 0;
   padding: 3px 8px;
@@ -1075,9 +1106,6 @@
   cursor: pointer;
 }
 
-.studio-agent-testing-overlay__alarm:hover,
-.studio-agent-testing-overlay__cursor-flag:hover,
-.studio-agent-testing-overlay__scroll-flag:hover,
 .studio-agent-testing-overlay__dump:hover:not(:disabled) {
   color: #fff;
   border-color: rgba(255, 255, 255, 0.45);
@@ -1087,21 +1115,6 @@
   opacity: 0.38;
   cursor: not-allowed;
   color: #8b909a;
-}
-
-.studio-agent-testing-overlay__alarm {
-  border-color: rgba(230, 184, 77, 0.55);
-  color: #f0d48a;
-}
-
-.studio-agent-testing-overlay__cursor-flag {
-  border-color: rgba(224, 184, 92, 0.5);
-  color: var(--qa-fg-warning);
-}
-
-.studio-agent-testing-overlay__scroll-flag {
-  border-color: rgba(120, 190, 255, 0.5);
-  color: #a8d4ff;
 }
 
 .studio-agent-testing-overlay__log {
@@ -1202,7 +1215,7 @@
   font-weight: 700;
 }
 
-.studio-agent-testing-overlay__log li[data-outcome="soft-fail"] .studio-agent-testing-overlay__log-body {
+.studio-agent-testing-overlay__log li[data-outcome="notice"] .studio-agent-testing-overlay__log-body {
   color: var(--qa-fg-warning);
 }
 

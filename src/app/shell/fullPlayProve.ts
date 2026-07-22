@@ -134,7 +134,7 @@ export type FullPlayProveOptions = {
   /** Thin experience preset — ignored when journeyId maps to a known preset. */
   experience?: FullPlayProveExperience;
   timeoutMs?: number;
-  softFailPoAlarm?: boolean;
+  continueOnPoAlarm?: boolean;
   expectedPeak?: number;
   /**
    * Dynamic prerequisite routes: accept the runtime-filtered total when the
@@ -431,7 +431,7 @@ export async function runFullPlayProve(
       startBeatId: preset.startBeatId,
       startScreenId: preset.startScreenId,
       timeoutMs: preset.timeoutMs,
-      softFailPoAlarm: options?.softFailPoAlarm,
+      continueOnPoAlarm: options?.continueOnPoAlarm,
       delay,
       ensureClean: () => {
         (

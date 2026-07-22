@@ -21,7 +21,7 @@
 | RESULT / halt | **No RESULT seal** (smoke tears down overlay; Save Log after stop/refresh) |
 | Type-in | starts/ends/samples **0** (Traditional has no composer type-in — expected) |
 | Click summary counter | `summaries.click.ok=0` despite 9 click rows — counter smell |
-| Soft-fails | **3×** `scroll-reversal` (Δ−922 / Δ−1207 / Δ−88), each mirrored twice in QA chat |
+| Notices | **3×** `scroll-reversal` (Δ−922 / Δ−1207 / Δ−88), each mirrored twice in QA chat |
 | Book date/time | **June 21 / 15:30** (primary pick — Traditional has no Avail handoff; pick-other N/A here) |
 
 ### Click sequence (QA chat)
@@ -41,10 +41,10 @@
 
 | Smell | Bug vs acceptable | Notes |
 |-------|-------------------|--------|
-| **Camera yank to origin on beat land** (`scrollCameraToOrigin` / `snapScreenScrollTop`) after Reserve / Open Appointments / View Details | **Bug (UX)** | Soft-fail text ties to origin scroll; large Δ = “jumped the wrong way”. Primary “less smooth than Agentic” signal. |
+| **Camera yank to origin on beat land** (`scrollCameraToOrigin` / `snapScreenScrollTop`) after Reserve / Open Appointments / View Details | **Bug (UX)** | Notice text ties to origin scroll; large Δ = “jumped the wrong way”. Primary “less smooth than Agentic” signal. |
 | PLP first click labeled **Remove from Bookmarks** | **Smell / possible state desync** | Script intends add-bookmark showcase after `resetPlpTileBookmarkForPlayback`. Label may be post-toggle QA text — prove heart start state before calling green. |
 | Login → Step1 → Step2 in ~1s; **no Continue click** in log | **Smell** | Feels abrupt vs agentic pacing; may be skip-logged or already-chosen slot. |
-| Duplicate soft-fail / Play-finished rows in QA chat | **Tooling noise** | Mirror double-emit — not product FAIL. |
+| Duplicate notice / Play-finished rows in QA chat | **Tooling noise** | Mirror double-emit — not product FAIL. |
 | Smoke teardown → Save Log with Steps 1/12 | **Acceptable (smoke)** | Prefer keep-overlay full prove helper (agentic has one; Traditional still smoke-only). |
 | `summaries.click.ok=0` | **Tooling smell** | Do not invent click-pass from summaries alone. |
 | No type-in / no chat rails | **Acceptable** | Traditional path by design. |

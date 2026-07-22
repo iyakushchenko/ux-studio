@@ -13,7 +13,7 @@ import {
 } from "@/app/shell/agent-testing/agentTestingFinaleSeal";
 
 /** Align with QA chat row outcomes — ok = neutral info, not warn/fail paint. */
-export type PlaybackDiagQaOutcome = "ok" | "soft-fail" | "fail" | "pass";
+export type PlaybackDiagQaOutcome = "ok" | "notice" | "fail" | "pass";
 
 export type ConsumedPlaybackDiagnostic = {
   consumed: boolean;
@@ -103,7 +103,7 @@ function detailOf(event: PlaybackDiagEvent): string {
 /** Intentional host-top resets — never “jumped the wrong way” in QA. */
 function isIntentionalScrollOrigin(detail: string): boolean {
   if (!/scrollCameraToOrigin/i.test(detail)) return false;
-  // Require an explicit reason — bare named-SSoT mid-play snaps can still soft-fail.
+  // Require an explicit reason — bare named-SSoT mid-play snaps can still notice.
   return /jump-to-start|resetPrototypeScroll|page-land|play-end|journey-reset|book-step-\d+-first-mount/i.test(
     detail
   );
@@ -198,7 +198,7 @@ export function shouldMirrorPlaybackDiagToQa(event: PlaybackDiagEvent): boolean 
   }
 
   if (kind === "scroll") {
-    // Intentional host-top — dump-only (never soft-fail “wrong way”).
+    // Intentional host-top — dump-only (never notice “wrong way”).
     if (isIntentionalScrollOrigin(detail)) return false;
     if (isScrollReversal(event)) return true;
     // Routine camera dwell — dump-only (PO: chat spam before every click).
@@ -323,21 +323,25 @@ export function outcomeForPlaybackDiagEvent(
       return "fail";
     }
   }
-  if (event.kind === "skip" || event.kind === "type-in-skip") return "soft-fail";
+  if (event.kind === "skip" || event.kind === "type-in-skip") return "notice";
   if (
     event.kind === "info" &&
     /camera-beat:target-unusable/i.test(detailOf(event))
   ) {
-    return "soft-fail";
+    // This is the intentional dwell-only fallback when a decorative camera
+    // target is replaced during a route transition. The runner continues and
+    // validates the actual destination, so it is useful trace context rather
+    // than a warning in an otherwise green functional run.
+    return "ok";
   }
   if (event.kind === "hub-nav") return "fail";
   if (event.kind === "scroll") {
-    if (isScrollReversal(event)) return "soft-fail";
+    if (isScrollReversal(event)) return "notice";
     if (/SCROLL_ISSUE|fail|error|script-timeout/i.test(detailOf(event))) {
       return "fail";
     }
     if (/warn|unexpected|reversal|stutter/i.test(detailOf(event))) {
-      return "soft-fail";
+      return "notice";
     }
     return "ok";
   }
@@ -362,8 +366,8 @@ export function outcomeForPlaybackDiagEvent(
     return "fail";
   }
   // Soft attention only — not routine clear / po-signal chatter as "warn red-ish".
-  if (/warn|unexpected|monitor/i.test(detailOf(event))) return "soft-fail";
-  if (/po-signal/i.test(detailOf(event))) return "soft-fail";
+  if (/warn|unexpected|monitor/i.test(detailOf(event))) return "notice";
+  if (/po-signal/i.test(detailOf(event))) return "notice";
   return "ok";
 }
 
@@ -383,7 +387,7 @@ export function labelForPlaybackDiagEvent(event: PlaybackDiagEvent): string {
   }
   if (kind === "skip") {
     if (/camera-beat:target-unusable/i.test(detail)) {
-      return "Camera target missing — wait only";
+      return "Camera framing deferred — continuing";
     }
     return `Step skipped${detail ? ` — ${clip(detail, 60)}` : ""}`;
   }
@@ -526,7 +530,7 @@ export function labelForPlaybackDiagEvent(event: PlaybackDiagEvent): string {
 
   if (kind === "info") {
     if (/camera-beat:target-unusable/i.test(detail)) {
-      return "Camera target missing — wait only";
+      return "Camera framing deferred — continuing";
     }
     if (/script-timeout/i.test(detail)) return "Script timed out";
     if (/po-signal/i.test(detail)) {
@@ -574,9 +578,9 @@ let lastMirroredJourneyResetAt = 0;
 const JOURNEY_RESET_DEDUPE_MS = 1600;
 let lastMirroredPlayEndAt = 0;
 const PLAY_END_DEDUPE_MS = 1600;
-let lastMirroredSoftFailKey = "";
-let lastMirroredSoftFailAt = 0;
-const SOFT_FAIL_DEDUPE_MS = 900;
+let lastMirroredNoticeKey = "";
+let lastMirroredNoticeAt = 0;
+const NOTICE_DEDUPE_MS = 900;
 let lastMirroredChatCameraKey = "";
 let lastMirroredChatCameraAt = 0;
 const CHAT_CAMERA_MIRROR_DEDUPE_MS = 500;
@@ -624,19 +628,19 @@ export function mirrorPlaybackDiagToQa(event: PlaybackDiagEvent): void {
   const label = labelForPlaybackDiagEvent(event);
   const outcome = outcomeForPlaybackDiagEvent(event);
 
-  // Soft-fail rows (scroll-reversal etc.) often double-emit — keep one visible.
-  if (outcome === "soft-fail") {
+  // Notice rows (scroll-reversal etc.) often double-emit — keep one visible.
+  if (outcome === "notice") {
     const key = `${event.kind}|${label}`;
     const now =
       typeof performance !== "undefined" ? performance.now() : Date.now();
     if (
-      key === lastMirroredSoftFailKey &&
-      now - lastMirroredSoftFailAt < SOFT_FAIL_DEDUPE_MS
+      key === lastMirroredNoticeKey &&
+      now - lastMirroredNoticeAt < NOTICE_DEDUPE_MS
     ) {
       return;
     }
-    lastMirroredSoftFailKey = key;
-    lastMirroredSoftFailAt = now;
+    lastMirroredNoticeKey = key;
+    lastMirroredNoticeAt = now;
   }
 
   // HARD: do NOT appendQaDiagRing here — logStep → pushLogEntry already rings.

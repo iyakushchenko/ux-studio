@@ -72,7 +72,7 @@ Lean ship (this stream). Residuals stay OPEN until proven on `:5173`.
 | # | Feature | MVP target | Status |
 |---|---------|------------|--------|
 | 1 | Readable step rows | Beat / touchpoint / action — not identical helper spam | COMPLETE (MVP) |
-| 2 | Outcome colors | fail red-ish · soft-fail/unexpected amber · ok default/white | COMPLETE (MVP) |
+| 2 | Outcome colors | fail red-ish · notice/unexpected amber · ok default/white | COMPLETE (MVP) |
 | 3 | Elapsed timer | Mid-flight elapsed + cheap per-step duration | COMPLETE (MVP) |
 | 4 | Control-panel sitrep | Mode / CJM / experience / screen / beat counter in panel | COMPLETE (MVP) |
 | 5 | Alarm bell CTA | PO rings **sequence / expected-steps mismatch** → **live latch** `__studioAgentTestingTakeover` / `__studioConsumePoSignal` (primary) + dump secondary | COMPLETE (MVP) |

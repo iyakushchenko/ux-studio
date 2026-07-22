@@ -184,8 +184,6 @@ export function StudioNavScenarioControls({
   recMode: recModeControlled,
   onRecModeChange,
 }: StudioNavScenarioControlsProps) {
-  const STEP_DIODE_MS = CONTROL_ROOM_TAP_MS;
-  const CLICK_DIODE_MS = CONTROL_ROOM_TAP_MS;
   const [blinkToken, setBlinkToken] = useState(0);
   const [diodeEndPulse, setDiodeEndPulse] = useState(false);
   const [stepBlinkActive, setStepBlinkActive] = useState(false);
@@ -328,7 +326,7 @@ export function StudioNavScenarioControls({
       clickBlinkTimerRef.current = window.setTimeout(() => {
         setClickBlinkActive(false);
         clickBlinkTimerRef.current = null;
-      }, CLICK_DIODE_MS);
+      }, CONTROL_ROOM_TAP_MS);
     };
 
     document.addEventListener("studio-demo-click", handleDemoClick);
@@ -360,7 +358,7 @@ export function StudioNavScenarioControls({
     stepBlinkTimerRef.current = window.setTimeout(() => {
       setStepBlinkActive(false);
       stepBlinkTimerRef.current = null;
-    }, STEP_DIODE_MS);
+    }, CONTROL_ROOM_TAP_MS);
   };
 
   const flashTransportTap = (button: HTMLButtonElement) => {

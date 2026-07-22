@@ -91,6 +91,10 @@ export type ChatBubbleMotionPayload = {
 };
 
 const SCROLL_CHOP_PX = 18;
+/** Premium motion guard: >2 dropped 60Hz frames, or sustained sub-42fps. */
+const FRAME_GAP_CHOP_MS = 38;
+const SLOW_FRAME_MS = 24;
+const SLOW_FRAME_STREAK = 3;
 
 /**
  * Measure bubble vs composer dock + scroll host — TRACE for composer-exit chop.
@@ -225,8 +229,8 @@ export function logChatRevealCameraTrace(options: {
   });
 }
 
-function readTransformY(el: HTMLElement): number {
-  const transform = getComputedStyle(el).transform;
+function readTransformY(style: CSSStyleDeclaration): number {
+  const transform = style.transform;
   if (!transform || transform === "none") return 0;
   const m = transform.match(/matrix\(([^)]+)\)/);
   if (m) {
@@ -260,17 +264,30 @@ export function startChatBubbleMotionSample(options: {
   const durationMs = options.durationMs ?? CHAT_PULL_UP_MS + 80;
   let prevLayoutY: number | null = null;
   let prevScrollTop: number | null = null;
+  let prevFrameAt: number | null = null;
+  let slowFrameStreak = 0;
+  let cadenceChopLatched = false;
   let raf = 0;
   let stopped = false;
 
   const tick = () => {
     if (stopped || !options.el) return;
     const now = performance.now();
+    const frameGapMs = prevFrameAt == null ? null : now - prevFrameAt;
+    prevFrameAt = now;
+    if (frameGapMs != null && frameGapMs > SLOW_FRAME_MS) {
+      slowFrameStreak += 1;
+    } else {
+      slowFrameStreak = 0;
+    }
+    // One computed-style read + one bubble rect per frame. The old sampler
+    // forced the same layouts repeatedly and could create the stutter it was
+    // intended to diagnose while the QA gate was open.
     const style = getComputedStyle(options.el);
-    const y = readTransformY(options.el);
+    const y = readTransformY(style);
     const opacity = Number.parseFloat(style.opacity);
-    const layoutY =
-      Math.round(options.el.getBoundingClientRect().top * 100) / 100;
+    const bubbleRect = options.el.getBoundingClientRect();
+    const layoutY = Math.round(bubbleRect.top * 100) / 100;
     const deltaY =
       prevLayoutY == null
         ? 0
@@ -286,10 +303,25 @@ export function startChatBubbleMotionSample(options: {
       typeof trace.deltaScrollTop === "number" &&
       Math.abs(trace.deltaScrollTop) > SCROLL_CHOP_PX &&
       !trace.scrollLock;
-    const chop = scrollChop;
+    // A delayed rAF after the bubble has already reached its final pose is a
+    // scheduler delay, not a visible bubble chop. Only fail cadence while the
+    // bubble is still perceptibly moving/fading.
+    const motionStillVisible =
+      Math.abs(y) > 0.5 ||
+      (Number.isFinite(opacity) && opacity < 0.98) ||
+      Math.abs(deltaY) > 0.5;
+    const cadenceChop =
+      !cadenceChopLatched &&
+      motionStillVisible &&
+      frameGapMs != null &&
+      (frameGapMs > FRAME_GAP_CHOP_MS || slowFrameStreak >= SLOW_FRAME_STREAK);
+    if (cadenceChop) cadenceChopLatched = true;
+    const chop = scrollChop || cadenceChop;
     const chopReason = scrollChop
       ? `scrollTop Δ=${trace.deltaScrollTop}`
-      : null;
+      : cadenceChop
+        ? `dropped-frame cadence gap=${frameGapMs.toFixed(1)}ms streak=${slowFrameStreak}`
+        : null;
 
     logChatBubbleMotion({
       id: options.id,

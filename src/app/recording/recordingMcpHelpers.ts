@@ -240,7 +240,7 @@ export function registerRecordingMcpHelpers(options?: {
         label: session
           ? `REC stop · ${session.id} · events=${session.events.length}`
           : "REC stop · no session",
-        outcome: session ? "ok" : "soft-fail",
+        outcome: session ? "ok" : "notice",
       });
     } catch {
       /* hang-safe */

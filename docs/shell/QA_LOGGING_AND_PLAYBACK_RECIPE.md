@@ -108,7 +108,7 @@ After fix: full Play **PASS 22/22**. Do not invent green past real timeouts.
 1. Keep **AGENT TESTING** overlay **visible** for the whole Play (gate open).  
 2. **One sequence:** playback diag events that matter land in the **main QA chat** (chronological with clicks / transport / RESULT) — not a separate cryptic PLAYBACK_DIAG pane.  
 3. Expect lean rows: clicks, nav, FAIL/chop/JUMP, type-in **start/end**, skips, scroll-reversal, play-end — **not** a waterfall of TRACE frames / cursor park chatter / 249 typeIn samples.  
-4. **Do not invent green.** Bubble-chop, script-timeout, Alarm, cursor-hidden-during-type-in, scroll-reversal soft-fails are **real** until fixed. Tests alone ≠ PROVEN.  
+4. **Do not invent green.** Bubble-chop, script-timeout, Alarm, cursor-hidden-during-type-in, scroll-reversal notices are **real** until fixed. Tests alone ≠ PROVEN.
 5. Mid-flight Save Log dumps may show **no RESULT** (Play still running) — read `sitrepLine` / `timeline` / `summaries` honestly.  
 6. **Save Log** stays enabled while capturing **and** after **Keep open → Complete**.  
 7. **ALWAYS CLEAR is code law** — `requireFreshQaSession(title)` (`forceClear` + `start`, **no skip flag**). ArmRecCapture / RecNewCjmProve / FullPlayProve call it first; `startRecording` re-asserts if bypassed. Smokes wipe too.  
@@ -159,7 +159,7 @@ Emit: `logCursorEngineTracker` in `demoCursorEngine.ts`. Mirror: `playbackDiagQa
 | Sitrep | Steps **12/21** · `avail-continue` · chat | Play not finished — no RESULT row |
 | `typeIn` | starts **2** / ends **2** / samples **249** | **FORBIDDEN** per-letter sampling class |
 | Bubble motion | jumps **0** / chops **0** | No bubble-chop in this dump |
-| Soft-fail | 2× `scroll-reversal` (eased Δ) | Open / watch — pull-up co-travel noise |
+| Notice | 2× `scroll-reversal` (eased Δ) | Open / watch — pull-up co-travel noise |
 | Helper spam | 52/80 log = peek/is-open polls | Agent poll noise (not product FAIL) |
 | script-timeout | **absent** in this dump | Separate prove: confirmation hang → cursor `stop()` fix |
 
@@ -171,7 +171,7 @@ Emit: `logCursorEngineTracker` in `demoCursorEngine.ts`. Mirror: `playbackDiagQa
 | Peak | Play finished → journey start (PLP→…→details) | Playlist **completed**; sitrep at Save Log = post-reset **1/12** |
 | RESULT | **absent** | Smoke tears down overlay — use keep-overlay prove when available |
 | Clicks | Bookmark → Book now → PDP Book → Sign in → **21/15:30** → Reserve → Open Appts → View Details | No date/time re-click; location Continue not in click log |
-| Soft-fail | **3×** scroll-reversal (Δ−922 / Δ−1207 / Δ−88) | Camera origin yank — **not green** smoothness |
+| Notice | **3×** scroll-reversal (Δ−922 / Δ−1207 / Δ−88) | Camera origin yank — **not green** smoothness |
 | Type-in | 0 | Expected (no Traditional composer type-in) |
 
 Sitrep audit: [TRADITIONAL_CJM_UX_2026-07-21.md](../projects/boots-pharmacy/audits/TRADITIONAL_CJM_UX_2026-07-21.md).
@@ -223,7 +223,7 @@ http://localhost:5173/?project=boots-pharmacy&screen=home&persona=sarah-jenkins&
 0. **Reset QA before each test (ALWAYS CLEAR = code law)** — `requireFreshQaSession(title)` = `forceClear` + fresh `start` (**no skip flag**). Entry points: `__studioArmRecCapture`, `__studioRunRecNewCjmProve`, `__studioRunFullPlayProve`. Bypass guard: `startRecording` → `ensureQaSessionForRecCapture`. Smoke `withMcpTestSession` also wipes. Never reuse a dirty overlay. **Do not invent** a parallel ad-hoc Play/REC path that skips this.  
 0b. **URL `modal=` is navigable state** — if Continue opens `modal=choose-pharmacy`, drain (pick pharmacy) before the next beat; QA logs `RecModalOpen` / `RecModalPharmacyPick`. Never rush past.  
 0c. **Human REC pace** — `REC_USER_PACE_MS` (read / before CTA / after click / scroll-stop ≥2.4s). Prove helper enforces; not optional.  
-0d. **Fast Play QA is not fast REC** — `Fast test current CJM` / `Fast test all CJMs` compress presentation dwell, cursor travel, typing cadence, and camera easing only. They keep the same journey, selectors, clicks, modal drains, state/counter alignment, readiness polling, failure alarms, and terminal PASS/FAIL. REC capture remains human-paced because timing is part of the recorded artifact.  
+0d. **Fast Play QA is not fast REC** — `Fast test current CJM` / `Fast test all CJMs` compress narrative dwell, cursor travel, and typing cadence while preserving every declared UI-transition floor. They keep the same journey, selectors, clicks, modal drains, state/counter alignment, readiness polling, failure alarms, and terminal PASS/FAIL. Bubble jump/chop and cursor-hidden evidence are hard failures in both timing modes. REC capture remains human-paced because timing is part of the recorded artifact.
 1. Open QA logger / agent overlay (gate open) — only after step 0.  
 2. Start **continuous Play** (same path as Step).  
 3. **Eyes on composer:** Home then Chat type-in must animate letter-by-letter.  
@@ -252,7 +252,7 @@ await window.__studioRunFullPlayProve?.({ experience: "traditional" }) // defaul
 
 **Smoke (tears down overlay):** `await window.__protoRunTraditionalPlaySmoke?.()` — Play → start assert; good for local smoke, **weak** for Save Log peak sitrep.
 
-**Dump/log hygiene (2026-07-21):** click rows prefer `data-studio-action` / `data-studio-cal-*` selectors; consecutive duplicate `Journey reset to start` / soft-fail QA rows are deduped (~900–1600ms). `summaries.click.ok` uses durable tallies (survives diag ring rotation).
+**Dump/log hygiene (2026-07-21):** click rows prefer `data-studio-action` / `data-studio-cal-*` selectors; consecutive duplicate `Journey reset to start` / notice QA rows are deduped (~900–1600ms). `summaries.click.ok` uses durable tallies (survives diag ring rotation).
 
 **REC ⊕ QA (XOR):** REC live → QA capture auto-pauses + page click guard releases — product clicks must work; observe logger may stay open. Log: `REC live · QA capture paused (product clicks free)`.
 
@@ -266,7 +266,7 @@ Example URL:
 http://localhost:5173/?project=boots-pharmacy&screen=plp&persona=sarah-jenkins&cjm=on&experience=traditional
 ```
 
-Eyes: no already-selected date/time re-click; Book Step 3 camera beat dwells then scrolls to Open Appointments; watch residual soft-fails on play-end rewind ([TRADITIONAL_CJM_UX_2026-07-21.md](../projects/boots-pharmacy/audits/TRADITIONAL_CJM_UX_2026-07-21.md)).
+Eyes: no already-selected date/time re-click; Book Step 3 camera beat dwells then scrolls to Open Appointments; watch residual notices on play-end rewind ([TRADITIONAL_CJM_UX_2026-07-21.md](../projects/boots-pharmacy/audits/TRADITIONAL_CJM_UX_2026-07-21.md)).
 
 ---
 
@@ -318,6 +318,8 @@ window.__studioStartQaSuite?.([
 ```
 
 Supported IDs include page probes, interaction maps, current/all-CJM playback, REC and QA self-tests; the product dropdown is the canonical catalog. Read compact state with `__studioGetQaSuiteStatus()`. Failure persists across refresh, latches QA, and stays on the failed test. After a fix, `__studioProceedQaSuite()` reruns that test before continuing. `__studioCancelQaSuite()` explicitly aborts. Never agent-loop individual cases.
+
+**Save Log evidence contract:** completed autonomous dumps include `verdict` (pass/fail/incomplete), `suite` (profile, start/end, aggregate duration, per-test duration, failure if any), and compact per-CJM outcome data (`journeyId`, experience, speed, peak, elapsed, errors). A successful suite has no “QA Pause” priority hint: the final pause is intentional handoff hygiene, not a defect.
 
 Global CJM warning **Run tests** and agent helper `window.__studioRunGlobalCompatibilityTests?.()` both start the canonical fail-fast `all-cjms` suite. The warning dialog supplies the static issue inventory and copy-ready aggregate diagnostic; the QA overlay remains execution evidence.
 

@@ -180,6 +180,8 @@ const events: PlaybackDiagEvent[] = [];
  */
 let clickOkCount = 0;
 let clickFailCount = 0;
+/** Durable cursor disappearance tally — must survive event-ring rotation. */
+let cursorHiddenCount = 0;
 /** Completed type-in char samples (in-memory only — never per-char events). */
 let completedTypeInSamples: number[] = [];
 /** Durable lifecycle tallies — event-ring rotation must not erase type-in proof. */
@@ -323,6 +325,7 @@ export function playbackDiagClear(): void {
   typeInSkipCount = 0;
   clickOkCount = 0;
   clickFailCount = 0;
+  cursorHiddenCount = 0;
   if (isQaDiagGateOpen()) {
     console.info("[PLAYBACK_DIAG]", "clear");
   }
@@ -433,6 +436,7 @@ export function playbackDiagCursor(options: {
   parkReason?: string | null;
   selector?: string | null;
 }): void {
+  if (/\bHIDDEN\b/i.test(options.detail ?? "")) cursorHiddenCount += 1;
   const parked = options.parked === true || options.action === "park";
   push({
     kind: "cursor",
@@ -727,6 +731,7 @@ export type PlaybackDiagBundle = {
   cursor: {
     events: number;
     parks: number;
+    hidden: number;
     lastParkReason?: string | null;
   };
   scroll: {
@@ -1033,7 +1038,7 @@ export function playbackDiagChatBubbleMotion(options: {
                 __studioAgentTestingOverlay?: {
                   logStep?: (input: {
                     label?: string;
-                    outcome?: "ok" | "soft-fail" | "fail";
+                    outcome?: "ok" | "notice" | "fail";
                     kind?: string;
                   }) => void;
                 };
@@ -1043,7 +1048,10 @@ export function playbackDiagChatBubbleMotion(options: {
       api?.logStep?.({
         kind: jump || chop ? "chat-bubble-motion" : "sequence",
         label,
-        outcome: jump || chop || skippedNote ? "soft-fail" : "ok",
+        // A detected visual discontinuity is a real test failure. Fast suites
+        // may keep running for batch coverage, but the row must still be red
+        // and the exported log must remain non-passing for that touchpoint.
+        outcome: jump || chop || skippedNote ? "fail" : "ok",
       });
     } catch {
       /* hang-safe */
@@ -1096,6 +1104,7 @@ export function getPlaybackDiagBundle(): PlaybackDiagBundle {
     cursor: {
       events: cursorEvents.length,
       parks: parks.length,
+      hidden: cursorHiddenCount,
       lastParkReason: parks[parks.length - 1]?.cursor?.parkReason ?? null,
     },
     scroll: {

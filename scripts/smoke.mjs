@@ -16,7 +16,7 @@
  *
  * PO mid-flight (R15): step-forward + Play smokes poll __studioConsumePoSignal
  * each beat. Alarm → fail with reason po-alarm:* + poSignal.diagSnapshot.
- * Soft Alarm: { softFailPoAlarm: true }. See docs/shell/PLAYBACK_DIAG.md.
+ * Soft Alarm: { continueOnPoAlarm: true }. See docs/shell/PLAYBACK_DIAG.md.
  *
  * Or: npm run smoke (Playwright headless, needs dev server)
  */

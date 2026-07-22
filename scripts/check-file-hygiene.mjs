@@ -31,11 +31,11 @@ const ALLOWLIST = {
   "src/styles/globals-hub.css": 1400,
   // Engine / hybrid monsters — prefer domain split over bumping.
   "src/app/orchestra/useJourneyPlayback.ts": 2230, // + director handoff + recordedClick note start
-  "src/app/App.tsx": 2140, // + Session reset capture-on + jump-to-start clear QA blocks
+  "src/app/App.tsx": 2160, // + declarative scenario transition floor; orchestration extraction is a separate refactor
   "src/app/shell/agent-testing/agentTestingOverlay.ts": 4800, // + Reset capture-off + ring restore coalesce + Save Log silent pause
   "src/app/nav/studioNavPanel.css": 1700, // + MCP status hint near version/bug
   "src/app/shell/studioMcpHelpers.ts": 1380, // + Traditional keep-overlay full Play prove window API
-  "src/app/scenario/demoCursor.ts": 2200, // + steady binary latch / thrash watch / carriage graphic
+  "src/app/scenario/demoCursor.ts": 2250, // + lifecycle visibility guard / steady graphic diagnostics; split is a separate engine refactor
   "src/projects/boots-pharmacy/wire/BootsPharmacyProjectView.tsx": 4840, // + page-land only on screen change (no isPlaying yank)
   "src/projects/boots-pharmacy/data/plpListing.ts": 2000, // Make PLP DOM; retire with PLP React
 };

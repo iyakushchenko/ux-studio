@@ -13,7 +13,7 @@ export const QA_DIAG_RING_MAX = 300;
 
 export type QaDiagRingEvent = {
   kind: string;
-  outcome?: "ok" | "soft-fail" | "fail" | "pass";
+  outcome?: "ok" | "notice" | "fail" | "pass";
   text?: string;
   atMs: number;
   atIso?: string;

@@ -64,6 +64,7 @@ export type AgentTestingPoSignal = {
     cursor?: {
       events: number;
       parks: number;
+      hidden: number;
       lastParkReason: string | null;
     };
     click?: { ok: number; fail: number };
@@ -105,6 +106,7 @@ function buildDiagSnapshot(): AgentTestingPoSignal["diagSnapshot"] {
       cursor: {
         events: bundle.cursor.events,
         parks: bundle.cursor.parks,
+        hidden: bundle.cursor.hidden,
         lastParkReason: bundle.cursor.lastParkReason,
       },
       click: {

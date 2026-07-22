@@ -65,18 +65,18 @@ describe("playbackDiagQaBridge", () => {
     );
   });
 
-  it("flags unexpected scroll-reversal as soft-fail with human label", () => {
+  it("flags unexpected scroll-reversal as notice with human label", () => {
     const scroll = ev({
       kind: "scroll",
       detail: "competing snap during play",
       scroll: { beforeTop: 400, afterTop: 200, retreat: false },
     });
     expect(shouldMirrorPlaybackDiagToQa(scroll)).toBe(true);
-    expect(outcomeForPlaybackDiagEvent(scroll)).toBe("soft-fail");
+    expect(outcomeForPlaybackDiagEvent(scroll)).toBe("notice");
     expect(labelForPlaybackDiagEvent(scroll)).toMatch(/wrong way/i);
   });
 
-  it("does not soft-fail intentional scrollCameraToOrigin (jump-to-start / page land)", () => {
+  it("does not notice intentional scrollCameraToOrigin (jump-to-start / page land)", () => {
     const jumpStart = ev({
       kind: "scroll",
       detail: "scrollCameraToOrigin — host top (named SSoT; jump-to-start)",
@@ -103,7 +103,7 @@ describe("playbackDiagQaBridge", () => {
     expect(labelForPlaybackDiagEvent(park)).toBe("Cursor parked (play-end)");
   });
 
-  it("does not soft-fail target-driven scrollIntoView (large upward camera is OK)", () => {
+  it("does not notice target-driven scrollIntoView (large upward camera is OK)", () => {
     const scroll = ev({
       kind: "scroll",
       detail: "scrollIntoView done (eased)",
@@ -246,9 +246,9 @@ describe("playbackDiagQaBridge", () => {
       detail: "camera-beat:target-unusable — dwell only ([data-name=\"module.plp.filters\"])",
     });
     expect(shouldMirrorPlaybackDiagToQa(unusable)).toBe(true);
-    expect(outcomeForPlaybackDiagEvent(unusable)).toBe("soft-fail");
+    expect(outcomeForPlaybackDiagEvent(unusable)).toBe("ok");
     expect(labelForPlaybackDiagEvent(unusable)).toBe(
-      "Camera target missing — wait only"
+      "Camera framing deferred — continuing"
     );
   });
 

@@ -32,7 +32,7 @@ export type PlayJourneySmokeResult = {
   assert?: PlayEndAtStartAssertResult;
   peakVisible?: number;
   peakCounter?: string | null;
-  /** Set when PO Alarm aborted (or soft-failed) mid-Play. */
+  /** Set when PO Alarm aborted (or noticeed) mid-Play. */
   poSignal?: AgentTestingPoSignal | null;
 };
 
@@ -56,8 +56,8 @@ export async function runPlayJourneyToStartSmoke(options: {
   startBeatId: string;
   startScreenId: string;
   timeoutMs?: number;
-  /** Alarm soft-fails + logs instead of aborting (default: hard fail). */
-  softFailPoAlarm?: boolean;
+  /** Alarm notices + logs instead of aborting (default: hard fail). */
+  continueOnPoAlarm?: boolean;
   delay: (ms: number) => Promise<void>;
   ensureClean: () => void;
   setOrchestraMode: (mode: OrchestraModeId) => void;
@@ -168,7 +168,7 @@ export async function runPlayJourneyToStartSmoke(options: {
     // R15 — poll live PO latch each beat (Alarm must not be ignored mid-Play).
     const po = pollSmokePoSignal({
       context: `play:${options.orchestraMode}:${state.beatId ?? "?"}`,
-      softFailAlarm: options.softFailPoAlarm,
+      continueOnAlarm: options.continueOnPoAlarm,
       pausePlay: () => {
         if (state.isPlaying || state.isOnAir) {
           options.triggerTransport("play");
@@ -227,6 +227,45 @@ export async function runPlayJourneyToStartSmoke(options: {
     }
 
     const diag = getPlaybackDiagBundle();
+    // A red click diagnostic is an actual playback failure. It must terminate
+    // this proof before the transport can make a later route look green.
+    if (diag.click.fail > 0) {
+      return {
+        pass: false,
+        reason: `playback-click-failed:${diag.click.fail}`,
+        state,
+        peakVisible,
+        peakCounter,
+      };
+    }
+    // Cursor loss is never cosmetic: a later re-create must not turn the
+    // journey green. The durable tally survives the diagnostic event ring.
+    if (diag.cursor.hidden > 0) {
+      return {
+        pass: false,
+        reason: `playback-cursor-hidden:${diag.cursor.hidden}`,
+        state,
+        peakVisible,
+        peakCounter,
+      };
+    }
+    if (
+      diag.chatBubbleMotion.jumps > 0 ||
+      diag.chatBubbleMotion.chops > 0 ||
+      diag.chatBubbleMotion.skippedPhaseNotes.length > 0
+    ) {
+      return {
+        pass: false,
+        reason:
+          `playback-chat-motion-failed:` +
+          `jumps=${diag.chatBubbleMotion.jumps},` +
+          `chops=${diag.chatBubbleMotion.chops},` +
+          `skipped=${diag.chatBubbleMotion.skippedPhaseNotes.length}`,
+        state,
+        peakVisible,
+        peakCounter,
+      };
+    }
     const idle = !state.isPlaying && !state.isOnAir;
     if (
       sawPlaying &&

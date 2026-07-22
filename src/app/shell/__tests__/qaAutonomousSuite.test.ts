@@ -112,6 +112,34 @@ describe("autonomous QA suite", () => {
       "pass",
       "13/13 CJMs passed"
     );
+    expect(suiteStatus?.playbackProfile).toBe("normal");
+    expect(suiteStatus?.completed[0]).toMatchObject({
+      startedAtIso: expect.any(String),
+      finishedAtIso: expect.any(String),
+      elapsedMs: expect.any(Number),
+    });
+  });
+
+  it("records fast proof profile and a current-CJM identity", async () => {
+    window.__protoStudioState = () => ({ orchestraMode: "agentic-cjm" });
+    window.__studioRunFullPlayProve = vi.fn(async ({ journeyId }) => ({
+      pass: true,
+      journeyId,
+      experience: "agentic",
+    }));
+    window.__studioStartQaSuite?.([
+      { id: "play-current-cjm", options: { playbackSpeed: "fast" } },
+    ], { suiteId: "current-cjm-fast" });
+    await settle();
+    expect(window.__studioGetQaSuiteStatus?.()).toMatchObject({
+      phase: "passed",
+      playbackProfile: "fast",
+      completed: [{ result: { journeyId: "agentic-cjm", playbackSpeed: "fast" } }],
+    });
+    expect(window.__studioAgentTestingOverlay?.appendFinale).toHaveBeenLastCalledWith(
+      "pass",
+      "CJM agentic-cjm passed"
+    );
   });
 
   it("validates every CJM structurally without playing animations", () => {

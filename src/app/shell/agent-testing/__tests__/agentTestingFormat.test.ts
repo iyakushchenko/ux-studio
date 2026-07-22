@@ -33,11 +33,11 @@ describe("agentTestingFormat", () => {
     expect(inferOutcomeFromText("PASS  overlay-arm")).toBe("ok");
     expect(inferOutcomeFromText("RESULT · PASS — all checks ok")).toBe("pass");
     expect(inferOutcomeFromText("FAIL  click")).toBe("fail");
-    expect(inferOutcomeFromText("soft-fail unexpected dwell")).toBe("soft-fail");
-    expect(inferOutcomeFromText("cursor issue detected")).toBe("soft-fail");
+    expect(inferOutcomeFromText("notice unexpected dwell")).toBe("notice");
+    expect(inferOutcomeFromText("cursor issue detected")).toBe("notice");
     expect(
       inferOutcomeFromText("scroll issue detected · SCROLL_ISSUE_REPORTED")
-    ).toBe("soft-fail");
+    ).toBe("notice");
     expect(inferOutcomeFromText("no errors")).toBe("ok");
     expect(inferOutcomeFromText("errors: []")).toBe("ok");
     expect(inferOutcomeFromText("unexpected fatal error")).toBe("fail");
@@ -64,7 +64,7 @@ describe("agentTestingFormat", () => {
       atMs: 1,
       timeLabel: "07:26:04",
       label: "vite-hmr · capture/play paused (hot invalidate)",
-      outcome: "soft-fail" as const,
+      outcome: "notice" as const,
       kind: "system" as const,
       count: 1,
     };

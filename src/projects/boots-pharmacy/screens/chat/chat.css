@@ -275,9 +275,12 @@ html:has([data-studio-modal="choose-pharmacy"])
   flex-direction: column;
   align-items: center;
   padding: 64px 64px 24px;
-  padding-bottom: calc(var(--studio-chat-composer-h, 0px) + 24px);
+  /* Reserve a real visual rail below short thinking bubbles as well as the
+   * measured dock.  Without this extra clearance, a terminal 40px thinking
+   * slot can reach max-scroll while still sitting under the composer. */
+  padding-bottom: calc(var(--studio-chat-composer-h, 0px) + 48px);
   /* Match pad+gutter so scrollIntoView/align:end clears helpful strip above dock. */
-  scroll-padding-bottom: calc(var(--studio-chat-composer-h, 0px) + 24px);
+  scroll-padding-bottom: calc(var(--studio-chat-composer-h, 0px) + 48px);
   box-sizing: border-box;
   scrollbar-width: thin;
   scrollbar-color: rgba(122, 125, 135, 0.32) transparent;

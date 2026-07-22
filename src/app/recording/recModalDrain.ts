@@ -5,11 +5,15 @@
  * before continuing. Never rush past Continue into an open modal.
  */
 
-import { simulateDemoPointerClick } from "@/app/scenario/demoCursor";
+import {
+  isClickableTarget,
+  simulateDemoPointerClick,
+} from "@/app/scenario/demoCursor";
 import { logAgentTestingStep, touchAgentTestingOverlay } from "@/app/shell/agent-testing/agentTestingOverlay";
 import { parseStudioUrl } from "@/app/shell/studioUrl";
 import { STUDIO_MODAL } from "@/app/shell/studioModalGuard";
 import { recUserPace } from "@/app/recording/recUserPace";
+import { playbackMs } from "@/app/shell/playbackTiming";
 import {
   trackStudioModalForQa,
   trackStudioModalPickForQa,
@@ -119,21 +123,54 @@ async function pickChoosePharmacyStore(): Promise<{
   };
 }
 
-async function pickLoginSignIn(): Promise<{
-  ok: boolean;
-  reason?: string;
-}> {
+function findLoginSignIn(): HTMLElement | null {
   const root =
     document.querySelector<HTMLElement>('[data-studio-modal="login"]') ??
     document.querySelector<HTMLElement>(".proto-login-card");
-  if (!root) {
-    return { ok: false, reason: "login modal DOM missing" };
-  }
-  const signIn =
+  if (!root) return null;
+  return (
     root.querySelector<HTMLElement>(".proto-login-cta") ??
     Array.from(root.querySelectorAll<HTMLElement>("button")).find((btn) =>
       /^sign in$/i.test((btn.textContent ?? "").trim())
-    );
+    ) ??
+    null
+  );
+}
+
+async function waitForStableLoginSignIn(fast = false): Promise<HTMLElement | null> {
+  let previous: HTMLElement | null = null;
+  let stable = 0;
+  for (let attempt = 0; attempt < 24; attempt += 1) {
+    const candidate = findLoginSignIn();
+    if (candidate && isClickableTarget(candidate)) {
+      stable = candidate === previous ? stable + 1 : 1;
+      previous = candidate;
+      if (stable >= 3) return candidate;
+    } else {
+      previous = null;
+      stable = 0;
+    }
+    await new Promise((resolve) => window.setTimeout(resolve, fast ? 24 : 50));
+  }
+  return null;
+}
+
+async function loginPace(key: "beforeCta" | "modalPickSettle" | "modalOpenWait", fast: boolean): Promise<void> {
+  if (!fast) return recUserPace(key);
+  await new Promise((resolve) => window.setTimeout(resolve, playbackMs(
+    key === "beforeCta" ? 900 : key === "modalPickSettle" ? 1100 : 900,
+    24
+  )));
+}
+
+async function pickLoginSignIn(fast = false): Promise<{
+  ok: boolean;
+  reason?: string;
+}> {
+  let signIn = await waitForStableLoginSignIn(fast);
+  if (!signIn && !document.querySelector('[data-studio-modal="login"], .proto-login-card')) {
+    return { ok: false, reason: "login modal DOM missing" };
+  }
   if (!signIn) {
     return { ok: false, reason: "login Sign in button missing" };
   }
@@ -142,9 +179,14 @@ async function pickLoginSignIn(): Promise<{
     detail: "Sign in",
     source: "drain",
   });
-  await recUserPace("beforeCta");
-  const ok = await simulateDemoPointerClick(signIn, { scroll: true });
-  await recUserPace("modalPickSettle");
+  await loginPace("beforeCta", fast);
+  let ok = false;
+  for (let attempt = 0; attempt < 3 && !ok; attempt += 1) {
+    if (attempt > 0) signIn = await waitForStableLoginSignIn(fast);
+    if (!signIn) break;
+    ok = await simulateDemoPointerClick(signIn, { scroll: true });
+  }
+  await loginPace("modalPickSettle", fast);
   if (!ok) return { ok: false, reason: "login Sign in click failed" };
   // Wait for modal to clear.
   for (let i = 0; i < 20; i++) {
@@ -153,7 +195,7 @@ async function pickLoginSignIn(): Promise<{
       isBlockingModalOpenInDom(STUDIO_MODAL.login) ||
       Boolean(document.querySelector(".proto-login-card"));
     if (!still) return { ok: true };
-    await recUserPace("modalOpenWait");
+    await loginPace("modalOpenWait", fast);
   }
   const stillOpen =
     readUrlModalId() === STUDIO_MODAL.login ||
@@ -177,7 +219,10 @@ export function isLoginModalOpenInDom(): boolean {
  * Used by recorded-click Play when PDP Book Now opens login (logged-out gate)
  * — does NOT auto-drain choose-pharmacy (next beat often owns that pick).
  */
-export async function drainLoginModalIfOpen(): Promise<RecModalDrainResult> {
+export async function drainLoginModalIfOpen(options?: {
+  /** Fast PLAY keeps functional guards but must not inherit human REC dwell. */
+  fast?: boolean;
+}): Promise<RecModalDrainResult> {
   if (!isLoginModalOpenInDom()) {
     return { ok: true, modalId: null, drained: false };
   }
@@ -196,7 +241,7 @@ export async function drainLoginModalIfOpen(): Promise<RecModalDrainResult> {
       reason: "login modal not visible",
     };
   }
-  const pick = await pickLoginSignIn();
+  const pick = await pickLoginSignIn(options?.fast === true);
   if (!pick.ok) {
     logQaModal("RecModalPick", pick.reason ?? "login fail", "fail");
     return {

@@ -381,16 +381,36 @@ export async function runChatBubbleMotionSelfTest(options?: {
       appendFinale?: (result: "pass" | "fail", summary?: string) => void;
       logStep?: (input: {
         label?: string;
-        outcome?: "ok" | "soft-fail" | "fail";
+        outcome?: "ok" | "notice" | "fail";
         kind?: string;
       }) => void;
     };
   };
 
-  const transport = (action: string) =>
-    w.__studioTriggerTransport?.(action) ??
-    w.__protoTriggerTransport?.(action) ??
-    false;
+  /**
+   * One physical transport action per test step.  Calling both the window
+   * bridge and the visible button can skip a chat beat and falsely blame the
+   * bubble engine for missing samples.
+   */
+  const triggerStep = (action: "step-forward" | "step-back") => {
+    // The App bridge intentionally returns void even after it has dispatched
+    // the action. Presence, not its return value, is therefore the truth.
+    if (typeof w.__studioTriggerTransport === "function") {
+      w.__studioTriggerTransport(action);
+      return true;
+    }
+    if (typeof w.__protoTriggerTransport === "function") {
+      w.__protoTriggerTransport(action);
+      return true;
+    }
+    const label = action === "step-forward" ? "Step forward" : "Step back";
+    const btn = [...document.querySelectorAll("button")].find(
+      (b) => b.getAttribute("aria-label") === label
+    ) as HTMLButtonElement | undefined;
+    if (!btn || btn.disabled) return false;
+    btn.click();
+    return true;
+  };
 
   const pace = readBubblePace();
 
@@ -441,16 +461,12 @@ export async function runChatBubbleMotionSelfTest(options?: {
 
   // Soft reset: retreat until only q0 (or empty) so later frames re-pull-up with samples.
   for (let i = 0; i < 20 && onChat() && revealedCount() > 1; i++) {
-    transport("step-back");
-    const btn = [...document.querySelectorAll("button")].find(
-      (b) => b.getAttribute("aria-label") === "Step back"
-    ) as HTMLButtonElement | undefined;
-    if (btn && !btn.disabled) btn.click();
+    triggerStep("step-back");
     await sleep(300);
   }
   // One more back if still >1 (finale / sticky).
   if (revealedCount() > 1) {
-    transport("step-back");
+    triggerStep("step-back");
     await sleep(400);
   }
   if (!onChat()) {
@@ -507,23 +523,14 @@ export async function runChatBubbleMotionSelfTest(options?: {
         w.__studioAgentTestingOverlay?.logStep?.({
           kind: "sequence",
           label: `Bubble ${id} already up — samples may be incomplete`,
-          outcome: "soft-fail",
+          outcome: "notice",
         });
       }
     }
     if (!isRevealed(id)) {
       // q2/q3: sitePilotChat beforeReveal clicks the agent CTA with demo cursor.
       // Do NOT raw-click here — that races/aborts the prelude and starves q3/r3.
-      const clicked =
-        transport("step-forward") ||
-        (() => {
-          const btn = [...document.querySelectorAll("button")].find(
-            (b) => b.getAttribute("aria-label") === "Step forward"
-          ) as HTMLButtonElement | undefined;
-          if (!btn || btn.disabled) return false;
-          btn.click();
-          return true;
-        })();
+      const clicked = triggerStep("step-forward");
       const maxWait =
         id === "q3" || id === "q2"
           ? pace.thinkMs + 8000
@@ -534,11 +541,7 @@ export async function runChatBubbleMotionSelfTest(options?: {
               : pace.thinkMs + 2800;
       let got = await waitUntil(() => isRevealed(id), maxWait);
       if (!got && (id === "q2" || id === "q3" || id.startsWith("r"))) {
-        transport("step-forward");
-        const btn = [...document.querySelectorAll("button")].find(
-          (b) => b.getAttribute("aria-label") === "Step forward"
-        ) as HTMLButtonElement | undefined;
-        if (btn && !btn.disabled) btn.click();
+        triggerStep("step-forward");
         got = await waitUntil(() => isRevealed(id), 8000);
       }
       // Wait until pull-up samples land (not only DOM revealed).
@@ -549,7 +552,7 @@ export async function runChatBubbleMotionSelfTest(options?: {
       w.__studioAgentTestingOverlay?.logStep?.({
         kind: "sequence",
         label: `Bubble SF → ${id}${clicked ? "" : " (blocked)"}${got ? "" : " TIMEOUT"}`,
-        outcome: clicked && got ? "ok" : "soft-fail",
+        outcome: clicked && got ? "ok" : "notice",
       });
     } else {
       await sleep(CHAT_PULL_UP_SETTLE_MS);
@@ -607,7 +610,7 @@ export async function runChatBubbleMotionSelfTest(options?: {
         kind: "system",
         label:
           "self-test RESULT withheld — USER_MESSAGE pending (consume first)",
-        outcome: "soft-fail",
+        outcome: "notice",
       });
     } else {
       w.__studioAgentTestingOverlay?.appendFinale?.(

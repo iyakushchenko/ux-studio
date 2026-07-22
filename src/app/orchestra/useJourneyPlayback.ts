@@ -883,6 +883,7 @@ export function useJourneyPlayback({
           () =>
             playRecordedClick(click, {
               ...options,
+              nextRecordedClick: beats[beatIndexRef.current + 1]?.recordedClick,
               applyStudioModal: (modalId) => {
                 try {
                   runtime.applyStudioModal?.(modalId);
@@ -1477,6 +1478,7 @@ export function useJourneyPlayback({
       !active ||
       !isPlaying ||
       isScripting ||
+      isScriptingRef.current ||
       !currentBeat?.recordedClick?.selectorChain?.length
     ) {
       return;

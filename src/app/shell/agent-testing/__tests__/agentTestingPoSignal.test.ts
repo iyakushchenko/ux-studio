@@ -15,7 +15,7 @@ vi.mock("@/app/shell/playbackDiag", () => ({
       progressSamples: [1, 2, 3],
     },
     step: { forwards: 1, backs: 0, retreatSyncs: 0 },
-    cursor: { events: 2, parks: 0, lastParkReason: null },
+    cursor: { events: 2, parks: 0, hidden: 0, lastParkReason: null },
     scroll: { events: 0, retreatIntoView: 0 },
     click: { ok: 1, fail: 0 },
     skip: { count: 0, reasons: [] },

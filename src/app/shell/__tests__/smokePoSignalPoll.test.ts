@@ -40,9 +40,9 @@ describe("smokePoSignalPoll", () => {
     expect(pollSmokePoSignal().hit).toBe(false);
   });
 
-  it("soft-fails alarm when requested", () => {
+  it("notices alarm when requested", () => {
     latchPoSignal({ type: "alarm", code: "ALARM_SEQUENCE_MISMATCH" });
-    const result = pollSmokePoSignal({ softFailAlarm: true, context: "step" });
+    const result = pollSmokePoSignal({ continueOnAlarm: true, context: "step" });
     expect(result.hit).toBe(true);
     if (!result.hit) return;
     expect(result.abort).toBe(false);
@@ -68,10 +68,10 @@ describe("smokePoSignalPoll", () => {
     expect(result.reason).toBe("po-scroll:SCROLL_ISSUE_REPORTED");
   });
 
-  it("soft-fails cursor/scroll when requested", () => {
+  it("notices cursor/scroll when requested", () => {
     latchPoSignal({ type: "cursor", code: "CURSOR_WEIRD_FLAG" });
     const result = pollSmokePoSignal({
-      softFailCursorScroll: true,
+      continueOnCursorScroll: true,
       context: "step-fwd",
     });
     expect(result.hit).toBe(true);

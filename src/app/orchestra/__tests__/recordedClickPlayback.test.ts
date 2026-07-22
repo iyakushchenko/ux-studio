@@ -36,7 +36,7 @@ import { playRecordedClick } from "@/app/orchestra/recordedClickPlayback";
 function mountLoginModal(): HTMLElement {
   const root = document.createElement("div");
   root.setAttribute("data-studio-modal", "login");
-  root.innerHTML = `<div class="proto-login-card"><button type="button" class="proto-login-cta">Sign in</button></div>`;
+  root.innerHTML = `<div class="proto-login-card"><button type="button" class="proto-login-cta" data-studio-action="login-sign-in">Sign in</button></div>`;
   document.body.appendChild(root);
   return root;
 }
@@ -107,6 +107,68 @@ describe("playRecordedClick — login interstitial", () => {
     expect(document.querySelector('[data-studio-modal="login"]')).toBeNull();
     // Book Now + Sign in
     expect(vi.mocked(simulateDemoPointerClick).mock.calls.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("leaves login for the next recorded login beat instead of consuming it twice", async () => {
+    const book = mountBookNow();
+    vi.mocked(simulateDemoPointerClick).mockImplementation(async (el) => {
+      if (el === book) {
+        mountLoginModal();
+        return true;
+      }
+      return false;
+    });
+
+    const result = await playRecordedClick(
+      {
+        selectorChain: ['[data-studio-action="pdp-book-now"]'],
+        element: "Book Now",
+      },
+      { nextRecordedClick: { selectorChain: ['[data-studio-action="login-sign-in"]'], modalId: "login" } }
+    );
+
+    expect(result).toEqual({ ok: true });
+    expect(document.querySelector('[data-studio-modal="login"]')).not.toBeNull();
+    expect(vi.mocked(simulateDemoPointerClick)).toHaveBeenCalledTimes(1);
+  });
+
+  it("uses an already-open recorded login modal without remounting it", async () => {
+    const login = mountLoginModal();
+    const applyStudioModal = vi.fn();
+    vi.mocked(simulateDemoPointerClick).mockImplementation(async (el) => {
+      if (el === login.querySelector(".proto-login-cta")) {
+        login.remove();
+        return true;
+      }
+      return false;
+    });
+
+    const result = await playRecordedClick(
+      {
+        selectorChain: ['[data-studio-action="login-sign-in"]'],
+        element: "Login Sign In",
+        modalId: "login",
+      },
+      { applyStudioModal }
+    );
+
+    expect(result).toEqual({ ok: true });
+    expect(applyStudioModal).not.toHaveBeenCalled();
+  });
+
+  it("never drains the closing login again after its recorded sign-in action", async () => {
+    const login = mountLoginModal();
+    vi.mocked(simulateDemoPointerClick).mockResolvedValue(true);
+
+    const result = await playRecordedClick({
+      selectorChain: ['[data-studio-action="login-sign-in"]'],
+      element: "Login Sign In",
+      modalId: "login",
+    });
+
+    expect(result).toEqual({ ok: true });
+    expect(login.isConnected).toBe(true);
+    expect(vi.mocked(simulateDemoPointerClick)).toHaveBeenCalledTimes(1);
   });
 
   it("fails clearly when target sits under a non-login modal", async () => {

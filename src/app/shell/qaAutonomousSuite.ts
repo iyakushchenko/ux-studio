@@ -26,8 +26,8 @@ export const QA_SUITE_COLLECTION: ReadonlyArray<{
   { id: "current-page", label: "Test current page", description: "Run the current project's registered page contract", tests: [{ id: "mcp-page-probe" }] },
   { id: "current-interactions", label: "Map current page interactions", description: "Inventory and grade every visible interactive candidate without activating it", tests: [{ id: "map-current-interactions" }] },
   { id: "all-interactions", label: "Map all project interactions", description: "Inventory Hub and every registered project page into one machine-readable report", tests: [{ id: "map-all-interactions" }] },
-  { id: "current-cjm-fast", label: "Fast test current CJM", description: "Prove the selected CJM with compressed presentation timing and full functional guards", tests: [{ id: "play-current-cjm", options: { playbackSpeed: "fast" } }] },
-  { id: "all-cjms-fast", label: "Fast test all CJMs", description: "Prove every project CJM with compressed presentation timing and stop on first failure", tests: [{ id: "play-all-cjms", options: { playbackSpeed: "fast" } }] },
+  { id: "current-cjm-fast", label: "Fast test current CJM", description: "Compressed functional proof; target, route, modal, counter, and end-state guards stay strict. Motion-frame samples remain diagnostic-only.", tests: [{ id: "play-current-cjm", options: { playbackSpeed: "fast" } }] },
+  { id: "all-cjms-fast", label: "Fast test all CJMs", description: "Compressed functional proof of every project CJM; stops on the first real error. Motion-frame samples remain diagnostic-only.", tests: [{ id: "play-all-cjms", options: { playbackSpeed: "fast" } }] },
   { id: "current-cjm", label: "Test current CJM", description: "Continuously play and prove the currently selected CJM at demo speed", tests: [{ id: "play-current-cjm" }] },
   { id: "all-cjms", label: "Test all CJMs", description: "Enumerate and continuously prove every CJM at demo speed", tests: [{ id: "play-all-cjms" }] },
   { id: "project-core", label: "Current project core", description: "Fast QA health, page contract, interaction map, and structural validation of every project CJM", tests: [{ id: "mcp-sanity" }, { id: "mcp-page-probe" }, { id: "map-all-interactions" }, { id: "validate-all-cjms" }] },
@@ -39,11 +39,37 @@ export function getQaSuiteDefinition(id: string) {
 export type QaSuiteStatus = {
   suiteId: string;
   phase: "idle" | "running" | "paused-failure" | "passed" | "cancelled";
+  startedAtIso?: string;
+  finishedAtIso?: string;
+  elapsedMs?: number;
+  /** `fast` = functional proof with visual-frame diagnostics retained but non-blocking. */
+  playbackProfile?: "normal" | "fast";
   index: number;
   total: number;
   current: QaSuiteTestId | null;
-  completed: Array<{ id: QaSuiteTestId; pass: boolean; result?: unknown }>;
-  failure: { id: QaSuiteTestId; message: string; result?: unknown } | null;
+  /** Nested scope for a suite test such as `play-all-cjms` (shown in QA chrome). */
+  scope?: {
+    label: string;
+    current: number;
+    total: number;
+    items?: Array<{ label: string; outcome: "pending" | "pass" | "fail" }>;
+  };
+  completed: Array<{
+    id: QaSuiteTestId;
+    pass: boolean;
+    startedAtIso: string;
+    finishedAtIso: string;
+    elapsedMs: number;
+    result?: unknown;
+  }>;
+  failure: {
+    id: QaSuiteTestId;
+    message: string;
+    startedAtIso: string;
+    finishedAtIso: string;
+    elapsedMs: number;
+    result?: unknown;
+  } | null;
 };
 
 const STORAGE_KEY = "studioAutonomousQaSuiteV1";
@@ -53,6 +79,25 @@ let runToken = 0;
 
 function emptyStatus(): QaSuiteStatus {
   return { suiteId: "", phase: "idle", index: 0, total: 0, current: null, completed: [], failure: null };
+}
+
+function qaSuiteTouchpointLabel(id: QaSuiteTestId): string {
+  const labels: Record<QaSuiteTestId, string> = {
+    "mcp-sanity": "QA tool health",
+    "mcp-page-probe": "Current page contract",
+    "play-current-cjm": "Current CJM",
+    "play-all-cjms": "All CJMs",
+    "validate-all-cjms": "CJM structure",
+    "map-current-interactions": "Current page interactions",
+    "map-all-interactions": "Project interactions",
+    "qa-self-test": "QA self-test",
+    "control-room-traditional": "Control room",
+    "play-agentic": "Agentic CJM",
+    "play-traditional": "Traditional CJM",
+    "rec-traditional": "New recording",
+    "token-lean-matrix": "Token budget",
+  };
+  return labels[id];
 }
 
 function persist(): void {
@@ -80,13 +125,28 @@ export function startAutonomousQaSuite(
   status = {
     suiteId: options?.suiteId?.trim() || `qa-${Date.now().toString(36)}`,
     phase: "running",
+    startedAtIso: new Date().toISOString(),
+    playbackProfile: activeTests.some((test) => test.options?.playbackSpeed === "fast")
+      ? "fast"
+      : "normal",
     index: 0,
     total: activeTests.length,
     current: null,
     completed: [],
     failure: null,
+    scope: {
+      label: "Checks",
+      current: 0,
+      total: activeTests.length,
+      items: activeTests.map((test) => ({ label: qaSuiteTouchpointLabel(test.id), outcome: "pending" })),
+    },
   };
   const token = ++runToken;
+  const definition = getQaSuiteDefinition(status.suiteId);
+  window.__studioAgentTestingOverlay?.logStep({
+    label: `Suite started · ${definition?.label ?? status.suiteId} · ${status.playbackProfile === "fast" ? "fast functional proof; motion frames diagnostic-only" : "demo-speed functional and motion proof"}`,
+    outcome: "ok",
+  });
   publish();
   void runRemaining(token);
   return { accepted: true, status };
@@ -105,16 +165,37 @@ function passOf(result: unknown): boolean {
   return value.pass === true || value.ok === true;
 }
 
+function compactJourneyProof(result: unknown, journeyId?: unknown, pass?: unknown) {
+  const proof = result as {
+    journeyId?: unknown;
+    experience?: unknown;
+    peak?: unknown;
+    errors?: unknown;
+    failureStep?: unknown;
+    qaSuite?: { journeyId?: unknown; elapsedMs?: unknown; playbackSpeed?: unknown };
+  } | null;
+  return {
+    journeyId: String(journeyId ?? proof?.qaSuite?.journeyId ?? proof?.journeyId ?? ""),
+    pass: pass === undefined ? passOf(result) : pass === true,
+    experience: typeof proof?.experience === "string" ? proof.experience : undefined,
+    elapsedMs: typeof proof?.qaSuite?.elapsedMs === "number" ? proof.qaSuite.elapsedMs : undefined,
+    playbackSpeed: proof?.qaSuite?.playbackSpeed === "fast" ? "fast" : "normal",
+    peak: proof?.peak ?? undefined,
+    errors: Array.isArray(proof?.errors) ? proof.errors.slice(0, 3) : undefined,
+    failureStep: typeof proof?.failureStep === "string" ? proof.failureStep : undefined,
+  };
+}
+
 function compactCompletedResult(testId: QaSuiteTestId, result: unknown): unknown {
-  if (testId !== "play-all-cjms" || !result || typeof result !== "object") {
-    return undefined;
-  }
+  if (!result || typeof result !== "object") return undefined;
+  if (testId === "play-current-cjm") return compactJourneyProof(result);
+  if (testId !== "play-all-cjms") return undefined;
   const results = (result as { results?: unknown }).results;
   if (!Array.isArray(results)) return undefined;
   return {
     results: results.map((item) => {
-      const row = item as { journeyId?: unknown; pass?: unknown };
-      return { journeyId: String(row.journeyId ?? ""), pass: row.pass === true };
+      const row = item as { journeyId?: unknown; pass?: unknown; result?: unknown };
+      return compactJourneyProof(row.result, row.journeyId, row.pass);
     }),
   };
 }
@@ -127,8 +208,19 @@ function activeJourneyId(): string | null {
 }
 
 async function proveJourney(journeyId: string, playbackSpeed: "normal" | "fast" = "normal"): Promise<unknown> {
+  const startedAt = Date.now();
+  const finish = (result: unknown): unknown => {
+    const elapsedMs = Date.now() - startedAt;
+    if (result && typeof result === "object") {
+      return {
+        ...(result as Record<string, unknown>),
+        qaSuite: { journeyId, playbackSpeed, elapsedMs },
+      };
+    }
+    return { pass: false, journeyId, qaSuite: { journeyId, playbackSpeed, elapsedMs } };
+  };
   const runner = window.__studioRunFullPlayProve;
-  if (!runner) return { pass: false, journeyId, failureStep: "runner-unavailable" };
+  if (!runner) return finish({ pass: false, journeyId, failureStep: "runner-unavailable" });
   // A previous stopped suite may leave its takeover latch for the agent. This
   // run owns a fresh boundary; consume that stale signal before monitoring.
   window.__studioConsumePoSignal?.();
@@ -192,7 +284,7 @@ async function proveJourney(journeyId: string, playbackSpeed: "normal" | "fast" 
         journeyId,
       );
     }
-    return result;
+    return finish(result);
   } finally {
     if (timeoutId !== undefined) clearTimeout(timeoutId);
     if (signalPollId !== undefined) clearInterval(signalPollId);
@@ -202,10 +294,25 @@ async function proveJourney(journeyId: string, playbackSpeed: "normal" | "fast" 
 async function proveAllJourneys(playbackSpeed: "normal" | "fast" = "normal"): Promise<{ pass: boolean; results: Array<{ journeyId: string; pass: boolean; result: unknown }> }> {
   const journeys = window.__protoListJourneys?.() ?? [];
   const results: Array<{ journeyId: string; pass: boolean; result: unknown }> = [];
-  for (const journey of journeys) {
+  const labels = journeys.map((journey) => journey.label || journey.id);
+  window.__studioAgentTestingOverlay?.setTimeline?.(labels);
+  const items = labels.map((label) => ({ label, outcome: "pending" as const }));
+  const setScope = (current: number) => {
+    status = { ...status, scope: { label: "CJMs", current, total: journeys.length, items: [...items] } };
+    publish();
+  };
+  setScope(0);
+  for (const [index, journey] of journeys.entries()) {
+    // Count the on-air journey, not just completed ones: the panel must never
+    // appear stalled while an honest playback prove is under way.
+    setScope(index + 1);
     const result = await proveJourney(journey.id, playbackSpeed);
     const pass = passOf(result);
     results.push({ journeyId: journey.id, pass, result });
+    const label = labels[index];
+    items[index] = { label, outcome: pass ? "pass" : "fail" };
+    window.__studioAgentTestingOverlay?.markTimeline?.(label, pass ? "pass" : "fail");
+    setScope(index + 1);
     if (!pass) return { pass: false, results };
   }
   return { pass: journeys.length > 0, results };
@@ -262,6 +369,8 @@ async function runTest(test: QaSuiteTest): Promise<unknown> {
 async function runRemaining(token: number): Promise<void> {
   while (token === runToken && status.index < activeTests.length) {
     const test = activeTests[status.index];
+    const testStartedAt = Date.now();
+    const testStartedAtIso = new Date(testStartedAt).toISOString();
     status = { ...status, phase: "running", current: test.id, failure: null };
     window.__studioAgentTestingOverlay?.touch(`QA suite · ${status.index + 1}/${status.total} · ${test.id}`);
     publish();
@@ -271,7 +380,35 @@ async function runRemaining(token: number): Promise<void> {
       if (!passOf(result)) throw new Error("Test returned a non-passing result");
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      status = { ...status, phase: "paused-failure", current: test.id, failure: { id: test.id, message, result } };
+      const finishedAt = Date.now();
+      status = {
+        ...status,
+        scope: status.scope?.label === "CJMs"
+          ? status.scope
+          : status.scope
+          ? {
+              ...status.scope,
+              current: status.index,
+              items: status.scope.items?.map((item, index) =>
+                index === status.index ? { ...item, outcome: "fail" } : item
+              ),
+            }
+          : status.scope,
+        phase: "paused-failure",
+        current: test.id,
+        finishedAtIso: new Date(finishedAt).toISOString(),
+        elapsedMs: status.startedAtIso
+          ? finishedAt - new Date(status.startedAtIso).getTime()
+          : undefined,
+        failure: {
+          id: test.id,
+          message,
+          result,
+          startedAtIso: testStartedAtIso,
+          finishedAtIso: new Date(finishedAt).toISOString(),
+          elapsedMs: finishedAt - testStartedAt,
+        },
+      };
       window.__studioAgentTestingOverlay?.logStep({ label: `Suite stopped · ${test.id} · ${message}`, outcome: "fail" });
       window.__studioAgentTestingOverlay?.ringAlarm(`QA suite ${status.suiteId} stopped at ${test.id}: ${message}`);
       window.__studioAgentTestingOverlay?.appendFinale("fail", `${test.id} · ${message}`);
@@ -281,19 +418,55 @@ async function runRemaining(token: number): Promise<void> {
     status.completed.push({
       id: test.id,
       pass: true,
+      startedAtIso: testStartedAtIso,
+      finishedAtIso: new Date().toISOString(),
+      elapsedMs: Date.now() - testStartedAt,
       result: compactCompletedResult(test.id, result),
     });
-    status = { ...status, index: status.index + 1 };
+    status = {
+      ...status,
+      index: status.index + 1,
+      scope: status.scope?.label === "CJMs"
+        ? status.scope
+        : status.scope
+          ? {
+              ...status.scope,
+              current: status.index + 1,
+              items: status.scope.items?.map((item, index) =>
+                index === status.index ? { ...item, outcome: "pass" } : item
+              ),
+            }
+          : undefined,
+    };
     publish();
   }
   if (token !== runToken) return;
-  status = { ...status, phase: "passed", current: null, failure: null };
+  const finishedAt = Date.now();
+  status = {
+    ...status,
+    phase: "passed",
+    current: null,
+    failure: null,
+    finishedAtIso: new Date(finishedAt).toISOString(),
+    elapsedMs: status.startedAtIso
+      ? finishedAt - new Date(status.startedAtIso).getTime()
+      : undefined,
+  };
   const allCjmResult = status.completed.find((item) => item.id === "play-all-cjms")
     ?.result as { results?: Array<{ journeyId: string; pass: boolean }> } | undefined;
+  const currentCjmResult = status.completed.find((item) => item.id === "play-current-cjm")
+    ?.result as { journeyId?: string } | undefined;
   const cjmCount = allCjmResult?.results?.length ?? 0;
   const summary = cjmCount > 0
     ? `${cjmCount}/${cjmCount} CJMs passed`
+    : currentCjmResult?.journeyId
+      ? `CJM ${currentCjmResult.journeyId} passed`
     : `${status.total}/${status.total} autonomous tests passed`;
+  const duration = status.elapsedMs != null ? ` · ${(status.elapsedMs / 1000).toFixed(1)}s` : "";
+  window.__studioAgentTestingOverlay?.logStep({
+    label: `Suite passed · ${status.suiteId} · ${summary}${duration}`,
+    outcome: "ok",
+  });
   window.__studioAgentTestingOverlay?.appendFinale("pass", summary);
   publish();
 }
@@ -301,7 +474,12 @@ async function runRemaining(token: number): Promise<void> {
 export function installAutonomousQaSuiteApi(): () => void {
   try {
     const saved = JSON.parse(sessionStorage.getItem(STORAGE_KEY) ?? "null") as { status?: QaSuiteStatus; tests?: QaSuiteTest[] } | null;
-    if (saved?.status?.phase === "paused-failure" && Array.isArray(saved.tests)) {
+    // A finished suite is still evidence. Restore it so a deliberate page refresh
+    // cannot turn a green run into an "incomplete" Save Log download.
+    if (
+      (saved?.status?.phase === "paused-failure" || saved?.status?.phase === "passed")
+      && Array.isArray(saved.tests)
+    ) {
       status = saved.status;
       activeTests = saved.tests;
     }

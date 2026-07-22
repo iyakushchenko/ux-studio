@@ -1,6 +1,7 @@
 import {
+  cancelDemoCursorTravel,
   delay,
-  removeDemoCursor,
+  parkDemoCursorAtRest,
   settleDemoCursorAfterInteraction,
   simulateDemoPointerClick,
 } from "@/app/scenario/demoCursor";
@@ -12,6 +13,7 @@ import {
 } from "@/app/shell/playbackDiag";
 import {
   beginTypeInCursorGuard,
+  endTypeInCursorGuard,
   tickTypeInCursorGuard,
 } from "@/app/shell/typeInCursorGuard";
 import type { PlaybackScriptOptions } from "@/projects/playbackScriptOptions";
@@ -39,7 +41,14 @@ let homeScriptInFlight = false;
 export function abortSitePilotHomePlayback(): void {
   playbackAborted = true;
   if (homeScriptInFlight) {
-    removeDemoCursor({ immediate: true });
+    // `abortAll()` also runs during the normal Home → Chat handoff. Removing
+    // the element here made the robo-cursor disappear for one paint between
+    // screens. Stop any obsolete travel, but keep a visible settled cursor.
+    cancelDemoCursorTravel();
+    void parkDemoCursorAtRest({
+      animate: true,
+      reason: "site-pilot-home-handoff",
+    });
   }
   homeScriptInFlight = false;
 }
@@ -166,6 +175,7 @@ async function simulateSarahHomeTyping(text: string): Promise<boolean> {
       setReactTextareaValue(ta, "");
       syncHomeQueryHeight(ta);
       playbackDiagTypeInEnd(false, "aborted");
+      endTypeInCursorGuard();
       return false;
     }
     setReactTextareaValue(ta, text.slice(0, i + 1));
@@ -179,12 +189,14 @@ async function simulateSarahHomeTyping(text: string): Promise<boolean> {
     setReactTextareaValue(ta, "");
     syncHomeQueryHeight(ta);
     playbackDiagTypeInEnd(false, "aborted");
+    endTypeInCursorGuard();
     return false;
   }
 
   const sendBtn = getHomeSendButton();
   if (!sendBtn) {
     playbackDiagTypeInEnd(false, "send button missing");
+    endTypeInCursorGuard();
     return false;
   }
 
@@ -194,6 +206,7 @@ async function simulateSarahHomeTyping(text: string): Promise<boolean> {
     await settleDemoCursorAfterInteraction(sendBtn);
   }
   playbackDiagTypeInEnd(clicked, clicked ? "typed + send" : "send click failed");
+  endTypeInCursorGuard();
   return clicked;
 }
 

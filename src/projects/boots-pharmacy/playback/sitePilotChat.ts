@@ -1,9 +1,10 @@
 import {
+  cancelDemoCursorTravel,
   clearSimulatedClickRipples,
   delay,
   holdDemoCursorAtLastClick,
   isDemoCursorHeldAtLastClick,
-  removeDemoCursor as removeSharedDemoCursor,
+  parkDemoCursorAtRest,
   settleDemoCursorAfterInteraction,
   simulateDemoPointerClick,
 } from "@/app/scenario/demoCursor";
@@ -22,6 +23,7 @@ import {
 } from "@/app/shell/playbackDiag";
 import {
   beginTypeInCursorGuard,
+  endTypeInCursorGuard,
   tickTypeInCursorGuard,
 } from "@/app/shell/typeInCursorGuard";
 import { playbackScrollMonitor } from "@/app/shell/playbackScrollMonitor";
@@ -85,7 +87,13 @@ let preludeAborted = false;
 export function abortSitePilotChatPlaybackPrelude(): void {
   preludeAborted = true;
   if (!isDemoCursorHeldAtLastClick()) {
-    removeDemoCursorImmediate();
+    // A screen/beat handoff is not cursor teardown. Removing here left one
+    // painted frame with no cursor before the next director action recreated it.
+    cancelDemoCursorTravel();
+    void parkDemoCursorAtRest({
+      animate: true,
+      reason: "site-pilot-chat-handoff",
+    });
   }
   clearSimulatedClickRipples();
   endSitePilotChatThinking();
@@ -107,7 +115,14 @@ function getChatScrollEl(): HTMLElement | null {
   );
 }
 
+function isReactChatPlaybackSurface(): boolean {
+  return Boolean(document.querySelector('[data-studio-react-screen="chat"]'));
+}
+
 function scrollChatToBottom(instant = false): void {
+  // React Chat's ChatScreen owns camera moves.  Director prelude calls remain
+  // for the legacy DOM surface only; sharing them creates reverse scrolls.
+  if (isReactChatPlaybackSurface()) return;
   // Camera SSoT — target thinking/last frame; host-end only if no DOM target.
   scrollChatCamera(getChatScrollEl(), { instant });
 }
@@ -183,11 +198,6 @@ function findCtaInAgentFrame(
   );
 }
 
-/** Abort path only — hard-remove. Post-click uses holdDemoCursorAtLastClick. */
-function removeDemoCursorImmediate(): void {
-  removeSharedDemoCursor({ immediate: true });
-}
-
 async function simulateSarahCtaClick(button: HTMLElement): Promise<void> {
   if (preludeAborted) return;
   // Camera SSoT — scroll to CTA target (not anonymous bottom-pin + scroll:false).
@@ -196,6 +206,8 @@ async function simulateSarahCtaClick(button: HTMLElement): Promise<void> {
     scrollEl: scrollEl ?? undefined,
     align: "center",
     instant: true,
+    force: true,
+    skipHold: true,
   });
   await delay(80);
   playbackDiagTarget({
@@ -285,6 +297,7 @@ export async function simulateSarahTypingInComposer(text: string): Promise<void>
       setReactTextareaValue(ta, "");
       syncComposerHeight(ta);
       playbackDiagTypeInEnd(false, "aborted");
+      endTypeInCursorGuard();
       return;
     }
     setReactTextareaValue(ta, text.slice(0, i + 1));
@@ -303,6 +316,7 @@ export async function simulateSarahTypingInComposer(text: string): Promise<void>
     setReactTextareaValue(ta, "");
     syncComposerHeight(ta);
     playbackDiagTypeInEnd(false, "aborted");
+    endTypeInCursorGuard();
     return;
   }
 
@@ -310,6 +324,7 @@ export async function simulateSarahTypingInComposer(text: string): Promise<void>
   setReactTextareaValue(ta, "");
   syncComposerHeight(ta);
   playbackDiagTypeInEnd(true, "typed + send");
+  endTypeInCursorGuard();
 }
 
 export async function runSitePilotChatBeforeReveal(
@@ -350,6 +365,11 @@ export async function runSitePilotChatBeforeReveal(
     holdDemoCursorAtLastClick();
     const screen = getChatScreen();
     const scrollEl = getChatScrollEl();
+    // React Chat owns its own target-first camera in ChatScreen.  The legacy
+    // director pin calls below are only for the old DOM screen; running both
+    // makes the host reverse direction during thinking and can bury the dots
+    // under the fixed composer.
+    const isReactChat = isReactChatPlaybackSurface();
     // First agent reply (r0) MUST show thinking — never skip for frame 0/handoff.
     const anchorId = frameId.startsWith("r") || frameId.startsWith("q")
       ? frameId
@@ -367,9 +387,10 @@ export async function runSitePilotChatBeforeReveal(
     if (screen) {
       beginSitePilotChatPlaybackThinking(screen, frame, {
         anchorFrameId: anchorId,
+        scroll: !isReactChat,
       });
     }
-    if (scrollEl) {
+    if (scrollEl && !isReactChat) {
       logChatCameraTracker("thinking", { reason: "playback thinking pin" });
       scrollChatToBottom(true);
       // Keep latest frame in view while thinking grows (SSoT chat camera / host-end).
@@ -381,14 +402,16 @@ export async function runSitePilotChatBeforeReveal(
     await delay(SITE_PILOT_CHAT_PLAYBACK_THINK_MS);
     if (!preludeAborted) {
       await fadeOutSitePilotChatThinking();
-      // Target-based chat camera (reply frame / thinking) — not competing eased zoos.
-      scrollChatToBottom(true);
-      window.setTimeout(() => {
-        if (!preludeAborted) scrollChatToBottom(true);
-      }, 80);
-      window.setTimeout(() => {
-        if (!preludeAborted) scrollChatToBottom(true);
-      }, CHAT_PULL_UP_MS + 40);
+      if (!isReactChat) {
+        // Legacy screen only — React Chat's sole camera is ChatScreen.
+        scrollChatToBottom(true);
+        window.setTimeout(() => {
+          if (!preludeAborted) scrollChatToBottom(true);
+        }, 80);
+        window.setTimeout(() => {
+          if (!preludeAborted) scrollChatToBottom(true);
+        }, CHAT_PULL_UP_MS + 40);
+      }
       logChatReveal({
         kind: "agent",
         index: zeroIndex,

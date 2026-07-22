@@ -30,8 +30,6 @@ export {
   logAgentTestingStep,
   logAgentTestingHelper,
   ringAgentTestingAlarm,
-  flagAgentTestingCursorWeird,
-  flagAgentTestingScrollIssue,
   setAgentTestingTimeline,
   markAgentTestingTimeline,
   isAgentTestingOverlayDomPresent,

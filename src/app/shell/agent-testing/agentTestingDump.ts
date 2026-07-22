@@ -73,6 +73,26 @@ export type AgentTestingDump = {
   lastPlaybackDiagnostic?: Record<string, unknown> | null;
   /** Lean cause-before-symptom hints for agents (not spam). */
   priorityHints?: string[];
+  /** Autonomous suite proof, including test timing and CJM-level outcomes. */
+  suite?: {
+    suiteId: string;
+    phase: string;
+    playbackProfile?: "normal" | "fast";
+    startedAtIso?: string;
+    finishedAtIso?: string;
+    elapsedMs?: number;
+    index: number;
+    total: number;
+    current: string | null;
+    completed: Array<Record<string, unknown>>;
+    failure: Record<string, unknown> | null;
+  };
+  /** Explicit outcome, so an intentional post-proof pause is never presented as an issue. */
+  verdict?: {
+    status: "pass" | "fail" | "incomplete";
+    summary: string;
+    nextAction: string;
+  };
   /** Full chat-bubble-motion frame series (gate-open) + jump/chop summary. */
   chatBubbleMotion?: {
     samples: Array<Record<string, unknown>>;
@@ -95,6 +115,7 @@ export type AgentTestingDump = {
     cursor?: {
       events: number;
       parks: number;
+      hidden: number;
       lastParkReason: string | null;
     };
     click?: { ok: number; fail: number };
@@ -237,6 +258,7 @@ export function buildAgentTestingDump(options: {
   gateMode?: AgentTestingDumpGateMode;
   capturePaused?: boolean;
   agentPrompt?: string;
+  suite?: AgentTestingDump["suite"];
   /** Live MCP status — omit only in unit tests without overlay. */
   mcp?: AgentTestingDump["mcp"];
 }): AgentTestingDump {
@@ -281,6 +303,7 @@ export function buildAgentTestingDump(options: {
       cursor: {
         events: bundle.cursor.events,
         parks: bundle.cursor.parks,
+        hidden: bundle.cursor.hidden,
         lastParkReason: bundle.cursor.lastParkReason,
       },
       click: {
@@ -354,8 +377,9 @@ export function buildAgentTestingDump(options: {
   const gateMode = options.gateMode ?? "agent";
   const diagOpen =
     Boolean(getOpenDiagnosticFlash()) || Boolean(lastPlaybackDiagnostic);
+  const suitePassed = options.suite?.phase === "passed";
   const priorityHints = buildQaPriorityHints({
-    capturePaused: options.capturePaused,
+    capturePaused: suitePassed ? false : options.capturePaused,
     awaitingReply: options.mcp?.phase === "pending",
     poSignalCode: options.poSignal?.code ?? options.code ?? null,
     diagnosticOpen: diagOpen,
@@ -364,6 +388,24 @@ export function buildAgentTestingDump(options: {
         ?.message ?? null,
     mcpPhase: options.mcp?.phase ?? null,
   });
+  const finalFail = options.log.find((entry) => entry.outcome === "fail");
+  const verdict = suitePassed
+    ? {
+        status: "pass" as const,
+        summary: `QA suite ${options.suite?.suiteId ?? ""} passed${options.suite?.elapsedMs != null ? ` in ${(options.suite.elapsedMs / 1000).toFixed(1)}s` : ""}.`,
+        nextAction: "Retain this dump as the green compatibility baseline.",
+      }
+    : finalFail
+      ? {
+          status: "fail" as const,
+          summary: humanizeQaLogLabel(finalFail.label),
+          nextAction: "Inspect priorityHints and the failed suite row; re-run only the affected route after repair.",
+        }
+      : {
+          status: "incomplete" as const,
+          summary: "QA session was saved before a final verdict.",
+          nextAction: "Use the suite status and diagnostic tail to decide whether to resume or rerun.",
+        };
 
   return {
     atIso: new Date().toISOString(),
@@ -390,6 +432,8 @@ export function buildAgentTestingDump(options: {
     diagnosticFlashes,
     lastPlaybackDiagnostic,
     priorityHints,
+    suite: options.suite,
+    verdict,
     chatBubbleMotion,
     summaries,
     poSignal: options.poSignal ?? null,
@@ -491,7 +535,7 @@ export function buildAgentTestingEvidencePack(dumps = readAgentTestingDumps()) {
   const clusterMap = new Map<string, { code: string; count: number; sessions: string[]; cue: string }>();
   for (const session of sessions) {
     const dump = session.dump;
-    const failRow = dump.log.find((row) => row.outcome === "fail" || row.outcome === "soft-fail");
+    const failRow = dump.log.find((row) => row.outcome === "fail" || row.outcome === "notice");
     const code = dump.code || failRow?.kind || (session.verdict === "review" ? "EVIDENCE_PARITY_REVIEW" : "PASS");
     if (code === "PASS") continue;
     const cue = dump.priorityHints?.[0] || failRow?.displayLabel || session.issues[0] || "Inspect structured diagnostic.";

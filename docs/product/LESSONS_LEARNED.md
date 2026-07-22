@@ -68,7 +68,7 @@ For role-specific mandatory reading, return to
 
 - **Symptom / class:** Play finished 23/23 + play-end ok, but QA painted `Scroll jumped the wrong way (Δ-96)` and `Cursor eased to rest` as **fail**. Also “Chat camera: wait” on traditional PDP/book; `RecModalPharmacyPick` on login Sign in.
 - **Root cause:** `isBubbleChopOrJump` used `/JUMP/i` which matched reason tag `jump-to-start`. Intentional `scrollCameraToOrigin` (jump-to-start / resetPrototypeScroll) was labeled “wrong way”.
-- **Right fix:** Word-boundary JUMP; suppress intentional origin resets + play-end park-rest from soft-fail mirror; Camera: wait (not Chat); RecModalPick for login.
+- **Right fix:** Word-boundary JUMP; suppress intentional origin resets + play-end park-rest from notice mirror; Camera: wait (not Chat); RecModalPick for login.
 - **Gate:** Unit `playbackDiagQaBridge` — jump-to-start origin not mirrored; park-rest jump-to-start not fail.
 
 ### Long traditional REC Play FAIL at ~11/23 — login interstitial under Book Now (PO / Finn)

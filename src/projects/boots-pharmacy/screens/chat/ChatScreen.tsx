@@ -36,6 +36,7 @@ import {
   syncStudioScrollOverflowGutter,
 } from "@/app/scenario/studioScrollOverflow";
 import {
+  cancelPlaybackScroll,
   isPlaybackScrollAnimating,
   logChatCameraTracker,
   resolveChatCameraTarget,
@@ -885,6 +886,13 @@ export function ChatScreen({
       thinking.mode === "playback" || thinking.mode === "send";
     if (!scenarioReveal.active && !thinkingNeedsCamera) return;
 
+    // Dependency changes hand camera ownership from thinking → reply (or one
+    // revealed frame → the next). Stop the previous ease at its current pose
+    // before the two-paint pull-up cadence; otherwise that stale ease can keep
+    // travelling back toward its old target, then the new host-end ease yanks
+    // forward — the observed 95 → 0 → 313 reversal.
+    if (isPlaybackScrollAnimating()) cancelPlaybackScroll("replace");
+
     /**
      * Latest content under dock? Prefer thinking (held reply is
      * revealed=false) → CTA → last revealed — same as resolveChatCameraTarget.
@@ -945,22 +953,28 @@ export function ChatScreen({
         logChatCameraTracker("host-end", { reason: "settle co-travel" });
       }
 
-      // Same duration as pull-up — bubble/thinking lands already on target.
-      // coTravel: keep ease alive under pull-up lock (no abort→instant yank).
-      // Do NOT force past camera dwell / hold — only co-travel new content.
-      // The composer overlays the scroll viewport, so element `align: end`
-      // can legitimately resolve to 0 while the reply is still hidden under
-      // the dock. Co-travel to the thread extent; the latest target remains
-      // the visual tracker, while host-end is the correct camera coordinate.
-      scrollCameraToHostEnd(column, {
-        instant: false,
-        durationMs: STUDIO_ENTER_MS,
-        skipHold: true,
-        coTravel: true,
-        reason: target
-          ? "pull-up co-travel latest target"
-          : "pull-up co-travel host-end",
-      });
+      // Thinking has no final reply geometry below it, so host-end can leave
+      // it underneath the fixed composer. Frame the live thinking target at
+      // centre; replies retain host-end co-travel for the latest-thread rail.
+      if (thinkingNeedsCamera && target) {
+        void scrollCameraToTarget(target, {
+          scrollEl: column,
+          align: "center",
+          durationMs: STUDIO_ENTER_MS,
+          skipHold: true,
+          coTravel: true,
+        });
+      } else {
+        scrollCameraToHostEnd(column, {
+          instant: false,
+          durationMs: STUDIO_ENTER_MS,
+          skipHold: true,
+          coTravel: true,
+          reason: target
+            ? "pull-up co-travel latest target"
+            : "pull-up co-travel host-end",
+        });
+      }
       const delta = column.scrollTop - before;
       logChatRevealCameraTrace({
         tag: "pull-up-co-travel",
@@ -1023,12 +1037,17 @@ export function ChatScreen({
       }, STUDIO_ENTER_MS + 40);
     };
 
-    // Start on next frame so layout has the new bubble, then co-travel.
+    // `useChatPullUpLive` begins the bubble on its second paint frame (after
+    // reveal/layout). Match that exact cadence for the scroll camera: starting
+    // it one frame early makes the old thread jump upward before the new
+    // bubble begins its pull-up.
+    let raf2 = 0;
     const raf = requestAnimationFrame(() => {
-      runCoTravelCamera();
+      raf2 = requestAnimationFrame(runCoTravelCamera);
     });
     return () => {
       cancelAnimationFrame(raf);
+      cancelAnimationFrame(raf2);
       if (topUp != null) window.clearTimeout(topUp);
     };
   }, [

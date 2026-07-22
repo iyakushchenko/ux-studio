@@ -107,6 +107,33 @@ describe("buildAgentTestingDump lean-rich", () => {
     expect(dump.poSignal).toBeNull();
   });
 
+  it("preserves autonomous suite proof and does not mislabel its final pause", () => {
+    const dump = buildAgentTestingDump({
+      reason: "manual",
+      title: "AGENT TESTING",
+      elapsedMs: 15000,
+      gateMode: "agent",
+      capturePaused: true,
+      suite: {
+        suiteId: "all-cjms-fast",
+        phase: "passed",
+        playbackProfile: "fast",
+        startedAtIso: "2026-07-22T00:00:00.000Z",
+        finishedAtIso: "2026-07-22T00:00:15.000Z",
+        elapsedMs: 15000,
+        index: 1,
+        total: 1,
+        current: null,
+        completed: [{ id: "play-all-cjms", pass: true }],
+        failure: null,
+      },
+      log: [],
+    });
+    expect(dump.verdict).toMatchObject({ status: "pass", nextAction: expect.stringContaining("green") });
+    expect(dump.priorityHints).toEqual([]);
+    expect(dump.suite).toMatchObject({ suiteId: "all-cjms-fast", playbackProfile: "fast" });
+  });
+
   it("names Save Log files by session kind (not reason=manual)", () => {
     expect(
       buildAgentTestingDumpFilename({

@@ -64,7 +64,7 @@ describe("qaDiagGate", () => {
       outcome: "fail",
       action: fullMessage,
     });
-    appendQaDiagRing({ kind: "system", label: "Attention", outcome: "soft-fail" });
+    appendQaDiagRing({ kind: "system", label: "Attention", outcome: "notice" });
 
     const gate = sessionStorage.getItem("studioQaDiagGate");
     const ring = sessionStorage.getItem("studioQaDiagRing");
@@ -76,7 +76,7 @@ describe("qaDiagGate", () => {
     expect(hydrated.capturePaused).toBe(true);
     expect(hydrated.finaleSealed).toBe(true);
     expect(hydrated.ring.map((event) => event.outcome)).toContain("fail");
-    expect(hydrated.ring.map((event) => event.outcome)).toContain("soft-fail");
+    expect(hydrated.ring.map((event) => event.outcome)).toContain("notice");
     expect(hydrated.ring.find((event) => event.kind === "alarm")?.action).toBe(fullMessage);
   });
 

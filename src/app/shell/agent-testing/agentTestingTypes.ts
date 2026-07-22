@@ -5,11 +5,11 @@ export type AgentTestingOverlayResult = "pass" | "fail" | "neutral";
 /**
  * Row outcome — drives log + timeline colors (industry norms):
  * - fail = red (hard FAIL / chop / script-timeout / Play-stopping alarms)
- * - soft-fail = amber (attention, not fatal)
+ * - notice = amber (attention, not fatal)
  * - ok = neutral info (routine milestones)
  * - pass = green (explicit PASS / prove complete only — sparingly)
  */
-export type AgentTestingStepOutcome = "ok" | "soft-fail" | "fail" | "pass";
+export type AgentTestingStepOutcome = "ok" | "notice" | "fail" | "pass";
 
 export type AgentTestingLogKind =
   | "info"
