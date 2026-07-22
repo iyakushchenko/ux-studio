@@ -7,7 +7,10 @@ import {
   setSelectedAppointmentId,
   type Appointment,
 } from "@/projects/boots-pharmacy/data/appointments";
-import { MaNavigationPanel } from "@/projects/boots-pharmacy/chrome/MaNavigationPanel";
+import {
+  MA_NAV_LINKED_LABELS,
+  MaNavigationPanel,
+} from "@/projects/boots-pharmacy/chrome/MaNavigationPanel";
 import { ButtonPrimary } from "@/uxds/components";
 import {
   APPOINTMENT_HISTORY_HELP_LINK,
@@ -300,6 +303,10 @@ export function AppointmentHistoryScreen({
               profileName={APPOINTMENT_HISTORY_PROFILE_NAME}
               navItems={APPOINTMENT_HISTORY_NAV_ITEMS}
               activeItem={APPOINTMENT_HISTORY_NAV_ACTIVE}
+              linkedLabels={MA_NAV_LINKED_LABELS}
+              onNavigate={() => {
+                /* Already on Appointment History — no-op self-nav. */
+              }}
             />
 
             <div className="appointment-history__content" data-name="Content">

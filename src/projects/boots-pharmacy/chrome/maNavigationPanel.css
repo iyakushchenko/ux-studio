@@ -60,7 +60,35 @@
 .ma-navigation-panel__menu-item--active {
   padding: 8px 16px;
   font-weight: 600;
-  background: #f5f5f5;
+  background: var(--uxds-surface-subtle, #f5f5f5);
+}
+
+/* Interactive items — only rendered as <button> when a real page target
+   exists (MA_NAV_LINKED_LABELS). Rest/hover/focus/active per DS text-link
+   family tokens, not invented colors. */
+button.ma-navigation-panel__menu-item {
+  display: block;
+  width: 100%;
+  border: none;
+  background: none;
+  font: inherit;
+  text-align: left;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+button.ma-navigation-panel__menu-item:hover {
+  background: var(--uxds-filter-chip-surface-hover, #f0f5f4);
+}
+
+button.ma-navigation-panel__menu-item:focus-visible {
+  outline: 2px solid var(--uxds-text-link-link, #305854);
+  outline-offset: 2px;
+}
+
+button.ma-navigation-panel__menu-item:active {
+  background: var(--uxds-surface-subtle, #f5f5f5);
 }
 
 .ma-navigation-panel__service {

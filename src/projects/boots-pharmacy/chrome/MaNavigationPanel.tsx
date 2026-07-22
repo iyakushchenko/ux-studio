@@ -5,13 +5,26 @@ import "./maNavigationPanel.css";
  * (Figma: myqzp3KRc1pxKDOv8RfTsl, node 12409:640716).
  * Used by appointment-history + appointment-details; keep in sync with
  * that Figma node rather than re-inlining per screen.
+ *
+ * Items only become real interactive links when their target page
+ * exists in this project (no dead/invented hrefs) — see
+ * `MA_NAV_LINKED_LABELS`. Non-linked items stay plain text, same as
+ * before. "Current page" can be the exact screen OR its logical
+ * parent section (e.g. Appointment Details highlights "Appointment
+ * history") — callers pass that via `activeItem`.
  */
 export type MaNavigationPanelProps = {
   helloLabel: string;
   profileName: string;
   navItems: readonly string[];
   activeItem: string;
+  /** Labels with a real target page in this project — become clickable. */
+  linkedLabels?: readonly string[];
+  onNavigate?: (label: string) => void;
 };
+
+/** Labels that map to a real screen today — keep in sync as pages ship. */
+export const MA_NAV_LINKED_LABELS = ["Appointment history"] as const;
 
 function AccountAvatar() {
   return (
@@ -37,6 +50,8 @@ export function MaNavigationPanel({
   profileName,
   navItems,
   activeItem,
+  linkedLabels,
+  onNavigate,
 }: MaNavigationPanelProps) {
   return (
     <aside className="ma-navigation-panel" data-name="module.ma.navigation">
@@ -57,14 +72,31 @@ export function MaNavigationPanel({
       >
         {navItems.map((label) => {
           const active = label === activeItem;
+          const linked = linkedLabels?.includes(label) ?? false;
+          const className = active
+            ? "ma-navigation-panel__menu-item ma-navigation-panel__menu-item--active"
+            : "ma-navigation-panel__menu-item";
+
+          if (linked) {
+            return (
+              <button
+                key={label}
+                type="button"
+                className={className}
+                data-name="component.ma.navigation.menu.item"
+                data-studio-ma-nav-link="true"
+                aria-current={active ? "page" : undefined}
+                onClick={() => onNavigate?.(label)}
+              >
+                {label}
+              </button>
+            );
+          }
+
           return (
             <div
               key={label}
-              className={
-                active
-                  ? "ma-navigation-panel__menu-item ma-navigation-panel__menu-item--active"
-                  : "ma-navigation-panel__menu-item"
-              }
+              className={className}
               data-name="component.ma.navigation.menu.item"
               aria-current={active ? "page" : undefined}
             >

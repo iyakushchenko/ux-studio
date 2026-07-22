@@ -13,7 +13,10 @@ import {
   computeOrderPricing,
   formatGbp,
 } from "@/projects/boots-pharmacy/data/orderPricing";
-import { MaNavigationPanel } from "@/projects/boots-pharmacy/chrome/MaNavigationPanel";
+import {
+  MA_NAV_LINKED_LABELS,
+  MaNavigationPanel,
+} from "@/projects/boots-pharmacy/chrome/MaNavigationPanel";
 import {
   Accordion,
   AccordionChevron,
@@ -403,6 +406,8 @@ export function AppointmentDetailsScreen({
               profileName={APPOINTMENT_DETAILS_PROFILE_NAME}
               navItems={APPOINTMENT_DETAILS_NAV_ITEMS}
               activeItem={APPOINTMENT_DETAILS_NAV_ACTIVE}
+              linkedLabels={MA_NAV_LINKED_LABELS}
+              onNavigate={onGoHistory}
             />
 
             <div
