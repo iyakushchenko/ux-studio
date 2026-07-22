@@ -77,10 +77,25 @@ describe("recording metadata", () => {
     );
     const legacy = session();
     legacy.metadata = { recordedFrom: "ui" };
-    expect(buildCjmOptionMetadata(journey, legacy).issues).toEqual(
+    const pendingLegacy = buildCjmOptionMetadata(journey, legacy);
+    expect(pendingLegacy.playable).toBe(true);
+    expect(pendingLegacy.issues).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ code: "legacy-recording-contract" }),
+        expect.objectContaining({
+          code: "legacy-recording-contract",
+          severity: "warning",
+        }),
       ])
+    );
+    legacy.metadata.compatibilityProof = {
+      playbackContract: 1,
+      studioVersion: getStudioRelease().version,
+      provedAt: "2026-07-21T20:00:00.000Z",
+    };
+    expect(buildCjmOptionMetadata(journey, legacy).issues).toEqual([]);
+    legacy.metadata.compatibilityProof.studioVersion = "0.0.0";
+    expect(buildCjmOptionMetadata(journey, legacy).issues).toContainEqual(
+      expect.objectContaining({ code: "legacy-recording-contract" })
     );
   });
 

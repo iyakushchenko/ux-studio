@@ -1,6 +1,7 @@
 import type { JourneyBeat, JourneyDefinition } from "@/app/orchestra/types";
 
 export const TRADITIONAL_LOGIN_BEAT_ID = "traditional-login";
+export const TRADITIONAL_LOCATION_BEAT_ID = "choose-location";
 
 /** Logged-in Sarah skips the login beat in timeline + playback. */
 export function shouldSkipTraditionalLoginBeat(
@@ -8,6 +9,16 @@ export function shouldSkipTraditionalLoginBeat(
   headerLoggedIn: boolean
 ): boolean {
   return headerLoggedIn && beat?.id === TRADITIONAL_LOGIN_BEAT_ID;
+}
+
+/** Sarah's account route omits prerequisites already satisfied by live account state. */
+export function shouldSkipTraditionalAccountBeat(
+  beat: JourneyBeat | undefined,
+  context: { headerLoggedIn: boolean; hasSavedLocation: boolean }
+): boolean {
+  if (!context.headerLoggedIn) return false;
+  if (beat?.id === TRADITIONAL_LOGIN_BEAT_ID) return true;
+  return context.hasSavedLocation && beat?.id === TRADITIONAL_LOCATION_BEAT_ID;
 }
 
 /** After confirmation — open appointments list, then first card details. */
@@ -55,7 +66,7 @@ const TRADITIONAL_BOOKING_BEATS: JourneyDefinition["beats"] = [
     tabScript: "login-sign-in",
   },
   {
-    id: "choose-location",
+    id: TRADITIONAL_LOCATION_BEAT_ID,
     label: "Choose location",
     kind: "tab-landing",
     protoTab: 5,

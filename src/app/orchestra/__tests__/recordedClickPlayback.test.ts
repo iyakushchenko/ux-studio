@@ -4,6 +4,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/app/scenario/demoCursor", () => ({
+  isClickableTarget: vi.fn(() => true),
   simulateDemoPointerClick: vi.fn(async () => true),
 }));
 

@@ -1,5 +1,10 @@
 # PLAYBACK_DIAG — console contract
 
+Runtime alignment verifies the active beat, expected tab, address URL, rendered
+screen, semantic touchpoint, and filtered playlist counter. Sampling is deferred
+by one animation frame and cancelled when a scripted handoff changes the beat or
+touchpoint, preventing transitional false alarms without masking stable drift.
+
 **Status:** Locked (PO 2026-07-19) · Expanded beat/cursor/scroll schema (PO 2026-07-20)  
 **Owners:** Finn (wire) · Quinn (prove) · Ben (MCP helpers) · Arch (Auto-Rule)  
 **Code:** `src/app/shell/playbackDiag.ts`  

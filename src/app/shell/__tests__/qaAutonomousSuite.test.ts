@@ -1,8 +1,8 @@
 /** @vitest-environment happy-dom */
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { QA_SUITE_COLLECTION, installAutonomousQaSuiteApi } from "@/app/shell/qaAutonomousSuite";
+import { QA_SUITE_COLLECTION, installAutonomousQaSuiteApi, validateAllJourneys } from "@/app/shell/qaAutonomousSuite";
 
-const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
+const settle = () => new Promise((resolve) => setTimeout(resolve, 30));
 
 describe("autonomous QA suite", () => {
   beforeEach(() => {
@@ -11,6 +11,10 @@ describe("autonomous QA suite", () => {
       touch: vi.fn(), logStep: vi.fn(), ringAlarm: vi.fn(), appendFinale: vi.fn(),
       ackDiagnostic: vi.fn(), consumePoSignal: vi.fn(),
     } as unknown as typeof window.__studioAgentTestingOverlay;
+    window.__studioConsumePoSignal = vi.fn(() => {
+      window.__studioAgentTestingTakeover = null;
+      return null;
+    });
     installAutonomousQaSuiteApi();
     expect(window.__studioRunQaSuiteById).toBeTypeOf("function");
     expect(window.__studioRunGlobalCompatibilityTests).toBeTypeOf("function");
@@ -37,12 +41,39 @@ describe("autonomous QA suite", () => {
     expect(window.__studioRunMcpSanityCheck).toHaveBeenCalledTimes(2);
   });
 
+  it("promotes a nested playback alarm to terminal suite failure", async () => {
+    window.__protoListJourneys = () => [
+      { id: "alarm-journey", label: "Alarm", beatCount: 1, beatIds: ["one"] },
+    ];
+    let resolveRunner!: (value: { pass: false }) => void;
+    window.__studioRunFullPlayProve = vi.fn(() => new Promise((resolve) => {
+      resolveRunner = resolve;
+    }));
+    window.__protoAbortAll = vi.fn(() => resolveRunner({ pass: false }));
+    window.__studioStartQaSuite?.(["play-all-cjms"]);
+    setTimeout(() => {
+      window.__studioAgentTestingTakeover = {
+        type: "alarm",
+        code: "ALARM_SEQUENCE_MISMATCH",
+        note: "sequence mismatch",
+      };
+    }, 10);
+    await new Promise((resolve) => setTimeout(resolve, 130));
+    expect(window.__studioGetQaSuiteStatus?.()).toMatchObject({
+      phase: "paused-failure",
+      current: "play-all-cjms",
+    });
+    window.__studioAgentTestingTakeover = null;
+  });
+
   it("keeps the visible collection project-agnostic", () => {
     expect(QA_SUITE_COLLECTION.map((suite) => suite.label)).toEqual([
       "QA tool health",
       "Test current page",
       "Map current page interactions",
       "Map all project interactions",
+      "Fast test current CJM",
+      "Fast test all CJMs",
       "Test current CJM",
       "Test all CJMs",
       "Current project core",
@@ -60,5 +91,47 @@ describe("autonomous QA suite", () => {
     await settle();
     expect(window.__studioGetQaSuiteStatus?.().phase).toBe("paused-failure");
     expect(window.__studioRunFullPlayProve).toHaveBeenCalledTimes(2);
+  });
+
+  it("retains every all-CJM result and reports the real journey count", async () => {
+    window.__protoListJourneys = () => Array.from({ length: 13 }, (_, index) => ({
+      id: `journey-${index + 1}`,
+      label: `Journey ${index + 1}`,
+      beatCount: 1,
+      beatIds: [`beat-${index + 1}`],
+    }));
+    window.__studioRunFullPlayProve = vi.fn(async () => ({ pass: true }));
+    window.__studioStartQaSuite?.(["play-all-cjms"]);
+    await settle();
+    const suiteStatus = window.__studioGetQaSuiteStatus?.();
+    expect(suiteStatus?.phase).toBe("passed");
+    expect(
+      (suiteStatus?.completed[0]?.result as { results?: unknown[] }).results
+    ).toHaveLength(13);
+    expect(window.__studioAgentTestingOverlay?.appendFinale).toHaveBeenLastCalledWith(
+      "pass",
+      "13/13 CJMs passed"
+    );
+  });
+
+  it("validates every CJM structurally without playing animations", () => {
+    window.__protoListJourneys = () => [
+      { id: "valid", label: "Valid", beatCount: 2, beatIds: ["one", "two"] },
+      { id: "broken", label: "Broken", beatCount: 2, beatIds: ["same", "same"] },
+    ];
+    expect(validateAllJourneys()).toEqual({
+      pass: false,
+      results: [
+        { journeyId: "valid", pass: true, issues: [] },
+        { journeyId: "broken", pass: false, issues: ["duplicate-beat-id"] },
+      ],
+    });
+  });
+
+  it("keeps Current project core fast and reserves playback for Test all CJMs", () => {
+    expect(QA_SUITE_COLLECTION.find((suite) => suite.id === "project-core")?.tests)
+      .toContainEqual({ id: "validate-all-cjms" });
+    expect(QA_SUITE_COLLECTION.find((suite) => suite.id === "project-core")?.tests)
+      .not.toContainEqual({ id: "play-all-cjms" });
   });
 });

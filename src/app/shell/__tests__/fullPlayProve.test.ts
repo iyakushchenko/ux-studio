@@ -96,11 +96,11 @@ describe("runFullPlayProve (universal)", () => {
     });
   });
 
-  it("PASS traditional preset via journeyId; login-skip peak ok", async () => {
+  it("PASS traditional preset via journeyId; filtered prerequisite peak ok", async () => {
     vi.mocked(runPlayJourneyToStartSmoke).mockResolvedValue({
       pass: true,
-      peakVisible: 12,
-      peakCounter: "STEPS: 12 / 12",
+      peakVisible: 10,
+      peakCounter: "STEPS: 10 / 10",
       assert: {
         pass: true,
         beatId: "traditional-plp",
@@ -116,11 +116,29 @@ describe("runFullPlayProve (universal)", () => {
 
     expect(result.pass).toBe(true);
     expect(result.experience).toBe("traditional");
-    expect(result.peak.visible).toBe(12);
+    expect(result.peak.visible).toBe(10);
     expect(vi.mocked(runPlayJourneyToStartSmoke).mock.calls[0]?.[0]).toMatchObject({
       orchestraMode: "traditional-cjm",
       startScreenId: "plp",
     });
+  });
+
+  it("FAILS an implausibly short completed traditional route", async () => {
+    vi.mocked(runPlayJourneyToStartSmoke).mockResolvedValue({
+      pass: true,
+      peakVisible: 1,
+      peakCounter: "STEPS: 1 / 1",
+      assert: { pass: true, beatId: "traditional-plp", screenId: "plp" },
+    });
+
+    const result = await runFullPlayProve({
+      journeyId: "traditional-cjm",
+      delay: async () => undefined,
+      preArmMs: 0,
+    });
+
+    expect(result.pass).toBe(false);
+    expect(result.errors).toContain("peak-not-13: got 1/1 (STEPS: 1 / 1)");
   });
 
   it("rec-* asserts that journey playlist — not built-in traditional 13", async () => {

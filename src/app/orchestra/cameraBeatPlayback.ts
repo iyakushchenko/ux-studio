@@ -12,6 +12,7 @@ import {
   setCameraBeatDwellActive,
 } from "@/app/scenario/playbackScroll";
 import { playbackDiagLog, playbackDiagScroll } from "@/app/shell/playbackDiag";
+import { playbackMs } from "@/app/shell/playbackTiming";
 
 const DEFAULT_CAMERA_DWELL_MS = 1200;
 
@@ -112,7 +113,7 @@ export async function playCameraBeat(
   } else if (dwellMs > 0) {
     setCameraBeatDwellActive(true);
     try {
-      await delay(dwellMs);
+      await delay(playbackMs(dwellMs));
     } finally {
       setCameraBeatDwellActive(false);
     }

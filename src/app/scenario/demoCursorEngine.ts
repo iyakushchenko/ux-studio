@@ -452,6 +452,8 @@ export function resolvePostInteractionPark(
 
 export const EARLY_HAND_INTERACTIVE_SELECTORS: readonly string[] = [
 
+  "[data-studio-action]",
+
   "button",
 
   "a[href]",
@@ -494,6 +496,38 @@ export const EARLY_HAND_INTERACTIVE_SELECTORS: readonly string[] = [
 
 ];
 
+/** Native-equivalent actionability guard shared by hover and click paths. */
+export function isDisabledDemoInteractionTarget(
+  el: Element | null | undefined
+): boolean {
+  if (!el || !(el instanceof Element)) return true;
+  let node: Element | null = el;
+  while (node) {
+    if (
+      node.hasAttribute("inert") ||
+      node.getAttribute("aria-disabled") === "true" ||
+      (node instanceof HTMLButtonElement && node.disabled) ||
+      (node instanceof HTMLInputElement && node.disabled) ||
+      (node instanceof HTMLSelectElement && node.disabled) ||
+      (node instanceof HTMLTextAreaElement && node.disabled)
+    ) {
+      return true;
+    }
+    // The playback shield may deliberately disable OS pointer events on a
+    // concept ancestor while the robo-cursor remains the authorized driver.
+    // Only the actionable element's own pointer-events state blocks it.
+    if (
+      node === el &&
+      node instanceof HTMLElement &&
+      node.style.pointerEvents === "none"
+    ) {
+      return true;
+    }
+    node = node.parentElement;
+  }
+  return false;
+}
+
 
 
 /**
@@ -509,6 +543,8 @@ export function isEarlyHandInteractiveTarget(
 ): boolean {
 
   if (!el || !(el instanceof Element)) return false;
+
+  if (isDisabledDemoInteractionTarget(el)) return false;
 
   let node: Element | null = el;
 

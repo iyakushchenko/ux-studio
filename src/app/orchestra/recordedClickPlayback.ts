@@ -2,7 +2,10 @@ import {
   resolveUsableDemoClickTarget,
 } from "@/app/recording/recordingCapture";
 import type { JourneyBeatRecordedClick } from "@/app/orchestra/types";
-import { simulateDemoPointerClick } from "@/app/scenario/demoCursor";
+import {
+  isClickableTarget,
+  simulateDemoPointerClick,
+} from "@/app/scenario/demoCursor";
 import { scrollCameraToTarget } from "@/app/scenario/playbackScroll";
 import {
   isBlockingModalOpen,
@@ -20,6 +23,7 @@ import {
   drainLoginModalIfOpen,
   isLoginModalOpenInDom,
 } from "@/app/recording/recModalDrain";
+import { playbackMs } from "@/app/shell/playbackTiming";
 
 function resolveRecordedClickTarget(
   click: JourneyBeatRecordedClick
@@ -30,6 +34,27 @@ function resolveRecordedClickTarget(
       resolvePlaybackSelectorChain(click.selectorChain, modal),
   });
   return resolveUsableDemoClickTarget(modalResolved);
+}
+
+/** React/filter updates may replace a matching node between resolve and click. */
+async function waitForStableRecordedClickTarget(
+  click: JourneyBeatRecordedClick
+): Promise<HTMLElement | null> {
+  let previous: HTMLElement | null = null;
+  let stableSamples = 0;
+  for (let attempt = 0; attempt < 40; attempt += 1) {
+    const candidate = resolveRecordedClickTarget(click);
+    if (candidate && isClickableTarget(candidate)) {
+      stableSamples = candidate === previous ? stableSamples + 1 : 1;
+      previous = candidate;
+      if (stableSamples >= 3) return candidate;
+    } else {
+      previous = null;
+      stableSamples = 0;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+  return null;
 }
 
 /**
@@ -57,7 +82,7 @@ export async function playRecordedClick(
     } catch {
       /* hang-safe */
     }
-    await new Promise((r) => setTimeout(r, 350));
+    await new Promise((r) => setTimeout(r, playbackMs(350)));
   } else if (click.modalId) {
     // Fallback: journey runtime may not be wired — try window bridge.
     try {
@@ -69,7 +94,7 @@ export async function playRecordedClick(
     } catch {
       /* hang-safe */
     }
-    await new Promise((r) => setTimeout(r, 350));
+    await new Promise((r) => setTimeout(r, playbackMs(350)));
   }
 
   const cameraChain =
@@ -86,7 +111,7 @@ export async function playRecordedClick(
     }
   }
 
-  let target = resolveRecordedClickTarget(click);
+  let target = await waitForStableRecordedClickTarget(click);
   if (!target && isLoginModalOpenInDom()) {
     const drain = await drainLoginModalIfOpen();
     if (!drain.ok) {
@@ -102,7 +127,7 @@ export async function playRecordedClick(
       );
     }
     if (drain.drained) {
-      target = resolveRecordedClickTarget(click);
+      target = await waitForStableRecordedClickTarget(click);
     }
   }
 
@@ -124,14 +149,23 @@ export async function playRecordedClick(
     );
   }
 
-  const clicked = await simulateDemoPointerClick(target, { scroll: true });
-  if (!clicked) {
-    return fromBool(false, "recorded-click");
+  let clicked = false;
+  for (let attempt = 0; attempt < 3 && !clicked; attempt += 1) {
+    // The cursor flight itself gives React time to replace a result tile. A
+    // failed simulation dispatches no click, so safely re-resolve the semantic
+    // target and retry instead of stalling on the detached node.
+    const liveTarget =
+      attempt === 0 && isClickableTarget(target)
+        ? target
+        : await waitForStableRecordedClickTarget(click);
+    if (!liveTarget) break;
+    clicked = await simulateDemoPointerClick(liveTarget, { scroll: true });
   }
+  if (!clicked) return fromBool(false, "recorded-click");
 
   // PDP Book Now (logged out) opens login — sign in so later beats can proceed.
   // Brief wait so React can paint the modal before we look for it.
-  await new Promise((r) => setTimeout(r, 200));
+  await new Promise((r) => setTimeout(r, playbackMs(200)));
   if (isLoginModalOpenInDom()) {
     const drain = await drainLoginModalIfOpen();
     if (!drain.ok) {

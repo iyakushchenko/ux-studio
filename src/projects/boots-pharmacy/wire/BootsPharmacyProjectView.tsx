@@ -40,6 +40,9 @@ import {
   syncSitePilotChatThinkingHint,
 } from "@/projects/boots-pharmacy/dom/sitePilotChatThinking";
 import { resolveAvailStoreId, getDemoChosenLocation } from "@/projects/boots-pharmacy/data/availStores";
+import { hasUsableSavedLocation } from "@/projects/boots-pharmacy/data/savedLocations";
+import { formatBookingDateHeading } from "@/projects/boots-pharmacy/data/bookingDateLabel";
+import { resolvePrerequisiteRoute } from "@/app/journey/prerequisiteRoute";
 import { resolveAvailIntent } from "@/projects/boots-pharmacy/wire/resolveAvailIntent";
 import iconArrowsSecondary from "@/assets/avail/arrows-secondary.svg";
 import type { VaccineItem } from "@/projects/boots-pharmacy/data/vaccineList";
@@ -687,37 +690,6 @@ const DEFAULT_UI_STATE = {
   chosenLocation: null as ChosenLocation | null,
 };
 
-const BOOKING_WEEKDAYS = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
-
-function bookingDayOrdinal(n: number): string {
-  const v = n % 100;
-  if (v >= 11 && v <= 13) return `${n}th`;
-  switch (n % 10) {
-    case 1:
-      return `${n}st`;
-    case 2:
-      return `${n}nd`;
-    case 3:
-      return `${n}rd`;
-    default:
-      return `${n}th`;
-  }
-}
-
-function formatBookingDateHeading(month: "June" | "July", day: number): string {
-  const monthIndex = month === "July" ? 6 : 5;
-  const d = new Date(2026, monthIndex, day);
-  return `${BOOKING_WEEKDAYS[d.getDay()]}, ${bookingDayOrdinal(day)} ${month} 2026`;
-}
-
 function formatBookingDateTimeLabel(slot: ChosenBookingSlot): string {
   return `${formatBookingDateHeading(slot.month, slot.day)}, ${slot.time}`;
 }
@@ -1041,10 +1013,34 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     setHubOpen(false);
     setCurrent(0);
   }, [setCurrent, setHubOpen]);
+  const continueBooking = useCallback(
+    (authenticated = isStudioLoggedIn()) => {
+      const route = resolvePrerequisiteRoute({
+        authenticated,
+        prerequisiteUsable: hasUsableSavedLocation(),
+        destinations: {
+          authenticationRequired: "login",
+          prerequisiteRequired: "location",
+          ready: "booking",
+        } as const,
+      });
+      if (route.destination === "login") {
+        openLoginPopup("signin");
+        return;
+      }
+      if (route.destination === "location") {
+        setCurrent(INDEX_BOOK_STEP1);
+        return;
+      }
+      setChosenLocation(getDemoChosenLocation());
+      setCurrent(INDEX_BOOK_STEP2);
+    },
+    [INDEX_BOOK_STEP1, INDEX_BOOK_STEP2, openLoginPopup, setCurrent]
+  );
   const onQuickViewBookNow = useCallback(() => {
     closeQuickView();
-    setCurrent(INDEX_BOOK_STEP1);
-  }, [setCurrent, INDEX_BOOK_STEP1, closeQuickView]);
+    continueBooking();
+  }, [closeQuickView, continueBooking]);
   const onQuickViewViewDetails = useCallback(() => {
     closeQuickView();
     setCurrent(3);
@@ -1641,11 +1637,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       includeBoosterDose,
       onToggleBooster: () => setIncludeBoosterDose((prev) => !prev),
       onBookNow: () => {
-        if (!isStudioLoggedIn()) {
-          openLoginPopup("signin");
-          return;
-        }
-        setCurrent(INDEX_BOOK_STEP1);
+        continueBooking();
       },
       onCheckAvailability: () => openAvailabilityTool(AVAIL_INTENT.browse),
       onGoPlp: () => goRef.current(INDEX_PLP),
@@ -1663,7 +1655,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     loggedInFlag,
     INDEX_HOME,
     INDEX_PLP,
-    INDEX_BOOK_STEP1,
+    continueBooking,
     openAvailabilityTool,
     openLoginPopup,
   ]);
@@ -2372,11 +2364,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     };
     const goBookStep1 = (e: Event) => {
       stop(e);
-      if (!isStudioLoggedIn()) {
-        openLoginPopup("signin");
-        return;
-      }
-      setCurrent(INDEX_BOOK_STEP1);
+      continueBooking();
     };
 
     const allBtns = Array.from(
@@ -2418,7 +2406,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       bookBtns.forEach((btn) => btn.removeEventListener("click", goBookStep1));
       screen.removeEventListener("keydown", onKey);
     };
-  }, [current, loggedInFlag]);
+  }, [current, continueBooking, loggedInFlag, openAvailabilityTool]);
 
   // PDP (child 8) — "Quick Sign In" / "Create Boots Account" links → login popup
   useEffect(() => {
@@ -4818,6 +4806,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
         onSignIn={() => {
           setStudioLoggedIn(true);
           setLoggedInFlag(true);
+          if (SCREENS[current]?.childIndex === 8) continueBooking(true);
           if (SCREENS[current]?.childIndex === 11) {
             syncAgenticHomeHeading(true);
           }

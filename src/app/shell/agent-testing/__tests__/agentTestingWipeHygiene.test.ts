@@ -31,6 +31,7 @@ import {
   isAwaitingUserReply,
   resetQaSessionForTests,
   setAwaitingUserReply,
+  shouldBlockPageClicks,
 } from "@/app/shell/agent-testing/agentTestingSession";
 import {
   armMcpPendingTimeout,
@@ -50,6 +51,10 @@ import {
 } from "@/app/shell/agent-testing/agentTestingPoSignal";
 import { requireFreshQaSession } from "@/app/shell/requireFreshQaSession";
 import { acknowledgePlaybackDiagnosticStop } from "@/app/shell/agent-testing/agentTestingPlaybackHalt";
+import {
+  isAgentTestingFinaleSealed,
+  sealAgentTestingFinale,
+} from "@/app/shell/agent-testing/agentTestingFinaleSeal";
 
 describe("agentTesting wipe hygiene (forceClear / softClose)", () => {
   beforeEach(() => {
@@ -177,6 +182,44 @@ describe("agentTesting wipe hygiene (forceClear / softClose)", () => {
     expect(getSessionKind()).toBe("manual");
     expect(isQaDiagGateOpen()).toBe(false);
     expect(getQaDiagRing()).toEqual([]);
+  });
+
+  it("releases a completed-playback finale before fresh manual capture", () => {
+    openAgentTestingLogger({ kind: "agent" });
+    sealAgentTestingFinale();
+    expect(isAgentTestingFinaleSealed()).toBe(true);
+
+    softCloseAgentTestingLogger("completed-playback");
+    expect(isAgentTestingFinaleSealed()).toBe(false);
+
+    openAgentTestingLogger({ kind: "manual" });
+    expect(isAgentTestingFinaleSealed()).toBe(false);
+    expect(hydrateQaDiagGate().finaleSealed).toBe(false);
+    expect(window.__studioAgentTestingOverlay?.isCapturePaused()).toBe(true);
+    expect(shouldBlockPageClicks()).toBe(false);
+  });
+
+  it("keeps capture and click ownership aligned across manual, observe, and agent", () => {
+    openAgentTestingLogger({ kind: "manual" });
+    expect(getSessionKind()).toBe("manual");
+    expect(window.__studioAgentTestingOverlay?.isCapturePaused()).toBe(true);
+    expect(shouldBlockPageClicks()).toBe(false);
+
+    softCloseAgentTestingLogger("manual-transition");
+    openAgentTestingLogger({ kind: "observe" });
+    expect(getSessionKind()).toBe("observe");
+    expect(window.__studioAgentTestingOverlay?.isCapturePaused()).toBe(false);
+    expect(shouldBlockPageClicks()).toBe(false);
+
+    handoffQaSession({ oversee: true, kind: "agent" });
+    expect(getSessionKind()).toBe("agent");
+    expect(window.__studioAgentTestingOverlay?.isCapturePaused()).toBe(false);
+    expect(shouldBlockPageClicks()).toBe(true);
+
+    softCloseAgentTestingLogger("agent-transition");
+    expect(getSessionKind()).toBe("manual");
+    expect(isQaDiagGateOpen()).toBe(false);
+    expect(shouldBlockPageClicks()).toBe(false);
   });
 
   it("no ghost OBS/CTRL in header when popup closed", () => {

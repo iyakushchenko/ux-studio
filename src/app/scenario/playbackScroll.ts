@@ -14,6 +14,7 @@
 
 import { playbackDiagScroll } from "@/app/shell/playbackDiag";
 import { playbackScrollMonitor } from "@/app/shell/playbackScrollMonitor";
+import { isFastPlayback, playbackMs } from "@/app/shell/playbackTiming";
 import { isChatPullUpScrollLocked } from "@/projects/boots-pharmacy/screens/chat/chatMotion";
 import { motionEaseInOutProgress } from "@/uxds/motion";
 
@@ -73,6 +74,7 @@ export function noteCameraHoldInteraction(source = "click"): void {
 }
 
 export function msUntilPostClickCameraHoldClears(): number {
+  if (isFastPlayback()) return 0;
   if (!Number.isFinite(lastCameraHoldInteractionAt)) return 0;
   return Math.max(
     0,
@@ -345,8 +347,8 @@ function isAborted(options?: PlaybackScrollOptions): boolean {
 }
 
 function computeDuration(distance: number, durationMs?: number): number {
-  if (durationMs != null) return durationMs;
-  return Math.min(1050, Math.max(520, Math.abs(distance) * 0.62));
+  const duration = durationMs ?? Math.min(1050, Math.max(520, Math.abs(distance) * 0.62));
+  return playbackMs(duration, 32);
 }
 
 /** Demo robot targets — slightly longer, always centers the CTA in the pane. */
@@ -473,7 +475,7 @@ export async function revealDemoTargetForAgent(
 }
 
 export function computeDemoScrollDuration(distance: number): number {
-  return Math.min(1200, Math.max(720, Math.abs(distance) * 0.82));
+  return playbackMs(Math.min(1200, Math.max(720, Math.abs(distance) * 0.82)), 32);
 }
 
 function describeScrollHost(scrollEl: HTMLElement): string {

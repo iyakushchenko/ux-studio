@@ -14,6 +14,7 @@ import {
   logAgentTestingHelper,
   touchAgentTestingOverlay,
 } from "@/app/shell/agent-testing/agentTestingOverlay";
+import { getMcpTestSession } from "@/app/shell/mcpTestGuard";
 
 const READ_ONLY_HELPER_SUFFIXES = new Set([
   "AgentTestingOverlay",
@@ -137,13 +138,17 @@ function isReadOnlySuffix(suffix: string): boolean {
 function wrapHelper(suffix: string, fn: (...args: unknown[]) => unknown) {
   if ((fn as { [ARMED_FLAG]?: boolean })[ARMED_FLAG]) return fn;
   const wrapped = (...args: unknown[]) => {
-    // Clean title only — structured helper row (coalesces transport spam).
-    touchAgentTestingOverlay(
-      undefined,
-      PRESERVE_LOGGER_HELPER_SUFFIXES.has(suffix)
-        ? { preserveLogger: true }
-        : undefined
-    );
+    // Autonomous QA already owns an active session. Re-touching its own
+    // window helpers can confirm a just-raised handoff and pause the runner.
+    // Manual agent calls still arm/touch exactly as before.
+    if (!getMcpTestSession()) {
+      touchAgentTestingOverlay(
+        undefined,
+        PRESERVE_LOGGER_HELPER_SUFFIXES.has(suffix)
+          ? { preserveLogger: true }
+          : undefined
+      );
+    }
     try {
       if (!SELF_LOGGED_HELPER_SUFFIXES.has(suffix)) {
         logAgentTestingHelper(suffix);

@@ -47,6 +47,8 @@ Never `from "framer-motion"` / `from "motion"` in new code. Shared timings: Acco
 
 ## Robo-cursor travel (shell)
 
+Enterprise-demo actionability and arrow/hand/press acceptance: [CURSOR_ENGINE_DEMO_HARDENING.md](./CURSOR_ENGINE_DEMO_HARDENING.md).
+
 - **SSoT policy:** `demoCursorEngine.ts` — park = travel-to-rest; snap only via `force` / first-mount; **step parks / Play stays** (+ forbidden submit rest). See [PLAYBACK.md](../shell/PLAYBACK.md) § Cursor engine SSoT.
 - **API:** `animate` from `@/uxds/motion` — progress `0 → 1`, `ease: "easeInOut"` (cubic ease-in / ease-out).
 - **Path:** straight-line lerp to target. **No** spring, back-ease, overshoot, arc jitter, or end-frame noise.

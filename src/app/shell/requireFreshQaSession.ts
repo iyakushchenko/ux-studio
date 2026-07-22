@@ -2,7 +2,7 @@
  * ALWAYS CLEAR QA — code law (not a reminder).
  *
  * Every REC arm / prove entrypoint MUST call this first. No skip flag.
- * forceClear → fresh start → touch → assert overlay DOM visible.
+ * forceClear → fresh start → assert overlay DOM visible.
  */
 
 import {
@@ -12,7 +12,6 @@ import {
   isAgentTestingOverlayDomVisible,
   logAgentTestingStep,
   startAgentTestingOverlay,
-  touchAgentTestingOverlay,
 } from "@/app/shell/agent-testing/agentTestingOverlay";
 import { beginQaProveMode } from "@/app/shell/agent-testing/agentTestingPresence";
 import { resetQaModalTrackForTests } from "@/app/shell/qaModalTrack";
@@ -45,9 +44,10 @@ export function requireFreshQaSession(
     /* hang-safe */
   }
 
-  // 2) Fresh arm — visible overlay for the whole prove/REC.
+  // 2) Fresh arm — visible overlay for the whole prove/REC. `start` already
+  // establishes agent presence; a second `touch` could confirm a diagnostic
+  // raised by the just-reset React tree and make autonomous QA hand itself off.
   startAgentTestingOverlay(cleanTitle);
-  touchAgentTestingOverlay(cleanTitle);
 
   // Keep open if sitrep somehow entered settle early (no-op when not settling).
   try {

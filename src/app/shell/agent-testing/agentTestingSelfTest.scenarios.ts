@@ -25,6 +25,9 @@ export type QaSelfTestScenarioId =
   | "message-rtt-helpers"
   | "control-kind-stepped-vs-playback"
   | "result-finale-seal"
+  | "finale-to-manual-capture"
+  | "close-no-ghost-chrome"
+  | "session-kind-transition-invariants"
   | "message-withholds-result"
   | "stale-green-detect"
   | "diag-mirror-rows";
@@ -186,6 +189,43 @@ export const QA_SELF_TEST_SCENARIOS: QaSelfTestScenario[] = [
     trust: true,
     summary: "After RESULT seal, playback-diag housekeeping cannot land in chat.",
     helpers: ["sealAgentTestingFinale", "isAgentTestingFinaleSealed"],
+  },
+  {
+    id: "finale-to-manual-capture",
+    dualRole: "both",
+    trust: true,
+    summary:
+      "Completed playback → close → fresh Manual clears finale and starts paused; CAPTURE can accept new events.",
+    helpers: [
+      "softCloseAgentTestingLogger",
+      "__studioOpenQaLogger({ kind:'manual' })",
+      "__studioAgentTestingOverlay.isCapturePaused",
+    ],
+  },
+  {
+    id: "close-no-ghost-chrome",
+    dualRole: "both",
+    trust: true,
+    summary:
+      "Close clears gate, OBS/CTRL hint, viewport lock/border state, pending state, and finale seal.",
+    helpers: [
+      "softCloseAgentTestingLogger",
+      "document.documentElement.dataset.studioMcpStatus",
+      "document.documentElement.dataset.studioQaLock",
+    ],
+  },
+  {
+    id: "session-kind-transition-invariants",
+    dualRole: "both",
+    trust: true,
+    summary:
+      "Manual opens paused; Observe captures with free page clicks; Agent captures locked; wipe/oversee obey context policy.",
+    helpers: [
+      "__studioQaSessionKind",
+      "__studioAgentTestingOverlay.isCapturePaused",
+      "shouldBlockPageClicks",
+      "__studioQaHandoff",
+    ],
   },
   {
     id: "message-withholds-result",

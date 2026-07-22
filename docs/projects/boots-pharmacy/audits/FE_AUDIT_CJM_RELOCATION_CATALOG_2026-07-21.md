@@ -5,6 +5,8 @@
 **Verdict:** **PROVEN**
 **PO green-light allowed:** **Yes**
 
+> **Superseded compatibility outcome (2026-07-22):** the legacy Agentic recording is now safely re-testable and has passed current playback proof. Structural blockers remain enforced. See [FE_AUDIT_CJM_COMPATIBILITY_RETEST_2026-07-22.md](FE_AUDIT_CJM_COMPATIBILITY_RETEST_2026-07-22.md).
+
 ## Verdict
 
 The prior clean-deployment blocker is closed. `PersonaDefinition` now carries deployed `journeyRecordings`; the Sarah catalog exposes all embedded sessions keyed by journey id; and runtime metadata resolves a browser-local draft first, then immutable deployed evidence. The clean-origin regression proves there is no `recording-source-missing`, all ten current-contract Traditional recordings are playable, and the one genuinely legacy Agentic recording remains truthfully blocked rather than being falsely upgraded.

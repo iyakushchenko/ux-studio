@@ -13,7 +13,6 @@ import {
   logAgentTestingOverlay,
   pauseForAgentLeave,
   preArmAgentTestingOverlay,
-  touchAgentTestingOverlay,
   type AgentLeavePauseResult,
 } from "@/app/shell/agent-testing/agentTestingOverlay";
 import { requireFreshQaSession } from "@/app/shell/requireFreshQaSession";
@@ -38,6 +37,10 @@ import {
 } from "@/app/shell/playJourneySmoke";
 import { getImportedJourneys } from "@/app/journey/journeyRuntimeStore";
 import { logAgentTestingStep } from "@/app/shell/agent-testing/agentTestingOverlay";
+import {
+  setPlaybackTimingMode,
+  type PlaybackTimingMode,
+} from "@/app/shell/playbackTiming";
 
 export type FullPlayProveExperience = "agentic" | "traditional";
 
@@ -72,6 +75,7 @@ export type FullPlayProvePreset = {
   expectedPeak: number;
   timeoutMs: number;
   peakMode: FullPlayProvePeakMode;
+  allowedPeaks?: readonly number[];
   sessionName: string;
   overlayTitle: string;
 };
@@ -102,6 +106,7 @@ export const FULL_PLAY_PROVE_PRESETS: Record<
     expectedPeak: 13,
     timeoutMs: 180_000,
     peakMode: "login-skip-safe",
+    allowedPeaks: [13, 12, 10],
     sessionName: "full-play-prove",
     overlayTitle: "AGENT TESTING — full play prove",
   },
@@ -132,8 +137,8 @@ export type FullPlayProveOptions = {
   softFailPoAlarm?: boolean;
   expectedPeak?: number;
   /**
-   * Traditional login-skip: accept peak.total from smoke if ≥ expectedPeak−1
-   * and visible reached end. Default true for traditional preset.
+   * Dynamic prerequisite routes: accept the runtime-filtered total when the
+   * journey genuinely reaches its end. Default true for traditional preset.
    */
   allowLoginSkipPeak?: boolean;
   preArmMs?: number;
@@ -143,6 +148,10 @@ export type FullPlayProveOptions = {
   startScreenId?: string;
   orchestraMode?: string;
   peakMode?: FullPlayProvePeakMode;
+  /** Exact route-contract totals allowed after prerequisite filtering. */
+  allowedPeaks?: readonly number[];
+  /** QA-only presentation timing; functional guards and assertions are unchanged. */
+  playbackSpeed?: PlaybackTimingMode;
 };
 
 function delayMs(ms: number): Promise<void> {
@@ -286,8 +295,9 @@ function resolvePreset(options?: FullPlayProveOptions): FullPlayProvePreset {
         options?.startScreenId ?? inferStartScreenId(startBeatId),
       expectedPeak,
       timeoutMs: options?.timeoutMs ?? base.timeoutMs,
-      // Accept smoke peak.total when the journey finished (login-skip style).
+      // Recorded journey contracts use their own catalog total, never built-in totals.
       peakMode: options?.peakMode ?? "login-skip-safe",
+      allowedPeaks: options?.allowedPeaks ?? [expectedPeak],
       overlayTitle: `AGENT TESTING — Play journey prove (${journeyId})`,
       sessionName: "play-journey-prove",
     };
@@ -303,6 +313,7 @@ function resolvePreset(options?: FullPlayProveOptions): FullPlayProvePreset {
     expectedPeak: options?.expectedPeak ?? base.expectedPeak,
     timeoutMs: options?.timeoutMs ?? base.timeoutMs,
     peakMode: options?.peakMode ?? base.peakMode,
+    allowedPeaks: options?.allowedPeaks ?? base.allowedPeaks,
   };
 }
 
@@ -310,7 +321,8 @@ function assertPeak(
   peak: FullPlayProvePeak,
   expectedPeak: number,
   peakMode: FullPlayProvePeakMode,
-  allowLoginSkip: boolean
+  allowLoginSkip: boolean,
+  allowedPeaks?: readonly number[]
 ): string | null {
   // Recorded journey with unknown catalog — assert reached end only.
   if (expectedPeak <= 0) {
@@ -325,7 +337,11 @@ function assertPeak(
   }
   if (peakMode === "login-skip-safe" && allowLoginSkip) {
     const reachedEnd = peak.visible >= peak.total && peak.total > 0;
-    const peakOk = reachedEnd && peak.total >= expectedPeak - 1;
+    const peakOk =
+      reachedEnd &&
+      (allowedPeaks?.length
+        ? allowedPeaks.includes(peak.total)
+        : peak.total === expectedPeak);
     if (!peakOk) {
       return (
         `peak-not-${expectedPeak}: got ${peak.visible}/${peak.total}` +
@@ -375,6 +391,7 @@ export async function runFullPlayProve(
     endMcpTestSession(prior.id);
   }
   const sessionId = beginMcpTestSession(preset.sessionName);
+  const previousTimingMode = setPlaybackTimingMode(options?.playbackSpeed ?? "normal");
   enableCursorQaEyes();
   beginQaProveMode("full-play-prove");
 
@@ -388,13 +405,12 @@ export async function runFullPlayProve(
   let end: PlayEndAtStartAssertResult | null = null;
 
   try {
-    // Fresh session already started by requireFreshQaSession — keep title + pre-arm.
-    touchAgentTestingOverlay(preset.overlayTitle);
+    // requireFreshQaSession already starts and touches the overlay. Do not
+    // re-touch here: an autonomous prove must never confirm its own handoff.
     await preArmAgentTestingOverlay({
       preArmMs: options?.preArmMs ?? DEFAULT_PREARM_MS,
       title: "AGENT TESTING — preparing…",
     });
-    touchAgentTestingOverlay(preset.overlayTitle);
     try {
       logAgentTestingStep({
         kind: "helper",
@@ -472,7 +488,8 @@ export async function runFullPlayProve(
       peak,
       preset.expectedPeak,
       preset.peakMode,
-      allowLoginSkip
+      allowLoginSkip,
+      preset.allowedPeaks
     );
     if (peakErr) errors.push(peakErr);
     if (!end?.pass) {
@@ -533,6 +550,7 @@ export async function runFullPlayProve(
       /* hang-safe */
     }
     endMcpTestSession(sessionId);
+    setPlaybackTimingMode(previousTimingMode);
   }
 }
 

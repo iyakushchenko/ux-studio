@@ -4,6 +4,7 @@ import {
   markPersistedJourneyPlaybackProven,
   persistRecordedJourneys,
   readPersistedRecordingForJourney,
+  withPersistedJourneyPlaybackProof,
 } from "@/app/journey/recordedJourneyPersist";
 import type { JourneyDefinition } from "@/app/orchestra/types";
 import type { RecordingSession } from "@/app/recording/recordingTypes";
@@ -44,5 +45,25 @@ describe("recorded journey playback proof", () => {
       playbackContract: 1,
       studioVersion: getStudioRelease().version,
     });
+  });
+
+  it("stores a proof overlay for an immutable deployed recording", () => {
+    expect(markPersistedJourneyPlaybackProven(
+      "boots-pharmacy",
+      "sarah-jenkins",
+      journey.id
+    )).toBe(true);
+    const updated = withPersistedJourneyPlaybackProof(
+      "boots-pharmacy",
+      "sarah-jenkins",
+      journey.id,
+      recording
+    );
+    expect(updated?.metadata?.studioVersion).toBe("0.0.0");
+    expect(updated?.metadata?.compatibilityProof).toMatchObject({
+      playbackContract: 1,
+      studioVersion: getStudioRelease().version,
+    });
+    expect(recording.metadata?.compatibilityProof).toBeUndefined();
   });
 });

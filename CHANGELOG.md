@@ -2,6 +2,9 @@
 
 > _Append a bullet on coherent commits via `npm run notes:append -- --lane="<lane>" --intent="<text>"`. Preview with `npm run notes:preview`. On `npm run release:patch` this section is promoted to `## v<X.Y.Z> - DDMMYY` and a fresh empty `## Current` is re-inserted. Policy: `docs/product/VERSIONING.md`._
 
+- **shell:** All 13 Boots Sarah CJMs live-proven through fail-fast QA; legacy recordings can earn current compatibility proof, camera anomaly tolerance avoids compositor false positives, and suite logs report truthful per-CJM results
+- **engine:** Enterprise-demo cursor hardening: declared tap areas show a steady hand at the hit edge, disabled or stale targets cannot press, modal state is rechecked before action, and autonomous QA remains alive through long 13-CJM runs
+
 ## v0.0.107 - 210726
 - **engine:** Project/persona-owned CJM catalogs with 13 Boots Sarah journeys, retained recording evidence, scoped hydration, and deployed-entry protection
 

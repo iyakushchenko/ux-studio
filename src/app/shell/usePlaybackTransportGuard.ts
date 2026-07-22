@@ -15,6 +15,11 @@ import {
   detectStrayPopupOnBeat,
   detectTouchpointAheadOfBeat,
 } from "@/app/shell/playbackTransportAnomalies";
+import {
+  detectPlaybackStateAlignment,
+  shouldDiscardQueuedAlignmentFrame,
+} from "@/app/shell/playbackStateAlignment";
+import { isStudioPostAgentResetSyncLocked, parseStudioUrl } from "@/app/shell/studioUrl";
 
 export type TransportGuardSnapshot = {
   active: boolean;
@@ -23,6 +28,7 @@ export type TransportGuardSnapshot = {
   isScripting: boolean;
   /** CJM step-back DOM sync in flight — beat/UI may disagree for a tick. */
   retreatSyncing?: boolean;
+  isPausingBeforeReveal?: boolean;
   journeyId?: string;
   beatId?: string;
   beatLabel?: string;
@@ -32,6 +38,11 @@ export type TransportGuardSnapshot = {
   playlist: readonly StudioTouchpointEntry[];
   /** Increments on each manual cassette transport action. */
   transportStepToken: number;
+  currentTabIndex: number;
+  expectedTabIndex?: number;
+  renderedScreenId?: string;
+  visibleCount: number;
+  totalFrames: number;
   availabilityOpen?: boolean;
   loginPopupOpen?: boolean;
   vaccinePickerOpen?: boolean;
@@ -52,11 +63,20 @@ export function usePlaybackTransportGuard({
 }: Options): void {
   const onDiagnosticRef = useRef(onDiagnostic);
   onDiagnosticRef.current = onDiagnostic;
+  const latestSnapshotRef = useRef(snapshot);
+  latestSnapshotRef.current = snapshot;
+  const latestBeatIdRef = useRef(currentBeat?.id);
+  latestBeatIdRef.current = currentBeat?.id;
+  const latestBeatRef = useRef(currentBeat);
+  latestBeatRef.current = currentBeat;
 
   const prevTouchpointIndexRef = useRef<number | null>(null);
   const prevTouchpointKeyRef = useRef<string | null>(null);
   const prevTransportStepTokenRef = useRef(snapshot.transportStepToken);
   const reportedRef = useRef(false);
+  const alignmentFingerprintRef = useRef<string | null>(null);
+  const alignmentGraceUntilRef = useRef(0);
+  const transportValidatedRef = useRef(false);
 
   useEffect(() => {
     if (!snapshot.active || !snapshot.journeyMode) {
@@ -64,6 +84,8 @@ export function usePlaybackTransportGuard({
       prevTouchpointKeyRef.current = null;
       prevTransportStepTokenRef.current = snapshot.transportStepToken;
       reportedRef.current = false;
+      alignmentFingerprintRef.current = null;
+      transportValidatedRef.current = false;
       return;
     }
 
@@ -82,6 +104,10 @@ export function usePlaybackTransportGuard({
     const transportStepped =
       snapshot.transportStepToken !== prevTransportStepTokenRef.current;
     prevTransportStepTokenRef.current = snapshot.transportStepToken;
+    if (transportStepped) {
+      transportValidatedRef.current = true;
+      alignmentGraceUntilRef.current = performance.now() + 600;
+    }
 
     const report = (failureStep: string, message: string, detail?: string) => {
       if (reportedRef.current) return;
@@ -158,5 +184,92 @@ export function usePlaybackTransportGuard({
     if (strayPopup) {
       report(strayPopup.kind, strayPopup.message, strayPopup.detail);
     }
+
+    if (
+      snapshot.isOnAir ||
+      snapshot.isScripting ||
+      snapshot.retreatSyncing ||
+      snapshot.isPausingBeforeReveal ||
+      // A freshly armed QA session is not a transport result. Wait for the
+      // first explicit cassette action before checking the tuple; otherwise
+      // React's URL-reset effect can self-create a false fail handoff.
+      !transportValidatedRef.current
+    ) {
+      return;
+    }
+
+    // URL reflection is passive-effect owned. Sample one animation frame later
+    // so a legitimate navigation commit is not reported as a mismatch.
+    let retryTimer: number | null = null;
+    const validateAlignment = () => {
+      if (isStudioPostAgentResetSyncLocked()) {
+        // URL sync deliberately writes on the next effect just after the reset
+        // lock lifts; retain a small handoff grace so this validator samples the
+        // reconciled address bar, never the prior screen.
+        alignmentGraceUntilRef.current = Math.max(
+          alignmentGraceUntilRef.current,
+          performance.now() + 300
+        );
+        retryTimer = window.setTimeout(validateAlignment, 100);
+        return;
+      }
+      const graceLeft = alignmentGraceUntilRef.current - performance.now();
+      if (graceLeft > 0) {
+        retryTimer = window.setTimeout(validateAlignment, graceLeft + 16);
+        return;
+      }
+      const latest = latestSnapshotRef.current;
+      // A render can enter a scripted handoff after this frame was queued.
+      // Never validate a stale pre-handoff tuple against its next touchpoint.
+      if (shouldDiscardQueuedAlignmentFrame(
+        { beatId: currentBeat?.id, touchpointKey: snapshot.touchpointKey },
+        {
+          beatId: latestBeatIdRef.current,
+          touchpointKey: latest.touchpointKey,
+          isOnAir: latest.isOnAir,
+          isScripting: latest.isScripting,
+          retreatSyncing: latest.retreatSyncing,
+          isPausingBeforeReveal: latest.isPausingBeforeReveal,
+        }
+      )) {
+        return;
+      }
+      const anomalies = detectPlaybackStateAlignment({
+        beat: latestBeatRef.current,
+        playlist: latest.playlist,
+        touchpointKey: latest.touchpointKey ?? "",
+        currentTabIndex: latest.currentTabIndex,
+        expectedTabIndex: latest.expectedTabIndex,
+        renderedScreenId: latest.renderedScreenId,
+        addressScreenId: parseStudioUrl().screenId,
+        visibleCount: latest.visibleCount,
+        totalFrames: latest.totalFrames,
+      });
+      const anomaly = anomalies[0];
+      if (!anomaly) {
+        alignmentFingerprintRef.current = null;
+        return;
+      }
+      const fingerprint = `${anomaly.kind}:${anomaly.detail}`;
+      if (alignmentFingerprintRef.current === fingerprint) return;
+      alignmentFingerprintRef.current = fingerprint;
+      onDiagnosticRef.current(
+        playbackTransportContractDiagnostic({
+          journeyId: latest.journeyId,
+          beatId: latest.beatId ?? latestBeatRef.current?.id,
+          beatLabel: latest.beatLabel ?? latestBeatRef.current?.label,
+          failureStep: anomaly.kind,
+          message: anomaly.message,
+          detail: anomaly.detail,
+          touchpoint: latest.touchpointLabel,
+          visibleProgress: latest.visibleProgress,
+        })
+      );
+    };
+    const frame = window.requestAnimationFrame(validateAlignment);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      if (retryTimer != null) window.clearTimeout(retryTimer);
+    };
   }, [currentBeat, snapshot]);
 }

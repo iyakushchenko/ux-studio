@@ -13,7 +13,7 @@
  * Console: `[StudioControlPanel]` · `[PLAYBACK_DIAG]` · Eyes: `__protoMcpEyes()`
  */
 import type { OrchestraModeId } from "@/app/orchestra/types";
-import { isOrchestraModeId } from "@/app/orchestra/orchestraModes";
+import { isBuiltInOrchestraModeId } from "@/app/orchestra/orchestraModes";
 import { runTraditionalControlRoomRobotQa } from "@/app/shell/controlRoomQaRunner";
 import { installAutonomousQaSuiteApi } from "@/app/shell/qaAutonomousSuite";
 import { logControlPanel } from "@/app/shell/controlPanelLog";
@@ -655,12 +655,12 @@ export function registerStudioMcpHelpers(options: {
     "diagnosticOpen" | "logLen" | "orchestraMode"
   >;
   getOrchestraModeId?: () => OrchestraModeId;
+  hasOrchestraMode?: (modeId: OrchestraModeId) => boolean;
   setOrchestraMode?: (modeId: OrchestraModeId) => void;
   setJourneyMode?: (enabled: boolean) => void;
   triggerTransport?: (action: TransportAction) => void;
 }): () => void {
   if (typeof window === "undefined") return () => {};
-
   installAgentTestingOverlayApi();
   installStudioAgentTeardownContractApi();
   installPlaybackDiagWindowApis();
@@ -883,9 +883,9 @@ export function registerStudioMcpHelpers(options: {
   window.__protoRunMcpPageProbe = (options) => runMcpPageProbe(options);
   window.__studioRunMcpPageProbe = window.__protoRunMcpPageProbe;
   window.__studioProveRoboCursorFeedback = proveRoboCursorFeedback;
-
   window.__protoSetOrchestraMode = (modeId) => {
-    if (!isOrchestraModeId(modeId)) return false;
+    const known = isBuiltInOrchestraModeId(modeId) || options.hasOrchestraMode?.(modeId);
+    if (!known) return false;
     if (!options.setOrchestraMode) return false;
     logControlPanel("studio:orchestra-mode", { source: "mcp-helper", to: modeId });
     options.setOrchestraMode(modeId);

@@ -242,6 +242,43 @@ describe("demoCursorEngine step vs play + forbidden submit", () => {
     ).toBe(false);
   });
 
+  it("treats declared tap areas as hand targets", () => {
+    const tapArea = document.createElement("div");
+    tapArea.setAttribute("data-studio-action", "future-project-action");
+    document.body.appendChild(tapArea);
+    Object.defineProperty(tapArea, "getBoundingClientRect", {
+      value: () => ({
+        left: 20, top: 20, right: 140, bottom: 68,
+        width: 120, height: 48, x: 20, y: 20, toJSON() {},
+      }),
+    });
+    expect(
+      resolveEarlyHandAtHotspot(22, 40, { destination: tapArea })
+    ).toBe(true);
+  });
+
+  it.each([
+    ["native disabled", (el: HTMLElement) => ((el as HTMLButtonElement).disabled = true)],
+    ["aria disabled", (el: HTMLElement) => el.setAttribute("aria-disabled", "true")],
+    ["inert ancestor", (el: HTMLElement) => el.parentElement?.setAttribute("inert", "")],
+    ["pointer-events none", (el: HTMLElement) => (el.style.pointerEvents = "none")],
+  ])("never shows hand for %s targets", (_label, disable) => {
+    const wrap = document.createElement("div");
+    const btn = document.createElement("button");
+    wrap.appendChild(btn);
+    document.body.appendChild(wrap);
+    disable(btn);
+    Object.defineProperty(btn, "getBoundingClientRect", {
+      value: () => ({
+        left: 100, top: 100, right: 200, bottom: 140,
+        width: 100, height: 40, x: 100, y: 100, toJSON() {},
+      }),
+    });
+    expect(
+      resolveEarlyHandAtHotspot(102, 120, { destination: btn })
+    ).toBe(false);
+  });
+
   it("destinationOnly skips mid-path elementFromPoint thrash", () => {
     const dest = document.createElement("button");
     dest.textContent = "Dest";

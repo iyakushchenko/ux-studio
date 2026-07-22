@@ -22,10 +22,13 @@ import {
   playbackDiagTypeInStart,
   playbackDiagChatBubbleMotion,
 } from "@/app/shell/playbackDiag";
+/** @vitest-environment happy-dom */
+
 import {
   openQaDiagGate,
   resetQaDiagGateForTests,
 } from "@/app/shell/qaDiagGate";
+import { setPlaybackTimingMode } from "@/app/shell/playbackTiming";
 
 describe("playbackDiag", () => {
   beforeEach(() => {
@@ -36,6 +39,7 @@ describe("playbackDiag", () => {
   afterEach(() => {
     playbackDiagClear();
     resetQaDiagGateForTests();
+    setPlaybackTimingMode("normal");
     vi.restoreAllMocks();
   });
 
@@ -170,6 +174,25 @@ describe("playbackDiag", () => {
     expect(event?.bubble?.chopReason).toMatch(/scrollTop ΔΔ=27/);
     expect(getPlaybackDiagBundle().chatBubbleMotion.jumps).toBe(1);
     expect(getPlaybackDiagBundle().chatBubbleMotion.chops).toBe(1);
+  });
+
+  it("keeps compressed fast-motion samples diagnostic-only", () => {
+    vi.spyOn(console, "info").mockImplementation(() => {});
+    const handoff = vi.fn();
+    (window as Window & { __studioBeginQaFailHandoff?: typeof handoff })
+      .__studioBeginQaFailHandoff = handoff;
+    setPlaybackTimingMode("fast");
+    for (const velocity of [4, 5]) {
+      playbackDiagChatBubbleMotion({
+        id: "fast-r2", phase: "frame", y: 8, deltaY: -velocity,
+        trace: { scrollLock: true, deltaScrollTop: velocity },
+      });
+    }
+    playbackDiagChatBubbleMotion({
+      id: "fast-r2", phase: "frame", y: 7, deltaY: -32,
+      trace: { scrollLock: true, deltaScrollTop: 32 },
+    });
+    expect(handoff).not.toHaveBeenCalled();
   });
 
   it("records type-in progress and asserts PASS", () => {

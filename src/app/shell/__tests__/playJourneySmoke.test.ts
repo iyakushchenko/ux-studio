@@ -30,12 +30,67 @@ describe("runPlayJourneyToStartSmoke arming", () => {
         reads += 1;
         return reads < 3
           ? { journeyMode: false, counter: "0 / 0" }
-          : { journeyMode: true, counter: "0 / 22" };
+          : { journeyMode: true, orchestraMode: "agentic-cjm", counter: "0 / 22" };
       },
     });
 
     expect(triggerTransport).toHaveBeenCalledWith("jump-to-start");
     expect(result.reason).toBe("jump-to-start-unavailable");
+  });
+
+  it("refuses transport while the previous CJM is still mounted", async () => {
+    let now = 0;
+    const nowSpy = vi.spyOn(Date, "now").mockImplementation(() => (now += 1_000));
+    const triggerTransport = vi.fn(() => true);
+    const result = await runPlayJourneyToStartSmoke({
+      orchestraMode: "rec-agentic-target",
+      startBeatId: "plp",
+      startScreenId: "plp",
+      delay: vi.fn(async () => undefined),
+      ensureClean: vi.fn(),
+      setOrchestraMode: vi.fn(),
+      setJourneyMode: vi.fn(() => true),
+      triggerTransport,
+      getState: () => ({
+        journeyMode: true,
+        orchestraMode: "agentic-cjm",
+        counter: "1 / 22",
+        beatId: "book-step2",
+        screenId: "book-step-2",
+      }),
+    });
+
+    nowSpy.mockRestore();
+    expect(result.reason).toBe("journey-mode-did-not-arm");
+    expect(triggerTransport).not.toHaveBeenCalled();
+  });
+
+  it("does not press Play until jump-to-start reaches the declared beat and screen", async () => {
+    let now = 0;
+    const nowSpy = vi.spyOn(Date, "now").mockImplementation(() => (now += 1_000));
+    const triggerTransport = vi.fn(() => true);
+    const result = await runPlayJourneyToStartSmoke({
+      orchestraMode: "rec-agentic-target",
+      startBeatId: "plp",
+      startScreenId: "plp",
+      delay: vi.fn(async () => undefined),
+      ensureClean: vi.fn(),
+      setOrchestraMode: vi.fn(),
+      setJourneyMode: vi.fn(() => true),
+      triggerTransport,
+      getState: () => ({
+        journeyMode: true,
+        orchestraMode: "rec-agentic-target",
+        counter: "1 / 26",
+        beatId: "plp",
+        screenId: "book-step-2",
+      }),
+    });
+
+    nowSpy.mockRestore();
+    expect(result.reason).toBe("journey-start-did-not-settle");
+    expect(triggerTransport).toHaveBeenCalledTimes(1);
+    expect(triggerTransport).toHaveBeenCalledWith("jump-to-start");
   });
 
   it("fails fast without touching transport when journey mode never commits", async () => {

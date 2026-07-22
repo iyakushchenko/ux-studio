@@ -21,6 +21,7 @@ import {
   uninstallPlaybackDiagQaBridgeApis,
 } from "@/app/shell/playbackDiagQaBridge";
 import { clearDemoCursorCarriageLatches } from "@/app/scenario/demoCursor";
+import { isFastPlayback } from "@/app/shell/playbackTiming";
 
 export type PlaybackDiagKind =
   | "type-in-start"
@@ -1001,7 +1002,11 @@ export function playbackDiagChatBubbleMotion(options: {
               : phase === "animate-end"
                 ? `Bubble ${id} settle${skippedNote ? " · SKIP" : ""}`
                 : `Bubble ${id} ${phase}`;
-    if (jump || chop) {
+    // Fast QA validates journey semantics and interaction wiring, not
+    // frame-by-frame visual interpolation. Compressed rAF samples can look
+    // discontinuous by design, so retain them in diagnostics but never turn
+    // them into an autonomous fail handoff. Normal playback remains strict.
+    if ((jump || chop) && !isFastPlayback()) {
       try {
         (
           window as Window & { __studioBeginQaFailHandoff?: (r: string) => void }

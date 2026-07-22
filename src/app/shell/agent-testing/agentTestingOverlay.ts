@@ -1476,7 +1476,11 @@ function armSafetyTimer(): void {
   clearSafetyTimer();
   safetyTimer = setTimeout(() => {
     // Long REC / prove must not be force-killed at MAX_MS — re-arm instead.
-    if (isRecordingActive() || isQaProveModeActive()) {
+    if (
+      isRecordingActive() ||
+      isQaProveModeActive() ||
+      getAutonomousQaSuiteStatus().phase === "running"
+    ) {
       try {
         logAgentTestingOverlay("overlay safety timeout deferred — REC/prove still live");
       } catch {
@@ -1507,7 +1511,8 @@ function armIdleTimer(): void {
       isQaDiagLoggerMode() ||
       isLoggerStyleSession() ||
       isRecordingActive() ||
-      isQaProveModeActive()
+      isQaProveModeActive() ||
+      getAutonomousQaSuiteStatus().phase === "running"
     ) {
       armIdleTimer();
       return;
@@ -3432,6 +3437,13 @@ export type TouchAgentTestingOverlayOptions = {
  * Idle → `startAgentTestingOverlay` (agent).
  */
 export function touchAgentTestingOverlay(title?: string, options?: TouchAgentTestingOverlayOptions): void {
+  // A live autonomous runner is not an outside agent taking over. Its internal
+  // helper calls may occur while a diagnostic is being raised; treating those
+  // calls as a handshake confirms and pauses the test itself.
+  if (getMcpTestSession()) {
+    noteActivity();
+    return;
+  }
   confirmAgentHandshake("touch");
   openQaDiagGate({ reason: "overlay-touch" });
   if (settling) {
@@ -3704,6 +3716,10 @@ export function openAgentTestingLogger(options?: OpenQaLoggerOptions | string): 
   // Fresh open / handoff wipe — always reset QA log (no stale).
   // Hydrate restore keeps ring-restored rows.
   if (!hydrateRestore) {
+    // Fresh Manual/Observe sessions must not inherit a completed Play RESULT
+    // seal; otherwise CAPTURE looks live while every event is discarded.
+    clearAgentTestingFinaleSeal();
+    setQaDiagSessionMeta({ finaleSealed: false });
     logEntries = [];
     timelineKeys = [];
     lastStepAt = 0;
@@ -3821,6 +3837,8 @@ export function softCloseAgentTestingLogger(reason = "soft-close"): void {
   settleResult = "neutral";
   logEntries = [];
   timelineKeys = [];
+  clearAgentTestingFinaleSeal();
+  setQaDiagSessionMeta({ finaleSealed: false });
   sessionHadProgress = false;
   logDirty = false;
   lastStepAt = 0;

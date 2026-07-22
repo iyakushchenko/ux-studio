@@ -18,6 +18,11 @@ describe("agentTestingSelfTest", () => {
     expect(trust.some((s) => s.id === "fail-handoff-freeze")).toBe(true);
     expect(trust.some((s) => s.id === "session-origin-active")).toBe(true);
     expect(trust.some((s) => s.id === "stale-green-detect")).toBe(true);
+    expect(trust.some((s) => s.id === "finale-to-manual-capture")).toBe(true);
+    expect(trust.some((s) => s.id === "close-no-ghost-chrome")).toBe(true);
+    expect(
+      trust.some((s) => s.id === "session-kind-transition-invariants")
+    ).toBe(true);
     expect(trust.every((s) => s.helpers.length > 0)).toBe(true);
   });
 

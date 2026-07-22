@@ -15,6 +15,8 @@ export {
   AGENTIC_CJM_JOURNEY,
   TRADITIONAL_CJM_JOURNEY,
   TRADITIONAL_LOGIN_BEAT_ID,
+  TRADITIONAL_LOCATION_BEAT_ID,
+  shouldSkipTraditionalAccountBeat,
   shouldSkipTraditionalLoginBeat,
 } from "@/projects/boots-pharmacy/personas/sarah-jenkins/cjm/builtInJourneys";
 import {

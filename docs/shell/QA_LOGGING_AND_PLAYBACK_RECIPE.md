@@ -1,5 +1,9 @@
 # QA logging & playback recipe (HARD)
 
+Fresh Manual capture clears any completed-run/finale seal before accepting
+events. A previous completed session may never make a new `CAPTURE` state look
+live while silently dropping rows.
+
 **Status:** Locked (PO 2026-07-21)  
 **Owners:** Arch · Finn · Quinn · Bea  
 **Related:** [PLAYBACK.md](./PLAYBACK.md) · [PLAYBACK_DIAG.md](./PLAYBACK_DIAG.md) · [RECORDING.md](./RECORDING.md) · [CJM_RECORD_PLAY_EDIT.md](./CJM_RECORD_PLAY_EDIT.md) (Record/Play/Edit = guitar tabs) · [CHAT_PAGE_RAILS.md](../projects/boots-pharmacy/features/CHAT_PAGE_RAILS.md) · [agent-testing/README.md](../../src/app/shell/agent-testing/README.md)
@@ -219,6 +223,7 @@ http://localhost:5173/?project=boots-pharmacy&screen=home&persona=sarah-jenkins&
 0. **Reset QA before each test (ALWAYS CLEAR = code law)** — `requireFreshQaSession(title)` = `forceClear` + fresh `start` (**no skip flag**). Entry points: `__studioArmRecCapture`, `__studioRunRecNewCjmProve`, `__studioRunFullPlayProve`. Bypass guard: `startRecording` → `ensureQaSessionForRecCapture`. Smoke `withMcpTestSession` also wipes. Never reuse a dirty overlay. **Do not invent** a parallel ad-hoc Play/REC path that skips this.  
 0b. **URL `modal=` is navigable state** — if Continue opens `modal=choose-pharmacy`, drain (pick pharmacy) before the next beat; QA logs `RecModalOpen` / `RecModalPharmacyPick`. Never rush past.  
 0c. **Human REC pace** — `REC_USER_PACE_MS` (read / before CTA / after click / scroll-stop ≥2.4s). Prove helper enforces; not optional.  
+0d. **Fast Play QA is not fast REC** — `Fast test current CJM` / `Fast test all CJMs` compress presentation dwell, cursor travel, typing cadence, and camera easing only. They keep the same journey, selectors, clicks, modal drains, state/counter alignment, readiness polling, failure alarms, and terminal PASS/FAIL. REC capture remains human-paced because timing is part of the recorded artifact.  
 1. Open QA logger / agent overlay (gate open) — only after step 0.  
 2. Start **continuous Play** (same path as Step).  
 3. **Eyes on composer:** Home then Chat type-in must animate letter-by-letter.  

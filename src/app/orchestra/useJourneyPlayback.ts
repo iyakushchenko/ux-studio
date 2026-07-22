@@ -18,10 +18,7 @@ import {
   type PlaybackScriptResult,
 } from "@/projects/playbackScriptResult";
 import { playbackDirectorMonitor } from "@/app/shell/playbackDirectorMonitor";
-import {
-  notePlaybackBeatEnter,
-  notePlaybackDirectorScript,
-} from "@/app/shell/playbackInteractionContext";
+import { notePlaybackBeatEnter, notePlaybackDirectorScript } from "@/app/shell/playbackInteractionContext";
 import {
   beatDirectorScriptLabel,
   beatHasCameraStep,
@@ -69,6 +66,7 @@ import {
 } from "@/app/shell/playbackDiag";
 import type { JourneyBeat, JourneyRuntime, JourneyDefinition } from "@/app/orchestra/types";
 import type { ProjectPlayback } from "@/projects/types";
+import { playbackMs } from "@/app/shell/playbackTiming";
 import type { StudioTouchpointEntry } from "@/projects/types";
 export type ScreenPlaybackApi = {
   totalFrames: number;
@@ -1239,7 +1237,7 @@ export function useJourneyPlayback({
         lastAvailAutoRunRef.current = null;
         setBeatIndex(next);
         beatIndexRef.current = next;
-      }, 1200);
+      }, playbackMs(1200));
       return;
     }
     const dwellMs = beat?.dwellMs ?? 2800;
@@ -1273,7 +1271,7 @@ export function useJourneyPlayback({
       setBeatIndex(next);
       beatIndexRef.current = next;
       scheduleDwellAdvance();
-    }, dwellMs);
+    }, playbackMs(dwellMs));
   }, [advanceFrom, beats.length, completeJourneyPlay, setBeatIndex]);
 
   scheduleDwellAdvanceRef.current = scheduleDwellAdvance;

@@ -1,4 +1,6 @@
 /** Sarah's saved pharmacy locations — persisted like vaccine wishlist. */
+import { AVAIL_STORES } from "@/projects/boots-pharmacy/data/availStores";
+
 const SAVED_LOCATIONS_KEY = "proto-saved-locations";
 
 export const SAVED_LOCATIONS_CHANGE_EVENT = "proto-saved-locations-change";
@@ -27,6 +29,13 @@ function notifySavedLocationsChange(): void {
 
 export function getSavedLocationsCount(): number {
   return savedLocationsSet.size;
+}
+
+/** Account location may bypass booking Step 1 only while it is still a valid store. */
+export function hasUsableSavedLocation(): boolean {
+  return AVAIL_STORES.some(
+    (store) => store.hasSlots && savedLocationsSet.has(store.id)
+  );
 }
 
 export function isInSavedLocations(id: string): boolean {

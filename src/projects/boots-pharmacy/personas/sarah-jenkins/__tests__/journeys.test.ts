@@ -11,6 +11,7 @@ import { BOOTS_PHARMACY_SCENARIO_SCREENS } from "@/projects/boots-pharmacy/scree
 import {
   AGENTIC_CJM_JOURNEY,
   shouldSkipTraditionalLoginBeat,
+  shouldSkipTraditionalAccountBeat,
   TRADITIONAL_CJM_JOURNEY,
   TRADITIONAL_LOGIN_BEAT_ID,
 } from "@/projects/boots-pharmacy/personas/sarah-jenkins/journeys";
@@ -127,5 +128,34 @@ describe("shouldSkipTraditionalLoginBeat", () => {
   it("does not skip unrelated beats", () => {
     const other: JourneyBeat = { id: "other", label: "Other", kind: "tab-landing" };
     expect(shouldSkipTraditionalLoginBeat(other, true)).toBe(false);
+  });
+});
+
+describe("shouldSkipTraditionalAccountBeat", () => {
+  const beat = (id: string): JourneyBeat => ({
+    id,
+    label: id,
+    kind: "tab-landing",
+  });
+
+  it("omits login and location when Sarah is authenticated with a saved location", () => {
+    const context = { headerLoggedIn: true, hasSavedLocation: true };
+    expect(shouldSkipTraditionalAccountBeat(beat("traditional-login"), context)).toBe(true);
+    expect(shouldSkipTraditionalAccountBeat(beat("choose-location"), context)).toBe(true);
+  });
+
+  it("keeps location when the authenticated account has no usable saved location", () => {
+    expect(
+      shouldSkipTraditionalAccountBeat(beat("choose-location"), {
+        headerLoggedIn: true,
+        hasSavedLocation: false,
+      })
+    ).toBe(false);
+  });
+
+  it("keeps login and location for guests", () => {
+    const context = { headerLoggedIn: false, hasSavedLocation: true };
+    expect(shouldSkipTraditionalAccountBeat(beat("traditional-login"), context)).toBe(false);
+    expect(shouldSkipTraditionalAccountBeat(beat("choose-location"), context)).toBe(false);
   });
 });

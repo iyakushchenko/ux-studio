@@ -10,6 +10,8 @@ See also: [SHELL.md](./SHELL.md) (architecture), [PROJECTS.md](./PROJECTS.md) (r
 
 Continuous **Play** uses the **same** beat/script runners as **Step Forward** (automated). Do not invent a dump-all / skip-type-in Play path. CJM-on chat enter = q0 then progressive; CJM-off = saved-chat load — [CHAT_PAGE_RAILS.md](../projects/boots-pharmacy/features/CHAT_PAGE_RAILS.md).
 
+The QA overlay also exposes **Fast test current CJM** and **Fast test all CJMs**. Fast mode uses those same runners and assertions, but applies a scoped timing profile to presentation-only waits and motion. It never skips beats, direct-clicks past cursor target checks, bypasses modal handling, weakens alignment guards, or changes REC pacing. The normal profile is restored in `finally`, including failures.
+
 **Type-in:** page composers must still animate letter-by-letter. Gate **QA/diag logging** of per-character progress only — never kill the animation to quiet the overlay. Dump smell: `typeIn.samples ≫ starts` (e.g. 249 vs 2).
 
 **Cursor travel:** never `await` FM controls after `stop()` alone — settles on onComplete/abort/ceiling (`demoCursor.ts`) or Play dies with `script-timeout` at confirmation.

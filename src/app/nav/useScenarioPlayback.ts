@@ -16,6 +16,7 @@ import {
   scenarioStallDiagnostic,
 } from "@/app/shell/playbackDiagnostic";
 import { playbackScrollMonitor } from "@/app/shell/playbackScrollMonitor";
+import { playbackMs } from "@/app/shell/playbackTiming";
 
 type Options = {
   active: boolean;
@@ -494,7 +495,7 @@ export function useScenarioPlayback({
       if (!advanceOneFrameRef.current(scheduleNext)) {
         completePlayback();
       }
-    }, playbackStepMs);
+    }, playbackMs(playbackStepMs));
   }, [completePlayback, playbackStepMs]);
 
   const advanceOneFrameRef = useRef<

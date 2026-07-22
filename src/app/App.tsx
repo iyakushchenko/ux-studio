@@ -15,10 +15,7 @@ import {
   resolveStableChatScenarioPlaylistFrames,
 } from "@/app/nav/resolveStudioTouchpoint";
 import { useScenarioPlayback, type PlaybackStepHooks } from "@/app/nav/useScenarioPlayback";
-import {
-  orchestraShowControls,
-  resolveActiveScreenScenario,
-} from "@/app/orchestra/resolveActiveScreenScenario";
+import { orchestraShowControls, resolveActiveScreenScenario } from "@/app/orchestra/resolveActiveScreenScenario";
 import {
   getJourneyForMode,
   resolveBeatIndexForScreenTab,
@@ -102,6 +99,7 @@ import {
   isDeletableRecordedJourneyId,
   readPersistedRecordingForJourney,
   removePersistedRecordedJourney,
+  withPersistedJourneyPlaybackProof,
 } from "@/app/journey/recordedJourneyPersist";
 import { getImportedJourneys } from "@/app/journey/journeyRuntimeStore";
 import {
@@ -1256,6 +1254,8 @@ export default function App() {
     current,
     screens: SCREENS,
   });
+  const snapshotScreenIdRef = useRef(snapshotScreenId);
+  snapshotScreenIdRef.current = snapshotScreenId;
   const snapshotStudioUrl = serializeStudioUrl({
     projectId: studioProjectId,
     screenId: snapshotScreenId,
@@ -1369,14 +1369,13 @@ export default function App() {
     currentBeat,
     onDiagnostic: handlePlaybackDiagnostic,
   });
-
   usePlaybackTransportGuard({
     snapshot: {
       active: !hubOpen,
       journeyMode: studioJourneyMode,
       isOnAir: transport.isOnAir,
       isScripting: transport.isScripting,
-      retreatSyncing: transport.retreatSyncing,
+      retreatSyncing: transport.retreatSyncing, isPausingBeforeReveal: transport.isPausingBeforeReveal,
       journeyId: activeJourney?.id,
       beatId: currentBeat?.id,
       beatLabel: currentBeat?.label,
@@ -1384,7 +1383,9 @@ export default function App() {
       touchpointLabel: studioTouchpoint.label,
       visibleProgress: `${studioProgress.visibleCount}/${studioProgress.totalFrames}`,
       playlist: studioPlaylist,
-      transportStepToken: transport.transportStepToken,
+      transportStepToken: transport.transportStepToken, currentTabIndex: current,
+      renderedScreenId: snapshotScreenId, expectedTabIndex: currentBeat?.protoTab != null ? studioTabToIndex(currentBeat.protoTab) : undefined,
+      visibleCount: studioProgress.visibleCount, totalFrames: studioProgress.totalFrames,
       availabilityOpen: wire?.availabilityOpen ?? false,
       loginPopupOpen: wire?.loginPopupOpen ?? false,
       vaccinePickerOpen: wire?.vaccinePickerOpen ?? false,
@@ -1394,7 +1395,6 @@ export default function App() {
     currentBeat,
     onDiagnostic: handlePlaybackDiagnostic,
   });
-
   const screenFramesBeat =
     activeScreenScenario != null &&
     activeJourney?.beats[journeyBeatIndex]?.kind === "screen-frames";
@@ -1622,7 +1622,7 @@ export default function App() {
           studioProjectId,
           studioPersonaId,
           journeyId
-        ) ?? studioPersona.journeyRecordings?.[journeyId]
+        ) ?? withPersistedJourneyPlaybackProof(studioProjectId, studioPersonaId, journeyId, studioPersona.journeyRecordings?.[journeyId])
       ),
     [studioJourneys, studioProjectId, studioPersonaId, studioPersona, cjmCompatibilityRevision]
   );
@@ -1767,9 +1767,7 @@ export default function App() {
       playbackScrollMonitor.reset();
       setPlaybackDiagnostic(null);
     });
-    registerPlaybackDiagnosticForceClear(() => {
-      setPlaybackDiagnostic(null);
-    });
+    registerPlaybackDiagnosticForceClear(() => setPlaybackDiagnostic(null));
     const unregisterMcp = registerStudioMcpHelpers({
       dismissDiagnostic: (opts) => {
         if (opts?.acknowledgeStop !== false) {
@@ -1800,10 +1798,12 @@ export default function App() {
         counter:
           document.querySelector(".studio-nav-scenario__counter")?.textContent?.trim() ??
           null,
+        screenId: snapshotScreenIdRef.current,
         beatId: playbackSnapshotRef.current.beatId ?? null,
         availStep: playbackSnapshotRef.current.availStep ?? null,
       }),
       getOrchestraModeId: () => orchestraModeId,
+      hasOrchestraMode: (modeId) => resolveJourneyForOrchestraMode(modeId) != null,
       setOrchestraMode: (modeId) => handleOrchestraModeChangeRef.current(modeId),
       setJourneyMode: (enabled) =>
         handleStudioJourneyModeChangeRef.current(enabled),

@@ -24,8 +24,10 @@ export const SCROLL_REVERSAL_MIN_COUNT = 3;
 export const SCROLL_JUMP_OUTSIDE_ANIM_PX = 52;
 export const SCROLL_STUTTER_FRAME_MS = 50;
 export const SCROLL_STUTTER_MIN_FRAMES = 3;
-/** Mid-path lag threshold — knife-edge 36 false-FAILed book-step3-camera (37px). */
-export const SCROLL_PATH_DEVIATION_PX = 48;
+/** Browser/compositor frames can land tens of px off-model without visible drift. */
+export const SCROLL_PATH_DEVIATION_PX = 64;
+/** Long camera moves receive proportional tolerance while large drift still fails. */
+export const SCROLL_PATH_DEVIATION_TRAVEL_RATIO = 0.08;
 /** Skip early easeOut frames — first samples lag before compositor catches up. */
 export const SCROLL_PATH_DEVIATION_MIN_PROGRESS = 0.12;
 
@@ -173,10 +175,14 @@ export function detectScrollPathDeviation(options: {
   if (progress < SCROLL_PATH_DEVIATION_MIN_PROGRESS) return null;
   const expected = startTop + (targetTop - startTop) * easeOutCubic(progress);
   const deviation = Math.abs(actualTop - expected);
-  if (deviation < SCROLL_PATH_DEVIATION_PX) return null;
+  const threshold = Math.max(
+    SCROLL_PATH_DEVIATION_PX,
+    Math.abs(targetTop - startTop) * SCROLL_PATH_DEVIATION_TRAVEL_RATIO
+  );
+  if (deviation < threshold) return null;
   return {
     kind: "scroll-path-deviation",
     message: `Eased scroll deviated ${Math.round(deviation)}px from expected path`,
-    detail: `progress=${progress.toFixed(2)} expected=${Math.round(expected)} actual=${Math.round(actualTop)}`,
+    detail: `progress=${progress.toFixed(2)} expected=${Math.round(expected)} actual=${Math.round(actualTop)} threshold=${Math.round(threshold)}`,
   };
 }

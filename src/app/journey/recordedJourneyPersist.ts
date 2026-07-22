@@ -22,6 +22,7 @@ import { getStudioRelease } from "@/app/shell/studioRelease";
 import type { PersonaId, ProjectId } from "@/projects/types";
 
 const STORAGE_PREFIX = "studio-recorded-cjm";
+const PROOF_STORAGE_PREFIX = "studio-cjm-playback-proof";
 
 type PersistedCatalogV2 = {
   version: 2;
@@ -33,6 +34,48 @@ type PersistedCatalogV2 = {
 
 function storageKey(projectId: string, personaId: string): string {
   return `${STORAGE_PREFIX}:${projectId}:${personaId}`;
+}
+
+function proofStorageKey(projectId: string, personaId: string, journeyId: string): string {
+  return `${PROOF_STORAGE_PREFIX}:${projectId}:${personaId}:${journeyId}`;
+}
+
+type PlaybackProof = NonNullable<
+  NonNullable<RecordingSession["metadata"]>["compatibilityProof"]
+>;
+
+function readPlaybackProof(
+  projectId: ProjectId | string,
+  personaId: PersonaId | string,
+  journeyId: string
+): PlaybackProof | undefined {
+  if (typeof localStorage === "undefined") return undefined;
+  try {
+    const raw = localStorage.getItem(proofStorageKey(projectId, personaId, journeyId));
+    if (!raw) return undefined;
+    const proof = JSON.parse(raw) as PlaybackProof;
+    return proof?.playbackContract && proof?.studioVersion && proof?.provedAt
+      ? proof
+      : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/** Apply an origin-local proof receipt to immutable deployed REC evidence. */
+export function withPersistedJourneyPlaybackProof(
+  projectId: ProjectId | string,
+  personaId: PersonaId | string,
+  journeyId: string,
+  session: RecordingSession | undefined
+): RecordingSession | undefined {
+  if (!session) return undefined;
+  const proof = readPlaybackProof(projectId, personaId, journeyId);
+  if (!proof) return session;
+  return {
+    ...session,
+    metadata: { ...session.metadata, compatibilityProof: proof },
+  };
 }
 
 function healPersistedJourney(
@@ -95,7 +138,7 @@ export function readPersistedRecordingForJourney(
   const catalog = readCatalogRaw(projectId, personaId);
   const session = catalog?.recordings?.[journeyId];
   if (!session || !Array.isArray(session.events)) return undefined;
-  return session;
+  return withPersistedJourneyPlaybackProof(projectId, personaId, journeyId, session);
 }
 
 /** Attach a successful playback proof without rewriting recording provenance. */
@@ -106,19 +149,26 @@ export function markPersistedJourneyPlaybackProven(
 ): boolean {
   const catalog = readCatalogRaw(projectId, personaId);
   const session = catalog?.recordings?.[journeyId];
-  if (!catalog || !session) return false;
-  const updated: RecordingSession = {
-    ...session,
-    metadata: {
-      ...session.metadata,
-      compatibilityProof: {
-        playbackContract: CJM_PLAYBACK_CONTRACT_VERSION,
-        studioVersion: getStudioRelease().version,
-        provedAt: new Date().toISOString(),
-      },
-    },
+  const proof: PlaybackProof = {
+    playbackContract: CJM_PLAYBACK_CONTRACT_VERSION,
+    studioVersion: getStudioRelease().version,
+    provedAt: new Date().toISOString(),
   };
-  persistRecordedJourneys(projectId, personaId, catalog.journeys, { [journeyId]: updated });
+  try {
+    localStorage.setItem(
+      proofStorageKey(projectId, personaId, journeyId),
+      JSON.stringify(proof)
+    );
+  } catch {
+    return false;
+  }
+  if (catalog && session) {
+    const updated: RecordingSession = {
+      ...session,
+      metadata: { ...session.metadata, compatibilityProof: proof },
+    };
+    persistRecordedJourneys(projectId, personaId, catalog.journeys, { [journeyId]: updated });
+  }
   window.dispatchEvent(new CustomEvent("studio:cjm-compatibility-proof", { detail: { journeyId } }));
   return true;
 }

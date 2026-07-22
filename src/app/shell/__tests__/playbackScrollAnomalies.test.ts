@@ -89,6 +89,22 @@ describe("playbackScrollAnomalies", () => {
     ).toBeNull();
   });
 
+  it("ignores a transient 52px compositor offset on a short camera move", () => {
+    const duration = 500;
+    const now = 80;
+    const expected = 400 * (1 - Math.pow(1 - now / duration, 3));
+    expect(
+      detectScrollPathDeviation({
+        startTop: 0,
+        targetTop: 400,
+        duration,
+        startTime: 0,
+        actualTop: expected - 52,
+        now,
+      })
+    ).toBeNull();
+  });
+
   it("still FAILS mid-path large lag after grace", () => {
     expect(
       detectScrollPathDeviation({

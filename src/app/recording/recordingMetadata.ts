@@ -4,6 +4,14 @@ import { getStudioRelease } from "@/app/shell/studioRelease";
 
 export const CJM_PLAYBACK_CONTRACT_VERSION = 1 as const;
 
+function hasCurrentCompatibilityProof(session: RecordingSession): boolean {
+  const proof = session.metadata?.compatibilityProof;
+  return (
+    proof?.playbackContract === CJM_PLAYBACK_CONTRACT_VERSION &&
+    proof.studioVersion === getStudioRelease().version
+  );
+}
+
 export type CjmMetadataIssue = {
   code: string;
   detail: string;
@@ -56,6 +64,7 @@ export function buildCjmOptionMetadata(
 ): CjmOptionMetadata {
   const builtIn = journey.id === "agentic-cjm" || journey.id === "traditional-cjm";
   const currentVersion = getStudioRelease().version;
+  const currentProof = session ? hasCurrentCompatibilityProof(session) : false;
   const issues: CjmMetadataIssue[] = [];
   if (!builtIn && !session) {
     issues.push({
@@ -64,17 +73,21 @@ export function buildCjmOptionMetadata(
       severity: "blocking",
     });
   }
-  if (session && session.metadata?.recordingContractVersion !== 1) {
+  if (
+    session &&
+    session.metadata?.recordingContractVersion !== CJM_PLAYBACK_CONTRACT_VERSION &&
+    !currentProof
+  ) {
     issues.push({
       code: "legacy-recording-contract",
-      detail: "Recording predates the current metadata/diagnostic contract.",
-      severity: "blocking",
+      detail: "Recording predates the current metadata contract; run playback to establish a current compatibility proof.",
+      severity: "warning",
     });
   }
   if (
     session?.metadata?.studioVersion &&
     session.metadata.studioVersion !== currentVersion &&
-    session.metadata.compatibilityProof?.playbackContract !== CJM_PLAYBACK_CONTRACT_VERSION
+    !currentProof
   ) {
     issues.push({
       code: "retest-required",

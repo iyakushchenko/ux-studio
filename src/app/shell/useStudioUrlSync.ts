@@ -119,9 +119,6 @@ export function useStudioUrlSync(options: StudioUrlSyncOptions): void {
     // BUT intentional modal OPEN (Continue → choose-pharmacy) must still stamp
     // `&modal=` so REC + agents can see navigable state (never ignore).
     const modalChanged = lastModalRef.current !== modalId;
-    if (isStudioPostAgentResetSyncLocked()) {
-      if (!(modalChanged && Boolean(modalId))) return;
-    }
     const screenId = resolveScreenIdFromNav({ hubOpen, current, screens });
     const state: StudioUrlState = {
       projectId,
@@ -131,6 +128,18 @@ export function useStudioUrlSync(options: StudioUrlSyncOptions): void {
       cjm: journeyMode,
       modalId,
     };
+    if (isStudioPostAgentResetSyncLocked()) {
+      if (!(modalChanged && Boolean(modalId))) {
+        // A force-clear immediately followed by Play can change the screen
+        // while the reset lock owns the address bar. Reconcile once the lock
+        // expires even when React state remains otherwise unchanged.
+        const retry = window.setTimeout(() => {
+          const search = writeStudioUrl(state);
+          lastHrefRef.current = search || "?";
+        }, 2600);
+        return () => window.clearTimeout(retry);
+      }
+    }
     lastModalRef.current = modalId;
     // Lean QA chat — modal open/close on REC + Play (URL is navigable state).
     try {

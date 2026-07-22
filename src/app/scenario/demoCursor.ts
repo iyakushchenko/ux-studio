@@ -18,11 +18,8 @@ import {
   noteCursorPathSample,
   notePlaybackCursorEvent,
 } from "@/app/shell/playbackCursorDiagnostic";
-import {
-  playbackDiagClick,
-  playbackDiagCursor,
-  playbackDiagTarget,
-} from "@/app/shell/playbackDiag";
+import { playbackDiagClick, playbackDiagCursor, playbackDiagTarget } from "@/app/shell/playbackDiag";
+import { playbackMs } from "@/app/shell/playbackTiming";
 import {
   isElementBlockedByModal,
   resolveClickTargetRespectingModal,
@@ -46,6 +43,7 @@ import {
 import {
   CURSOR_ENGINE_PARK_TRAVEL_MS,
   isForbiddenRestTarget,
+  isDisabledDemoInteractionTarget,
   isTextEntryFocusTarget,
   logCursorEngineTracker,
   noteCursorGraphicModeChange,
@@ -65,6 +63,7 @@ export {
   CURSOR_GRAPHIC_THRASH_WINDOW_MS,
   FORBIDDEN_REST_TARGET_SELECTORS,
   isForbiddenRestTarget,
+  isDisabledDemoInteractionTarget,
   isEarlyHandInteractiveTarget,
   isHotspotOverInteractiveEdge,
   isTextEntryFocusTarget,
@@ -1168,7 +1167,7 @@ const BUTTON_INTERACTION_SELECTORS = [
 ];
 
 export function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => window.setTimeout(resolve, ms));
+  return new Promise((resolve) => window.setTimeout(resolve, playbackMs(ms)));
 }
 
 export function clearDemoCtaStates(): void {
@@ -1666,6 +1665,7 @@ function tapDemoCursor(cursor: HTMLElement): void {
 
 export function isClickableTarget(target: HTMLElement): boolean {
   if (!target.isConnected) return false;
+  if (isDisabledDemoInteractionTarget(target)) return false;
   const rect = target.getBoundingClientRect();
   if (rect.width < 2 || rect.height < 2) return false;
   const style = window.getComputedStyle(target);
@@ -1699,6 +1699,8 @@ export async function moveDemoCursorTo(
   target: HTMLElement,
   options?: {
     applyHover?: boolean;
+    /** Keep early hand until caller transfers it to proven hover. */
+    preservePointerHintOnSettle?: boolean;
     syncPageScroll?: boolean;
     shouldAbort?: () => boolean;
   }
@@ -1786,7 +1788,7 @@ export async function moveDemoCursorTo(
   if (travelAborted()) return bail();
 
   const cursorBaseMs = CTA_TRAVEL_MS * randomInRange(0.88, 1.14);
-  const durationMs = Math.max(cursorBaseMs, scrollDurationMs);
+  const durationMs = playbackMs(Math.max(cursorBaseMs, scrollDurationMs), 24);
 
   const traveled = await animateCursorTravel(
     cursor,
@@ -1799,7 +1801,7 @@ export async function moveDemoCursorTo(
       // Track only while a real page scroll is running; frozen ≥90% progress.
       trackTarget: syncPageScroll && scrollDurationMs > 0 ? target : undefined,
       earlyHandTarget: interactionRoot,
-      keepPointerHintOnSettle: applyHover,
+      keepPointerHintOnSettle: applyHover || options?.preservePointerHintOnSettle === true,
       shouldAbort: () => travelAborted(),
     }
   );
@@ -1818,7 +1820,7 @@ export async function moveDemoCursorTo(
     // Hover root owns hand now — drop travel latch without arrow blink.
     travelPointerHint = false;
     syncDemoCursorGraphicMode();
-  } else {
+  } else if (!options?.preservePointerHintOnSettle) {
     travelPointerHint = false;
     syncDemoCursorGraphicMode();
   }
@@ -1999,6 +2001,8 @@ export async function simulateDemoPointerClick(
     syncPageScroll: options?.scroll !== false,
     // Hover only after on-target gate below — never mid-travel / pre-gate.
     applyHover: false,
+    // Transfer early hand to proven hover without a settle blink.
+    preservePointerHintOnSettle: true,
   });
   if (!cursor || options?.shouldAbort?.()) {
     playbackDiagClick({
@@ -2048,6 +2052,8 @@ export async function simulateDemoPointerClick(
 
   // Hover class + enter/over/move events — only after tip is proven on-target.
   setDemoInteractionHover(pressRoot, true, { x, y });
+  travelPointerHint = false;
+  syncDemoCursorGraphicMode();
   await delay(CTA_HOVER_DWELL_MS);
   if (options?.shouldAbort?.()) {
     setDemoInteractionHover(pressRoot, false, { x, y });
@@ -2060,6 +2066,33 @@ export async function simulateDemoPointerClick(
       selector,
       bbox,
       detail: "click FAIL — aborted during hover",
+    });
+    await releaseDemoCursorAfterScript();
+    return false;
+  }
+
+  // Async UI changes must never turn a safe dwell into a stale press.
+  const guardedAfterHover = resolveClickTargetRespectingModal(clickTarget);
+  if (
+    !guardedAfterHover ||
+    isElementBlockedByModal(clickTarget) ||
+    !isClickableTarget(clickTarget) ||
+    !isClickableTarget(pressRoot)
+  ) {
+    setDemoInteractionHover(pressRoot, false, { x, y });
+    notePlaybackCursorEvent("abort", {
+      target: describeCursorTarget(clickTarget),
+      abortReason: isElementBlockedByModal(clickTarget)
+        ? "blocked-by-modal"
+        : "target-no-longer-actionable",
+    });
+    playbackDiagClick({
+      ok: false,
+      selector,
+      bbox,
+      detail: isElementBlockedByModal(clickTarget)
+        ? "click FAIL — blocked-by-modal after hover"
+        : "click FAIL — target no longer actionable after hover",
     });
     await releaseDemoCursorAfterScript();
     return false;

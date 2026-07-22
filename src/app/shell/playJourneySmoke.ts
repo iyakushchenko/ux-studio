@@ -86,12 +86,17 @@ export async function runPlayJourneyToStartSmoke(options: {
   let armedState = options.getState();
   while (Date.now() < armDeadline) {
     const counter = parseVisible(armedState?.counter);
-    if (armedState?.journeyMode === true && counter.total > 0) break;
+    if (
+      armedState?.journeyMode === true &&
+      armedState.orchestraMode === options.orchestraMode &&
+      counter.total > 0
+    ) break;
     await options.delay(100);
     armedState = options.getState();
   }
   if (
     armedState?.journeyMode !== true ||
+    armedState.orchestraMode !== options.orchestraMode ||
     parseVisible(armedState.counter).total <= 0
   ) {
     return {
@@ -104,7 +109,31 @@ export async function runPlayJourneyToStartSmoke(options: {
   if (!options.triggerTransport("jump-to-start")) {
     return { pass: false, reason: "jump-to-start-unavailable" };
   }
-  await options.delay(800);
+  const startDeadline = Date.now() + 5_000;
+  let startState = options.getState();
+  while (Date.now() < startDeadline) {
+    if (
+      startState?.orchestraMode === options.orchestraMode &&
+      startState.beatId === options.startBeatId &&
+      startState.screenId === options.startScreenId
+    ) break;
+    await options.delay(100);
+    startState = options.getState();
+  }
+  if (
+    startState?.orchestraMode !== options.orchestraMode ||
+    startState.beatId !== options.startBeatId ||
+    startState.screenId !== options.startScreenId
+  ) {
+    playbackDiagLog("error", "journey-start-did-not-settle", {
+      detail: `mode=${startState?.orchestraMode ?? "?"}/${options.orchestraMode} beat=${startState?.beatId ?? "?"}/${options.startBeatId} screen=${startState?.screenId ?? "?"}/${options.startScreenId}`,
+    });
+    return {
+      pass: false,
+      reason: "journey-start-did-not-settle",
+      state: startState,
+    };
+  }
   if (!options.triggerTransport("play")) {
     return { pass: false, reason: "trigger-play-unavailable" };
   }

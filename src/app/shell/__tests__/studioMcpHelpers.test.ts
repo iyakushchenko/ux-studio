@@ -111,6 +111,34 @@ describe("studioMcpHelpers", () => {
     expect(win.__protoSetOrchestraMode?.("invalid" as never)).toBe(false);
   });
 
+  it("switches to a recorded journey that exists in the active catalog", () => {
+    const setOrchestraMode = vi.fn();
+    const win = { __protoControlPanelLog: [] } as Window & {
+      __protoControlPanelLog: unknown[];
+    };
+    vi.stubGlobal("window", win);
+
+    registerStudioMcpHelpers({
+      dismissDiagnostic: () => {},
+      isDiagnosticOpen: () => false,
+      getState: () => ({
+        journeyMode: false,
+        scrollLock: false,
+        screenId: "plp",
+        label: null,
+        counter: null,
+        beatId: null,
+        availStep: null,
+      }),
+      hasOrchestraMode: (id) => id === "rec-agentic-test",
+      setOrchestraMode,
+    });
+
+    expect(win.__protoSetOrchestraMode?.("rec-agentic-test")).toBe(true);
+    expect(setOrchestraMode).toHaveBeenCalledWith("rec-agentic-test");
+    expect(win.__protoSetOrchestraMode?.("rec-missing")).toBe(false);
+  });
+
   it("runs smoke retreat baseline checks", () => {
     const win = {
       __protoControlPanelLog: [],

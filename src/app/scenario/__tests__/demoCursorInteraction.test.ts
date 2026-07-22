@@ -223,6 +223,25 @@ describe("demoCursor interaction contract", () => {
     expect(btn.classList.contains("proto-chat-cta--pressed")).toBe(false);
   });
 
+  it("refuses disabled targets without hand, press, or click", async () => {
+    const btn = mountButton();
+    btn.disabled = true;
+    const clickSpy = vi.fn();
+    const downSpy = vi.fn();
+    btn.addEventListener("click", clickSpy);
+    btn.addEventListener("pointerdown", downSpy);
+
+    const clickPromise = simulateDemoPointerClick(btn, { scroll: false });
+    await vi.runAllTimersAsync();
+
+    expect(await clickPromise).toBe(false);
+    expect(clickSpy).not.toHaveBeenCalled();
+    expect(downSpy).not.toHaveBeenCalled();
+    expect(isDemoCursorPointerMode()).toBe(false);
+    expect(btn.classList.contains("proto-chat-cta--hover")).toBe(false);
+    expect(btn.classList.contains("proto-chat-cta--pressed")).toBe(false);
+  });
+
   it("settleDemoCursorAfterClick clears pointer mode immediately", () => {
     const cursor = document.createElement("div");
     cursor.className = "proto-chat-demo-cursor proto-chat-demo-cursor--pointer";
