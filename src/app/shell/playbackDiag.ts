@@ -9,7 +9,9 @@
  * Console:
  *   window.__studioPlaybackDiag()
  *   window.__studioAssertTypeIn({ minChars?: number, minSamples?: number })
- *   window.__studioAssertPlayEndedAtStart({ startBeatId, startScreenId? })
+ *   window.__studioAssertPlayEndedAtEnd({ endBeatId?, endScreenId?, startBeatId? })
+ *   // legacy alias (same as AtEnd — play stays on finale, not start):
+ *   window.__studioAssertPlayEndedAtStart(...)
  *   window.__studioPlaybackDiagClear()
  */
 
@@ -22,6 +24,7 @@ import {
 } from "@/app/shell/playbackDiagQaBridge";
 import { clearDemoCursorCarriageLatches } from "@/app/scenario/demoCursor";
 import { isFastPlayback } from "@/app/shell/playbackTiming";
+import { isQaProveModeActive } from "@/app/shell/agent-testing/agentTestingPresence";
 
 export type PlaybackDiagKind =
   | "type-in-start"
@@ -1020,7 +1023,10 @@ export function playbackDiagChatBubbleMotion(options: {
     // frame-by-frame visual interpolation. Compressed rAF samples can look
     // discontinuous by design, so retain them in diagnostics but never turn
     // them into an autonomous fail handoff. Normal playback remains strict.
-    if ((jump || chop) && !isFastPlayback()) {
+    // Prove/MCP step-forward smokes also stay diagnostic-only — handoff freeze
+    // without a polled PO latch silent-no-ops SF → transport-no-progress
+    // (PO fury 2026-07-22 agentic book-step2 / mid-chat).
+    if ((jump || chop) && !isFastPlayback() && !isQaProveModeActive()) {
       try {
         (
           window as Window & { __studioBeginQaFailHandoff?: (r: string) => void }
@@ -1319,54 +1325,77 @@ export function playbackDiagPlayEnd(options: {
   toBeatId?: string | null;
   counter?: string | null;
   detail?: string;
+  /** @deprecated Prefer endScreenId — play-end stays on finale. */
   startScreenId?: string | null;
+  endScreenId?: string | null;
 }): void {
   const screen = readScreenId();
+  const landedScreen =
+    options.endScreenId ?? options.startScreenId ?? screen;
   push({
     kind: "play-end",
-    detail: options.detail ?? "play-end → journey-start",
+    detail: options.detail ?? "play-end → stay at journey end",
     beatId: options.toBeatId ?? options.fromBeatId,
     startBeatId: options.toBeatId,
-    startScreenId: options.startScreenId ?? screen,
+    startScreenId: landedScreen,
     counter: options.counter,
     screenBefore: screen,
-    screenAfter: options.startScreenId ?? screen,
+    screenAfter: landedScreen,
     mode: resolvePlaybackDiagMode(),
     surface: options.fromBeatId
-      ? `${options.fromBeatId}→${options.toBeatId ?? "start"}`
+      ? `${options.fromBeatId}→${options.toBeatId ?? "end"}`
       : undefined,
   });
 }
 
-export type PlayEndAtStartAssertOptions = {
-  /** Expected first playable beat id (e.g. traditional-plp / agentic-home). */
-  startBeatId: string;
-  /** URL screen id that must match start (e.g. plp / site-pilot). */
+export type PlayEndAtEndAssertOptions = {
+  /** Expected last playable beat id (e.g. appointment-details). */
+  endBeatId?: string;
+  /** URL screen id that must match finale (e.g. appointment-details). */
+  endScreenId?: string;
+  /**
+   * When set on multi-beat journeys, FAIL if transport rewound to this start
+   * beat (product: play-end stays on finale).
+   */
+  startBeatId?: string;
+  /** Require STEPS visible === total after play-end (default true). */
+  requireCounterAtEnd?: boolean;
+};
+
+/** @deprecated Use PlayEndAtEndAssertOptions — play-end stays on finale. */
+export type PlayEndAtStartAssertOptions = PlayEndAtEndAssertOptions & {
+  /** @deprecated Prefer endBeatId. */
   startScreenId?: string;
 };
 
-export type PlayEndAtStartAssertResult = {
+export type PlayEndAtEndAssertResult = {
   pass: boolean;
   reason?: string;
   bundle: PlaybackDiagBundle;
   beatId?: string | null;
   screenId?: string | null;
+  counter?: string | null;
 };
 
-export function assertPlaybackPlayEndedAtStart(
-  options: PlayEndAtStartAssertOptions
-): PlayEndAtStartAssertResult {
+/** @deprecated Alias of PlayEndAtEndAssertResult. */
+export type PlayEndAtStartAssertResult = PlayEndAtEndAssertResult;
+
+export function assertPlaybackPlayEndedAtEnd(
+  options: PlayEndAtEndAssertOptions = {}
+): PlayEndAtEndAssertResult {
   const bundle = getPlaybackDiagBundle();
   const state = (
     window as Window & {
       __protoStudioState?: () => {
         beatId?: string | null;
+        counter?: string | null;
         isPlaying?: boolean;
         isOnAir?: boolean;
       };
     }
   ).__protoStudioState?.();
   const beatId = state?.beatId ?? null;
+  const counter = state?.counter ?? null;
   const screenId =
     typeof location !== "undefined"
       ? new URLSearchParams(location.search).get("screen")
@@ -1375,12 +1404,13 @@ export function assertPlaybackPlayEndedAtStart(
   if (bundle.playEnd.count < 1) {
     const result = {
       pass: false,
-      reason: "no play-end diag — Play did not return to CJM start",
+      reason: "no play-end diag — Play did not finish",
       bundle,
       beatId,
       screenId,
+      counter,
     };
-    console.info("[PLAYBACK_DIAG]", "assertPlayEndAtStart FAIL", result.reason);
+    console.info("[PLAYBACK_DIAG]", "assertPlayEndAtEnd FAIL", result.reason);
     return result;
   }
 
@@ -1391,54 +1421,114 @@ export function assertPlaybackPlayEndedAtStart(
       bundle,
       beatId,
       screenId,
+      counter,
     };
-    console.info("[PLAYBACK_DIAG]", "assertPlayEndAtStart FAIL", result.reason);
-    return result;
-  }
-
-  if (beatId !== options.startBeatId) {
-    const result = {
-      pass: false,
-      reason: `beatId=${beatId ?? "null"} expected start ${options.startBeatId}`,
-      bundle,
-      beatId,
-      screenId,
-    };
-    console.info("[PLAYBACK_DIAG]", "assertPlayEndAtStart FAIL", result.reason);
+    console.info("[PLAYBACK_DIAG]", "assertPlayEndAtEnd FAIL", result.reason);
     return result;
   }
 
   if (screenId === "hub") {
     const result = {
       pass: false,
-      reason: "screen=hub after play-end — must stay on CJM start, not hub",
+      reason: "screen=hub after play-end — must stay on finale, not hub",
       bundle,
       beatId,
       screenId,
+      counter,
     };
-    console.info("[PLAYBACK_DIAG]", "assertPlayEndAtStart FAIL", result.reason);
+    console.info("[PLAYBACK_DIAG]", "assertPlayEndAtEnd FAIL", result.reason);
     return result;
   }
 
-  if (options.startScreenId && screenId !== options.startScreenId) {
+  if (options.endBeatId && beatId !== options.endBeatId) {
     const result = {
       pass: false,
-      reason: `screen=${screenId ?? "null"} expected ${options.startScreenId}`,
+      reason: `beatId=${beatId ?? "null"} expected end ${options.endBeatId}`,
       bundle,
       beatId,
       screenId,
+      counter,
     };
-    console.info("[PLAYBACK_DIAG]", "assertPlayEndAtStart FAIL", result.reason);
+    console.info("[PLAYBACK_DIAG]", "assertPlayEndAtEnd FAIL", result.reason);
     return result;
   }
 
-  const result = { pass: true, bundle, beatId, screenId };
-  console.info("[PLAYBACK_DIAG]", "assertPlayEndAtStart PASS", {
+  if (options.endScreenId && screenId !== options.endScreenId) {
+    const result = {
+      pass: false,
+      reason: `screen=${screenId ?? "null"} expected ${options.endScreenId}`,
+      bundle,
+      beatId,
+      screenId,
+      counter,
+    };
+    console.info("[PLAYBACK_DIAG]", "assertPlayEndAtEnd FAIL", result.reason);
+    return result;
+  }
+
+  // Anti-rewind: multi-beat Play must not land back on journey start.
+  if (
+    options.startBeatId &&
+    options.endBeatId &&
+    options.startBeatId !== options.endBeatId &&
+    beatId === options.startBeatId
+  ) {
+    const result = {
+      pass: false,
+      reason: `beatId rewound to start ${options.startBeatId} — play-end must stay at end`,
+      bundle,
+      beatId,
+      screenId,
+      counter,
+    };
+    console.info("[PLAYBACK_DIAG]", "assertPlayEndAtEnd FAIL", result.reason);
+    return result;
+  }
+
+  const requireCounter = options.requireCounterAtEnd !== false;
+  if (requireCounter && counter) {
+    const match = /(\d+)\s*\/\s*(\d+)/.exec(counter);
+    if (match) {
+      const visible = Number(match[1]);
+      const total = Number(match[2]);
+      if (total > 0 && visible < total) {
+        const result = {
+          pass: false,
+          reason: `counter=${counter} expected N/N at play-end (not rewound)`,
+          bundle,
+          beatId,
+          screenId,
+          counter,
+        };
+        console.info("[PLAYBACK_DIAG]", "assertPlayEndAtEnd FAIL", result.reason);
+        return result;
+      }
+    }
+  }
+
+  const result = { pass: true, bundle, beatId, screenId, counter };
+  console.info("[PLAYBACK_DIAG]", "assertPlayEndAtEnd PASS", {
     beatId,
     screenId,
+    counter,
     playEndCount: bundle.playEnd.count,
   });
   return result;
+}
+
+/**
+ * @deprecated Play-end stays on finale — use {@link assertPlaybackPlayEndedAtEnd}.
+ * Maps legacy startScreenId → endScreenId; startBeatId kept for anti-rewind.
+ */
+export function assertPlaybackPlayEndedAtStart(
+  options: PlayEndAtStartAssertOptions
+): PlayEndAtEndAssertResult {
+  return assertPlaybackPlayEndedAtEnd({
+    endBeatId: options.endBeatId,
+    endScreenId: options.endScreenId ?? options.startScreenId,
+    startBeatId: options.startBeatId,
+    requireCounterAtEnd: options.requireCounterAtEnd,
+  });
 }
 
 export type TypeInAssertOptions = {
@@ -1520,23 +1610,33 @@ export function installPlaybackDiagWindowApis(): void {
     __studioPlaybackDiag?: () => PlaybackDiagBundle;
     __studioPlaybackDiagClear?: () => void;
     __studioAssertTypeIn?: (options?: TypeInAssertOptions) => TypeInAssertResult;
+    __studioAssertPlayEndedAtEnd?: (
+      options?: PlayEndAtEndAssertOptions
+    ) => PlayEndAtEndAssertResult;
+    /** @deprecated Prefer __studioAssertPlayEndedAtEnd — play stays on finale. */
     __studioAssertPlayEndedAtStart?: (
-      options: PlayEndAtStartAssertOptions
-    ) => PlayEndAtStartAssertResult;
+      options?: PlayEndAtStartAssertOptions
+    ) => PlayEndAtEndAssertResult;
     __protoPlaybackDiag?: () => PlaybackDiagBundle;
     __protoPlaybackDiagClear?: () => void;
     __protoAssertTypeIn?: (options?: TypeInAssertOptions) => TypeInAssertResult;
+    __protoAssertPlayEndedAtEnd?: (
+      options?: PlayEndAtEndAssertOptions
+    ) => PlayEndAtEndAssertResult;
+    /** @deprecated Prefer __protoAssertPlayEndedAtEnd. */
     __protoAssertPlayEndedAtStart?: (
-      options: PlayEndAtStartAssertOptions
-    ) => PlayEndAtStartAssertResult;
+      options?: PlayEndAtStartAssertOptions
+    ) => PlayEndAtEndAssertResult;
   };
   w.__studioPlaybackDiag = getPlaybackDiagBundle;
   w.__studioPlaybackDiagClear = playbackDiagClear;
   w.__studioAssertTypeIn = assertPlaybackTypeIn;
+  w.__studioAssertPlayEndedAtEnd = assertPlaybackPlayEndedAtEnd;
   w.__studioAssertPlayEndedAtStart = assertPlaybackPlayEndedAtStart;
   w.__protoPlaybackDiag = getPlaybackDiagBundle;
   w.__protoPlaybackDiagClear = playbackDiagClear;
   w.__protoAssertTypeIn = assertPlaybackTypeIn;
+  w.__protoAssertPlayEndedAtEnd = assertPlaybackPlayEndedAtEnd;
   w.__protoAssertPlayEndedAtStart = assertPlaybackPlayEndedAtStart;
   installPlaybackDiagQaBridgeApis();
 }
@@ -1544,7 +1644,9 @@ export function installPlaybackDiagWindowApis(): void {
 export function uninstallPlaybackDiagWindowApis(): void {
   const w = window as Window & {
     __studioPlaybackDiag?: unknown;
+    __studioAssertPlayEndedAtEnd?: unknown;
     __studioAssertPlayEndedAtStart?: unknown;
+    __protoAssertPlayEndedAtEnd?: unknown;
     __protoAssertPlayEndedAtStart?: unknown;
     __studioPlaybackDiagClear?: unknown;
     __studioAssertTypeIn?: unknown;
@@ -1555,10 +1657,12 @@ export function uninstallPlaybackDiagWindowApis(): void {
   delete w.__studioPlaybackDiag;
   delete w.__studioPlaybackDiagClear;
   delete w.__studioAssertTypeIn;
+  delete w.__studioAssertPlayEndedAtEnd;
   delete w.__studioAssertPlayEndedAtStart;
   delete w.__protoPlaybackDiag;
   delete w.__protoPlaybackDiagClear;
   delete w.__protoAssertTypeIn;
+  delete w.__protoAssertPlayEndedAtEnd;
   delete w.__protoAssertPlayEndedAtStart;
   uninstallPlaybackDiagQaBridgeApis();
 }

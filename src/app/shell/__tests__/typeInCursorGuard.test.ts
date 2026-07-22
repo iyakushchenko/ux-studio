@@ -14,6 +14,8 @@ import {
 import { getPlaybackDiagBundle, playbackDiagClear } from "@/app/shell/playbackDiag";
 import {
   beginTypeInCursorGuard,
+  endTypeInCursorGuard,
+  isTypeInCursorGuardActive,
   reportTypeInCursorVisibility,
   resetTypeInCursorGuard,
   tickTypeInCursorGuard,
@@ -85,5 +87,18 @@ describe("typeInCursorGuard", () => {
     expect(visible).toBe(false);
     expect(peekPoSignal()?.code).toBe("CURSOR_HIDDEN_DURING_TYPEIN");
     expect(getPlaybackDiagBundle().cursor.hidden).toBe(1);
+  });
+
+  it("exposes active latch for stale-pause skip during type-in", async () => {
+    setDemoCursorJourneyMode(true, { parkAfterInteraction: true });
+    await parkDemoCursorAtRest({ force: true, reason: "test-seed" });
+    const ta = document.createElement("textarea");
+    document.body.appendChild(ta);
+    expect(isTypeInCursorGuardActive()).toBe(false);
+    beginTypeInCursorGuard(ta);
+    expect(isTypeInCursorGuardActive()).toBe(true);
+    endTypeInCursorGuard();
+    expect(isTypeInCursorGuardActive()).toBe(false);
+    ta.remove();
   });
 });

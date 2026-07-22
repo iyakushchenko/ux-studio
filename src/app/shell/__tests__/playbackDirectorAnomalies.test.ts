@@ -168,6 +168,29 @@ describe("journeyBeatDirector", () => {
     ).toBe(false);
   });
 
+  it("advances a chained View Details click to the Appointment details beat (LESSONS 2026-07-22 beat-tab-mismatch)", () => {
+    const appointmentDetailsBeat: JourneyBeat = {
+      id: "appointment-details",
+      label: "Appointment details",
+      kind: "tab-landing",
+      protoTab: 9,
+    };
+
+    expect(
+      shouldAdvanceAfterChainedManualDirectorBeat(
+        appointmentHistoryBeat,
+        appointmentDetailsBeat
+      )
+    ).toBe(true);
+    // Confirmation's own chained script does not navigate ahead — no auto-advance.
+    expect(
+      shouldAdvanceAfterChainedManualDirectorBeat(
+        confirmationBeat,
+        appointmentHistoryBeat
+      )
+    ).toBe(false);
+  });
+
   it("does not expect viewport follow when touchpoint is a popup", () => {
     expect(
       touchpointExpectsViewportFollow(

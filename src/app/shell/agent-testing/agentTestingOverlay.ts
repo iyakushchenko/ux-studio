@@ -39,7 +39,6 @@ import { animate, motionEaseInOutTransition } from "@/uxds/motion";
 import {
   formatActivityStatus,
   type AgentTestingActivityPhase,
-  resolveCaptureToggleLabel,
 } from "@/app/shell/agent-testing/agentTestingActivity";
 import {
   bugIconClosesSession,
@@ -62,6 +61,10 @@ import {
   type QaHandoffOptions,
   type AgentTestingSessionKind,
 } from "@/app/shell/agent-testing/agentTestingSession";
+import {
+  canActivateRunTestFromPopup,
+  resolveQaPopupActionsChrome,
+} from "@/app/shell/agent-testing/qaPopupActionState";
 import {
   clearNavMcpHintDom,
   deriveLiveMcpStatus,
@@ -167,8 +170,10 @@ import {
   deriveAgentControlKind,
   isCjmCassetteOn,
   readLiveJourneyIsPlaying,
+  readLiveJourneyOnAir,
   type AgentControlKind,
 } from "@/app/shell/agent-testing/agentTestingControlKind";
+import { isTypeInCursorGuardActive } from "@/app/shell/typeInCursorGuard";
 import {
   clearAgentTestingFinaleSeal,
   isAgentTestingFinaleSealed,
@@ -310,7 +315,10 @@ type OverlayApi = {
   /** Play gate: auto-lift Pause-only (not FAIL modal / freeze). */
   autoResumeCaptureForPlay: () => boolean;
   isCapturePaused: () => boolean;
+  isDiagnosticOpen: () => boolean;
   isDiagnosticBlocking: () => boolean;
+  /** Wipe freeze / handoff / sticky diagnosticBlocking (Reset / prove orphan). */
+  clearPlaybackBlocksForReset: (source?: string) => void;
 };
 
 /** Result of `pauseForAgentLeave`. */
@@ -1064,9 +1072,22 @@ export function beginQaFailHandoff(reason: string): void {
     } catch {
       /* hang-safe */
     }
-    return;
+  } else {
+    beginFailHandoffFromOverlay(reason);
   }
-  beginFailHandoffFromOverlay(reason);
+  // HARD — always latch so MCP smokes poll + abort (never silent SF no-op →
+  // transport-no-progress while freeze blocks refusePlayIfQaBlocks).
+  try {
+    latchPoSignal({
+      type: "alarm",
+      code: "QA_FAIL_HANDOFF",
+      note: reason.trim() || "fail-handoff",
+      sitrepLine: lastSitrepLine,
+      timeline: timelineKeys,
+    });
+  } catch {
+    /* hang-safe */
+  }
 }
 
 /**
@@ -1759,38 +1780,43 @@ function syncSessionChrome(): void {
         : "Reset session — clear log, ring, and timer";
   }
 
+  const suiteStatus = getAutonomousQaSuiteStatus();
+  const actions = resolveQaPopupActionsChrome({
+    active,
+    settling,
+    sessionKind: kind,
+    selectedSuiteId: selectedQaSuiteId,
+    suitePhase: suiteStatus?.phase ?? "idle",
+    capturePaused,
+    sessionHadProgress,
+    suiteDescription: selectedQaSuiteId
+      ? getQaSuiteDefinition(selectedQaSuiteId)?.description
+      : undefined,
+  });
+  root.dataset.qaActionState = actions.state;
+
   const captureBtn = root.querySelector<HTMLButtonElement>(".studio-agent-testing-overlay__capture-toggle");
   if (captureBtn) {
-    const show = active && !settling;
-    captureBtn.hidden = !show;
-    captureBtn.disabled = !show;
-    const cta = resolveCaptureToggleLabel({
-      capturePaused,
-      sessionHadProgress,
-    });
-    const suiteStatus = getAutonomousQaSuiteStatus();
-    captureBtn.textContent = selectedQaSuiteId
-      ? suiteStatus?.phase === "running" ? "Running…" : "Run Test"
-      : cta;
-    captureBtn.disabled = !show || suiteStatus?.phase === "running";
-    if (selectedQaSuiteId) {
-      captureBtn.title = getQaSuiteDefinition(selectedQaSuiteId)?.description ?? "Run selected autonomous QA suite";
-    } else if (cta === "Pause") {
-      captureBtn.title =
-        kind === "agent"
-          ? "Pause — freeze clock + halt Play; type Message, then Resume"
-          : "Pause — freeze clock + stop capture";
-    } else if (cta === "Resume") {
-      captureBtn.title =
-        kind === "agent" ? "Resume capture (does not auto-Play — transport stays stopped)" : "Resume capture + clock";
-    } else {
-      captureBtn.title = "Start capture + clock";
-    }
+    const { primary } = actions;
+    captureBtn.hidden = primary.hidden;
+    captureBtn.disabled = primary.disabled;
+    captureBtn.setAttribute("aria-disabled", primary.ariaDisabled ? "true" : "false");
+    captureBtn.textContent = primary.label;
+    captureBtn.title = primary.title;
+    captureBtn.dataset.ctaKind = primary.kind;
   }
 
+  const suitePicker = root.querySelector<HTMLElement>(".studio-agent-testing-overlay__suite-picker");
+  if (suitePicker) {
+    suitePicker.hidden = !actions.suitePickerVisible;
+  }
   const suiteSelect = root.querySelector<HTMLSelectElement>(".studio-agent-testing-overlay__suite-select");
-  if (suiteSelect && suiteSelect.value !== selectedQaSuiteId) {
-    suiteSelect.value = selectedQaSuiteId;
+  if (suiteSelect) {
+    suiteSelect.disabled = !actions.suitePickerVisible;
+    suiteSelect.setAttribute("aria-hidden", actions.suitePickerVisible ? "false" : "true");
+    if (suiteSelect.value !== selectedQaSuiteId) {
+      suiteSelect.value = selectedQaSuiteId;
+    }
   }
   syncQaSuiteProgress(root);
 
@@ -2427,7 +2453,8 @@ function disarmRecordingXorWatch(): void {
  * HARD guard rail — stale presence (≥ QA_AGENT_AUTO_PAUSE_MS) pauses capture +
  * Play like leave, without clearing Last seen and without QA_PAUSE_HALT /
  * DIAGNOSTIC_ACK_STOP latch. Agents should still call pauseForAgentLeave.
- * Skipped while prove-mode latch is armed (`__studioRunFullPlayProve`).
+ * Skipped while prove-mode latch is armed (`__studioRunFullPlayProve` /
+ * `withMcpTestSession` smokes), while director is on-air, or mid type-in.
  */
 function maybeAutoPauseOnStalePresence(ageMs: number): void {
   if (isQaProveModeActive()) {
@@ -2435,6 +2462,17 @@ function maybeAutoPauseOnStalePresence(ageMs: number): void {
     // Keep presence fresh so ONLINE stays honest during long proves.
     touchQaAgentPresence("prove-mode");
     return;
+  }
+  // Stepped Play / type-in can exceed 8s while PO watches without overlay touch.
+  // Aborting mid-director → director-step-no-effect (PO fury 2026-07-22).
+  try {
+    if (readLiveJourneyOnAir() || isTypeInCursorGuardActive()) {
+      autoPausedForStalePresence = false;
+      touchQaAgentPresence("director-busy");
+      return;
+    }
+  } catch {
+    /* hang-safe */
   }
   if (!isQaAgentPresenceStaleForAutoPause(ageMs)) {
     autoPausedForStalePresence = false;
@@ -2708,19 +2746,35 @@ function ensureRoot(): HTMLElement | null {
   root
     .querySelector<HTMLButtonElement>(".studio-agent-testing-overlay__capture-toggle")
     ?.addEventListener("click", () => {
-      const suite = getQaSuiteDefinition(selectedQaSuiteId);
-      if (suite) {
-        if (getAutonomousQaSuiteStatus().phase === "running") return;
+      const suiteStatus = getAutonomousQaSuiteStatus();
+      const actions = resolveQaPopupActionsChrome({
+        active,
+        settling,
+        sessionKind: getSessionKind(),
+        selectedSuiteId: selectedQaSuiteId,
+        suitePhase: suiteStatus?.phase ?? "idle",
+        capturePaused,
+        sessionHadProgress,
+      });
+      if (canActivateRunTestFromPopup(actions.state)) {
+        const suite = getQaSuiteDefinition(selectedQaSuiteId);
+        if (!suite || suiteStatus.phase === "running") return;
         window.__studioStartQaSuite?.([...suite.tests], { suiteId: suite.id });
         syncSessionChrome();
         return;
       }
+      // agentic-user / prove / idle — never launch suite from leftover selection
       toggleCapturePause();
     });
   const suiteSelect = root.querySelector<HTMLSelectElement>(".studio-agent-testing-overlay__suite-select");
   if (suiteSelect) {
     suiteSelect.value = selectedQaSuiteId;
     const applySuiteSelection = () => {
+      // Suite picker is control-room only; ignore selection while hidden.
+      if (suiteSelect.disabled || suiteSelect.closest("[hidden]")) {
+        syncSessionChrome();
+        return;
+      }
       selectedQaSuiteId = suiteSelect.value;
       persistQaSuiteSelection();
       syncSessionChrome();
@@ -4296,7 +4350,9 @@ export function installAgentTestingOverlayApi(): void {
     shouldBlockPlay: () => shouldBlockPlayNow(qaListenDeps()),
     autoResumeCaptureForPlay: () => autoResumeCaptureForPlay(),
     isCapturePaused: () => capturePaused,
+    isDiagnosticOpen: () => isDiagnosticOpenNow(qaListenDeps()),
     isDiagnosticBlocking: () => isDiagnosticOpenNow(qaListenDeps()),
+    clearPlaybackBlocksForReset: clearQaPlaybackBlocksForReset,
   };
   bindOverlayApi(api);
   installPoSignalWindowApis();
@@ -4315,12 +4371,14 @@ export function installAgentTestingOverlayApi(): void {
       __studioBeginQaFailHandoff?: (reason: string) => void;
       __studioConfirmFailTakeover?: () => boolean;
       __studioIsQaProgressFrozen?: () => boolean;
+      __studioClearQaPlaybackBlocksForReset?: typeof clearQaPlaybackBlocksForReset;
       __studioQaMessageRttStats?: typeof getQaMessageRttStats;
       __studioBenchmarkQaMessageRtt?: () => ReturnType<typeof getQaMessageRttStats>;
     };
     w.__studioBeginQaFailHandoff = beginQaFailHandoff;
     w.__studioConfirmFailTakeover = () => confirmAgentHandshake("window");
     w.__studioIsQaProgressFrozen = isQaProgressFrozen;
+    w.__studioClearQaPlaybackBlocksForReset = clearQaPlaybackBlocksForReset;
     w.__studioQaMessageRttStats = getQaMessageRttStats;
     w.__studioBenchmarkQaMessageRtt = getQaMessageRttStats;
   } catch {

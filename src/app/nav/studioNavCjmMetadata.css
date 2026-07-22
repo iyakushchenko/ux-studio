@@ -3,7 +3,7 @@
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
 }
 
 .studio-nav-cjm-meta__icon {
@@ -24,9 +24,28 @@
   background: #181818;
 }
 
+/* Active dd option = tan row (#ccb57f); match step-btn chrome so (i) stays readable. */
+.studio-nav-journey-menu__option--active .studio-nav-cjm-meta__icon {
+  color: #3d3018;
+  background: rgba(61, 48, 24, 0.12);
+  border-color: rgba(61, 48, 24, 0.42);
+}
+
+.studio-nav-journey-menu__option--active .studio-nav-cjm-meta__icon:hover {
+  color: #ead9ad;
+  background: #181818;
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
 .studio-nav-cjm-meta__icon--warning {
   color: #e2b95f;
   border-color: rgba(226, 185, 95, 0.42);
+}
+
+.studio-nav-journey-menu__option--active .studio-nav-cjm-meta__icon--warning {
+  color: #3d3018;
+  border-color: rgba(61, 48, 24, 0.55);
+  background: rgba(61, 48, 24, 0.16);
 }
 
 .studio-nav-cjm-meta__panel {

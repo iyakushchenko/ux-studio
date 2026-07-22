@@ -1,3 +1,6 @@
+/**
+ * @vitest-environment happy-dom
+ */
 import { describe, expect, it } from "vitest";
 import {
   buildQaPriorityHints,
@@ -67,5 +70,80 @@ describe("agentTestingListen", () => {
     expect(sessionStorage.getItem(QA_MESSAGE_DRAFT_KEY)).toBe("hello draft");
     clearQaMessageDraft();
     expect(readQaMessageDraft()).toBe("");
+  });
+
+  it("prove-mode clears orphan freeze so SF is not silent-blocked", async () => {
+    const {
+      beginQaProveMode,
+      endQaProveMode,
+    } = await import("@/app/shell/agent-testing/agentTestingPresence");
+    const {
+      setQaProgressFreeze,
+      clearQaProgressFreeze,
+      isQaProgressFrozen,
+    } = await import("@/app/shell/agent-testing/agentTestingProgressFreeze");
+    const { beginFailHandoff, clearFailHandoff, resetFailHandoffForTests } =
+      await import("@/app/shell/agent-testing/agentTestingFailHandoff");
+    const { refusePlayIfQaBlocks } = await import(
+      "@/app/shell/agent-testing/agentTestingListen"
+    );
+
+    resetFailHandoffForTests();
+    clearQaProgressFreeze();
+    (window as Window & {
+      __studioIsQaProgressFrozen?: () => boolean;
+      __studioAgentTestingOverlay?: {
+        autoResumeCaptureForPlay?: () => boolean;
+        shouldBlockPlay?: () => boolean;
+        isDiagnosticBlocking?: () => boolean;
+        clearPlaybackBlocksForReset?: (source?: string) => void;
+      };
+      __studioNoteBlockedQaPlay?: () => void;
+      __protoStudioState?: () => { diagnosticOpen?: boolean };
+    }).__studioIsQaProgressFrozen = isQaProgressFrozen;
+    (
+      window as Window & {
+        __studioAgentTestingOverlay?: {
+          autoResumeCaptureForPlay?: () => boolean;
+          shouldBlockPlay?: () => boolean;
+          isDiagnosticBlocking?: () => boolean;
+          clearPlaybackBlocksForReset?: (source?: string) => void;
+        };
+        __protoStudioState?: () => { diagnosticOpen?: boolean };
+      }
+    ).__studioAgentTestingOverlay = {
+      autoResumeCaptureForPlay: () => true,
+      shouldBlockPlay: () => false,
+      // Sticky overlay flag with no Studio diagnostic — prove must clear.
+      isDiagnosticBlocking: () => true,
+      clearPlaybackBlocksForReset: () => {
+        clearQaProgressFreeze();
+        clearFailHandoff();
+      },
+    };
+    (
+      window as Window & {
+        __protoStudioState?: () => { diagnosticOpen?: boolean };
+      }
+    ).__protoStudioState = () => ({ diagnosticOpen: false });
+
+    beginFailHandoff({
+      reason: "bubble-chop",
+      pause: () => undefined,
+      log: () => undefined,
+    });
+    setQaProgressFreeze("fail-handoff:bubble-chop");
+    expect(isQaProgressFrozen()).toBe(true);
+
+    beginQaProveMode("unit-orphan-freeze");
+    try {
+      expect(refusePlayIfQaBlocks()).toBe(false);
+      expect(isQaProgressFrozen()).toBe(false);
+    } finally {
+      endQaProveMode();
+      clearFailHandoff();
+      clearQaProgressFreeze();
+      resetFailHandoffForTests();
+    }
   });
 });

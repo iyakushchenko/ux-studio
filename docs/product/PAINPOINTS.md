@@ -2,7 +2,7 @@
 
 **Status:** Living board — mark → COMPLETE when shipped + proven.  
 **Owner:** Arch (curate) · Bea (acceptance language) · callsigns execute.  
-**Updated:** 2026-07-20  
+**Updated:** 2026-07-22  
 **Related:** [NEXT_STEPS.md](./NEXT_STEPS.md) · [PRODUCT_FORECAST.md](./PRODUCT_FORECAST.md) · [UX_STUDIO_VISION.md](./UX_STUDIO_VISION.md) · [TEAM_KNOWLEDGE.md](./TEAM_KNOWLEDGE.md) · [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) · [../shell/PLAYBACK_DIAG.md](../shell/PLAYBACK_DIAG.md)
 
 Do **not** lose this list. New PO rage → append a row here **and** stamp TEAM_KNOWLEDGE. Prefer COMPLETE over silent delete.
@@ -24,10 +24,10 @@ Do **not** lose this list. New PO rage → append a row here **and** stamp TEAM_
 
 | ID | Pain | PO sentiment (compressed) | Status | Track / owner |
 |----|------|---------------------------|--------|---------------|
-| PP-01 | Playback engine reliability | CJM / step / retreat / play-end still feel fragile after React Site Pilot / Chat — “did it actually work?” | WATCH | 2026-07-20 prove: `__protoRunAgenticPlaySmoke` PASS (~71s) + `assertPlayEndedAtStart` → `site-pilot`/`agentic-home`; type-in PASS; retreat smoke PASS after counter-honesty fix; traditional Play PASS. Keep eyes on Play→end regressions. |
+| PP-01 | Playback engine reliability | CJM / step / retreat / play-end still feel fragile after React Site Pilot / Chat — “did it actually work?” | WATCH | 2026-07-22: play-end **stays at finale** (`assertPlayEndedAtEnd`); prior 2026-07-20 start-rewind superseded. Keep eyes on Play→end regressions. |
 | PP-02 | Diag-first culture | Prefer console + overlay evidence over “tests green / vibes green.” Agents must prove, not narrate. | WATCH | R13 PLAYBACK_DIAG + agentic/traditional smokes used as evidence this wave |
 | PP-03 | CJM micro-fails | Small silent breaks (type-in skip, wrong scroll host, CTA off-by-one, fade missing) stack into “CJM broken.” | WATCH | Type-in skips=0 on Play; retreatIntoView logged; false smoke FAIL (`>=10` vs 9/21) fixed — not invent UX |
-| PP-04 | Hub vs journey-start | Play finish / jump must land **selected journey start**, never silent hub. | WATCH | `resetToJourneyStart` smokes + `hub-nav` diag · tip `862bc97` · Finn · 2026-07-20 agentic/trad Play hubNav=0 |
+| PP-04 | Hub vs journey-start | Jump-to-start / smoke teardown must land **selected journey start**, never silent hub. Play-end itself stays on finale (not hub, not auto-start). | WATCH | `resetToJourneyStart` smokes + `hub-nav` diag · tip `862bc97` · Finn · 2026-07-20 agentic/trad Play hubNav=0 |
 | PP-11 | Type-in cursor invisible | CJM Site Pilot typed-text beat hid robo-cursor — PO Cursor flag / eyes. CJM on = always visible incl. type-in. | WATCH | R11 prove: mid type-in `.proto-chat-demo-cursor` opacity>0 + `type-in-park` · `CURSOR_HIDDEN_DURING_TYPEIN` · Finn/Quinn |
 | PP-12 | PO-signal process | Alarm/Cursor/Scroll click must **stop → (understand OR ask PO) → fix → reprove that issue** — not soft-log, not invent. | COMPLETE | R15 docs: TEAM / PLAYBACK_DIAG / COMMAND_DOCTRINE / AGENTS / STUDIO_AUTO_RULES / agent-testing README · Arch |
 | PP-05 | Fuchsia invent / Step2 / retreat scroll | No invented fuchsia hover; book-step-2 dwell cursor law; retreat must scrollIntoView correctly. | WATCH | Uma no-invent · cursor QA · scroll host LESSONS |
@@ -62,6 +62,7 @@ Do **not** lose this list. New PO rage → append a row here **and** stamp TEAM_
 | PP-37 | RESULT not final | clear-stale / playback-diag rows after `RESULT · PASS` undermine finale. | COMPLETE | cleanup→RESULT last + finale seal |
 | PP-39 | Composer-exit scroll chop | Bubble rise from under dock + instant clearance top-up = stutter; dump too thin. | COMPLETE | TRACE + host-end settle |
 | PP-40 | Message then RESULT | Self-test RESULT after PO Message looks like ignore/reply. | COMPLETE | withhold RESULT while USER_MESSAGE latch |
+| PP-41 | Playback/REC/QA prove surface sprawl | PO exhausted by monster token burn when touching Play/REC/QA — scattered law + duplicated play-end contracts; unsafe to flip one product line. | OPEN (P0 future — **not now**) | Arch/Finn/Quinn: one SSoT behavior module + thin prove API + single regression harness. Board [NEXT_STEPS.md](./NEXT_STEPS.md) LATER 12a |
 
 ---
 

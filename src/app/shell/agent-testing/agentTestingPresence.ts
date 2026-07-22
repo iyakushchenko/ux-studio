@@ -9,9 +9,11 @@
  * DIAGNOSTIC_ACK_STOP / QA_PAUSE_HALT latch). Return via
  * `resumeForAgentReturn` / touch unpauses + reads Message latch.
  *
- * **Prove latch:** `__studioRunFullPlayProve` / continuous Play prove arms
+ * **Prove latch:** `__studioRunFullPlayProve` / continuous Play prove **and**
+ * `withMcpTestSession` smokes (step-forward / retreat / play) arm
  * `beginQaProveMode()` so the 8s stale heartbeat does **not** auto-pause /
  * abort mid-prove. Cleared in `endQaProveMode()` (finally).
+ * Director on-air + live type-in also skip stale auto-pause (manual stepped watch).
  *
  * Label XOR (PO): either **ONLINE** (recently touched) **or**
  * **Last seen Xs ago** when stale — never both. Green diode = present only.
@@ -50,7 +52,7 @@ function proveLatch(): ProveLatch {
   return w[PROVE_LATCH_KEY]!;
 }
 
-/** Arm during `__studioRunFullPlayProve` — skips stale auto-pause until end. */
+/** Arm during full Play prove / MCP smokes — skips stale auto-pause until end. */
 export function beginQaProveMode(source = "full-play-prove"): void {
   const latch = proveLatch();
   latch.active = true;

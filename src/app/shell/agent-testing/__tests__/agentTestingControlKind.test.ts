@@ -7,6 +7,7 @@ import {
   formatAgentControlKindSuffix,
   isCjmCassetteOn,
   readLiveJourneyIsPlaying,
+  readLiveJourneyOnAir,
 } from "@/app/shell/agent-testing/agentTestingControlKind";
 
 describe("agentTestingControlKind", () => {
@@ -71,5 +72,12 @@ describe("agentTestingControlKind", () => {
       <button data-studio-action="transport-play" aria-label="Play journey" aria-pressed="false"></button>
     `;
     expect(readLiveJourneyIsPlaying()).toBe(false);
+  });
+
+  it("reads director on-air from studio-nav-scenario--on-air", () => {
+    document.body.innerHTML = `<div class="studio-nav-scenario"></div>`;
+    expect(readLiveJourneyOnAir()).toBe(false);
+    document.body.innerHTML = `<div class="studio-nav-scenario studio-nav-scenario--on-air"></div>`;
+    expect(readLiveJourneyOnAir()).toBe(true);
   });
 });

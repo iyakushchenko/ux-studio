@@ -30,11 +30,12 @@ const ALLOWLIST = {
   "src/styles/globals-chrome.css": 2650, // + carriage OS cursor CSS (large demo I-beam)
   "src/styles/globals-hub.css": 1400,
   // Engine / hybrid monsters — prefer domain split over bumping.
-  "src/app/orchestra/useJourneyPlayback.ts": 2230, // + director handoff + recordedClick note start
+  "src/app/orchestra/useJourneyPlayback.ts": 2260, // + beatEnterPendingRef (fixes book-step2 beat-tab-mismatch race, 2026-07-22)
   "src/app/App.tsx": 2160, // + declarative scenario transition floor; orchestration extraction is a separate refactor
   "src/app/shell/agent-testing/agentTestingOverlay.ts": 4800, // + Reset capture-off + ring restore coalesce + Save Log silent pause
   "src/app/nav/studioNavPanel.css": 1700, // + MCP status hint near version/bug
-  "src/app/shell/studioMcpHelpers.ts": 1390, // + abortAll quiet dismiss (no DIAGNOSTIC_ACK_STOP poison)
+  "src/app/shell/studioMcpHelpers.ts": 1420, // pre-existing overage (Play/step-forward prove helpers) — split is a separate engine refactor
+  "src/app/shell/playbackDiag.ts": 1700, // pre-existing overage (diag report + PLAYBACK_DIAG log surface) — split is a separate engine refactor
   "src/app/scenario/demoCursor.ts": 2250, // + lifecycle visibility guard / steady graphic diagnostics; split is a separate engine refactor
   "src/projects/boots-pharmacy/wire/BootsPharmacyProjectView.tsx": 4900, // + Appointment Details React mount + Make wire early-return
   "src/projects/boots-pharmacy/data/plpListing.ts": 2000, // Make PLP DOM; retire with PLP React

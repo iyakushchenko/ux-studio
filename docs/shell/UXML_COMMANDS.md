@@ -42,7 +42,7 @@ Do this shell **around** the blessed helper — all-in-one QA + DevTools:
 | PO says | Meaning | Blessed helper (default CJM / experience) | PASS evidence |
 |---------|---------|---------------------------------------------|---------------|
 | **`uxml rec`** | Mint a **new** recorded CJM and Play **that** journey (REC robustness) | `await window.__studioRunRecNewCjmProve?.({ experience })` — ALWAYS CLEAR → arm REC → human pace → modal drain → Stop → Add as CJM → Play that `rec-*` | `{ pass: true, journeyId, recLive, peak }`; latch was live; **not** built-in CJM Play alone |
-| **`uxml play`** | **Continuous** Play of the default / named CJM | `await window.__studioRunFullPlayProve?.({ journeyId })` preferred; or `{ experience }` when no free journey selected | `{ pass: true }`; peak / play-end at journey start; overlay retained |
+| **`uxml play`** | **Continuous** Play of the default / named CJM | `await window.__studioRunFullPlayProve?.({ journeyId })` preferred; or `{ experience }` when no free journey selected | `{ pass: true }`; peak / play-end **stays at journey end** (N/N finale); overlay retained |
 | **`uxml play step`** | **Stepped** Play (Step forward through the playlist) | Agentic: `await window.__protoRunAgenticStepForwardSmoke?.({ timeoutMs: 600_000 })` · Traditional: `await window.__protoRunTraditionalStepForwardSmoke?.({ timeoutMs: 600_000 })` | `{ pass: true }` (or smoke `pass`); each beat polled for PO signals |
 | **`uxml play step r`** | Stepped Play **including rewind** (Step back / retreat) | (1) same as **`uxml play step`**, then (2) retreat: agentic `__protoRunRetreatSmoke` / `__protoRunAgenticRetreatSmoke` · traditional `__protoRunTraditionalRetreatSmoke` | Both segments PASS; Step back buttons exercised |
 

@@ -1,6 +1,6 @@
 # UX Studio — next steps (living board)
 
-**Updated:** 2026-07-21  
+**Updated:** 2026-07-22  
 **Owner:** Arch (agents execute; human PO accept/reject + assets only; **Pax** sim for bump/push)  
 **Status authority:** This file is the **only mutable source of truth** for current priority, sequence, blockers, and completion. Forecasts, briefs, and feature registers may preserve historical context; when they disagree with this board, treat their status prose as historical. Evidence artifacts remain authoritative for the proof they record.  
 **Team:** [TEAM.md](./TEAM.md) · Forecast: [PRODUCT_FORECAST.md](./PRODUCT_FORECAST.md) · Painpoints: [PAINPOINTS.md](./PAINPOINTS.md) · [ARCHITECTURE.md](./ARCHITECTURE.md) · [HYGIENE.md](./HYGIENE.md)  
@@ -63,6 +63,7 @@ A screen is **DONE** only when **all** are true:
 
 ## LATER
 
+12a. [ ] **P0 future — Playback/REC/QA prove architecture refactor + single regression harness** — **not now** (PO 2026-07-22). Pain: monster token burn + scattered law (`completeJourneyPlay` + many prove contracts) so a one-line product flip (e.g. play-end stay-at-end) cascades across smokes/docs/asserts. Desired: one SSoT behavior module + thin prove API + fewer duplicated play-end at-start/at-end contracts. Track: [PAINPOINTS.md](./PAINPOINTS.md) PP-41 · forecast LATER. **Do not start until Arch/Pax open this wave.**
 13. [ ] **Second project rabbit** — after Boots book + URL + REC proven on Pages.
 14. [ ] **Release / tag CI** — when versioning habit is stable and Actions budget allows.
 15. [ ] **Broader CSS check ratchets** — more `scripts/check-*.mjs`, not more Playwright on every push.

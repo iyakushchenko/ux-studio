@@ -14,6 +14,10 @@ import {
   touchAgentTestingOverlay,
 } from "@/app/shell/agent-testing/agentTestingOverlay";
 import {
+  beginQaProveMode,
+  endQaProveMode,
+} from "@/app/shell/agent-testing/agentTestingPresence";
+import {
   beginMcpTestSession,
   endMcpTestSession,
   getMcpTestSession,
@@ -68,6 +72,8 @@ export async function withMcpTestSession<T>(
   const resetToHub =
     !resetToJourneyStart && sessionOptions?.resetToHub === true;
   // HARD — always wipe prior QA before a new smoke/prove session.
+  // forceClear also ends prove-mode — re-arm below so step-forward / retreat /
+  // play smokes survive long type-in (>8s) without agent-stale abort.
   forceClearAgentTestingOverlay();
   startAgentTestingOverlay("AGENT TESTING — preparing…");
   try {
@@ -76,6 +82,7 @@ export async function withMcpTestSession<T>(
       title: "AGENT TESTING — preparing…",
     });
     touchAgentTestingOverlay(`AGENT TESTING — ${label}`);
+    beginQaProveMode(`mcp-test-session:${label}`);
     logAgentTestingOverlay(`session: ${label}`);
     const out = await run();
     if (sessionOptions?.result == null) {
@@ -91,6 +98,11 @@ export async function withMcpTestSession<T>(
     }
     return out;
   } finally {
+    try {
+      endQaProveMode();
+    } catch {
+      /* hang-safe */
+    }
     try {
       stopAgentTestingOverlay({
         reload: sessionOptions?.reload !== false,

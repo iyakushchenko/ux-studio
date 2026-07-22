@@ -80,6 +80,26 @@ describe("agentTestingFormat", () => {
     expect(humanizeQaLogLabel("Click: June 24")).toBe("Selected · June 24");
     expect(humanizeQaLogLabel("Click: Continue")).toBe("Activated · Continue");
     expect(humanizeQaLogLabel("Click: Confirm order")).toBe("Activated · Confirm order");
+    expect(
+      humanizeQaLogLabel(
+        "prove PASS · agentic-cjm · peak 22/22 · play-end at end"
+      )
+    ).toBe("PASS · Completed 22/22 · stayed at journey end");
+    expect(
+      humanizeQaLogLabel(
+        "prove PASS · agentic-cjm · peak 22/22 · play-end at start"
+      )
+    ).toBe("PASS · Completed 22/22 · stayed at journey end");
+  });
+
+  it("tags prove verdicts as system so leave-pause cannot drop Save Log lines", () => {
+    const pass = buildLogEntryFromPlain(
+      "prove PASS · rec-agentic-x · peak 14/14 · play-end at end"
+    );
+    const fail = buildLogEntryFromPlain("prove FAIL · rec-agentic-x · peak-not-14");
+    expect(pass.kind).toBe("system");
+    expect(fail.kind).toBe("system");
+    expect(buildLogEntryFromPlain("Camera: target").kind).toBe("info");
   });
 
   it("marks inferred gaps as elapsed time and suppresses routine choreography", () => {

@@ -30,9 +30,9 @@ import {
   disableCursorQaEyes,
   enableCursorQaEyes,
 } from "@/app/shell/playbackCursorDiagnostic";
-import type { PlayEndAtStartAssertResult } from "@/app/shell/playbackDiag";
+import type { PlayEndAtEndAssertResult } from "@/app/shell/playbackDiag";
 import {
-  runPlayJourneyToStartSmoke,
+  runPlayJourneyToEndSmoke,
   type PlayJourneySmokeResult,
 } from "@/app/shell/playJourneySmoke";
 import { getImportedJourneys } from "@/app/journey/journeyRuntimeStore";
@@ -53,7 +53,7 @@ export type FullPlayProvePeak = {
 export type FullPlayProveResult = {
   pass: boolean;
   peak: FullPlayProvePeak;
-  end: PlayEndAtStartAssertResult | null;
+  end: PlayEndAtEndAssertResult | null;
   errors: string[];
   /** Leave result — overlay stays open for Save Log. */
   leave?: AgentLeavePauseResult;
@@ -72,6 +72,9 @@ export type FullPlayProvePreset = {
   orchestraMode: string;
   startBeatId: string;
   startScreenId: string;
+  /** Finale beat after continuous Play (product: stay here — no auto-rewind). */
+  endBeatId: string;
+  endScreenId: string;
   expectedPeak: number;
   timeoutMs: number;
   peakMode: FullPlayProvePeakMode;
@@ -91,6 +94,8 @@ export const FULL_PLAY_PROVE_PRESETS: Record<
     orchestraMode: "agentic-cjm",
     startBeatId: "agentic-home",
     startScreenId: "site-pilot",
+    endBeatId: "appointment-details",
+    endScreenId: "appointment-details",
     expectedPeak: 22,
     timeoutMs: 300_000,
     peakMode: "exact",
@@ -103,6 +108,8 @@ export const FULL_PLAY_PROVE_PRESETS: Record<
     orchestraMode: "traditional-cjm",
     startBeatId: "traditional-plp",
     startScreenId: "plp",
+    endBeatId: "appointment-details",
+    endScreenId: "appointment-details",
     expectedPeak: 13,
     timeoutMs: 180_000,
     peakMode: "login-skip-safe",
@@ -146,6 +153,9 @@ export type FullPlayProveOptions = {
   /** Override preset start (recorded / custom CJMs). */
   startBeatId?: string;
   startScreenId?: string;
+  /** Override preset finale (recorded / custom CJMs). */
+  endBeatId?: string;
+  endScreenId?: string;
   orchestraMode?: string;
   peakMode?: FullPlayProvePeakMode;
   /** Exact route-contract totals allowed after prerequisite filtering. */
@@ -244,6 +254,24 @@ function inferStartScreenId(startBeatId: string): string {
   return "plp";
 }
 
+function inferEndScreenId(endBeatId: string): string {
+  const id = endBeatId.toLowerCase();
+  if (id.includes("appointment-details") || id.includes("details")) {
+    return "appointment-details";
+  }
+  if (id.includes("appointment-history") || id.includes("history")) {
+    return "appointment-history";
+  }
+  if (id.includes("confirmation") || id.includes("book-step-3")) {
+    return "book-step-3";
+  }
+  if (id.includes("chat")) return "chat";
+  if (id.includes("pdp")) return "pdp";
+  if (id.includes("plp")) return "plp";
+  if (id.includes("site-pilot") || id.includes("home")) return "site-pilot";
+  return inferStartScreenId(endBeatId);
+}
+
 function resolveExperience(
   options?: FullPlayProveOptions
 ): FullPlayProveExperience {
@@ -284,6 +312,9 @@ function resolvePreset(options?: FullPlayProveOptions): FullPlayProvePreset {
     // NEVER fall back to built-in traditional-plp / peak 13 for rec-*.
     const startBeatId =
       options?.startBeatId ?? beatIds[0] ?? "rec-start-unknown";
+    const endBeatId =
+      options?.endBeatId ??
+      (beatIds.length > 0 ? beatIds[beatIds.length - 1] : startBeatId);
     const expectedPeak = options?.expectedPeak ?? catalogPeak;
     return {
       ...base,
@@ -293,6 +324,8 @@ function resolvePreset(options?: FullPlayProveOptions): FullPlayProvePreset {
       startBeatId,
       startScreenId:
         options?.startScreenId ?? inferStartScreenId(startBeatId),
+      endBeatId,
+      endScreenId: options?.endScreenId ?? inferEndScreenId(endBeatId),
       expectedPeak,
       timeoutMs: options?.timeoutMs ?? base.timeoutMs,
       // Recorded journey contracts use their own catalog total, never built-in totals.
@@ -310,6 +343,8 @@ function resolvePreset(options?: FullPlayProveOptions): FullPlayProvePreset {
     orchestraMode: options?.orchestraMode ?? journeyId ?? base.orchestraMode,
     startBeatId: options?.startBeatId ?? base.startBeatId,
     startScreenId: options?.startScreenId ?? base.startScreenId,
+    endBeatId: options?.endBeatId ?? base.endBeatId,
+    endScreenId: options?.endScreenId ?? base.endScreenId,
     expectedPeak: options?.expectedPeak ?? base.expectedPeak,
     timeoutMs: options?.timeoutMs ?? base.timeoutMs,
     peakMode: options?.peakMode ?? base.peakMode,
@@ -402,7 +437,7 @@ export async function runFullPlayProve(
     total: 0,
     counter: null,
   };
-  let end: PlayEndAtStartAssertResult | null = null;
+  let end: PlayEndAtEndAssertResult | null = null;
 
   try {
     // requireFreshQaSession already starts and touches the overlay. Do not
@@ -425,11 +460,13 @@ export async function runFullPlayProve(
       `prove: Play journey ${preset.journeyId} (NOT REC · keep overlay · prove-mode latch)`
     );
 
-    // 3–5) Jump start + continuous Play + play-end assert (shared smoke core).
-    smoke = await runPlayJourneyToStartSmoke({
+    // 3–5) Jump start + continuous Play + play-end-at-end assert (shared smoke core).
+    smoke = await runPlayJourneyToEndSmoke({
       orchestraMode: preset.orchestraMode,
       startBeatId: preset.startBeatId,
       startScreenId: preset.startScreenId,
+      endBeatId: preset.endBeatId,
+      endScreenId: preset.endScreenId,
       timeoutMs: preset.timeoutMs,
       continueOnPoAlarm: options?.continueOnPoAlarm,
       delay,
@@ -493,21 +530,28 @@ export async function runFullPlayProve(
     );
     if (peakErr) errors.push(peakErr);
     if (!end?.pass) {
-      errors.push(end?.reason ?? "play-end-at-start-failed");
+      errors.push(end?.reason ?? "play-end-at-end-failed");
     }
+
+    // Verdict MUST land before leave-pause: capturePaused drops kind "info"
+    // overlay lines, which would swallow prove PASS/FAIL from Save Log.
+    // (prove lines also use kind "system" as belt-and-suspenders.)
+    let pass = errors.length === 0;
+    logAgentTestingOverlay(
+      pass
+        ? `prove PASS · ${preset.journeyId} · peak ${peak.visible}/${peak.total} · play-end at end`
+        : `prove FAIL · ${preset.journeyId} · ${errors.join("; ")}`
+    );
 
     // 6) Pause for agent leave — overlay stays open (Save Log usable).
     leave = pauseForAgentLeave();
     if (!leave.ok) {
       errors.push(`leave-failed:${leave.reason ?? "unknown"}`);
+      pass = false;
+      logAgentTestingOverlay(
+        `prove FAIL · ${preset.journeyId} · ${errors.join("; ")}`
+      );
     }
-
-    const pass = errors.length === 0;
-    logAgentTestingOverlay(
-      pass
-        ? `prove PASS · ${preset.journeyId} · peak ${peak.visible}/${peak.total} · play-end at start`
-        : `prove FAIL · ${preset.journeyId} · ${errors.join("; ")}`
-    );
 
     return {
       pass,
@@ -522,6 +566,13 @@ export async function runFullPlayProve(
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     errors.push(`exception:${msg}`);
+    try {
+      logAgentTestingOverlay(
+        `prove FAIL · ${preset.journeyId} · ${errors.join("; ")}`
+      );
+    } catch {
+      /* hang-safe */
+    }
     try {
       leave = pauseForAgentLeave();
     } catch {

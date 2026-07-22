@@ -76,7 +76,7 @@ import {
   waitForDirectorSettle as waitForDirectorSettleCore,
 } from "@/app/shell/stepForwardSmokeSettle";
 import {
-  runPlayJourneyToStartSmoke,
+  runPlayJourneyToEndSmoke,
   type PlayJourneySmokeResult,
 } from "@/app/shell/playJourneySmoke";
 import {
@@ -542,6 +542,19 @@ async function dismissDiagnosticsUntilClear(maxMs = 4000): Promise<boolean> {
     }
 
     const beforeFingerprint = stateFingerprint(before);
+    // Prove: wipe orphan freeze / sticky diagnosticBlocking before SF so
+    // refusePlayIfQaBlocks cannot soft-block → transport-no-progress.
+    if (!before.diagnosticOpen) {
+      try {
+        (
+          window as Window & {
+            __studioClearQaPlaybackBlocksForReset?: (source?: string) => void;
+          }
+        ).__studioClearQaPlaybackBlocksForReset?.("prove-step-fwd");
+      } catch {
+        /* hang-safe */
+      }
+    }
     if (!window.__protoTriggerTransport?.("step-forward")) {
       return fail(`step-forward-unavailable-${index + 1}`, before);
     }
@@ -658,7 +671,7 @@ export function registerStudioMcpHelpers(options: {
   hasOrchestraMode?: (modeId: OrchestraModeId) => boolean;
   setOrchestraMode?: (modeId: OrchestraModeId) => void;
   setJourneyMode?: (enabled: boolean) => void;
-  triggerTransport?: (action: TransportAction) => void;
+  triggerTransport?: (action: TransportAction) => boolean | void;
 }): () => void {
   if (typeof window === "undefined") return () => {};
   installAgentTestingOverlayApi();
@@ -932,7 +945,17 @@ export function registerStudioMcpHelpers(options: {
     if (!options.triggerTransport) return false;
     logControlPanel(`transport:${action}`, { source: "mcp-helper" });
     // notePlaybackTransport (via App triggerTransport) emits PLAYBACK_DIAG step events.
-    options.triggerTransport(action);
+    // App returns false when QA freeze/diag refuses — must not fake success.
+    const fired = options.triggerTransport(action);
+    if (fired === false) {
+      logControlPanel(`transport:${action}`, {
+        source: "mcp-helper",
+        blocked: true,
+        blockReason: "transport-refused",
+      });
+      playbackDiagLog("transport", `blocked: transport-refused (${action})`);
+      return false;
+    }
     return true;
   };
 
@@ -1151,16 +1174,20 @@ export function registerStudioMcpHelpers(options: {
       { resetToJourneyStart: true }
     );
 
-  const runPlayToStartForMode = (
+  const runPlayToEndForMode = (
     orchestraMode: OrchestraModeId,
     startBeatId: string,
     startScreenId: string,
+    endBeatId: string,
+    endScreenId: string,
     smokeOptions?: { timeoutMs?: number; continueOnPoAlarm?: boolean }
   ) =>
-    runPlayJourneyToStartSmoke({
+    runPlayJourneyToEndSmoke({
       orchestraMode,
       startBeatId,
       startScreenId,
+      endBeatId,
+      endScreenId,
       timeoutMs: smokeOptions?.timeoutMs,
       continueOnPoAlarm: smokeOptions?.continueOnPoAlarm,
       delay,
@@ -1181,10 +1208,12 @@ export function registerStudioMcpHelpers(options: {
     withMcpTestSession(
       "traditional-play-smoke",
       () =>
-        runPlayToStartForMode(
+        runPlayToEndForMode(
           "traditional-cjm",
           "traditional-plp",
           "plp",
+          "appointment-details",
+          "appointment-details",
           smokeOptions
         ),
       { resetToJourneyStart: true }
@@ -1194,10 +1223,12 @@ export function registerStudioMcpHelpers(options: {
     withMcpTestSession(
       "agentic-play-smoke",
       () =>
-        runPlayToStartForMode(
+        runPlayToEndForMode(
           "agentic-cjm",
           "agentic-home",
           "site-pilot",
+          "appointment-details",
+          "appointment-details",
           smokeOptions
         ),
       { resetToJourneyStart: true }

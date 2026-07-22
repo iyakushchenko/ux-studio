@@ -3,6 +3,13 @@
  * Overlay owns pause/latch; this module stays hang-safe + lean.
  */
 
+import { isQaProveModeActive } from "@/app/shell/agent-testing/agentTestingPresence";
+import {
+  clearQaProgressFreeze,
+  isQaProgressFrozen,
+} from "@/app/shell/agent-testing/agentTestingProgressFreeze";
+import { clearFailHandoff } from "@/app/shell/agent-testing/agentTestingFailHandoff";
+
 export const QA_MESSAGE_DRAFT_KEY = "studioQaMessageDraft";
 
 /** Prefer cause-before-symptom; cap spam. */
@@ -101,6 +108,10 @@ export function shouldBlockQaPlay(input: {
  * App / MCP transport gate — refuse Play/SF while diagnostic or FAIL freeze.
  * QA Pause alone auto-resumes capture (PO: never "Play ignored — QA Pause" after Reset).
  * Returns true when transport was blocked (caller must return early).
+ *
+ * Prove/MCP smokes: clear orphan freeze/handoff/capture-pause when Studio state
+ * has no open diagnostic — prevents silent SF no-op → transport-no-progress /
+ * step-forward-unavailable (bubble handoff / sticky diagnosticBlocking).
  */
 export function refusePlayIfQaBlocks(): boolean {
   if (typeof window === "undefined") return false;
@@ -109,17 +120,52 @@ export function refusePlayIfQaBlocks(): boolean {
       __studioAgentTestingOverlay?: {
         shouldBlockPlay?: () => boolean;
         autoResumeCaptureForPlay?: () => boolean;
+        isDiagnosticOpen?: () => boolean;
+        isDiagnosticBlocking?: () => boolean;
+        clearPlaybackBlocksForReset?: (source?: string) => void;
       };
       __studioNoteBlockedQaPlay?: () => void;
       __studioIsQaProgressFrozen?: () => boolean;
+      __studioClearQaPlaybackBlocksForReset?: (source?: string) => void;
+      __protoStudioState?: () => { diagnosticOpen?: boolean } | undefined;
     };
-    const frozen = w.__studioIsQaProgressFrozen?.() === true;
-    if (frozen) {
+    // Pause-only: lift capture so Play/SF proceed without a Resume click.
+    w.__studioAgentTestingOverlay?.autoResumeCaptureForPlay?.();
+
+    const frozen =
+      w.__studioIsQaProgressFrozen?.() === true || isQaProgressFrozen();
+    const studioDiag = w.__protoStudioState?.()?.diagnosticOpen === true;
+    const overlayDiag =
+      w.__studioAgentTestingOverlay?.isDiagnosticOpen?.() === true ||
+      w.__studioAgentTestingOverlay?.isDiagnosticBlocking?.() === true;
+
+    if (isQaProveModeActive() && (frozen || overlayDiag) && !studioDiag) {
+      try {
+        (
+          w.__studioClearQaPlaybackBlocksForReset ??
+          w.__studioAgentTestingOverlay?.clearPlaybackBlocksForReset
+        )?.("prove-orphan-freeze");
+      } catch {
+        try {
+          clearQaProgressFreeze();
+          clearFailHandoff();
+        } catch {
+          /* hang-safe */
+        }
+      }
+      try {
+        w.__studioAgentTestingOverlay?.autoResumeCaptureForPlay?.();
+      } catch {
+        /* hang-safe */
+      }
+    }
+
+    const stillFrozen =
+      w.__studioIsQaProgressFrozen?.() === true || isQaProgressFrozen();
+    if (stillFrozen) {
       w.__studioNoteBlockedQaPlay?.();
       return true;
     }
-    // Pause-only: lift capture so Play/SF proceed without a Resume click.
-    w.__studioAgentTestingOverlay?.autoResumeCaptureForPlay?.();
     const blocked =
       w.__studioAgentTestingOverlay?.shouldBlockPlay?.() === true;
     if (!blocked) return false;

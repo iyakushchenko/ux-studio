@@ -1,5 +1,9 @@
 /**
- * Play → journey end → CJM start smoke (product path; harness may still resetToHub after).
+ * Play → journey end → stay at finale smoke (product path).
+ *
+ * Jump-to-start is only the prove arm (begin from key 1). Continuous Play
+ * completion must leave the player on the last beat / N/N — no auto-rewind.
+ * Harness may still `resetToJourneyStart` after the assert for teardown.
  *
  * Polls `__studioConsumePoSignal` each beat (R15). Alarm → pause + fail with diagSnapshot.
  */
@@ -7,11 +11,11 @@
 import type { OrchestraModeId } from "@/app/orchestra/types";
 import type { AgentTestingPoSignal } from "@/app/shell/agent-testing/agentTestingPoSignal";
 import {
-  assertPlaybackPlayEndedAtStart,
+  assertPlaybackPlayEndedAtEnd,
   getPlaybackDiagBundle,
   playbackDiagClear,
   playbackDiagLog,
-  type PlayEndAtStartAssertResult,
+  type PlayEndAtEndAssertResult,
 } from "@/app/shell/playbackDiag";
 import { isFastPlayback } from "@/app/shell/playbackTiming";
 import { pollSmokePoSignal } from "@/app/shell/smokePoSignalPoll";
@@ -24,13 +28,15 @@ export type PlayJourneySmokeState = {
   isPlaying?: boolean;
   isOnAir?: boolean;
   label?: string | null;
+  orchestraMode?: string | null;
+  screenId?: string | null;
 };
 
 export type PlayJourneySmokeResult = {
   pass: boolean;
   reason?: string;
   state?: PlayJourneySmokeState;
-  assert?: PlayEndAtStartAssertResult;
+  assert?: PlayEndAtEndAssertResult;
   peakVisible?: number;
   peakCounter?: string | null;
   /** Set when PO Alarm aborted (or noticeed) mid-Play. */
@@ -47,15 +53,18 @@ function parseVisible(counter: string | null | undefined): {
   return { visible: Number(match[1]), total: Number(match[2]) };
 }
 
-/** Peak STEPS visible — end was reached before rewind to start. */
+/** Peak STEPS visible — end was reached (and must remain after play-end). */
 function journeyReachedEnd(peakVisible: number, total: number): boolean {
   return total > 0 && peakVisible >= total;
 }
 
-export async function runPlayJourneyToStartSmoke(options: {
+export type PlayJourneySmokeOptions = {
   orchestraMode: OrchestraModeId;
   startBeatId: string;
   startScreenId: string;
+  /** Expected finale beat (built-ins: appointment-details). */
+  endBeatId?: string;
+  endScreenId?: string;
   timeoutMs?: number;
   /** Alarm notices + logs instead of aborting (default: hard fail). */
   continueOnPoAlarm?: boolean;
@@ -65,7 +74,11 @@ export async function runPlayJourneyToStartSmoke(options: {
   setJourneyMode: (enabled: boolean) => boolean;
   triggerTransport: (action: "jump-to-start" | "play") => boolean;
   getState: () => PlayJourneySmokeState | undefined;
-}): Promise<PlayJourneySmokeResult> {
+};
+
+export async function runPlayJourneyToEndSmoke(
+  options: PlayJourneySmokeOptions
+): Promise<PlayJourneySmokeResult> {
   const timeoutMs = options.timeoutMs ?? 180_000;
   playbackDiagClear();
   playbackDiagLog(
@@ -91,7 +104,8 @@ export async function runPlayJourneyToStartSmoke(options: {
       armedState?.journeyMode === true &&
       armedState.orchestraMode === options.orchestraMode &&
       counter.total > 0
-    ) break;
+    )
+      break;
     await options.delay(100);
     armedState = options.getState();
   }
@@ -117,7 +131,8 @@ export async function runPlayJourneyToStartSmoke(options: {
       startState?.orchestraMode === options.orchestraMode &&
       startState.beatId === options.startBeatId &&
       startState.screenId === options.startScreenId
-    ) break;
+    )
+      break;
     await options.delay(100);
     startState = options.getState();
   }
@@ -153,12 +168,13 @@ export async function runPlayJourneyToStartSmoke(options: {
       continue;
     }
     // Keep agent-testing overlay awake — idle auto-stop (~45s) aborts long Play.
-    const overlayApi = (
-      window as Window & {
-        __studioAgentTestingOverlay?: { touch?: (title?: string) => void };
-        __protoAgentTestingOverlay?: { touch?: (title?: string) => void };
-      }
-    ).__studioAgentTestingOverlay ??
+    const overlayApi =
+      (
+        window as Window & {
+          __studioAgentTestingOverlay?: { touch?: (title?: string) => void };
+          __protoAgentTestingOverlay?: { touch?: (title?: string) => void };
+        }
+      ).__studioAgentTestingOverlay ??
       (
         window as Window & {
           __protoAgentTestingOverlay?: { touch?: (title?: string) => void };
@@ -192,7 +208,7 @@ export async function runPlayJourneyToStartSmoke(options: {
 
     if (state.diagnosticOpen) {
       // Known flake: agentic chat eased-scroll path can flash ±40px mid-Play.
-      // Dismiss + resume so we can still prove play-end → CJM start (product gate).
+      // Dismiss + resume so we can still prove play-end → stay at finale.
       const diagText =
         typeof document !== "undefined"
           ? document.querySelector(".studio-playback-diagnostic")
@@ -277,12 +293,13 @@ export async function runPlayJourneyToStartSmoke(options: {
       diag.playEnd.count >= 1 &&
       journeyReachedEnd(peakVisible, peakTotal || total)
     ) {
-      // Let beat/tab URL settle after jumpToStart.
+      // Let beat/tab URL settle after stop-at-end (no jump).
       await options.delay(400);
       const settled = options.getState();
-      const assert = assertPlaybackPlayEndedAtStart({
+      const assert = assertPlaybackPlayEndedAtEnd({
+        endBeatId: options.endBeatId,
+        endScreenId: options.endScreenId,
         startBeatId: options.startBeatId,
-        startScreenId: options.startScreenId,
       });
       if (!assert.pass) {
         return {
@@ -294,8 +311,9 @@ export async function runPlayJourneyToStartSmoke(options: {
           peakCounter,
         };
       }
-      playbackDiagLog("info", "play-journey-smoke PASS at start", {
+      playbackDiagLog("info", "play-journey-smoke PASS at end", {
         beatId: assert.beatId,
+        screenId: assert.screenId,
       });
       return {
         pass: true,
@@ -311,9 +329,10 @@ export async function runPlayJourneyToStartSmoke(options: {
   }
 
   const finalState = options.getState();
-  const assert = assertPlaybackPlayEndedAtStart({
+  const assert = assertPlaybackPlayEndedAtEnd({
+    endBeatId: options.endBeatId,
+    endScreenId: options.endScreenId,
     startBeatId: options.startBeatId,
-    startScreenId: options.startScreenId,
   });
   return {
     pass: false,
@@ -327,3 +346,6 @@ export async function runPlayJourneyToStartSmoke(options: {
     poSignal: lastSoftPo,
   };
 }
+
+/** @deprecated Prefer {@link runPlayJourneyToEndSmoke} — play-end stays on finale. */
+export const runPlayJourneyToStartSmoke = runPlayJourneyToEndSmoke;

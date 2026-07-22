@@ -7,6 +7,20 @@
 **One overlay · one gate · explicit `sessionKind`:** `manual` | `agent` | `observe`  
 Module: [`agentTestingSession.ts`](./agentTestingSession.ts) — do **not** reintroduce `loggerSession` / dual owner flags.
 
+### Popup action state machine (Run Test gate)
+
+Module: [`qaPopupActionState.ts`](./qaPopupActionState.ts) — CTA visibility is **state-driven**, not CSS hide.
+
+| State | Meaning | Run Test |
+|-------|---------|----------|
+| `idle` | Overlay closed | unavailable |
+| `agentic-user` | **User agentic QA** = `manual` \| `observe` (product QA chrome) | **unavailable** (hidden + not activatable); suite picker hidden |
+| `prove` | `agent` control room, no suite selected | unavailable (CAPTURE/Pause/Resume) |
+| `suite-armed` | `agent` + suite selected | **available** |
+| `suite-running` | suite `phase === running` | unavailable (`Running…` disabled) |
+
+Programmatic `__studioRunQaSuiteById` / `__studioStartQaSuite` stay independent of the CTA.
+
 ```
 idle ──bug/open──► manual (paused) ──Resume──► manual (capturing)
   │                    │

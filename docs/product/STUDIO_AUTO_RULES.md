@@ -196,8 +196,8 @@ Deep links stay on that origin, e.g. `http://localhost:5173/?project=boots-pharm
 1. Type-in on Site Pilot home **always** clears + types (never skip because prefilled `HOME_QUERY_DEFAULT` matches demo query).
 2. Chat composer type-in logs the same diag events.
 3. Step-forward / step-back / retreat-sync emit `[PLAYBACK_DIAG]` console events.
-4. Every beat (agentic + traditional) logs: beat id/kind/mode/screen, target found+bbox, cursor travel/park/press (park reason visible), scroll host before/after + retreat scrollIntoView, click/type results, skips + why, journey-reset/`play-end` destination (start beat + screen — never silent hub).
-5. Window APIs installed with MCP helpers: `__studioPlaybackDiag`, `__studioPlaybackDiagClear`, `__studioAssertTypeIn`, `__studioAssertPlayEndedAtStart` (`__proto*` aliases).
+4. Every beat (agentic + traditional) logs: beat id/kind/mode/screen, target found+bbox, cursor travel/park/press (park reason visible), scroll host before/after + retreat scrollIntoView, click/type results, skips + why, `play-end` destination (finale beat + screen — never silent hub; **no auto-rewind** — Jump-to-start for manual reset).
+5. Window APIs installed with MCP helpers: `__studioPlaybackDiag`, `__studioPlaybackDiagClear`, `__studioAssertTypeIn`, `__studioAssertPlayEndedAtEnd` (legacy `__studioAssertPlayEndedAtStart` alias; `__proto*` aliases).
 6. Quinn prove uses assert + step/retreat smokes on **R11** `:5173` reuse tab — see [PLAYBACK_DIAG.md](../shell/PLAYBACK_DIAG.md).
 
 **CI:** Vitest `playbackDiag.test.ts` (emits on step/retreat/cursor/scroll).  

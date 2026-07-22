@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@/app/shell/playbackDiag", () => ({
+  assertPlaybackPlayEndedAtEnd: vi.fn(() => ({ pass: true })),
   assertPlaybackPlayEndedAtStart: vi.fn(() => ({ pass: true })),
   getPlaybackDiagBundle: vi.fn(() => ({ playEnd: { count: 0 } })),
   playbackDiagClear: vi.fn(),
@@ -11,13 +12,13 @@ vi.mock("@/app/shell/smokePoSignalPoll", () => ({
   pollSmokePoSignal: vi.fn(() => ({ hit: false, abort: false, signal: null })),
 }));
 
-import { runPlayJourneyToStartSmoke } from "@/app/shell/playJourneySmoke";
+import { runPlayJourneyToEndSmoke } from "@/app/shell/playJourneySmoke";
 
-describe("runPlayJourneyToStartSmoke arming", () => {
+describe("runPlayJourneyToEndSmoke arming", () => {
   it("waits for committed journey mode and a populated counter before transport", async () => {
     let reads = 0;
     const triggerTransport = vi.fn(() => false);
-    const result = await runPlayJourneyToStartSmoke({
+    const result = await runPlayJourneyToEndSmoke({
       orchestraMode: "agentic-cjm",
       startBeatId: "agentic-home",
       startScreenId: "site-pilot",
@@ -42,7 +43,7 @@ describe("runPlayJourneyToStartSmoke arming", () => {
     let now = 0;
     const nowSpy = vi.spyOn(Date, "now").mockImplementation(() => (now += 1_000));
     const triggerTransport = vi.fn(() => true);
-    const result = await runPlayJourneyToStartSmoke({
+    const result = await runPlayJourneyToEndSmoke({
       orchestraMode: "rec-agentic-target",
       startBeatId: "plp",
       startScreenId: "plp",
@@ -69,7 +70,7 @@ describe("runPlayJourneyToStartSmoke arming", () => {
     let now = 0;
     const nowSpy = vi.spyOn(Date, "now").mockImplementation(() => (now += 1_000));
     const triggerTransport = vi.fn(() => true);
-    const result = await runPlayJourneyToStartSmoke({
+    const result = await runPlayJourneyToEndSmoke({
       orchestraMode: "rec-agentic-target",
       startBeatId: "plp",
       startScreenId: "plp",
@@ -97,7 +98,7 @@ describe("runPlayJourneyToStartSmoke arming", () => {
     let now = 0;
     const nowSpy = vi.spyOn(Date, "now").mockImplementation(() => (now += 1_000));
     const triggerTransport = vi.fn(() => true);
-    const result = await runPlayJourneyToStartSmoke({
+    const result = await runPlayJourneyToEndSmoke({
       orchestraMode: "agentic-cjm",
       startBeatId: "agentic-home",
       startScreenId: "site-pilot",

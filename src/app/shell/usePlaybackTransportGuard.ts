@@ -29,6 +29,13 @@ export type TransportGuardSnapshot = {
   journeyMode: boolean;
   isOnAir: boolean;
   isScripting: boolean;
+  /**
+   * Beat-index advance committed, runBeatEnter (tab nav + book-step2 landing
+   * prep) not settled yet. Suppresses the alignment check below only —
+   * deliberately NOT folded into isScripting (that also feeds
+   * detectDirectorScriptOffAir, which ties isScripting to on-air state).
+   */
+  beatEnterPending?: boolean;
   /** CJM step-back DOM sync in flight — beat/UI may disagree for a tick. */
   retreatSyncing?: boolean;
   isPausingBeforeReveal?: boolean;
@@ -209,6 +216,7 @@ export function usePlaybackTransportGuard({
       snapshot.isScripting ||
       snapshot.retreatSyncing ||
       snapshot.isPausingBeforeReveal ||
+      snapshot.beatEnterPending ||
       // A freshly armed QA session is not a transport result. Wait for the
       // first explicit cassette action before checking the tuple; otherwise
       // React's URL-reset effect can self-create a false fail handoff.
@@ -246,7 +254,7 @@ export function usePlaybackTransportGuard({
           beatId: latestBeatIdRef.current,
           touchpointKey: latest.touchpointKey,
           isOnAir: latest.isOnAir,
-          isScripting: latest.isScripting,
+          isScripting: latest.isScripting || latest.beatEnterPending,
           retreatSyncing: latest.retreatSyncing,
           isPausingBeforeReveal: latest.isPausingBeforeReveal,
         }

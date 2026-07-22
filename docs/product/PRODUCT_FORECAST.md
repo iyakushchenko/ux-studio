@@ -45,6 +45,7 @@ Ship the **control room** first: deep-linkable screens, recordable interactions,
 
 | Work | Why |
 |------|-----|
+| **P0 future — Playback/REC/QA prove refactor + single regression harness** | PO token burn; scattered prove law (`completeJourneyPlay` + many contracts); one-line flips cascade. **Not now** — board 12a · PP-41 |
 | Second project rabbit | After Boots book + URL + REC proven on Pages |
 | Release / tag CI | When versioning habit is stable + Actions budget |
 | Broader CSS contracts | More `check-*.mjs`, not more Playwright on every push |

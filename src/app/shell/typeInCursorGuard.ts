@@ -13,9 +13,17 @@ import { latchPoSignal } from "@/app/shell/agent-testing/agentTestingPoSignal";
 import { playbackDiagCursor } from "@/app/shell/playbackDiag";
 
 let hiddenLatchedForActiveTypeIn = false;
+/** True between beginTypeInCursorGuard → endTypeInCursorGuard (CJM typing beat). */
+let typeInCursorGuardActive = false;
 
 export function resetTypeInCursorGuard(): void {
   hiddenLatchedForActiveTypeIn = false;
+  typeInCursorGuardActive = false;
+}
+
+/** Live type-in beat — used to skip 8s agent-stale auto-pause mid-typing. */
+export function isTypeInCursorGuardActive(): boolean {
+  return typeInCursorGuardActive;
 }
 
 /** Type-in finished / aborted — drop carriage latch so Play hover/click is hand|arrow. */
@@ -31,6 +39,7 @@ export function endTypeInCursorGuard(): void {
 /** Hold journey park rest at type-in start; log visibility. */
 export function beginTypeInCursorGuard(target: HTMLElement): void {
   resetTypeInCursorGuard();
+  typeInCursorGuardActive = true;
   // Force one park pose for this type-in; ticks must not slide it.
   parkDemoCursorForTypeIn(target, { force: true });
   reportTypeInCursorVisibility("start", target);

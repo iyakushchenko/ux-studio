@@ -10,6 +10,10 @@ See also: [SHELL.md](./SHELL.md) (architecture), [PROJECTS.md](./PROJECTS.md) (r
 
 Continuous **Play** uses the **same** beat/script runners as **Step Forward** (automated). Do not invent a dump-all / skip-type-in Play path. CJM-on chat enter = q0 then progressive; CJM-off = saved-chat load — [CHAT_PAGE_RAILS.md](../projects/boots-pharmacy/features/CHAT_PAGE_RAILS.md).
 
+### Play end (PO 2026-07-22)
+
+Continuous Play completion **stays on the finale** (last beat / STEPS N/N / last product screen). **No auto-rewind** to journey start. Jump-to-start (and Stop → Jump) remain for **manual** rewind. Step-forward finishing the last beat also stays (does not complete/rewind). Diag: `play-end → stay at journey end`. Assert: `__studioAssertPlayEndedAtEnd`. See [PLAYBACK_DIAG.md](./PLAYBACK_DIAG.md).
+
 The QA overlay also exposes **Fast test current CJM** and **Fast test all CJMs**. Fast mode uses those same runners and assertions, but applies a scoped timing profile to presentation-only waits and motion. It never skips beats, direct-clicks past cursor target checks, bypasses modal handling, weakens alignment guards, or changes REC pacing. The normal profile is restored in `finally`, including failures.
 
 **Type-in:** page composers must still animate letter-by-letter. Gate **QA/diag logging** of per-character progress only — never kill the animation to quiet the overlay. Dump smell: `typeIn.samples ≫ starts` (e.g. 249 vs 2).

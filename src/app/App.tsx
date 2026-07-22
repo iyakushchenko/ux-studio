@@ -1380,6 +1380,11 @@ export default function App() {
       journeyMode: studioJourneyMode,
       isOnAir: transport.isOnAir,
       isScripting: transport.isScripting,
+      // Separate from isScripting (not OR'd in — that also feeds
+      // detectDirectorScriptOffAir). True while a beat-index advance has
+      // committed but runBeatEnter hasn't settled (LESSONS
+      // topic-playback-alignment, 2026-07-22 beat-tab-mismatch race).
+      beatEnterPending: transport.isBeatEnterPending?.(),
       retreatSyncing: transport.retreatSyncing, isPausingBeforeReveal: transport.isPausingBeforeReveal,
       journeyId: activeJourney?.id,
       beatId: currentBeat?.id,
@@ -1822,7 +1827,7 @@ export default function App() {
             action === "jump-to-end") &&
           (refuseTransportForIncompatibleCjm() || refusePlayIfQaBlocks())
         ) {
-          return;
+          return false;
         }
         switch (action) {
           case "play":
@@ -1846,6 +1851,7 @@ export default function App() {
             transportActionsRef.current.jumpToEnd();
             break;
         }
+        return true;
       },
     });
     return () => {

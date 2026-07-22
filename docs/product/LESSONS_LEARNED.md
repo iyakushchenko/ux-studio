@@ -18,13 +18,14 @@ without rewriting history.
 | Topic | Start with | Typical use |
 |-------|------------|-------------|
 | REC capture, compile, and honesty | [REC robustness](#topic-rec) · [Recording baseline](#topic-recording-baseline) | Arming, new-CJM proof, labels, scroll-stop, compile/replay |
-| Continuous Play and diagnostics | [Playback completion](#topic-playback) · [Navigation/journeys baseline](#topic-navigation-baseline) | Stalls, end state, scroll/cursor diagnostics, Step/Play parity |
+| Continuous Play and diagnostics | [Playback completion](#topic-playback) · [Navigation/journeys baseline](#topic-navigation-baseline) · [Beat-tab alignment race](#topic-playback-alignment) | Stalls, end state, scroll/cursor diagnostics, Step/Play parity, beat-tab-mismatch |
+| Play/REC/QA prove surface sprawl (token burn) | [Prove harness debt](#topic-prove-harness) · board LATER 12a · PP-41 | One-line product flips cascade across smokes/docs/asserts — **refactor later, not now** |
 | QA overlay and PO signals | [Overlay reset/HMR](#topic-overlay) · [Overlay baseline](#topic-overlay-baseline) | ALWAYS CLEAR, alarm/cursor/scroll, teardown, false FAIL |
 | QA suite Observe / touch-wrap (R16) | [Suite Observe race](#topic-suite-observe) · dig [`qaSuiteTouchWrapContract.ts`](../../src/app/shell/qaSuiteTouchWrapContract.ts) | `dom-observe-open kind=agent` after suite sanity |
 | Chat, camera, scroll, and type-in | [Chat camera](#topic-chat) · [Nested scroll host](#topic-scroll) | Progressive bubbles, composer pad, type-in, scroll reversal |
 | Make→React mounts and selectors | [Make ghosts](#topic-hybrid) · [Hybrid baseline](#topic-hybrid-baseline) | Retire/park Make, first-match ghosts, mount/unmount |
 | CSS, UXDS, hover, and fidelity | [Typical DS checks](#topic-ds) · [DS/CSS baseline](#topic-ds-baseline) | Tokens, kit states, loading parity, no invented chrome |
-| URL, modal, and navigation state | [URL/CJM state](#topic-url) · [Modal URL](#topic-modal) | Deep links, modal registry, return/reset behavior |
+| URL, modal, and navigation state | [URL/CJM state](#topic-url) · [Modal URL](#topic-modal) · [Non-destructive overlay](#topic-overlay-underlay) | Deep links, modal registry, underlay must stay painted |
 | Page migration and Final Pass | [Page Final Pass](#topic-final-pass) · [Page create inheritance](#topic-page-create) | Sequencing, proof, audits, next-page gate; UXDS/UXML reuse |
 | Naming, hygiene, docs, version, CI | [Version](#topic-version) · [Naming](#topic-naming) · [CI](#topic-ci) | Repository conventions and delivery mechanics |
 | **Stuck / don’t know / looping** | **[AGENT_STUCK_ROUTER.md](./AGENT_STUCK_ROUTER.md)** | One dig — do not thrash tokens |
@@ -35,6 +36,40 @@ For role-specific mandatory reading, return to
 ---
 
 ## 2026-07-22
+
+<a id="topic-prove-harness"></a>
+### Playback/REC/QA prove surface — architecture debt (PO / Arch)
+
+- **Symptom / class:** Touching Play / REC / QA prove burns monster tokens; law is scattered (`completeJourneyPlay` + many prove contracts); one-line product flips (e.g. play-end stay-at-end) cascade across smokes/docs/asserts.
+- **Root cause:** No single SSoT behavior module; duplicated at-start/at-end contracts; thin prove API missing.
+- **Right fix (future P0 — not now):** Architecture refactor + one regression harness; thin prove API; fewer duplicated play-end contracts. Stamp: [NEXT_STEPS.md](./NEXT_STEPS.md) LATER 12a · [PAINPOINTS.md](./PAINPOINTS.md) PP-41.
+- **Gate:** Do **not** start until Arch/Pax open the wave; until then prefer minimal product flips + update the fewest asserts.
+
+### Play end stays at finale — no auto-rewind (PO)
+
+- **Symptom / class:** Continuous Play finished then jumped to CJM start (PLP / site-pilot / 1/N). PO wants end state left on the last beat.
+- **Root cause:** `completeJourneyPlay` called `jumpToStart` + emitted play-end `journey-reset`; `play()` at last beat also rewound; asserts/smokes required play-end-at-start.
+- **Right fix:** `completeJourneyPlay` stops in place (park cursor `play-end`); Play-at-end is a no-op; Jump-to-start stays manual. Assert `__studioAssertPlayEndedAtEnd` (N/N + finale beat; anti-rewind vs startBeatId). Step-at-last already stayed.
+- **Gate:** Unit `playbackDiag` / `fullPlayProve` / format humanize; live `__studioRunFullPlayProve({ experience: "traditional" })` → PASS peak N/N · play-end at end · `screen=appointment-details` (not plp/site-pilot).
+
+### Agentic SF `transport-no-progress` — bubble fail-handoff freeze silent-blocks SF (PO / Quinn)
+
+- **Symptom / class:** `__protoRunAgenticStepForwardSmoke` FAIL `transport-no-progress` mid-chat or at `book-step2` after Avail — fingerprint stuck; no diagnostic modal; SF appears to fire. Residual after honest refuse: `step-forward-unavailable` with `frozen` + sticky overlay `isDiagnosticBlocking` while Studio `diagnosticOpen:false` (avail→book-step2 land often leaves `PLAYBACK_DIAGNOSTIC_OPEN` beat-tab race).
+- **Root cause:** Chat bubble JUMP/CHOP called `__studioBeginQaFailHandoff` (freeze + handoff pending) **without** a polled PO latch. App `refusePlayIfQaBlocks` then silent-no-op’d SF while MCP helper still returned `true`. Orphan clear previously keyed off overlay diag flags — sticky `diagnosticBlocking` prevented freeze wipe.
+- **Right fix:** Prove-mode skips bubble fail-handoff (diag-only, like fast). `beginQaFailHandoff` always latches `QA_FAIL_HANDOFF`. Prove-mode clears via `clearQaPlaybackBlocksForReset` when Studio has no open diagnostic (ignore sticky overlay flag). App `triggerTransport` returns `false` when refused. Step-forward smoke pre-clears orphan blocks before each SF.
+- **Gate:** `playbackDiag.test.ts` prove-mode + `agentTestingListen.test.ts` orphan freeze (sticky diagBlocking); full R11 `__protoRunAgenticStepForwardSmoke` PASS → `STEPS: 22 / 22` appointment-details.
+
+- **Symptom / class:** `uxml play step` / `__protoRunAgenticStepForwardSmoke` FAIL on beat 1 `agentic-home` / `sarah-query-submit` — `PLAYBACK_DIAGNOSTIC_OPEN` “Step forward had no effect”; QA log shows `Agent stale · auto-pause` then `Typing finished — FAIL` / type-in `aborted`.
+- **Root cause:** `withMcpTestSession` `forceClear` ends prove-mode and never re-armed it (unlike `__studioRunFullPlayProve` / `requireFreshQaSession`). Long Site Pilot type-in (>8s) hit stale heartbeat → `haltPlaybackForPoSignal("agent-stale-auto")` mid-script → director-step-no-effect. Same class for manual stepped watch with overlay open.
+- **Right fix:** Arm `beginQaProveMode` inside `withMcpTestSession` (clear in finally). Skip stale auto-pause while director on-air or `isTypeInCursorGuardActive()`.
+- **Gate:** `mcpTestSession.test.ts` + type-in active latch test; R11 re-prove `__protoRunAgenticStepForwardSmoke` past home type-in.
+
+### QA popup Run Test must not appear in user agentic QA mode (PO)
+
+- **Symptom / class:** QA tool popup showed half-visible / activatable **Run Test** while human product QA chrome was open (`manual` / `observe`), driven by leftover suite selection rather than an explicit operator mode.
+- **Root cause:** Capture toggle text flipped to “Run Test” whenever `selectedQaSuiteId` was set — no solid popup action state machine; CSS/ad-hoc hide was insufficient.
+- **Right fix:** `qaPopupActionState.ts` — states `idle | agentic-user | prove | suite-armed | suite-running`. **User agentic QA mode** = `sessionKind` `manual` \| `observe` → Run Test unavailable + suite picker hidden. Run Test only in `suite-armed` (`agent` + suite selected). Click path gated by `canActivateRunTestFromPopup`. `__studioRunQaSuiteById` unchanged.
+- **Gate:** `qaPopupActionState.test.ts`; MCP spot-check `:5173` manual/observe QA open → no Run Test.
 
 ### Recorded `modalId: choose-pharmacy` vs live Availability / noSlots (PO / Quinn)
 
@@ -94,6 +129,19 @@ For role-specific mandatory reading, return to
 - **Root cause:** Shared cursor treated any visible non-disabled rectangle as clickable, always aimed at its geometric centre, captured before verifying outcome, and had no universal idempotent-selection rule.
 - **Right fix:** One engine contract: require native/ARIA/action semantics; reject selected idempotent options before travel; target visible text/content inside oversized actions; read checkbox/radio/selection state before click and require a transition before logging PASS or REC capture. Toggle-off remains valid; selected radio/date/tab no-op does not.
 - **Gate:** `demoInteractionContract` units + cursor interaction tests + cross-route localhost REC/playback. Page migrations preserve semantic action/state hooks; no CJM-id rescue branches.
+
+<a id="topic-playback-alignment"></a>
+### `beat-tab-mismatch` — beatIndex advance can commit one render before the tab navigates (PO / Arch)
+
+- **Symptom / class:** `uxml play` / `uxml play step` PO diagnostic `state-mismatch` / `beat-tab-mismatch` — `beat=book-step2 protoTab=6 expectedTabIndex=5 currentTabIndex=1` right after Robo-cursor "Book Now" at Availability "Choose time"; later also seen at `appointment-history → appointment-details` ("View Details").
+- **Root cause (two distinct causes, same symptom):**
+  1. **Timing race:** director-script beats (`runAvailScriptBeat` / `runBookScriptBeat` / `runTabScriptBeat`) call `setBeatIndex(next)` then `setScriptingActive(false)` in their `finally` — both in the **same** synchronous flow, so React can commit `beatId = next beat` and `isScripting = false` **simultaneously**, one render **before** the beat-enter effect (`runBeatEnter` → `navigateBeatTab`) has run. `usePlaybackTransportGuard` samples that exact render and reports a false mismatch.
+  2. **Missing chain-advance rescue:** `history-view-details`'s click genuinely navigates the prototype to Appointment Details, but `shouldAdvanceAfterChainedManualDirectorBeat` only auto-advanced `beatIndex` for the `reserve-appointment → camera` pair — `appointment-history → appointment-details` was missing, so the beat stayed parked one step behind a click that had already navigated.
+- **Right fix:**
+  1. `beatEnterPendingRef` (ref, not state) in `useJourneyPlayback` — the `setBeatIndex` param is wrapped so **every** internal advance latches it synchronously; cleared only when that beat's `runBeatEnter` (tab nav + book-step2 landing prep) finishes, or the retreat-sync branch settles. Threaded into `usePlaybackTransportGuard`'s snapshot as its **own** `beatEnterPending` field — deliberately **not** OR'd into `isScripting` (that also feeds `detectDirectorScriptOffAir`, which ties `isScripting` to on-air state; OR'ing in caused a *new* false `director-script-off-air` diagnostic during stepped Play).
+  2. `shouldAdvanceAfterChainedManualDirectorBeat` also returns true when `completedBeat.tabScript === "history-view-details"` — same gesture that clicks View Details also moves the journey beat to the beat that click actually landed on.
+- **Gate:** `playbackDirectorAnomalies.test.ts` chain-advance case; live `uxml play` (`__studioRunFullPlayProve`) + `uxml play step` (`__protoRunAgenticStepForwardSmoke`) both PASS 22/22 with zero diagnostics through avail-book→book-step2 and confirmation→appointment-history→appointment-details.
+- **Forecast:** Any new director-script beat that ends with `setBeatIndex` (avail/book/tab/home/recordedClick/camera) is already covered by the wrapped setter — no per-call-site fix needed. Any new *chained* click-that-navigates beat must be added to `shouldAdvanceAfterChainedManualDirectorBeat` or it will reproduce class 2.
 
 ## 2026-07-21
 
@@ -533,6 +581,15 @@ For role-specific mandatory reading, return to
   2. App derives `modalId` via `resolveStudioModalIdFromFlags`; open/close → `writeStudioUrl`; deep-link / `popstate` → `applyStudioModalFromUrl`.
   3. `check:felonies` + ratchet **modal-url-sync** fail npm test if registry entry missing, lacks URL helper, or source opens via orphan `set*Open(true)`.
 - **Quinn prove:** open Quick View on PLP → bar shows `modal=quick-view`; close / Back clears `modal`.
+
+<a id="topic-overlay-underlay"></a>
+### Non-destructive overlay — popup must not hide page beneath (PO 2026-07-22)
+
+- **Symptom / class:** Agentic CJM Play opens Availability **Choose Date** (`modal=choose-pharmacy`) → React chat underlay vanishes (`content-visibility: hidden` / looks like `display: none`).
+- **Root cause:** Boots `chat.css` FPS hack froze chat when choose-pharmacy was open. **Not** engine modal law — engine overlays are meant to sit on top without trashing underlay.
+- **Gate (HARD):** Opening any registered popup is **non-destructive** — underlay stays mounted and painted. Allowed: solid scrim, `pointer-events` on scrim only, z-index. **Forbidden:** `display:none` / `content-visibility:hidden` / unmount host solely because a modal opened.
+- **Fix:** Removed chat freeze rule; keep solid `.studio-avail-scrim` (no backdrop-filter). Recipe: [QA_LOGGING_AND_PLAYBACK_RECIPE.md](../shell/QA_LOGGING_AND_PLAYBACK_RECIPE.md) § Avail after chat.
+- **Quinn prove:** `screen=chat&modal=choose-pharmacy` → chat host computed `content-visibility` not `hidden`; underlay present under scrim.
 
 ### Stale jab count during Reset / filter refresh = ship fail (PO rage #5)
 

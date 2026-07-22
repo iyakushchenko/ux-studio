@@ -13,10 +13,11 @@ vi.mock("@/app/scenario/playbackScroll", () => ({
 }));
 
 vi.mock("@/app/shell/playJourneySmoke", () => ({
+  runPlayJourneyToEndSmoke: vi.fn(),
   runPlayJourneyToStartSmoke: vi.fn(),
 }));
 
-import { runPlayJourneyToStartSmoke } from "@/app/shell/playJourneySmoke";
+import { runPlayJourneyToEndSmoke } from "@/app/shell/playJourneySmoke";
 import {
   AGENTIC_FULL_PLAY_EXPECTED_PEAK,
   AGENTIC_FULL_PLAY_PROVE_DEFAULT_TIMEOUT_MS,
@@ -57,18 +58,18 @@ describe("runAgenticFullPlayProve", () => {
   afterEach(() => {
     forceClearAgentTestingOverlay();
     uninstallAgentTestingOverlayApi();
-    vi.mocked(runPlayJourneyToStartSmoke).mockReset();
+    vi.mocked(runPlayJourneyToEndSmoke).mockReset();
   });
 
   it("PASS when smoke peak 22/22 + play-end assert; keeps overlay; pauses leave", async () => {
-    vi.mocked(runPlayJourneyToStartSmoke).mockResolvedValue({
+    vi.mocked(runPlayJourneyToEndSmoke).mockResolvedValue({
       pass: true,
       peakVisible: 22,
       peakCounter: "STEPS: 22 / 22",
       assert: {
         pass: true,
-        beatId: "agentic-home",
-        screenId: "site-pilot",
+        beatId: "appointment-details",
+        screenId: "appointment-details",
       },
     });
 
@@ -94,14 +95,14 @@ describe("runAgenticFullPlayProve", () => {
   });
 
   it("passes default timeoutMs 300_000 into play smoke when omitted", async () => {
-    vi.mocked(runPlayJourneyToStartSmoke).mockResolvedValue({
+    vi.mocked(runPlayJourneyToEndSmoke).mockResolvedValue({
       pass: true,
       peakVisible: 22,
       peakCounter: "STEPS: 22 / 22",
       assert: {
         pass: true,
-        beatId: "agentic-home",
-        screenId: "site-pilot",
+        beatId: "appointment-details",
+        screenId: "appointment-details",
       },
     });
 
@@ -110,20 +111,20 @@ describe("runAgenticFullPlayProve", () => {
       preArmMs: 0,
     });
 
-    expect(vi.mocked(runPlayJourneyToStartSmoke).mock.calls[0]?.[0]).toMatchObject({
+    expect(vi.mocked(runPlayJourneyToEndSmoke).mock.calls[0]?.[0]).toMatchObject({
       timeoutMs: 300_000,
     });
   });
 
   it("FAIL honestly when peak short of 22/22 — no invent green", async () => {
-    vi.mocked(runPlayJourneyToStartSmoke).mockResolvedValue({
+    vi.mocked(runPlayJourneyToEndSmoke).mockResolvedValue({
       pass: true,
       peakVisible: 12,
       peakCounter: "STEPS: 12 / 22",
       assert: {
         pass: true,
-        beatId: "agentic-home",
-        screenId: "site-pilot",
+        beatId: "appointment-details",
+        screenId: "appointment-details",
       },
     });
 
@@ -140,12 +141,12 @@ describe("runAgenticFullPlayProve", () => {
   });
 
   it("FAIL when smoke fails — surfaces reason in errors", async () => {
-    vi.mocked(runPlayJourneyToStartSmoke).mockResolvedValue({
+    vi.mocked(runPlayJourneyToEndSmoke).mockResolvedValue({
       pass: false,
       reason: "playback-diagnostic",
       peakVisible: 8,
       peakCounter: "STEPS: 8 / 22",
-      assert: { pass: false, reason: "not-at-start" },
+      assert: { pass: false, reason: "not-at-end" },
     });
 
     const result = await runAgenticFullPlayProve({
@@ -155,7 +156,7 @@ describe("runAgenticFullPlayProve", () => {
 
     expect(result.pass).toBe(false);
     expect(result.errors).toContain("playback-diagnostic");
-    expect(result.errors.some((e) => e.includes("not-at-start") || e.includes("play-end"))).toBe(
+    expect(result.errors.some((e) => e.includes("not-at-end") || e.includes("play-end"))).toBe(
       true
     );
   });

@@ -230,17 +230,21 @@ export function shouldChainManualDirectorStepOnAdvance(
 }
 
 /**
- * A chained Reserve click navigates the prototype to Book Step 3 immediately.
- * Move transport to the following camera beat in the same gesture so the
- * runtime screen/touchpoint cannot outrun the active journey beat.
+ * A chained click navigates the prototype immediately (Reserve → Book Step 3;
+ * View Details → Appointment details). Move transport to the following beat
+ * in the same gesture so the runtime screen/touchpoint cannot outrun the
+ * active journey beat — leaving beatIndex parked one beat behind a click that
+ * already navigated is exactly the beat-tab-mismatch class in LESSONS_LEARNED
+ * topic-playback-alignment (2026-07-22, appointment-history → -details).
  */
 export function shouldAdvanceAfterChainedManualDirectorBeat(
   completedBeat: JourneyBeat | undefined,
   followingBeat: JourneyBeat | undefined
 ): boolean {
   return (
-    completedBeat?.bookScript === "reserve-appointment" &&
-    beatHasCameraStep(followingBeat)
+    (completedBeat?.bookScript === "reserve-appointment" &&
+      beatHasCameraStep(followingBeat)) ||
+    completedBeat?.tabScript === "history-view-details"
   );
 }
 

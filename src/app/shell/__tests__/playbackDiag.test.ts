@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  assertPlaybackPlayEndedAtEnd,
   assertPlaybackPlayEndedAtStart,
   assertPlaybackTypeIn,
   getPlaybackDiagBundle,
@@ -223,6 +224,37 @@ describe("playbackDiag", () => {
     expect(handoff).not.toHaveBeenCalled();
   });
 
+  it("keeps bubble jump/chop diagnostic-only while prove-mode is armed", async () => {
+    vi.spyOn(console, "info").mockImplementation(() => {});
+    const handoff = vi.fn();
+    (window as Window & { __studioBeginQaFailHandoff?: typeof handoff })
+      .__studioBeginQaFailHandoff = handoff;
+    const { beginQaProveMode, endQaProveMode } = await import(
+      "@/app/shell/agent-testing/agentTestingPresence"
+    );
+    setPlaybackTimingMode("normal");
+    beginQaProveMode("unit-prove");
+    try {
+      playbackDiagChatBubbleMotion({
+        id: "prove-r1",
+        phase: "frame",
+        y: 8,
+        deltaY: -4,
+        trace: { scrollLock: true, deltaScrollTop: 4 },
+      });
+      playbackDiagChatBubbleMotion({
+        id: "prove-r1",
+        phase: "frame",
+        y: 7,
+        deltaY: -32,
+        trace: { scrollLock: true, deltaScrollTop: 32 },
+      });
+      expect(handoff).not.toHaveBeenCalled();
+    } finally {
+      endQaProveMode();
+    }
+  });
+
   it("records type-in progress and asserts PASS", () => {
     const spy = vi.spyOn(console, "info").mockImplementation(() => {});
     playbackDiagTypeInStart("site-pilot", 20);
@@ -371,11 +403,51 @@ describe("playbackDiag", () => {
     expect(getPlaybackDiagBundle().click.fail).toBe(1);
   });
 
-  it("assertPlayEndedAtStart requires play-end + start beat", () => {
+  it("assertPlayEndedAtEnd requires play-end + finale beat (no rewind)", () => {
+    vi.spyOn(console, "info").mockImplementation(() => {});
+    vi.stubGlobal("window", {
+      __protoStudioState: () => ({
+        beatId: "appointment-details",
+        counter: "13 / 13",
+        isPlaying: false,
+        isOnAir: false,
+      }),
+    });
+    vi.stubGlobal("location", {
+      search: "?project=boots-pharmacy&screen=appointment-details&cjm=on",
+    });
+
+    expect(
+      assertPlaybackPlayEndedAtEnd({
+        endBeatId: "appointment-details",
+        endScreenId: "appointment-details",
+        startBeatId: "traditional-plp",
+      }).pass
+    ).toBe(false);
+
+    playbackDiagPlayEnd({
+      fromBeatId: "appointment-details",
+      toBeatId: "appointment-details",
+      endScreenId: "appointment-details",
+      detail: "play-end → stay at journey end",
+    });
+    const assert = assertPlaybackPlayEndedAtEnd({
+      endBeatId: "appointment-details",
+      endScreenId: "appointment-details",
+      startBeatId: "traditional-plp",
+    });
+    expect(assert.pass).toBe(true);
+    expect(getPlaybackDiagBundle().playEnd.count).toBe(1);
+    // Play-end must not emit journey-reset (manual Jump-to-start still does).
+    expect(getPlaybackDiagBundle().journeyReset.count).toBe(0);
+  });
+
+  it("assertPlayEndedAtEnd fails when rewound to journey start", () => {
     vi.spyOn(console, "info").mockImplementation(() => {});
     vi.stubGlobal("window", {
       __protoStudioState: () => ({
         beatId: "traditional-plp",
+        counter: "1 / 13",
         isPlaying: false,
         isOnAir: false,
       }),
@@ -383,30 +455,17 @@ describe("playbackDiag", () => {
     vi.stubGlobal("location", {
       search: "?project=boots-pharmacy&screen=plp&cjm=on",
     });
-
-    expect(
-      assertPlaybackPlayEndedAtStart({
-        startBeatId: "traditional-plp",
-        startScreenId: "plp",
-      }).pass
-    ).toBe(false);
-
     playbackDiagPlayEnd({
       fromBeatId: "appointment-details",
       toBeatId: "traditional-plp",
     });
-    playbackDiagJourneyReset({
-      fromBeatId: "appointment-details",
+    const assert = assertPlaybackPlayEndedAtEnd({
+      endBeatId: "appointment-details",
+      endScreenId: "appointment-details",
       startBeatId: "traditional-plp",
-      startScreenId: "plp",
     });
-    const assert = assertPlaybackPlayEndedAtStart({
-      startBeatId: "traditional-plp",
-      startScreenId: "plp",
-    });
-    expect(assert.pass).toBe(true);
-    expect(getPlaybackDiagBundle().playEnd.count).toBe(1);
-    expect(getPlaybackDiagBundle().journeyReset.count).toBe(1);
+    expect(assert.pass).toBe(false);
+    expect(assert.reason).toMatch(/expected end|rewound to start|counter=/);
   });
 
   it("hub-nav records reason + stack for PO forensics", () => {

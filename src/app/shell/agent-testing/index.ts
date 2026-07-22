@@ -128,6 +128,16 @@ export {
 } from "@/app/shell/agent-testing/agentTestingSession";
 
 export {
+  isUserAgenticQaMode,
+  resolveQaPopupActionState,
+  resolveQaPopupActionsChrome,
+  canActivateRunTestFromPopup,
+  type QaPopupActionState,
+  type QaPopupActionsChrome,
+  type QaPopupPrimaryCta,
+} from "@/app/shell/agent-testing/qaPopupActionState";
+
+export {
   deriveMcpConnectionStatus,
   getQaPendingTimeoutMs,
   type McpConnectionPhase,

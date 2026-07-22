@@ -1337,8 +1337,8 @@
   justify-content: center;
   padding: 24px;
   background: rgba(33, 43, 65, 0.55);
-  /* Blur over a live chat underlay was a main-thread killer (~15fps). Solid scrim
-   * + content-visibility freeze on chat (chat.css) keeps avail open smooth. */
+  /* Solid scrim only — no backdrop-filter (blur over live underlay was ~15fps).
+   * Underlay stays painted (non-destructive overlay law — do not freeze chat). */
   animation: proto-avail-fade 0.28s cubic-bezier(0, 0, 0.2, 1);
 }
 .studio-avail-scrim--closing {

@@ -13,10 +13,11 @@ vi.mock("@/app/scenario/playbackScroll", () => ({
 }));
 
 vi.mock("@/app/shell/playJourneySmoke", () => ({
+  runPlayJourneyToEndSmoke: vi.fn(),
   runPlayJourneyToStartSmoke: vi.fn(),
 }));
 
-import { runPlayJourneyToStartSmoke } from "@/app/shell/playJourneySmoke";
+import { runPlayJourneyToEndSmoke } from "@/app/shell/playJourneySmoke";
 import {
   AGENTIC_FULL_PLAY_EXPECTED_PEAK,
   AGENTIC_FULL_PLAY_PROVE_DEFAULT_TIMEOUT_MS,
@@ -61,18 +62,18 @@ describe("runFullPlayProve (universal)", () => {
   afterEach(() => {
     forceClearAgentTestingOverlay();
     uninstallAgentTestingOverlayApi();
-    vi.mocked(runPlayJourneyToStartSmoke).mockReset();
+    vi.mocked(runPlayJourneyToEndSmoke).mockReset();
   });
 
   it("PASS agentic preset via universal API; keeps overlay", async () => {
-    vi.mocked(runPlayJourneyToStartSmoke).mockResolvedValue({
+    vi.mocked(runPlayJourneyToEndSmoke).mockResolvedValue({
       pass: true,
       peakVisible: 22,
       peakCounter: "STEPS: 22 / 22",
       assert: {
         pass: true,
-        beatId: "agentic-home",
-        screenId: "site-pilot",
+        beatId: "appointment-details",
+        screenId: "appointment-details",
       },
     });
 
@@ -90,21 +91,28 @@ describe("runFullPlayProve (universal)", () => {
     expect(result.leave?.ok).toBe(true);
     expect(isAgentTestingOverlayActive()).toBe(true);
     expect(isAgentTestingOverlayDomPresent()).toBe(true);
-    expect(vi.mocked(runPlayJourneyToStartSmoke).mock.calls[0]?.[0]).toMatchObject({
+    expect(vi.mocked(runPlayJourneyToEndSmoke).mock.calls[0]?.[0]).toMatchObject({
       orchestraMode: "agentic-cjm",
       startBeatId: "agentic-home",
+      endBeatId: "appointment-details",
+    });
+    // Leave-pause must not swallow the prove verdict (Save Log). DOM flush is rAF.
+    await vi.waitFor(() => {
+      expect(document.body.textContent || "").toMatch(
+        /PASS · Completed 22\/22 · stayed at journey end/
+      );
     });
   });
 
   it("PASS traditional preset via journeyId; filtered prerequisite peak ok", async () => {
-    vi.mocked(runPlayJourneyToStartSmoke).mockResolvedValue({
+    vi.mocked(runPlayJourneyToEndSmoke).mockResolvedValue({
       pass: true,
       peakVisible: 10,
       peakCounter: "STEPS: 10 / 10",
       assert: {
         pass: true,
-        beatId: "traditional-plp",
-        screenId: "plp",
+        beatId: "appointment-details",
+        screenId: "appointment-details",
       },
     });
 
@@ -117,18 +125,19 @@ describe("runFullPlayProve (universal)", () => {
     expect(result.pass).toBe(true);
     expect(result.experience).toBe("traditional");
     expect(result.peak.visible).toBe(10);
-    expect(vi.mocked(runPlayJourneyToStartSmoke).mock.calls[0]?.[0]).toMatchObject({
+    expect(vi.mocked(runPlayJourneyToEndSmoke).mock.calls[0]?.[0]).toMatchObject({
       orchestraMode: "traditional-cjm",
       startScreenId: "plp",
+      endBeatId: "appointment-details",
     });
   });
 
   it("FAILS an implausibly short completed traditional route", async () => {
-    vi.mocked(runPlayJourneyToStartSmoke).mockResolvedValue({
+    vi.mocked(runPlayJourneyToEndSmoke).mockResolvedValue({
       pass: true,
       peakVisible: 1,
       peakCounter: "STEPS: 1 / 1",
-      assert: { pass: true, beatId: "traditional-plp", screenId: "plp" },
+      assert: { pass: true, beatId: "appointment-details", screenId: "appointment-details" },
     });
 
     const result = await runFullPlayProve({
@@ -158,14 +167,14 @@ describe("runFullPlayProve (universal)", () => {
       },
     ];
 
-    vi.mocked(runPlayJourneyToStartSmoke).mockResolvedValue({
+    vi.mocked(runPlayJourneyToEndSmoke).mockResolvedValue({
       pass: true,
       peakVisible: 4,
       peakCounter: "STEPS: 4 / 4",
       assert: {
         pass: true,
-        beatId: "plp",
-        screenId: "plp",
+        beatId: "pdp",
+        screenId: "pdp",
       },
     });
 
@@ -178,10 +187,11 @@ describe("runFullPlayProve (universal)", () => {
     expect(result.pass).toBe(true);
     expect(result.journeyId).toBe("rec-trad-mrtzf6sz-xcs5");
     expect(result.experience).toBe("traditional");
-    expect(vi.mocked(runPlayJourneyToStartSmoke).mock.calls[0]?.[0]).toMatchObject({
+    expect(vi.mocked(runPlayJourneyToEndSmoke).mock.calls[0]?.[0]).toMatchObject({
       orchestraMode: "rec-trad-mrtzf6sz-xcs5",
       startBeatId: "plp",
       startScreenId: "plp",
+      endBeatId: "pdp",
     });
     // Must NOT demand traditional-plp / peak 13.
     expect(result.errors.some((e) => e.includes("peak-not-13"))).toBe(false);
@@ -193,11 +203,11 @@ describe("runFullPlayProve (universal)", () => {
   });
 
   it("thin aliases share the same core (no duplicated logic)", async () => {
-    vi.mocked(runPlayJourneyToStartSmoke).mockResolvedValue({
+    vi.mocked(runPlayJourneyToEndSmoke).mockResolvedValue({
       pass: true,
       peakVisible: 22,
       peakCounter: "STEPS: 22 / 22",
-      assert: { pass: true, beatId: "agentic-home", screenId: "site-pilot" },
+      assert: { pass: true, beatId: "appointment-details", screenId: "appointment-details" },
     });
 
     const a = await runAgenticFullPlayProve({
@@ -207,11 +217,11 @@ describe("runFullPlayProve (universal)", () => {
     expect(a.pass).toBe(true);
     expect(a.experience).toBe("agentic");
 
-    vi.mocked(runPlayJourneyToStartSmoke).mockResolvedValue({
+    vi.mocked(runPlayJourneyToEndSmoke).mockResolvedValue({
       pass: true,
       peakVisible: 13,
       peakCounter: "STEPS: 13 / 13",
-      assert: { pass: true, beatId: "traditional-plp", screenId: "plp" },
+      assert: { pass: true, beatId: "appointment-details", screenId: "appointment-details" },
     });
     const t = await runTraditionalFullPlayProve({
       delay: async () => undefined,
@@ -228,14 +238,14 @@ describe("runFullPlayProve (universal)", () => {
   });
 
   it("FAIL honestly when peak short — no invent green", async () => {
-    vi.mocked(runPlayJourneyToStartSmoke).mockResolvedValue({
+    vi.mocked(runPlayJourneyToEndSmoke).mockResolvedValue({
       pass: true,
       peakVisible: 12,
       peakCounter: "STEPS: 12 / 22",
       assert: {
         pass: true,
-        beatId: "agentic-home",
-        screenId: "site-pilot",
+        beatId: "appointment-details",
+        screenId: "appointment-details",
       },
     });
 

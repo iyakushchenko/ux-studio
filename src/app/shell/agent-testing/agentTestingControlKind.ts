@@ -64,3 +64,16 @@ export function readLiveJourneyIsPlaying(): boolean {
     return false;
   }
 }
+
+/**
+ * Live director travel (step-forward script / continuous Play) from Studio nav.
+ * Hang-safe — false when DOM missing.
+ */
+export function readLiveJourneyOnAir(): boolean {
+  if (typeof document === "undefined") return false;
+  try {
+    return document.querySelector(".studio-nav-scenario--on-air") != null;
+  } catch {
+    return false;
+  }
+}

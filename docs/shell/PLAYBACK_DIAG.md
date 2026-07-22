@@ -48,12 +48,15 @@ window.__studioPlaybackDiag?.()
 window.__studioAssertTypeIn?.()
 // → { pass, reason?, bundle }  — FAIL if type-in-skip or too few progress samples
 
-window.__studioAssertPlayEndedAtStart?.({ startBeatId, startScreenId })
-// → FAIL if hub / wrong beat / no play-end
+window.__studioAssertPlayEndedAtEnd?.({ endBeatId, endScreenId?, startBeatId? })
+// → FAIL if hub / rewound to start / counter not N/N / no play-end
+// legacy alias (same AtEnd semantics):
+window.__studioAssertPlayEndedAtStart?.(...)
 
 // Legacy aliases (same functions):
 window.__protoPlaybackDiag?.()
 window.__protoAssertTypeIn?.()
+window.__protoAssertPlayEndedAtEnd?.()
 window.__protoAssertPlayEndedAtStart?.()
 ```
 
@@ -250,7 +253,7 @@ Smokes cannot auto-fix; orchestrator session owns the loop. Opt-in soft continue
 
 **Note:** `__protoTriggerTransport` requires an active MCP session (`__protoRun*` / recording). UI Step buttons always work; for console step use a smoke runner or click the nav button. Helper arm coalesces identical transport rows on the overlay (no monotonous spam).
 
-Harness journey smokes use **`resetToJourneyStart`** (key 1: `site-pilot` / `plp`) — **never** `resetToHub`. Product Play/end/reset/Jump-to-start/Stop-at-end/Alarm-abort/CJM-on must stay on journey start (`startBeatId` + `startScreenId`, never `screen=hub`). Hub only via Hub nav click. Matching-tab `goToTab` skip is a FAIL class. Every hub open logs `hub-nav` with stack.
+Harness journey smokes use **`resetToJourneyStart`** (key 1: `site-pilot` / `plp`) **after** the play-end assert for teardown — **never** `resetToHub`. Product continuous Play completion **stays on the finale** (`endBeatId` + `endScreenId`, counter N/N — never silent hub, never auto-rewind). Jump-to-start / Stop remain for **manual** rewind. Hub only via Hub nav click. Matching-tab `goToTab` skip is a FAIL class. Every hub open logs `hub-nav` with stack.
 
 ---
 
@@ -274,7 +277,7 @@ window.__studioPlaybackDiag?.()
 
 **Traditional settle (2026-07-19):** After each Step, wait until transport is idle (`!isOnAir && !isPlaying`). Login chains into `book-location-pick` — early Step aborts mid-picker → stray Availability on `book-step2`.
 
-**Play end → CJM start (2026-07-20):** Product Play finish returns to the first journey beat (not hub, not stuck on last). Diag: `play-end` + `journey-reset` + `__studioAssertPlayEndedAtStart({ startBeatId, startScreenId })`. Smokes: `__protoRunTraditionalPlaySmoke` / `__protoRunAgenticPlaySmoke` (harness `resetToJourneyStart` after assert — never hub).
+**Play end → stay at finale (PO 2026-07-22; supersedes 2026-07-20 start-rewind):** Continuous Play finish **stays** on the last journey beat / N/N (not hub, not auto-jump to start). Diag: `play-end` only (`play-end → stay at journey end`) — **no** play-end `journey-reset`. Assert: `__studioAssertPlayEndedAtEnd({ endBeatId, endScreenId?, startBeatId? })`. Manual rewind = Jump-to-start (emits `journey-reset`). Step-forward on the last beat also stays (no complete/rewind). Smokes: `__protoRunTraditionalPlaySmoke` / `__protoRunAgenticPlaySmoke` (harness `resetToJourneyStart` **after** assert — never hub).
 
 **PO Alarm mid-Play prove (R11 `:5173`):**
 

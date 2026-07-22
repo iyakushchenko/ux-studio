@@ -514,7 +514,7 @@ export function labelForPlaybackDiagEvent(event: PlaybackDiagEvent): string {
     return `Chat motion — ${clip(detail || kind, 70)}`;
   }
 
-  if (kind === "play-end") return "Play finished — back at journey start";
+  if (kind === "play-end") return "Play finished — stayed at journey end";
   if (kind === "journey-reset") return "Journey reset to start";
   if (kind === "hub-nav") {
     return `Unexpected hub navigation${detail ? ` — ${clip(detail, 60)}` : ""}`;

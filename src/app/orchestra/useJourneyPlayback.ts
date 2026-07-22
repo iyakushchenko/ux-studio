@@ -136,7 +136,7 @@ export function useJourneyPlayback({
   active,
   journey,
   beatIndex,
-  setBeatIndex,
+  setBeatIndex: setBeatIndexState,
   currentTabIndex,
   runtime,
   screenPlayback,
@@ -178,6 +178,24 @@ export function useJourneyPlayback({
   const [isPlaying, setIsPlaying] = useState(false);
   const [isScripting, setIsScripting] = useState(false);
   const isScriptingRef = useRef(false);
+  // True from the instant a beat-index advance is committed until that beat's
+  // runBeatEnter (navigate tab + book-step2 landing prep + onEnter) finishes.
+  // A ref (not state) so it is readable mid-render with zero commit lag —
+  // isScripting alone can flip false in the SAME batch as the beatIndex
+  // advance (director-script beats end their try/finally right after
+  // setBeatIndex), exposing a real render where beatId already reads the new
+  // landing beat but the tab hasn't navigated yet → false beat-tab-mismatch.
+  const beatEnterPendingRef = useRef(false);
+  // Wrap the incoming setter so every internal beatIndex advance latches the
+  // pending flag synchronously, in the same statement group as the state
+  // update — no call site elsewhere in this hook needs to remember to do it.
+  const setBeatIndex = useCallback(
+    (next: number) => {
+      beatEnterPendingRef.current = true;
+      setBeatIndexState(next);
+    },
+    [setBeatIndexState]
+  );
   const [playbackScrollBusy, setPlaybackScrollBusy] = useState(false);
   const scrollPollRafRef = useRef<number | null>(null);
 
@@ -295,6 +313,7 @@ export function useJourneyPlayback({
     stopScrollPoll();
     setPlaybackScrollBusy(false);
     setScriptingActive(false);
+    beatEnterPendingRef.current = false;
     notePlaybackCursorEvent("abort", { abortReason: "playback-abort-all" });
     resetPlaybackCursorDiagnosticContext();
     lastAvailAutoRunRef.current = null;
@@ -325,30 +344,24 @@ export function useJourneyPlayback({
     setIsPlaying(false);
   }, []);
 
-  /** Jump-to-start after Play finishes — set by jumpToStart (avoids TDZ). */
+  /** Manual Jump-to-start — set by jumpToStart (avoids TDZ). Not called on Play end. */
   const jumpToStartRef = useRef<() => void>(() => {});
 
   const completeJourneyPlay = useCallback(() => {
-    const fromBeat = beats[beatIndexRef.current];
+    const endBeat = beats[beatIndexRef.current];
     setPlaybackEndToken((token) => token + 1);
     stopJourneyPlay();
-    // Product: return to CJM journey start (first beat) — not hub, not stuck on last.
-    jumpToStartRef.current();
-    const firstBeat = beats.find((beat) => !shouldSkipBeat(beat));
-    const startScreenId = resolveStartScreenId(firstBeat);
+    // Product (PO 2026-07-22): continuous Play completion stays on the finale /
+    // last beat — no auto-rewind. Jump-to-start remains for manual rewind.
+    const endScreenId = resolveStartScreenId(endBeat);
+    void parkDemoCursorAtRest({ reason: "play-end" });
     playbackDiagPlayEnd({
-      fromBeatId: fromBeat?.id,
-      toBeatId: firstBeat?.id,
-      startScreenId,
-      detail: "play-end → journey-start",
+      fromBeatId: endBeat?.id,
+      toBeatId: endBeat?.id,
+      endScreenId,
+      detail: "play-end → stay at journey end",
     });
-    playbackDiagJourneyReset({
-      fromBeatId: fromBeat?.id,
-      startBeatId: firstBeat?.id,
-      startScreenId,
-      detail: "play-end journey-reset → selected journey start (never hub)",
-    });
-  }, [beats, resolveStartScreenId, shouldSkipBeat, stopJourneyPlay]);
+  }, [beats, resolveStartScreenId, stopJourneyPlay]);
 
   const reportScriptFailure = useCallback(
     (
@@ -1178,26 +1191,32 @@ export function useJourneyPlayback({
 
   const runBeatEnter = useCallback(
     async (beat: JourneyBeat) => {
-      // Browse (CJM off): beat index may fall back to journey-start for tabs
-      // outside the active CJM (e.g. Book Step 1 under agentic-cjm). Never snap
-      // the viewport to that fallback tab — manual nav owns the screen.
-      if (
-        shouldNavigateBeatTabOnEnter(
-          scenarioBrowseMode,
-          suppressInitialBeatTabNavRef.current
-        )
-      ) {
-        navigateBeatTab(beat);
-      }
-      if (isBookStep2DwellBeatId(beat.id) && !scenarioBrowseMode) {
-        await prepareBookStep2Landing(beat);
-      } else if (isBookStep2DwellBeatId(beat.id)) {
-        runtime.closeAllPopups();
-        runtime.closeAvailability();
-      }
-      if (beat.onEnter) {
-        notePlaybackBeatEnter(beat.onEnter, beat.id);
-        playback.runBeatAction(beat.onEnter, runtime);
+      try {
+        // Browse (CJM off): beat index may fall back to journey-start for tabs
+        // outside the active CJM (e.g. Book Step 1 under agentic-cjm). Never snap
+        // the viewport to that fallback tab — manual nav owns the screen.
+        if (
+          shouldNavigateBeatTabOnEnter(
+            scenarioBrowseMode,
+            suppressInitialBeatTabNavRef.current
+          )
+        ) {
+          navigateBeatTab(beat);
+        }
+        if (isBookStep2DwellBeatId(beat.id) && !scenarioBrowseMode) {
+          await prepareBookStep2Landing(beat);
+        } else if (isBookStep2DwellBeatId(beat.id)) {
+          runtime.closeAllPopups();
+          runtime.closeAvailability();
+        }
+        if (beat.onEnter) {
+          notePlaybackBeatEnter(beat.onEnter, beat.id);
+          playback.runBeatAction(beat.onEnter, runtime);
+        }
+      } finally {
+        // Tab now navigated (+ book-step2 popup teardown settled) — safe for
+        // the transport guard to validate beat/tab alignment again.
+        beatEnterPendingRef.current = false;
       }
     },
     [
@@ -1348,6 +1367,7 @@ export function useJourneyPlayback({
           playbackScrollMonitor.noteRetreatSync();
         }
         endRetreatSync();
+        beatEnterPendingRef.current = false;
       });
     } else if (
       !scenarioBrowseMode &&
@@ -1986,8 +2006,7 @@ export function useJourneyPlayback({
 
     const lastPlayable = findLastPlayableBeatIndex(beats, shouldSkipBeat);
     if (beatIndexRef.current >= lastPlayable) {
-      // Stop-at-end cassette → rewind to first playable beat (never hub).
-      jumpToStartRef.current();
+      // Already stopped at finale — no auto-rewind. Use Jump to start to replay.
       return;
     }
 
@@ -2205,6 +2224,11 @@ export function useJourneyPlayback({
     isPlaying: onScreenFramesBeat ? screenPlayback.isPlaying : isPlaying,
     isOnAir,
     isScripting: scriptingActive,
+    // Ref read (not state) — true while a beat-index advance has committed
+    // but that beat's runBeatEnter (tab nav + landing prep) hasn't finished.
+    // See beatEnterPendingRef above; consumed by usePlaybackTransportGuard to
+    // suppress beat-tab-mismatch during the one-tick nav/dwell handoff.
+    isBeatEnterPending: () => beatEnterPendingRef.current,
     retreatSyncing,
     transportStepToken,
     playbackEndToken,

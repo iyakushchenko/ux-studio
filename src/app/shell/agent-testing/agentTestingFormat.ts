@@ -76,7 +76,10 @@ export function humanizeQaLogLabel(label: string): string {
   const modalClose = /^Modal close ·\s*([^·]+)/i.exec(label)?.[1];
   if (modalClose) return `Closed dialog · ${titleId(modalClose)}`;
   if (label === "Journey reset to start") return "Returned to journey start";
-  if (label === "Play finished — back at journey start") return "Play completed · returned to journey start";
+  if (label === "Play finished — stayed at journey end")
+    return "Play completed · stayed at journey end";
+  if (label === "Play finished — back at journey start")
+    return "Play completed · stayed at journey end";
   const click = /^Click:\s*(.+)$/i.exec(label)?.[1]?.trim();
   if (click) {
     if (/^(?:\d{1,2}(?::\d{2})?|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{1,2})$/i.test(click)) {
@@ -89,9 +92,9 @@ export function humanizeQaLogLabel(label: string): string {
   if (/^Bubble\s+r\d+\s+thinking→reply/i.test(label)) return "Thinking changed to reply";
   if (/^Bubble\s+\S+\s+settle/i.test(label)) return "Chat message settled";
   if (/^Cursor stayed at last click/i.test(label)) return "Cursor stayed at last action";
-  if (/^prove PASS ·\s*([^·]+)\s*· peak\s*(\d+)\/(\d+)\s*· play-end at start/i.test(label)) {
+  if (/^prove PASS ·\s*([^·]+)\s*· peak\s*(\d+)\/(\d+)\s*· play-end at (?:end|start)/i.test(label)) {
     const match = /^prove PASS ·\s*([^·]+)\s*· peak\s*(\d+)\/(\d+)/i.exec(label);
-    return match ? `PASS · Completed ${match[2]}/${match[3]} · returned to journey start` : label;
+    return match ? `PASS · Completed ${match[2]}/${match[3]} · stayed at journey end` : label;
   }
   if (/^Save Log · paused \+ downloaded/i.test(label)) {
     return label.replace(/^Save Log · paused \+ downloaded/i, "Log saved · QA paused after saving");
@@ -192,12 +195,14 @@ export function buildLogEntryFromPlain(line: string): AgentTestingLogEntry {
       count: 1,
     };
   }
+  // Prove verdicts must survive capturePaused (leave-pause) for Save Log.
+  const proveVerdict = /^prove\s+(PASS|FAIL)\b/i.test(trimmed);
   return {
     atMs,
     timeLabel: timeLabelNow(atMs),
     label: trimmed,
     outcome: inferOutcomeFromText(trimmed),
-    kind: "info",
+    kind: proveVerdict ? "system" : "info",
     count: 1,
   };
 }

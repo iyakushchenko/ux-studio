@@ -168,7 +168,7 @@ Emit: `logCursorEngineTracker` in `demoCursorEngine.ts`. Mirror: `playbackDiagQa
 | Field | Value | Read as |
 |-------|-------|---------|
 | Mode | **traditional** · CJM **on** · session `traditional-play-smoke` | Primary Traditional smoothness evidence |
-| Peak | Play finished → journey start (PLP→…→details) | Playlist **completed**; sitrep at Save Log = post-reset **1/12** |
+| Peak | Play finished → stayed at finale (PLP→…→details) | Playlist **completed**; sitrep at Save Log = **N/N** on finale (not rewound) |
 | RESULT | **absent** | Smoke tears down overlay — use keep-overlay prove when available |
 | Clicks | Bookmark → Book now → PDP Book → Sign in → **21/15:30** → Reserve → Open Appts → View Details | No date/time re-click; location Continue not in click log |
 | Notice | **3×** scroll-reversal (Δ−922 / Δ−1207 / Δ−88) | Camera origin yank — **not green** smoothness |
@@ -201,7 +201,7 @@ await window.__studioRunFullPlayProve?.({ experience: "agentic" })
 // or: await window.__studioRunFullPlayProve?.({ experience: "traditional", timeoutMs: 180_000 })
 // alias: window.__protoRunFullPlayProve
 // → { pass, peak, end, errors, journeyId, experience } — ALWAYS forceClear + fresh arm
-//   + Play + peak assert + play-end at start + pauseForAgentLeave; overlay STAYS open.
+//   + Play + peak assert + play-end at end + pauseForAgentLeave; overlay STAYS open.
 // Thin presets (same core, no duplicated logic):
 //   __studioRunAgenticFullPlayProve / __studioRunTraditionalFullPlayProve
 // Do NOT ad-hoc Play / do NOT prefer *PlaySmoke (tears down overlay).
@@ -246,7 +246,7 @@ await window.__studioRunFullPlayProve?.({ experience: "traditional" }) // defaul
 // thin: window.__studioRunTraditionalFullPlayProve?.()
 // alias: window.__protoRunTraditionalFullPlayProve
 // → { pass, peak, end, errors } — forceClear + fresh arm + Play + peak
-//   (13 with login, or 12 when Sarah login-skipped) + play-end at start
+//   (13 with login, or 12 when Sarah login-skipped) + play-end at end
 //   + pauseForAgentLeave; overlay STAYS open for Save Log.
 ```
 
@@ -348,6 +348,6 @@ Global CJM warning **Run tests** and agent helper `window.__studioRunGlobalCompa
 
 **Keep always:** real FAIL / bubble-chop / JUMP / Alarm / type-in start+end / Play≡Step path.
 
-**Avail after chat (HARD):** Opening Availability Tool over a full React chat underlay was ~15fps (chat layout/paint + scrim blur). Fix: freeze chat under `html:has([data-studio-modal="choose-pharmacy"])` via `content-visibility: hidden` + drop avail `backdrop-filter`. Keep Save Log / type-in / friendly diag.
+**Avail after chat (HARD — non-destructive overlay):** Opening Availability Tool must **not** hide/freeze/`display:none` the chat (or any) underlay. Popup sits on top; page beneath stays painted. Perf lever = solid `.studio-avail-scrim` (no `backdrop-filter`) only — **forbidden:** `content-visibility: hidden` / contain-strict chat freeze when `modal=choose-pharmacy` (PO 2026-07-22; prior FPS hack retired). Keep Save Log / type-in / friendly diag.
 
-**Prove:** Play a stretch with QA open — page feels usable; console + overlay not flooding; composers still type letter-by-letter. After chat → open avail with QA paused — avail feels smooth (~60fps).
+**Prove:** Play a stretch with QA open — page feels usable; console + overlay not flooding; composers still type letter-by-letter. After chat → open avail — chat underlay still visible through/under scrim; avail usable.
