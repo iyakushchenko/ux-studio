@@ -47,4 +47,24 @@ describe("retireMakeUnderPage", () => {
     expect(document.getElementById("make-body")).toBeTruthy();
     expect(isMakeParkedForScreen("plp")).toBe(false);
   });
+
+  it("permanent: true deletes outright — no park entry, restore is a no-op", () => {
+    document.body.innerHTML = `
+      <div id="page">
+        <div data-name="body" id="make-body">ghost</div>
+        <div class="studio-react-screen-host" data-studio-react-screen="book-step-1"></div>
+        <div class="proto-footer-mount"></div>
+      </div>`;
+    const page = document.getElementById("page")!;
+    retireMakeUnderPage(page, "book-step-1", {
+      hideSelectors: [':scope > [data-name="body"]'],
+      permanent: true,
+    });
+    expect(document.getElementById("make-body")).toBeNull();
+    expect(page.dataset.studioReactScreen).toBe("book-step-1");
+    // Nothing was parked — restore has nothing to bring back.
+    expect(isMakeParkedForScreen("book-step-1")).toBe(false);
+    restoreMakeUnderPage(page, "book-step-1");
+    expect(document.getElementById("make-body")).toBeNull();
+  });
 });

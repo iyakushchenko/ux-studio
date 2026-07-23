@@ -992,52 +992,6 @@
   margin: 0 !important;
 }
 
-/* Book Step 3 — Open Appointment icon+link under primary CTAs */
-.studio-viewport > div > div:nth-child(3) .proto-confirm-open-appointment {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 8px !important;
-  height: auto !important;
-  margin-top: 40px !important;
-  padding: 0 !important;
-  border: none !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  color: #012169 !important;
-  font-family: "Open Sans", sans-serif !important;
-  font-size: 13px !important;
-  font-weight: 400 !important;
-  line-height: 24px !important;
-  cursor: pointer !important;
-  transition: color 0.18s ease !important;
-}
-.studio-viewport > div > div:nth-child(3) .proto-confirm-open-appointment__icon {
-  transform: scaleX(-1);
-}
-.studio-viewport > div > div:nth-child(3) .proto-confirm-open-appointment:hover {
-  background: transparent !important;
-  color: #01318f !important;
-  box-shadow: none !important;
-  transform: none !important;
-}
-.studio-viewport > div > div:nth-child(3) .proto-confirm-open-appointment:hover
-  .proto-confirm-open-appointment__icon {
-  filter: brightness(0) saturate(100%) invert(15%) sepia(55%) saturate(3000%)
-    hue-rotate(205deg) brightness(0.85);
-}
-.studio-viewport > div > div:nth-child(3) .proto-confirm-open-appointment:active {
-  background: transparent !important;
-  transform: none !important;
-  box-shadow: none !important;
-}
-.studio-viewport > div > div:nth-child(3) .proto-confirm-open-appointment:focus-visible {
-  outline: 2px solid #012169 !important;
-  outline-offset: 2px !important;
-}
-.studio-viewport > div > div:nth-child(3) .proto-confirm-open-appointment:focus:not(:focus-visible) {
-  outline: none !important;
-}
 
 /* Book Step 1 — progress + form card width matches Steps 2–3 (863px) */
 .studio-viewport > div > div:nth-child(7) [data-name="component.book.appointment.progress"] {
@@ -1106,34 +1060,6 @@
   outline-offset: 2px;
 }
 
-/* Book Appointment — booster checkbox (single instance; no row hover wash) */
-.studio-viewport > div > div:nth-child(7) .proto-page-booster-checkbox,
-.studio-viewport > div > div:nth-child(7) .proto-page-booster-checkbox *:not([data-name="box"]) {
-  background: transparent !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
-.studio-viewport > div > div:nth-child(7) .proto-page-booster-checkbox [data-name="component.input.checkbox"] {
-  cursor: pointer !important;
-  background: transparent !important;
-}
-.studio-viewport > div > div:nth-child(7) .proto-page-booster-checkbox [data-name="component.input.checkbox"]:hover {
-  background: transparent !important;
-}
-.studio-viewport > div > div:nth-child(7) .proto-page-booster-checkbox [data-name="component.input.checkbox"][data-checkbox-checked="true"] [data-name="Label"] p,
-.studio-viewport > div > div:nth-child(7) .proto-page-booster-checkbox [data-name="component.input.checkbox"][data-checkbox-checked="true"] [data-name="Label"] span {
-  font-weight: 700 !important;
-}
-.studio-viewport > div > div:nth-child(7) .proto-page-booster-checkbox [data-name="component.input.checkbox"][data-checkbox-checked="true"] [data-name="box"] {
-  background: #afccca !important;
-  border-color: #afccca !important;
-}
-.studio-viewport > div > div:nth-child(7) .proto-page-booster-checkbox [data-name="component.input.checkbox"][data-checkbox-checked="true"] [data-name="box"] svg path {
-  fill: #305854 !important;
-}
-.studio-viewport > div > div:nth-child(7) .proto-page-booster-checkbox [data-name="component.input.checkbox"][data-checkbox-checked="false"] [data-name="element. gse. checkbox. check mark"] {
-  opacity: 0 !important;
-}
 /* Remove any leftover cloned duplicates under the location tile */
 .proto-chosen-slot > .proto-chosen-checkbox {
   display: none !important;

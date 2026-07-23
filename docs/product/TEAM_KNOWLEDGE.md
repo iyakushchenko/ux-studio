@@ -588,6 +588,13 @@ retrieval table and LESSONS topic index before scanning by date.
 4. **False PROVEN ban** — Arch rejects PROVEN without MCP evidence log; PO dispute revokes until re-prove.
 5. **Reflex** — after each PAGE FINAL PASS HARD-GREEN, Arch runs micro-retro (Pain/Worked/Keep lean) and appends **Knowledge improved** here before opening the next migrated page.
 
+**Knowledge improved** (2026-07-23 · stream: erase-Make Phase B — Book Step 1–3 Make delete · board #8 · local, no push):
+- Arch (Director): confirmed board #8's own gate ("after History/Details Final Pass hard-green + CJM/playback green") was actually satisfied by Phase A's `3909eb0` camera-yank fix (10/10 Traditional Play prove) before proceeding — did not blind-trust the task framing; fenced `frame/index.tsx`/`headerMount.tsx` (Header Phase D lane 7c) and the larger wire dead-code family (board #9) out of scope rather than scope-creep into them — applied: NEXT_STEPS #8 checked + #9 scoping note
+- Finn (FE): `retireMakeUnderPage` gained `permanent: true` (delete outright, no park/restore) instead of inventing a second parallel retire function; Book Step 1/2/3 mounts switched to it; found and left alone (not touched) the ~1500-line always-true-guard dead effect family in `BootsPharmacyProjectView.tsx` since it's board #9's job, not #8's — applied: `retireMakeUnderPage.ts` · 3 mount files
+- Uma (UI/UX light — no browser MCP available this ship): verified by static trace, not screenshot, that no live React screen references `.proto-confirm-open-appointment*` / `.proto-page-booster-checkbox*` before deleting their CSS; confirmed `BookAppointmentProgress`/calendar-cell/`.utility / cursor` CSS IS live-referenced by React screens and left untouched — applied: this ship's CSS diff; **live MCP re-prove of Book Step 1/2/3 visuals still owed** (flagged, not claimed)
+- Quinn (QA): `npm test` 162/162 files (1008 tests) green incl. `check:page-final-pass` / `check:parity-ratchets` / `check:felonies`; `npm run build` green; no MCP/browser transport was available this session — Book Step 1/2/3 localhost re-prove is a named residual, not a false PROVEN — applied: this report's residual list
+- Pax (PO sim): local-only ship (no commit per task instruction); no version bump — applied: leave tree uncommitted for PO review
+
 **Knowledge improved** (2026-07-22 · stream: universal REC/playback interaction contract · local):
 - Arch (Director): CJM/persona/route-order exceptions are forbidden; recordings are regression contracts over semantic page actions.
 - Bea (BA): legacy-page ghost clicks are requirements failures, not forgivable playback gaps.

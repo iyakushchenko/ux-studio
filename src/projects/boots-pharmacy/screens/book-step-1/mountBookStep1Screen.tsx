@@ -7,10 +7,7 @@ import {
   BOOK_STEP1_REACT_SCREEN_ID,
   BOOK_STEP1_SCREEN_SELECTOR,
 } from "./bookStep1Contract";
-import {
-  restoreMakeUnderPage,
-  retireMakeUnderPage,
-} from "../retireMakeUnderPage";
+import { retireMakeUnderPage } from "../retireMakeUnderPage";
 
 const HOST_CLASS = "studio-react-screen-host";
 const HIDE_SELECTORS = [
@@ -51,14 +48,15 @@ function ensureHost(page: HTMLElement): HTMLElement {
   return host;
 }
 
+/**
+ * Erase-Make DONE (board #8): delete Book Step 1's Make chrome outright on
+ * first mount — no restore path back to Make for this screen.
+ */
 function hideMakeChrome(page: HTMLElement): void {
   retireMakeUnderPage(page, BOOK_STEP1_REACT_SCREEN_ID, {
     hideSelectors: HIDE_SELECTORS,
+    permanent: true,
   });
-}
-
-function restoreMakeChrome(page: HTMLElement): void {
-  restoreMakeUnderPage(page, BOOK_STEP1_REACT_SCREEN_ID);
 }
 
 /** True when Book Step 1 Make wire has been retired for the React pilot. */
@@ -83,11 +81,7 @@ export function mountBookStep1Screen(props: BookStep1LocationScreenProps): void 
  */
 export function unmountBookStep1Screen(): void {
   if (unmountTimer != null) return;
-  if (!root && !hostEl) {
-    const page = pageEl();
-    if (page) restoreMakeChrome(page);
-    return;
-  }
+  if (!root && !hostEl) return;
 
   const page = pageEl();
   // Gate Make wire immediately; actual createRoot.unmount runs after commit.
@@ -101,6 +95,5 @@ export function unmountBookStep1Screen(): void {
     hostEl = null;
     r?.unmount();
     h?.remove();
-    if (page) restoreMakeChrome(page);
   }, 0);
 }

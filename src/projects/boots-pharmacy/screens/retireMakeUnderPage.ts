@@ -11,6 +11,12 @@ export type RetireMakeOptions = {
   hideSelectors?: readonly string[];
   /** PLP/PDP/home style — retire all direct children except these classes. */
   keepClassNames?: ReadonlySet<string>;
+  /**
+   * Erase-Make DONE screens only: delete Make nodes outright instead of
+   * parking for restore. No `restoreMakeUnderPage` call can bring them back
+   * — use once a screen has no Make fallback path left (board NEXT_STEPS #8).
+   */
+  permanent?: boolean;
 };
 
 type ParkedNode = {
@@ -61,14 +67,24 @@ function collectRetireTargets(
 /**
  * Detach Make nodes under `page` and stamp `data-studio-make-retired`.
  * Idempotent for the same screenId (re-parks any still-attached leftovers).
+ *
+ * `permanent: true` deletes outright — no park entry, no restore possible.
  */
 export function retireMakeUnderPage(
   page: HTMLElement,
   screenId: string,
   options: RetireMakeOptions = {}
 ): void {
-  const prev = parkingByScreen.get(screenId) ?? [];
   const targets = collectRetireTargets(page, screenId, options);
+  if (options.permanent) {
+    for (const el of targets) {
+      el.dataset.studioMakeRetired = screenId;
+      el.remove();
+    }
+    page.dataset.studioReactScreen = screenId;
+    return;
+  }
+  const prev = parkingByScreen.get(screenId) ?? [];
   for (const el of targets) {
     if (prev.some((p) => p.el === el)) continue;
     if (!el.parentNode) continue;
