@@ -61,6 +61,12 @@ body:has(
   z-index: 0;
   pointer-events: none;
   box-sizing: border-box;
+  /* Rest = same shadow shape, transparent — lets box-shadow interpolate
+     smoothly to/from every colored state below instead of snapping
+     between `none` and a color (same ease-in-out curve as the shared
+     Motion default, MOTION_EASE_IN_OUT — see docs/product/MOTION.md). */
+  box-shadow: inset 0 0 0 var(--studio-agent-testing-frame-size) transparent;
+  transition: box-shadow 220ms ease-in-out;
 }
 
 /* Suite progress belongs to the QA console itself, never the viewport. */

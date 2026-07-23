@@ -800,6 +800,16 @@ For role-specific mandatory reading, return to
 
 ---
 
+## 2026-07-23 — QA viewport activity border now fades, not snaps
+
+- **Ask:** PO wants the agent-testing overlay's viewport frame (the inset colored ring — gold=`control`, blue=`pending`, red=`error`, orange=`rec:live`) to appear/disappear "in a more fluid way" via the shared motion system.
+- **Found:** `.studio-agent-testing-overlay__frame` (`agent-testing-overlay.css`) is a plain imperative DOM node — attributes (`data-mcp`, `data-rec`) are painted by `paintMcpChromeDom`/`agentTestingOverlay.ts`, not React mount/unmount, so there is no presence/exit to hand to `AnimatePresence`. Per [MOTION.md](./MOTION.md)'s own table, "trivial hover color/opacity" stays CSS — and CSS `ease-in-out` **is** `MOTION_EASE_IN_OUT` (`cubic-bezier(0.42,0,0.58,1)`) by spec, so a plain `transition` on this property already rides the same curve as the rest of the platform's motion, no framer-motion import needed for a single interpolated property on a non-React node.
+- **The actual bug:** the frame's rest state had **no** `box-shadow` declared at all (`box-shadow: none` implicitly) while every active state set `box-shadow: inset 0 0 0 10px <color>`. Browsers cannot smoothly interpolate `none ↔ <shadow>` — it just snaps regardless of any `transition` you add, because there's no matching shadow list to blend from/to.
+- **Fix:** gave the base rule an explicit rest shadow of the **same shape, transparent** (`inset 0 0 0 var(--studio-agent-testing-frame-size) transparent`) plus `transition: box-shadow 220ms ease-in-out;`. Now every phase change (idle→control, control→pending, rec start/stop, sitrep clear) interpolates color+alpha smoothly instead of popping, and going back to idle fades to transparent instead of vanishing.
+- **Gate:** `npm test` 153/153 green, `npm run build` green. Live MCP: `__studioArmRecCapture()` → frame computed `transition: "box-shadow 0.22s ease-in-out"`, `boxShadow` resolved to the live REC-orange value — confirms the rule is live, not just present in source.
+
+---
+
 ## How to append
 
 Add a `## YYYY-MM-DD` section with concrete bullets (symptom → root cause → gate). Link the audit SHA or commit when relevant.
