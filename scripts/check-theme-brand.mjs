@@ -183,6 +183,31 @@ const AVAIL_REL =
   }
 }
 
+// ── 5) Every --uxds-* remap must resolve through Boots' OWN --project-brand-*
+//      token — no bare hex, no uxds-to-uxds reference (PO 2026-07-23: "DO NOT
+//      use any other color from uxds in BOOTS custom theme css delta file").
+{
+  const theme = read(THEME_REL);
+  if (theme) {
+    const remapLines = theme.match(/--uxds-[a-z0-9-]+\s*:\s*[^;]+;/g) ?? [];
+    for (const line of remapLines) {
+      const [, value] = line.match(/--uxds-[a-z0-9-]+\s*:\s*([^;]+);/) ?? [];
+      if (!value) continue;
+      const v = value.trim();
+      if (/^var\(\s*--project-brand-[a-z0-9-]+\s*\)$/.test(v)) continue;
+      if (/^var\(\s*--uxds-/.test(v)) {
+        fail(
+          `RATCHET theme-brand: "${line.trim()}" remaps a uxds token to ANOTHER uxds token — must resolve to a --project-brand-* value owned by Boots, not a base UXDS color`
+        );
+        continue;
+      }
+      fail(
+        `RATCHET theme-brand: "${line.trim()}" is a bare/anonymous value — declare a named --project-brand-* token above and remap through it (own color, not a floating hex)`
+      );
+    }
+  }
+}
+
 // ── Docs companion ──────────────────────────────────────────────────────────
 {
   if (!fs.existsSync(path.join(ROOT, "docs/product/STUDIO_AUTO_RULES.md"))) {

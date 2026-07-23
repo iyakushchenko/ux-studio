@@ -62,3 +62,12 @@ export {
   type MegaMenuLinkGroup,
   type MegaMenuLinkItem,
 } from "./MegaMenuFlyout";
+
+export { UxdsTextLink, type UxdsTextLinkItem } from "./UxdsTextLink";
+export { useOverlayEscapeDismiss } from "./useOverlayEscapeDismiss";
+
+export {
+  FullScreenSearch,
+  type FullScreenSearchProps,
+  type FullScreenSearchLinkGroup,
+} from "./FullScreenSearch";

@@ -20,6 +20,12 @@
  * of relying on the CSS default (non-positioned siblings always paint BELOW
  * positioned ones regardless of DOM order — that default previously put the
  * fixed, unpositioned-sibling scrim above the then-`position: static` panel).
+ *
+ * `pointer-events: auto` (not `none`) — clicking anywhere on the dimmed
+ * backdrop dismisses the flyout (`onDismiss`, `useOverlayEscapeDismiss`),
+ * same lightbox contract as `FullScreenSearch`'s scrim. The panel itself
+ * sits on top (`z-index: 1`) so clicks on real flyout content never reach
+ * the scrim underneath it.
  */
 
 .uxds-mega-menu-flyout__root {
@@ -44,7 +50,8 @@
     rgba(99, 109, 115, 0) 100%
   );
   mix-blend-mode: multiply;
-  pointer-events: none;
+  pointer-events: auto;
+  cursor: default;
 }
 
 .uxds-mega-menu-flyout {

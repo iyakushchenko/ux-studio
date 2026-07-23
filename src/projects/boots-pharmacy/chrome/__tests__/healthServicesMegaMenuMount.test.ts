@@ -181,6 +181,38 @@ describe("attachHealthServicesMegaMenu", () => {
     ).toBeNull();
   });
 
+  it("Escape force-closes immediately while open — no 200ms hover hide delay (PO 2026-07-23 dismiss fix)", async () => {
+    const headerClone = buildHeaderClone();
+    act(() => {
+      attachHealthServicesMegaMenu(headerClone);
+    });
+    const item = headerClone.querySelector(
+      '[data-name="component.mega.menu.item"]',
+    ) as HTMLElement;
+    const mount = headerClone.parentElement!;
+    const panelSelector = '[data-name="component.header.mega.menu.flyout.standard"]';
+
+    await act(async () => {
+      item.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
+      await new Promise((r) => setTimeout(r, 120));
+    });
+    expect(mount.querySelector(panelSelector)).toBeTruthy();
+
+    // Escape force-closes `open` immediately (no hide delay) but the panel
+    // still needs its own two-phase AnimatePresence exit — same act() split
+    // as the mouseleave case above.
+    await act(async () => {
+      document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+      await new Promise((r) => setTimeout(r, 50));
+    });
+    expect(mount.querySelector(panelSelector)).toBeTruthy();
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 350));
+    });
+    expect(mount.querySelector(panelSelector)).toBeNull();
+  });
+
   it("is idempotent — calling twice does not duplicate the flyout host", () => {
     const headerClone = buildHeaderClone();
     act(() => {

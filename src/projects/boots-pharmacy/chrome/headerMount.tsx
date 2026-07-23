@@ -17,6 +17,7 @@ import {
   toggleSavedLocation,
 } from "@/projects/boots-pharmacy/data/savedLocations";
 import { attachHealthServicesMegaMenu } from "@/projects/boots-pharmacy/chrome/healthServicesMegaMenuMount";
+import { attachFullScreenSearch } from "@/projects/boots-pharmacy/chrome/fullScreenSearchMount";
 
 const HEADER_MOUNT_CLASS = "proto-header-mount";
 
@@ -536,6 +537,10 @@ export function setupHeader(
       updateLoginLabel();
       // Fix search icon
       fixSearchIcon();
+      // Click-to-open full-screen search takeover
+      attachFullScreenSearch(headerClone, {
+        onNavigateToPlp: loginCallbacks.onNavigateToPlp,
+      });
 
       // Show/hide flyout on hover
       let hideTimeout: ReturnType<typeof setTimeout> | null = null;

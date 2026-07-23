@@ -4,7 +4,7 @@
   "kits": [
     {
       "reactModule": "src/uxds/components/SearchField.tsx",
-      "figmaNames": ["component.search.fullscreen.field", "component.support.center.search.field"]
+      "figmaNames": ["component.support.center.search.field"]
     },
     {
       "reactModule": "src/uxds/components/ButtonPrimary.tsx",
@@ -45,7 +45,12 @@
         "component.header.mega.menu.flyout.standard",
         "module.mega.menu"
       ],
-      "note": "Presentational panel (link groups grid + hero asset + promo band); parent mega-menu nav item owns hover open-state via `open` prop (Larkin frame 7650:86049 / integration frame 2539:593672). `module.mega.menu` (node 7650:86158) is the same file's wrapper adding the full-viewport separation scrim (`fills/mega menu flyout gradient` fill style, mix-blend-multiply) rendered by this same component as `[data-name=\"module.mega.menu.scrim\"]`."
+      "note": "Presentational panel (link groups grid + hero asset + promo band); parent mega-menu nav item owns hover open-state via `open` prop (Larkin frame 7650:86049 / integration frame 2539:593672). `module.mega.menu` (node 7650:86158) is the same file's wrapper adding the full-viewport separation scrim (`fills/mega menu flyout gradient` fill style, mix-blend-multiply) rendered by this same component as `[data-name=\"module.mega.menu.scrim\"]`. Scrim click / Escape dismiss via `useOverlayEscapeDismiss.ts` (`onDismiss` prop)."
+    },
+    {
+      "reactModule": "src/uxds/interactions/FullScreenSearch.tsx",
+      "figmaNames": ["component.search.fullscreen.field", "module.ss.couldnt.find.content.slot"],
+      "note": "Click-to-open full-viewport search takeover. `L & XL / Initial Suggestions` (node 2544:589387) — empty-query Quick Links state. `L & XL / Search Query Suggestions` (node 2544:589399) is unbuilt in Figma (only the browser-mock device frame, no content layer) — the non-empty-query grouped-results layout reuses the same field row + the one titled-link-group pattern already proven by MegaMenuFlyout, not invented chrome. `module.ss.couldnt.find.content.slot` (node 21362:294522) is the third \"couldn't find\" scenario — `notFound` prop: spelling-correction offer + Category/Content Suggestions + a product-suggestion grid + \"View all results\" CTA; Boots' `fullScreenSearchMount.tsx` curates every field from real PLP catalog + footer data (typo-tolerant match via a confidence-floored edit-distance check, never a wild guess) and renders product tiles with no photography — the real PLP catalog has none, so that's an intentional under-match, not a gap. Shares `UxdsTextLink.tsx` (link renderer) and `useOverlayEscapeDismiss.ts` (Escape/scrim-click dismiss) with MegaMenuFlyout."
     },
     {
       "reactModule": "src/uxds/interactions/PendingSpinnerIcon.tsx",

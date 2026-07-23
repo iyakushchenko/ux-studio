@@ -9,6 +9,8 @@
   --uxds-text-text-secondary: #5c5c5c;
   --uxds-text-text-strong: #2e2e2e;
   --uxds-text-text-inverse: #ffffff;
+  /* Figma "uxds.text/text-warning" — FullScreenSearch "couldn't find" query highlight (node 21362:294522). */
+  --uxds-text-text-warning: #d48a46;
   --uxds-text-link-link-dark: #305854;
   --uxds-text-link-link: #305854;
   --uxds-text-link-link-hover: #244440;
@@ -20,6 +22,8 @@
   --uxds-surface-success: #e8f5e9;
   --uxds-surface-error: #fdecea;
   --uxds-surface-accent-soft: #e8f5e9;
+  /* Figma "uxds-surface/primary-light" — same brand teal as icon-accent-soft/border-secondary below. */
+  --uxds-surface-primary-light: #afccca;
 
   --uxds-border-border-default: #d6d6d6;
   --uxds-border-border-strong: #afafaf;
@@ -35,6 +39,8 @@
   --uxds-input-button-surface-surface-primary-active: #1a3330;
   --uxds-input-button-surface-surface-secondary-solid: #ffffff;
   --uxds-input-button-border-border-secondary: #afccca;
+  /* Figma "uxds-input/button/surface/surface-primary-tonal" — same teal, full-screen search field pills. */
+  --uxds-input-button-surface-surface-primary-tonal: #afccca;
   --uxds-input-field-surface-surface-default: #ffffff;
   --uxds-input-field-border-border-default: #afafaf;
   --uxds-input-button-surface-surface-commerce-solid: #305854;

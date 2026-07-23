@@ -115,11 +115,35 @@ describe("MegaMenuFlyout kit", () => {
     );
   });
 
-  it("renders module.mega.menu's full-viewport separation scrim (non-interactive)", () => {
+  it("renders module.mega.menu's full-viewport separation scrim (aria-hidden — Escape stays the accessible dismiss path)", () => {
     const { host } = renderFlyout();
     const scrim = host.querySelector('[data-name="module.mega.menu.scrim"]');
     expect(scrim).toBeTruthy();
     expect(scrim?.getAttribute("aria-hidden")).toBe("true");
+  });
+
+  it("Escape calls onDismiss while open (useOverlayEscapeDismiss — shared with FullScreenSearch)", () => {
+    const onDismiss = vi.fn();
+    renderFlyout({ onDismiss });
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it("Escape does nothing while closed", () => {
+    const onDismiss = vi.fn();
+    renderFlyout({ open: false, onDismiss });
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+    expect(onDismiss).not.toHaveBeenCalled();
+  });
+
+  it("clicking the scrim calls onDismiss — flyout previously had no dismiss action at all (PO 2026-07-23)", () => {
+    const onDismiss = vi.fn();
+    const { host } = renderFlyout({ onDismiss });
+    const scrim = host.querySelector('[data-name="module.mega.menu.scrim"]');
+    act(() => {
+      scrim?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+    expect(onDismiss).toHaveBeenCalledTimes(1);
   });
 
   it("no hero/promo → no dead chrome mounted", () => {
@@ -165,10 +189,12 @@ describe("MegaMenuFlyout kit", () => {
     expect(css).not.toMatch(/color:\s*#[0-9a-fA-F]{3,6}/);
   });
 
-  it("scrim is a documented literal (Figma fill style citation), non-interactive, and blends with the page beneath", () => {
+  it("scrim is a documented literal (Figma fill style citation), click-to-dismiss, and blends with the page beneath", () => {
     expect(css).toMatch(/fills\/mega menu flyout gradient/i);
     expect(css).toMatch(/\.uxds-mega-menu-flyout__scrim\s*\{[^}]*mix-blend-mode:\s*multiply/);
-    expect(css).toMatch(/\.uxds-mega-menu-flyout__scrim\s*\{[^}]*pointer-events:\s*none/);
+    // Lightbox contract: clicking the dimmed backdrop dismisses the flyout
+    // (2026-07-23 — "we dont have dismiss actions" PO fix), same as FullScreenSearch.
+    expect(css).toMatch(/\.uxds-mega-menu-flyout__scrim\s*\{[^}]*pointer-events:\s*auto/);
   });
 
   it("regression: scrim must stack BELOW the panel and never reach above the flyout's own top edge (2026-07-23 — scrim washed over the header/breadcrumb AND the panel itself)", () => {

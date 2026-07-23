@@ -196,9 +196,24 @@ export function attachHealthServicesMegaMenu(
 
   const render = () => {
     host!.style.pointerEvents = open ? "auto" : "none";
-    root!.render(<MegaMenuFlyout {...content} open={open} />);
+    root!.render(<MegaMenuFlyout {...content} open={open} onDismiss={forceClose} />);
   };
   render();
+
+  /** Escape / scrim click — close now, no 200ms hover hide delay. */
+  function forceClose(): void {
+    if (showTimeout) {
+      clearTimeout(showTimeout);
+      showTimeout = null;
+    }
+    if (hideTimeout) {
+      clearTimeout(hideTimeout);
+      hideTimeout = null;
+    }
+    if (!open) return;
+    open = false;
+    render();
+  }
 
   const scheduleShow = () => {
     if (hideTimeout) {

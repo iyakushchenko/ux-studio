@@ -1,5 +1,7 @@
 import { Fragment, type MouseEventHandler, type ReactNode } from "react";
 import { AnimatePresence, motion, MOTION_EASE_IN_OUT } from "@/uxds/motion";
+import { UxdsTextLink, type UxdsTextLinkItem } from "./UxdsTextLink";
+import { useOverlayEscapeDismiss } from "./useOverlayEscapeDismiss";
 import "./mega-menu-flyout.css";
 
 /**
@@ -13,13 +15,8 @@ const MEGA_MENU_FLYOUT_TRANSITION = {
   ease: MOTION_EASE_IN_OUT,
 } as const;
 
-export type MegaMenuLinkItem = {
-  label: string;
-  href?: string;
-  onClick?: MouseEventHandler<HTMLElement>;
-  /** Stable REC/CJM capture target — see `data-studio-action` (RECORDING.md § Hit targets). */
-  actionId?: string;
-};
+/** @deprecated Import `UxdsTextLinkItem` from `./UxdsTextLink` — kept as an alias so existing imports don't break. */
+export type MegaMenuLinkItem = UxdsTextLinkItem;
 
 export type MegaMenuLinkGroup = {
   title: string;
@@ -47,35 +44,11 @@ export type MegaMenuFlyoutProps = {
   promoText?: ReactNode;
   /** Parent (mega-menu nav item hover) owns visibility — unmounts when false. */
   open?: boolean;
+  /** Escape key or scrim click — parent should force-close (no hide delay). */
+  onDismiss?: () => void;
   className?: string;
   "data-name"?: string;
 };
-
-function MegaMenuLink({ link }: { link: MegaMenuLinkItem }) {
-  const className = "uxds-mega-menu-flyout__link uxds-link";
-  if (link.href) {
-    return (
-      <a
-        className={className}
-        href={link.href}
-        onClick={link.onClick}
-        data-studio-action={link.actionId}
-      >
-        {link.label}
-      </a>
-    );
-  }
-  return (
-    <button
-      type="button"
-      className={className}
-      onClick={link.onClick}
-      data-studio-action={link.actionId}
-    >
-      {link.label}
-    </button>
-  );
-}
 
 function MegaMenuHeroCtaButton({ cta }: { cta: MegaMenuHeroCta }) {
   const className = "uxds-mega-menu-flyout__hero-cta";
@@ -111,9 +84,13 @@ function MegaMenuHeroCtaButton({ cta }: { cta: MegaMenuHeroCta }) {
  * secondary-outline pill (`--uxds-input-button-*` tokens), not `ButtonPrimary`.
  *
  * Also renders `module.mega.menu`'s scrim (Figma node 7650:86158) for visual
- * separation from the page underneath — `aria-hidden` + `pointer-events: none`
- * so it never blocks clicks, and anchored to the flyout's own top edge (never
- * the header/breadcrumb above it — see `mega-menu-flyout.css` header comment).
+ * separation from the page underneath — anchored to the flyout's own top
+ * edge (never the header/breadcrumb above it — see `mega-menu-flyout.css`
+ * header comment). Clicking the scrim, or pressing Escape while open, calls
+ * `onDismiss` (`useOverlayEscapeDismiss` — shared with `FullScreenSearch`)
+ * so the parent can force-close immediately instead of waiting the hover
+ * hide delay; `aria-hidden` stays on the scrim since Escape is the
+ * accessible dismiss path and the click is a mouse-only convenience.
  *
  * Show/hide is `framer-motion` `AnimatePresence` (opacity + tiny y, per
  * MOTION.md — same idiom as `StudioNavStudioSelect`), **not** an instant
@@ -126,9 +103,12 @@ export function MegaMenuFlyout({
   hero,
   promoText,
   open = true,
+  onDismiss,
   className,
   "data-name": dataName = "component.header.mega.menu.flyout.standard",
 }: MegaMenuFlyoutProps) {
+  useOverlayEscapeDismiss({ open, onDismiss });
+
   return (
     <AnimatePresence>
       {open ? (
@@ -143,6 +123,7 @@ export function MegaMenuFlyout({
           <div
             className="uxds-mega-menu-flyout__scrim"
             data-name="module.mega.menu.scrim"
+            onClick={onDismiss}
             aria-hidden
           />
           <div
@@ -181,7 +162,11 @@ export function MegaMenuFlyout({
                             data-name="group.links"
                           >
                             {group.links.map((link) => (
-                              <MegaMenuLink link={link} key={link.label} />
+                              <UxdsTextLink
+                                link={link}
+                                className="uxds-mega-menu-flyout__link"
+                                key={link.label}
+                              />
                             ))}
                           </div>
                         </div>

@@ -1,0 +1,383 @@
+/**
+ * component.search.fullscreen — full-viewport search takeover.
+ * Figma: [UX] UXDS - Larkin · myqzp3KRc1pxKDOv8RfTsl · node 2544:589387
+ * ("L & XL / Initial Suggestions"). The query-result state (node
+ * 2544:589399, "Search Query Suggestions") is unbuilt in Figma — its layout
+ * below reuses the same field row + the one titled-link-group pattern
+ * (`.uxds-full-screen-search__group*`), not invented chrome.
+ *
+ * Same overlay techniques as `mega-menu-flyout.css`: a real positioned
+ * `__root` (not a bare Fragment) so the scrim's `position: absolute` has a
+ * containing block, explicit `position` + `z-index` on every layer so paint
+ * order is deterministic, and a `pointer-events: auto` scrim (click
+ * dismisses — `onDismiss`, `useOverlayEscapeDismiss`). Unlike the mega-menu
+ * flyout, this overlay is `position: fixed; inset: 0` — it covers the
+ * *entire* viewport (including the header, which its own field row visually
+ * replaces) rather than dropping in below the header.
+ */
+
+.uxds-full-screen-search__root {
+  position: fixed;
+  inset: 0;
+  z-index: 10200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.uxds-full-screen-search__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(99, 109, 115, 0.66) 0%,
+    rgba(99, 109, 115, 0) 100%
+  );
+  mix-blend-mode: multiply;
+  pointer-events: auto;
+  cursor: default;
+}
+
+/* Same grid as the header/breadcrumb (`globals-chrome.css` "1440px outer,
+   1312px content inside 64px pad"): the panel's own background spans the
+   *entire* viewport width — no cap here — while the field row and body each
+   center their own content at `max-width: 1312px` below. A cap on this
+   outer panel (previously 1440px) left bare page background showing on
+   either side above that width instead of teal/white bleeding edge-to-edge
+   like the header does. */
+.uxds-full-screen-search {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-height: 100%;
+  overflow: auto;
+  background: var(--uxds-surface-neutral);
+  box-shadow: 0px 5px 19.5px 0px rgba(0, 0, 0, 0.05);
+}
+
+/* Field row — teal band, same brand teal as icon-accent-soft/border-secondary. */
+.uxds-full-screen-search__field-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 24px 64px;
+  box-sizing: border-box;
+  background: var(--uxds-surface-primary-light);
+  flex-shrink: 0;
+}
+
+.uxds-full-screen-search__field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 1312px;
+}
+
+.uxds-full-screen-search__pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 32px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 360px;
+  background: var(--uxds-input-button-surface-surface-primary-tonal);
+  font-family: inherit;
+  flex-shrink: 0;
+}
+
+.uxds-full-screen-search__pill--search {
+  cursor: default;
+}
+
+.uxds-full-screen-search__pill--clear {
+  color: var(--uxds-text-text-secondary);
+  cursor: pointer;
+}
+
+.uxds-full-screen-search__pill--exit {
+  background: none;
+  color: var(--uxds-input-button-text-text-on-secondary, var(--uxds-text-text-secondary));
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  letter-spacing: -0.36px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.uxds-full-screen-search__pill--clear:hover,
+.uxds-full-screen-search__pill--exit:hover {
+  color: var(--uxds-text-text-primary);
+}
+
+.uxds-full-screen-search__pill--clear:focus-visible,
+.uxds-full-screen-search__pill--exit:focus-visible {
+  outline: 2px solid var(--uxds-border-border-focus);
+  outline-offset: 2px;
+}
+
+.uxds-full-screen-search__input {
+  flex: 1 0 0;
+  min-width: 0;
+  border: none;
+  background: none;
+  outline: none;
+  color: var(--uxds-text-text-primary);
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 24px;
+  letter-spacing: 0.1px;
+}
+
+.uxds-full-screen-search__input::placeholder {
+  color: var(--uxds-text-text-secondary);
+}
+
+/*
+ * Body — Quick Links (empty query) or grouped results (non-empty query).
+ * Horizontal inset comes ONLY from centering this `max-width: 1312px` box in
+ * the full-width flex parent — same math the field row above uses for its
+ * own `max-width: 1312px` box (`justify-content: center`, no side padding).
+ * Regression 2026-07-23 — this used to ALSO carry `padding: 64px` (all
+ * sides) on top of the centered 1312px box, doubling the horizontal inset
+ * vs. the field row (measured live: field content left edge x=290, body
+ * content left edge x=354 at a 1892px viewport — a 64px jag between the
+ * search field and "Quick Links" that has nothing to do with viewport width).
+ * Vertical spacing stays as top/bottom-only padding.
+ */
+.uxds-full-screen-search__body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 1312px;
+  padding: 64px 0;
+  box-sizing: border-box;
+}
+
+.uxds-full-screen-search__results {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  width: 100%;
+}
+
+.uxds-full-screen-search__group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 328px;
+}
+
+.uxds-full-screen-search__group-title {
+  margin: 0 0 24px;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 32px;
+  color: var(--uxds-text-text-primary);
+}
+
+.uxds-full-screen-search__results .uxds-full-screen-search__group-title {
+  margin: 0;
+  font-size: 10px;
+  line-height: 12px;
+}
+
+.uxds-full-screen-search__group-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+/*
+ * Layout only — no color/decoration/hover rules here. Figma (node 2544:589387)
+ * happens to show Quick Links underlined at rest, but link color + underline
+ * are owned exclusively by the shared `.uxds-link` pattern (rest: no
+ * underline, hover: underline — `text-link.css`, `DS_STRICTNESS.md` "one
+ * pattern per role"). Do NOT add a `.uxds-full-screen-search__link.uxds-link`
+ * override to chase that one pixel — that's the exact per-kit fork the ONE
+ * text-link pattern rule forbids; under-match Figma here on purpose.
+ */
+.uxds-full-screen-search__link {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font-size: 13px;
+  line-height: 24px;
+}
+
+.uxds-full-screen-search__no-results {
+  margin: 0;
+  color: var(--uxds-text-text-secondary);
+  font-size: 13px;
+  line-height: 24px;
+}
+
+/*
+ * "Couldn't find" scenario (Figma node 21362:294522) — layout only, same
+ * discipline as `.uxds-full-screen-search__link` above: every clickable
+ * term (`__did-you-mean-term`, group links, product tiles) gets its color
+ * from shared tokens / the `.uxds-link` pattern, never a local override.
+ */
+.uxds-full-screen-search__not-found {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  width: 100%;
+}
+
+.uxds-full-screen-search__not-found-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.uxds-full-screen-search__not-found-title {
+  margin: 0;
+  font-size: 31px;
+  font-weight: 600;
+  line-height: 32px;
+  color: var(--uxds-text-text-primary);
+}
+
+.uxds-full-screen-search__not-found-query {
+  color: var(--uxds-text-text-warning);
+}
+
+.uxds-full-screen-search__did-you-mean {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 32px;
+  color: var(--uxds-text-text-primary);
+}
+
+/* Layout only — color comes free from the shared `.uxds-link` token
+   (`--uxds-text-link-link: #305854` already matches Figma's cited value). */
+.uxds-full-screen-search__did-you-mean-term {
+  display: inline;
+  width: auto;
+  padding: 4px;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 32px;
+}
+
+.uxds-full-screen-search__suggestion-columns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px 24px;
+  width: 100%;
+}
+
+.uxds-full-screen-search__suggestion-columns .uxds-full-screen-search__group {
+  flex: 1 0 0;
+  min-width: 253px;
+  width: auto;
+}
+
+.uxds-full-screen-search__category-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 8px;
+  width: 100%;
+}
+
+.uxds-full-screen-search__category-row .uxds-full-screen-search__link {
+  display: inline;
+  width: auto;
+}
+
+.uxds-full-screen-search__category-hint {
+  color: var(--uxds-text-text-secondary);
+  font-size: 13px;
+  line-height: 24px;
+}
+
+.uxds-full-screen-search__category-hint strong {
+  color: var(--uxds-text-text-strong);
+  font-weight: 600;
+}
+
+.uxds-full-screen-search__product-suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.uxds-full-screen-search__product-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 32px;
+  width: 100%;
+}
+
+.uxds-full-screen-search__product-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1 0 0;
+  min-width: 114px;
+  max-width: 320px;
+  border: none;
+  background: none;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.uxds-full-screen-search__product-title {
+  color: var(--uxds-text-text-primary);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 12px;
+}
+
+.uxds-full-screen-search__product-price {
+  display: flex;
+  color: var(--uxds-text-text-primary);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 12px;
+}
+
+.uxds-full-screen-search__view-all {
+  align-self: flex-start;
+  height: 48px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 360px;
+  background: var(--uxds-input-button-surface-surface-primary-tonal);
+  color: var(--uxds-input-button-text-text-on-primary-tonal, var(--uxds-text-link-link-dark));
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.32px;
+  cursor: pointer;
+}
+
+.uxds-full-screen-search__view-all:hover {
+  background: var(--uxds-input-button-surface-surface-primary-hover);
+  color: var(--uxds-text-text-inverse);
+}
+
+.uxds-full-screen-search__view-all:focus-visible {
+  outline: 2px solid var(--uxds-border-border-focus);
+  outline-offset: 2px;
+}

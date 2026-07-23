@@ -7,15 +7,19 @@
 [data-studio-project="boots-pharmacy"] {
   --project-brand-primary: #467672;
   --project-brand-primary-darkest: #305854;
+  --project-brand-primary-hover: #244440;
+  --project-brand-primary-active: #1a3330;
   --project-brand-primary-light: #afccca;
   --project-brand-primary-soft: #c6e5e1;
+  --project-brand-primary-hover-soft: #eef8f7;
+  --project-brand-text-inverse: #ffffff;
   --project-brand-cta-navy: #012169;
   --project-brand-cta-navy-hover: #01318f;
   --project-brand-cta-navy-active: #011a5c;
 
   --uxds-input-button-surface-surface-primary-solid: var(--project-brand-primary-darkest);
-  --uxds-input-button-surface-surface-primary-hover: #244440;
-  --uxds-input-button-surface-surface-primary-active: #1a3330;
+  --uxds-input-button-surface-surface-primary-hover: var(--project-brand-primary-hover);
+  --uxds-input-button-surface-surface-primary-active: var(--project-brand-primary-active);
   --uxds-input-button-border-border-secondary: var(--project-brand-primary-light);
   --uxds-icon-icon-accent-strong: var(--project-brand-primary);
   --uxds-icon-icon-accent-soft: var(--project-brand-primary-light);
@@ -34,8 +38,8 @@
 
   /* Strong filter pills (All locations / Slots available): brand primary — not UXDS :root #305854.
    * Gate: npm run check:theme-brand (Auto-Rule theme-brand-active). */
-  --uxds-filter-chip-surface-hover: #eef8f7;
+  --uxds-filter-chip-surface-hover: var(--project-brand-primary-hover-soft);
   --uxds-filter-chip-surface-selected-strong: var(--project-brand-primary);
   --uxds-filter-chip-surface-selected-strong-hover: var(--project-brand-primary-darkest);
-  --uxds-filter-chip-text-on-selected-strong: var(--uxds-text-text-inverse);
+  --uxds-filter-chip-text-on-selected-strong: var(--project-brand-text-inverse);
 }
