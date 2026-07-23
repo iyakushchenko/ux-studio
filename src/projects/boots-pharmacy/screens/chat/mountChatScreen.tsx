@@ -8,10 +8,7 @@ import {
   CHAT_SCREEN_SELECTOR,
   isChatReactMounted,
 } from "./chatContract";
-import {
-  restoreMakeUnderPage,
-  retireMakeUnderPage,
-} from "../retireMakeUnderPage";
+import { retireMakeUnderPage } from "../retireMakeUnderPage";
 
 export { CHAT_REACT_MOUNT_ENABLED, isChatReactMounted };
 
@@ -50,16 +47,16 @@ function ensureHost(page: HTMLElement): HTMLElement {
   return host;
 }
 
+/**
+ * Erase-Make Phase E (board #7c tail / substrate replacement): `ProjectPageShell`
+ * columns start empty — there is no Frame219-sourced Make content left to
+ * park-and-restore. Retire permanently, matching the Book Step 1-3 precedent.
+ */
 function hideMakeChrome(page: HTMLElement): void {
-  // Detach Make Frame children — display:none left ghosts for querySelector
-  // (and globals with display:flex !important resurrected Site Pilot bar).
   retireMakeUnderPage(page, CHAT_REACT_SCREEN_ID, {
     keepClassNames: KEEP_VISIBLE,
+    permanent: true,
   });
-}
-
-function restoreMakeChrome(page: HTMLElement): void {
-  restoreMakeUnderPage(page, CHAT_REACT_SCREEN_ID);
 }
 
 export function mountChatScreen(props: ChatScreenProps): void {
@@ -88,11 +85,7 @@ export function mountChatScreen(props: ChatScreenProps): void {
 
 export function unmountChatScreen(): void {
   if (unmountTimer != null) return;
-  if (!root && !hostEl) {
-    const page = pageEl();
-    if (page) restoreMakeChrome(page);
-    return;
-  }
+  if (!root && !hostEl) return;
 
   const page = pageEl();
   if (page) delete page.dataset.studioReactScreen;
@@ -105,7 +98,6 @@ export function unmountChatScreen(): void {
     hostEl = null;
     r?.unmount();
     h?.remove();
-    if (page) restoreMakeChrome(page);
   }, 0);
 }
 

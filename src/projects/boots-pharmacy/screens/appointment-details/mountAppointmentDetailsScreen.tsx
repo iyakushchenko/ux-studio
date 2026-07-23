@@ -7,10 +7,7 @@ import {
   APPOINTMENT_DETAILS_REACT_SCREEN_ID,
   APPOINTMENT_DETAILS_SCREEN_SELECTOR,
 } from "./appointmentDetailsContract";
-import {
-  restoreMakeUnderPage,
-  retireMakeUnderPage,
-} from "../retireMakeUnderPage";
+import { retireMakeUnderPage } from "../retireMakeUnderPage";
 
 const HOST_CLASS = "studio-react-screen-host";
 /** Keep Studio chrome mounts; retire every Make Frame child under Details. */
@@ -48,14 +45,16 @@ function ensureHost(page: HTMLElement): HTMLElement {
   return host;
 }
 
+/**
+ * Erase-Make Phase E (board #7c tail / substrate replacement): `ProjectPageShell`
+ * columns start empty — there is no Frame219-sourced Make content left to
+ * park-and-restore. Retire permanently, matching the Book Step 1-3 precedent.
+ */
 function hideMakeChrome(page: HTMLElement): void {
   retireMakeUnderPage(page, APPOINTMENT_DETAILS_REACT_SCREEN_ID, {
     keepClassNames: KEEP_VISIBLE,
+    permanent: true,
   });
-}
-
-function restoreMakeChrome(page: HTMLElement): void {
-  restoreMakeUnderPage(page, APPOINTMENT_DETAILS_REACT_SCREEN_ID);
 }
 
 /** True when Appointment Details Make wire has been retired for the React migration. */
@@ -83,11 +82,7 @@ export function mountAppointmentDetailsScreen(
  */
 export function unmountAppointmentDetailsScreen(): void {
   if (unmountTimer != null) return;
-  if (!root && !hostEl) {
-    const page = pageEl();
-    if (page) restoreMakeChrome(page);
-    return;
-  }
+  if (!root && !hostEl) return;
 
   const page = pageEl();
   if (page) delete page.dataset.studioReactScreen;
@@ -100,6 +95,5 @@ export function unmountAppointmentDetailsScreen(): void {
     hostEl = null;
     r?.unmount();
     h?.remove();
-    if (page) restoreMakeChrome(page);
   }, 0);
 }

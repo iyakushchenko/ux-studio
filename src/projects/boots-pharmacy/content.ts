@@ -28,6 +28,3 @@ export {
 
 /** Tab 0 onboarding wiki content. */
 export { default as HubViewport } from "@/projects/boots-pharmacy/hub/HubViewport";
-
-/** Figma export entry — project DOM shell. */
-export { default as ProjectFrame } from "@/projects/boots-pharmacy/frame/index";

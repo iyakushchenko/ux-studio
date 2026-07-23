@@ -57,6 +57,7 @@ import {
 } from "@/projects/boots-pharmacy/data/plpListing";
 import { initSearchFields, syncFigmaSearchClearIcons } from "@/projects/boots-pharmacy/dom/locationSearch";
 import { setupFooters } from "@/projects/boots-pharmacy/chrome/footerMount";
+import ProjectPageShell from "@/projects/boots-pharmacy/chrome/ProjectPageShell";
 import {
   isStudioLoggedIn,
   setStudioLoggedIn,
@@ -877,7 +878,6 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     INDEX_PDP,
     INDEX_PLP,
     studioTabToIndex,
-    ProjectFrame,
     HubViewport,
   } = projectContent;
 
@@ -4828,7 +4828,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
               height: isViewportLocked ? "100%" : "auto",
             }}
           >
-            <ProjectFrame />
+            <ProjectPageShell />
           </div>
         </div>
       </div>
