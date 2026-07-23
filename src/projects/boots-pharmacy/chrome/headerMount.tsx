@@ -16,6 +16,7 @@ import {
   SAVED_LOCATIONS_CHANGE_EVENT,
   toggleSavedLocation,
 } from "@/projects/boots-pharmacy/data/savedLocations";
+import { attachHealthServicesMegaMenu } from "@/projects/boots-pharmacy/chrome/healthServicesMegaMenuMount";
 
 const HEADER_MOUNT_CLASS = "proto-header-mount";
 
@@ -213,7 +214,7 @@ if (wishlistSet.size === 0) { wishlistSet.add("chickenpox"); saveWishlist(); }
 
 let headerClone: HTMLElement | null = null;
 let flyoutEl: HTMLElement | null = null;
-let loginCallbacks: { onLoginChange?: (isLoggedIn: boolean) => void; onLoginClick?: (tab?: "signin" | "create") => void; onSignOut?: () => void; onNavigate?: (screenIndex: number) => void } = {};
+let loginCallbacks: { onLoginChange?: (isLoggedIn: boolean) => void; onLoginClick?: (tab?: "signin" | "create") => void; onSignOut?: () => void; onNavigate?: (screenIndex: number) => void; onNavigateToPlp?: () => void } = {};
 
 /** Keep header chrome + wire mirrors in sync with studio auth SSoT. */
 subscribeStudioLoggedIn((next) => {
@@ -475,7 +476,7 @@ function injectFlyoutStyles(): void {
 
 export function setupHeader(
   scrollEl: HTMLElement,
-  callbacks?: { onLoginChange?: (isLoggedIn: boolean) => void; onLoginClick?: (tab?: "signin" | "create") => void; onSignOut?: () => void; onNavigate?: (screenIndex: number) => void },
+  callbacks?: { onLoginChange?: (isLoggedIn: boolean) => void; onLoginClick?: (tab?: "signin" | "create") => void; onSignOut?: () => void; onNavigate?: (screenIndex: number) => void; onNavigateToPlp?: () => void },
 ): void {
   loginCallbacks = callbacks || {};
   injectFlyoutStyles();
@@ -507,6 +508,11 @@ export function setupHeader(
     headerClone.classList.add("proto-header-sticky");
     headerClone.style.cssText = "display: flex !important; width: 100%; min-width: 1200px;";
     headerMount.appendChild(headerClone);
+
+    // Hover flyout on the "Health Services" mega menu item
+    attachHealthServicesMegaMenu(headerClone, {
+      onNavigateToPlp: loginCallbacks.onNavigateToPlp,
+    });
 
     // Detect initial login state from cloned label text
     const initLabel = findLoginLabel(headerClone);

@@ -1430,6 +1430,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
         }
       },
       onNavigate: (screenIndex) => { setCurrent(screenIndex); },
+      onNavigateToPlp: () => setCurrent(INDEX_PLP),
     });
   }, []);
 

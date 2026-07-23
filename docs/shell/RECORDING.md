@@ -429,6 +429,16 @@ Stable field selectors: `data-studio-action="avail-search-query"` / `agentic-hom
 
 ---
 
+## Known gap (backlog, not started): hover-reveal is not a recordable event
+
+There is **no `hover` event kind** in the table above. Hover-driven open/close (e.g. a mega-menu flyout revealed on `mouseenter`) can never become a CJM step today — only the resulting `demo-click`s can be captured, and only if the revealed content is actually in the DOM to receive them. A component that **unmounts** on close (`return null` when `open=false`, same contract as `DisclosureContent`) leaves a captured click with no replay target, since nothing can reopen it first.
+
+**Desired fix (LATER, engine-wide — not a one-off patch):** a first-class `hover-reveal` event kind through capture → compile → replay (`recordingTypes.ts` / `recordingCapture.ts` / `recordingCompile.ts` / `recordingReplay.ts` + a PLAYBACK_DIAG kind). Track: [NEXT_STEPS.md](../product/NEXT_STEPS.md) LATER 12b · [PRODUCT_OWNER_BRIEF.md](../product/PRODUCT_OWNER_BRIEF.md) ledger 2026-07-23 · [LESSONS_LEARNED.md](../product/LESSONS_LEARNED.md#topic-hover-reveal-rec). **Do not start until Arch/Pax open this wave.**
+
+If a hover-revealed panel must tolerate manual/scripted replay in the meantime, the only tolerant pattern is **keep it mounted, hidden via CSS** (like the existing login flyout in `headerMount.tsx`) rather than unmounting — but do not build this as a workaround without a PO ask; it is explicitly parked, not approved.
+
+---
+
 ## Recordable DOM conventions
 
 Prefer stable selectors on interactive targets:

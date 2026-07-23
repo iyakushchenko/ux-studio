@@ -38,6 +38,24 @@
         "component.co.product.in.this.order"
       ],
       "note": "Page stamps data-name=component.co.product.in.this.order on Accordion root; Item keeps component.gse.accordion (Order Details UXDS frame 11920:238008)."
+    },
+    {
+      "reactModule": "src/uxds/interactions/MegaMenuFlyout.tsx",
+      "figmaNames": [
+        "component.header.mega.menu.flyout.standard",
+        "module.mega.menu"
+      ],
+      "note": "Presentational panel (link groups grid + hero asset + promo band); parent mega-menu nav item owns hover open-state via `open` prop (Larkin frame 7650:86049 / integration frame 2539:593672). `module.mega.menu` (node 7650:86158) is the same file's wrapper adding the full-viewport separation scrim (`fills/mega menu flyout gradient` fill style, mix-blend-multiply) rendered by this same component as `[data-name=\"module.mega.menu.scrim\"]`."
+    },
+    {
+      "reactModule": "src/uxds/interactions/PendingSpinnerIcon.tsx",
+      "figmaNames": [],
+      "note": "Engine-native motion primitive — no Figma source node. Glyph-swap arc spinner for optimistic pending states (wishlist/save/add-to-cart)."
+    },
+    {
+      "reactModule": "src/uxds/interactions/CommitPulseIcon.tsx",
+      "figmaNames": [],
+      "note": "Engine-native motion primitive — no Figma source node. `framer-motion` scale pulse celebrating a pending action's real commit landing."
     }
   ]
 }

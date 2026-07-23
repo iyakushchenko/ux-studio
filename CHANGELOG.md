@@ -7,6 +7,13 @@
 - **shell:** Fix Reset not repainting title after a suite-run Finale seal on an active session
 - **shell:** Fix kind-hijack for remaining self-test entry points (mcp-page-probe + shared withMcpTestSession wrapper behind retreat/step-forward/play smokes + robot QA) so Manual/Observe QA sessions keep their own kind through any suite test, not only mcp-sanity
 - **shell:** Test current page now polls the shared PO-signal gate (Alarm/diagnostic) each step, so a real control-room Alarm firing mid-probe fails the run instead of silently coalescing into RESULT PASS
+- **uxds:** Add MegaMenuFlyout UXDS kit (src/uxds/interactions) for component.header.mega.menu.flyout.standard -- link groups grid + hero asset + secondary CTA + promo band, reusing .uxds-link and shared button tokens; parent nav item owns hover open-state via open prop
+- **project:** Boots: wire MegaMenuFlyout hover flyout to header 'Health Services' mega menu item — real footer Health Services links, PLP nav wired, closed-by-default (no invented content/hero)
+- **project:** Boots: fix MegaMenuFlyout under-fidelity vs Figma (7650:86049) — flyout now fills 3-column grid + hero (real PLP Vaccinations image/heading) + Advantage Card promo, not a single bare link column
+- **uxds:** MegaMenuFlyout: fill all 3 rows with real content (footer service columns + PLP sidebar facets By Age/Disease/Region/Country, capped like the real PLP sidebar); complete the react-kit-map roster with engine-native kits (PendingSpinnerIcon, CommitPulseIcon) that have no Figma source node
+- **uxds:** MegaMenuFlyout: cap link groups (5/group, 8 groups), left-align groups when a row has fewer than 3, and stamp stable data-studio-action per link for REC/CJM capture
+- **uxds:** MegaMenuFlyout: add module.mega.menu (node 7650:86158) lightbox scrim for visual separation from the page beneath -- anchored to the flyout's own top edge (never the header/breadcrumb), stacked strictly below the panel, non-interactive
+- **uxds:** MegaMenuFlyout: show/hide now uses framer-motion AnimatePresence (opacity + tiny y) instead of an instant mount/unmount, matching the engine's enter/exit-presence motion policy
 
 ## v0.0.108 - 220726
 - **shell:** All 13 Boots Sarah CJMs live-proven through fail-fast QA; legacy recordings can earn current compatibility proof, camera anomaly tolerance avoids compositor false positives, and suite logs report truthful per-CJM results

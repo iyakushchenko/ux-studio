@@ -53,3 +53,12 @@ export {
   CommitPulseIcon,
   type CommitPulseIconProps,
 } from "./CommitPulseIcon";
+
+export {
+  MegaMenuFlyout,
+  type MegaMenuFlyoutProps,
+  type MegaMenuHero,
+  type MegaMenuHeroCta,
+  type MegaMenuLinkGroup,
+  type MegaMenuLinkItem,
+} from "./MegaMenuFlyout";
