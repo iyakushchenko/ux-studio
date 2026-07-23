@@ -222,10 +222,10 @@ describe("agentTesting wipe hygiene (forceClear / softClose)", () => {
     expect(shouldBlockPageClicks()).toBe(false);
   });
 
-  it("no ghost OBS/CTRL in header when popup closed", () => {
+  it("no ghost CONNECTED glyph in header when popup closed", () => {
     document.body.insertAdjacentHTML(
       "beforeend",
-      `<span class="studio-nav-version__mcp" hidden data-studio-mcp-hint="true"></span>`
+      `<span class="studio-nav-version__mcp" data-connected="false" data-studio-mcp-hint="true"></span>`
     );
     openAgentTestingLogger({ kind: "observe" });
     const hint = document.querySelector<HTMLElement>(".studio-nav-version__mcp");
@@ -237,15 +237,16 @@ describe("agentTesting wipe hygiene (forceClear / softClose)", () => {
       }
     ).__studioMcpConnectionStatus?.();
     expect(["observe", "connecting", "connected"]).toContain(live?.phase);
-    if (hint && !hint.hidden) {
-      expect(["OBS", "…", "OK"]).toContain(hint.textContent);
-    }
+    // Persistent glyph — never hidden, but must read "connected" while live.
+    expect(hint?.hidden).toBe(false);
+    expect(hint?.dataset.connected).toBe("true");
 
     softCloseAgentTestingLogger("ghost-check");
     expect(isAgentTestingOverlayActive()).toBe(false);
     expect(isQaDiagGateOpen()).toBe(false);
-    expect(hint?.hidden).toBe(true);
-    expect(hint?.textContent || "").toBe("");
+    // Glyph persists (never hidden) but must fall back to disconnected/muted.
+    expect(hint?.hidden).toBe(false);
+    expect(hint?.dataset.connected).toBe("false");
     expect(document.documentElement.dataset.studioMcpStatus).toBeUndefined();
     expect(document.documentElement.dataset.studioQaLock).toBeUndefined();
     const idle = (

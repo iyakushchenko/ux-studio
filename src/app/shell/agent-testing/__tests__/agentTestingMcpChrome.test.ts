@@ -63,9 +63,9 @@ describe("agentTestingMcpChrome — no ghost OBS", () => {
     expect(status.label).toBe("");
   });
 
-  it("paint clears nav OBS when not live", () => {
+  it("paint drops nav icon to disconnected (not hidden) when not live", () => {
     document.body.innerHTML =
-      '<span class="studio-nav-version__mcp" data-phase="observe">OBS</span>' +
+      '<span class="studio-nav-version__mcp" data-phase="observe" data-connected="true"></span>' +
       '<div id="agent-testing-overlay"><div class="studio-agent-testing-overlay__mcp-status">' +
       '<span class="studio-agent-testing-overlay__mcp-diode" data-phase="observe"></span>' +
       '<span class="studio-agent-testing-overlay__mcp" data-phase="observe">AGENT — OBSERVE</span>' +
@@ -82,9 +82,13 @@ describe("agentTestingMcpChrome — no ghost OBS", () => {
     };
     paintMcpChromeDom(input, deriveLiveMcpStatus(input));
     const hint = document.querySelector<HTMLElement>(".studio-nav-version__mcp");
-    expect(hint?.hidden).toBe(true);
-    expect(hint?.textContent || "").toBe("");
+    // Persistent glyph — never hidden, just falls back to muted/disconnected.
+    expect(hint?.hidden).toBe(false);
+    expect(hint?.dataset.connected).toBe("false");
+    expect(hint?.dataset.phase).toBeUndefined();
     expect(document.documentElement.dataset.studioMcpStatus).toBeUndefined();
     clearNavMcpHintDom();
+    expect(hint?.hidden).toBe(false);
+    expect(hint?.dataset.connected).toBe("false");
   });
 });

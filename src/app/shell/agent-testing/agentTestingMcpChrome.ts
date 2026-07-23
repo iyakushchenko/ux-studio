@@ -48,6 +48,16 @@ export function deriveLiveMcpStatus(input: McpChromeLiveInput): McpConnectionSta
   });
 }
 
+/** Phases that read as "an agent session is actually live" — green icon. Error
+ * is deliberately excluded (broken ≠ connected) even though it carries a label. */
+const MCP_NAV_CONNECTED_PHASES = new Set([
+  "connecting",
+  "connected",
+  "control",
+  "observe",
+  "pending",
+]);
+
 export function clearNavMcpHintDom(): void {
   if (typeof document === "undefined") return;
   if (typeof document.querySelector !== "function") return;
@@ -55,32 +65,15 @@ export function clearNavMcpHintDom(): void {
     ".studio-nav-version__mcp"
   );
   if (navHint) {
-    navHint.hidden = true;
-    navHint.textContent = "";
+    // Persistent icon — never hide, just drop back to muted/disconnected.
+    navHint.hidden = false;
+    navHint.dataset.connected = "false";
     delete navHint.dataset.phase;
+    navHint.title = `Agent MCP — idle — ${AGENT_LATCH_STATUS_TITLE}`;
   }
   const html = document.documentElement;
   if (html?.dataset) {
     delete html.dataset.studioMcpStatus;
-  }
-}
-
-function shortNavPhase(phase: string): string {
-  switch (phase) {
-    case "pending":
-      return "PENDING";
-    case "control":
-      return "CTRL";
-    case "observe":
-      return "OBS";
-    case "connecting":
-      return "…";
-    case "connected":
-      return "OK";
-    case "error":
-      return "ERR";
-    default:
-      return "";
   }
 }
 
@@ -177,15 +170,16 @@ export function paintMcpChromeDom(
     ".studio-nav-version__mcp"
   );
   if (navHint) {
-    if (!show) {
-      navHint.hidden = true;
-      navHint.textContent = "";
-      delete navHint.dataset.phase;
-    } else {
-      navHint.hidden = false;
-      navHint.textContent = shortNavPhase(status.phase);
+    // Icon persists always; only its color (via data-connected) and title change.
+    navHint.hidden = false;
+    const connected = live && MCP_NAV_CONNECTED_PHASES.has(status.phase);
+    navHint.dataset.connected = connected ? "true" : "false";
+    if (show) {
       navHint.dataset.phase = status.phase;
       navHint.title = `${status.label} — ${AGENT_LATCH_STATUS_TITLE}`;
+    } else {
+      delete navHint.dataset.phase;
+      navHint.title = `Agent MCP — idle — ${AGENT_LATCH_STATUS_TITLE}`;
     }
   }
 }

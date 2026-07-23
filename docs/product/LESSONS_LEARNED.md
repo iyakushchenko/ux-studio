@@ -810,6 +810,16 @@ For role-specific mandatory reading, return to
 
 ---
 
+## 2026-07-23 — Header MCP hint: text chip → persistent icon glyph
+
+- **Ask:** PO wants the header "CTRL" text chip replaced with an MCP-server glyph icon (PO supplied `mcp-server-stroke-rounded` — already sitting in `src/assets/mcp-server-stroke-rounded.svg`, `stroke="currentColor"`), and wants it **always visible** ("persist") instead of only appearing while a session is live: green while connected, muted silver otherwise.
+- **Found:** `.studio-nav-version__mcp` (`StudioNavVersionChip.tsx`) rendered `hidden` by default and only un-hid + wrote 5-way phase text (`CTRL`/`OBS`/`PENDING`/`…`/`OK`/`ERR`) via `paintMcpChromeDom`/`shortNavPhase` in `agentTestingMcpChrome.ts` while the overlay was live. PO's binary "connected/not" ask is simpler than the 5-phase text model — folded `connecting`/`connected`/`control`/`observe`/`pending` into one `data-connected="true"` (green), and `idle`/`error`/overlay-not-live into `data-connected="false"` (muted silver). **Error is deliberately excluded from green** even though it carries a label — "broken" should not paint as "connected"; the real error text still surfaces via the `title` tooltip, just not as a green glyph.
+- **Fix:** inlined the SVG (same `McpGlyphIcon` pattern as the existing bug-icon button — codebase convention is inline JSX `<svg stroke="currentColor">`, not `<img src>`, so CSS `color` drives the fill directly, no mask-image hack needed). `paintMcpChromeDom`/`clearNavMcpHintDom` now always set `navHint.hidden = false` and only toggle `data-connected` + `title`; removed the now-dead `shortNavPhase()`. CSS dropped the pill/border/background chip styling (no longer text, just a bare 18px icon) and added `transition: color 220ms ease-in-out` so connect/disconnect fades rather than snaps (see the box-shadow fade lesson above — same curve, same reasoning).
+- **Test contract change:** two existing unit tests asserted `hint.hidden === true` + `textContent === ""` when not live — that's the *old* contract this ask explicitly reversed. Updated both to assert `hidden === false` + `dataset.connected === "false"` instead of skipping/deleting them.
+- **Gate:** `npm test` 153/153 green, `npm run build` green. Live MCP: idle → `color: rgba(160,166,176,0.7)` (muted silver), zoomed element screenshot confirms a plain gray glyph; `__studioArmRecCapture()` → `dataset.connected === "true"`, `color: rgb(61,255,138)` (`#3dff8a`), zoomed screenshot confirms green — both states read from `getComputedStyle`, not eyeballed.
+
+---
+
 ## How to append
 
 Add a `## YYYY-MM-DD` section with concrete bullets (symptom → root cause → gate). Link the audit SHA or commit when relevant.
