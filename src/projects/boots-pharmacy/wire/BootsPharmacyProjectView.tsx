@@ -1144,17 +1144,24 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     }
   }, []);
 
-  const resetPrototypeScroll = useCallback((options?: { force?: boolean }) => {
-    prototypeScrollPosRef.current = 0;
-    const el = prototypeScrollElRef.current;
-    if (!el) return;
-    // Default honors camera session / hold. force = jump-to-start / wire wipe.
-    scrollPrototypeScrollToTopAfterLayout(el, {
-      force: options?.force === true,
-      reason: "resetPrototypeScroll",
-      skipHold: options?.force === true,
-    });
-  }, []);
+  const resetPrototypeScroll = useCallback(
+    (options?: { force?: boolean; yieldToActiveCameraWork?: boolean }) => {
+      prototypeScrollPosRef.current = 0;
+      const el = prototypeScrollElRef.current;
+      if (!el) return;
+      // Default honors camera session / hold. force = jump-to-start / wire wipe.
+      // yieldToActiveCameraWork: routine page-land only — still skip under force
+      // when a beat already owns the camera (dwell / in-flight ease) so the
+      // origin snap does not fight it (scroll-reversal yank class).
+      scrollPrototypeScrollToTopAfterLayout(el, {
+        force: options?.force === true,
+        reason: "resetPrototypeScroll",
+        skipHold: options?.force === true,
+        yieldToActiveCameraWork: options?.yieldToActiveCameraWork === true,
+      });
+    },
+    []
+  );
 
   const resetWireInteractionState = useCallback(() => {
     closeAllPopups();
@@ -1240,7 +1247,11 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       if (!screenChanged) return;
       cancelPlaybackScroll("abort");
       // Page land = top unless intentional camera beat owns the next move.
-      resetPrototypeScroll({ force: true });
+      // yieldToActiveCameraWork: the deferred re-assert inside
+      // resetPrototypeScroll must not yank a beat's own dwell/ease mid-flight
+      // (Reserve→confirm / history / details forward-land scroll-reversal —
+      // TRADITIONAL_CJM_UX_2026-07-21.md).
+      resetPrototypeScroll({ force: true, yieldToActiveCameraWork: true });
       return;
     }
     if (!shouldBlindOriginResetOnScreenEnter()) return;

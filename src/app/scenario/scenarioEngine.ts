@@ -181,19 +181,30 @@ export function scenarioScrollTopBeforeCollapse(
 export function scrollPrototypeScrollToTop(
   scrollEl?: HTMLElement | null,
   behavior: ScrollBehavior = "instant",
-  options?: { force?: boolean; reason?: string; skipHold?: boolean }
+  options?: {
+    force?: boolean;
+    reason?: string;
+    skipHold?: boolean;
+    yieldToActiveCameraWork?: boolean;
+  }
 ): void {
   scrollCameraToOrigin(scrollEl, {
     instant: behavior !== "smooth",
     force: options?.force,
     reason: options?.reason,
     skipHold: options?.skipHold,
+    yieldToActiveCameraWork: options?.yieldToActiveCameraWork,
   });
 }
 
 export function scrollPrototypeScrollToTopAfterLayout(
   scrollEl?: HTMLElement | null,
-  options?: { force?: boolean; reason?: string; skipHold?: boolean }
+  options?: {
+    force?: boolean;
+    reason?: string;
+    skipHold?: boolean;
+    yieldToActiveCameraWork?: boolean;
+  }
 ): void {
   scrollPrototypeScrollToTop(scrollEl, "instant", options);
   window.setTimeout(

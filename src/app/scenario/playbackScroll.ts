@@ -1092,6 +1092,17 @@ export type ScrollCameraOriginOptions = PlaybackScrollOptions & {
   force?: boolean;
   skipHold?: boolean;
   reason?: string;
+  /**
+   * Routine "page land = top" reset only (NOT a true wipe like jump-to-start /
+   * go-home / resetWireInteractionState). When true, still no-op — even under
+   * `force` — while a beat has already claimed the camera (camera-beat dwell,
+   * or any eased scroll already in flight from that beat's own script, e.g.
+   * `history-view-details` revealing its CTA). Prevents the origin snap from
+   * fighting that beat-owned move mid-flight and re-settling — the
+   * "scroll-reversal" yank class on Reserve→confirm / history / details
+   * forward lands (TRADITIONAL_CJM_UX_2026-07-21.md).
+   */
+  yieldToActiveCameraWork?: boolean;
 };
 
 /**
@@ -1101,13 +1112,32 @@ export type ScrollCameraOriginOptions = PlaybackScrollOptions & {
  * **Screen-enter while CJM/play:** wire page-land uses `force: true` so hosts
  * start at top; non-forced calls still no-op when a playback camera session is
  * active, post-click hold is armed, or an ease is in flight (avoids yank fighting
- * target scrolls mid-beat).
+ * target scrolls mid-beat). Routine page-land also passes
+ * `yieldToActiveCameraWork: true` so a *forced* reset still yields to a beat
+ * that already owns the camera (dwell / in-flight ease) — see
+ * {@link ScrollCameraOriginOptions.yieldToActiveCameraWork}.
  */
 export function scrollCameraToOrigin(
   scrollEl?: HTMLElement | null,
   options?: ScrollCameraOriginOptions
 ): void {
   const force = options?.force === true;
+  if (
+    force &&
+    options?.yieldToActiveCameraWork &&
+    (isPlaybackScrollAnimating() || isCameraBeatDwellActive())
+  ) {
+    try {
+      playbackDiagScroll({
+        detail: `scrollCameraToOrigin — skipped (active camera work${
+          options?.reason ? `; ${options.reason}` : ""
+        })`,
+      });
+    } catch {
+      /* hang-safe */
+    }
+    return;
+  }
   if (!force) {
     if (playbackCameraSessionActive) {
       try {

@@ -662,6 +662,113 @@ describe("screen-enter camera policy", () => {
   });
 });
 
+// Pins TRADITIONAL_CJM_UX_2026-07-21.md fix: routine "page land = top" resets
+// (wire's forced screen-change reset) must not yank a beat that already owns
+// the camera — Reserve→confirm (camera-beat dwell) / history / details
+// (in-flight reveal ease) forward lands were bouncing origin↔target
+// (scroll-reversal). `force: true` alone (jump-to-start / go-home / wipe)
+// must keep overriding everything — only `yieldToActiveCameraWork` yields.
+describe("scrollCameraToOrigin — yieldToActiveCameraWork (forward-land fix)", () => {
+  afterEach(() => {
+    resetChatCameraTrackerForTests();
+    resetPlaybackCameraSessionForTests();
+    resetPostClickCameraHoldForTests();
+    vi.unstubAllGlobals();
+  });
+
+  function fullScrollEl(scrollTop: number) {
+    return {
+      scrollTop,
+      scrollLeft: 0,
+      scrollHeight: 2000,
+      clientHeight: 400,
+      classList: { contains: () => false },
+      dataset: {},
+      tagName: "DIV",
+      id: "",
+      className: "",
+      getBoundingClientRect: () => mockRect(0, 400),
+    } as unknown as HTMLElement;
+  }
+
+  it("does not yank origin while a camera-beat dwell owns the land (book-step-3 confirm)", () => {
+    setCameraBeatDwellActive(true);
+    const el = fullScrollEl(640);
+
+    scrollCameraToOrigin(el, {
+      instant: true,
+      force: true,
+      yieldToActiveCameraWork: true,
+      reason: "resetPrototypeScroll",
+    });
+    expect(el.scrollTop).toBe(640);
+
+    setCameraBeatDwellActive(false);
+    scrollCameraToOrigin(el, {
+      instant: true,
+      force: true,
+      yieldToActiveCameraWork: true,
+      reason: "resetPrototypeScroll",
+    });
+    expect(el.scrollTop).toBe(0);
+  });
+
+  it("does not yank origin while a beat's own reveal ease is mid-flight (history/details)", async () => {
+    const el = fullScrollEl(0);
+
+    let rafCallback: FrameRequestCallback | null = null;
+    vi.stubGlobal("requestAnimationFrame", (cb: FrameRequestCallback) => {
+      rafCallback = cb;
+      return 1;
+    });
+    vi.stubGlobal("cancelAnimationFrame", () => {});
+    let now = 0;
+    vi.stubGlobal("performance", { now: () => now });
+
+    const promise = animateScrollTo(el, 800, { durationMs: 400 });
+    now = 200;
+    rafCallback!(200);
+    const midFlightTop = el.scrollTop;
+    expect(midFlightTop).toBeGreaterThan(0);
+    expect(midFlightTop).toBeLessThan(800);
+
+    scrollCameraToOrigin(el, {
+      instant: true,
+      force: true,
+      yieldToActiveCameraWork: true,
+      reason: "resetPrototypeScroll",
+    });
+    expect(el.scrollTop).toBe(midFlightTop);
+
+    now = 400;
+    rafCallback!(400);
+    await promise;
+    expect(el.scrollTop).toBe(800);
+  });
+
+  it("still forces the origin snap when no beat owns the camera (idle land)", () => {
+    const el = fullScrollEl(640);
+    scrollCameraToOrigin(el, {
+      instant: true,
+      force: true,
+      yieldToActiveCameraWork: true,
+      reason: "resetPrototypeScroll",
+    });
+    expect(el.scrollTop).toBe(0);
+  });
+
+  it("plain force (no yieldToActiveCameraWork) still overrides dwell — jump-to-start / go-home unaffected", () => {
+    setCameraBeatDwellActive(true);
+    const el = fullScrollEl(640);
+    scrollCameraToOrigin(el, {
+      instant: true,
+      force: true,
+      reason: "jump-to-start",
+    });
+    expect(el.scrollTop).toBe(0);
+  });
+});
+
 describe("camera beat dwell vs chat host-end", () => {
   afterEach(() => {
     resetChatCameraTrackerForTests();

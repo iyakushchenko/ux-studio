@@ -48,6 +48,7 @@ onboarding path. Do not reread it end-to-end unless reconstructing a regression.
 | PLP Make parity register | [../projects/boots-pharmacy/features/PLP_MAKE_PARITY_REGISTER.md](../projects/boots-pharmacy/features/PLP_MAKE_PARITY_REGISTER.md) | Band-by-band Make inventory |
 | PLP React brief | [../projects/boots-pharmacy/features/PLP_REACT.md](../projects/boots-pharmacy/features/PLP_REACT.md) | PLP migration brief |
 | **PLP team retro** | [TEAM_RETRO_2026-07-19_PLP.md](./TEAM_RETRO_2026-07-19_PLP.md) | Pain / Worked / Keep — apply on PDP+ |
+| **History/Details team retro** | [TEAM_RETRO_2026-07-22_HISTORY_DETAILS.md](./TEAM_RETRO_2026-07-22_HISTORY_DETAILS.md) | Pain / Worked / Keep — densify, MaNav, terminal CTA, header 7c |
 | Studio URL (modal ids) | [../shell/URL.md](../shell/URL.md) | **Modal URL registry** before any dialog ship |
 | Doctrine | [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) | Locked tech + process |
 | **Motion standard** | [MOTION.md](./MOTION.md) | `framer-motion` via `@/uxds/motion`; CSS for trivial + Accordion |
@@ -69,6 +70,7 @@ onboarding path. Do not reread it end-to-end unless reconstructing a regression.
 | [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) §0 / §6–§7 | Parallel siblings, distrust handoffs, strict interface audit |
 | [PAGE_FINAL_PASS.md](./PAGE_FINAL_PASS.md) | No next migrated page until previous hard-green |
 | [TEAM_RETRO_2026-07-19_PLP.md](./TEAM_RETRO_2026-07-19_PLP.md) | After HARD-GREEN: micro-retro → this index (Reflex) |
+| [TEAM_RETRO_2026-07-22_HISTORY_DETAILS.md](./TEAM_RETRO_2026-07-22_HISTORY_DETAILS.md) | History + Details wave — densify gate, shared chrome, before Book delete |
 | [LESSONS_LEARNED.md](./LESSONS_LEARNED.md) (latest + surface) | Reject “done” without applied lessons |
 | [NEXT_STEPS.md](./NEXT_STEPS.md) · [PRODUCT_FORECAST.md](./PRODUCT_FORECAST.md) · [PAINPOINTS.md](./PAINPOINTS.md) | Board / forecast / painpoints |
 | [PARITY_RATCHETS.md](./PARITY_RATCHETS.md) | New typical fail → ratchet same ship |
