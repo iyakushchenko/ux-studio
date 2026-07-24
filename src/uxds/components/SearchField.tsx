@@ -17,7 +17,7 @@ export type SearchFieldProps = {
   /** Hint / helper under the field (optional). */
   hint?: string;
   /**
-   * Magnifier position — Make/Availability/Book Step 1 = `end` (right).
+   * Magnifier position — Legacy/Availability/Book Step 1 = `end` (right).
    * Stamp `data-studio-search-icon-pos`.
    */
   iconPosition?: SearchFieldIconPosition;

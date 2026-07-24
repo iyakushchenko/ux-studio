@@ -24,13 +24,13 @@ without rewriting history.
 | QA overlay and PO signals | [Overlay reset/HMR](#topic-overlay) · [Overlay baseline](#topic-overlay-baseline) | ALWAYS CLEAR, alarm/cursor/scroll, teardown, false FAIL |
 | QA suite Observe / touch-wrap (R16) | [Suite Observe race](#topic-suite-observe) · dig [`qaSuiteTouchWrapContract.ts`](../../src/app/shell/qaSuiteTouchWrapContract.ts) | `dom-observe-open kind=agent` after suite sanity |
 | Chat, camera, scroll, and type-in | [Chat camera](#topic-chat) · [Nested scroll host](#topic-scroll) | Progressive bubbles, composer pad, type-in, scroll reversal |
-| Make→React mounts and selectors | [Make ghosts](#topic-hybrid) · [Hybrid baseline](#topic-hybrid-baseline) | Retire/park Make, first-match ghosts, mount/unmount |
+| Make→React mounts and selectors | [Legacy ghosts](#topic-hybrid) · [Hybrid baseline](#topic-hybrid-baseline) | Retire/park Legacy, first-match ghosts, mount/unmount |
 | CSS, UXDS, hover, and fidelity | [Typical DS checks](#topic-ds) · [DS/CSS baseline](#topic-ds-baseline) | Tokens, kit states, loading parity, no invented chrome |
 | Component library / typical action kits | [Pending-commit spinner icon](#topic-pending-spinner-icon) · [My Account nav panel dedup](#topic-ma-nav-panel) | Reusable `src/uxds/interactions/` primitives beyond Accordion/Disclosure/FilterChip — optimistic-flip-then-delayed-commit affordances; per-screen chrome copy-paste |
 | URL, modal, and navigation state | [URL/CJM state](#topic-url) · [Modal URL](#topic-modal) · [Non-destructive overlay](#topic-overlay-underlay) | Deep links, modal registry, underlay must stay painted |
 | Page migration and Final Pass | [Page Final Pass](#topic-final-pass) · [Page create inheritance](#topic-page-create) | Sequencing, proof, audits, next-page gate; UXDS/UXML reuse |
 | Naming, hygiene, docs, version, CI | [Version](#topic-version) · [Naming](#topic-naming) · [CI](#topic-ci) | Repository conventions and delivery mechanics |
-| Theme-scope mount ordering | [Detached-clone mount escapes theme scope](#topic-theme-scope-mount) | Any `document.body`-mounted React root from a Make-wire chrome mount — verify it lands **inside** `[data-studio-project]`, not beside it |
+| Theme-scope mount ordering | [Detached-clone mount escapes theme scope](#topic-theme-scope-mount) | Any `document.body`-mounted React root from a Legacy-wire chrome mount — verify it lands **inside** `[data-studio-project]`, not beside it |
 | **Stuck / don’t know / looping** | **[AGENT_STUCK_ROUTER.md](./AGENT_STUCK_ROUTER.md)** | One dig — do not thrash tokens |
 
 For role-specific mandatory reading, return to
@@ -56,14 +56,14 @@ For role-specific mandatory reading, return to
 <a id="topic-pending-spinner-icon"></a>
 ### Pending-commit spinner icon — new `src/uxds/interactions/` primitive (PO ask, 2026-07-22)
 
-- **Ask:** PO asked whether the engine has a reusable "library of typical actions" to enrich UX beyond point fixes — specifically, could the PLP bookmark heart show a loading/committing state during its intentional ~2s delayed-commit window (`PLP_WISHLIST_ADD_DELAY_MS`), and could that be done the standard way without breaking REC/Play. Explicitly **not Make-parity-gated**: "forget about make parity. implement as suggested. we may and WILL improve as we go."
+- **Ask:** PO asked whether the engine has a reusable "library of typical actions" to enrich UX beyond point fixes — specifically, could the PLP bookmark heart show a loading/committing state during its intentional ~2s delayed-commit window (`PLP_WISHLIST_ADD_DELAY_MS`), and could that be done the standard way without breaking REC/Play. Explicitly **not Legacy-parity-gated**: "forget about make parity. implement as suggested. we may and WILL improve as we go."
 - **Gap found:** `src/uxds/interactions/` (Accordion, Disclosure, FilterChip) is the real "typical actions" library today, but it had no loading/pending-icon entry — every screen either hand-rolled its own spinner (PLP's listing loader) or explicitly avoided one (Chat, by PO request). No shared "optimistic flip → delayed real commit → show it's committing" pattern existed.
 - **Built:** `PendingSpinnerIcon` (`src/uxds/interactions/PendingSpinnerIcon.tsx` + `pendingSpinnerIcon.css`) — same arc-turn visual language as PLP's existing listing-loader spinner (promoted to a shared kit, not reinvented), `stroke: currentColor` on the arc so it inherits whatever active-state color the consumer already sets (fuchsia here) rather than a generic loader color. Exported from `src/uxds/interactions/index.ts` alongside Accordion/Disclosure/FilterChip.
 - **Wiring (PLP heart, `PlpScreen.tsx`):** `wishlistCommitPending = heartActive && !wishlisted` — a **derived** signal from state that already existed (optimistic flip vs. real store), no new prop threading, and it is `false` on the remove path for free (remove commits synchronously, so `heartActive`/`wishlisted` never diverge there). While pending: swap `BookmarkGlyph` for `<PendingSpinnerIcon />` and stamp `data-fav-pending` on the icon span for QA/future-contract visibility.
 - **Why this cannot break REC/Play:** the click-verification contract watches `data-studio-bookmarked` / `aria-pressed` on the **button** (unchanged, flips synchronously on `pointerdown` regardless of which glyph is inside), never the inner SVG. `waitForWishlistCommit()` (`traditional.ts`) already polls the real store, so Play never races the pending window either way — the spinner is a pure presentation layer on top of contracts that were already correct.
 - **Gate:** Live MCP — `data-fav-pending` flips `true` at click, spinner renders in fuchsia (`currentColor` inheriting `.is-active`), holds for the full ~2s window, flips back to the solid heart glyph exactly when the real commit lands. Full `__studioRunFullPlayProve({ experience: "traditional" })` still completes `10/10 STEPS`, `pass: true`, no errors, with the spinner mid-flight during that beat. `npm test` 153/153 files green, build green.
 - **Open for reuse:** any future "optimistic UI ahead of a delayed real commit" surface (save, add-to-cart, follow…) gets this via `import { PendingSpinnerIcon } from "@/uxds/interactions"` instead of a bespoke spinner. Not registered in `docs/uxds/DEVIATIONS.md` — that registry is for anonymous/hacky chrome outside the kit system; this *is* the kit system (one named, reusable, exported primitive), same tier as Accordion/FilterChip.
-- **Follow-up (same day) — "Saving…" label + commit-pulse, engine motion only:** PO asked for two more enrichments on the same interaction, explicitly forgetting Make parity and explicitly "using engine, not hardcoded stuff": (1) swap the label to `Saving…` during the pending window, (2) pop the icon slightly bigger then back to normal size the instant the real commit lands.
+- **Follow-up (same day) — "Saving…" label + commit-pulse, engine motion only:** PO asked for two more enrichments on the same interaction, explicitly forgetting Legacy parity and explicitly "using engine, not hardcoded stuff": (1) swap the label to `Saving…` during the pending window, (2) pop the icon slightly bigger then back to normal size the instant the real commit lands.
   - **Label:** `wishlistCommitPending` (already-derived state) gates a third label branch — no new state, no magic string disconnected from the actual signal.
   - **Icon pulse:** new `CommitPulseIcon` (`src/uxds/interactions/CommitPulseIcon.tsx`) — `motion.span` from `@/uxds/motion` (doctrine-mandated motion engine, not a bespoke `@keyframes`), `animate={{ scale: [1, 1.32, 1] }}`. Framer-motion only replays a keyframe `animate` array on (re)mount, so the trigger is a `pulseKey` prop bumped via `key={pulseKey}` — remounting is what replays it.
   - **Mount-safety gotcha (why it's not `commitPulseKey >= 0`):** a static `animate` keyframe array plays on **every** mount, including first paint — wrapping *every* tile's rest-state heart in `CommitPulseIcon` from render 1 would pop every untouched tile once on initial reveal. Fix: only wrap once `commitPulseKey > 0` (i.e. only after a real commit has actually happened at least once); the plain `<BookmarkGlyph />` renders unwrapped before that. The pulse's own first mount **is** the commit moment, so it still fires exactly once when intended.
@@ -74,11 +74,11 @@ For role-specific mandatory reading, return to
 ### My Account left-nav panel — copy-pasted per screen, not shared (PO ask, 2026-07-23)
 
 - **Ask:** PO asked whether the `appointment-history` / `appointment-details` left-hand rail is a shared component and whether it semantically matches UXDS Figma `module.ma.navigation` (`myqzp3KRc1pxKDOv8RfTsl`, node `12409:640716`).
-- **Found:** Semantic match was already exact — `data-name` stamps (`module.ma.navigation`, `component.ma.navigation.profile.name.and.icon`, `.menu`, `.menu.item`, `.content.slot`) mirror the Figma node 1:1, confirmed via `get_design_context`. But it was **not a shared component**: `AccountAvatar()` and the whole `<aside>` block (profile + 10-item menu + Customer Service slot) were byte-for-byte duplicated in `AppointmentHistoryScreen.tsx` and `AppointmentDetailsScreen.tsx` (only the CSS class prefix differed), plus the same CSS rules duplicated in both screen `.css` files, plus a third legacy copy in Make `frame/index.tsx`. Classic one-pattern-per-role violation (`DS_STRICTNESS.md`) that hadn't surfaced as a visible bug yet.
+- **Found:** Semantic match was already exact — `data-name` stamps (`module.ma.navigation`, `component.ma.navigation.profile.name.and.icon`, `.menu`, `.menu.item`, `.content.slot`) mirror the Figma node 1:1, confirmed via `get_design_context`. But it was **not a shared component**: `AccountAvatar()` and the whole `<aside>` block (profile + 10-item menu + Customer Service slot) were byte-for-byte duplicated in `AppointmentHistoryScreen.tsx` and `AppointmentDetailsScreen.tsx` (only the CSS class prefix differed), plus the same CSS rules duplicated in both screen `.css` files, plus a third legacy copy in Legacy `frame/index.tsx`. Classic one-pattern-per-role violation (`DS_STRICTNESS.md`) that hadn't surfaced as a visible bug yet.
 - **Fix:** Extracted `MaNavigationPanel` (`src/projects/boots-pharmacy/chrome/MaNavigationPanel.tsx` + `maNavigationPanel.css`) taking `helloLabel` / `profileName` / `navItems` / `activeItem` as props (each screen's own `*_NAV_ITEMS` / `*_NAV_ACTIVE` / `*_PROFILE_*` contract constants stay screen-owned — the markup/CSS is what was shared, not the content). Both screens now render `<MaNavigationPanel ... />`; per-screen `AccountAvatar()` and the ~90-line duplicated `<aside>` JSX + ~90 lines of duplicated CSS removed from both.
 - **Verified:** `npm test` all gates green, `npm run build` green, live MCP screenshot on both `screen=appointment-history` and `screen=appointment-details` — panel renders identically (profile photo swap still applies via the preserved `data-name="icon / accent / account"` global theme selector in `globals-screens.css`, unaffected by the class rename).
 - **Reuse rule:** any future My Account screen (profile, invoices, address book…) consumes `MaNavigationPanel` from day one — do not re-fork the `<aside>` a third time.
-- **Follow-up (same day) — make real links, no dead hrefs:** PO asked that nav items be genuinely interactive with DS hover/focus/active states, but **only** for labels whose target page actually exists in the project (no invented navigation for the other 9 generic Make labels — under-match over invent, doctrine item 23). `MA_NAV_LINKED_LABELS` (exported from `MaNavigationPanel.tsx`) is the single place that lists which labels have a real screen; today that's just `"Appointment history"` (only `appointment-history` + `appointment-details` exist). Matching items render as real `<button>`s (hover: `--uxds-filter-chip-surface-hover`; active/focus-visible via existing text-link tokens); non-matching items stay plain `<div>` text, unchanged.
+- **Follow-up (same day) — make real links, no dead hrefs:** PO asked that nav items be genuinely interactive with DS hover/focus/active states, but **only** for labels whose target page actually exists in the project (no invented navigation for the other 9 generic Legacy labels — under-match over invent, doctrine item 23). `MA_NAV_LINKED_LABELS` (exported from `MaNavigationPanel.tsx`) is the single place that lists which labels have a real screen; today that's just `"Appointment history"` (only `appointment-history` + `appointment-details` exist). Matching items render as real `<button>`s (hover: `--uxds-filter-chip-surface-hover`; active/focus-visible via existing text-link tokens); non-matching items stay plain `<div>` text, unchanged.
 - **Current = self OR parent, and still clickable:** kept the existing convention (`*_NAV_ACTIVE = "Appointment history"` on *both* screens) — mirrors the breadcrumb pattern already in these screens, where a parent crumb stays clickable even while its child page is "current". So on Details, "Appointment history" is both the highlighted current-section item **and** a real link back to History (`onNavigate={onGoHistory}`); on History it's current **and** a harmless self-nav no-op. Verified live via MCP: hover tint visible + distinct from the active background, click from Details → navigates to History, self-click on History → no console errors, no-op.
 - **Follow-up (same day) — every item hoverable, not just linked ones; and a real width regression found underneath:** PO refined the ask: *all* 10 items must read as one interactive DS pattern (hoverable/focusable), not just the one with a real target; current page keeps its bold+filled wrapper unaffected; others = transparent bg at rest, transparent bg + brand-primary text on hover. Separately PO flagged the body container as "narrower than needed" vs other pages.
   - **All-items-hoverable fix:** every `navItems` entry now renders as a real `<button>`; `MA_NAV_LINKED_LABELS` still gates *navigation only* (`onClick` set vs `undefined`) so un-shipped pages stay a no-op click — hover affordance is uniform, invented targets are not (doctrine item 23, under-match over invent).
@@ -176,11 +176,11 @@ For role-specific mandatory reading, return to
 - **Right fix:** Engine `mcpPageProbeRegistry` + project `registerMcpPageProbes`; pages stamp `data-studio-action` (engine contract); legacy project attrs stay on the page. Freeze beat-id allowlists in `playbackTransportAnomalies` — no new rescue rows.
 - **Gate:** New screen probe = register only; UXDS kit has no project selector props; `npm test` registry unit.
 
-### Make densify `!important` vs React History host (PO / Uma)
+### Legacy densify `!important` vs React History host (PO / Uma)
 
-- **Symptom / class:** React Appointment History CSS set Make pad/gap (32/56, CTA 32) but computed styles stayed densified (20/20, CTA 12) — Uma FAIL.
-- **Root cause:** `globals-chrome.css` Make densify rules target child-2 `[data-name=…]` with `!important`. React cards kept Make `data-name`s, so densify won over page CSS.
-- **Right fix:** Gate densify with `:not([data-studio-react-screen])` on History child-2 so React mounts skip densify; leave Details child 1 densified while Make. Do **not** invent Cancel hover to “improve” wire (removed `#c96b6b`).
+- **Symptom / class:** React Appointment History CSS set Legacy pad/gap (32/56, CTA 32) but computed styles stayed densified (20/20, CTA 12) — Uma FAIL.
+- **Root cause:** `globals-chrome.css` Legacy densify rules target child-2 `[data-name=…]` with `!important`. React cards kept Legacy `data-name`s, so densify won over page CSS.
+- **Right fix:** Gate densify with `:not([data-studio-react-screen])` on History child-2 so React mounts skip densify; leave Details child 1 densified while Legacy. Do **not** invent Cancel hover to “improve” wire (removed `#c96b6b`).
 - **Gate:** Uma re-measure pad/gap/title/info/CTA; Quinn `__studioRunMcpPageProbe` appointment-history; PAGE FINAL PASS HARD-GREEN.
 
 ### REC/playback target truth — visible box, selected no-op, and unchecked checkbox (PO)
@@ -216,7 +216,7 @@ For role-specific mandatory reading, return to
 
 - **Symptom / class:** `__studioRunAgenticFullPlayProve` FAIL at ~20/22 (`scroll-path-deviation` ~37px on `book-step3-camera`); immediate re-prove aborts 0/22 with `po-alarm:DIAGNOSTIC_ACK_STOP`. Agents buried FAIL in wrap-up sitrep.
 - **Root cause:** (1) `SCROLL_PATH_DEVIATION_PX=36` knife-edge + early easeOut frames lag before compositor catches up. (2) Session Reset cleared `clearPoSignal`, but `forceClearAgentTestingOverlay` / ALWAYS CLEAR did **not** — Ack/leave latch survived into next prove.
-- **Right fix:** Path grace `progress < 0.12` + threshold **48**; `forceClear` always `clearPoSignal()`. Report mid-prove FAIL immediately — do not invent green. History/Details Make (`data-name=Left`) still board #7 — out of this hotfix.
+- **Right fix:** Path grace `progress < 0.12` + threshold **48**; `forceClear` always `clearPoSignal()`. Report mid-prove FAIL immediately — do not invent green. History/Details Legacy (`data-name=Left`) still board #7 — out of this hotfix.
 - **Gate:** Units wipe-hygiene + playbackScrollAnomalies; MCP agentic 22/22 then immediate second prove without manual Ack.
 
 ### QA chat spam — Camera wait ×N + ring twin restore (PO)
@@ -235,12 +235,12 @@ For role-specific mandatory reading, return to
 - **Gate:** Unit `agentTestingViteHmr.test.ts` + format coalesce vite-hmr.
 
 <a id="topic-hybrid"></a>
-### Make `display:none` ≠ gone — ghosts win querySelector / Play (PO)
+### Legacy `display:none` ≠ gone — ghosts win querySelector / Play (PO)
 
-- **Symptom / class:** React-migrated page still clicks Make `div[data-name=…]` (not clickable / wrong node) while React `<button>` with same name exists. QA Save Log spam: `Save Log · export` + `Click: a` + download row; capture stayed ON.
-- **Root cause:** Retiring Make with `display:none` + `data-studio-make-retired` left nodes in the document → first-match selectors hit ghosts. Download used a bare `<a>.click()` while capture was live.
-- **Right fix:** `retireMakeUnderPage` **detaches** Make from the live tree (park + restore on unmount). Save Log **auto-pauses** (silent) then one timeline row; ephemeral download `<a>` stamped `data-studio-agent-testing-ignore`; bare-tag click labels dropped.
-- **Gate:** Unit `retireMakeUnderPage.test.ts`; parity / page-final-pass accept `retireMakeUnderPage(`; MCP probes use `isMakeParkedForScreen`.
+- **Symptom / class:** React-migrated page still clicks Legacy `div[data-name=…]` (not clickable / wrong node) while React `<button>` with same name exists. QA Save Log spam: `Save Log · export` + `Click: a` + download row; capture stayed ON.
+- **Root cause:** Retiring Legacy with `display:none` + `data-studio-legacy-retired` left nodes in the document → first-match selectors hit ghosts. Download used a bare `<a>.click()` while capture was live.
+- **Right fix:** `retireLegacyUnderPage` **detaches** Legacy from the live tree (park + restore on unmount). Save Log **auto-pauses** (silent) then one timeline row; ephemeral download `<a>` stamped `data-studio-agent-testing-ignore`; bare-tag click labels dropped.
+- **Gate:** Unit `retireLegacyUnderPage.test.ts`; parity / page-final-pass accept `retireLegacyUnderPage(`; MCP probes use `isLegacyParkedForScreen`.
 
 ### QA dump false FAIL — `jump-to-start` matched as bubble JUMP (PO dump 03:30Z)
 
@@ -272,7 +272,7 @@ For role-specific mandatory reading, return to
 
 ### REC prove / labels / camera bind (PO retest `rec-trad-*` FAIL)
 
-- **Symptom / class:** (1) STEPS/touchpoints empty or Make-ish (`data-name="module.plp.tiles"`, `component.plp…`). (2) Camera scroll-stop bound to hidden/filter checkbox. (3) Click degraded to tiles container. (4) `__studioRunFullPlayProve({ journeyId: "rec-trad-…" })` asserted traditional-plp / peak 13. (5) Scroll-reversal Δ~1k from page-land yank on `isPlaying` flip.
+- **Symptom / class:** (1) STEPS/touchpoints empty or Legacy-ish (`data-name="module.plp.tiles"`, `component.plp…`). (2) Camera scroll-stop bound to hidden/filter checkbox. (3) Click degraded to tiles container. (4) `__studioRunFullPlayProve({ journeyId: "rec-trad-…" })` asserted traditional-plp / peak 13. (5) Scroll-reversal Δ~1k from page-land yank on `isPlaying` flip.
 - **Root causes:** `resolveExperience` used `id.includes("trad")` → matched `rec-trad-*`; scroll anchor scored nearest `[data-name]` (filters); click `closest("[data-name]")` climbed to module; page-land `force` top ran whenever play/journey deps flipped, not only on screen change; labels stored raw attr soup.
 - **Right fix:** Prove catalog lookup for `rec-*` (playlist length + start beat); `humanizeRecordingLabel` scrub at capture/compile; prefer title/content scroll anchors + drop weak filter chains; refine clicks to `data-studio-action` / tile CTA; page-land only when `current` screen changes.
 - **Gate:** Unit `recordingLabels` + compile human labels + `fullPlayProve` rec-* peak; live REC PLP→PDP → Play → `__studioRunFullPlayProve({ journeyId })` asserts that journey.
@@ -282,7 +282,7 @@ For role-specific mandatory reading, return to
 
 - **Symptom / class:** Continuous Play reaches last PDP `recordedClick` (or last `kind:camera`) then hangs → playback-stall ~22s / idle ~45s (often reported as script-timeout). Peak can show `N/N` but play never ends.
 - **Root cause:** `scheduleDwellAdvance` no-ops on beats that still carry `recordedClick` / camera / `*Script`. Script runners advanced mid-journey but on **last beat** only `return true` — never `completeJourneyPlay()`.
-- **Right fix:** After script success, if `next >= length` and continuous Play (`isPlaying && !manualStep`) → `completeJourneyPlay()`. Helper: `shouldCompleteJourneyPlayAfterScript`. Camera Make ghosts (`display:none` / 0×0 / make-retired) soft-continue dwell-only (`camera-beat:target-unusable`) instead of ghost-scroll.
+- **Right fix:** After script success, if `next >= length` and continuous Play (`isPlaying && !manualStep`) → `completeJourneyPlay()`. Helper: `shouldCompleteJourneyPlayAfterScript`. Camera Legacy ghosts (`display:none` / 0×0 / legacy-retired) soft-continue dwell-only (`camera-beat:target-unusable`) instead of ghost-scroll.
 - **Gate:** Unit `journeyPlayAdvance` + camera unusable; live `__studioRunFullPlayProve({ journeyId: rec-…, startBeatId, startScreenId })` → PASS peak N/N + play-end at start.
 
 ### REC scroll-stop never compiled to camera (PO / Quinn + Finn)
@@ -336,7 +336,7 @@ For role-specific mandatory reading, return to
 ### Agentic chat reply before thinking bubble (PO / Finn + Quinn)
 
 - **Symptom / class:** Chat progressed too fast — first agent reply painted without (or with) thinking bubble; PO Alarm sequence mismatch at `frame:2`.
-- **Root cause:** Manual `stepForward` (and home→chat handoff) used `skipPrelude: true`, skipping `runSitePilotChatBeforeReveal` thinking pause. Make order is thinking → fade → reveal reply.
+- **Root cause:** Manual `stepForward` (and home→chat handoff) used `skipPrelude: true`, skipping `runSitePilotChatBeforeReveal` thinking pause. Legacy order is thinking → fade → reveal reply.
 - **Gate:** CJM Step runs `beforeReveal` when hooks exist; React holds reply paint while `playback` thinking anchors that frame (`resolveChatFrameRevealed`). Diag: `thinking-start` / `thinking-end → reveal reply`. Prove: thinking visible + r0 `revealed=false` before reveal; then r0 after fade.
 
 ### CJM type-in hid robo-cursor on Site Pilot (PO / Finn + Quinn)
@@ -364,7 +364,7 @@ For role-specific mandatory reading, return to
 
 ### Agentic chat full-thread dump on enter — React paint ignored engine visibleCount (PO / Finn + Quinn)
 
-- **Symptom / class:** CJM enter chat / Play shows **all bubbles at once** (not Make step-by-step progressive disclosure). Counter may say `2/9` while DOM paints 8 frames.
+- **Symptom / class:** CJM enter chat / Play shows **all bubbles at once** (not Legacy step-by-step progressive disclosure). Counter may say `2/9` while DOM paints 8 frames.
 - **Root cause:** React Chat mounted the full `CHAT_THREAD_FRAMES` list; scenario hide used delayed `display:none` + CSS opacity that lost to paint. Engine `visibleCount` was not a React control point.
 - **Gate:** `chatScenarioRevealBridge` + `usePublishChatScenarioReveal` — paint only `index < visibleCount` (`data-studio-chat-revealed` / `hidden`). Engine still collects all mounted frames. Never-shown frames: immediate `display:none` in `applyScenarioFrameVisibility`. Prove: first chat land → visible content frames === 1; step → sequential reveal.
 
@@ -397,8 +397,8 @@ For role-specific mandatory reading, return to
 ### Traditional SF `stray-popup-on-beat` — settle skipped chained location pick (PO / Finn + Quinn)
 
 - **Symptom / class:** `__protoRunTraditionalStepForwardSmoke` FAIL `stray-popup-on-beat` — Availability still open (`availStep=list`) on `book-step2`.
-- **Root cause:** `login-sign-in` **chains** into `book-location-pick`. Smoke `waitForDirectorSettle` ignored `choose-location` / on-air, so the next Step aborted mid-picker and left the scrim. Secondary: Book Step 1 Continue/search first-match could hit Make-retired ghosts.
-- **Gate:** Settle must wait until `!isOnAir && !isPlaying` (see `stepForwardSmokeSettle.ts`). Abort closes Availability. Prefer React `[data-studio-action="book-step-1-continue"]` / live `.book-step-1` — never Make-retired Continue. Prove full traditional SF smoke PASS on R11 `:5173` from **`E:\\UX\\ux-studio`** (not abandoned VaccineConcept clone).
+- **Root cause:** `login-sign-in` **chains** into `book-location-pick`. Smoke `waitForDirectorSettle` ignored `choose-location` / on-air, so the next Step aborted mid-picker and left the scrim. Secondary: Book Step 1 Continue/search first-match could hit Legacy-retired ghosts.
+- **Gate:** Settle must wait until `!isOnAir && !isPlaying` (see `stepForwardSmokeSettle.ts`). Abort closes Availability. Prefer React `[data-studio-action="book-step-1-continue"]` / live `.book-step-1` — never Legacy-retired Continue. Prove full traditional SF smoke PASS on R11 `:5173` from **`E:\\UX\\ux-studio`** (not abandoned VaccineConcept clone).
 
 ### CJM type-in skipped + Chat fade removed — PLAYBACK_DIAG (PO / Finn + Quinn + Ben)
 
@@ -415,7 +415,7 @@ For role-specific mandatory reading, return to
 ### Appointment history ghost card first-match (PO / Finn)
 
 - **Symptom / class:** `history-view-details` / late agentic step → scroll-path-deviation or miss; first `recent.order` card is 0×0 with `display:none` View Details.
-- **Root cause:** `querySelector` first card is a Make ghost template; visible cards are siblings 2+.
+- **Root cause:** `querySelector` first card is a Legacy ghost template; visible cards are siblings 2+.
 - **Gate:** `findVisibleHistoryViewDetails` — first `isClickableTarget` card + button (never bare first-match).
 
 ### Scrollbar gutter always-on → empty white strip on short pages (PO / Finn)
@@ -426,7 +426,7 @@ For role-specific mandatory reading, return to
 
 ### Chat sticky / scroll / Site Pilot bar — don't regress (PO / Finn + Uma + Bea)
 
-- **Symptom / class:** React Chat retired Make Frame337 → Site Pilot white microheader gone; bubble links invent always-underline / browser-blue; scrollbar track shifts centered column left (jagged UI).
+- **Symptom / class:** React Chat retired Legacy Frame337 → Site Pilot white microheader gone; bubble links invent always-underline / browser-blue; scrollbar track shifts centered column left (jagged UI).
 - **Root cause:** `hideMakeChrome` retired Frame337 without a React port; `.chat__link` rest-underline fought UXDS `.uxds-link`; always-on `overflow-y: scroll` / uncompensated thin track stole right inset from the flex-centered column.
 - **Gate:** Keep `ChatSitePilotBar` (`data-studio-chat-site-pilot-bar`) above `.chat__column`. Bubble/disclaimer links = `.uxds-link` (+ optional `.chat__link` hook). Scroll = auto → overflow sync thin-track + left pad compensate — never classic `scrollbar-gutter: stable` on Studio hosts.
 
@@ -485,7 +485,7 @@ For role-specific mandatory reading, return to
 <a id="topic-final-pass"></a>
 ### PAGE FINAL PASS — no next migrated page until previous hard-green (PO / Arch)
 
-- **Symptom / class:** Team starts PDP (or next erase-Make page) while PLP (previous) still has open Final Pass gaps — PROVEN/tests green used as a false “open next page” signal.
+- **Symptom / class:** Team starts PDP (or next erase-Legacy page) while PLP (previous) still has open Final Pass gaps — PROVEN/tests green used as a false “open next page” signal.
 - **Gate (GLOBAL sequencing):** **No new migrated page** until previous is **PAGE FINAL PASS hard-green** — [PAGE_FINAL_PASS.md](./PAGE_FINAL_PASS.md). Finn/Uma own checklist + `check:page-final-pass` (single contract; do not duplicate). Arch vetoes next-page brief/mount otherwise. Team check reports `PAGE FINAL PASS — <screenId> — HARD-GREEN | NOT-GREEN`.
 - **Process:** Parallel callsigns still required; **`Knowledge used:`** still mandatory on team check. Board: [NEXT_STEPS.md](./NEXT_STEPS.md) NOW 2e blocks PDP.
 
@@ -516,7 +516,7 @@ For role-specific mandatory reading, return to
 
 ### Sticky Chat composer scroll pad (Finn / Uma)
 
-- **Symptom / class:** Flex-sibling composer (outside `.chat__column`) regresses Make under-composer scroll — below-fold bubbles clip at the dock; Motion wrap height changes leave last CTAs under the overlay.
+- **Symptom / class:** Flex-sibling composer (outside `.chat__column`) regresses Legacy under-composer scroll — below-fold bubbles clip at the dock; Motion wrap height changes leave last CTAs under the overlay.
 - **Contract:** Overlay dock (`position: absolute` bottom) + dynamic `--studio-chat-composer-h` (ResizeObserver) → `.chat__column` `padding-bottom` / `scroll-padding-bottom` ≥ dock height; reveal/scrollIntoView reads `scroll-padding-bottom`. Single scroll host only (viewport locked). Transparent scrollbar track.
 - **Gate:** Probe `chat-composer-scroll-pad` — pad var ≥120, last CTA above dock at max scroll, prototype `protoMax≈0`.
 
@@ -528,10 +528,10 @@ For role-specific mandatory reading, return to
 <a id="topic-ds"></a>
 ### Typical DS checks mandatory before screen PROVEN (PO)
 
-- **Symptom / class:** Screens stamped **PROVEN** while UXDS controls (SearchField, Button, checkbox, link) were flat at rest — missing kit/Make **hover / focus / active / disabled**. Concrete miss: PLP filter SearchField had **focus-only** kit (no `:hover`); Make / Availability / Book Step 1 use inset navy ring on hover+focus.
+- **Symptom / class:** Screens stamped **PROVEN** while UXDS controls (SearchField, Button, checkbox, link) were flat at rest — missing kit/Legacy **hover / focus / active / disabled**. Concrete miss: PLP filter SearchField had **focus-only** kit (no `:hover`); Legacy / Availability / Book Step 1 use inset navy ring on hover+focus.
 - **PO callout:** **Missing DS hover = fidelity FAIL class** — not a polish nicety. “Why no typical DS checks as rule of thumb?”
 - **Gate (GLOBAL rule of thumb):**
-  1. Before any screen **PROVEN**, Uma walks the **full state matrix** (default/hover/focus/active/filled/disabled/error + icon positions) per [UMA_FIDELITY_NOTES.md](./UMA_FIDELITY_NOTES.md) §0a — vs **UXDS kit + Make**.
+  1. Before any screen **PROVEN**, Uma walks the **full state matrix** (default/hover/focus/active/filled/disabled/error + icon positions) per [UMA_FIDELITY_NOTES.md](./UMA_FIDELITY_NOTES.md) §0a — vs **UXDS kit + Legacy**.
   2. SearchField: `.uxds-search-field__control:hover` + `:focus-within` inset `2px` `--uxds-border-border-focus` (Boots → navy); magnifier stays borderless.
   3. Ratchet **search-field-states** fails CI if kit omits control `:hover` / `:focus-within`.
   4. **Uma (UI/UX)** signs `typical DS checks (state matrix) — PASS|FAIL` in audit + **team check**.
@@ -542,7 +542,7 @@ For role-specific mandatory reading, return to
 ### Filter search parity — icon side, double X, View all, counters (PO rage)
 
 - **Symptom:** PLP filter search had **two X** clears; magnifier on the **LEFT** (PO: original RIGHT); no **10-cap / View all**; no option **counters**; invented filter `border-bottom` separator; bespoke input instead of UXDS.
-- **Root cause:** Prior “PROVEN” trusted Make static DOM order + `type="search"` (native cancel) without wire scripts (`PLP_FILTER_LIST_MAX`, `handlePlpFilterViewAllClick`, `setFilterRowCount`) or Availability/Book icon-end pattern.
+- **Root cause:** Prior “PROVEN” trusted Legacy static DOM order + `type="search"` (native cancel) without wire scripts (`PLP_FILTER_LIST_MAX`, `handlePlpFilterViewAllClick`, `setFilterRowCount`) or Availability/Book icon-end pattern.
 - **Gate (GLOBAL):**
   1. UXDS `SearchField` — `iconPosition` start\|end, single `data-studio-search-clear`, `type="text"`, stamps `data-studio-search-icon-pos`.
   2. PLP: icon **end**, View all + 10-cap, facet counters, **no** `.plp__filter-section` border separator.
@@ -550,15 +550,15 @@ For role-specific mandatory reading, return to
   4. Distrust prior PROVEN on filter/search until re-proved.
 - **Process:** Every new PO miss → ratchet same ship ([PARITY_RATCHETS.md](./PARITY_RATCHETS.md)).
 
-### Search icon boxed by Make border-overlay hover (PO)
+### Search icon boxed by Legacy border-overlay hover (PO)
 
 - **Symptom:** PLP “Search countries” / “Search diseases” magnifier showed a weird navy/grey **box border** around the icon.
 - **Root cause:** LEGACY chrome targeted `Text Field > [aria-hidden]` for Make’s absolute inset border overlay. UXDS `SearchField` stamps `aria-hidden` on the magnifier (direct child of `Text Field`), so hover/focus painted the overlay ring on the icon.
 - **Gate (GLOBAL):**
-  1. Make overlay hover selectors must be `> [aria-hidden].absolute` only — never bare `[aria-hidden]`.
+  1. Legacy overlay hover selectors must be `> [aria-hidden].absolute` only — never bare `[aria-hidden]`.
   2. UXDS `.uxds-search-field__icon` forces `border/box-shadow: none` (defense in depth).
   3. Uma §7b: magnifier = bare glyph; boxed icon = FAIL.
-- **Process:** When porting Make `aria-hidden` overlays into React kits, do not reuse overlay selectors on decorative icons.
+- **Process:** When porting Legacy `aria-hidden` overlays into React kits, do not reuse overlay selectors on decorative icons.
 
 ### Missing search icon = classic Make→React parity fail
 
@@ -668,39 +668,39 @@ For role-specific mandatory reading, return to
   3. `check:parity-ratchets` **count-hide-load** + MCP probe `plp-reset-filters` (mid-load empty) → `plp-reset-count-ready`.
 - **Quinn prove:** Reset → no count text while loader up → real count after.
 
-### Invented hover / loading chrome not in Make = ship fail (PO rage #3)
+### Invented hover / loading chrome not in Legacy = ship fail (PO rage #3)
 
-- **Symptom:** React PLP showed **duplicate** “Updating results…” (count line + spinner label) + listing **jump**; empty bookmark heart went **fuchsia on hover** (Make tertiary empty hover is navy link; fuchsia only when filled/active).
-- **Root cause:** Agents “improved” Make — invented fuchsia-on-empty hover and doubled loader copy / pulsed count — then stamped **PROVEN** without MCP real-user matrix.
-- **Forbidden:** Invent hover colors, loader copy placement, or attention chrome not present in Make CSS/behavior. Prefer under-matching over inventing.
+- **Symptom:** React PLP showed **duplicate** “Updating results…” (count line + spinner label) + listing **jump**; empty bookmark heart went **fuchsia on hover** (Legacy tertiary empty hover is navy link; fuchsia only when filled/active).
+- **Root cause:** Agents “improved” Legacy — invented fuchsia-on-empty hover and doubled loader copy / pulsed count — then stamped **PROVEN** without MCP real-user matrix.
+- **Forbidden:** Invent hover colors, loader copy placement, or attention chrome not present in Legacy CSS/behavior. Prefer under-matching over inventing.
 - **Gate:**
-  1. Uma side-by-side Make vs React for **empty vs filled** icon states and **exactly one** loader treatment (spinner ± one label; never duplicate count-line copy).
+  1. Uma side-by-side Legacy vs React for **empty vs filled** icon states and **exactly one** loader treatment (spinner ± one label; never duplicate count-line copy).
   2. Quinn + Ben: **MCP localhost real-user matrix mandatory for every screen ship** — overlay start → log each step → stop/clean slate. Arch **rejects** audit **PROVEN** without that evidence log.
   3. Prior “PROVEN” is **BAD until re-proven** when PO disputes pixels.
 
 ### Wrong preloader / loading scenario = fidelity fail (PO called out twice)
 
-- **Symptom:** React PLP filter-change showed a blank listing band with only “Updating results…” (results-count text) — PO rage again; not the Make scenario.
-- **Make truth (PLP child 9):** ~450ms load → **hide tiles** → **centered spinner overlay** (44px arc + **one** “Updating results…” under spinner) on height-locked host → stagger reveal. **Not** opacity-0 tiles, **not** text-only, **not** duplicate count-line “Updating results…”.
-- **Root cause:** Loading/empty/updating treated as copy polish, not a first-class Make scenario; register marked “preloader Fixed” without mechanism prove; Uma did not sign off loading states.
+- **Symptom:** React PLP filter-change showed a blank listing band with only “Updating results…” (results-count text) — PO rage again; not the Legacy scenario.
+- **Legacy truth (PLP child 9):** ~450ms load → **hide tiles** → **centered spinner overlay** (44px arc + **one** “Updating results…” under spinner) on height-locked host → stagger reveal. **Not** opacity-0 tiles, **not** text-only, **not** duplicate count-line “Updating results…”.
+- **Root cause:** Loading/empty/updating treated as copy polish, not a first-class Legacy scenario; register marked “preloader Fixed” without mechanism prove; Uma did not sign off loading states.
 - **Gate:**
-  1. Uma + Bea capture Make loading mechanism **before** Finn codes ([UMA_FIDELITY_NOTES.md](./UMA_FIDELITY_NOTES.md) §0).
+  1. Uma + Bea capture Legacy loading mechanism **before** Finn codes ([UMA_FIDELITY_NOTES.md](./UMA_FIDELITY_NOTES.md) §0).
   2. Bea register P0 rows for loading/empty/updating with layout notes + screenshot notes.
   3. Quinn proves filter-change: spinner/overlay **in-band**, then results return — blank+text alone = FAIL; duplicate “Updating results…” = FAIL.
   4. **team check:** Uma must explicitly report `loading states — PASS|FAIL` and `checkbox/radio hover — PASS|FAIL`.
 
 ### Checkbox / radio hover miss on migrated PLP
 
-- **Symptom:** React filter checkboxes had no Make mint hover (`#c6e5e1`); Make `globals-chrome` targets `[data-name="box"]` which React rows do not use.
+- **Symptom:** React filter checkboxes had no Legacy mint hover (`#c6e5e1`); Legacy `globals-chrome` targets `[data-name="box"]` which React rows do not use.
 - **Gate:** Page CSS must port unchecked hover wash; Uma + Quinn prove hover visible on every migrated checkbox/radio.
 
-### Make → React fidelity (PO rage — not first time)
+### Legacy → React fidelity (PO rage — not first time)
 
 - **Symptom:** PLP shipped “PROVEN” while Advantage Card promo bar was entirely missing, tile had invent border, Book now hover was mint secondary (LEGACY catch-all), heart had weak/laggy feedback, Reset Filters was text-only — register Wrongly marked OK / residual.
 - **Root cause:** Make→React ships without a pixel+interaction register prove; Uma skipped Nazi-hover on every CTA/icon; Bea register incomplete (bands not inventoried before Finn coded); Quinn passed with unchecked P0s / “prior ship” wishlist.
 - **PO context:** Human PO has complained before about near-dups / fidelity slips — **zero tolerance**. Missing whole components = ship fail.
 - **Gate:**
-  1. Bea register lists **every** Make band/component before Finn codes ([UMA_FIDELITY_NOTES.md](./UMA_FIDELITY_NOTES.md)).
+  1. Bea register lists **every** Legacy band/component before Finn codes ([UMA_FIDELITY_NOTES.md](./UMA_FIDELITY_NOTES.md)).
   2. Uma Nazi-hovers every CTA/icon; runs full fidelity checklist; audit PROVEN only when checklist PASS.
   3. Quinn cannot PASS if register has unchecked P0s; must click-hover every interactive control (interaction matrix).
   4. **team check** must include Uma checklist + Bea register completeness + Quinn interaction matrix — ship not done if Uma or Quinn FAIL.
@@ -730,13 +730,13 @@ For role-specific mandatory reading, return to
 
 ### Domain identity
 
-- **No new `.proto-*` / `data-proto-*`.** PANEL/chrome classes are `.studio-nav-*` / `.studio-*`; DOM attrs are `data-studio-*` (`dataset.studio*`). Prefer `__studio*` window APIs; keep `__proto*` aliases. Concept Make leftovers may stay `.proto-*` in LEGACY until that screen retires — do not invent new ones. Gate: [NAMING.md](./NAMING.md) + light strict interface audit after chrome class renames.
+- **No new `.proto-*` / `data-proto-*`.** PANEL/chrome classes are `.studio-nav-*` / `.studio-*`; DOM attrs are `data-studio-*` (`dataset.studio*`). Prefer `__studio*` window APIs; keep `__proto*` aliases. Concept Legacy leftovers may stay `.proto-*` in LEGACY until that screen retires — do not invent new ones. Gate: [NAMING.md](./NAMING.md) + light strict interface audit after chrome class renames.
 - **Half-renames kill agents** — className + CSS + smoke/MCP selectors must move together (one codemod). Dual attrs only if a release truly needs them; prefer clean cut.
 - **Storage/events** — `studio-nav:` / `studio-hub:` / `studio-*-sync` with one-time legacy read; beat field `protoTab` waits for a schema migration.
 
 ### File hygiene
 
-- **Monster files block agents** — default 1600 LOC via `npm run check:hygiene`. Allowlist LEGACY Make dumps + current engine ceilings; prefer domain cohesion splits over micro-file zoos or silent ceiling bumps ([HYGIENE.md](./HYGIENE.md)).
+- **Monster files block agents** — default 1600 LOC via `npm run check:hygiene`. Allowlist LEGACY dumps + current engine ceilings; prefer domain cohesion splits over micro-file zoos or silent ceiling bumps ([HYGIENE.md](./HYGIENE.md)).
 
 ### Studio chrome
 
@@ -747,23 +747,23 @@ For role-specific mandatory reading, return to
 ### DS / links / CSS
 
 - **Near-dup text links forbidden** — one footer-like pattern (`.uxds-link` + LEGACY aliases): no underline at rest, underline on hover. Enforce with `npm run check:links` ([DS_STRICTNESS.md](./DS_STRICTNESS.md)).
-- **Make `!important` vs kit tokens** — when retiring Make for a React screen, do not fight LEGACY `!important` forever; hide Make chrome and style the React host in page CSS / UXDS / theme. No LEGACY growth for new React pages.
+- **Legacy `!important` vs kit tokens** — when retiring Legacy for a React screen, do not fight LEGACY `!important` forever; hide Legacy chrome and style the React host in page CSS / UXDS / theme. No LEGACY growth for new React pages.
 - **Incomplete CSS grid / flex rows must left-align** — never `justify-content: space-between` with narrower pad spacers on short last rows (Book Step 2 time slots). Prefer CSS `grid` with fixed columns, or equal-width pads + `flex-start`.
 
 <a id="topic-hybrid-baseline"></a>
-### Hybrid Make + React
+### Hybrid Legacy + React
 
 - **Distrust “done” without browser proof** — green Vitest/build/smoke alone are BAD for UI. Live localhost or CSS gate; write audit **PROVEN** under `docs/projects/<project-id>/audits/` (Boots: `docs/projects/boots-pharmacy/audits/`).
-- **Hybrid mount gates** — when React mounts, hide Make duplicates (`data-studio-make-retired`); gate Make wire handlers with `isBookStepNReactMounted()`; preserve `data-name` / AIR hooks (`data-studio-open-appointment`, `data-studio-cal-*`).
-- **querySelector first-match traps** — Make DOM often still exists (hidden). Prefer React host selectors or React-owned props for clicks (e.g. progress Step 1 → `onBackToStep1`), not wiring the first Make progress node.
-- **Agentic home `sarah-query-submit` / Chat summary** — after Site Pilot React mount, hidden Make `[data-name="component.co.order.summary"]` / `appointment.summary` still wins `querySelector` → director transport-no-op (`diagnostic-on-step-1`). Always prefer `.studio-react-screen-host` / `.home__card` / `.chat__summary` and skip `[data-studio-make-retired]` ancestors. Controlled React textareas need the native `value` setter + `input` event for playback typing.
-- **Traditional `pdp-book-now`** — same first-match class: Make `[data-name="component.input.button"]` Book now under `data-studio-make-retired` can win while React wire is gated → transport-no-op. Prefer `button[data-studio-action="pdp-book-now"]` on `.studio-react-screen-host` / `[data-studio-react-screen="pdp"]` and skip make-retired ancestors (`findPdpBookNowBtn`).
+- **Hybrid mount gates** — when React mounts, hide Legacy duplicates (`data-studio-legacy-retired`); gate Legacy wire handlers with `isBookStepNReactMounted()`; preserve `data-name` / AIR hooks (`data-studio-open-appointment`, `data-studio-cal-*`).
+- **querySelector first-match traps** — Legacy DOM often still exists (hidden). Prefer React host selectors or React-owned props for clicks (e.g. progress Step 1 → `onBackToStep1`), not wiring the first Legacy progress node.
+- **Agentic home `sarah-query-submit` / Chat summary** — after Site Pilot React mount, hidden Legacy `[data-name="component.co.order.summary"]` / `appointment.summary` still wins `querySelector` → director transport-no-op (`diagnostic-on-step-1`). Always prefer `.studio-react-screen-host` / `.home__card` / `.chat__summary` and skip `[data-studio-legacy-retired]` ancestors. Controlled React textareas need the native `value` setter + `input` event for playback typing.
+- **Traditional `pdp-book-now`** — same first-match class: Legacy `[data-name="component.input.button"]` Book now under `data-studio-legacy-retired` can win while React wire is gated → transport-no-op. Prefer `button[data-studio-action="pdp-book-now"]` on `.studio-react-screen-host` / `[data-studio-react-screen="pdp"]` and skip legacy-retired ancestors (`findPdpBookNowBtn`).
 - **createRoot `unmount()` must not run sync during parent React render/commit** — calling `root.unmount()` from `useLayoutEffect` / effect cleanup while `BootsPharmacyProjectView` is committing triggers: *Attempted to synchronously unmount a root while React was already rendering*. Defer with `setTimeout(0)` (or equivalent); cancel the deferred unmount on remount so Step tab / AIR / CJM flips do not race. Gate: `mountBookStep{1,2,3}Screen.tsx`.
 
 <a id="topic-navigation-baseline"></a>
 ### Navigation / journeys
 
-- **Progress / Studio “Step 1” ≠ Make “tab1”.** Book Step 1 is `INDEX_BOOK_STEP1` (screen index **4**, child **7**, protoTab **5**). Agentic CJM has no beat on that tab; beat-index fallback to `agentic-home` must **not** `goToTab` while browsing (`shouldNavigateBeatTabOnEnter` / `scenarioBrowseMode`).
+- **Progress / Studio “Step 1” ≠ Legacy “tab1”.** Book Step 1 is `INDEX_BOOK_STEP1` (screen index **4**, child **7**, protoTab **5**). Agentic CJM has no beat on that tab; beat-index fallback to `agentic-home` must **not** `goToTab` while browsing (`shouldNavigateBeatTabOnEnter` / `scenarioBrowseMode`).
 - **Named screen indices** — use `INDEX_BOOK_STEP*` / `INDEX_PLP` from `screens.ts`; avoid magic `setCurrent(4)` comments that confuse childIndex vs screen index.
 
 ### Docs layout
@@ -1012,7 +1012,7 @@ For role-specific mandatory reading, return to
 - **Root cause (live-diagnosed via Chrome DevTools MCP, not guessed):** `attachFullScreenSearch(headerClone, …)` created its React host with `document.body.appendChild(host)`. `--project-brand-*` remaps in `theme.css` are scoped to `[data-studio-project="boots-pharmacy"]` (the `.studio-app-root` element) — a CSS custom property only cascades to that element's own **descendants**. A host on `document.body` is a **sibling** of `.studio-app-root`, so `.uxds-link` inside it resolved `--uxds-text-link-link` against the un-themed `:root` default (`#305854` UXDS teal) instead of Boots navy (`#012169`). Confirmed live: `getComputedStyle(fscLink).color` → `rgb(48,88,84)` vs footer's correctly-themed `rgb(1,33,105)`.
 - **Why "just walk up with `.closest()` from the header clone" didn't fix it either:** `setupHeader` (`headerMount.tsx`) calls `attachFullScreenSearch(headerClone, …)` **before** `scrollEl.insertBefore(headerMount, …)` — at call time `headerClone` is still a **detached** node, so `headerClone.closest("[data-studio-project]")` always returns `null`. Any fix that resolves the mount root eagerly at attach-time is a dead end regardless of which selector it walks.
 - **Fix:** mount the FSC host as a **descendant of `headerClone` itself** (same trick `MegaMenuFlyout`'s `positioningRoot` already uses), not `document.body` and not a `.closest()`-resolved ancestor. Because `headerClone` is guaranteed to be inserted into the live themed tree later in the same synchronous call, the host travels with it. `position: fixed` inside `full-screen-search.css` still covers the full viewport regardless of DOM depth — no ancestor in that subtree sets `transform`/`filter`/`contain`.
-- **General rule:** for any Make-wire chrome mount that spawns a separate React root, mounting on `document.body` is only theme-safe if you've verified (live, via `getComputedStyle`, not by reading the CSS) that the mount point is an actual descendant of `[data-studio-project]` **at the moment the host div is created** — not just "somewhere in the header," and not by walking up from a node that may still be detached.
+- **General rule:** for any Legacy-wire chrome mount that spawns a separate React root, mounting on `document.body` is only theme-safe if you've verified (live, via `getComputedStyle`, not by reading the CSS) that the mount point is an actual descendant of `[data-studio-project]` **at the moment the host div is created** — not just "somewhere in the header," and not by walking up from a node that may still be detached.
 - **Gate:** rewrote `fullScreenSearchMount.test.ts`'s "themed ancestor" case to mount with `headerClone` genuinely **detached** at call time (mirrors the real `setupHeader` ordering) and assert the host still ends up nested inside the themed root once the clone is later attached — the previous version of this test attached `headerClone` before calling the mount function, which is why it passed against the broken `.closest()` fix and gave false confidence. Live-verified on `:5173`: FSC link color now `rgb(1, 33, 105)`, byte-identical to footer.
 
 ## 2026-07-23 — FSC "Quick Links" jagged vs. search field — a `max-width: 1312px` box centered AND then padded 64px on top
@@ -1022,27 +1022,27 @@ For role-specific mandatory reading, return to
 - **Fix:** `padding: 64px` → `padding: 64px 0` on `.uxds-full-screen-search__body` — vertical spacing stays, horizontal inset now comes only from centering the 1312px box (identical math to the field row). Live-verified: both now resolve to `x=290`, matching the underlying page's own filter-sidebar gutter (`x=285`, negligible rounding).
 - **Rule of thumb:** when a kit's own “1312 column” box is *centered by a flex parent* (not itself full-bleed with padding), it must not also carry side padding — that's the field-row/body-row split producing two different effective content widths from the same nominal 1312 number. Compare every capped box in a kit against its sibling capped boxes with real `getBoundingClientRect()`, not just eyeballing the CSS.
 
-## 2026-07-23 — "Figma Make eradicated?" — no; hybrid substrate is still load-bearing by design
+## 2026-07-23 — "Figma Legacy eradicated?" — no; hybrid substrate is still load-bearing by design
 
-- **PO ask:** confirm Make/Figma legacy fully eradicated from UXML, "no single trace."
-- **Honest answer:** not eradicated — and not supposed to be yet. `src/projects/boots-pharmacy/frame/index.tsx` (13,600+ lines) is the raw Figma-Make-exported component tree and is still the live `.studio-viewport` DOM substrate at runtime. Per-screen migration (`retireMakeUnderPage.ts`) **parks** (detaches + `data-studio-make-retired`, restorable) the Make chrome for each of the 9 `PARITY_PROVEN` screens — it does not delete it, by design (tab-flip / Strict Mode restore). Shared chrome (header) is not hand-authored UXDS React at all: `headerMount.tsx`'s `setupHeader` literally `cloneNode(true)`s a live `[data-name="boots-pharmacy.module.header"]` node sourced from that same Make export, then progressively enhances the clone (flyouts, FSC, avatar dot, etc.).
-- **Where this is genuinely already Make-free:** kit-level UXDS components authored under `src/uxds/interactions/` (`MegaMenuFlyout`, `FullScreenSearch`, `UxdsTextLink`, …) are pure React/CSS with zero dependency on the Make export — only the Boots **mount layer** (`src/projects/boots-pharmacy/chrome/*Mount.tsx`) bridges them onto the cloned Make header.
-- **Do not report "eradicated"** until every `PROJECT_SCREENS` entry is migrated (currently all 9 are) **and** the shared header/footer/nav chrome is re-authored as hand-built UXDS React instead of a runtime clone of Make markup, **and** `frame/index.tsx` itself is deleted (not just fully parked). That's a distinct, larger ship — track it on `NEXT_STEPS.md`, don't imply it's already done.
+- **PO ask:** confirm Legacy/Figma legacy fully eradicated from UXML, "no single trace."
+- **Honest answer:** not eradicated — and not supposed to be yet. `src/projects/boots-pharmacy/frame/index.tsx` (13,600+ lines) is the raw Figma-Legacy-exported component tree and is still the live `.studio-viewport` DOM substrate at runtime. Per-screen migration (`retireLegacyUnderPage.ts`) **parks** (detaches + `data-studio-legacy-retired`, restorable) the Legacy chrome for each of the 9 `PARITY_PROVEN` screens — it does not delete it, by design (tab-flip / Strict Mode restore). Shared chrome (header) is not hand-authored UXDS React at all: `headerMount.tsx`'s `setupHeader` literally `cloneNode(true)`s a live `[data-name="boots-pharmacy.module.header"]` node sourced from that same Legacy export, then progressively enhances the clone (flyouts, FSC, avatar dot, etc.).
+- **Where this is genuinely already Legacy-free:** kit-level UXDS components authored under `src/uxds/interactions/` (`MegaMenuFlyout`, `FullScreenSearch`, `UxdsTextLink`, …) are pure React/CSS with zero dependency on the Legacy export — only the Boots **mount layer** (`src/projects/boots-pharmacy/chrome/*Mount.tsx`) bridges them onto the cloned Legacy header.
+- **Do not report "eradicated"** until every `PROJECT_SCREENS` entry is migrated (currently all 9 are) **and** the shared header/footer/nav chrome is re-authored as hand-built UXDS React instead of a runtime clone of Legacy markup, **and** `frame/index.tsx` itself is deleted (not just fully parked). That's a distinct, larger ship — track it on `NEXT_STEPS.md`, don't imply it's already done.
 
-## 2026-07-23 — Book Step 1–3 Make delete (board #8) exposed a real "always-true guard" dead-code family, not just retired DOM
+## 2026-07-23 — Book Step 1–3 Legacy delete (board #8) exposed a real "always-true guard" dead-code family, not just retired DOM
 
-- **Symptom / class:** `retireMakeUnderPage`'s park+restore mechanism (previous lesson: "not eradicated — parked, not deleted, by design") kept Book Step 1–3's Make header/breadcrumbs/body/footer nodes reversible forever, even though those three screens mount React **unconditionally** (`BootsPharmacyProjectView.tsx` has no flag gating `mountBookStep{1,2,3}Screen`) — the restore path could never usefully serve a live Make fallback for these screens, only a theoretical dev-reference view.
-- **Root cause (two layers):** (1) the shared retire helper only had one mode (park+restore); nothing distinguished "still might need Make back" screens from "erase-Make DONE, no fallback ever" screens. (2) Because mount is unconditional, `BootsPharmacyProjectView.tsx` grew ~10 `useEffect` blocks (~1500+ lines) commented "Make path only" and gated by `if (isBookStep{1,2,3}ReactMounted()) return;` with no other reachable branch — these were **already** 100% dead code before this ship (the guard is permanently true whenever its screen is current), independent of whether the DOM nodes they'd touch still exist.
-- **Right fix (this ship):** added `retireMakeUnderPage(page, id, { ...options, permanent: true })` — deletes outright (no park entry, so `restoreMakeUnderPage` on that id is a guaranteed no-op) — and switched Book Step 1/2/3 mounts to it, dropping their now-pointless `restoreMakeChrome`/`restoreMakeUnderPage` import and unmount branch. Also removed the 2 CSS blocks (`.proto-confirm-open-appointment*`, `.proto-page-booster-checkbox*`) that were nested under the deleted `[data-name="body"]` subtree **and** whose only possible producer was the dead-guard wire code above (doubly dead, not just newly dead).
+- **Symptom / class:** `retireLegacyUnderPage`'s park+restore mechanism (previous lesson: "not eradicated — parked, not deleted, by design") kept Book Step 1–3's Legacy header/breadcrumbs/body/footer nodes reversible forever, even though those three screens mount React **unconditionally** (`BootsPharmacyProjectView.tsx` has no flag gating `mountBookStep{1,2,3}Screen`) — the restore path could never usefully serve a live Legacy fallback for these screens, only a theoretical dev-reference view.
+- **Root cause (two layers):** (1) the shared retire helper only had one mode (park+restore); nothing distinguished "still might need Legacy back" screens from "erase-Legacy DONE, no fallback ever" screens. (2) Because mount is unconditional, `BootsPharmacyProjectView.tsx` grew ~10 `useEffect` blocks (~1500+ lines) commented "Legacy path only" and gated by `if (isBookStep{1,2,3}ReactMounted()) return;` with no other reachable branch — these were **already** 100% dead code before this ship (the guard is permanently true whenever its screen is current), independent of whether the DOM nodes they'd touch still exist.
+- **Right fix (this ship):** added `retireLegacyUnderPage(page, id, { ...options, permanent: true })` — deletes outright (no park entry, so `restoreLegacyUnderPage` on that id is a guaranteed no-op) — and switched Book Step 1/2/3 mounts to it, dropping their now-pointless `restoreMakeChrome`/`restoreLegacyUnderPage` import and unmount branch. Also removed the 2 CSS blocks (`.proto-confirm-open-appointment*`, `.proto-page-booster-checkbox*`) that were nested under the deleted `[data-name="body"]` subtree **and** whose only possible producer was the dead-guard wire code above (doubly dead, not just newly dead).
 - **Deliberately NOT fixed here (logged forward, not invented):** the ~1500 lines of always-true-guard dead effects in `BootsPharmacyProjectView.tsx`, and `frame/index.tsx` itself (13,600+ lines) — both out of this ship's fence (`frame/index.tsx`/`headerMount.tsx` = Header Phase D lane 7c; the wire dead-code family = board #9 LEGACY retirement, now cross-referenced there as the first cut).
-- **Forecast / gate:** any future screen ship that flips its React mount from flag-gated to unconditional inherits the same "always-true guard → dead branch" risk in its own wire effects — check for that at the same time as retiring Make, not as an afterthought. `retireMakeUnderPage.test.ts` covers `permanent: true` (no park, restore no-op); `check:page-final-pass` / `check:parity-ratchets` still just regex for a `retireMakeUnderPage(` call, so `permanent: true` mounts still satisfy those gates unchanged.
+- **Forecast / gate:** any future screen ship that flips its React mount from flag-gated to unconditional inherits the same "always-true guard → dead branch" risk in its own wire effects — check for that at the same time as retiring Legacy, not as an afterthought. `retireLegacyUnderPage.test.ts` covers `permanent: true` (no park, restore no-op); `check:page-final-pass` / `check:parity-ratchets` still just regex for a `retireLegacyUnderPage(` call, so `permanent: true` mounts still satisfy those gates unchanged.
 
-## 2026-07-23 — "Make path only" dead JS ≠ dead CSS: React screens deliberately reuse legacy `.proto-*` class/`data-name` values for styling continuity
+## 2026-07-23 — "Legacy path only" dead JS ≠ dead CSS: React screens deliberately reuse legacy `.proto-*` class/`data-name` values for styling continuity
 
-- **Symptom / risk class:** board #9's Phase C CSS sweep started from the same ~10 "Make path only" `useEffect` blocks in `BootsPharmacyProjectView.tsx` flagged as permanently dead by the previous lesson. The naive assumption — "dead effect ⇒ every class/attribute it touches is a safe CSS delete" — is **false** and would have deleted live, currently-rendered styling if followed blindly.
-- **Root cause:** when Book Step 1–3 were rebuilt in React (`BookStep1LocationScreen.tsx`, `BookStep2DateTimeScreen.tsx`, `BookStep3ConfirmationScreen.tsx`, `BookAppointmentProgress` UXDS kit), the authors intentionally **kept the old Make class names / `data-name` values** on the new JSX nodes instead of inventing new ones — e.g. `BOOK_STEP1_CHOSEN_SLOT_CLASS = "proto-chosen-slot"` (`bookStep1Contract.ts`), `className="proto-confirm-advantage"` in the Step 3 screen, `data-name="calendar. date. cell"` + `data-studio-cal-*` in the Step 2 calendar, `data-name="component.book.appointment.progress"` + `data-studio-book-step-back` in the shared progress kit. This was a deliberate reuse-the-CSS shortcut (avoid re-authoring dozens of hover/focus/layout rules), not an oversight — but it means a class name can be "only ever written by dead-gated Make-wire JS" for a *different, nested* class in the same family while the *outer* class is still live.
+- **Symptom / risk class:** board #9's Phase C CSS sweep started from the same ~10 "Legacy path only" `useEffect` blocks in `BootsPharmacyProjectView.tsx` flagged as permanently dead by the previous lesson. The naive assumption — "dead effect ⇒ every class/attribute it touches is a safe CSS delete" — is **false** and would have deleted live, currently-rendered styling if followed blindly.
+- **Root cause:** when Book Step 1–3 were rebuilt in React (`BookStep1LocationScreen.tsx`, `BookStep2DateTimeScreen.tsx`, `BookStep3ConfirmationScreen.tsx`, `BookAppointmentProgress` UXDS kit), the authors intentionally **kept the old Legacy class names / `data-name` values** on the new JSX nodes instead of inventing new ones — e.g. `BOOK_STEP1_CHOSEN_SLOT_CLASS = "proto-chosen-slot"` (`bookStep1Contract.ts`), `className="proto-confirm-advantage"` in the Step 3 screen, `data-name="calendar. date. cell"` + `data-studio-cal-*` in the Step 2 calendar, `data-name="component.book.appointment.progress"` + `data-studio-book-step-back` in the shared progress kit. This was a deliberate reuse-the-CSS shortcut (avoid re-authoring dozens of hover/focus/layout rules), not an oversight — but it means a class name can be "only ever written by dead-gated Legacy-wire JS" for a *different, nested* class in the same family while the *outer* class is still live.
 - **Concrete near-miss caught by grep, not assumption:** `.proto-chosen-slot` (outer) is live (React renders it) but every descendant the dead effect used to nest inside it — `.proto-chosen-tile`, `.proto-chosen-store-card`, `.proto-chosen-checkbox`, `.proto-chosen-map` (+ `-viewport`/`-surface`/`-dragging`), `.proto-page-map-pin` — is **not** re-created by the React screen (it renders plain `book-step-1__map` / `boots-pharmacy.store` structure instead) and was produced only by `setupChosenPageMap()` in `locationsMap.ts`, whose **only call site** was inside the dead effect. `.proto-chosen-map-bg` sits in between: same family, but written as a **bare, unscoped** selector in CSS, and the React screen happens to reuse that exact leaf class on its static `<img>` — so it stayed live even though every sibling class around it was dead.
-- **Rule of thumb:** for any CSS selector whose class/attribute is produced inside a "Make path only" / always-true-guard effect, do **not** treat "the effect is dead" as sufficient proof the selector is dead. Grep the *exact* class/attribute string (not the family prefix) across every live screen/kit `.tsx` under `src/projects/**/screens/` and `src/uxds/components/`. If any live component still emits it — even for unrelated reuse-the-CSS reasons — the selector is live and must be left in place, no matter how "Make-only" the JS that used to also produce it looks.
+- **Rule of thumb:** for any CSS selector whose class/attribute is produced inside a "Legacy path only" / always-true-guard effect, do **not** treat "the effect is dead" as sufficient proof the selector is dead. Grep the *exact* class/attribute string (not the family prefix) across every live screen/kit `.tsx` under `src/projects/**/screens/` and `src/uxds/components/`. If any live component still emits it — even for unrelated reuse-the-CSS reasons — the selector is live and must be left in place, no matter how "Legacy-only" the JS that used to also produce it looks.
 - **Gate:** Phase C (this ship) removed only the grep-proven-zero-producer subset (114 lines from `globals-screens.css`: the `.proto-chosen-tile`/`-store-card`/`-checkbox`/`-map`(+viewport/surface/dragging)/`.proto-page-map-pin` family nested under `.proto-chosen-slot`, plus the Book Step 1 `nth-child(7)` `.utility / cursor` hide rule) and explicitly left `.proto-chosen-slot`, `.proto-chosen-map-bg`, `.proto-confirm-advantage*`, the `component.book.appointment.progress` / `data-studio-book-step-back` rules, and the calendar-cell `data-studio-cal-*` rules untouched with a documented live-producer citation for each. `npm test` 162/162 files green, `npm run build` green.
 
 ## 2026-07-23 — Header re-author (Phase D): hoisting a `document.addEventListener` from function-scope to module-scope silently broke a Node-only test, invisible to `vite build`
@@ -1063,8 +1063,8 @@ For role-specific mandatory reading, return to
 ## 2026-07-23 — Phase E follow-up: `frame/index.tsx` was dead, but `frame/` the *directory* was a live shared asset library — near-miss caught by `npm test`, not by grep on the filename alone
 
 - **Symptom / risk class:** after Phase E's substrate swap was live-MCP re-proven HARD-GREEN (all 9 screens, header/footer/mega-menu/FSC, agentic + traditional Play all `pass:true`), grep confirmed `frame/index.tsx` had exactly one live consumer (the already-dead `src/imports/Frame1000007317/index.tsx` shim). The natural next move — `rm -rf src/projects/boots-pharmacy/frame` (deleting the whole directory, not just `index.tsx`) — immediately broke 5 test files and `npm run build` with `Failed to resolve import ".../frame/5b75d20d7a0df34031ca23477a68cf97cac4938d.png"`.
-- **Root cause:** `frame/` is a **dual-purpose directory** — it holds both the dead `index.tsx` (the Frame219 JSX component, superseded by `ProjectPageShell`) **and** a set of Figma-exported PNG assets + `svg-p97rh8hlns.ts` path data that are separately, directly imported by `PlpScreen.tsx`, `PdpScreen.tsx`, `BookStep1LocationScreen.tsx`/`BookStep2DateTimeScreen.tsx`/`BookStep3ConfirmationScreen.tsx`, `AvailabilityTool.tsx`, `ChatSitePilotBar.tsx`, `SocialIcons.tsx`, and `healthServicesMegaMenuMount.tsx`. "The Make component is dead" does not imply "its containing asset folder is dead" — Figma-export folders frequently get reused this way as a de-facto shared image bucket.
-- **Rule of thumb:** when retiring a dead Make/Figma-export **component file**, never delete its containing directory as a unit. Grep every filename inside that directory individually (`grep -r "<dirname>/" src`) before deleting anything beyond the one file proven dead. A directory-level `rm -rf` on a Figma-export folder is a distinct, higher-risk operation than a single-file delete and needs its own grep pass.
+- **Root cause:** `frame/` is a **dual-purpose directory** — it holds both the dead `index.tsx` (the Frame219 JSX component, superseded by `ProjectPageShell`) **and** a set of Figma-exported PNG assets + `svg-p97rh8hlns.ts` path data that are separately, directly imported by `PlpScreen.tsx`, `PdpScreen.tsx`, `BookStep1LocationScreen.tsx`/`BookStep2DateTimeScreen.tsx`/`BookStep3ConfirmationScreen.tsx`, `AvailabilityTool.tsx`, `ChatSitePilotBar.tsx`, `SocialIcons.tsx`, and `healthServicesMegaMenuMount.tsx`. "The Legacy component is dead" does not imply "its containing asset folder is dead" — Figma-export folders frequently get reused this way as a de-facto shared image bucket.
+- **Rule of thumb:** when retiring a dead Legacy/Figma-export **component file**, never delete its containing directory as a unit. Grep every filename inside that directory individually (`grep -r "<dirname>/" src`) before deleting anything beyond the one file proven dead. A directory-level `rm -rf` on a Figma-export folder is a distinct, higher-risk operation than a single-file delete and needs its own grep pass.
 - **Gate (self-corrected same pass):** caught by immediately re-running `npm test` after the deletion (162/162 → 5 failed); reverted via `git checkout -- <paths>`; redone as a precise `Remove-Item` on only `frame/index.tsx` + the dead shim, keeping every asset file. `npm test` 162/162 files (1008/1008 tests) green; `npm run build` green; live-MCP spot-recheck on PLP (heaviest asset consumer) confirmed hero/body images still render, console clean.
 
 ---

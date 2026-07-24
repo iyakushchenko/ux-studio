@@ -1,13 +1,13 @@
-# Appointment History — Make interaction baseline (2026-07-22)
+# Appointment History — Legacy interaction baseline (2026-07-22)
 
-**Quinn (QA)** · Make-only · **not** React done
+**Quinn (QA)** · Legacy-only · **not** React done
 
 ## Artifact
 
-[`INTERACTION_INVENTORY_APPOINTMENT_HISTORY_MAKE_BASELINE_2026-07-22.json`](./INTERACTION_INVENTORY_APPOINTMENT_HISTORY_MAKE_BASELINE_2026-07-22.json)
+[`INTERACTION_INVENTORY_APPOINTMENT_HISTORY_LEGACY_BASELINE_2026-07-22.json`](./INTERACTION_INVENTORY_APPOINTMENT_HISTORY_LEGACY_BASELINE_2026-07-22.json)
 
 Captured via `await window.__studioMapCurrentInteractions()` on  
-`http://localhost:5173/?project=boots-pharmacy&screen=appointment-history` while the screen was still Make-hosted.
+`http://localhost:5173/?project=boots-pharmacy&screen=appointment-history` while the screen was still Legacy-hosted.
 
 ## Totals (class)
 
@@ -20,7 +20,7 @@ Captured via `await window.__studioMapCurrentInteractions()` on
 | `invalid` | 8 |
 | **items** | **71** |
 
-`pass=true` (no traversal errors) · `readinessPass=false` (**expected on Make** — duplicate CTAs / missing unique Studio hooks).
+`pass=true` (no traversal errors) · `readinessPass=false` (**expected on Legacy** — duplicate CTAs / missing unique Studio hooks).
 
 ## View Details
 
@@ -31,7 +31,7 @@ Captured via `await window.__studioMapCurrentInteractions()` on
 
 ## Card structure
 
-- Make `data-name`: `boots-pharmacy.component.ma.acc.overview.recent.order`
+- Legacy `data-name`: `boots-pharmacy.component.ma.acc.overview.recent.order`
 - Clone marker: `data-studio-appointment-card-clone="true"` (cancelled card `#8762341`)
 - CTA row siblings typically: **View Details** + Edit + Cancel (Edit/Cancel often `visual-candidate` nested divs; Studio hooks `[data-studio-appointment-edit="true"]` / `[data-studio-appointment-cancel="true"]` present on wired cards)
 - Extra on cancelled: `.proto-appointment-refund-pilot-link` · “Discuss with Site Pilot”
@@ -45,11 +45,11 @@ Captured via `await window.__studioMapCurrentInteractions()` on
 4. Diff vs this baseline: `readinessPass` **false → true**; `invalid` **8 → 0**; View Details still **4**.
 5. Primary hooks keep `data-studio-appointment-view-details` (Quinn MCP 8/8). Unique `ready-target` per card still optional polish.
 6. Unexplained target loss → blocks PAGE FINAL PASS.
-7. Make `readinessPass=false` remains baseline evidence only.
+7. Legacy `readinessPass=false` remains baseline evidence only.
 
 ## Blockers noted at capture
 
-- Vite process (pid from long-running `npm run dev`) became unresponsive to fresh TCP connects mid-session; existing Chrome tab at `:5173` still had a live Make page and helpers — map was taken from that tab.
+- Vite process (pid from long-running `npm run dev`) became unresponsive to fresh TCP connects mid-session; existing Chrome tab at `:5173` still had a live Legacy page and helpers — map was taken from that tab.
 - No empty page; 4 appointment cards + View Details CTAs visible.
 - `reactHost=false` confirmed.
 

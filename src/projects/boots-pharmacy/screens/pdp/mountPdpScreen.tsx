@@ -1,10 +1,10 @@
 import { createRoot, type Root } from "react-dom/client";
 import { PdpScreen, type PdpScreenProps } from "./PdpScreen";
 import { PDP_REACT_SCREEN_ID, PDP_SCREEN_SELECTOR } from "./pdpContract";
-import { retireMakeUnderPage } from "../retireMakeUnderPage";
+import { retireLegacyUnderPage } from "../retireLegacyUnderPage";
 
 const HOST_CLASS = "studio-react-screen-host";
-/** Keep Studio chrome mounts; retire every Make Frame child under PDP. */
+/** Keep Studio chrome mounts; retire every Legacy Frame child under PDP. */
 const KEEP_VISIBLE = new Set([HOST_CLASS, "proto-footer-mount", "proto-header-mount"]);
 
 let root: Root | null = null;
@@ -40,18 +40,18 @@ function ensureHost(page: HTMLElement): HTMLElement {
 }
 
 /**
- * Erase-Make Phase E (board #7c tail / substrate replacement): `ProjectPageShell`
- * columns start empty — there is no Frame219-sourced Make content left to
+ * Erase-Legacy Phase E (board #7c tail / substrate replacement): `ProjectPageShell`
+ * columns start empty — there is no Frame219-sourced Legacy content left to
  * park-and-restore. Retire permanently, matching the Book Step 1-3 precedent.
  */
 function hideMakeChrome(page: HTMLElement): void {
-  retireMakeUnderPage(page, PDP_REACT_SCREEN_ID, {
+  retireLegacyUnderPage(page, PDP_REACT_SCREEN_ID, {
     keepClassNames: KEEP_VISIBLE,
     permanent: true,
   });
 }
 
-/** True when PDP Make wire has been retired for the React migration. */
+/** True when PDP Legacy wire has been retired for the React migration. */
 export function isPdpReactMounted(): boolean {
   return !!pageEl()?.dataset.studioReactScreen;
 }

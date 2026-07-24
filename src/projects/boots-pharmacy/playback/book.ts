@@ -455,17 +455,17 @@ async function syncBookBeatState(
   }
 }
 
-/** Exported for unit ratchet — React CTA over Make retired div. */
+/** Exported for unit ratchet — React CTA over Legacy retired div. */
 export function findReserveAppointmentButton(
   screen: HTMLElement
 ): HTMLElement | null {
-  // Prefer React Book Step 2 CTA — Make dump uses a non-button div with the
+  // Prefer React Book Step 2 CTA — Legacy dump uses a non-button div with the
   // same data-name and was winning querySelector → click FAIL not-clickable.
   const reactBtn =
     screen.querySelector<HTMLElement>(
       'button[data-studio-action="book-step-2-reserve"], button.book-step-2__reserve'
     ) ?? null;
-  if (reactBtn && !reactBtn.closest("[data-studio-make-retired]")) {
+  if (reactBtn && !reactBtn.closest("[data-studio-legacy-retired]")) {
     return reactBtn;
   }
   return (
@@ -475,7 +475,7 @@ export function findReserveAppointmentButton(
       )
     ).find(
       (el) =>
-        !el.closest("[data-studio-make-retired]") &&
+        !el.closest("[data-studio-legacy-retired]") &&
         /^reserve appointment$/i.test(
           (el.textContent ?? "").replace(/\s+/g, " ").trim()
         )

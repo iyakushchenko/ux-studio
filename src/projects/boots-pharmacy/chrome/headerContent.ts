@@ -1,11 +1,11 @@
 /**
  * Hand-authored Boots Pharmacy header content — nav items, aux nav glyphs,
- * and the account flyout menu. No runtime Make dependency (contrast the old
+ * and the account flyout menu. No runtime Legacy dependency (contrast the old
  * `headerMount.tsx` `sourceHeader.cloneNode(true)` on live Figma-authored
  * DOM). Same extraction shape/naming as `footerContent.ts` — pure data, no
  * JSX — consumed by `Header.tsx`.
  *
- * Vector paths below are literal copies of the same glyphs the Make source
+ * Vector paths below are literal copies of the same glyphs the Legacy source
  * (and the prior hand-rolled `innerHTML` strings in `headerMount.tsx`)
  * already rendered — not invented artwork.
  */

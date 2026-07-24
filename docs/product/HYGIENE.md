@@ -11,7 +11,7 @@
 | Rule | Value | Notes |
 |------|-------|--------|
 | Default max lines | **1600** | `src/app`, `src/uxds`, `src/projects`, `src/styles`, `scripts` |
-| Allowlist | Per-file ceiling in the script | LEGACY Make dumps + current engine monsters |
+| Allowlist | Per-file ceiling in the script | LEGACY dumps + current engine monsters |
 | Fragmentation | **Not gated** | Prefer domain cohesion over tiny-file sprawl |
 
 **Bump policy:** Prefer splitting by **business/domain verb** over raising a ceiling. If you must bump, add a one-line rationale next to the allowlist entry.
@@ -21,7 +21,7 @@
 ## Excluded from the gate
 
 - `src/app/components/**` (shadcn kit)
-- `**/frame/**`, `src/imports/**` (Make dumps)
+- `**/frame/**`, `src/imports/**` (Legacy dumps)
 - `**/__tests__/**`
 - One-shot `scripts/inspect-*.mjs`, playwright-out, domain codemod
 

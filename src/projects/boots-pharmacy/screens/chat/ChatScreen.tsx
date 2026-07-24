@@ -115,7 +115,7 @@ export type ChatScreenProps = {
   onProductLink?: (label: string) => void;
 };
 
-/** Make `Frame342` / `Frame343` thumb paths (`svg-p97rh8hlns`). */
+/** Legacy `Frame342` / `Frame343` thumb paths (`svg-p97rh8hlns`). */
 const THUMB_UP_PATHS = [
   "M10.8967 3.98816C11.8405 1.52853 10.0387 0.613319 8.95191 0.0985124C8.58011 -0.10169 8.1225 0.0127112 7.8651 0.355915L2.74563 7.4202C2.63123 7.56321 2.57403 7.73481 2.57403 7.93501V15.1423C2.57403 15.6285 2.94584 16.0003 3.43204 16.0003H11.9549C13.385 16.0003 14.672 15.1137 15.1868 13.7981L16.102 11.3957C16.5882 10.1658 16.4166 8.76442 15.673 7.67761C14.9294 6.59079 13.6996 5.93298 12.3554 5.93298H9.98152L10.8967 4.04536C10.8967 4.01676 10.8967 3.98816 10.8967 3.98816ZM12.3554 7.64901C13.1276 7.64901 13.814 8.02081 14.243 8.65002C14.672 9.27923 14.7578 10.0514 14.5004 10.7664L13.5852 13.1689C13.3278 13.8267 12.67 14.2843 11.9549 14.2843H4.29005V8.19241L8.83751 1.95754C9.60972 2.41514 9.58112 2.70114 9.32372 3.33035L7.8365 6.41919C7.7221 6.67659 7.7221 6.9912 7.8937 7.2486C8.0367 7.50601 8.3227 7.64901 8.60871 7.64901H12.3554Z",
   "M0 7.93548V15.1428C0 15.629 0.371805 16.0008 0.858011 16.0008C1.34422 16.0008 1.71602 15.629 1.71602 15.1428V7.93548C1.71602 7.44928 1.34422 7.07747 0.858011 7.07747C0.371805 7.07747 0 7.44928 0 7.93548Z",
@@ -143,7 +143,7 @@ function ThumbIcon({ paths }: { paths: readonly string[] }) {
   );
 }
 
-/** Make `ComponentGseSystemMessage` / `ComponentInputButton` — thumbs Yes/No (wire no-op). */
+/** Legacy `ComponentGseSystemMessage` / `ComponentInputButton` — thumbs Yes/No (wire no-op). */
 function HelpfulStrip({ conversation }: { conversation?: boolean }) {
   return (
     <div
@@ -175,8 +175,8 @@ function HelpfulStrip({ conversation }: { conversation?: boolean }) {
 }
 
 /**
- * Make `component.input.button` bubble pills — UXDS ButtonPrimary commerce
- * (same navy primary as PLP/PDP). Make runtime forced Figma `#003fcb` rest
+ * Legacy `component.input.button` bubble pills — UXDS ButtonPrimary commerce
+ * (same navy primary as PLP/PDP). Legacy runtime forced Figma `#003fcb` rest
  * fills back to `#012169`; no page-local CTA color/hover CSS.
  */
 function AgentCta({ label, onClick }: { label: string; onClick?: () => void }) {
@@ -413,7 +413,7 @@ function QueryFrame({
 const REPLY_FRAME_CLASSES = ["chat__frame", "chat__frame--reply"];
 
 /**
- * Agent turn slot — thinking LEFT then reply in the same slot (Make).
+ * Agent turn slot — thinking LEFT then reply in the same slot (Legacy).
  * AnimatePresence mode=sync: thinking opacity-exits while reply pull-ups —
  * no sibling unmount collapse, no opacity-only flash swap.
  */
@@ -584,7 +584,7 @@ const CHAT_COMPOSER_PAD_VAR = "--studio-chat-composer-h";
 /**
  * Measure overlay composer dock → CSS var on `.chat__column` so
  * padding-bottom / scroll-padding-bottom track Motion wrap height.
- * Near-bottom scroll adjusts when pad grows (Make syncInPlaceGeometry).
+ * Near-bottom scroll adjusts when pad grows (Legacy syncInPlaceGeometry).
  */
 function useChatComposerScrollPad(
   columnRef: RefObject<HTMLDivElement | null>,
@@ -1147,7 +1147,7 @@ export function ChatScreen({
       return;
     }
 
-    // PO / Make player: thinking bubble ONLY before agent reply — never on
+    // PO / Legacy player: thinking bubble ONLY before agent reply — never on
     // Sarah send. Playback owns thinking via beforeReveal on reply frames.
     // Composer click during CJM type-in must not latch send-thinking.
     setSendThinking(false);
@@ -1165,7 +1165,7 @@ export function ChatScreen({
 
   const threadNodes: ReactNode[] = [];
   CHAT_THREAD_FRAMES.forEach((frame, frameIndex) => {
-    // Make: thinking bubble before agent reply — never paint reply while held.
+    // Legacy: thinking bubble before agent reply — never paint reply while held.
     const revealed = resolveChatFrameRevealed(
       frameIndex,
       revealedFrameCount,

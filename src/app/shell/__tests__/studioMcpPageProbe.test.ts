@@ -883,7 +883,7 @@ describe("runMcpPageProbe", () => {
       querySelector: (sel: string) => {
         if (sel === '.pdp[data-studio-react-screen="pdp"]') return pdpRoot;
         if (sel === '[data-studio-react-screen="pdp"]') return pdpRoot;
-        if (sel.includes("data-studio-make-retired")) return retired;
+        if (sel.includes("data-studio-legacy-retired")) return retired;
         if (sel.includes(".pdp__advantage")) return advantage;
         if (sel.includes('data-name="component.input.checkbox"')) return checkbox;
         if (sel.includes('data-studio-action="pdp-book-now"')) return book;

@@ -8,7 +8,7 @@
 **Version:** `0.0.10`  
  
 **Checklist:** [../../../product/FE_UI_UX_AUDIT.md](../../../product/FE_UI_UX_AUDIT.md) · [UMA_FIDELITY_NOTES.md](../../../product/UMA_FIDELITY_NOTES.md)  
-**Register:** [../features/PLP_MAKE_PARITY_REGISTER.md](../features/PLP_MAKE_PARITY_REGISTER.md)
+**Register:** [../features/PLP_LEGACY_PARITY_REGISTER.md](../features/PLP_LEGACY_PARITY_REGISTER.md)
 
 ---
 
@@ -29,9 +29,9 @@
 
 ## Root causes (honest)
 
-1. **Duplicate “Updating results…”** — React (and DOM Make helper) put the same copy in **results count** *and* spinner overlay; count pulse looked like invented attention chrome. PO: one treatment only.
+1. **Duplicate “Updating results…”** — React (and DOM Legacy helper) put the same copy in **results count** *and* spinner overlay; count pulse looked like invented attention chrome. PO: one treatment only.
 2. **Layout jump** — tiles `display:none` collapsed host to 220px while prior band was taller; fixed by locking host `min-height` to measured band height during load.
-3. **Fuchsia-on-empty heart** — invented optimistic hover (`heartPreview = active \|\| hover` + CSS fuchsia on empty `:hover`). Make tertiary empty hover = **navy/link**; fuchsia only when filled/active (`#c8247e`).
+3. **Fuchsia-on-empty heart** — invented optimistic hover (`heartPreview = active \|\| hover` + CSS fuchsia on empty `:hover`). Legacy tertiary empty hover = **navy/link**; fuchsia only when filled/active (`#c8247e`).
 
 ---
 
@@ -68,7 +68,7 @@
 | Tile → PDP | **PASS** | URL `screen=pdp` |
 | Quick View | **PASS** | dialog open |
 | Advantage bar | **PASS** | “Collect 3 points… Advantage Card‡” |
-| Bundles / chips / Make leak | **PASS** | `7 bundles found`; chips; `makeRetired=plp` |
+| Bundles / chips / Legacy leak | **PASS** | `7 bundles found`; chips; `makeRetired=plp` |
 | Version chip | **PASS** | MCP: `v0.0.7` at prove; ship bumped to `0.0.8` |
 
 ### Follow-up MCP — overlay eyes + bookmark copy (v0.0.10)
@@ -93,7 +93,7 @@
 |------|--------|
 | AI Assistant promo strip (L6) | Missing — residual |
 | Filter View all (I6) | Missing — residual |
-| Catalog depth vs Make | Partial |
+| Catalog depth vs Legacy | Partial |
 
 ---
 

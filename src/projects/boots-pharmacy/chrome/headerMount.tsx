@@ -1,9 +1,9 @@
 /**
  * Mounts the hand-authored Boots Pharmacy `Header` (see `Header.tsx` /
  * `headerContent.ts`) as a direct child of the scroll container. Replaces
- * the former `sourceHeader.cloneNode(true)` on live Figma Make DOM — the
+ * the former `sourceHeader.cloneNode(true)` on live Figma Legacy DOM — the
  * header no longer reads from `frame/index.tsx` at runtime (contrast the
- * still-live Make body/footer inside that file, out of scope for this
+ * still-live Legacy body/footer inside that file, out of scope for this
  * lane). Supports logged-in/out state toggling via "Log in" / "Sarah"
  * label, with hover flyout menu — same behavior contract as before, now
  * driven by React state + re-render instead of imperative DOM mutation.
@@ -323,7 +323,7 @@ export function setupHeader(
       if (headerRootEl) {
         // Hover flyout on the "Health Services" mega menu item (unchanged
         // kit, now attached to the React-rendered header instead of a
-        // Make clone).
+        // Legacy clone).
         attachHealthServicesMegaMenu(headerRootEl, {
           onNavigateToPlp: loginCallbacks.onNavigateToPlp,
         });

@@ -41,7 +41,7 @@ export type BookStep2DateTimeScreenProps = {
   onChangeLocation: () => void;
   onSlotChange: (next: ChosenBookingSlot) => void;
   onReserve: () => void;
-  /** Progress step 1 — back to Book Step 1 (React owns; Make wire gated). */
+  /** Progress step 1 — back to Book Step 1 (React owns; Legacy wire gated). */
   onBackToStep1: () => void;
 };
 
@@ -184,7 +184,7 @@ function TimeSection({
 
 /**
  * React + UXDS pilot for Book — Step 2 (Date and Time).
- * Retires Make HTML for Frame child 4; Studio hooks via data-name / data-studio-cal-*.
+ * Retires Legacy HTML for Frame child 4; Studio hooks via data-name / data-studio-cal-*.
  */
 export function BookStep2DateTimeScreen({
   chosenLocation,

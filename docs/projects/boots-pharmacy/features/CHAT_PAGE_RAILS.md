@@ -2,7 +2,7 @@
 
 **Project:** `boots-pharmacy` · `screen=chat`  
 **Purpose:** Agent recovery doc. When chat load/scroll/thinking regresses, read this first — then fix code to match these rails.  
-**Motion:** [MOTION.md](../../../product/MOTION.md) · **Parity:** [CHAT_MAKE_PARITY_REGISTER.md](./CHAT_MAKE_PARITY_REGISTER.md) · **Migration brief:** [CHAT_REACT.md](./CHAT_REACT.md)
+**Motion:** [MOTION.md](../../../product/MOTION.md) · **Parity:** [CHAT_LEGACY_PARITY_REGISTER.md](./CHAT_LEGACY_PARITY_REGISTER.md) · **Migration brief:** [CHAT_REACT.md](./CHAT_REACT.md)
 
 **Prove URL (CJM off):**  
 `http://localhost:5173/?project=boots-pharmacy&screen=chat&persona=sarah-jenkins&cjm=off&experience=agentic`
@@ -16,7 +16,7 @@
 
 | Condition | What the user should feel | Owner path |
 |-----------|---------------------------|------------|
-| **`cjm=off`** | Opening a **saved chat** (Make-like): brief empty hold → **full thread at once** → **smooth scroll to bottom** | `runChatBrowseEntryReveal` |
+| **`cjm=off`** | Opening a **saved chat** (Legacy-like): brief empty hold → **full thread at once** → **smooth scroll to bottom** | `runChatBrowseEntryReveal` |
 | **`cjm=on`** + agentic chat beat | Scripted progressive disclosure: thinking → staged bubbles / CTAs via engine `visibleCount` | `usePublishChatScenarioReveal` + scenario prelude |
 | **`cjm=on`** + leave chat scenario (e.g. avail overlay) | **Hold** last painted count — never wipe thread to empty behind modal | `usePublishChatScenarioReveal` hold branch |
 | Traditional CJM | No chat beat — do not invent chat load for traditional path | Journey playlist |

@@ -35,13 +35,13 @@ export type SitePilotComposerProps = {
   onChip?: (label: string) => void;
   className?: string;
   showSuggested?: boolean;
-  /** Chat send→stop while thinking (Make `proto-agentic-send--stop`). */
+  /** Chat send→stop while thinking (Legacy `proto-agentic-send--stop`). */
   sendThinking?: boolean;
 };
 
 const QUERY_MAX_PX = SITE_PILOT_QUERY_LINE_PX * SITE_PILOT_QUERY_MAX_LINES;
 
-/** Make-like grow/shrink — short ease-in-out; reduced-motion snaps. */
+/** Legacy-like grow/shrink — short ease-in-out; reduced-motion snaps. */
 const QUERY_HEIGHT_TRANSITION = {
   duration: 0.2,
   ease: MOTION_EASE_IN_OUT,
@@ -77,8 +77,8 @@ function StopGlyph() {
 }
 
 function measureQueryHeight(ta: HTMLTextAreaElement): number {
-  // Collapse before measure so delete/wrap shrinks (Make syncAgenticQueryHeight).
-  // Must use !important — kit CSS sets height:100% !important vs Make LEGACY.
+  // Collapse before measure so delete/wrap shrinks (Legacy syncAgenticQueryHeight).
+  // Must use !important — kit CSS sets height:100% !important vs Legacy LEGACY.
   ta.style.setProperty("height", "0px", "important");
   const next = Math.min(
     Math.max(ta.scrollHeight, SITE_PILOT_QUERY_LINE_PX),

@@ -154,7 +154,7 @@ export function AppointmentHistoryScreen({
                 <p className="appointment-history__sorting-label">
                   {appointmentHistoryDisplayedLabel(count)}
                 </p>
-                {/* Visual only — Make has no open/filter wire (register I12). */}
+                {/* Visual only — Legacy has no open/filter wire (register I12). */}
                 <button
                   type="button"
                   className="appointment-history__show-all"

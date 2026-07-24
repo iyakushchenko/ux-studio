@@ -36,7 +36,7 @@ Suspect **multiple systems same beat** — map before coding:
 3. **Thinking→reply handoff** — `AnimatePresence mode="sync"` + absolute thinking CSS + reply mount full height (`chat.css` `:has`, `ChatThinkingBubble`)
 4. **Layout growth** — helpful strip / tall reply height (HelpfulStrip defer may be incomplete)
 5. **Composer clearance top-up** — post co-travel timeouts / TRACE tags
-6. **CSS** — any remaining transition/animation on bubble/thinking/column fighting FM (`chat.css`, globals Make leftovers)
+6. **CSS** — any remaining transition/animation on bubble/thinking/column fighting FM (`chat.css`, globals Legacy leftovers)
 7. **Reveal bridge** — `visibleCount` / `pullLive` / double-rAF / sample restart mid tween
 
 Primary code:  

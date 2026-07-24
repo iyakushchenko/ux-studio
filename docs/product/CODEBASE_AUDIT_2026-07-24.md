@@ -88,9 +88,9 @@
 
 **Evidence:** `globals-screens.css` (2891/3200 ceiling), `globals-chrome.css` (2522/2650), `globals-hub.css` (1334/1400) are all allowlisted and all close to their own ceilings. [NEXT_STEPS.md](./NEXT_STEPS.md) #9 (LEGACY retirement) is `[~]` in progress with real recent cuts (Phase C, -114 lines), but the mechanism is "shrink when a screen migrates," and several ceilings are already within ~100–300 lines of being hit again.
 
-**Why it compounds:** not a second-project risk specifically, but relevant to strategy: if project #2 is scoped before Boots's own LEGACY sheets are fully retired, you now have two active concept surfaces both partially depending on quarantined global CSS, doubling the surface a future "did this new page accidentally depend on Make globals" review has to cover.
+**Why it compounds:** not a second-project risk specifically, but relevant to strategy: if project #2 is scoped before Boots's own LEGACY sheets are fully retired, you now have two active concept surfaces both partially depending on quarantined global CSS, doubling the surface a future "did this new page accidentally depend on Legacy globals" review has to cover.
 
-**Fix now:** none required structurally — this is correctly sequenced behind Book Make-child deletion (already done) and the dead-`useEffect` sweep (in progress, discussed last turn). Just noting it as a **soft precondition**: finishing #9 before starting project #2 is worth more than starting project #2 sooner.
+**Fix now:** none required structurally — this is correctly sequenced behind Book Legacy-child deletion (already done) and the dead-`useEffect` sweep (in progress, discussed last turn). Just noting it as a **soft precondition**: finishing #9 before starting project #2 is worth more than starting project #2 sooner.
 
 ---
 

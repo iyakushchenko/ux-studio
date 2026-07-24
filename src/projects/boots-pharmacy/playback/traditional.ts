@@ -113,14 +113,14 @@ function queryVisibleProtoScreen(childIndex: number): HTMLElement | null {
   return null;
 }
 
-/** Engine contract first; legacy Make attr kept for residual Make History. */
+/** Engine contract first; legacy Legacy attr kept for residual Legacy History. */
 const HISTORY_VIEW_DETAILS_SEL =
   '[data-studio-action="history-view-details"], [data-studio-appointment-view-details="true"]';
 
 function findVisibleHistoryViewDetails(
   screen: HTMLElement
 ): HTMLElement | null {
-  // Make exports a zero-size / display:none ghost card first — never first-match.
+  // Legacy exports a zero-size / display:none ghost card first — never first-match.
   const cards = screen.querySelectorAll<HTMLElement>(
     '[data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]'
   );
@@ -175,8 +175,8 @@ function findButtonByText(
 }
 
 /**
- * Prefer React PDP Book now. Make `[data-name="component.input.button"]`
- * under `data-studio-make-retired` still wins first-match and can transport-no-op
+ * Prefer React PDP Book now. Legacy `[data-name="component.input.button"]`
+ * under `data-studio-legacy-retired` still wins first-match and can transport-no-op
  * when wire is gated by `isPdpReactMounted()` — same class as Chat/Home (LESSONS).
  */
 export function findPdpBookNowBtn(root: ParentNode): HTMLElement | null {
@@ -189,7 +189,7 @@ export function findPdpBookNowBtn(root: ParentNode): HTMLElement | null {
         '.pdp button[data-studio-action="pdp-book-now"]',
       ].join(", ")
     ) ?? null;
-  if (reactBtn && !reactBtn.closest("[data-studio-make-retired]")) {
+  if (reactBtn && !reactBtn.closest("[data-studio-legacy-retired]")) {
     return reactBtn;
   }
 
@@ -199,7 +199,7 @@ export function findPdpBookNowBtn(root: ParentNode): HTMLElement | null {
         'button[data-studio-action="pdp-book-now"], [data-name="component.input.button"]'
       )
     ).find((btn) => {
-      if (btn.closest("[data-studio-make-retired]")) return false;
+      if (btn.closest("[data-studio-legacy-retired]")) return false;
       if (btn.getAttribute("data-studio-action") === "pdp-book-now") return true;
       return /^book now/i.test(
         (btn.textContent ?? "").replace(/\s+/g, " ").trim()
@@ -230,7 +230,7 @@ function findFirstVisiblePlpTile(scope: ParentNode): HTMLElement | null {
   return (
     Array.from(searchRoot.querySelectorAll<HTMLElement>(PLP_TILE_SELECTOR)).find(
       (tile) =>
-        !tile.closest("[data-studio-make-retired]") &&
+        !tile.closest("[data-studio-legacy-retired]") &&
         !tile.classList.contains("proto-plp-tile--hidden") &&
         isClickableTarget(tile)
     ) ?? null
@@ -584,7 +584,7 @@ async function runLoginSignIn(
   return !shouldAbort();
 }
 
-/** Prefer live React Book Step 1 — Make under `data-studio-make-retired` is a ghost. */
+/** Prefer live React Book Step 1 — Legacy under `data-studio-legacy-retired` is a ghost. */
 function liveBookStep1Root(screen: HTMLElement): HTMLElement {
   return (
     screen.querySelector<HTMLElement>(
@@ -599,8 +599,8 @@ function liveBookStep1Root(screen: HTMLElement): HTMLElement {
 
 function isLiveBookStep1Target(el: HTMLElement | null): el is HTMLElement {
   // Size/visibility checked by waitForVisibleTarget / simulate click — here only
-  // skip Make-retired ghosts that win first-match querySelector.
-  return Boolean(el && !el.closest("[data-studio-make-retired]"));
+  // skip Legacy-retired ghosts that win first-match querySelector.
+  return Boolean(el && !el.closest("[data-studio-legacy-retired]"));
 }
 
 async function waitForBookStep1ChosenSlot(screen: HTMLElement): Promise<boolean> {
@@ -609,13 +609,13 @@ async function waitForBookStep1ChosenSlot(screen: HTMLElement): Promise<boolean>
     const slot = root.querySelector<HTMLElement>(
       ".book-step-1__chosen, .proto-chosen-slot"
     );
-    if (slot && !slot.closest("[data-studio-make-retired]")) return true;
+    if (slot && !slot.closest("[data-studio-legacy-retired]")) return true;
     await playbackReadinessDelay(50);
   }
   return false;
 }
 
-/** Prefer React Continue — Make-retired `component.input.button` is a ghost. */
+/** Prefer React Continue — Legacy-retired `component.input.button` is a ghost. */
 export function findBookStep1ContinueBtn(
   screen: HTMLElement
 ): HTMLElement | null {

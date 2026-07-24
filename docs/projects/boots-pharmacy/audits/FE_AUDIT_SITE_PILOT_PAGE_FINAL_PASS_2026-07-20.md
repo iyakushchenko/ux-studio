@@ -1,6 +1,6 @@
 # PAGE FINAL PASS — Site Pilot / Home (HARD-GREEN)
 
-**Surface:** Agentic Site Pilot Home (`screenId: site-pilot`, Make child 11)  
+**Surface:** Agentic Site Pilot Home (`screenId: site-pilot`, Legacy child 11)  
 **Date:** 2026-07-20  
 **Auditor:** Quinn (QA) MCP matrix · Uma (UI/UX) fidelity · Arch (Director) HARD-GREEN  
 **Ship tip:** _(stamped at commit)_ · **v0.0.59**  
@@ -35,7 +35,7 @@
 |----|------|
 | overlay-arm | PASS |
 | site-pilot-host | PASS |
-| site-pilot-make-retired | PASS |
+| site-pilot-legacy-retired | PASS |
 | site-pilot-landmarks | PASS |
 | site-pilot-heading-logged-out | PASS |
 | site-pilot-heading-logged-in | PASS |
@@ -51,7 +51,7 @@
 
 **Overlay:** AGENT TESTING visible every step.  
 **Auth:** heading personalization via `__studioSetLoggedIn` / `isStudioLoggedIn` SSoT (HomeScreen `useSyncExternalStore`).  
-**DS:** Make hover CSS present for mic / send / chip (no invent).  
+**DS:** Legacy hover CSS present for mic / send / chip (no invent).  
 **Teardown:** restored `screen=site-pilot` after send/chip nav; `reload: false`.
 
 ---
@@ -59,10 +59,10 @@
 ## Structure contracts
 
 - `<main class="site-pilot home">` + `data-studio-react-screen="site-pilot"`
-- Make retired: `data-studio-make-retired="site-pilot"`
+- Legacy retired: `data-studio-legacy-retired="site-pilot"`
 - BEM root includes `site-pilot` (folder residual `home__*` OK — honest)
-- No in-page `<header>` crumbs (Make Body10 has none — engine chrome) — check script `HEADER_LANDMARK_OPTIONAL`
-- UXDS: shared `SitePilotComposer` (Make `component.input.button`) — ButtonPrimary N/A
+- No in-page `<header>` crumbs (Legacy Body10 has none — engine chrome) — check script `HEADER_LANDMARK_OPTIONAL`
+- UXDS: shared `SitePilotComposer` (Legacy `component.input.button`) — ButtonPrimary N/A
 
 ---
 
@@ -71,6 +71,6 @@
 | Id | Note |
 |----|------|
 | R1 | Element BEM still `home__*` under dual root class — optional rename later |
-| R2 | Decorative Make PNG atmosphere under-matched by gradient (signed under-match) |
-| R3 | Mic remains visual no-op (Make parity) |
+| R2 | Decorative Legacy PNG atmosphere under-matched by gradient (signed under-match) |
+| R3 | Mic remains visual no-op (Legacy parity) |
 | R4 | PDP HARD-GREEN unchanged — not demoted |

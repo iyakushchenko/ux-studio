@@ -8,7 +8,7 @@ export type ChatThinkingBubbleProps = {
 };
 
 export function ChatThinkingBubble({ mode, generation }: ChatThinkingBubbleProps) {
-  // Make: playback toggled --hint → align-items flex-start (LEFT agent rail).
+  // Legacy: playback toggled --hint → align-items flex-start (LEFT agent rail).
   const hint = mode === "hint" || mode === "playback";
   // Playback thinking must be visibly LEFT immediately — opacity:0 pull-up
   // made r0 look like “no thinking” (PO). Send uses full CHAT_PULL_UP enter.

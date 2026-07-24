@@ -25,7 +25,7 @@ describe("appointmentDetailsContract", () => {
     expect(APPOINTMENT_DETAILS_CHILD_INDEX).toBe(1);
   });
 
-  it("locks title / nav active / Details Make row labels", () => {
+  it("locks title / nav active / Details Legacy row labels", () => {
     expect(APPOINTMENT_DETAILS_TITLE).toBe("Appointment Details");
     expect(APPOINTMENT_DETAILS_NAV_ACTIVE).toBe("Appointment history");
     expect(APPOINTMENT_DETAILS_NAV_ITEMS).toContain(

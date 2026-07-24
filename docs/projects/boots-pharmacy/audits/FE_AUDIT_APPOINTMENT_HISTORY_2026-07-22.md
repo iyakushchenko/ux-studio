@@ -34,15 +34,15 @@
 | C1–C3 | **PASS** | Edit/Cancel icon+text nowrap |
 | D1–D4 | **PASS** | View Details commerce hover; Ask/Discuss `.uxds-link`; Edit/Cancel under-match (no invent) |
 | D5 | **PASS** | ButtonPrimary + links checked; SearchField **N/A**; Quinn MCP-hovered View Details |
-| E1–E3 | **PASS** | View Details → Make Details + restore; terminal CTA hide; Ask/Discuss wired |
+| E1–E3 | **PASS** | View Details → Legacy Details + restore; terminal CTA hide; Ask/Discuss wired |
 | F1–F3 | **PASS** | One commerce primary + quiet icon CTAs |
 | G1–G6 | **PASS** / engine | Studio XOR unchanged this wave |
-| G7 | **PASS** | React host + Make parked (`retireMakeUnderPage`) |
+| G7 | **PASS** | React host + Legacy parked (`retireLegacyUnderPage`) |
 | G8 | **N/A** | no chip grid |
 | G9 | **PASS** | URL `screen=appointment-history` |
 | H1–H3 | **PASS** | densify gated; no LEGACY page CSS |
 | I1–I4 | **PASS** | kits + theme tokens |
-| J1 | **N/A** | Make LE1–LE3 none — honest |
+| J1 | **N/A** | Legacy LE1–LE3 none — honest |
 | J2 | **PASS** | typical DS (D5) |
 | J3 | **PASS** | card rhythm L11 |
 | J4 | **N/A** | no empty invent |
@@ -55,6 +55,6 @@
 - Show All / Load more visual-only (P1).
 - Account nav items visual (P1).
 - Breadcrumb Home / Account Overview affordance spans.
-- Details stays **Make** until History Final Pass hard-green → Details brief.
+- Details stays **Legacy** until History Final Pass hard-green → Details brief.
 
 **Knowledge used:** FE_UI_UX_AUDIT rows · PAGE_FINAL_PASS · UMA no-invent · densify vs React host · Quinn R11 `:5173` · LESSONS false-PROVEN.

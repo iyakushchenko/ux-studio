@@ -4,7 +4,7 @@
  * Lean source/DOM-contract scans (Summarizer-style). No Playwright / screenshots.
  *
  * Policy: docs/product/PARITY_RATCHETS.md
- * Seed: LESSONS_LEARNED · UMA_FIDELITY_NOTES · PLP Make parity register
+ * Seed: LESSONS_LEARNED · UMA_FIDELITY_NOTES · PLP Legacy parity register
  *
  * Every new typical PO fail class → add a ratchet here (Arch/Ben).
  */
@@ -186,7 +186,7 @@ const REACT_MOUNT_FILES = [
     const match = compact.match(sectionRule);
     if (match && /border-bottom|border-top/.test(match[0])) {
       fail(
-        `RATCHET no-filter-hr: ${PLP_CSS} .plp__filter-section must not invent border separator (Make has none)`
+        `RATCHET no-filter-hr: ${PLP_CSS} .plp__filter-section must not invent border separator (Legacy has none)`
       );
     }
     if (
@@ -238,7 +238,7 @@ const REACT_MOUNT_FILES = [
       );
     } else if (!/--uxds-text-link-link/.test(emptyMatch[0])) {
       fail(
-        `RATCHET empty-heart-fuchsia: ${PLP_CSS} empty wishlist hover must use --uxds-text-link-link (Make tertiary navy)`
+        `RATCHET empty-heart-fuchsia: ${PLP_CSS} empty wishlist hover must use --uxds-text-link-link (Legacy tertiary navy)`
       );
     }
     // Filled may use fuchsia — require active rule exists (parity of filled state).
@@ -398,18 +398,18 @@ const REACT_MOUNT_FILES = [
   }
 }
 
-// ── 8) Make-retired screens stamp data-studio-make-retired when React mounts ─
+// ── 8) Legacy-retired screens stamp data-studio-legacy-retired when React mounts ─
 {
   for (const rel of REACT_MOUNT_FILES) {
     const src = requireFile(rel);
     if (!src) continue;
     const stamps =
-      /dataset\.studioMakeRetired\s*=/.test(src) ||
-      /data-studio-make-retired/.test(src) ||
-      /retireMakeUnderPage\s*\(/.test(src);
+      /dataset.studioLegacyRetired\s*=/.test(src) ||
+      /data-studio-legacy-retired/.test(src) ||
+      /retireLegacyUnderPage\s*\(/.test(src);
     if (!stamps) {
       fail(
-        `RATCHET make-retired: ${rel} must retire Make via retireMakeUnderPage (or stamp data-studio-make-retired)`
+        `RATCHET legacy-retired: ${rel} must retire legacy source via retireLegacyUnderPage (or stamp data-studio-legacy-retired)`
       );
     }
   }
@@ -456,7 +456,7 @@ const REACT_MOUNT_FILES = [
     const compact = css.replace(/\s+/g, " ");
     if (!/\.uxds-search-field__control:hover\b/.test(compact)) {
       fail(
-        "RATCHET search-field-states: search-field.css must define .uxds-search-field__control:hover (Make inset ring on control shell)"
+        "RATCHET search-field-states: search-field.css must define .uxds-search-field__control:hover (Legacy inset ring on control shell)"
       );
     }
     if (!/\.uxds-search-field__control:focus-within\b/.test(compact)) {
@@ -469,7 +469,7 @@ const REACT_MOUNT_FILES = [
     );
     if (!hoverRule || !/border-color|box-shadow/.test(hoverRule[0])) {
       fail(
-        "RATCHET search-field-states: .uxds-search-field__control:hover must set border-color and/or box-shadow (Make ring)"
+        "RATCHET search-field-states: .uxds-search-field__control:hover must set border-color and/or box-shadow (Legacy ring)"
       );
     }
   }
@@ -535,7 +535,7 @@ const REACT_MOUNT_FILES = [
     const rtbCol = pdpCss.match(/\.pdp__rtb-col\s*\{[^}]+\}/);
     if (!rtbCol || !/gap:\s*32px/.test(rtbCol[0])) {
       fail(
-        "RATCHET pdp-rtb-rhythm: .pdp__rtb-col must set gap: 32px (Uma §0b Make parity)"
+        "RATCHET pdp-rtb-rhythm: .pdp__rtb-col must set gap: 32px (Uma §0b Legacy parity)"
       );
     }
     if (

@@ -20,7 +20,7 @@
 
 ## Summary
 
-Live localhost audit of React Book Step 2 confirms hybrid mount at Frame child 4: Make body/header/crumbs/footer retired (`display:none` + `data-studio-make-retired`), React host `.book-step-2` with progress/card **863px**, grid **1440/64/1312**, body fill opacity **0.31**, default slot June **24** / **16:30** (`#c6e5e1` selected), date/time click + Reserve → Step 3 Confirmation. MCP sanity **pass** including `rec-disabled-when-cjm-on`. No LEGACY growth for this page (styles in `book-step-2-datetime.css` only). Intentional: Proto header/footer Studio chrome; wire heading weekday (Wednesday) over Figma Thursday typo.
+Live localhost audit of React Book Step 2 confirms hybrid mount at Frame child 4: Legacy body/header/crumbs/footer retired (`display:none` + `data-studio-legacy-retired`), React host `.book-step-2` with progress/card **863px**, grid **1440/64/1312**, body fill opacity **0.31**, default slot June **24** / **16:30** (`#c6e5e1` selected), date/time click + Reserve → Step 3 Confirmation. MCP sanity **pass** including `rec-disabled-when-cjm-on`. No LEGACY growth for this page (styles in `book-step-2-datetime.css` only). Intentional: Proto header/footer Studio chrome; wire heading weekday (Wednesday) over Figma Thursday typo.
 
 ---
 
@@ -40,7 +40,7 @@ Live localhost audit of React Book Step 2 confirms hybrid mount at Frame child 4
 |---|--------|----------|
 | B1 | **PASS** | Shell max-width **1440px**, pad L **64px**; inner **1312px**; card/progress width **863**. |
 | B2 | **PASS** | Progress + card share 863 column; crumb Home left measured **283** at audit viewport (shell math). |
-| B3 | **PASS** | Make body `display:none`; Proto footer mount retained; no dual-layout clash. |
+| B3 | **PASS** | Legacy body `display:none`; Proto footer mount retained; no dual-layout clash. |
 | B4 | **PASS** | Desktop-first dual months + 7-col time grid intact. |
 
 ### C. Icon + text CTAs — no wrap
@@ -58,7 +58,7 @@ Live localhost audit of React Book Step 2 confirms hybrid mount at Frame child 4
 | D1 | **PASS** | Available cal cells hover white + inset `#afafaf`; Change hover label black / icon navy (page CSS). |
 | D2 | **PASS** | `:focus-visible` on cal cells + Change; mouse-only focus suppressed on Change. |
 | D3 | **PASS** | Active progress label `rgb(1, 33, 105)`; completed+current bars `#c6e5e1`; upcoming white. |
-| D4 | **N/A** | Reserve always enabled with default slot (matches Make/wire). |
+| D4 | **N/A** | Reserve always enabled with default slot (matches Legacy/wire). |
 
 ### E. Behavior parity
 
@@ -66,7 +66,7 @@ Live localhost audit of React Book Step 2 confirms hybrid mount at Frame child 4
 |---|--------|----------|
 | E1 | **PASS** | Click June 21 → heading `Sunday, 21st June 2026`; click 15:30 → selected `["21","15:30"]`. |
 | E2 | **PASS** | Reserve → Step 3 Confirmation (`child3Visible`, nav label Step 3). |
-| E3 | **PASS** | Live buttons + `data-studio-cal-*` hooks; Make calendar/reserve handlers gated when React mounted. |
+| E3 | **PASS** | Live buttons + `data-studio-cal-*` hooks; Legacy calendar/reserve handlers gated when React mounted. |
 
 ### F. Control hierarchy / no zoo
 
@@ -89,7 +89,7 @@ Live localhost audit of React Book Step 2 confirms hybrid mount at Frame child 4
 | # | Result | Evidence |
 |---|--------|----------|
 | H1 | **PASS** | New styles only in `screens/book-step-2/book-step-2-datetime.css` + UXDS ButtonPrimary. |
-| H2 | **PASS** | Make handlers gated (`isBookStep2ReactMounted`); `applyBookStep2CalendarFromSlot` no-ops strip on React screen. |
+| H2 | **PASS** | Legacy handlers gated (`isBookStep2ReactMounted`); `applyBookStep2CalendarFromSlot` no-ops strip on React screen. |
 | H3 | **PASS** | Contract test: child index 4; 15:30/16:30 selectable. |
 
 ---
@@ -98,9 +98,9 @@ Live localhost audit of React Book Step 2 confirms hybrid mount at Frame child 4
 
 | # | Debt | Notes |
 |---|------|-------|
-| N1 | Hex still in page CSS (Make parity) | Same class of debt as Step 1; token harden later |
-| N2 | Dead Make calendar CSS for child 4 still in LEGACY | Stop adding; delete when safe |
-| N3 | Availability Tool time availability differs slightly from Make Step 2 morning | Step 2 matches Make; Availability kit separate |
+| N1 | Hex still in page CSS (Legacy parity) | Same class of debt as Step 1; token harden later |
+| N2 | Dead Legacy calendar CSS for child 4 still in LEGACY | Stop adding; delete when safe |
+| N3 | Availability Tool time availability differs slightly from Legacy Step 2 morning | Step 2 matches Legacy; Availability kit separate |
 
 ---
 
@@ -142,6 +142,6 @@ Going forward: `__studioRunMcpPageProbe({ screenId: "book-step-2" })` for visibl
 ## PO verify (localhost)
 
 1. Boots → **Book - Step 2 - Date and Time**
-2. Confirm React (no Make absolute calendar); June 24 / 16:30 selected
+2. Confirm React (no Legacy absolute calendar); June 24 / 16:30 selected
 3. Change date/time; Reserve → Confirmation
 4. Optional: Traditional CJM through `book-step-2*` beats

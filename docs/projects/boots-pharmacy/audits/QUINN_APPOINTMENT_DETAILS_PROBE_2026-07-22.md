@@ -12,7 +12,7 @@
 |-------|--------|
 | overlay-arm | PASS |
 | appointment-details-host | PASS |
-| appointment-details-make-retired | PASS |
+| appointment-details-legacy-retired | PASS |
 | appointment-details-url-screen | PASS |
 | appointment-details-selected-card | PASS |
 | appointment-details-edit-cancel-rules (non-terminal sample) | PASS |
@@ -43,7 +43,7 @@ Path: History URL → click `[data-studio-appointment-view-details]` on cancelle
 ## Contracts proved
 
 - React host `main[data-studio-react-screen="appointment-details"]`
-- Make parked via `isMakeParkedForScreen("appointment-details")`
+- Legacy parked via `isLegacyParkedForScreen("appointment-details")`
 - Selected card fields match SSoT; View Details absent on Details
 - Non-terminal: Edit + Cancel present + hoverable (`data-studio-appointment-edit` / `cancel`)
 - Terminal (#8762341): Edit/Cancel + CTA host omitted
@@ -53,7 +53,7 @@ Path: History URL → click `[data-studio-appointment-view-details]` on cancelle
 ## Rematch inventory (optional)
 
 - Post-React: [INTERACTION_INVENTORY_APPOINTMENT_DETAILS_REACT_2026-07-22.json](./INTERACTION_INVENTORY_APPOINTMENT_DETAILS_REACT_2026-07-22.json)
-- vs Make baseline: `readinessPass` **false → true**; `invalid` **3 → 0**
+- vs Legacy baseline: `readinessPass` **false → true**; `invalid` **3 → 0**
 
 ## Final Pass
 

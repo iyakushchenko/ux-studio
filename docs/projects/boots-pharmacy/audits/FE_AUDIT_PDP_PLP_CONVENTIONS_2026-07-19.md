@@ -16,7 +16,7 @@
 | Scoped CSS | `plp.css` | `pdp.css` |
 | BEM block | `.plp` / `plp__*` | `.pdp` / `pdp__*` |
 | React root stamp | `data-studio-react-screen="plp"` | `data-studio-react-screen="pdp"` |
-| Make retire | `data-studio-make-retired=plp` | `data-studio-make-retired=pdp` |
+| Legacy retire | `data-studio-legacy-retired=plp` | `data-studio-legacy-retired=pdp` |
 | Host class | `studio-react-screen-host` | same |
 | Commerce primary | UXDS `ButtonPrimary` | same |
 | Theme remaps | `styleguide/theme.css` | same (no page-local brand fork) |
@@ -39,9 +39,9 @@
 
 | Residual | Why not fixed now |
 |----------|-------------------|
-| No journey URL for download / Find out more clicks | Make had none — decorative until PO wires assets |
-| Three FAQ panels still have no Make Description | NHS / already-have / personal-data — residual static headers; 3 bodies from Make RTB/Description/specs |
-| A few Make-parity hexes in `pdp.css` (leaflet border `#c7e4ff`, mint `#e0fbf8`) | Same class as PLP Make-parity leftovers; not a second brand system |
+| No journey URL for download / Find out more clicks | Legacy had none — decorative until PO wires assets |
+| Three FAQ panels still have no Legacy Description | NHS / already-have / personal-data — residual static headers; 3 bodies from Legacy RTB/Description/specs |
+| A few Legacy-parity hexes in `pdp.css` (leaflet border `#c7e4ff`, mint `#e0fbf8`) | Same class as PLP Legacy-parity leftovers; not a second brand system |
 | Final Pass hardGreen restored | Arch HARD-GREEN @ `48f2016` after Quinn 23/23 @ `7c7c9e1` / v0.0.32 + Uma §0a @ `76e2433` |
 
 ---
@@ -50,6 +50,6 @@
 
 - No new `proto-*` classes on PDP React path.
 - Action probes use `data-studio-action` / `data-studio-accordion-*` (PLP-style studio hooks).
-- Accordion kit keeps `data-uxds-kit="accordion"`; Make `data-name` preserved on band/items.
+- Accordion kit keeps `data-uxds-kit="accordion"`; Legacy `data-name` preserved on band/items.
 
 **Team check line:** `PAGE FINAL PASS — pdp — HARD-GREEN` (retained @ `48f2016` after v0.0.32 Quinn 23/23 + Uma §0a)

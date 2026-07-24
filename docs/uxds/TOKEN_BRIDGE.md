@@ -55,7 +55,7 @@ src/projects/<id>/styleguide/
   assets/               # logos
 ```
 
-Import order (`src/styles/index.css`): **BASE** (UXDS tokens + kits) → **THEME** (project `theme.css`) → **PANEL** (engine chrome) → **LEGACY** (Make `globals*.css`). Full map: [../product/CSS_BASE_THEME.md](../product/CSS_BASE_THEME.md).
+Import order (`src/styles/index.css`): **BASE** (UXDS tokens + kits) → **THEME** (project `theme.css`) → **PANEL** (engine chrome) → **LEGACY** (Legacy `globals*.css`). Full map: [../product/CSS_BASE_THEME.md](../product/CSS_BASE_THEME.md).
 
 ### Turn theme off
 

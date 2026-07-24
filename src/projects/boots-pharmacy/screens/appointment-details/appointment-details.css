@@ -39,7 +39,7 @@
   margin: 0 auto;
 }
 
-/* Breadcrumbs — Make module.breadcrumbs */
+/* Breadcrumbs — Legacy module.breadcrumbs */
 .appointment-details__crumbs {
   background: #fff;
   padding: 16px 0;
@@ -85,7 +85,7 @@
   line-height: 12px;
 }
 
-/* Body — Make Body1 p-[64px] gap 32 */
+/* Body — Legacy Body1 p-[64px] gap 32 */
 .appointment-details__body {
   background: #fff;
   padding: 64px 0;

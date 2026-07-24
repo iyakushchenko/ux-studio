@@ -43,7 +43,7 @@ import {
 import {
   humanizeRecordingLabel,
   humanizeScreenLabel,
-  isCoarseMakeModuleName,
+  isCoarseLegacyModuleName,
   isWeakScrollAnchorName,
 } from "@/app/recording/recordingLabels";
 import type { PersonaId, ProjectId } from "@/projects/types";
@@ -383,7 +383,7 @@ function cameraFromScrollStop(
     .filter((s) => {
       const m = /data-name="([^"]+)"/.exec(s);
       if (!m) return true;
-      return !isWeakScrollAnchorName(m[1]) && !isCoarseMakeModuleName(m[1]);
+      return !isWeakScrollAnchorName(m[1]) && !isCoarseLegacyModuleName(m[1]);
     });
   const usable = isUsablePlaybackSelectorChain(chain);
   const anchorRaw = event.anchorSelector?.trim() || undefined;
@@ -393,7 +393,7 @@ function cameraFromScrollStop(
   const anchorSelector =
     anchorRaw &&
     !isWeakScrollAnchorName(anchorName) &&
-    !isCoarseMakeModuleName(anchorName)
+    !isCoarseLegacyModuleName(anchorName)
       ? anchorRaw
       : undefined;
   return {
@@ -412,7 +412,7 @@ function cameraFromPendingClickScroll(
 ): PendingCamera | null {
   const camChain = click.cameraSelectorChain?.filter((s) => {
     const m = /data-name="([^"]+)"/.exec(s);
-    if (m && (isWeakScrollAnchorName(m[1]) || isCoarseMakeModuleName(m[1]))) {
+    if (m && (isWeakScrollAnchorName(m[1]) || isCoarseLegacyModuleName(m[1]))) {
       return false;
     }
     return Boolean(s && s !== "#root");
@@ -420,7 +420,7 @@ function cameraFromPendingClickScroll(
   let camAnchor = click.cameraAnchorSelector;
   if (camAnchor) {
     const m = /data-name="([^"]+)"/.exec(camAnchor);
-    if (m && (isWeakScrollAnchorName(m[1]) || isCoarseMakeModuleName(m[1]))) {
+    if (m && (isWeakScrollAnchorName(m[1]) || isCoarseLegacyModuleName(m[1]))) {
       camAnchor = undefined;
     }
   }

@@ -562,7 +562,7 @@
 }
 
 /*
- * Soft mint tertiary — promo CTAs (Make GP “Find out more”).
+ * Soft mint tertiary — promo CTAs (Legacy GP “Find out more”).
  * Registered: docs/uxds/DEVIATIONS.md DEV-20260719-tertiary-soft
  */
 .studio-tertiary-cta.studio-tertiary-cta--soft {
@@ -966,7 +966,7 @@
   box-shadow: none !important;
 }
 
-/* PLP tile compact actions — Add to Bookmarks, Quick View (Make tiles only).
+/* PLP tile compact actions — Add to Bookmarks, Quick View (Legacy tiles only).
  * Exclude UXDS `.uxds-btn-primary` + React `.plp__tertiary` so commerce / page CSS hover tokens win. */
 .studio-viewport [data-name="boots-pharmacy.service.tile"]
   [data-name="component.input.button"]:not(.uxds-btn-primary):not(.plp__tertiary):not([class*="bg-[#012169]"]):not([class*="bg-[#003fcc]"]):not([class*="bg-[#003fcb]"]) {
@@ -1013,7 +1013,7 @@
 }
 
 /* ── Design System: Search fields (Figma export + Availability Tool) ────────
- * Hover/focus uses the Make aria-hidden *border overlay* (absolute inset-0) —
+ * Hover/focus uses the Legacy aria-hidden *border overlay* (absolute inset-0) —
  * same inset ring as `.proto-avail-field`. Must NOT match UXDS SearchField’s
  * magnifier (`[data-studio-search-icon][aria-hidden]`) or you get a navy box
  * around the icon (PO: Search countries). */
@@ -2213,7 +2213,7 @@
   color: #01318f !important;
 }
 
-/* Appointment Cancel CTA — Make-only (gated off React hosts; no invent Cancel hover on React). */
+/* Appointment Cancel CTA — Legacy-only (gated off React hosts; no invent Cancel hover on React). */
 .studio-viewport > div > div:nth-child(1):not([data-studio-react-screen])
   [data-name="boots-pharmacy.component.ma.acc.overview.recent.order"]
   [data-name="CTAs"]
@@ -2297,7 +2297,7 @@
   align-self: center !important;
 }
 
-/* Order summary + contact/payment blocks — Make Details only */
+/* Order summary + contact/payment blocks — Legacy Details only */
 .studio-viewport > div > div:nth-child(1):not([data-studio-react-screen]) [data-name="component.co.buyer.info.static"],
 .studio-viewport > div > div:nth-child(1):not([data-studio-react-screen]) [data-name="component.co.product.in.this.order"],
 .studio-viewport > div > div:nth-child(1):not([data-studio-react-screen]) [data-name="Info Blocks / Order Summary/NO"] {

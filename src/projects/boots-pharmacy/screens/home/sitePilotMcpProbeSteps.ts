@@ -1,9 +1,9 @@
 /**
  * Site Pilot (Agentic Home) MCP probe recipe — kept out of studioMcpPageProbe.ts (hygiene).
- * screenId: site-pilot · Make child 11 · React screens/home/*
+ * screenId: site-pilot · Legacy child 11 · React screens/home/*
  */
 
-import { isMakeRetiredForScreen } from "../retireMakeUnderPage";
+import { isLegacyRetiredForScreen } from "../retireLegacyUnderPage";
 
 export type SitePilotMcpProbeStep = {
   id: string;
@@ -81,17 +81,17 @@ export function sitePilotMcpProbeSteps(): SitePilotMcpProbeStep[] {
         'missing React Site Pilot host — expected [data-studio-react-screen="site-pilot"]',
     },
     {
-      id: "site-pilot-make-retired",
+      id: "site-pilot-legacy-retired",
       selector: HOST_FALLBACK,
       action: "assert",
       assert: () => {
-        if (!isMakeRetiredForScreen("site-pilot")) {
-          return "Make leak: expected Make Frame children parked for site-pilot";
+        if (!isLegacyRetiredForScreen("site-pilot")) {
+          return "Legacy leak: expected Legacy Frame children parked for site-pilot";
         }
         const liveBodies = Array.from(
           document.querySelectorAll('[data-name="body"]')
-        ).filter((el) => !el.closest("[data-studio-make-retired]"));
-        // React main.home has data-name=body; Make body must be retired.
+        ).filter((el) => !el.closest("[data-studio-legacy-retired]"));
+        // React main.home has data-name=body; Legacy body must be retired.
         if (liveBodies.length < 1) {
           return "expected live React body (data-name=body)";
         }
@@ -120,9 +120,9 @@ export function sitePilotMcpProbeSteps(): SitePilotMcpProbeStep[] {
         ) {
           return "missing query card (component.co.order.summary)";
         }
-        // Make Home has no crumbs/footer — invent would FAIL
+        // Legacy Home has no crumbs/footer — invent would FAIL
         if (host.querySelector("footer") || host.querySelector(".home__footer")) {
-          return "invented footer on Site Pilot (Make has none)";
+          return "invented footer on Site Pilot (Legacy has none)";
         }
         return true;
       },
@@ -189,7 +189,7 @@ export function sitePilotMcpProbeSteps(): SitePilotMcpProbeStep[] {
       action: "hover",
       assert: () => {
         if (!stylesheetHasRule(".site-pilot-composer__send:hover")) {
-          return "missing .site-pilot-composer__send:hover CSS (Make #01318f)";
+          return "missing .site-pilot-composer__send:hover CSS (Legacy #01318f)";
         }
         if (!stylesheetHasRule(".site-pilot-composer__send:active")) {
           return "missing .site-pilot-composer__send:active CSS";

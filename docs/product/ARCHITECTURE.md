@@ -35,7 +35,7 @@ Folders mimic **Studio verbs** people use — not a proto nickname.
 |------|-----|
 | `src/projects/<id>/` | Concept packages (screens, wire, DOM, theme) |
 | `src/uxds/` | Design system tokens + kits + interactions |
-| `src/styles/globals-*.css` | LEGACY Make dumps — **no new React page CSS** |
+| `src/styles/globals-*.css` | LEGACY dumps — **no new React page CSS** |
 | `src/projects/<project>/personas/<persona>/cjm/` | Authoritative deployed CJMs: built-ins plus promoted recording files |
 | `data/journeys/` | Portable journey exports/interchange; not runtime ownership |
 | `docs/product/` | Engine doctrine |
@@ -52,4 +52,4 @@ React component rather than appended as a fifth global layer. It must stay scope
 screen root and must not depend on source order to override LEGACY. Full contract:
 [CSS_BASE_THEME.md](./CSS_BASE_THEME.md).
 
-Panel classes: `.studio-nav-*`, `.studio-*` mode switches, `.studio-agent-testing-*`. Concept Make leftovers may still say `.proto-*` until screen retirement.
+Panel classes: `.studio-nav-*`, `.studio-*` mode switches, `.studio-agent-testing-*`. Concept Legacy leftovers may still say `.proto-*` until screen retirement.

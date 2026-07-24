@@ -13,7 +13,7 @@
 | CJM path | On Sarah **Traditional CJM** (`choose-location` / `book-location-pick`) |
 | Proof value | First full-page React + UXDS replacement in the booking funnel |
 | Feasible scope | Search, near-me chip, chosen store, CTAs, booster, progress — no calendar |
-| Sprawl cut | Retires Make DOM cloning of Guide map / store card for this step |
+| Sprawl cut | Retires Legacy DOM cloning of Guide map / store card for this step |
 
 Agentic CJM still lands on Book Step 2 after Availability Tool; this pilot proves the traditional booking entry and shared Studio wiring.
 
@@ -30,10 +30,10 @@ Agentic CJM still lands on Book Step 2 after Availability Tool; this pilot prove
 
 ---
 
-## Make vs React (current)
+## Legacy vs React (current)
 
 **Migration guard (HARD for every remaining Boots page):** before retiring its
-Make surface, download **Map current page interactions** as the legacy baseline.
+Legacy surface, download **Map current page interactions** as the legacy baseline.
 After the React mount, rerun the map, require `readinessPass=true`, and reconcile
 every removed/renamed target. This is the behavior/target companion to visual
 parity and prevents future CJMs or programmable connections losing their hooks.
@@ -41,24 +41,24 @@ See [Interaction inventory](../../product/INTERACTION_INVENTORY.md).
 
 | Screen | Stack |
 |--------|--------|
-| **PLP — Vaccinations** | **React + UXDS** (Make child **9** retired via `data-studio-make-retired`; delete deferred) |
-| **Book Step 1 — Location** | **React + UXDS** (Make HTML hidden for this child only) |
-| **Book Step 2 — Date and Time** | **React + UXDS** (Make HTML hidden for Frame child **4** only) |
-| **Book Step 3 — Confirmation** | **React + UXDS** (Make HTML hidden for Frame child **3** only) |
-| All other Boots screens | Make wire (+ overlays/popups as before) |
+| **PLP — Vaccinations** | **React + UXDS** (Legacy child **9** retired via `data-studio-legacy-retired`; delete deferred) |
+| **Book Step 1 — Location** | **React + UXDS** (Legacy HTML hidden for this child only) |
+| **Book Step 2 — Date and Time** | **React + UXDS** (Legacy HTML hidden for Frame child **4** only) |
+| **Book Step 3 — Confirmation** | **React + UXDS** (Legacy HTML hidden for Frame child **3** only) |
+| All other Boots screens | Legacy wire (+ overlays/popups as before) |
 | Availability Tool | React overlay (prior enrichment) |
 
-Erase-Make order: **PLP → PDP → Home → Chat → History/Details → delete Book Make children**. See [features/PLP_REACT.md](./features/PLP_REACT.md).
+Erase-Legacy order: **PLP → PDP → Home → Chat → History/Details → delete Book Legacy children**. See [features/PLP_REACT.md](./features/PLP_REACT.md).
 
 ---
 
-## Parity table — Make Book Step 1 → React (2026-07-19)
+## Parity table — Legacy Book Step 1 → React (2026-07-19)
 
-Status: **OK** = matches Make; **Partial** = works with known delta; **Gap** = still missing.
+Status: **OK** = matches Legacy; **Partial** = works with known delta; **Gap** = still missing.
 
 ### Behaviors / scripts
 
-| Make behavior | React status | Notes |
+| Legacy behavior | React status | Notes |
 |---------------|--------------|-------|
 | Search opens Availability (list) | OK | `onOpenSearch` → `openPickLocations("list")` |
 | Near-me opens Availability (map) | OK | `onOpenNearMe` → `openPickLocations("nearMe")` |
@@ -66,22 +66,22 @@ Status: **OK** = matches Make; **Partial** = works with known delta; **Gap** = s
 | Continue with store → Book Step 2 | OK | `setCurrent(5)` |
 | Change vaccine / recipient | OK | Opens existing pickers |
 | Change location (chosen card) | OK | Re-opens Availability list |
-| Booster checkbox toggle | OK | React state; `data-studio-react-owned` skips Make mutators |
+| Booster checkbox toggle | OK | React state; `data-studio-react-owned` skips Legacy mutators |
 | Learn more disclosure | OK | UXDS `Disclosure` kit |
 | Breadcrumb Home → Site Pilot Home | OK | Wire click delegation on crumbs |
 | Availability choose store → chosen card + map | OK | Existing overlay callback |
-| Chosen map drag / pin (Make page map) | Partial | Static chosen map image on React; full map UX stays in Availability Tool |
+| Chosen map drag / pin (Legacy page map) | Partial | Static chosen map image on React; full map UX stays in Availability Tool |
 
 ### Visual L&F
 
-| Make chrome | React status | Notes |
+| Legacy chrome | React status | Notes |
 |-------------|--------------|-------|
 | Progress 16px + teal/#fff bars | OK | `book-step-1__progress*` |
 | Pill search 360 / `#c3c3c3` | OK | `book-step-1__search` |
 | Summary pills + Change | OK | Vaccine / Recipient |
 | Near-me tertiary control | OK | FilterChip remapped to tertiary look |
 | Chosen store tile + map asset | OK | `.proto-chosen-slot` class kept |
-| Booster checkbox 24px Make colors | OK | Unchecked `#c3c3c3`; hover `#c6e5e1`; checked `#afccca` / mark `#305854` |
+| Booster checkbox 24px Legacy colors | OK | Unchecked `#c3c3c3`; hover `#c6e5e1`; checked `#afccca` / mark `#305854` |
 | Continue navy primary | OK | `ButtonPrimary` + Boots theme |
 | Help footer links | OK | Tel + hours copy |
 
@@ -90,7 +90,7 @@ Status: **OK** = matches Make; **Partial** = works with known delta; **Gap** = s
 | Control | React status | Migrated treatment |
 |---------|--------------|--------------------|
 | Primary Continue | OK | UXDS `button-primary.css`: darken `#01318f`, lift shadow, active `#011a5c` |
-| Search field | OK | Inset navy ring (same as Make / `.proto-avail-field`) |
+| Search field | OK | Inset navy ring (same as Legacy / `.proto-avail-field`) |
 | Near-me | OK | Tertiary: no wash; label → black; pin → navy filter |
 | Change / Change location | OK | Tertiary: no wash; label → black; edit glyph → navy |
 | Booster checkbox | OK | Unchecked hover mint fill; checked stays `#afccca` |
@@ -114,13 +114,13 @@ Status: **OK** = matches Make; **Partial** = works with known delta; **Gap** = s
 
 ## Visual fidelity (required for pilots)
 
-Unless PO explicitly asks to upgrade the look, React screen pilots must stay **visually close to the source concept / Make page** being replaced — layout, type, colors, radii, progress, inputs, CTAs. Prefer matching the computed Make+wire look over inventing a cleaner “DS” treatment.
+Unless PO explicitly asks to upgrade the look, React screen pilots must stay **visually close to the source concept / Legacy page** being replaced — layout, type, colors, radii, progress, inputs, CTAs. Prefer matching the computed Legacy+wire look over inventing a cleaner “DS” treatment.
 
 Book Step 1 targets (child 7):
 
-- Progress = Make `component.book.appointment.progress` instance (16px labels; active navy bold + `#c6e5e1` flat bar; inactive white bar)
-- Search = Make pill field (`border-radius: 360px`, `#c3c3c3` border, icon right, wire placeholder)
-- Near-me / summary pills / Continue = Make spacing and colors as-is
+- Progress = Legacy `component.book.appointment.progress` instance (16px labels; active navy bold + `#c6e5e1` flat bar; inactive white bar)
+- Search = Legacy pill field (`border-radius: 360px`, `#c3c3c3` border, icon right, wire placeholder)
+- Near-me / summary pills / Continue = Legacy spacing and colors as-is
 
 ---
 
@@ -128,9 +128,9 @@ Book Step 1 targets (child 7):
 
 1. `npm run dev` → http://localhost:5173/
 2. Open **Boots Pharmacy** → nav tab **Book - Step 1 - Location** (or Traditional CJM → after PDP/login).
-3. Confirm React card matches Make look (progress teal underline, pill search, near-me, Continue); Make absolute layout gone for this tab.
+3. Confirm React card matches Legacy look (progress teal underline, pill search, near-me, Continue); Legacy absolute layout gone for this tab.
 4. Search or Near me → Availability Tool → choose Covent Garden → chosen card + map.
-5. Continue → Book Step 2 (React) — pick date/time → Reserve → Step 3 (Make).
+5. Continue → Book Step 2 (React) — pick date/time → Reserve → Step 3 (Legacy).
 6. Optional: play Traditional CJM through `choose-location` / `book-step-2*` beats.
 
 ---

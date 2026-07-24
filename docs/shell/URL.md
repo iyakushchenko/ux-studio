@@ -114,13 +114,13 @@ Examples (local / Pages):
 
 
 
-| `screen` | Make child | Nav |
+| `screen` | Legacy child | Nav |
 
 |----------|------------|-----|
 
 | `hub` | (onboarding wiki) | Hub tab |
 
-| `site-pilot` | 11 | Agentic Site Pilot Home (Make “Agentic. Site Pilot. Home”) |
+| `site-pilot` | 11 | Agentic Site Pilot Home (Legacy “Agentic. Site Pilot. Home”) |
 
 | `chat` | 10 | Agentic chat |
 

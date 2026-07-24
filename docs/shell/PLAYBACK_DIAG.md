@@ -19,14 +19,14 @@ React Site Pilot / Chat migration broke CJM playback in silent ways:
 | Failure | Symptom | Root cause |
 |---------|---------|------------|
 | Type-in missing | Step jumps home→chat with no typing | Prefill `HOME_QUERY_DEFAULT === AGENTIC_HOME_DEMO_QUERY` skipped type-in |
-| Make-retired selectors | `diagnostic-on-step-1` / transport-no-op | Hidden Make DOM wins `querySelector` |
+| Legacy-retired selectors | `diagnostic-on-step-1` / transport-no-op | Hidden Legacy DOM wins `querySelector` |
 | Scroll host | Wrong scroll / sticky pad | Chat sole host is `.chat__column` |
 | Fade removed | Bubbles hard-edge under bar / composer | Composer + under-bar wash dropped |
 | Cursor opaque | “Did the cursor do its job?” | Diag only logged type-in/step labels — no target/bbox/park |
 | Hub reset | Play/end lands hub | `goToTab` left `hubOpen=true` |
 | Agentic CTAs | Chat skips progressive clicks | CTA frameIndex off-by-one after React |
 
-**Rule:** Prefer under-match Make over inventing chrome — but **do not** skip director type-in for convenience. Trust `[PLAYBACK_DIAG]` once it logs every beat.
+**Rule:** Prefer under-match Legacy over inventing chrome — but **do not** skip director type-in for convenience. Trust `[PLAYBACK_DIAG]` once it logs every beat.
 
 ---
 

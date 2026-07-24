@@ -1,5 +1,5 @@
 /**
- * Project page-shell substrate — erase-Make Phase E (complete, 2026-07-23).
+ * Project page-shell substrate — erase-Legacy Phase E (complete, 2026-07-23).
  *
  * Replaced `frame/index.tsx`'s `Frame219` (the former Figma export) as the
  * thing rendered directly inside `.studio-viewport`. `frame/index.tsx` is
@@ -18,7 +18,7 @@
  * below), containing exactly `PAGE_SHELL_COLUMNS.length` ordered child divs.
  * Each screen's React mount (`mountPlpScreen`, `mountBookStep1Screen`, etc.)
  * appends its own `.studio-react-screen-host` into the matching column — the
- * columns themselves never need Make-sourced markup, since `dynamicCSS`
+ * columns themselves never need Legacy-sourced markup, since `dynamicCSS`
  * already overrides every column's layout via `!important` regardless of
  * what (if anything) is inside it.
  *

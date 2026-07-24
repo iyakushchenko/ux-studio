@@ -1,6 +1,6 @@
 # PAGE FINAL PASS — Chat (HARD-GREEN)
 
-**Surface:** Agentic Site Pilot Chat (`screenId: chat`, Make child 10)  
+**Surface:** Agentic Site Pilot Chat (`screenId: chat`, Legacy child 10)  
 **Date:** 2026-07-20  
 **Auditor:** Quinn (QA) MCP matrix · Uma (UI/UX) fidelity · Arch (Director) HARD-GREEN  
 **Ship tip:** _(stamped at commit)_ · **v0.0.60**  
@@ -35,7 +35,7 @@
 |----|------|
 | overlay-arm | PASS |
 | chat-host | PASS |
-| chat-make-retired | PASS |
+| chat-legacy-retired | PASS |
 | chat-site-pilot-bar | PASS |
 | chat-landmarks | PASS |
 | chat-composer-dock | PASS |
@@ -61,16 +61,16 @@
 
 ### Playback adjunct (same day — not a substitute for recipe)
 
-Agentic CJM Site Pilot → Chat: `__studioAssertTypeIn` PASS · `type-in-end typed + send` · STEPS `1→3` · PLAYBACK_DIAG `thinking-start` / `thinking-end → reveal reply r0`. Thinking is **playback-owned** (not on Sarah send) — Make truth.
+Agentic CJM Site Pilot → Chat: `__studioAssertTypeIn` PASS · `type-in-end typed + send` · STEPS `1→3` · PLAYBACK_DIAG `thinking-start` / `thinking-end → reveal reply r0`. Thinking is **playback-owned** (not on Sarah send) — Legacy truth.
 
 ---
 
 ## Structure contracts
 
 - `<main class="chat">` + `data-studio-react-screen="chat"`
-- Make retired: `data-studio-make-retired="chat"`
+- Legacy retired: `data-studio-legacy-retired="chat"`
 - BEM root `chat` / `chat__*`
-- No in-page `<header>` crumbs (Make Body9) — check script `HEADER_LANDMARK_OPTIONAL`
+- No in-page `<header>` crumbs (Legacy Body9) — check script `HEADER_LANDMARK_OPTIONAL`
 - UXDS: `ButtonPrimary` commerce reply CTAs + shared `SitePilotComposer` (mic/send)
 
 ---
@@ -79,7 +79,7 @@ Agentic CJM Site Pilot → Chat: `__studioAssertTypeIn` PASS · `type-in-end typ
 
 | Id | Note |
 |----|------|
-| R1 | Conversation helpful strip remains `hidden` (Make end-of-thread residual) — present in DOM with correct copy |
+| R1 | Conversation helpful strip remains `hidden` (Legacy end-of-thread residual) — present in DOM with correct copy |
 | R2 | Dual-class composer (`proto-site-pilot-composer` / `proto-agentic-*`) retained for wire selectors |
 | R3 | Progressive CJM reveals fewer CTAs until frames paint — Final Pass prove uses `cjm=off` |
 | R4 | Site Pilot / PDP / PLP HARD-GREEN unchanged |

@@ -8,7 +8,7 @@
 
 ## Sequencing rule (non-negotiable)
 
-**No new migrated page** until the **previous** page in the erase-Make sequence is **PAGE FINAL PASS hard-green**.
+**No new migrated page** until the **previous** page in the erase-Legacy sequence is **PAGE FINAL PASS hard-green**.
 
 | Sequence (Boots) | Previous must be hard-green before… |
 |------------------|-------------------------------------|
@@ -17,7 +17,7 @@
 | Home | …starting **Chat** |
 | Chat | …starting **History** |
 | History | …starting **Details** |
-| History/Details | …deleting Book 1–3 Make children |
+| History/Details | …deleting Book 1–3 Legacy children |
 
 Arch **rejects** “start next page” / Bea brief / Finn mount for the next screen while the previous page’s Final Pass is not hard-green. **Parallel callsigns remain mandatory** for serious streams. **`Knowledge used:`** remains mandatory on team check ([TEAM.md](./TEAM.md) § Knowledge use).
 
@@ -29,14 +29,14 @@ Arch **rejects** “start next page” / Bea brief / Finn mount for the next scr
 
 A page is **PAGE FINAL PASS hard-green** only when **all** are true:
 
-1. Erase-Make **DONE** definition in [NEXT_STEPS.md](./NEXT_STEPS.md) (React mount + Make retired + wire gates + no LEGACY growth + honest residual).  
+1. Erase-Legacy **DONE** definition in [NEXT_STEPS.md](./NEXT_STEPS.md) (React mount + Legacy retired + wire gates + no LEGACY growth + honest residual).  
 2. Uma FE audit **PROVEN** with evidence for every applicable stable row ID + Quinn MCP real-user matrix in `PARITY_PROVEN.json` (`check:parity-proven` green). For migrated pages, audit rows **D5 + J1–J6** must be PASS; N/A requires a screen-specific reason.
 3. Team check green for that screen — including **`Knowledge used:`** per role, Uma fidelity + typical DS checks, Bea register (no Missing P0), Quinn interaction matrix.  
 4. **This gate green:** `npm run check:page-final-pass` — manifest stamp `status: "proven"` + full checklist + source contracts (see below).  
 5. Quinn MCP prove cited after stamp (manifest notes may say “Quinn MCP follow-up” — Arch does **not** open the next page until Quinn team-check matrix PASS).
-6. **Interaction inventory attached:** migrated page `readinessPass=true`, no unexplained target loss versus its pre-migration Make inventory, and intentional decorative/retired controls are recorded ([INTERACTION_INVENTORY.md](./INTERACTION_INVENTORY.md)).
+6. **Interaction inventory attached:** migrated page `readinessPass=true`, no unexplained target loss versus its pre-migration Legacy inventory, and intentional decorative/retired controls are recorded ([INTERACTION_INVENTORY.md](./INTERACTION_INVENTORY.md)).
 
-PROVEN / tests green alone are **insufficient** to open the next page. Final Pass is the erase-Make **page-close** bar.
+PROVEN / tests green alone are **insufficient** to open the next page. Final Pass is the erase-Legacy **page-close** bar.
 
 ---
 
@@ -57,9 +57,9 @@ Do **not** re-list a parallel checklist elsewhere. Extend keys in the script + J
 |-----|--------|
 | `semanticHtml` | Landmarks (`header` / `main` / `section` / `aside` as contracted) |
 | `bemScreenId` | BEM root / classes use `screenId` |
-| `dataStudioHooks` | `data-studio-react-screen` + make-retired mount gates |
+| `dataStudioHooks` | `data-studio-react-screen` + legacy-retired mount gates |
 | `uxdsKits` | Required kits (e.g. SearchField / ButtonPrimary per screen) |
-| `noInventSeparators` | No invented filter/section separators vs Make |
+| `noInventSeparators` | No invented filter/section separators vs Legacy |
 | `dsStates` | Typical DS state matrix (hover/focus/…) via kit + ratchets |
 
 Boots manifest: [../projects/boots-pharmacy/audits/PAGE_FINAL_PASS.json](../projects/boots-pharmacy/audits/PAGE_FINAL_PASS.json).
@@ -94,7 +94,7 @@ When closing a migrated page (or asking to open the next), Arch + callsigns repo
 
 ## Related
 
-- [NEXT_STEPS.md](./NEXT_STEPS.md) — erase-Make board + hard locks  
+- [NEXT_STEPS.md](./NEXT_STEPS.md) — erase-Legacy board + hard locks  
 - [TEAM.md](./TEAM.md) · [TEAM_KNOWLEDGE.md](./TEAM_KNOWLEDGE.md)  
 - [FE_UI_UX_AUDIT.md](./FE_UI_UX_AUDIT.md) · [UMA_FIDELITY_NOTES.md](./UMA_FIDELITY_NOTES.md) · [PARITY_RATCHETS.md](./PARITY_RATCHETS.md)
 - [../shell/PROOF_ROUTER.md](../shell/PROOF_ROUTER.md) — one task-based entry point for localhost proof

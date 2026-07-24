@@ -7,7 +7,7 @@ import {
   BOOK_STEP1_REACT_SCREEN_ID,
   BOOK_STEP1_SCREEN_SELECTOR,
 } from "./bookStep1Contract";
-import { retireMakeUnderPage } from "../retireMakeUnderPage";
+import { retireLegacyUnderPage } from "../retireLegacyUnderPage";
 
 const HOST_CLASS = "studio-react-screen-host";
 const HIDE_SELECTORS = [
@@ -49,17 +49,17 @@ function ensureHost(page: HTMLElement): HTMLElement {
 }
 
 /**
- * Erase-Make DONE (board #8): delete Book Step 1's Make chrome outright on
- * first mount — no restore path back to Make for this screen.
+ * Erase-Legacy DONE (board #8): delete Book Step 1's Legacy chrome outright on
+ * first mount — no restore path back to Legacy for this screen.
  */
 function hideMakeChrome(page: HTMLElement): void {
-  retireMakeUnderPage(page, BOOK_STEP1_REACT_SCREEN_ID, {
+  retireLegacyUnderPage(page, BOOK_STEP1_REACT_SCREEN_ID, {
     hideSelectors: HIDE_SELECTORS,
     permanent: true,
   });
 }
 
-/** True when Book Step 1 Make wire has been retired for the React pilot. */
+/** True when Book Step 1 Legacy wire has been retired for the React pilot. */
 export function isBookStep1ReactMounted(): boolean {
   return !!pageEl()?.dataset.studioReactScreen;
 }
@@ -84,7 +84,7 @@ export function unmountBookStep1Screen(): void {
   if (!root && !hostEl) return;
 
   const page = pageEl();
-  // Gate Make wire immediately; actual createRoot.unmount runs after commit.
+  // Gate Legacy wire immediately; actual createRoot.unmount runs after commit.
   if (page) delete page.dataset.studioReactScreen;
 
   unmountTimer = setTimeout(() => {

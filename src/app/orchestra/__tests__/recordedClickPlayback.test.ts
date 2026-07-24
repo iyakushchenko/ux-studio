@@ -378,7 +378,7 @@ describe("playRecordedClick — login interstitial", () => {
     expect(simulateDemoPointerClick).not.toHaveBeenCalled();
   });
 
-  it("heals View Details to live React CTA — skips Make ghost cards", async () => {
+  it("heals View Details to live React CTA — skips Legacy ghost cards", async () => {
     document.body.innerHTML = `
       <div data-studio-react-screen="appointment-history">
         <div data-name="boots-pharmacy.component.ma.acc.overview.recent.order" style="display:none;width:0;height:0">

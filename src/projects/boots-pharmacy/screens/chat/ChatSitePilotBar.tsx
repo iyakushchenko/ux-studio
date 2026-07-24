@@ -1,5 +1,5 @@
 /**
- * Make Frame337 / Frame338 — Site Pilot microheader (white bar under engine header).
+ * Legacy Frame337 / Frame338 — Site Pilot microheader (white bar under engine header).
  * Logo cluster + Contact Support | Rate / More. Sticky is structural: bar sits
  * above `.chat__column` (sole scroll host), so it never scrolls away.
  */

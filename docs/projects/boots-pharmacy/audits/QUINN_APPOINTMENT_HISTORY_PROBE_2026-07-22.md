@@ -11,7 +11,7 @@
 |-------|--------|
 | overlay-arm | PASS |
 | appointment-history-host | PASS |
-| appointment-history-make-retired | PASS |
+| appointment-history-legacy-retired | PASS |
 | appointment-history-view-details-count (4) | PASS |
 | appointment-history-view-details-hover | PASS |
 | appointment-history-view-details-click → `appointment-details` | PASS |
@@ -22,8 +22,8 @@
 ## Contracts proved
 
 - Playback selector `data-studio-appointment-view-details="true"` on React CTAs
-- Make parked via `isMakeParkedForScreen("appointment-history")`
-- View Details routes to Make Details; restore returns to History for `url-screen`
+- Legacy parked via `isLegacyParkedForScreen("appointment-history")`
+- View Details routes to Legacy Details; restore returns to History for `url-screen`
 - Uma fidelity PROVEN after densify gate (card 32/56 · CTA 32 · no Cancel invent)
 
 ## Final Pass

@@ -45,7 +45,7 @@ Arch **rejects** “done” / Finn mount if the brief or ship sitrep lacks this 
 | **THEME** `projects/<id>/styleguide/theme.css` | — | Brand primary/accent/logo/font under `[data-studio-project]` |
 | **Screen CSS** | Prefer kit classes; thin layout composition only | Concept band layout when UXDS has no kit yet — still `var(--uxds-…)` |
 
-Coarse concepts (Make strips) supply **intent + brand cues**. Agent upgrades structure to UXDS / UXML kits; brand stays in THEME delta.
+Coarse concepts (Legacy strips) supply **intent + brand cues**. Agent upgrades structure to UXDS / UXML kits; brand stays in THEME delta.
 
 ---
 

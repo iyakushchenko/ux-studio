@@ -17,7 +17,7 @@ Think **GeoCities for enterprise UX**: rough concepts in → playable proof out 
 
 ### Problem
 
-PO concepts are often **early and messy** (Make feeds, static strips, partial UXDS). Make HTML is throwaway. Fully structured UXDS pages exist but are **rarely** the Studio feed.
+PO concepts are often **early and messy** (Legacy feeds, static strips, partial UXDS). Legacy HTML is throwaway. Fully structured UXDS pages exist but are **rarely** the Studio feed.
 
 ### Locked page stack (2026-07-19)
 
@@ -25,7 +25,7 @@ Studio pages = **React + UXDS** (agent upgrades). Input Figma need **not** alrea
 
 ### Target workflow
 
-1. **PO feeds a concept** — often a rough strip / Make-class frame (may ignore variables).
+1. **PO feeds a concept** — often a rough strip / Legacy-class frame (may ignore variables).
 2. **Agent fills the gap** — React pages using UXDS tokens + closest `component.*` / `module.*`, preserving intent.
 3. **Studio wiring** — `data-name`, screens, touchpoints, playback.
 4. **CJM layer** — beats, journeys (agentic / traditional), scenarios.
@@ -50,7 +50,7 @@ Export both. Compiler (future) turns recordings into journey proposals.
 
 ## Collaboration model (command doctrine)
 
-- **Product Owner** — product intent, Figma/UXDS truth, accept/reject, veto. Does not pick tech or sprint order.
+- **Product Owner (CX Director)** — product intent, Figma/UXDS truth, accept/reject, veto — and specifically the judgment calls no export or gate can resolve (touchpoint→screen mapping, what "good enough" means for a draft). Does not pick tech or sprint order. See "The distinctive claim" above.
 - **Cursor agent (commander)** — decides tech direction and next steps; builds; documents; only asks PO for assets/judgments.
 - **Studio engine** — transport contract, diagnostics, robo-cursor, playlist sync.
 
@@ -94,3 +94,9 @@ See [PROJECTS.md](../shell/PROJECTS.md), [PLAYBACK.md](../shell/PLAYBACK.md), [R
 ## Positioning (one line)
 
 **UX Studio turns design-system concepts into playable journey maps — built and extended with AI, not hand-coded throwaway prototypes.**
+
+## The distinctive claim (PO, 2026-07-24 — read before pitching this to anyone)
+
+**This product does not phase out the human. It keeps the human exactly where UX expertise is genuinely useful, and automates the rest.** The UX designer's role shifts from doing (hand-coding prototypes, manually catching every bug, manually mapping every screen) to **directing** — a CX Director narrating intent to an agent, which drafts pages/journeys precise enough that the designer picks up from a real starting point, not a blank page or a static mockup.
+
+This is not a slogan — it's an architectural commitment, and [CX_CONVEYOR.md](./CX_CONVEYOR.md) § "The determinism boundary" is where it's enforced: every gap in this system is sorted into either *engine territory* (machine-checkable, gated, no human needed once built) or *judgment territory* (structurally requires a UX call, permanently — e.g. mapping a free-text touchpoint name to the right real screen). The line is drawn deliberately, not by what's convenient to automate yet. Selling this as "fully autonomous" would be wrong and would misrepresent what the architecture actually guarantees — the honest pitch is *"a UX designer operating as CX Director, directing an agent that clears the mechanical floor so their time goes to judgment, not typing."*

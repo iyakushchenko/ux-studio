@@ -34,9 +34,9 @@ function getScrollHost(): HTMLElement | null {
  * Prefer React Chat summary.
  *
  * MISS (React migration): comma `querySelector` is document-order, not
- * selector-priority — Make dump-all under `page[data-studio-react-screen]`
+ * selector-priority — Legacy dump-all under `page[data-studio-react-screen]`
  * wins over `.studio-react-screen-host` and poisons progressive CJM.
- * Always resolve host first; never return Make-retired nodes.
+ * Always resolve host first; never return Legacy-retired nodes.
  */
 function getChatSummary(screen: ParentNode): HTMLElement | null {
   const host = screen.querySelector<HTMLElement>(
@@ -50,7 +50,7 @@ function getChatSummary(screen: ParentNode): HTMLElement | null {
       host.querySelector<HTMLElement>(
         '[data-name="component.appointment.summary"]'
       );
-    if (fromHost && !fromHost.closest("[data-studio-make-retired]")) {
+    if (fromHost && !fromHost.closest("[data-studio-legacy-retired]")) {
       return fromHost;
     }
   }
@@ -61,7 +61,7 @@ function getChatSummary(screen: ParentNode): HTMLElement | null {
   const fromMain = reactMain?.querySelector<HTMLElement>(
     '[data-name="component.appointment.summary"]'
   );
-  if (fromMain && !fromMain.closest("[data-studio-make-retired]")) {
+  if (fromMain && !fromMain.closest("[data-studio-legacy-retired]")) {
     return fromMain;
   }
 
@@ -70,7 +70,7 @@ function getChatSummary(screen: ParentNode): HTMLElement | null {
       screen.querySelectorAll<HTMLElement>(
         '[data-name="component.appointment.summary"]'
       )
-    ).find((el) => !el.closest("[data-studio-make-retired]")) ?? null
+    ).find((el) => !el.closest("[data-studio-legacy-retired]")) ?? null
   );
 }
 
@@ -159,7 +159,7 @@ function syncInPlaceGeometry(
     );
     const maxDelta = newMaxScroll - prevMaxScroll;
     if (maxDelta !== 0 && nearBottom) {
-      // LAYOUT SYNC (Make composer pad) — not journey camera SSoT.
+      // LAYOUT SYNC (Legacy composer pad) — not journey camera SSoT.
       scrollHost.scrollTop = Math.max(0, prevTop + maxDelta);
     }
     playbackScrollMonitor.onPinApply(scrollHost.scrollTop);
@@ -284,7 +284,7 @@ export function isSitePilotChatComposerFrame(el: HTMLElement): boolean {
   return hasAskPrompt && /next dialog options/i.test(text);
 }
 
-/** Composer card — fixed in summary after setup (Make) or React dock. */
+/** Composer card — fixed in summary after setup (Legacy) or React dock. */
 export function findSitePilotChatComposerCard(): HTMLElement | null {
   const screen = document.querySelector<HTMLElement>(
     ".studio-viewport > div > div:nth-child(10)"
@@ -342,7 +342,7 @@ export function setSitePilotChatComposerDockSuppressed(suppressed: boolean): voi
 
 /** Mount / sync the fixed composer dock — same path for CJM on and browse. */
 export function mountSitePilotChatComposerDock(screen: HTMLElement): void {
-  // React Chat owns `.chat__composer-dock` — strip Make portal + fixed fade leftovers.
+  // React Chat owns `.chat__composer-dock` — strip Legacy portal + fixed fade leftovers.
   if (isChatReactMounted()) {
     teardownSitePilotChatComposerDock(screen);
     screen
@@ -479,8 +479,8 @@ export function collectSitePilotChatScenarioFrames(
   );
 
   // React Chat only: trust data-studio-chat-frame playlist (full q0…r3).
-  // Make path must NOT use sparsely stamped markers — beforeReveal used to
-  // stamp Make dump-all frames, then this short-circuit returned 2 nodes and
+  // Legacy path must NOT use sparsely stamped markers — beforeReveal used to
+  // stamp Legacy dump-all frames, then this short-circuit returned 2 nodes and
   // stepScenarioFrameForward advanced the journey (false "reset" after q0/q1).
   if (inReactHost) {
     const reactFrames = Array.from(

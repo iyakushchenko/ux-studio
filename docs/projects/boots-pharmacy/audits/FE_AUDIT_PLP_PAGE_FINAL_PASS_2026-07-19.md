@@ -30,7 +30,7 @@
 **Helper:** `await window.__studioRunMcpPageProbe({ screenId: "plp", reload: false })`  
 **Result:** `{ pass: true, screenId: "plp" }`  
 **Overlay:** visible after `overlay-arm` and through `plp-below-fold-scroll`  
-**Landmarks on `[data-studio-react-screen=plp]`:** `header` ✓ · `main` ✓ · `section` ✓ · `aside` ✓ · `data-studio-make-retired=plp` ✓
+**Landmarks on `[data-studio-react-screen=plp]`:** `header` ✓ · `main` ✓ · `section` ✓ · `aside` ✓ · `data-studio-legacy-retired=plp` ✓
 
 ### Full matrix
 

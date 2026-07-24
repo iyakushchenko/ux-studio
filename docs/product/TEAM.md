@@ -132,14 +132,14 @@ Do **not** use the exception to skip Quinn MCP / Uma audit on UI ships, **PAGE F
 | Callsign | Must report |
 |----------|-------------|
 | **Uma (UI/UX)** | Fidelity checklist PASS/FAIL + failed items ([UMA_FIDELITY_NOTES.md](./UMA_FIDELITY_NOTES.md)). **Also mandatory on every migrated screen:** `loading states — PASS\|FAIL`, `checkbox/radio hover — PASS\|FAIL`, and **`typical DS checks — PASS\|FAIL`** (below) |
-| **Bea (BA)** | Register complete? Any Missing P0? (every Make band listed before Finn coded). **Loading / empty / updating states must be P0 rows** when Make has them — mechanism + layout, not copy-only |
-| **Quinn (QA)** | Interaction matrix PASS/FAIL — **cannot PASS** without unchecked-P0-free register **and** a **MCP localhost real-user evidence log** for the screen matrix. **Always** use `__studioRunMcpPageProbe` (robo-cursor + overlay PASS/FAIL) for screen ships; cite MCP steps in team check. Gate: `check:parity-proven`. **Must MCP-hover at least one SearchField** (or every search on the screen when few) and prove hover/focus vs kit + Make |
+| **Bea (BA)** | Register complete? Any Missing P0? (every Legacy band listed before Finn coded). **Loading / empty / updating states must be P0 rows** when Legacy has them — mechanism + layout, not copy-only |
+| **Quinn (QA)** | Interaction matrix PASS/FAIL — **cannot PASS** without unchecked-P0-free register **and** a **MCP localhost real-user evidence log** for the screen matrix. **Always** use `__studioRunMcpPageProbe` (robo-cursor + overlay PASS/FAIL) for screen ships; cite MCP steps in team check. Gate: `check:parity-proven`. **Must MCP-hover at least one SearchField** (or every search on the screen when few) and prove hover/focus vs kit + Legacy |
 | **Ben (BE)** | Owns MCP session hygiene with Quinn (vite up, page probe overlay start/stop, stay-on-page prove); `gh` sitrep after push; keeps `PARITY_PROVEN.json` honest |
 | **Finn (FE)** | Gaps fixed or blocked |
 
 **Typical DS checks (mandatory rule of thumb — before any screen PROVEN):**
 
-For **each** UXDS control used on the screen (at minimum **SearchField**, **Button** / primary CTA, **checkbox** / radio, **link** / text-link): verify **hover / focus / active / disabled** against the **UXDS kit** and **Make** parity — not rest-state only.
+For **each** UXDS control used on the screen (at minimum **SearchField**, **Button** / primary CTA, **checkbox** / radio, **link** / text-link): verify **hover / focus / active / disabled** against the **UXDS kit** and **Legacy** parity — not rest-state only.
 
 | Who | Owns |
 |-----|------|
@@ -151,8 +151,8 @@ For **each** UXDS control used on the screen (at minimum **SearchField**, **Butt
 - After big ships, Arch auto-runs **team check** before “done” — green tests alone do not skip it.  
 - Ship **cannot** be “done” if **Uma (UI/UX)** or **Quinn (QA)** reports **FAIL**.  
 - Blank listing + lone “Updating results…” (or equivalent) **without** Make’s spinner/overlay/skeleton = automatic Uma + Quinn **FAIL**.  
-- **Missing DS hover = fidelity FAIL class** (PO called out) — flat dead SearchField / Button / checkbox / link vs kit+Make blocks **PROVEN**.  
-- **Forbidden to invent** hover/loading chrome not in Make.  
+- **Missing DS hover = fidelity FAIL class** (PO called out) — flat dead SearchField / Button / checkbox / link vs kit+Legacy blocks **PROVEN**.  
+- **Forbidden to invent** hover/loading chrome not in Legacy.  
 - **MCP real-user matrix mandatory for every screen ship** (Quinn + Ben). Prefer `__studioRunMcpPageProbe` so the PO sees the robo-cursor + overlay PASS/FAIL. Arch **rejects** audit **PROVEN** without MCP evidence log.  
 - **Fixed localhost + reuse tab (HARD — Auto-Rule `fixed-localhost-reuse-tab`):** prove only at **`http://localhost:5173/`**. One `npm run dev` (`strictPort`). Chrome DevTools MCP: `list_pages` → `select_page` / `navigate_page`; **`new_page` only if zero pages**. Never open a second window/port “for safety.” → [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R11 · [../shell/URL.md](../shell/URL.md)  
 - **PO mid-flight signals (HARD — Auto-Rule R15):** during MCP smoke the agent owns the window. Poll `__studioPeekPoSignal` / `__studioConsumePoSignal` (or peek `__studioAgentTestingTakeover`) **each beat**. Alarm / Cursor / Scroll latch **live** first; dump secondary. **Overlay test & bugfix process (HARD):** (1) **STOP** immediately, (2) **understand** from `diagSnapshot` — if unclear, **ask PO for follow-up details before guessing**, (3) **FIX** the reported issue, (4) **RESTART** and **prove that exact issue is gone**, (5) loop until next signal or green end. Not “log and move on.” Not “invent the bug.” Smokes return structured fail — orchestrator session owns understand→fix→reprove. → [PLAYBACK_DIAG.md](../shell/PLAYBACK_DIAG.md) · [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R15 · [agent-testing/README.md](../../src/app/shell/agent-testing/README.md)  
@@ -161,7 +161,7 @@ For **each** UXDS control used on the screen (at minimum **SearchField**, **Butt
 - **PAGE FINAL PASS (GLOBAL sequencing):** **no new migrated page** until previous is **hard-green** — [PAGE_FINAL_PASS.md](./PAGE_FINAL_PASS.md). Finn/Uma land checklist + `check:page-final-pass`; Arch enforces. Team check still requires **`Knowledge used:`** per role.  
 - **No merge** without `npm run check:parity-proven` green (`PARITY_PROVEN.json` + audit PROVEN + MCP section).  
 - **Page final-pass (GLOBAL HARD FAIL):** `npm run check:page-final-pass` — every React-migrated screen needs proven stamp + checklist in `PAGE_FINAL_PASS.json` + source contracts (`<main>`/`<header>`, BEM=`screenId`, kits). **No NEXT page** (e.g. PDP) until prior screen final-pass proven ([PAGE_FINAL_PASS.md](./PAGE_FINAL_PASS.md)).  
-- **Parity ratchets (GLOBAL HARD FAIL):** `npm run check:parity-ratchets` — typical Make→React misses (search icon + **icon-pos end**, single clear, View all / 10-cap, filter counters, no filter hr, bookmark copy, empty-heart fuchsia, Advantage bar, Book now primary, loader dup, make-retired). Every new typical fail class → Arch/Ben add a ratchet ([PARITY_RATCHETS.md](./PARITY_RATCHETS.md)). Overlay registry stays in `check:felonies`.  
+- **Parity ratchets (GLOBAL HARD FAIL):** `npm run check:parity-ratchets` — typical Make→React misses (search icon + **icon-pos end**, single clear, View all / 10-cap, filter counters, no filter hr, bookmark copy, empty-heart fuchsia, Advantage bar, Book now primary, loader dup, legacy-retired). Every new typical fail class → Arch/Ben add a ratchet ([PARITY_RATCHETS.md](./PARITY_RATCHETS.md)). Overlay registry stays in `check:felonies`.  
 
 - **Overlay eyes (GLOBAL HARD FAIL):** every blocking popup (Quick View, Choose Pharmacy, Login, pickers, …) must be in `studioModalGuard` registry + `data-studio-modal`. `__studioRunMcpPageProbe` / `simulateDemoPointerClick` **must refuse** clicks to targets under the topmost overlay (or only click inside it). Felony: `check:felonies` fails npm test if guard missing or known overlays unregistered. Quinn proves: open Quick View → under-tile refuse PASS.  
 - **Modal URL registry (GLOBAL HARD FAIL — before any dialog ship):** add the `modal` id to [URL.md](../shell/URL.md) **and** the code registry (`STUDIO_MODAL` / `REGISTERED_OVERLAY_MODAL_IDS`) **and** DOM `data-studio-modal` in the **same** change. No dialog lands “registry later.” Finn/Ben own; Quinn proves deep-link + overlay-eyes.  
@@ -194,7 +194,7 @@ Serious work = this loop **with parallel sibling subagents** (§ Parallel dispat
 | Lessons (append-only) | `docs/product/LESSONS_LEARNED.md` | All (Arch curates) |
 | Feature brief template | `docs/product/FEATURE_BRIEF_TEMPLATE.md` | Bea |
 | Project feature briefs | `docs/projects/<id>/features/*.md` | Bea |
-| PLP Make parity register | `docs/projects/boots-pharmacy/features/PLP_MAKE_PARITY_REGISTER.md` | Bea |
+| PLP Legacy parity register | `docs/projects/boots-pharmacy/features/PLP_LEGACY_PARITY_REGISTER.md` | Bea |
 | Living board | `docs/product/NEXT_STEPS.md` | Arch |
 | Forecast | `docs/product/PRODUCT_FORECAST.md` | Arch |
 | FE audit | `docs/projects/<id>/audits/` | Uma |

@@ -2,12 +2,12 @@ import { describe, expect, it } from "vitest";
 import {
   humanizeRecordingLabel,
   humanizeScreenLabel,
-  isCoarseMakeModuleName,
+  isCoarseLegacyModuleName,
   isWeakScrollAnchorName,
 } from "@/app/recording/recordingLabels";
 
 describe("humanizeRecordingLabel", () => {
-  it("scrubs Make-ish data-name / module paths", () => {
+  it("scrubs Legacy-ish data-name / module paths", () => {
     expect(humanizeRecordingLabel('data-name="module.plp.tiles"')).toBe(
       "Plp Tiles"
     );
@@ -32,7 +32,7 @@ describe("humanizeRecordingLabel", () => {
   });
 
   it("flags weak / coarse anchors", () => {
-    expect(isCoarseMakeModuleName("module.plp.tiles")).toBe(true);
+    expect(isCoarseLegacyModuleName("module.plp.tiles")).toBe(true);
     expect(isWeakScrollAnchorName("component.plp.filter.checkbox.item")).toBe(
       true
     );

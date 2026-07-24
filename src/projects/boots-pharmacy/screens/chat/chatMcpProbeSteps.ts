@@ -3,7 +3,7 @@
  * Expanded Final Pass matrix (layout / helpful / footer / CTA sweep).
  */
 
-import { isMakeRetiredForScreen } from "../retireMakeUnderPage";
+import { isLegacyRetiredForScreen } from "../retireLegacyUnderPage";
 import { assertChatComposerScrollPad } from "./chatComposerScrollPadProbe";
 
 export type ChatMcpProbeStep = {
@@ -52,18 +52,18 @@ export function chatMcpProbeSteps(): ChatMcpProbeStep[] {
         'missing React Chat host — expected main.chat[data-studio-react-screen="chat"]',
     },
     {
-      id: "chat-make-retired",
+      id: "chat-legacy-retired",
       selector: hostSel,
       action: "assert",
       assert: () => {
-        if (!isMakeRetiredForScreen("chat")) {
-          return "Make leak: expected Make Frame children parked for chat";
+        if (!isLegacyRetiredForScreen("chat")) {
+          return "Legacy leak: expected Legacy Frame children parked for chat";
         }
         const liveSummaries = Array.from(
           document.querySelectorAll(
             `${hostSel} [data-name="component.appointment.summary"]`
           )
-        ).filter((el) => !el.closest("[data-studio-make-retired]"));
+        ).filter((el) => !el.closest("[data-studio-legacy-retired]"));
         if (liveSummaries.length !== 1) {
           return `expected exactly 1 live chat summary (got ${liveSummaries.length})`;
         }
@@ -78,7 +78,7 @@ export function chatMcpProbeSteps(): ChatMcpProbeStep[] {
         const bar = document.querySelector(
           `${hostSel} [data-studio-chat-site-pilot-bar="true"]`
         );
-        if (!bar) return "missing Site Pilot bar (Make Frame337)";
+        if (!bar) return "missing Site Pilot bar (Legacy Frame337)";
         if (!bar.querySelector('[data-name="boots.ai assistant 3"]')) {
           return "Site Pilot bar missing compact logo (boots.ai assistant 3)";
         }
@@ -148,8 +148,8 @@ export function chatMcpProbeSteps(): ChatMcpProbeStep[] {
           `${hostSel} textarea[data-studio-action="agentic-chat-query"]`
         );
         if (!ta) return "missing chat query textarea";
-        if (ta.closest("[data-studio-make-retired]")) {
-          return "chat textarea under make-retired";
+        if (ta.closest("[data-studio-legacy-retired]")) {
+          return "chat textarea under legacy-retired";
         }
         if (!ta.classList.contains("site-pilot-composer__query")) {
           return "textarea missing shared site-pilot-composer__query class";
@@ -235,7 +235,7 @@ export function chatMcpProbeSteps(): ChatMcpProbeStep[] {
       },
     },
     {
-      // Conversation strip stays `hidden` (Make end-of-thread residual) — hover reply strip.
+      // Conversation strip stays `hidden` (Legacy end-of-thread residual) — hover reply strip.
       id: "chat-helpful-hover",
       selector: `${hostSel} [data-studio-chat-helpful="reply"] .chat__helpful-choice`,
       action: "hover",
@@ -262,7 +262,7 @@ export function chatMcpProbeSteps(): ChatMcpProbeStep[] {
         const conv = document.querySelector(
           `${hostSel} [data-studio-chat-helpful="conversation"]`
         );
-        if (!conv) return "missing conversation helpful strip (Make residual; may stay hidden)";
+        if (!conv) return "missing conversation helpful strip (Legacy residual; may stay hidden)";
         const convPrompt = normalizeText(
           conv.querySelector(".chat__helpful-prompt")
         );
@@ -340,7 +340,7 @@ export function chatMcpProbeSteps(): ChatMcpProbeStep[] {
         if (!mount) return true;
         const h = Math.round(mount.getBoundingClientRect().height);
         if (h > 1) {
-          return `chat must hide footer mount (height ${h}px — Make child-10 hide rule)`;
+          return `chat must hide footer mount (height ${h}px — Legacy child-10 hide rule)`;
         }
         return true;
       },

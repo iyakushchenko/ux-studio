@@ -19,7 +19,7 @@
 
 ## Summary
 
-Safe hex→UXDS/theme token remaps landed on `BookAppointmentProgress`, `AppointmentSummaryPill`, and Book Step 1/2/3 screen CSS. Localhost computed colors match prior Make-parity values (primary `#3a3a3a`, navy `#012169`, accent soft `#c6e5e1`, subtle `#f5f5f5`, borders `#d6d6d6`/`#afafaf`). Make-only colors without bridge tokens left as intentional hex. No tertiary CTA extract; BR agent-testing overlay untouched; no big-bang LEGACY delete.
+Safe hex→UXDS/theme token remaps landed on `BookAppointmentProgress`, `AppointmentSummaryPill`, and Book Step 1/2/3 screen CSS. Localhost computed colors match prior Legacy-parity values (primary `#3a3a3a`, navy `#012169`, accent soft `#c6e5e1`, subtle `#f5f5f5`, borders `#d6d6d6`/`#afafaf`). Legacy-only colors without bridge tokens left as intentional hex. No tertiary CTA extract; BR agent-testing overlay untouched; no big-bang LEGACY delete.
 
 ---
 
@@ -65,7 +65,7 @@ Safe hex→UXDS/theme token remaps landed on `BookAppointmentProgress`, `Appoint
 | # | Result | Evidence |
 |---|--------|----------|
 | F1 | PASS | Kits + screens share semantic tokens; no new anonymous color roles |
-| F2 | PASS | Remaining hexes are Make-only (documented) |
+| F2 | PASS | Remaining hexes are Legacy-only (documented) |
 | F3 | PASS | No LEGACY CSS added |
 
 ### G. Nav chrome logic
@@ -97,11 +97,11 @@ Safe hex→UXDS/theme token remaps landed on `BookAppointmentProgress`, `Appoint
 | `#c3c3c3` | crumbs sep, search/checkbox border, unavailable cells | No UXDS border token (≠ `#d6d6d6`) |
 | `#7a7d87` / `#7c7c7c` | crumbs current, store address, weekday/time labels | No muted-text token |
 | `#f2f2f2` / `#f1f1f1` | chosen/month/time borders | Near-white hairlines; inventing aliases forbidden |
-| `#c4dde3` | notice / Advantage banners | Make ice-blue; not in design bridge |
+| `#c4dde3` | notice / Advantage banners | Legacy ice-blue; not in design bridge |
 | `#ffe351` | Step 3 ok chip | Accent yellow; not bridged |
-| `#000000` | Change hover label | Intentional Make black |
+| `#000000` | Change hover label | Intentional Legacy black |
 
-LEGACY child-7/4/3 CSS cleanup: **not done** this pass (did not open Make child CSS paths).
+LEGACY child-7/4/3 CSS cleanup: **not done** this pass (did not open Legacy child CSS paths).
 
 ---
 

@@ -112,6 +112,9 @@ export function StudioNavProductAbout({ disabled = false }: { disabled?: boolean
           <p className="studio-nav-product-about__body">
             It keeps pages, customer journeys, recording, playback and automated quality checks connected, helping preserve design intent and expose regressions as products grow.
           </p>
+          <p className="studio-nav-product-about__body">
+            It does not phase out the UX designer. It keeps them exactly where UX expertise is genuinely useful — directing intent as a CX Director — while automation clears the mechanical floor: drafting pages, wiring interactions, and catching regressions before they'd otherwise need a person to find them by hand.
+          </p>
           <p className="studio-nav-product-about__maintainer">
             This lab is developed and maintained internally by the UX Department R&amp;D division.
           </p>

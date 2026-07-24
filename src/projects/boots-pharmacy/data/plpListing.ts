@@ -532,7 +532,7 @@ function inferCountriesFromText(text: string): string[] {
   return found;
 }
 
-/** Make wire — region selection narrows the By Country candidate pool. */
+/** Legacy wire — region selection narrows the By Country candidate pool. */
 export function getPlpCountryCandidates(selectedRegions: string[]): string[] {
   if (selectedRegions.length) {
     const set = new Set<string>();

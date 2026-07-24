@@ -3,7 +3,7 @@
 **Surface / slice:** Book Step 1 Location (React pilot) + shared NearMeCta tip  
 **Date:** 2026-07-19  
 **Auditor:** audit subagent (distrust / not the implementer)  
-**Implementer handoff:** `412922f` (Make visual parity) + tip `2ea93a0` (NearMeCta unify); audited live at `668a6dd` on localhost:5173  
+**Implementer handoff:** `412922f` (Legacy visual parity) + tip `2ea93a0` (NearMeCta unify); audited live at `668a6dd` on localhost:5173  
 **Checklist:** [../FE_UI_UX_AUDIT.md](../../../product/FE_UI_UX_AUDIT.md)  
 **Design delta:** [../BOOTS_BOOK_STEP1_DESIGN_DELTA.md](../BOOTS_BOOK_STEP1_DESIGN_DELTA.md)
 
@@ -30,7 +30,7 @@ Live localhost audit of React Book Step 1 confirms the claimed fidelity ship: bo
 
 | # | Result | Evidence |
 |---|--------|----------|
-| A1 | **PASS** | React `.book-step-1` mounted (`data-studio-react-screen=book-step-1`); Make body/header/footer retired. H1 39/48, card white 24px radius, progress active navy 700 / bar `#c6e5e1`, checked booster `#afccca` — matches delta / live Make. |
+| A1 | **PASS** | React `.book-step-1` mounted (`data-studio-react-screen=book-step-1`); Legacy body/header/footer retired. H1 39/48, card white 24px radius, progress active navy 700 / bar `#c6e5e1`, checked booster `#afccca` — matches delta / live Legacy. |
 | A2 | **PASS** | Delta covered: body fill img `6d60145a…` opacity 0.31 `object-position: 50% 100%`; crumbs white / no border / Home `#305854`; shell/inner split; NearMeCta tertiary. |
 | A3 | **PASS** | Remaps scoped to `.book-step-1*` + shared `.studio-tertiary-cta` / `.proto-near-me-cta`; no accidental global wash observed on this path. |
 
@@ -89,7 +89,7 @@ Live localhost audit of React Book Step 1 confirms the claimed fidelity ship: bo
 
 | # | Result | Evidence |
 |---|--------|----------|
-| H1 | **PASS** | Proto sticky header + Footer remain; Make child-7 chrome hidden as designed. |
+| H1 | **PASS** | Proto sticky header + Footer remain; Legacy child-7 chrome hidden as designed. |
 | H2 | **PASS** | No console errors on audited path after reload → Book Step 1. |
 | H3 | **PASS** | Visual gates measured live — not inferred from unit/build alone. |
 
@@ -105,9 +105,9 @@ Live localhost audit of React Book Step 1 confirms the claimed fidelity ship: bo
 
 ## Intentional non-blockers (from design delta)
 
-- Breadcrumb delimiter is text `/` (not Make rotated bar).  
-- Learn more uses UXDS Disclosure (closed by default) vs always-visible Make paragraph.  
-- Proto sticky header / Footer vs Make absolute chrome.
+- Breadcrumb delimiter is text `/` (not Legacy rotated bar).  
+- Learn more uses UXDS Disclosure (closed by default) vs always-visible Legacy paragraph.  
+- Proto sticky header / Footer vs Legacy absolute chrome.
 
 ---
 

@@ -53,7 +53,7 @@ See [FE_AUDIT_PDP_MCP_2026-07-19.md](./FE_AUDIT_PDP_MCP_2026-07-19.md) for step 
 
 | Gate | Status |
 |------|--------|
-| Erase-Make DONE (React + Make retired + wire) | **PASS** |
+| Erase-Legacy DONE (React + Legacy retired + wire) | **PASS** |
 | Uma FE audit PROVEN + §0a FAQ 6/6 / Accordion / TertiaryCta soft | **PASS** (`76e2433`) |
 | Quinn MCP matrix PASS (23/23) on tip past PromoMessageStrip | **PASS** (`f5f004f` / v0.0.38) |
 | `check:page-final-pass` | **PASS** |

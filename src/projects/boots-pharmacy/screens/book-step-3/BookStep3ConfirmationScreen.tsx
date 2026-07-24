@@ -97,7 +97,7 @@ function Price({ amount, large }: { amount: number; large?: boolean }) {
 
 /**
  * React + UXDS pilot for Book — Step 3 (Confirmation).
- * Retires Make HTML for Frame child 3; AIR hook `data-studio-open-appointment`.
+ * Retires Legacy HTML for Frame child 3; AIR hook `data-studio-open-appointment`.
  */
 export function BookStep3ConfirmationScreen({
   chosenLocation,

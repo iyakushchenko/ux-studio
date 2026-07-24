@@ -22,7 +22,7 @@ export type AppointmentSummaryPillProps = {
 };
 
 /**
- * Appointment summary row — Make `Week Schedule` pill.
+ * Appointment summary row — Legacy `Week Schedule` pill.
  * Optional Change uses one tertiary icon+text language ([FE_STANDARDS](../../../docs/product/FE_STANDARDS.md)).
  */
 export function AppointmentSummaryPill({

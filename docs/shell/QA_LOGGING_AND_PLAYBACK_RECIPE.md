@@ -28,7 +28,7 @@ live while silently dropping rows.
 | Rule | Meaning |
 |------|---------|
 | **Continuous Play = Step** | Play is the **same** beat/script path as step-by-step, automated. There is **no** separate “dump-all / skip type-in / skip motion” Play path. |
-| **Do not invent a fast path** | Prefer under-match Make over inventing chrome — never skip director type-in for convenience. |
+| **Do not invent a fast path** | Prefer under-match Legacy over inventing chrome — never skip director type-in for convenience. |
 | **CJM-on chat enter** | First Sarah message (**q0**) only on enter, then **progressive** disclosure (thinking → bubbles / CTAs). |
 | **CJM-off chat** | Saved-chat load: blank interim → full thread → smooth scroll to bottom. Full rails: [CHAT_PAGE_RAILS.md](../projects/boots-pharmacy/features/CHAT_PAGE_RAILS.md). |
 | **`CHAT_LOADING_DUMP_ALL` watch** | **CJM-off only** (`agentTestingChatLoadingWatch`). Must **not** Alarm during CJM-on Play/SF when frames advance fast — that is progressive reveal, not saved-chat dump. |

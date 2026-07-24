@@ -8,8 +8,8 @@
 **Prior PROVEN tip:** `bf59041` · v0.0.28 — superseded by PO polish; re-proved here  
 **Prior RTB / share tip:** `553e29c` · v0.0.24 (§0b / P2 still valid; not re-opened)  
 **React:** `src/projects/boots-pharmacy/screens/pdp/*` (L1–L20 RTB + below-fold)  
-**Make truth:** `frame/index.tsx` `ModuleBreadcrumbs` / `Body6` / `Body7` / `ModulePdpRtb` / `ComponentPdpRtb` / `ComponentPdpAccordion` · `globals-screens` child-8 · `globals-chrome` checkbox/CTA/icon hits  
-**Register:** [../features/PDP_MAKE_PARITY_REGISTER.md](../features/PDP_MAKE_PARITY_REGISTER.md)  
+**Legacy truth:** `frame/index.tsx` `ModuleBreadcrumbs` / `Body6` / `Body7` / `ModulePdpRtb` / `ComponentPdpRtb` / `ComponentPdpAccordion` · `globals-screens` child-8 · `globals-chrome` checkbox/CTA/icon hits  
+**Register:** [../features/PDP_LEGACY_PARITY_REGISTER.md](../features/PDP_LEGACY_PARITY_REGISTER.md)  
 **Checklist:** [../../../product/UMA_FIDELITY_NOTES.md](../../../product/UMA_FIDELITY_NOTES.md) · [VISUAL_FIDELITY.md](../../../product/VISUAL_FIDELITY.md) · [FE_UI_UX_AUDIT.md](../../../product/FE_UI_UX_AUDIT.md) · [DS_STRICTNESS.md](../../../product/DS_STRICTNESS.md)
 
 ---
@@ -20,27 +20,27 @@
 |-------|-------|
 | **Overall** | **PROVEN** |
 | **§0a typical DS / pointer matrix** | **PASS** — FAQ 6/6 + Accordion kit motion/chevrons + TertiaryCta soft Find out more (v0.0.30) |
-| **§0a FAQ Accordion (UXDS kit)** | **PASS** — **6/6** interactive panels with bodies; hover navy; **no focus ring** (PO/Make); CSS grid-template-rows collapse; muted closed chevrons |
+| **§0a FAQ Accordion (UXDS kit)** | **PASS** — **6/6** interactive panels with bodies; hover navy; **no focus ring** (PO/Legacy); CSS grid-template-rows collapse; muted closed chevrons |
 | **§0a download CTAs (tertiary)** | **PASS** — Guide + Leaflet **same** `.pdp__pill`; **no** `.pdp__pill--bordered` stub / CSS (carried v0.0.28) |
 | **§0a Find out more (GP promo)** | **PASS** — `TertiaryCta` `soft` → `.studio-tertiary-cta--soft`; **no** `.pdp__pill--mint` (CSSOM + DOM) |
 | **§0b RTB vertical rhythm** | **PASS** — carried from v0.0.24 measure (`32px` stack; title-block `72px`) |
-| **P2 share glyph Make flip** | **PASS** — carried from v0.0.24 MCP matrix |
+| **P2 share glyph Legacy flip** | **PASS** — carried from v0.0.24 MCP matrix |
 | **PO green-light allowed?** | **No** — wait PO `+` before Home (Final Pass HARD-GREEN restored) |
 | **PAGE FINAL PASS** | **HARD-GREEN** @ tip `53da33f` / v0.0.38 |
 | **Arch Final Pass after Quinn?** | **Done** — Uma §0a + Quinn 23/23 @ `f5f004f` / v0.0.38 (PromoMessageStrip re-prove) → Arch HARD-GREEN restore `53da33f` |
 
 **Honest residuals:**  
-1. **Download URLs** — Guide / Leaflet are `<button>` with no `href` / download asset (Make parity).  
-2. **FAQ body sourcing** — 3 Make+Bea, 3 Bea-sourced for former header-only Make residuals (PO ask; register documents).
+1. **Download URLs** — Guide / Leaflet are `<button>` with no `href` / download asset (Legacy parity).  
+2. **FAQ body sourcing** — 3 Legacy+Bea, 3 Bea-sourced for former header-only Legacy residuals (PO ask; register documents).
 
 ---
 
 ## RTB vertical rhythm checklist (§0b — mandatory before fidelity PROVEN)
 
-**Make truth:** `ComponentPdpRtb` = `flex-col gap-[32px]`; stack = Frame128 (title+id) → Frame180 (price) → Frame182 (Myself/Someone else) → blurb → Units7 (booster) → Frame179 (CTAs).  
+**Legacy truth:** `ComponentPdpRtb` = `flex-col gap-[32px]`; stack = Frame128 (title+id) → Frame180 (price) → Frame182 (Myself/Someone else) → blurb → Units7 (booster) → Frame179 (CTAs).  
 **PO hard-fail class:** cramped price→recipient→body→booster (Uma prior pass missed; claimed L6 PASS on CSS file alone).
 
-| Gate | Make | React must prove | Status |
+| Gate | Legacy | React must prove | Status |
 |------|------|------------------|--------|
 | Parent column `gap` | `32px` | computed `.pdp__rtb-col` gap = `32px` (not LEGACY `48px !important`) | **PASS** — `32px` (v0.0.24) |
 | title-block size | content (no 1:1) | `.pdp__title-block` height ≈ title+service (~72px); **not** media square | **PASS** — `72px` (v0.0.24) |
@@ -49,9 +49,9 @@
 | body → booster | 32px | rect distance ≈ 32 | **PASS** — `32` |
 | booster → CTA | 32px | rect distance ≈ 32 | **PASS** — `32` |
 | Screenshot evidence | — | RTB column after fix | **PASS** — Chrome MCP viewport screenshot (v0.0.24) |
-| LEGACY isolation | Make-only | `globals-screens` module rules `:not(.pdp__rtb-card)` | **PASS** — rule present; React gap stays 32 |
+| LEGACY isolation | Legacy-only | `globals-screens` module rules `:not(.pdp__rtb-card)` | **PASS** — rule present; React gap stays 32 |
 
-**Root cause (2026-07-19):** Make LEGACY  
+**Root cause (2026-07-19):** Legacy LEGACY  
 `.studio-viewport … [data-name="module.pdp.rtb"] > div > div { gap: 48px !important }` and  
 `… > :first-child { flex:1; aspect-ratio:1/1 }` matched React `module.pdp__rtb-card > .pdp__rtb-row > .pdp__rtb-col` / title-block — stole rhythm. Fixed via `:not(.pdp__rtb-card)` (`cbbd97d`).
 
@@ -70,12 +70,12 @@
 
 | Panel | Source | Live body / DOM | Pass |
 |-------|--------|-----------------|------|
-| `how-can-boots-help` | Make RTB + Bea | Opens; “Our private Chickenpox Vaccination Service…” (417 chars) | **PASS** |
-| `who-is-at-risk` | Make Accordion + Bea | Default open; “weakened immune system” (377 chars) | **PASS** |
+| `how-can-boots-help` | Legacy RTB + Bea | Opens; “Our private Chickenpox Vaccination Service…” (417 chars) | **PASS** |
+| `who-is-at-risk` | Legacy Accordion + Bea | Default open; “weakened immune system” (377 chars) | **PASS** |
 | `what-happens-at-appointment` | Appt strip + specs + Bea | “Typical appointment takes around 15 minutes…” (327 chars) | **PASS** |
-| `nhs-vaccination` | Bea (Make header-only) | Interactive body present (397 chars); **not** residual static | **PASS** |
-| `already-have-chickenpox` | Bea (Make header-only) | Interactive body present (444 chars) | **PASS** |
-| `personal-data` | Bea (Make header-only) | Interactive body present (529 chars) | **PASS** |
+| `nhs-vaccination` | Bea (Legacy header-only) | Interactive body present (397 chars); **not** residual static | **PASS** |
+| `already-have-chickenpox` | Bea (Legacy header-only) | Interactive body present (444 chars) | **PASS** |
+| `personal-data` | Bea (Legacy header-only) | Interactive body present (529 chars) | **PASS** |
 
 **Counts:** `itemCount=6` · `bodiesWithText=6` · `residuals=0` (no `[data-studio-faq-residual]`).
 
@@ -106,12 +106,12 @@
 | No custom mint pill | **no** `.pdp__pill--mint` in DOM / CSSOM; deviation `DEV-20260719-tertiary-soft` | **PASS** |
 | Label | “Find out more” | **PASS** |
 
-### §0a — Accordion focus-none (Make parity · carried)
+### §0a — Accordion focus-none (Legacy parity · carried)
 
 | Probe | Computed / CSSOM | Pass |
 |-------|------------------|------|
 | Header **hover** CSS | `.pdp__accordion-header:hover` title + chevron → link navy token | **PASS** |
-| Header **:focus / :focus-visible** | `outline: none` (PO/Make) | **PASS** (carried) |
+| Header **:focus / :focus-visible** | `outline: none` (PO/Legacy) | **PASS** (carried) |
 
 ### §0a — Download CTAs tertiary (unified · carried)
 
@@ -128,7 +128,7 @@
 | Book now commerce | bg → `#01318f` + lift shadow | **PASS** (v0.0.24) |
 | Check availability secondary | mint wash; icon navy | **PASS** (v0.0.24) |
 | Empty wishlist heart | navy + wash | **PASS** (v0.0.24) |
-| Share icon | navy + wash; Make flip matrix | **PASS** (v0.0.24) |
+| Share icon | navy + wash; Legacy flip matrix | **PASS** (v0.0.24) |
 | Recipient inactive toggle | chip hover token | **PASS** (v0.0.24) |
 
 **N/A on PDP:** SearchField / listing loader (LE1–LE3) — no invent.
@@ -139,7 +139,7 @@
 
 | Line | Stamp |
 |------|-------|
-| `loading states` | **N/A** — Make has no page loader / empty list / updating overlay (LE1–LE3). No skeleton/spinner invent observed on mount. |
+| `loading states` | **N/A** — Legacy has no page loader / empty list / updating overlay (LE1–LE3). No skeleton/spinner invent observed on mount. |
 | `checkbox/radio hover` | **PASS** — real MCP `:hover` mint on unchecked booster box (v0.0.24) |
 | `typical DS checks` | **PASS** — §0a FAQ 6/6 + Accordion motion/chevrons + TertiaryCta soft + focus-none + download unify (tip `76e2433` / v0.0.30) |
 | `fidelity checklist` | **PROVEN** — §0a polish re-proved; §0b/P2 carried |
@@ -161,7 +161,7 @@
 | **L9** | Recipient toggle + login | **PASS** | Active mint / inactive hover token `#eef8f7` |
 | **L10** | Service blurb | **PASS** | 13 / leading 24 |
 | **L11** | Booster checkbox | **PASS** | Unchecked hover mint proven |
-| **L12** | CTA row | **PASS** | Book / secondary / heart / share hovers + **share Make flip** proven |
+| **L12** | CTA row | **PASS** | Book / secondary / heart / share hovers + **share Legacy flip** proven |
 | **L13** | Advantage bar | **PASS** | Mint bar under card |
 | **L14** | Below-fold body | **PASS** (layout) | `py 96` / `gap 72` |
 | **L15** | Content hero | **PASS** | 39 bold + 14×3 `#afccca` |
@@ -177,9 +177,9 @@
 
 | Residual | Severity | Owner |
 |----------|----------|-------|
-| Download CTAs have no file URLs | **Accepted Make parity** — buttons only until assets exist | PO / Pax |
+| Download CTAs have no file URLs | **Accepted Legacy parity** — buttons only until assets exist | PO / Pax |
 | PAGE FINAL PASS / `mcpFinalPass` | **HARD-GREEN** @ `53da33f` / v0.0.38 | Arch |
-| FAQ Bea-sourced bodies (3 panels) | **Accepted** — PO ask; register documents Make header-only gap | Bea / PO |
+| FAQ Bea-sourced bodies (3 panels) | **Accepted** — PO ask; register documents Legacy header-only gap | Bea / PO |
 
 ---
 
@@ -203,10 +203,10 @@
 | Accordion height:auto stutter | **Clear** — CSS grid-template-rows kit motion |
 | Loud closed chevrons | **Clear** — muted soft closed / strong open |
 | Download tertiary stub border | **Clear** — both `.pdp__pill`; no `#c7e4ff` leaflet stub |
-| Accordion focus ring (anti-Make) | **Clear** — outline none on `:focus` / `:focus-visible` |
-| Make visual leak | **Clear** |
+| Accordion focus ring (anti-Legacy) | **Clear** — outline none on `:focus` / `:focus-visible` |
+| Legacy visual leak | **Clear** |
 | RTB vertical rhythm / LEGACY steal | **Clear** — measured 32px / title 72px |
-| Share glyph missing Make flip | **Clear** — MCP matrix match |
+| Share glyph missing Legacy flip | **Clear** — MCP matrix match |
 | Rest-state PROVEN | **PROVEN** |
 
 ---
@@ -216,22 +216,22 @@
 ```
 Uma (UI/UX): fidelity checklist — PROVEN (§0a PASS FAQ 6/6 + Accordion grid motion + muted closed chevrons + TertiaryCta soft Find out more; §0b PASS; P2 share flip PASS; residual: no download URLs)
 Uma (UI/UX): section vertical rhythm (§0b) — PASS (32px stack; title-block 72px; tip 87c0fc8 / cbbd97d)
-Uma (UI/UX): loading states — N/A (no Make loader; invent = FAIL) — PASS for absence
+Uma (UI/UX): loading states — N/A (no Legacy loader; invent = FAIL) — PASS for absence
 Uma (UI/UX): checkbox/radio hover — PASS (MCP :hover mint on unchecked booster)
 Uma (UI/UX): typical DS checks (state matrix) — PASS (§0a; tip 76e2433 / v0.0.30)
 Uma (UI/UX): FAQ Accordion UXDS — PASS (6/6 bodies; grid-template-rows motion CSSOM; closed chevron soft #afccca; open strong #467672)
 Uma (UI/UX): Find out more — PASS (TertiaryCta soft; no .pdp__pill--mint; DEV-20260719-tertiary-soft)
 Uma (UI/UX): download CTA tertiary unify — PASS (carried v0.0.28)
-Uma (UI/UX): share glyph Make flip — PASS (carried v0.0.24)
+Uma (UI/UX): share glyph Legacy flip — PASS (carried v0.0.24)
 Uma (UI/UX): Arch Final Pass — HARD-GREEN restored @ 53da33f / v0.0.38 (Uma §0a + Quinn 23/23 PromoMessageStrip re-prove @ f5f004f)
 ```
 
-**Knowledge used:** UMA_FIDELITY_NOTES §0/§0a/**§0b** · VISUAL_FIDELITY · DS_STRICTNESS · PDP_MAKE_PARITY_REGISTER L18–L20 · UXDS Accordion kit (`accordion.css` grid rows) · `TertiaryCta soft` · DEVIATIONS `DEV-20260719-tertiary-soft` · PAGE_FINAL_PASS.md (Arch after Quinn).
+**Knowledge used:** UMA_FIDELITY_NOTES §0/§0a/**§0b** · VISUAL_FIDELITY · DS_STRICTNESS · PDP_LEGACY_PARITY_REGISTER L18–L20 · UXDS Accordion kit (`accordion.css` grid rows) · `TertiaryCta soft` · DEVIATIONS `DEV-20260719-tertiary-soft` · PAGE_FINAL_PASS.md (Arch after Quinn).
 
 ---
 
 ## Related
 
-- [PDP_REACT.md](../features/PDP_REACT.md) · [PDP_MAKE_PARITY_REGISTER.md](../features/PDP_MAKE_PARITY_REGISTER.md)  
+- [PDP_REACT.md](../features/PDP_REACT.md) · [PDP_LEGACY_PARITY_REGISTER.md](../features/PDP_LEGACY_PARITY_REGISTER.md)  
 - [QUINN_PDP_PROBE_CRITERIA_2026-07-19.md](./QUINN_PDP_PROBE_CRITERIA_2026-07-19.md) · [FE_AUDIT_PDP_MCP_2026-07-19.md](./FE_AUDIT_PDP_MCP_2026-07-19.md)  
 - PLP HARD-GREEN audit: [FE_AUDIT_PLP_PAGE_FINAL_PASS_2026-07-19.md](./FE_AUDIT_PLP_PAGE_FINAL_PASS_2026-07-19.md)

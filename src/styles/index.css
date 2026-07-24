@@ -37,5 +37,5 @@
 @import '../app/shell/studioEmptyProject.css';
 @import '../app/shell/agent-testing/agent-testing-overlay.css';
 
-/* ── LEGACY — Make quarantine (`globals-*.css`); do not grow for React pages */
+/* ── LEGACY — legacy-source quarantine (`globals-*.css`); do not grow for React pages */
 @import './globals.css';

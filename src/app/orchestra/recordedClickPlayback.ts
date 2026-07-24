@@ -51,7 +51,7 @@ function isHistoryViewDetailsClick(click: JourneyBeatRecordedClick): boolean {
   );
 }
 
-/** Prefer live React History CTA — Make ghost cards win bare first-match. */
+/** Prefer live React History CTA — Legacy ghost cards win bare first-match. */
 function resolveVisibleHistoryViewDetails(): HTMLElement | null {
   const host =
     document.querySelector<HTMLElement>(
@@ -63,7 +63,7 @@ function resolveVisibleHistoryViewDetails(): HTMLElement | null {
       (btn) =>
         isClickableTarget(btn) &&
         hasDemoInteractionContract(btn) &&
-        !btn.closest("[data-studio-make-retired]")
+        !btn.closest("[data-studio-legacy-retired]")
     ) ?? null
   );
 }
@@ -95,7 +95,7 @@ function resolveRecordedClickByLabel(
       })
       .filter((node): node is HTMLElement => Boolean(node))
       .filter((node, nodeIndex, all) => all.indexOf(node) === nodeIndex)
-      .filter((node) => !node.closest("[data-studio-make-retired]"))
+      .filter((node) => !node.closest("[data-studio-legacy-retired]"))
       .filter((node) => {
         const actual = normalizeRecordedClickLabel(
           node.getAttribute("aria-label") ?? node.textContent ?? undefined,
@@ -158,7 +158,7 @@ function resolveRecordedClickTarget(
     usable &&
     isClickableTarget(usable) &&
     hasDemoInteractionContract(usable) &&
-    !usable.closest("[data-studio-make-retired]")
+    !usable.closest("[data-studio-legacy-retired]")
   ) {
     if (
       options?.preferSlottedLocation &&
@@ -273,7 +273,7 @@ function findSlottedChooseLocationButton(): HTMLElement | null {
       (btn) =>
         isClickableTarget(btn) &&
         !storeCardHasNoSlots(btn) &&
-        !btn.closest("[data-studio-make-retired]")
+        !btn.closest("[data-studio-legacy-retired]")
     ) ?? null
   );
 }

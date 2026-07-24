@@ -25,14 +25,14 @@ describe("SearchField UXDS kit", () => {
     expect(kit).not.toMatch(/type="search"/);
   });
 
-  it("keeps magnifier borderless (no Make overlay box on icon)", () => {
+  it("keeps magnifier borderless (no Legacy overlay box on icon)", () => {
     expect(css).toMatch(
       /\.uxds-search-field__icon\s*\{[\s\S]*?border:\s*none\s*!important/
     );
     expect(css).toMatch(
       /\.uxds-search-field__icon\s*\{[\s\S]*?box-shadow:\s*none\s*!important/
     );
-    // Make Text Field hover must target absolute border overlay only
+    // Legacy Text Field hover must target absolute border overlay only
     expect(chrome).toMatch(
       /\[data-name="Text Field"\]\s*>\s*\[aria-hidden\]\.absolute/
     );

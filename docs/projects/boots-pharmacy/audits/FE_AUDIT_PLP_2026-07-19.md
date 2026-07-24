@@ -1,12 +1,12 @@
 # FE / UI / UX audit result
 
-**Surface / slice:** PLP Vaccinations — Make preloader scenario restore + checkbox hover + team directions harden  
+**Surface / slice:** PLP Vaccinations — Legacy preloader scenario restore + checkbox hover + team directions harden  
 **Date:** 2026-07-19  
 **Auditor:** Uma (UI/UX) + Quinn (QA) — strict interface audit  
 **Implementer handoff / audited tip:** `614ebc7`  
 **Version:** `0.0.7`  
 **Checklist:** [../../../product/FE_UI_UX_AUDIT.md](../../../product/FE_UI_UX_AUDIT.md) · [UMA_FIDELITY_NOTES.md](../../../product/UMA_FIDELITY_NOTES.md) · [VISUAL_FIDELITY.md](../../../product/VISUAL_FIDELITY.md) · [FE_STANDARDS.md](../../../product/FE_STANDARDS.md) · [DS_STRICTNESS.md](../../../product/DS_STRICTNESS.md)  
-**Register:** [../features/PLP_MAKE_PARITY_REGISTER.md](../features/PLP_MAKE_PARITY_REGISTER.md)
+**Register:** [../features/PLP_LEGACY_PARITY_REGISTER.md](../features/PLP_LEGACY_PARITY_REGISTER.md)
 
 ---
 
@@ -28,7 +28,7 @@
 
 ## Summary
 
-PO rage #2: React PLP loading was **wrong** — opacity-0 tiles kept layout height so the Make spinner overlay centered below the fold; users only saw pulsed “Updating results…” (text-only feel). Restored Make scenario: hide tiles (`display: none`), in-band centered spinner overlay (arc + copy) on `min-height: 220px` host, pulsed count, stagger return. Added Make mint checkbox/radio hover on React rows. Team directions hardened so loading states + checkbox hover cannot be skipped.
+PO rage #2: React PLP loading was **wrong** — opacity-0 tiles kept layout height so the Legacy spinner overlay centered below the fold; users only saw pulsed “Updating results…” (text-only feel). Restored Legacy scenario: hide tiles (`display: none`), in-band centered spinner overlay (arc + copy) on `min-height: 220px` host, pulsed count, stagger return. Added Legacy mint checkbox/radio hover on React rows. Team directions hardened so loading states + checkbox hover cannot be skipped.
 
 ---
 
@@ -36,7 +36,7 @@ PO rage #2: React PLP loading was **wrong** — opacity-0 tiles kept layout heig
 
 | Item | Result |
 |------|--------|
-| Loading / empty / updating (§0) — Make spinner overlay in-band | **PASS** |
+| Loading / empty / updating (§0) — Legacy spinner overlay in-band | **PASS** |
 | Checkbox/radio hover mint `#c6e5e1` | **PASS** |
 | Page bg / shadows / wrappers | **PASS** (prior) |
 | Promo/banner — Advantage Card | **PASS** (prior) |
@@ -62,8 +62,8 @@ PO rage #2: React PLP loading was **wrong** — opacity-0 tiles kept layout heig
 |------|--------|
 | AI Assistant promo strip (L6) | Missing — residual |
 | Filter View all (I6) | Missing — residual |
-| Catalog ~10 vs Make ~21 (L14) | Partial |
-| Make Frame child 9 in bundle | Hidden + wire-gated |
+| Catalog ~10 vs Legacy ~21 (L14) | Partial |
+| Legacy Frame child 9 in bundle | Hidden + wire-gated |
 
 ---
 
@@ -72,4 +72,4 @@ PO rage #2: React PLP loading was **wrong** — opacity-0 tiles kept layout heig
 - `UMA_FIDELITY_NOTES.md` §0 loading first-class + checkbox hover §5 + team-check lines
 - `LESSONS_LEARNED.md` — wrong preloader = fail (PO twice); checkbox hover miss
 - `TEAM.md` / `COMMAND_DOCTRINE.md` / `ux-studio-director.mdc` / `POST_CHANGE_CHECKLIST.md`
-- Register L4 accurate Make description + I1b
+- Register L4 accurate Legacy description + I1b

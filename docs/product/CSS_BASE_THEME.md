@@ -14,7 +14,7 @@
 | **BASE** | `src/uxds/**/*.css` | Tokens + shared components/kits only |
 | **THEME** | `src/projects/<id>/styleguide/theme.css` | Variable remaps only; optional; off = BASE |
 | **PANEL** | `src/app/nav/**/*.css` (+ future `src/app/shell/**/*.css` if extracted) | Engine chrome only — REC / CJM / cassette |
-| **LEGACY** | Make globals under `src/styles/globals*.css` | Quarantine; **no NEW React page styles here** |
+| **LEGACY** | Legacy globals under `src/styles/globals*.css` | Quarantine; **no NEW React page styles here** |
 
 **Theme = delta only (HARD):** Keep UXDS / UXML BASE as mutual as possible across projects. Project `theme.css` remaps brand facts (primary/accent/logo/font) under `[data-studio-project]` — **not** layout, hover forks, or component anatomy. Page create must inherit kits first — [PAGE_CREATE_INHERITANCE.md](./PAGE_CREATE_INHERITANCE.md) · [PROJECT_STYLEGUIDE.md](./PROJECT_STYLEGUIDE.md).
 
@@ -69,8 +69,8 @@ PANEL is imported from `index.css` (not only from components) so it sits **befor
 |------|------------|-------------|
 | `src/styles/globals.css` | Barrel → hub / chrome / screens | Do not add new React page rules |
 | `src/styles/globals-hub.css` | Hub / tour surfaces | Retire as hub moves to React |
-| `src/styles/globals-chrome.css` | Mixed Make + engine wire/scroll | No new React page styles; eventual PANEL/shell extract |
-| `src/styles/globals-screens.css` | Make screen monster CSS | Retire screen-by-screen |
+| `src/styles/globals-chrome.css` | Mixed Legacy + engine wire/scroll | No new React page styles; eventual PANEL/shell extract |
+| `src/styles/globals-screens.css` | Legacy screen monster CSS | Retire screen-by-screen |
 
 ### React page CSS — COMPOSITION ownership (not a global layer)
 
@@ -94,7 +94,7 @@ LEGACY, or dumping into LEGACY. Deviations →
 | Brand color / logo remap | THEME | `src/projects/<id>/styleguide/theme.css` |
 | REC / CJM / cassette / nav chrome | PANEL | `src/app/nav/**/*.css` |
 | New React concept page | COMPOSITION or BASE/THEME | Component-imported `src/projects/<id>/screens/**`; scope under the screen root — **never** `globals-*.css` |
-| Touching unmigrated Make screen | LEGACY only if unavoidable | Prefer migrate that screen; do not grow the monster for React |
+| Touching unmigrated Legacy screen | LEGACY only if unavoidable | Prefer migrate that screen; do not grow the monster for React |
 
 ---
 
@@ -107,23 +107,23 @@ LEGACY, or dumping into LEGACY. Deviations →
 | Boots `styleguide/theme.css` | Done | THEME | Stay (remaps only) |
 | `studioNavPanel.css` (nav / REC / CJM) | Done | PANEL | Stay; all new chrome here |
 | Book Step 1 React screen CSS | Done | Page (`screens/book-step-1/`) | Stay; next screens same pattern |
-| Hub Make CSS (`globals-hub.css`) | Legacy | LEGACY | Retire with hub React |
+| Hub Legacy CSS (`globals-hub.css`) | Legacy | LEGACY | Retire with hub React |
 | Wire / scroll / playback shield (`globals-chrome.css`) | Mixed | LEGACY (engine bits) | Extract → `src/app/shell/**` (PANEL) |
-| Make screen dump (`globals-screens.css`) | Legacy | LEGACY | Retire screen-by-screen |
-| Remaining Make screens in wire | Legacy | LEGACY | React + page CSS / BASE kits |
+| Legacy screen dump (`globals-screens.css`) | Legacy | LEGACY | Retire screen-by-screen |
+| Remaining Legacy screens in wire | Legacy | LEGACY | React + page CSS / BASE kits |
 | `src/styles/theme.css` (shadcn) | Tooling preamble | Preamble | Not project THEME |
 
 ### Inventory (approx sizes at checkpoint)
 
 | Bucket | Paths | ~bytes |
 |--------|-------|--------|
-| LEGACY Make | `globals-screens.css` + `globals-chrome.css` + `globals-hub.css` | ~200 KB |
+| LEGACY | `globals-screens.css` + `globals-chrome.css` + `globals-hub.css` | ~200 KB |
 | BASE | `src/uxds/**/*.css` | ~9 KB |
 | THEME | `boots-pharmacy/styleguide/theme.css` | ~2 KB |
 | PANEL | `src/app/nav/studioNavPanel.css` | (nav chrome) |
 | Page (React) | `book-step-1-location.css` | ~13 KB |
 
-**Readiness verdict:** **Architecture ready now** (BASE + THEME + PANEL locked and imported). **LEGACY retirement is phased** — do not big-bang rewrite the Make monster; retire screen-by-screen as surfaces move to React. New work must land in BASE / THEME / PANEL / page CSS only.
+**Readiness verdict:** **Architecture ready now** (BASE + THEME + PANEL locked and imported). **LEGACY retirement is phased** — do not big-bang rewrite the Legacy monster; retire screen-by-screen as surfaces move to React. New work must land in BASE / THEME / PANEL / page CSS only.
 
 ---
 
@@ -138,7 +138,7 @@ Tailwind v4 fails the production build with `Invalid declaration: `` ` when a CS
 1. **No CSS dump** — one concern per file/layer.  
 2. **No whack-a-mole** — fix ownership, then style once in the right layer.  
 3. **LEGACY is quarantine** — do not add styles for new React pages there.  
-4. **PANEL isolated from Boots Make** — engine chrome does not live in `globals-screens.css`.  
+4. **PANEL isolated from Boots Legacy** — engine chrome does not live in `globals-screens.css`.  
 5. **Deviations registered** — [`DS_STRICTNESS.md`](./DS_STRICTNESS.md) + [`../uxds/DEVIATIONS.md`](../uxds/DEVIATIONS.md).
 
 ---

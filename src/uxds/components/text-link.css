@@ -1,7 +1,7 @@
 /**
  * UXDS regular text link — ONE pattern for body + footer-style links.
  * Rest: no underline. Hover: underline. Color via tokens (theme remaps).
- * Same visual contract as Make `.proto-link` under `.studio-viewport` / footer.
+ * Same visual contract as Legacy `.proto-link` under `.studio-viewport` / footer.
  * @see docs/product/FE_STANDARDS.md §2 · docs/product/DS_STRICTNESS.md
  * @see scripts/check-text-link-contract.mjs
  */

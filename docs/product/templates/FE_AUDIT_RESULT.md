@@ -109,14 +109,14 @@ Copy rows from [FE_UI_UX_AUDIT.md](../FE_UI_UX_AUDIT.md); keep PASS/FAIL/N/A + e
 | I3 | | |
 | I4 | | |
 
-### J. Make → React state and real-user proof
+### J. Legacy → React state and real-user proof
 
 | # | Result | Evidence |
 |---|--------|----------|
 | J1 | | Loading / empty / updating mechanism |
 | J2 | | Checkbox / radio state matrix |
 | J3 | | Computed vertical-rhythm measurements |
-| J4 | | Make register: no unchecked P0 |
+| J4 | | Legacy register: no unchecked P0 |
 | J5 | | Quinn localhost MCP matrix |
 | J6 | | Overlay visible / scroll-into-view / overlay eyes |
 

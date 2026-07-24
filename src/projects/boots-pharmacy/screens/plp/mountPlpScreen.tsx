@@ -1,10 +1,10 @@
 import { createRoot, type Root } from "react-dom/client";
 import { PlpScreen, type PlpScreenProps } from "./PlpScreen";
 import { PLP_REACT_SCREEN_ID, PLP_SCREEN_SELECTOR } from "./plpContract";
-import { retireMakeUnderPage } from "../retireMakeUnderPage";
+import { retireLegacyUnderPage } from "../retireLegacyUnderPage";
 
 const HOST_CLASS = "studio-react-screen-host";
-/** Keep Studio chrome mounts; retire every Make Frame child under PLP. */
+/** Keep Studio chrome mounts; retire every Legacy Frame child under PLP. */
 const KEEP_VISIBLE = new Set([HOST_CLASS, "proto-footer-mount", "proto-header-mount"]);
 
 let root: Root | null = null;
@@ -40,18 +40,18 @@ function ensureHost(page: HTMLElement): HTMLElement {
 }
 
 /**
- * Erase-Make Phase E (board #7c tail / substrate replacement): `ProjectPageShell`
- * columns start empty — there is no Frame219-sourced Make content left to
+ * Erase-Legacy Phase E (board #7c tail / substrate replacement): `ProjectPageShell`
+ * columns start empty — there is no Frame219-sourced Legacy content left to
  * park-and-restore. Retire permanently, matching the Book Step 1-3 precedent.
  */
 function hideMakeChrome(page: HTMLElement): void {
-  retireMakeUnderPage(page, PLP_REACT_SCREEN_ID, {
+  retireLegacyUnderPage(page, PLP_REACT_SCREEN_ID, {
     keepClassNames: KEEP_VISIBLE,
     permanent: true,
   });
 }
 
-/** True when PLP Make wire has been retired for the React migration. */
+/** True when PLP Legacy wire has been retired for the React migration. */
 export function isPlpReactMounted(): boolean {
   return !!pageEl()?.dataset.studioReactScreen;
 }

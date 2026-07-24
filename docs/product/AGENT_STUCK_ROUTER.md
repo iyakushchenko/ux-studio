@@ -17,7 +17,7 @@ Open **one** row below. Do **not** re-run blind, invent fixes, open five docs, o
 | Role / process unsure | Your hat in [TEAM_KNOWLEDGE.md](./TEAM_KNOWLEDGE.md) only |
 | Failure class history | [LESSONS topic index](./LESSONS_LEARNED.md#topic-index) — one topic row |
 
-**Forbidden:** reread LESSONS/TEAM_KNOWLEDGE end-to-end · retry suite/probe without changing a dig-named cause · parallel “maybe” edits · opening Figma + Make + three CSS files before the dig card.
+**Forbidden:** reread LESSONS/TEAM_KNOWLEDGE end-to-end · retry suite/probe without changing a dig-named cause · parallel “maybe” edits · opening Figma + Legacy + three CSS files before the dig card.
 
 ---
 
@@ -40,7 +40,7 @@ Open **one** row below. Do **not** re-run blind, invent fixes, open five docs, o
 | Popup opens → chat/page underlay gone (`display:none` / `content-visibility:hidden`) | [LESSONS non-destructive overlay](./LESSONS_LEARNED.md#topic-overlay-underlay) — not engine; kill Boots chat freeze | Solid scrim only; re-prove `screen=chat&modal=choose-pharmacy` underlay painted |
 | `uxml play` / `play step` FAIL `beat-tab-mismatch` (`state-mismatch`) after a director-script beat (avail-book→book-step2, history-view-details→appointment-details) | [LESSONS beat-tab alignment race](./LESSONS_LEARNED.md#topic-playback-alignment) — `beatEnterPendingRef` in [`useJourneyPlayback.ts`](../../src/app/orchestra/useJourneyPlayback.ts) + `shouldAdvanceAfterChainedManualDirectorBeat` in [`journeyBeatDirector.ts`](../../src/app/orchestra/journeyBeatDirector.ts) | New director-script beat: covered automatically. New chained-click beat that navigates: add its `tabScript`/`bookScript` to `shouldAdvanceAfterChainedManualDirectorBeat`; re-prove `uxml play step` 22/22 |
 | PO said `uxml rec` / `uxml play` / `uxml play step` / `uxml play step r` | [UXML_COMMANDS.md](../shell/UXML_COMMANDS.md) | Run that locked procedure only (default = current CJM) |
-| DS hover / loading invent / densify win | [UMA_FIDELITY_NOTES.md](./UMA_FIDELITY_NOTES.md) · LESSONS densify | Match Make; no invent |
+| DS hover / loading invent / densify win | [UMA_FIDELITY_NOTES.md](./UMA_FIDELITY_NOTES.md) · LESSONS densify | Match Legacy; no invent |
 | Naming / `proto*` / felonies red | [NAMING.md](./NAMING.md) · `npm run check:felonies` | Fix gate, do not bypass |
 | Push / CI babysit urge | [STUDIO_AUTO_RULES R12](./STUDIO_AUTO_RULES.md) | Push once · no `gh run watch` |
 | “What should I work on?” | [NEXT_STEPS.md](./NEXT_STEPS.md) | PO `+` / `ok` only |

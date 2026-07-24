@@ -102,8 +102,8 @@
 }
 
 /* ── Hand-authored header shell (Header.tsx) ─────────────────────────────
- * Base layout/typography that used to come from the cloned Make header's
- * own Tailwind-style utility classes; the header no longer clones Make DOM
+ * Base layout/typography that used to come from the cloned Legacy header's
+ * own Tailwind-style utility classes; the header no longer clones Legacy DOM
  * (`headerMount.tsx` renders `<Header>` instead), so this shell CSS is now
  * the single source for that geometry. */
 .proto-header-sticky {

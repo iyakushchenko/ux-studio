@@ -29,11 +29,11 @@
   border-radius: 360px;
   background: var(--uxds-input-field-surface-surface-default, #fff);
   cursor: text;
-  /* Make / Availability: inset ring on the control shell (not the magnifier) */
+  /* Legacy / Availability: inset ring on the control shell (not the magnifier) */
   transition: box-shadow 0.18s ease, border-color 0.18s ease;
 }
 
-/* Hover + focus — same Make inset ring as `.proto-avail-field` / Text Field overlay */
+/* Hover + focus — same Legacy inset ring as `.proto-avail-field` / Text Field overlay */
 .uxds-search-field__control:hover,
 .uxds-search-field__control:focus-within {
   border-color: var(--uxds-border-border-focus);
@@ -76,7 +76,7 @@
   height: 24px;
   pointer-events: none;
   color: var(--uxds-icon-icon-accent-soft);
-  /* Decorative glyph only — never inherit Make Text Field border-overlay hover */
+  /* Decorative glyph only — never inherit Legacy Text Field border-overlay hover */
   border: none !important;
   box-shadow: none !important;
   background: none;

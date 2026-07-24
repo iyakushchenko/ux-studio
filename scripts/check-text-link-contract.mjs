@@ -183,7 +183,7 @@ for (const dir of SCAN_DIRS) {
 }
 ok("no competing .uxds-link rest-underline in screen/kit CSS");
 
-// ── 5. Make viewport must not steal `.uxds-link` with !important hex ────────
+// ── 5. Legacy viewport must not steal `.uxds-link` with !important hex ────────
 if (fs.existsSync(GLOBALS_SCREENS_CSS)) {
   const screens = stripCssComments(fs.readFileSync(GLOBALS_SCREENS_CSS, "utf8"));
   const excludesKit =
@@ -191,10 +191,10 @@ if (fs.existsSync(GLOBALS_SCREENS_CSS)) {
     /\.studio-viewport\s+a:not\(\.uxds-link\):hover/.test(screens);
   if (!excludesKit) {
     fail(
-      "globals-screens.css must scope Make link chrome as `a:not(.uxds-link)` so kit tokens own migrated links"
+      "globals-screens.css must scope Legacy link chrome as `a:not(.uxds-link)` so kit tokens own migrated links"
     );
   } else {
-    ok("Make viewport link rules exclude `.uxds-link`");
+    ok("Legacy viewport link rules exclude `.uxds-link`");
   }
   // Footer-like contract still present for `.proto-link` (may share a multi-selector block)
   const protoLinkRest =
@@ -204,7 +204,7 @@ if (fs.existsSync(GLOBALS_SCREENS_CSS)) {
   if (!protoLinkRest) {
     fail("globals-screens.css `.proto-link` rest must remain no-underline (footer-like)");
   } else {
-    ok("Make `.proto-link` rest = no underline (footer-like)");
+    ok("Legacy `.proto-link` rest = no underline (footer-like)");
   }
 }
 

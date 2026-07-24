@@ -4,7 +4,7 @@
 **Callsigns:** Bea (BA) · Finn (FE) · Uma (UI/UX) · Quinn (QA) · Pax (PO sim) · Arch (Director)  
 **Status:** **PAGE FINAL PASS HARD-GREEN** (2026-07-20) — keep rails honest  
 **Updated:** 2026-07-21  
-**Refs:** [CHAT_MAKE_PARITY_REGISTER.md](./CHAT_MAKE_PARITY_REGISTER.md) · [CHAT_PAGE_RAILS.md](./CHAT_PAGE_RAILS.md) · [HOME_MAKE_PARITY_REGISTER.md](./HOME_MAKE_PARITY_REGISTER.md) · [NEXT_STEPS.md](../../../product/NEXT_STEPS.md) erase-Make · [PAGE_FINAL_PASS.md](../../../product/PAGE_FINAL_PASS.md) · audit [FE_AUDIT_CHAT_PAGE_FINAL_PASS_2026-07-20.md](../audits/FE_AUDIT_CHAT_PAGE_FINAL_PASS_2026-07-20.md)
+**Refs:** [CHAT_LEGACY_PARITY_REGISTER.md](./CHAT_LEGACY_PARITY_REGISTER.md) · [CHAT_PAGE_RAILS.md](./CHAT_PAGE_RAILS.md) · [HOME_LEGACY_PARITY_REGISTER.md](./HOME_LEGACY_PARITY_REGISTER.md) · [NEXT_STEPS.md](../../../product/NEXT_STEPS.md) erase-Legacy · [PAGE_FINAL_PASS.md](../../../product/PAGE_FINAL_PASS.md) · audit [FE_AUDIT_CHAT_PAGE_FINAL_PASS_2026-07-20.md](../audits/FE_AUDIT_CHAT_PAGE_FINAL_PASS_2026-07-20.md)
 
 **Rails (do not invent):** `cjm=off` = saved-chat load (blank interim → full thread → scroll bottom) — **no** creation “thinking pause”. `cjm=on` = progressive (thinking → staged bubbles). `CHAT_LOADING_DUMP_ALL` = **cjm=off only**. Type-in animation kept; no per-letter QA logs. → [CHAT_PAGE_RAILS.md](./CHAT_PAGE_RAILS.md) · [QA_LOGGING_AND_PLAYBACK_RECIPE.md](../../../shell/QA_LOGGING_AND_PLAYBACK_RECIPE.md)
 
@@ -12,7 +12,7 @@
 
 ## Context
 
-Erase-Make sequence: PLP → PDP (**HARD-GREEN**) → Site Pilot Home → **Chat** → History/Details. Site Pilot Chat (`screenId: chat`, Frame child **10**) is the agentic CJM thread after Home send/chip. Today Make + heavy wire (`sitePilotChat*`) own thread, thinking, composer dock, and playback prelude. React kickoff = full Make inventory + shared composer contract with Home — no second composer fork.
+Erase-Legacy sequence: PLP → PDP (**HARD-GREEN**) → Site Pilot Home → **Chat** → History/Details. Site Pilot Chat (`screenId: chat`, Frame child **10**) is the agentic CJM thread after Home send/chip. Today Legacy + heavy wire (`sitePilotChat*`) own thread, thinking, composer dock, and playback prelude. React kickoff = full Legacy inventory + shared composer contract with Home — no second composer fork.
 
 ## Business logic
 
@@ -30,9 +30,9 @@ Erase-Make sequence: PLP → PDP (**HARD-GREEN**) → Site Pilot Home → **Chat
 
 ## Acceptance (Bea → Quinn)
 
-- [ ] Register [CHAT_MAKE_PARITY_REGISTER.md](./CHAT_MAKE_PARITY_REGISTER.md) complete — no Missing **P0** at ship time
-- [ ] React host mounts at child 10; Make retired (`data-studio-make-retired=chat`)
-- [ ] Make wire effects early-return when React mounted (composer, links, dock)
+- [ ] Register [CHAT_LEGACY_PARITY_REGISTER.md](./CHAT_LEGACY_PARITY_REGISTER.md) complete — no Missing **P0** at ship time
+- [ ] React host mounts at child 10; Legacy retired (`data-studio-legacy-retired=chat`)
+- [ ] Legacy wire effects early-return when React mounted (composer, links, dock)
 - [ ] URL `?project=boots-pharmacy&screen=chat` (+ `cjm` / `experience` / `persona` as needed)
 - [ ] **Shared composer** — same React component as `site-pilot` Home (SK1 in register)
 - [ ] Thinking states LE1–LE5 parity (playback, send/stop, browse, hint, fade)
@@ -59,7 +59,7 @@ Erase-Make sequence: PLP → PDP (**HARD-GREEN**) → Site Pilot Home → **Chat
 - Contract: `CHAT_CHILD_INDEX = 10`, scenario id `site-pilot-chat`
 - Reuse: extract **Site Pilot composer** from `screens/home/HomeScreen.tsx` (chat label + chip set via props)
 - Keep: `dom/sitePilotChatScenario.ts` / thinking / playback until React owns equivalent hooks or wire gates cleanly
-- Hybrid: engine header + **React `ChatSitePilotBar`** (Make Frame337 retired with body); thread + dock in React
+- Hybrid: engine header + **React `ChatSitePilotBar`** (Legacy Frame337 retired with body); thread + dock in React
 - Auth: same `isStudioLoggedIn` SSoT where copy depends on login (if any)
 - **Don’t regress:** Site Pilot bar · chat sticky/scroll center-X · `.uxds-link` bubble links ([LESSONS_LEARNED.md](../../../product/LESSONS_LEARNED.md))
 

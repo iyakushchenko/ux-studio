@@ -13,7 +13,7 @@ type NearMeCtaProps = {
 /**
  * Shared “See what's available near me” CTA.
  *
- * Source of truth: Availability popup / Make search-row tertiary
+ * Source of truth: Availability popup / Legacy search-row tertiary
  * (`.studio-tertiary-cta--compact` + 16×16 map-pin glyph, nowrap, beside search).
  * Do not restyle via FilterChip or Change-pencil one-offs — both surfaces import this.
  */

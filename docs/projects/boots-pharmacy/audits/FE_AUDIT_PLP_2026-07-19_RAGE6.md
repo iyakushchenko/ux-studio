@@ -8,7 +8,7 @@
 **Version:** `0.0.14`
 
 **Checklist:** [../../../product/FE_UI_UX_AUDIT.md](../../../product/FE_UI_UX_AUDIT.md) · [UMA_FIDELITY_NOTES.md](../../../product/UMA_FIDELITY_NOTES.md)  
-**Register:** [../features/PLP_MAKE_PARITY_REGISTER.md](../features/PLP_MAKE_PARITY_REGISTER.md) · I3b
+**Register:** [../features/PLP_LEGACY_PARITY_REGISTER.md](../features/PLP_LEGACY_PARITY_REGISTER.md) · I3b
 
 ---
 
@@ -66,7 +66,7 @@
 
 | Step | Result | Evidence |
 |------|--------|----------|
-| search-icon-borderless | **PASS** | 2× icons: `borderWidth=0`, `boxShadow=none`, `weirdBox=false`; layout `atEnd=true`; Make border overlay is sibling `absolute` DIV, **not** on icon |
+| search-icon-borderless | **PASS** | 2× icons: `borderWidth=0`, `boxShadow=none`, `weirdBox=false`; layout `atEnd=true`; Legacy border overlay is sibling `absolute` DIV, **not** on icon |
 | region→country cascade | **PASS** | Baseline By Country (capped 10) → after **Europe**: **France, Germany, Italy, Spain** only (`beforeCount=10` → `afterCount=4`) |
 | country checks clear on region | **PASS** | Kenya checked (`data-checkbox-checked="true"` / `.is-on`) → after Europe: `checkedAfterRegionChange=[]` and Kenya gone from list |
 | version chip | **PASS** | `[data-studio-version="0.0.14"]` / chip text `v0.0.14` ≡ `package.json` `0.0.14` |

@@ -96,7 +96,7 @@
       "mcpMatrixAt": {
         "sha": "95ccca7",
         "date": "2026-07-22",
-        "note": "Quinn MCP 8/8 PASS __studioRunMcpPageProbe appointment-history reload:false on localhost:5173; Uma PROVEN (densify gate); View Details → Make Details + restore; PAGE FINAL PASS HARD-GREEN v0.0.108"
+        "note": "Quinn MCP 8/8 PASS __studioRunMcpPageProbe appointment-history reload:false on localhost:5173; Uma PROVEN (densify gate); View Details → Legacy Details + restore; PAGE FINAL PASS HARD-GREEN v0.0.108"
       },
       "requireMcp": true
     },

@@ -1,6 +1,6 @@
 # PAGE FINAL PASS — Appointment Details (HARD-GREEN)
 
-**Surface:** Boots Pharmacy Appointment Details (`screenId: appointment-details`, Make child **1**)  
+**Surface:** Boots Pharmacy Appointment Details (`screenId: appointment-details`, Legacy child **1**)  
 **Date:** 2026-07-22  
 **Auditor:** Quinn (QA) MCP matrix · Uma (UI/UX) fidelity · Arch (Director) HARD-GREEN  
 **Ship tip:** local prove on `95ccca7` tree · **v0.0.108**  
@@ -18,7 +18,7 @@
 | **Uma fidelity** | **PROVEN** — [UMA_FIDELITY_APPOINTMENT_DETAILS_2026-07-22.md](./UMA_FIDELITY_APPOINTMENT_DETAILS_2026-07-22.md) |
 | **PARITY_PROVEN `appointment-details`** | **proven** |
 | **FE audit** | **PROVEN** — [FE_AUDIT_APPOINTMENT_DETAILS_2026-07-22.md](./FE_AUDIT_APPOINTMENT_DETAILS_2026-07-22.md) |
-| **Erase-Make History/Details** | **Both HARD-GREEN** — Book Make delete residual next |
+| **Erase-Legacy History/Details** | **Both HARD-GREEN** — Book Legacy delete residual next |
 
 **Team check line:** `PAGE FINAL PASS — appointment-details — HARD-GREEN`
 
@@ -36,7 +36,7 @@
 |----|------|
 | overlay-arm | PASS |
 | appointment-details-host | PASS |
-| appointment-details-make-retired | PASS |
+| appointment-details-legacy-retired | PASS |
 | appointment-details-url-screen | PASS |
 | appointment-details-selected-card | PASS |
 | appointment-details-edit-cancel-rules | PASS |
@@ -52,7 +52,7 @@
 ## Structure contracts
 
 - `<main class="appointment-details">` + `data-studio-react-screen="appointment-details"`
-- Make retired via `retireMakeUnderPage`
+- Legacy retired via `retireLegacyUnderPage`
 - BEM `appointment-details` / `appointment-details__*`
 - `<header>` crumbs; History crumb → React History
 - No ButtonPrimary on this page (Edit/Cancel icon+text only — correct)
@@ -73,5 +73,5 @@
 
 ## Interaction inventory
 
-- Make baseline: [INTERACTION_INVENTORY_APPOINTMENT_DETAILS_MAKE_BASELINE_2026-07-22.json](./INTERACTION_INVENTORY_APPOINTMENT_DETAILS_MAKE_BASELINE_2026-07-22.json)
+- Legacy baseline: [INTERACTION_INVENTORY_APPOINTMENT_DETAILS_LEGACY_BASELINE_2026-07-22.json](./INTERACTION_INVENTORY_APPOINTMENT_DETAILS_LEGACY_BASELINE_2026-07-22.json)
 - React rematch: [INTERACTION_INVENTORY_APPOINTMENT_DETAILS_REACT_2026-07-22.json](./INTERACTION_INVENTORY_APPOINTMENT_DETAILS_REACT_2026-07-22.json) — `readinessPass` **true**, `invalid` **0**

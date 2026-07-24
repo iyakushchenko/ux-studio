@@ -23,7 +23,7 @@ describe("chatContract", () => {
     expect(CHAT_REACT_SCREEN_ID).toBe("chat");
   });
 
-  it("keeps React Chat mount ON after Make smoke unblock + P1–P10 gate", () => {
+  it("keeps React Chat mount ON after Legacy smoke unblock + P1–P10 gate", () => {
     expect(CHAT_REACT_MOUNT_ENABLED).toBe(true);
   });
 
@@ -33,7 +33,7 @@ describe("chatContract", () => {
     expect(CHAT_SEND_ACTION).toBe("agentic-chat-send");
   });
 
-  it("ports Make scenario frame count (query/reply ×4)", () => {
+  it("ports Legacy scenario frame count (query/reply ×4)", () => {
     expect(CHAT_THREAD_FRAMES).toHaveLength(8);
     expect(CHAT_THREAD_FRAMES.filter((f) => f.kind === "query")).toHaveLength(4);
     expect(CHAT_THREAD_FRAMES.filter((f) => f.kind === "reply")).toHaveLength(4);

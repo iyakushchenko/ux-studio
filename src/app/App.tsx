@@ -1486,7 +1486,7 @@ export default function App() {
     setSitePilotChatComposerDockSuppressed(overlayOpen);
 
     if (atFrameStart) {
-      // React Chat scrolls `.chat__column`; Make still uses prototype pane.
+      // React Chat scrolls `.chat__column`; Legacy still uses prototype pane.
       const chatHost = getPrototypeScrollRoot(screen) ?? scrollEl;
       if (chatHost) {
         scrollCameraToOrigin(chatHost, {

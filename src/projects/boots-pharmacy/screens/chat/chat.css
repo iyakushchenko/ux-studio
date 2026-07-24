@@ -1,4 +1,4 @@
-/* Chat screen composition — keep this module non-empty; visual source = Make child 10. */
+/* Chat screen composition — keep this module non-empty; visual source = Legacy child 10. */
 /*
  * HARD (PO 2026-07-22): Availability / choose-pharmacy is a non-destructive overlay.
  * Do NOT hide, freeze, or display:none the chat (or any) underlay when the modal opens.
@@ -10,7 +10,7 @@
 /* Agentic Site Pilot Chat — React (NOT PAGE FINAL PASS / NOT PROVEN). */
 
 /*
- * React Chat screen lock — Make `.proto-chat-screen` min-height fill expands past
+ * React Chat screen lock — Legacy `.proto-chat-screen` min-height fill expands past
  * the scrollport so absolute composer docks below the fold.
  * HARD: do NOT set overflow:hidden on the screen — that clips / kills SitePilot
  * sticky (globals-chrome: “never clip the screen (breaks sticky Site Pilot bar)”).
@@ -28,9 +28,9 @@
 }
 
 /*
- * HARD: Make `.proto-chat-screen::after` is a fixed bottom fade at z-index 10100.
- * React composer dock is inside `.chat` (z~4) — that Make wash paints OVER the
- * composer (PO: buried under gradient). Kill Make fade + portal leftovers.
+ * HARD: Legacy `.proto-chat-screen::after` is a fixed bottom fade at z-index 10100.
+ * React composer dock is inside `.chat` (z~4) — that Legacy wash paints OVER the
+ * composer (PO: buried under gradient). Kill Legacy fade + portal leftovers.
  */
 .studio-viewport
   > div
@@ -57,11 +57,11 @@
   pointer-events: none !important;
 }
 
-/* Make Frame337 SitePilot bar — stay dead under React (globals flex!important). */
+/* Legacy Frame337 SitePilot bar — stay dead under React (globals flex!important). */
 .studio-viewport
   > div
   > div:nth-child(10)[data-studio-react-screen="chat"]
-  > [data-studio-make-retired="chat"] {
+  > [data-studio-legacy-retired="chat"] {
   display: none !important;
   visibility: hidden !important;
   pointer-events: none !important;
@@ -99,10 +99,10 @@
 }
 
 /*
- * Make Frame337 — Site Pilot microheader (white bar under Boots sticky header).
+ * Legacy Frame337 — Site Pilot microheader (white bar under Boots sticky header).
  * Flex-sibling outside `.chat__column` (column scroll never carries it away).
  * sticky top:0 inside `.chat` (chat already sits below Boots header — do NOT use
- * Make’s --sticky-top 64px here or the bar double-offsets). z-index 40 = Make.
+ * Make’s --sticky-top 64px here or the bar double-offsets). z-index 40 = Legacy.
  * ::after = top fade wash — covers scrolled bubbles as they meet the bar edge.
  */
 .chat__site-pilot-bar {
@@ -228,7 +228,7 @@
   height: 100%;
 }
 
-/* Make context-menu glyph is 4×16 centered in the 16 hit box */
+/* Legacy context-menu glyph is 4×16 centered in the 16 hit box */
 .chat__site-pilot-action-icon--more svg {
   position: absolute;
   inset: 0 37.5%;
@@ -252,7 +252,7 @@
 
 /*
  * Sole scroll host. Sticky/absolute composer overlays the bottom — pad so
- * last bubbles can scroll fully above the dock (Make `--proto-chat-composer-h`).
+ * last bubbles can scroll fully above the dock (Legacy `--proto-chat-composer-h`).
  * Overflow strategy: auto when short (no empty gutter); thin-track scroll when
  * tall + left pad = scrollbar inset so centered 864 column X stays put.
  */
@@ -408,7 +408,7 @@
   align-items: flex-start;
 }
 
-/* Size only — Make Frame341 h-32 pills; hover/active from UXDS ButtonPrimary commerce */
+/* Size only — Legacy Frame341 h-32 pills; hover/active from UXDS ButtonPrimary commerce */
 .chat__cta.uxds-btn-primary {
   min-height: 32px;
   height: 32px;
@@ -419,7 +419,7 @@
   white-space: nowrap;
 }
 
-/* Make `component.gse.system.message` — centered under reply (PO / register L11). */
+/* Legacy `component.gse.system.message` — centered under reply (PO / register L11). */
 .chat__helpful-arrival {
   display: flex;
   justify-content: center;
@@ -511,7 +511,7 @@
 }
 
 /*
- * Make truth (globals-chrome.css pre-React):
+ * Legacy truth (globals-chrome.css pre-React):
  * default thinking = align-items flex-end; --hint|playback = flex-start (LEFT).
  * Playback always toggled --hint → agent-left rail before each reply.
  */

@@ -30,7 +30,7 @@ describe("pdpContract", () => {
     expect(PDP_REACT_SCREEN_ID).toBe("pdp");
   });
 
-  it("locks below-fold Make + Bea FAQ bodies for L16 / L18 / L19", () => {
+  it("locks below-fold Legacy + Bea FAQ bodies for L16 / L18 / L19", () => {
     expect(PDP_INTRO_PARAGRAPHS).toHaveLength(2);
     expect(PDP_SERVICE_BLURB).toMatch(/private Chickenpox Vaccination Service/i);
     expect(PDP_APPOINTMENT_STRIP).toMatch(/15 minutes/i);
@@ -60,7 +60,7 @@ describe("pdpContract", () => {
     const help = PDP_ACCORDION_PANELS.find((p) => p.id === "how-can-boots-help");
     expect(help?.body).toContain(PDP_SERVICE_BLURB);
     expect(help?.body).toMatch(/book online/i);
-    expect(help?.source).toBe("make+bea");
+    expect(help?.source).toBe("legacy+bea");
 
     expect(
       PDP_ACCORDION_PANELS.find((p) => p.id === "who-is-at-risk")?.body

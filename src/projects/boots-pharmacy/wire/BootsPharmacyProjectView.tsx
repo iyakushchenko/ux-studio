@@ -939,7 +939,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   }, []);
 
   // Book Step 2 — re-apply calendar selection when slot changes (incl. CJM step-back)
-  // React pilot owns selection via props — skip Make DOM mutators when mounted.
+  // React pilot owns selection via props — skip Legacy DOM mutators when mounted.
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 4) return;
     if (isBookStep2ReactMounted()) return;
@@ -1324,7 +1324,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
         return;
       }
 
-      // Make used p/span; React Book Step 1 uses a button — match any Home hit in crumbs.
+      // Legacy used p/span; React Book Step 1 uses a button — match any Home hit in crumbs.
       const crumbNav = t.closest("[data-name='component.breadcrumbs']");
       if (crumbNav) {
         const hit = (t.closest("p, span, button, a") ?? t) as HTMLElement;
@@ -1523,7 +1523,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     return () => { cancelAnimationFrame(raf); clearTimeout(t); };
   }, [current]);
 
-  // Book Step 1 — React + UXDS pilot (retires Make HTML for this screen only)
+  // Book Step 1 — React + UXDS pilot (retires Legacy HTML for this screen only)
   useLayoutEffect(() => {
     if (SCREENS[current]?.childIndex !== 7) {
       unmountBookStep1Screen();
@@ -1552,7 +1552,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       onContinue,
     });
 
-    // Ensure Footer remounts after Make footer is hidden.
+    // Ensure Footer remounts after Legacy footer is hidden.
     setupFooters({
       onGoToPlp: () => goRef.current(INDEX_PLP),
     });
@@ -1568,7 +1568,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     return () => unmountBookStep1Screen();
   }, []);
 
-  // Book Step 2 — React + UXDS pilot (retires Make HTML for this screen only)
+  // Book Step 2 — React + UXDS pilot (retires Legacy HTML for this screen only)
   useLayoutEffect(() => {
     if (SCREENS[current]?.childIndex !== 4) {
       unmountBookStep2Screen();
@@ -1603,7 +1603,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     return () => unmountBookStep2Screen();
   }, []);
 
-  // Book Step 3 — React + UXDS pilot (retires Make HTML for this screen only)
+  // Book Step 3 — React + UXDS pilot (retires Legacy HTML for this screen only)
   useLayoutEffect(() => {
     if (SCREENS[current]?.childIndex !== 3) {
       unmountBookStep3Screen();
@@ -1636,7 +1636,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     return () => unmountBookStep3Screen();
   }, []);
 
-  // PLP — React + UXDS migration (retires Make HTML for this screen only)
+  // PLP — React + UXDS migration (retires Legacy HTML for this screen only)
   useLayoutEffect(() => {
     if (SCREENS[current]?.childIndex !== 9) {
       unmountPlpScreen();
@@ -1659,7 +1659,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     return () => unmountPlpScreen();
   }, []);
 
-  // PDP — React + UXDS migration (retires Make HTML for this screen only)
+  // PDP — React + UXDS migration (retires Legacy HTML for this screen only)
   useLayoutEffect(() => {
     if (SCREENS[current]?.childIndex !== 8) {
       unmountPdpScreen();
@@ -1697,7 +1697,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     return () => unmountPdpScreen();
   }, []);
 
-  // Agentic. Site Pilot. Home — React + UXDS migration (retires Make HTML for this screen only)
+  // Agentic. Site Pilot. Home — React + UXDS migration (retires Legacy HTML for this screen only)
   useLayoutEffect(() => {
     if (SCREENS[current]?.childIndex !== HOME_CHILD_INDEX) {
       unmountHomeScreen();
@@ -1715,7 +1715,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     return () => unmountHomeScreen();
   }, []);
 
-  // Appointment History — React + UXDS migration (retires Make HTML for this screen only)
+  // Appointment History — React + UXDS migration (retires Legacy HTML for this screen only)
   useLayoutEffect(() => {
     if (SCREENS[current]?.childIndex !== APPOINTMENT_HISTORY_CHILD_INDEX) {
       unmountAppointmentHistoryScreen();
@@ -1733,7 +1733,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     return () => unmountAppointmentHistoryScreen();
   }, []);
 
-  // Appointment Details — React + UXDS migration (retires Make HTML for this screen only)
+  // Appointment Details — React + UXDS migration (retires Legacy HTML for this screen only)
   useLayoutEffect(() => {
     if (SCREENS[current]?.childIndex !== APPOINTMENT_DETAILS_CHILD_INDEX) {
       unmountAppointmentDetailsScreen();
@@ -1755,7 +1755,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     setCurrent,
   });
 
-  // Book – Step 1 (child 7): breadcrumb rewrite — Make path only
+  // Book – Step 1 (child 7): breadcrumb rewrite — Legacy path only
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 7) return;
     if (isBookStep1ReactMounted()) return;
@@ -2541,9 +2541,9 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     hearts.forEach((heart, i) => {
       // PDP / Quick View chickenpox heart uses PDP_WISHLIST_ID (cross-experience).
       if (heart.closest('[data-name="module.pdp.rtb"]')) return;
-      // React PLP tiles — skip Make wire (handlers live in PlpScreen).
+      // React PLP tiles — skip Legacy wire (handlers live in PlpScreen).
       if (plpReact && heart.closest('[data-studio-react-screen="plp"]')) return;
-      // React PDP heart — skip Make wire (handler lives in PdpScreen).
+      // React PDP heart — skip Legacy wire (handler lives in PdpScreen).
       if (pdpReact && heart.closest('[data-studio-react-screen="pdp"]')) return;
 
       const btn = heart.closest('[data-name="component.input.button"]') as HTMLElement | null;
@@ -2594,7 +2594,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   useEffect(() => {
     initProtoInputControls();
     initSearchFields();
-    // React PLP owns filter dirty via onFiltersDirtyChange — skip Make DOM sync.
+    // React PLP owns filter dirty via onFiltersDirtyChange — skip Legacy DOM sync.
     if (isPlpReactMounted()) return;
     ensurePlpFiltersDefault(document);
     const plpFilters = document.querySelector('[data-name="module.plp.filters"]');
@@ -2823,7 +2823,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   // Site Pilot Chat (child 10) — Frame337 microheader sticks below shared header.
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 10) return;
-    // React owns sticky via `.chat__site-pilot-bar` — skip Make child[1] stamp.
+    // React owns sticky via `.chat__site-pilot-bar` — skip Legacy child[1] stamp.
     if (isChatReactMounted()) return;
 
     const SCREEN2_CHILD = 10;
@@ -2862,7 +2862,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     };
   }, [current]);
 
-  // Screen 5 (Book Appointment Step 1, child 7): search + “near me” — Make path only
+  // Screen 5 (Book Appointment Step 1, child 7): search + “near me” — Legacy path only
   useEffect(() => {
     if (isBookStep1ReactMounted()) return;
     const screen = document.querySelector(
@@ -2940,7 +2940,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     }
   }, [current]);
 
-  // Tab 8 — Appointment History: Make wire only when React host is not mounted
+  // Tab 8 — Appointment History: Legacy wire only when React host is not mounted
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 2) return;
     if (isAppointmentHistoryReactMounted()) return;
@@ -2968,7 +2968,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     };
   }, [current, goSitePilotHome]);
 
-  // Tab 9 — Appointment Details: Make wire only when React host is not mounted
+  // Tab 9 — Appointment Details: Legacy wire only when React host is not mounted
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 1) return;
     if (isAppointmentDetailsReactMounted()) return;
@@ -3002,7 +3002,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     };
   }, [current, goSitePilotHome]);
 
-  // Location states on Book Appointment Step 1 (child 7) — Make path only.
+  // Location states on Book Appointment Step 1 (child 7) — Legacy path only.
   // React pilot owns chosen-location UI when mounted.
   useEffect(() => {
     if (isBookStep1ReactMounted()) return;
@@ -3317,7 +3317,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   }, [chosenLocation, current]);
 
   // Book Step 2 — date / time cells: hover + click selection (no Figma cursor demos)
-  // Make path only — React pilot owns calendar interaction.
+  // Legacy path only — React pilot owns calendar interaction.
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 4) return;
     if (isBookStep2ReactMounted()) return;
@@ -3483,7 +3483,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   }, [current]);
 
   // Book Step 2 — Reserve Appointment → Step 3 Confirmation
-  // Make path only — React pilot wires Reserve in-component.
+  // Legacy path only — React pilot wires Reserve in-component.
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 4) return;
     if (isBookStep2ReactMounted()) return;
@@ -3534,7 +3534,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   }, [current]);
 
   // Book Step 3 — Advantage Card points block: rows left, card image right.
-  // Make path only — React Step 3 owns Advantage layout in-component.
+  // Legacy path only — React Step 3 owns Advantage layout in-component.
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 3) return;
     if (isBookStep3ReactMounted()) return;
@@ -3597,7 +3597,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   }, [current]);
 
   // Book Step 3 — Explore more vaccinations → PLP
-  // Make path only — React Step 3 wires Explore in-component.
+  // Legacy path only — React Step 3 wires Explore in-component.
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 3) return;
     if (isBookStep3ReactMounted()) return;
@@ -3644,7 +3644,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   }, [current]);
 
   // Book Step 3 — Open Appointments link → Appointment History (tab 8)
-  // Make path only — React Step 3 owns `data-studio-open-appointment`.
+  // Legacy path only — React Step 3 owns `data-studio-open-appointment`.
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 3) return;
     if (isBookStep3ReactMounted()) return;
@@ -4132,12 +4132,12 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   }, [current]);
 
   // Book Step 2 — Step 1 progress column → back to Step 1 (Location)
-  // Make path only — React Step 2 wires onBackToStep1 in-component.
+  // Legacy path only — React Step 2 wires onBackToStep1 in-component.
   useEffect(() => {
     const childIndex = SCREENS[current]?.childIndex;
 
     // Confirmation — progress is read-only (no back-nav, all bars stay teal)
-    // Make path only when React Step 3 owns progress.
+    // Legacy path only when React Step 3 owns progress.
     if (childIndex === 3) {
       if (isBookStep3ReactMounted()) return;
       const lockProgress = () => {
@@ -4270,7 +4270,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
     };
   }, [current]);
 
-  // Book Step 1 — Continue (Make path only; React screen wires Continue in-component)
+  // Book Step 1 — Continue (Legacy path only; React screen wires Continue in-component)
   useEffect(() => {
     if (SCREENS[current]?.childIndex !== 7) return;
     if (isBookStep1ReactMounted()) return;
@@ -4542,7 +4542,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
   const { label, childIndex } = SCREENS[current];
   const isScreen1 = childIndex === 11 && !hubOpen;
   const isScreenChat = childIndex === 10 && !hubOpen;
-  // Home + React Chat lock → sole `.chat__column` scroll; Make chat keeps prototype.
+  // Home + React Chat lock → sole `.chat__column` scroll; Legacy chat keeps prototype.
   const isViewportLocked = isScreen1 || (isScreenChat && CHAT_REACT_MOUNT_ENABLED);
   const navLabel = hubOpen ? HUB_LABEL : label;
   const activeChildIndex = hubOpen ? null : childIndex;
@@ -4693,7 +4693,7 @@ export function BootsPharmacyProjectView({ bridge, apiRef }: BootsPharmacyProjec
       align-items: center !important;
     }
 
-    /* Search field on screen 5 — Make absolute border overlay only (not magnifier) */
+    /* Search field on screen 5 — Legacy absolute border overlay only (not magnifier) */
     .studio-viewport > div > div:nth-child(7) [data-name='component.input.field']:hover [data-name='Text Field'] > [aria-hidden].absolute,
     .studio-viewport > div > div:nth-child(7) [data-name='component.input.field']:focus-within [data-name='Text Field'] > [aria-hidden].absolute {
       border-color: #012169 !important;

@@ -1,7 +1,7 @@
 /**
  * Book Step 2 calendar / time data.
  * Dates align with Availability Tool (CJM / retreat defaults).
- * Time availability matches Make Frame child 4 (grey = unavailable).
+ * Time availability matches Legacy Frame child 4 (grey = unavailable).
  */
 
 export type BookStep2Month = "June" | "July";
@@ -63,7 +63,7 @@ export const BOOK_STEP2_WEEKDAYS = [
   "SU",
 ] as const;
 
-/** Make Book Step 2 morning row — only 11:20 available. */
+/** Legacy Book Step 2 morning row — only 11:20 available. */
 export const BOOK_STEP2_MORNING: BookStep2TimeSlot[] = [
   { t: "09:20", ok: false },
   { t: "09:35", ok: false },
@@ -77,7 +77,7 @@ export const BOOK_STEP2_MORNING: BookStep2TimeSlot[] = [
   { t: "11:35", ok: false },
 ];
 
-/** Make afternoon — slots open from 15:15 (playback reserve uses 15:30). */
+/** Legacy afternoon — slots open from 15:15 (playback reserve uses 15:30). */
 export const BOOK_STEP2_AFTERNOON: BookStep2TimeSlot[] = [
   { t: "12:15", ok: false },
   { t: "12:30", ok: false },

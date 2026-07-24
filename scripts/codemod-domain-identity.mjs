@@ -3,8 +3,8 @@
  * PANEL/shell chrome classes: .proto-* → .studio-*
  * Attributes: data-proto-* → data-studio-* (+ dataset.proto* → dataset.studio*)
  *
- * Does NOT rewrite LEGACY Make dump class names in globals-screens.css
- * (concept/Make-coupled). Re-run is mostly idempotent.
+ * Does NOT rewrite LEGACY Legacy dump class names in globals-screens.css
+ * (concept/Legacy-coupled). Re-run is mostly idempotent.
  */
 import fs from "node:fs";
 import path from "node:path";

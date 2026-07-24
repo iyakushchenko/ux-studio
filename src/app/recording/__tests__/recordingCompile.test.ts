@@ -562,7 +562,7 @@ describe("compileRecordingToJourney", () => {
     expect(cameras[0]?.camera?.dwellMs).toBe(4000);
   });
 
-  it("emits concise human labels — not Make data-name soup", () => {
+  it("emits concise human labels — not Legacy data-name soup", () => {
     const session: RecordingSession = {
       id: "human-labels",
       version: 1,

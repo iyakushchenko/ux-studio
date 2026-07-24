@@ -85,6 +85,7 @@ export function MaNavigationPanel({
               className={className}
               data-name="component.ma.navigation.menu.item"
               data-studio-ma-nav-link={linked ? "true" : undefined}
+              data-studio-action={`ma-nav-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
               aria-current={active ? "page" : undefined}
               onClick={linked ? () => onNavigate?.(label) : undefined}
             >

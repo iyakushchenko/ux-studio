@@ -45,7 +45,7 @@ onboarding path. Do not reread it end-to-end unless reconstructing a regression.
 | **Page Final Pass** | [PAGE_FINAL_PASS.md](./PAGE_FINAL_PASS.md) | Hard-green before next migrated page; Finn/Uma checklist + `check:page-final-pass` |
 | Feature brief template | [FEATURE_BRIEF_TEMPLATE.md](./FEATURE_BRIEF_TEMPLATE.md) | Bea 1-pager |
 | Boots feature briefs | [../projects/boots-pharmacy/features/](../projects/boots-pharmacy/features/) | Project briefs |
-| PLP Make parity register | [../projects/boots-pharmacy/features/PLP_MAKE_PARITY_REGISTER.md](../projects/boots-pharmacy/features/PLP_MAKE_PARITY_REGISTER.md) | Band-by-band Make inventory |
+| PLP Legacy parity register | [../projects/boots-pharmacy/features/PLP_LEGACY_PARITY_REGISTER.md](../projects/boots-pharmacy/features/PLP_LEGACY_PARITY_REGISTER.md) | Band-by-band Legacy inventory |
 | PLP React brief | [../projects/boots-pharmacy/features/PLP_REACT.md](../projects/boots-pharmacy/features/PLP_REACT.md) | PLP migration brief |
 | **PLP team retro** | [TEAM_RETRO_2026-07-19_PLP.md](./TEAM_RETRO_2026-07-19_PLP.md) | Pain / Worked / Keep — apply on PDP+ |
 | **History/Details team retro** | [TEAM_RETRO_2026-07-22_HISTORY_DETAILS.md](./TEAM_RETRO_2026-07-22_HISTORY_DETAILS.md) | Pain / Worked / Keep — densify, MaNav, terminal CTA, header 7c |
@@ -82,10 +82,10 @@ onboarding path. Do not reread it end-to-end unless reconstructing a regression.
 | Must re-read | Focus |
 |--------------|--------|
 | [FEATURE_BRIEF_TEMPLATE.md](./FEATURE_BRIEF_TEMPLATE.md) | Readiness of acceptance + **Inheritance preflight** table |
-| Project `features/*.md` + **Make register** for the screen | Every Make band **before** Finn codes (incl. loader mechanism) |
+| Project `features/*.md` + **Legacy register** for the screen | Every Legacy band **before** Finn codes (incl. loader mechanism) |
 | [PAGE_CREATE_INHERITANCE.md](./PAGE_CREATE_INHERITANCE.md) | P1–P6 UXDS/UXML reuse before brief “ready” |
 | [PAGE_FINAL_PASS.md](./PAGE_FINAL_PASS.md) | No next-page brief until previous hard-green |
-| [UMA_FIDELITY_NOTES.md](./UMA_FIDELITY_NOTES.md) §0 | Loading/empty/updating = P0 rows when Make has them |
+| [UMA_FIDELITY_NOTES.md](./UMA_FIDELITY_NOTES.md) §0 | Loading/empty/updating = P0 rows when Legacy has them |
 | LESSONS: Make→React fidelity, wrong preloader · PLP retro | Register completeness; no invent acceptance |
 
 **Knowledge used tip:** brief/register + PAGE_FINAL_PASS gate + LESSONS loading/P0 rows.
@@ -103,8 +103,8 @@ onboarding path. Do not reread it end-to-end unless reconstructing a regression.
 | [NAMING.md](./NAMING.md) · [ARCHITECTURE.md](./ARCHITECTURE.md) | `data-studio-*`, domain folders |
 | [PAGE_FINAL_PASS.md](./PAGE_FINAL_PASS.md) | Co-own checklist + `check:page-final-pass` with Uma; no next mount until previous hard-green |
 | [../shell/PLAYBACK_DIAG.md](../shell/PLAYBACK_DIAG.md) · R15 | Mid-smoke: poll `__studioConsumePoSignal` each beat; Alarm = sequence mismatch — branch before more steps |
-| LESSONS: hybrid mount, createRoot unmount, search/icon, DS hover · invent chrome | Do not re-ship known fail classes; under-match Make |
-| Screen brief + register for the page | Mount gates / Make-retired |
+| LESSONS: hybrid mount, createRoot unmount, search/icon, DS hover · invent chrome | Do not re-ship known fail classes; under-match Legacy |
+| Screen brief + register for the page | Mount gates / Legacy-retired |
 | [../shell/URL.md](../shell/URL.md) + modal guard | **Modal URL registry** + `data-studio-modal` before any dialog ship |
 | **R16 — new `__studio*` suite/status helpers** | Before shipping a polled window API: `isQuietHelperSuffix` / `MUST_STAY_QUIET` in `qaSuiteTouchWrapContract.ts` — never leave it touch-wrapped |
 
@@ -119,11 +119,11 @@ onboarding path. Do not reread it end-to-end unless reconstructing a regression.
 | [UMA_FIDELITY_NOTES.md](./UMA_FIDELITY_NOTES.md) | Full fidelity + state matrix |
 | [PAGE_FINAL_PASS.md](./PAGE_FINAL_PASS.md) | Co-own Final Pass checklist + check with Finn; page-close hard-green |
 | [VISUAL_FIDELITY.md](./VISUAL_FIDELITY.md) · [FE_UI_UX_AUDIT.md](./FE_UI_UX_AUDIT.md) | Audit gate |
-| LESSONS: typical DS checks, invent-vs-Make, loading scenario | Nazi hover / no invent |
-| Make register for the screen | Side-by-side bands |
+| LESSONS: typical DS checks, invent-vs-Legacy, loading scenario | Nazi hover / no invent |
+| Legacy register for the screen | Side-by-side bands |
 | **§0b section vertical rhythm** — MCP measure gap/padding (price→recipient→body→booster) before any fidelity IN PROGRESS claim | [UMA_FIDELITY_NOTES.md](./UMA_FIDELITY_NOTES.md) §0b · doctrine |
 
-**Knowledge used tip:** UMA notes §0/§0a/**§0b rhythm** + PAGE_FINAL_PASS + LESSONS DS hover / loading · **Make densify vs React `data-name` hosts** (2026-07-22 History) · **UXDS_MAP + REACT_KIT_MAP before any page control** (reuse Accordion / kits; no dead headers).
+**Knowledge used tip:** UMA notes §0/§0a/**§0b rhythm** + PAGE_FINAL_PASS + LESSONS DS hover / loading · **Legacy densify vs React `data-name` hosts** (2026-07-22 History) · **UXDS_MAP + REACT_KIT_MAP before any page control** (reuse Accordion / kits; no dead headers).
 
 ### Quinn (QA)
 
@@ -194,26 +194,26 @@ Use after every ship (in **`team report`** / close-out, and as a bullet in relea
 Append-only evidence follows. Search by stream, surface, error code, or callsign; use the
 retrieval table and LESSONS topic index before scanning by date.
 
-**Knowledge improved** (2026-07-23 · stream: erase-Make Phase E — `ProjectPageShell` substrate replacement · board #8b · local, uncommitted):
+**Knowledge improved** (2026-07-23 · stream: erase-Legacy Phase E — `ProjectPageShell` substrate replacement · board #8b · local, uncommitted):
 - Arch (Director): re-read the Phase D/7c readiness note's exact blocker list before touching anything (`BootsPharmacyProjectView.tsx:4831`/`:880`, `content.ts:33`, `footerMount.tsx:54-76`, 6 park-mode mounts) rather than re-deriving it from scratch; confirmed via full-file grep across `BootsPharmacyProjectView.tsx` + `globals-chrome.css` + `vaccineList.ts` + `pdpRtb.ts` + `headerMount.tsx` + every `screens/*Contract.ts` that `nth-child(N)` usage is exactly N=1..11 with no gaps before committing to an 11-column shell — did not trust the readiness note's "11 columns" claim without independently re-deriving it — applied: NEXT_STEPS #8b; `frame/index.tsx` intentionally left in place (out of scope, gated on live MCP proof, per explicit task constraint).
 - Bea (BA): traced Frame219's actual JSX (`export default function Frame219()`) to confirm it is literally 11 direct children under one root div (not 9, not a nested structure) before designing the replacement — one column per child, in the same left-to-right document order Frame219 declared them, including the 2 legacy-unused slots (5, 6) that no live screen mounts into but that CSS/footer selectors still numerically skip over — applied: `ProjectPageShell.tsx` `PAGE_SHELL_COLUMNS` array + inline column-map comment.
-- Finn (FE): found `footerMount.tsx` needed **zero code changes** — it already resolves its target purely through the `.studio-viewport > div > div:nth-child(N)` selector string, never through Frame219-specific markup or `data-name` lookups on the column itself — the DOM-shape-preserving swap made it transparent; converted the 6 remaining park-mode mounts (plp/pdp/home/chat/appointment-history/appointment-details) to the Book Step 1-3 `permanent: true` precedent instead of inventing a new no-op path — `retireMakeUnderPage` already degrades gracefully to "nothing to retire, stamp the attribute" on an empty page, so `permanent: true` was the correct minimal diff, not a rewrite — applied: `ProjectPageShell.tsx`, `BootsPharmacyProjectView.tsx`, `content.ts`, 6 `mount*Screen.tsx` files.
-- Uma (UI/UX light — no browser MCP available this ship): static-only fidelity check — grep-diffed the full `nth-child(N)` reference set (68+ distinct call sites across 5 files) against the shell's 11 columns index-by-index, confirmed 100% coverage with zero N>11 and zero gap; correctly identified that column *content* styling never depended on the column div's own class/attributes (every rule targets `.studio-viewport > div > div:nth-child(N)` directly with `!important`, overriding whatever's there) — so an unstyled empty `<div>` is DOM-contract-equivalent to Frame219's absolutely-positioned Make markup from the moment `dynamicCSS` applies, no FOUC risk since the `<style>` tag commits in the same React tree — applied: this report's Uma-hat section; **live MCP re-prove of all 9 screens + header/footer/mega-menu/FSC + both CJM Play modes is a named residual, not a false PROVEN**.
+- Finn (FE): found `footerMount.tsx` needed **zero code changes** — it already resolves its target purely through the `.studio-viewport > div > div:nth-child(N)` selector string, never through Frame219-specific markup or `data-name` lookups on the column itself — the DOM-shape-preserving swap made it transparent; converted the 6 remaining park-mode mounts (plp/pdp/home/chat/appointment-history/appointment-details) to the Book Step 1-3 `permanent: true` precedent instead of inventing a new no-op path — `retireLegacyUnderPage` already degrades gracefully to "nothing to retire, stamp the attribute" on an empty page, so `permanent: true` was the correct minimal diff, not a rewrite — applied: `ProjectPageShell.tsx`, `BootsPharmacyProjectView.tsx`, `content.ts`, 6 `mount*Screen.tsx` files.
+- Uma (UI/UX light — no browser MCP available this ship): static-only fidelity check — grep-diffed the full `nth-child(N)` reference set (68+ distinct call sites across 5 files) against the shell's 11 columns index-by-index, confirmed 100% coverage with zero N>11 and zero gap; correctly identified that column *content* styling never depended on the column div's own class/attributes (every rule targets `.studio-viewport > div > div:nth-child(N)` directly with `!important`, overriding whatever's there) — so an unstyled empty `<div>` is DOM-contract-equivalent to Frame219's absolutely-positioned Legacy markup from the moment `dynamicCSS` applies, no FOUC risk since the `<style>` tag commits in the same React tree — applied: this report's Uma-hat section; **live MCP re-prove of all 9 screens + header/footer/mega-menu/FSC + both CJM Play modes is a named residual, not a false PROVEN**.
 - Quinn (QA): `npm test` 162/162 files (1008/1008 tests) green incl. `check:page-final-pass`/`check:felonies`/`check:hygiene`/`check:parity-proven`; `npm run build` green (module count dropped `frame/index.tsx` from the graph, consistent with it now being genuinely unreferenced); no MCP/browser transport available this session — full 9-screen + chrome + CJM re-prove is this ship's largest named residual, explicitly not claimed — applied: this report's owed-checklist section.
 - Ben (BE): no push this turn (tree left uncommitted per task instruction); no CI touched.
-- Pax (PO sim): local-only ship (no commit, no version bump per task instruction) — this is the highest-risk lane in the erase-Make program (every screen's mount contract), so no self-declared "done" — leave for PO/Arch to gate the actual `frame/index.tsx` deletion behind live MCP proof, per the task's own hard constraint.
+- Pax (PO sim): local-only ship (no commit, no version bump per task instruction) — this is the highest-risk lane in the erase-Legacy program (every screen's mount contract), so no self-declared "done" — leave for PO/Arch to gate the actual `frame/index.tsx` deletion behind live MCP proof, per the task's own hard constraint.
 - Pain/Worked/Keep: Pain — none new; the risk this pass carried (silently breaking every screen's mount point) turned out to be fully mitigable by static analysis because every consumer already used the selector-string contract, never Frame219-specific DOM identity — the original Phase D readiness investigation had already done the hard part of proving that. Worked — grepping the *exact* `nth-child(N)` value set before designing the shell (rather than trusting a "looks like 11" glance) caught the two legacy-unused slots (5, 6) that a careless "9 screens = 9 columns" shell would have silently broken. Keep — when a substrate/contract swap is purely selector-string-addressed (no identity/class dependency), the safest replacement is the *minimal* structurally-equivalent stub, not a "cleaner" redesign — resist the urge to also fix the 2 unused-slot naming or simplify the 11-column shape in the same pass; that's a separate, lower-risk follow-up once live-proven.
 
-**Knowledge improved** (2026-07-23 · stream: erase-Make Phase E — live re-proof + `frame/index.tsx` deletion · board #8b closes HARD-GREEN):
+**Knowledge improved** (2026-07-23 · stream: erase-Legacy Phase E — live re-proof + `frame/index.tsx` deletion · board #8b closes HARD-GREEN):
 - Arch (Director): ran the full owed checklist myself before trusting the prior sitrep's residual — all 9 screens direct-navigated + screenshotted + console-checked; hovered Health Services mega-menu and clicked Search/FSC on 2 screens (appointment-details, plp) including Escape-dismiss; ran both `__studioRunFullPlayProve({experience:"agentic"})` (22/22, `pass:true`) and `({experience:"traditional"})` (10/10, `pass:true`, `errors:[]`) — the traditional route crosses book-step-3/history/details, the exact Phase A camera-yank risk class, with zero regression — applied: NEXT_STEPS #8b now `[x]` HARD-GREEN.
 - Finn (FE): attempted `frame/index.tsx` deletion via whole-directory `rm -rf` first — broke 5 test files + build (`Cannot resolve .png`) because `frame/` is a dual-purpose folder (dead component + live shared asset library). Caught by immediately re-running `npm test`, reverted via `git checkout`, redone as a precise single-file `Remove-Item` on only `index.tsx` + the dead `Frame1000007317` shim, keeping every PNG/`svg-p97rh8hlns.ts` asset — applied: LESSONS_LEARNED 2026-07-23 (new rule: never `rm -rf` a Figma-export directory on a single dead-file finding; grep every filename inside it first).
 - Uma (UI/UX): fidelity PASS on all 9 screens (screenshot-diffed against pre-Phase-E baselines from memory of this session's earlier checks) + mega-menu column layout/image panel + FSC full-width/scrim/Escape-dismiss; one unrelated pre-existing console warning noted (framer-motion `ref`-prop in `ChatScreen.tsx` `ReplyFrame`, file untouched by this diff) — flagged separately, not blocking.
 - Quinn (QA): `npm test` 162/162 files (1008/1008 tests) green + `npm run build` green *after* the correct precise deletion (not the broken broad one) — MCP evidence: 9× screenshot + console-message pairs, 2× mega-menu/FSC interaction pairs, 2× full-Play JSON results, all logged this turn.
 - Ben (BE): no push yet this message — batch commit of Phases 0/A/B/C/D/E follows immediately after this sitrep, per R12.
-- Pax (PO sim): Phase E + `frame/index.tsx` deletion is now genuinely HARD-GREEN with live evidence, not a self-declared residual — clears the last blocker in the erase-Make program; ready for one coherent batch commit.
+- Pax (PO sim): Phase E + `frame/index.tsx` deletion is now genuinely HARD-GREEN with live evidence, not a self-declared residual — clears the last blocker in the erase-Legacy program; ready for one coherent batch commit.
 - Pain/Worked/Keep: Pain — "0 references to `frame/index.tsx`" is not the same claim as "`frame/` the directory is dead"; conflating a dead-component finding with a dead-directory action nearly shipped a break. Worked — the ALWAYS re-run `npm test` immediately after any deletion, before moving on, caught it in one cycle with zero wasted investigation. Keep — for any Figma-export folder retirement, grep the directory name/every filename individually, never assume filename-implies-folder-scope.
 
-**Knowledge improved** (2026-07-23 · stream: erase-Make Phase D — Header re-author · local, uncommitted):
+**Knowledge improved** (2026-07-23 · stream: erase-Legacy Phase D — Header re-author · local, uncommitted):
 - Arch (Director): Header lane matched Footer precedent exactly (content extraction + hand component + colocated CSS split); no `sourceHeader.cloneNode` remains anywhere in the header path — applied: NEXT_STEPS 7c → partial/gate-green, PAGE FINAL PASS stamp deferred to next agent with MCP.
 - Bea (BA): Inventoried every nav item (Home/Health Services/Acne & Skin/More), aux items (Search, Login/Sarah), and both account-menu variants (5 logged-in + 4 guest actions incl. badges) from the prior hand-rolled `innerHTML` strings — 100% represented in `headerContent.ts`, none invented — applied: headerContent.ts.
 - Finn (FE): `headerMount.tsx` now `createRoot` + `flushSync` renders `<Header>` once, then hands the resulting DOM to the unchanged `attachHealthServicesMegaMenu`/`attachFullScreenSearch` kits — same `data-name` contract, zero rewrite of those kits; header CSS split to colocated `chrome/header.css` (hygiene ceiling) — applied: headerMount.tsx, Header.tsx, headerContent.ts, header.css.
@@ -243,30 +243,30 @@ retrieval table and LESSONS topic index before scanning by date.
 - Keep: Arch rejects mount without inheritance stamp; Accordion/kit reuse before invent.
 
 **Knowledge improved** (2026-07-22 · stream: Appointment Details PAGE FINAL PASS HARD-GREEN · tip `95ccca7` tree · v0.0.108):
-- Arch (Director): History HARD-GREEN → Details Final Pass; erase-Make History/Details closed; Reflex before Book Make delete — applied: NEXT_STEPS 0g/7b · PAGE_FINAL_PASS.json · PARITY_PROVEN
+- Arch (Director): History HARD-GREEN → Details Final Pass; erase-Legacy History/Details closed; Reflex before Book Legacy delete — applied: NEXT_STEPS 0g/7b · PAGE_FINAL_PASS.json · PARITY_PROVEN
 - Bea (BA): Details register · Date/Time SSoT bind · omit Shipping under-match — applied: APPOINTMENT_DETAILS_* 
 - Finn (FE): mount child 1 + densify gate + deferred unmount — applied: screens/appointment-details · globals-chrome
 - Uma (UI/UX): PROVEN densify 20/20 · no Cancel invent — applied: UMA_FIDELITY_APPOINTMENT_DETAILS
 - Quinn (QA): 10/10 + terminal CTA hide #8762341 · rematch readinessPass true — applied: probe audit · inventory REACT
 - Ben (BE): requiredScreens appointment-details (no ButtonPrimary required) — applied: check-page-final-pass · check-parity-proven
-- Pax (PO sim): Details HARD-GREEN local; Book Make delete + Traditional 0d next — applied: this stamp
+- Pax (PO sim): Details HARD-GREEN local; Book Legacy delete + Traditional 0d next — applied: this stamp
 - Pain/Worked/Keep: Details densify truth ≠ History 32/56 — measure per-screen densify; Keep no invent accordion/Shipping; extract shared account chrome next
 
 **Knowledge improved** (2026-07-22 · stream: Appointment History PAGE FINAL PASS HARD-GREEN · tip `95ccca7` tree · v0.0.108):
 - Arch (Director): Chat HARD-GREEN → History Final Pass; Details unblocked; Reflex before Details brief — applied: NEXT_STEPS 0f/7 · PAGE_FINAL_PASS.json · PARITY_PROVEN
-- Bea (BA): register + selector HARD `data-studio-appointment-view-details` — applied: MAKE_PARITY_REGISTER · APPOINTMENT_HISTORY_REACT
+- Bea (BA): register + selector HARD `data-studio-appointment-view-details` — applied: LEGACY_PARITY_REGISTER · APPOINTMENT_HISTORY_REACT
 - Finn (FE): mount + densify `:not([data-studio-react-screen])` on History child-2 — applied: screens/appointment-history · globals-chrome.css
 - Uma (UI/UX): FAIL→PROVEN (32/56 · CTA 32 · no Cancel invent) — applied: UMA_FIDELITY_APPOINTMENT_HISTORY · LESSONS densify
-- Quinn (QA): 8/8 View Details → Make Details + restore; re-prove after densify — applied: appointmentHistoryMcpProbeSteps · probe audit
+- Quinn (QA): 8/8 View Details → Legacy Details + restore; re-prove after densify — applied: appointmentHistoryMcpProbeSteps · probe audit
 - Ben (BE): requiredScreens + SCREEN_SOURCES/MOUNTS for appointment-history — applied: check-page-final-pass · check-parity-proven
 - Pax (PO sim): History HARD-GREEN local; Details next; no push until coherent ship ask — applied: this stamp
-- Pain/Worked/Keep: densify `!important` beat React CSS via Make `data-name` → gate densify off React hosts; Keep measure-before-PROVEN + no invent hover
+- Pain/Worked/Keep: densify `!important` beat React CSS via Legacy `data-name` → gate densify off React hosts; Keep measure-before-PROVEN + no invent hover
 
 **Knowledge improved** (2026-07-21 · stream: prove FAIL camera flake + PO latch wipe · local):
 - Arch (Director): Mid-prove FAIL must escalate immediately — not wrap-up only — applied: this ship · LESSONS
 - Finn (FE): forceClear clears PO latch; path-deviation grace 0.12 + threshold 48 — applied: agentTestingOverlay · playbackScrollAnomalies
 - Quinn (QA): Agentic 22/22 + immediate re-prove no DIAGNOSTIC_ACK_STOP — applied: `:5173` MCP
-- Pax (PO sim): History/Details Make stay board #7 — applied: NEXT_STEPS · no invent migrate
+- Pax (PO sim): History/Details Legacy stay board #7 — applied: NEXT_STEPS · no invent migrate
 
 **Knowledge improved** (2026-07-21 · stream: long REC Play login interstitial · no push):
 - Arch (Director): Read QA first when FAIL already logged; login interstitial ≠ invent green — applied: LESSONS · this ship
@@ -316,40 +316,40 @@ retrieval table and LESSONS topic index before scanning by date.
 - Ben (BE): R12 one push no CI await — applied: peek only
 
 **Knowledge improved** (2026-07-19 · stream: Chat sticky/scroll/bar — don’t regress · R12):
-- Bea (BA): Register L3–L6 Frame337 microheader → Present; I11 links = UXDS `.uxds-link` — applied: CHAT_MAKE_PARITY_REGISTER
-- Finn (FE): Port Make Frame337 → `ChatSitePilotBar`; bubble links `.uxds-link`; chat column overflow-sync + left pad compensate — applied: ChatSitePilotBar · ChatScreen · chat.css · globals-chrome
+- Bea (BA): Register L3–L6 Frame337 microheader → Present; I11 links = UXDS `.uxds-link` — applied: CHAT_LEGACY_PARITY_REGISTER
+- Finn (FE): Port Legacy Frame337 → `ChatSitePilotBar`; bubble links `.uxds-link`; chat column overflow-sync + left pad compensate — applied: ChatSitePilotBar · ChatScreen · chat.css · globals-chrome
 - Uma (UI/UX): Site Pilot bar + DS link rest/hover; no invent blue underline; center X stable — applied: chat.css · LESSONS Chat sticky/scroll/bar
 - Quinn (QA): probe `chat-site-pilot-bar` + bubble link rest assert — applied: chatMcpProbeSteps
 - Ben (BE): R12 one push no CI await — applied: peek only
 - Pax (PO sim): jagged Chat regression user-visible → patch notes — applied: notes:append
 
 **Knowledge improved** (2026-07-19 · stream: traditional pdp-book-now + Chat recipe · R12):
-- Finn (FE): Prefer React PDP `data-studio-action=pdp-book-now`; skip make-retired — applied: findPdpBookNowBtn · traditional.ts
+- Finn (FE): Prefer React PDP `data-studio-action=pdp-book-now`; skip legacy-retired — applied: findPdpBookNowBtn · traditional.ts
 - Uma (UI/UX): §0a PARTIAL — composer identity PASS vs Site Pilot + Motion ownership; no whole-page PROVEN — applied: UMA_FIDELITY_CHAT
 - Quinn (QA): Expanded `chatProbeSteps` (host/retired/composer/hovers/motion); recipe PASS ≠ Final Pass — applied: studioMcpPageProbe · QUINN_CHAT_PROBE_CRITERIA
 - Ben (BE): R12 one push no CI await — applied: peek only
 - Pax (PO sim): traditional CJM fix user-visible → patch bump — applied: release:patch
 
 **Knowledge improved** (2026-07-19 · stream: Chat React mount ON · step-forward unblock · R12):
-- Arch (Director): Mount ON after Make smoke unblock + React agentic P1–P10; no false Chat PROVEN/Final Pass; PDP HARD-GREEN untouched — applied: NEXT_STEPS §6
-- Finn (FE): Prefer React host over Make-retired first-match (`getAgenticHomeCard` / `getChatSummary`); React controlled textarea native setter; shared `SitePilotComposer` — applied: sitePilotHome · sitePilotChatScenario
+- Arch (Director): Mount ON after Legacy smoke unblock + React agentic P1–P10; no false Chat PROVEN/Final Pass; PDP HARD-GREEN untouched — applied: NEXT_STEPS §6
+- Finn (FE): Prefer React host over Legacy-retired first-match (`getAgenticHomeCard` / `getChatSummary`); React controlled textarea native setter; shared `SitePilotComposer` — applied: sitePilotHome · sitePilotChatScenario
 - Quinn (QA): Home play + agentic step through chat green on React host; traditional `pdp-book-now` no-op residual — applied: :5173 matrix
 - Ben (BE): Mount flag true + contract test; R12 one push no CI await — applied: chatContract
 - Pax (PO sim): user-visible Chat React mount → patch bump — applied: release:patch
 
 **Knowledge improved** (2026-07-19 · stream: Chat React parity behind flag · R12 batch):
 - Arch (Director): Flip veto until Quinn P1–P10 React smoke; PDP HARD-GREEN untouched; no Chat PROVEN — applied: NEXT_STEPS §6
-- Bea (BA): Register bands L/LE/SK → Partial for React port behind flag — applied: CHAT_MAKE_PARITY_REGISTER
+- Bea (BA): Register bands L/LE/SK → Partial for React port behind flag — applied: CHAT_LEGACY_PARITY_REGISTER
 - Finn (FE): Thread×8 + CTAs + thinking bridge + shared composer dual-class (`proto-agentic-*`); static frame classes preserve scenario hide — applied: screens/chat · chatThinkingBridge · SitePilotComposer
-- Uma (UI/UX): Chat motion via `@/uxds/motion` (thinking + frame enter); Make `#dbebf5` body — applied: ChatScreen · chat.css (pixel PROVEN still PENDING)
-- Quinn (QA): Mount stays OFF — React P1–P10 not smokeable until flip; Make host still 4q/4r — applied: no false PROVEN
+- Uma (UI/UX): Chat motion via `@/uxds/motion` (thinking + frame enter); Legacy `#dbebf5` body — applied: ChatScreen · chat.css (pixel PROVEN still PENDING)
+- Quinn (QA): Mount stays OFF — React P1–P10 not smokeable until flip; Legacy host still 4q/4r — applied: no false PROVEN
 - Ben (BE): Hygiene extract `chatScreenActions` / `useBootsChatScreenMount`; R12 push no-await — applied: check:hygiene under 4800
 - Pax (PO sim): no patch bump (flag OFF, not user-visible React mount) — applied: R12
 
 **Knowledge improved** (2026-07-19 · stream: Chat React kickoff · PO override · R12 batch):
 - Arch (Director): Chat kickoff under PAGE_FINAL_PASS discipline while Site Pilot NOT hard-green (PO override); PDP HARD-GREEN preserved; Chat NOT-GREEN — applied: NEXT_STEPS §6 · team check
-- Bea (BA): 69-band Chat Make register + CJM/playback contracts + shared composer SK rows — applied: CHAT_MAKE_PARITY_REGISTER · CHAT_REACT
-- Finn (FE): shared `SitePilotComposer` (Home+Chat); Chat scaffold gated `CHAT_REACT_MOUNT_ENABLED=false` so Make playback stays live — applied: screens/shared · screens/chat · isChatReactMounted
+- Bea (BA): 69-band Chat Legacy register + CJM/playback contracts + shared composer SK rows — applied: CHAT_LEGACY_PARITY_REGISTER · CHAT_REACT
+- Finn (FE): shared `SitePilotComposer` (Home+Chat); Chat scaffold gated `CHAT_REACT_MOUNT_ENABLED=false` so Legacy playback stays live — applied: screens/shared · screens/chat · isChatReactMounted
 - Uma (UI/UX): Chat fidelity IN PROGRESS; Motion owns chat animated transitions via `@/uxds/motion` — applied: UMA_FIDELITY_CHAT · MOTION.md
 - Quinn (QA): chat stub + mandatory playback smoke P1–P10; no false PROVEN — applied: QUINN_CHAT_PROBE_CRITERIA
 - Ben (BE): `chat-host` probe stub + `site-pilot-chat`→`chat` alias test; PAGE_FINAL_PASS/PARITY untouched — applied: studioMcpPageProbe · studioUrl.test
@@ -357,14 +357,14 @@ retrieval table and LESSONS topic index before scanning by date.
 
 **Knowledge improved** (2026-07-19 · stream: Site Pilot screenId rename · v0.0.40):
 - Arch (Director): public Boots Site Pilot id is `site-pilot`; `home` reserved — applied: screens.ts · URL.md · register
-- Bea (BA): register documents public `screenId=site-pilot` + reserved `home` — applied: HOME_MAKE_PARITY_REGISTER
+- Bea (BA): register documents public `screenId=site-pilot` + reserved `home` — applied: HOME_LEGACY_PARITY_REGISTER
 - Finn (FE): `HOME_REACT_SCREEN_ID` + host attrs + probe recipe → `site-pilot` (folder/BEM lag OK) — applied: homeContract · mount · studioMcpPageProbe
 - Ben (BE): URL aliases + tests + patch bump + R12 batch push — applied: studioUrl · v0.0.40
 - Pax (PO sim): user-visible URL seam → patch bump — applied: release:patch
 
 **Knowledge improved** (2026-07-19 · stream: Home naming + lean CI + batch-push R12 · tip post-`fd3241c`):
 - Arch (Director): R12 batch-ship-push locked; CI wall target ~35–45s warm — applied: doctrine §2.14 · TEAM · STUDIO_AUTO_RULES R12 · director #26
-- Bea (BA): Home chip/query naming contract in register — applied: HOME_MAKE_PARITY_REGISTER L7
+- Bea (BA): Home chip/query naming contract in register — applied: HOME_LEGACY_PARITY_REGISTER L7
 - Finn (FE): Home landmarks/form + kebab chip `data-studio-*` — applied: `HomeScreen.tsx` · naming audit PASS
 - Ben (BE): `npm ci` + cache + parallel `test`∥`build` + `test:gates` — applied: `ci.yml` · `run-static-gates.mjs` · CI_ACTIONS_BUDGET §2.1
 - Pax (PO sim): one batched push per coherent ship (this wave) — applied: R12 process
@@ -398,7 +398,7 @@ retrieval table and LESSONS topic index before scanning by date.
 |-------|------|--------------------|
 | **Batch ship / push (R12)** — no push after every tiny fix; **no await CI/Pages** on routine ships; land local until coherent ship / PO ask / HARD-GREEN / end of wave | Arch, Pax, Ben | [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R12 · TEAM § Batch ship · doctrine §2.13–14 · ci-sitrep |
 | **Faster CI** — `node_modules` cache; parallel `test`∥`build`; Vitest forks; **probe-test delay compress** (Vitest-only + fake timers; MCP settles untouched); warm target ≤20–25s | Ben, Finn, Arch | [CI_ACTIONS_BUDGET.md](./CI_ACTIONS_BUDGET.md) §2.1 · `studioMcpPageProbe.ts` · `ci.yml` |
-| **Site Pilot public id** — URL/`screenId`=`site-pilot` (`home` reserved); folder/BEM may lag; naming audit updated | Bea, Finn, Arch | [HOME_MAKE_PARITY_REGISTER.md](../projects/boots-pharmacy/features/HOME_MAKE_PARITY_REGISTER.md) · [URL.md](../shell/URL.md) |
+| **Site Pilot public id** — URL/`screenId`=`site-pilot` (`home` reserved); folder/BEM may lag; naming audit updated | Bea, Finn, Arch | [HOME_LEGACY_PARITY_REGISTER.md](../projects/boots-pharmacy/features/HOME_LEGACY_PARITY_REGISTER.md) · [URL.md](../shell/URL.md) |
 | **Fixed localhost + reuse tab** — canonical `http://localhost:5173/`; Vite `strictPort`; one `npm run dev`; Chrome MCP `list_pages`→reuse (`new_page` only if empty); Auto-Rule R11 + felony | Arch, Finn, Ben, Quinn | [STUDIO_AUTO_RULES.md](./STUDIO_AUTO_RULES.md) R11 · `vite.config.ts` · LESSONS |
 | **Platform Motion standard** — `framer-motion` via `@/uxds/motion`; Accordion height = Motion (not CSS `0fr/1fr`); chevron CSS; shell pilots: diagnostic overlay + studio select presence | Arch, Finn, Uma, Ben, Pax | [MOTION.md](./MOTION.md) · `src/uxds/motion/` · Accordion.tsx |
 | **Accordion invisible expand** — `prefers-reduced-motion` zeroed CSS grid transitions; root cause + Motion height fix | Uma, Finn, Arch, Quinn | LESSONS · accordion.css · MOTION.md |
@@ -408,9 +408,9 @@ retrieval table and LESSONS topic index before scanning by date.
 | **PDP Motion travel re-prove** — Quinn MCP **PASS** 23/23 @ `7c7c9e1` / v0.0.32; teardown clean; Uma §0a still PROVEN @ `76e2433` | Quinn, Arch, Finn, Uma | FE_AUDIT_PDP_MCP · PAGE_FINAL_PASS mcpFinalPass HARD-GREEN |
 | **PDP hang-guard re-prove** — Quinn MCP **PASS** 23/23 @ `7bce2b3` / v0.0.31 (superseded MCP stamp by `7c7c9e1`) | Quinn, Arch, Finn, Uma | FE_AUDIT_PDP_MCP · PAGE_FINAL_PASS mcpFinalPass PASS |
 | **PDP FAQ 6/6 + Accordion motion + TertiaryCta soft** — Uma §0a PROVEN + Quinn MCP **PASS** 23/23 @ `76e2433` / v0.0.30 (superseded MCP stamp by `7bce2b3`) | Uma, Quinn, Arch, Finn | UMA_FIDELITY_PDP · FE_AUDIT_PDP_MCP · PAGE_FINAL_PASS mcpFinalPass PASS · DEV-20260719-tertiary-soft |
-| **PDP FAQ/CTA/focus polish (PO)** — Make-sourced FAQ bodies 3/6; download tertiary unify (no leaflet stub); accordion focus-none; v0.0.28 | Bea, Uma, Finn, Quinn, Arch | PDP_MAKE_PARITY_REGISTER · UMA_FIDELITY_PDP · PAGE_FINAL_PASS.json |
-| **PDP RTB vertical rhythm** — LEGACY Make `module.pdp.rtb > div > div` stole React column gap (48≠32) + forced title-block 1:1; Uma must MCP-measure section gaps before fidelity IN PROGRESS; Quinn PASS ≠ rhythm done | Uma, Finn, Arch | UMA_FIDELITY_NOTES §0b · UMA_FIDELITY_PDP · globals-screens `:not(.pdp__rtb-card)` |
-| **PDP kickoff** — Bea register before code; Finn L1–L13 mount; Uma fidelity IN PROGRESS; Quinn probe criteria prep (no false PROVEN); accordion B1 static | Arch, Bea, Finn, Uma, Quinn, Ben | [PDP_MAKE_PARITY_REGISTER.md](../projects/boots-pharmacy/features/PDP_MAKE_PARITY_REGISTER.md) · screens/pdp |
+| **PDP FAQ/CTA/focus polish (PO)** — Legacy-sourced FAQ bodies 3/6; download tertiary unify (no leaflet stub); accordion focus-none; v0.0.28 | Bea, Uma, Finn, Quinn, Arch | PDP_LEGACY_PARITY_REGISTER · UMA_FIDELITY_PDP · PAGE_FINAL_PASS.json |
+| **PDP RTB vertical rhythm** — LEGACY `module.pdp.rtb > div > div` stole React column gap (48≠32) + forced title-block 1:1; Uma must MCP-measure section gaps before fidelity IN PROGRESS; Quinn PASS ≠ rhythm done | Uma, Finn, Arch | UMA_FIDELITY_NOTES §0b · UMA_FIDELITY_PDP · globals-screens `:not(.pdp__rtb-card)` |
+| **PDP kickoff** — Bea register before code; Finn L1–L13 mount; Uma fidelity IN PROGRESS; Quinn probe criteria prep (no false PROVEN); accordion B1 static | Arch, Bea, Finn, Uma, Quinn, Ben | [PDP_LEGACY_PARITY_REGISTER.md](../projects/boots-pharmacy/features/PDP_LEGACY_PARITY_REGISTER.md) · screens/pdp |
 | **PAGE FINAL PASS** — no new migrated page until previous hard-green; Finn/Uma checklist + check; parallel callsigns + Knowledge used still required | Arch, Finn, Uma, Bea | [PAGE_FINAL_PASS.md](./PAGE_FINAL_PASS.md) · TEAM · doctrine · NEXT_STEPS |
 | Typical DS checks mandatory before PROVEN; missing DS hover = FAIL | Uma, Quinn, Arch | LESSONS · UMA notes · ratchet search-field-states |
 | Filter search parity (icon end, single clear, View all, counters) | Finn, Uma, Bea, Quinn | LESSONS · PARITY_RATCHETS · PLP register |
@@ -547,14 +547,14 @@ retrieval table and LESSONS topic index before scanning by date.
 - Pax (PO sim): accept HARD-GREEN for sequencing; do not auto-start Home — applied: wait PO `+`
 
 **Knowledge improved** (2026-07-19 · stream: PDP RTB vertical rhythm + Uma §0b ratchet · user-visible):
-- Uma (UI/UX): PO hard-fail RTB cramped stack — root cause Make LEGACY `module.pdp.rtb > div > div` hitting React; MCP-measured 32px gaps restored; **§0a / PROVEN not stamped** — applied: pdp.css + globals-screens `:not(.pdp__rtb-card)` + UMA_FIDELITY_PDP §0b checklist
+- Uma (UI/UX): PO hard-fail RTB cramped stack — root cause Legacy LEGACY `module.pdp.rtb > div > div` hitting React; MCP-measured 32px gaps restored; **§0a / PROVEN not stamped** — applied: pdp.css + globals-screens `:not(.pdp__rtb-card)` + UMA_FIDELITY_PDP §0b checklist
 - Finn (FE): title-block content-sized + host belt `gap: 32px !important` — applied: screens/pdp/pdp.css
 - Arch (Director): ratchet — section vertical rhythm mandatory before fidelity IN PROGRESS; Quinn PASS ≠ rhythm — applied: COMMAND_DOCTRINE + UMA_FIDELITY_NOTES §0b + TEAM_KNOWLEDGE
 - Quinn (QA): functional MCP PASS stands; does not waive §0b/§0a — applied: residual note on stamp
 
 **Knowledge improved** (2026-07-19 · stream: PDP React kickoff scaffold · v0.0.21):
 - Arch (Director): parallel Bea→Finn/Uma/Ben after PLP HARD-GREEN + PO `+`; register-before-code enforced — applied: dispatch + board
-- Bea (BA): full PDP Make inventory incl. LE N/A + accordion B1 — applied: PDP_MAKE_PARITY_REGISTER.md
+- Bea (BA): full PDP Legacy inventory incl. LE N/A + accordion B1 — applied: PDP_LEGACY_PARITY_REGISTER.md
 - Finn (FE): PLP-pattern mount child 8; L1–L13 RTB; wire `isPdpReactMounted` gates; no invent loader — applied: screens/pdp/*
 - Uma (UI/UX): kickoff fidelity stamp IN PROGRESS — applied: UMA_FIDELITY_PDP_2026-07-19.md
 - Quinn (QA): probe criteria prep only — refuse PROVEN until MCP — applied: QUINN_PDP_PROBE_CRITERIA_2026-07-19.md
@@ -603,30 +603,30 @@ retrieval table and LESSONS topic index before scanning by date.
 **Knowledge improved** (2026-07-19 · stream: PLP team retro / Reflex · notes-only):
 - Arch (Director): facilitated full-callsign retro; locked **Reflex** (HARD-GREEN → micro-retro into TEAM_KNOWLEDGE); indexed top 5 keep actions — applied: TEAM_RETRO + TEAM.md + doctrine §0 + this index
 - Bea (BA): register-every-band incl. loader mechanism before Finn; unchecked P0 blocks PASS — applied: Bea must-re-read + retro Keep
-- Finn (FE): under-match Make; modal URL registry + `data-studio-modal` before dialog ship; ratchet same ship — applied: Finn must-re-read + URL.md link
-- Uma (UI/UX): no invent; typical DS checks vs kit+Make before PROVEN — applied: retro Keep (Uma)
+- Finn (FE): under-match Legacy; modal URL registry + `data-studio-modal` before dialog ship; ratchet same ship — applied: Finn must-re-read + URL.md link
+- Uma (UI/UX): no invent; typical DS checks vs kit+Legacy before PROVEN — applied: retro Keep (Uma)
 - Quinn (QA): PROVEN requires MCP probe evidence; overlay/scroll/eyes hard FAIL — applied: Quinn must-re-read
 - Ben (BE): modal URL table + overlay felonies same PR as dialog; no chat-only PROVEN — applied: Ben must-re-read
-- Pax (PO sim): accept bar = Make + MCP + Final Pass hard-green; notes/push without bump for docs/reflex — applied: retro Keep (Pax)
+- Pax (PO sim): accept bar = Legacy + MCP + Final Pass hard-green; notes/push without bump for docs/reflex — applied: retro Keep (Pax)
 
 **Process deltas (actionable — from retro):**
 1. **Modal URL registry mandatory** — before any blocking dialog ships: add `modal` id to [URL.md](../shell/URL.md), register in `STUDIO_MODAL` / `REGISTERED_OVERLAY_MODAL_IDS`, stamp `data-studio-modal` — same change as the dialog. Ben/Finn own; Quinn proves deep-link + overlay-eyes.
-2. **Make register before code** — Bea completes every band (incl. loading/empty/updating mechanism) before Finn implements; unchecked P0 = team-check FAIL.
+2. **Legacy register before code** — Bea completes every band (incl. loading/empty/updating mechanism) before Finn implements; unchecked P0 = team-check FAIL.
 3. **No invent / DS hover** — Uma signs typical DS checks; Quinn MCP-hovers ≥1 SearchField; invent chrome = FAIL.
 4. **False PROVEN ban** — Arch rejects PROVEN without MCP evidence log; PO dispute revokes until re-prove.
 5. **Reflex** — after each PAGE FINAL PASS HARD-GREEN, Arch runs micro-retro (Pain/Worked/Keep lean) and appends **Knowledge improved** here before opening the next migrated page.
 
-**Knowledge improved** (2026-07-23 · stream: erase-Make Phase B — Book Step 1–3 Make delete · board #8 · local, no push):
+**Knowledge improved** (2026-07-23 · stream: erase-Legacy Phase B — Book Step 1–3 Legacy delete · board #8 · local, no push):
 - Arch (Director): confirmed board #8's own gate ("after History/Details Final Pass hard-green + CJM/playback green") was actually satisfied by Phase A's `3909eb0` camera-yank fix (10/10 Traditional Play prove) before proceeding — did not blind-trust the task framing; fenced `frame/index.tsx`/`headerMount.tsx` (Header Phase D lane 7c) and the larger wire dead-code family (board #9) out of scope rather than scope-creep into them — applied: NEXT_STEPS #8 checked + #9 scoping note
-- Finn (FE): `retireMakeUnderPage` gained `permanent: true` (delete outright, no park/restore) instead of inventing a second parallel retire function; Book Step 1/2/3 mounts switched to it; found and left alone (not touched) the ~1500-line always-true-guard dead effect family in `BootsPharmacyProjectView.tsx` since it's board #9's job, not #8's — applied: `retireMakeUnderPage.ts` · 3 mount files
+- Finn (FE): `retireLegacyUnderPage` gained `permanent: true` (delete outright, no park/restore) instead of inventing a second parallel retire function; Book Step 1/2/3 mounts switched to it; found and left alone (not touched) the ~1500-line always-true-guard dead effect family in `BootsPharmacyProjectView.tsx` since it's board #9's job, not #8's — applied: `retireLegacyUnderPage.ts` · 3 mount files
 - Uma (UI/UX light — no browser MCP available this ship): verified by static trace, not screenshot, that no live React screen references `.proto-confirm-open-appointment*` / `.proto-page-booster-checkbox*` before deleting their CSS; confirmed `BookAppointmentProgress`/calendar-cell/`.utility / cursor` CSS IS live-referenced by React screens and left untouched — applied: this ship's CSS diff; **live MCP re-prove of Book Step 1/2/3 visuals still owed** (flagged, not claimed)
 - Quinn (QA): `npm test` 162/162 files (1008 tests) green incl. `check:page-final-pass` / `check:parity-ratchets` / `check:felonies`; `npm run build` green; no MCP/browser transport was available this session — Book Step 1/2/3 localhost re-prove is a named residual, not a false PROVEN — applied: this report's residual list
 - Pax (PO sim): local-only ship (no commit per task instruction); no version bump — applied: leave tree uncommitted for PO review
 
-**Knowledge improved** (2026-07-23 · stream: erase-Make Phase C — mechanical LEGACY CSS shrink · board #9 · local, no push):
-- Arch (Director): re-read Phase B's #8/#9 knowledge + lessons before starting; confirmed via `retireMakeUnderPage`/`mountBookStep{1,2,3}Screen.tsx` that Book 1–3 Make `body` is genuinely permanently deleted (not parked) before treating any selector as provably dead; kept the ~1500-line dead-`useEffect` JS family in `BootsPharmacyProjectView.tsx` untouched (not required to prove this pass's CSS deletions) — applied: NEXT_STEPS #9 partial-done note, honest about what's left
+**Knowledge improved** (2026-07-23 · stream: erase-Legacy Phase C — mechanical LEGACY CSS shrink · board #9 · local, no push):
+- Arch (Director): re-read Phase B's #8/#9 knowledge + lessons before starting; confirmed via `retireLegacyUnderPage`/`mountBookStep{1,2,3}Screen.tsx` that Book 1–3 Legacy `body` is genuinely permanently deleted (not parked) before treating any selector as provably dead; kept the ~1500-line dead-`useEffect` JS family in `BootsPharmacyProjectView.tsx` untouched (not required to prove this pass's CSS deletions) — applied: NEXT_STEPS #9 partial-done note, honest about what's left
 - Finn (FE — CSS only, no JS touched): grep-traced every candidate class to its producer before deleting; found the `.proto-chosen-tile`/`-store-card`/`-checkbox`/`-map`(+viewport/surface/dragging)/`.proto-page-map-pin` family (sole producer `setupChosenPageMap` in `locationsMap.ts`, called only from the dead Book Step 1 effect) plus the Book Step 1 `nth-child(7)` `.utility / cursor` rule were genuinely dead; correctly did **not** delete `.proto-chosen-slot`/`.proto-chosen-map-bg`/`.proto-confirm-advantage*`/`component.book.appointment.progress`/calendar-cell rules once grep showed live React producers for each (`BookStep1LocationScreen.tsx`, `BookStep3ConfirmationScreen.tsx`, `BookAppointmentProgress` kit, `BookStep2DateTimeScreen.tsx`) — applied: `src/styles/globals-screens.css` diff (114 lines removed, 3004→2891)
-- Uma (UI/UX light — no browser MCP available this ship): static-only fidelity check — confirmed each surviving selector's live JSX producer by exact string grep (not by class-family assumption) before signing off; flagged that the "Make path only ⇒ safe to delete" heuristic from Phase B's own lesson is incomplete and appended a correcting lesson (2026-07-23, "dead JS ≠ dead CSS") so future sweeps don't over-delete — applied: LESSONS_LEARNED new entry; **live MCP re-prove of Book Step 1 chosen-location tile + Step 3 confirmation still owed** (flagged, not claimed)
+- Uma (UI/UX light — no browser MCP available this ship): static-only fidelity check — confirmed each surviving selector's live JSX producer by exact string grep (not by class-family assumption) before signing off; flagged that the "Legacy path only ⇒ safe to delete" heuristic from Phase B's own lesson is incomplete and appended a correcting lesson (2026-07-23, "dead JS ≠ dead CSS") so future sweeps don't over-delete — applied: LESSONS_LEARNED new entry; **live MCP re-prove of Book Step 1 chosen-location tile + Step 3 confirmation still owed** (flagged, not claimed)
 - Quinn (QA): `npm test` 162/162 files (1008 tests) green, `npm run build` green, both re-run after the CSS diff; no MCP/browser transport available this session — visual re-prove of Book Step 1/2/3 is a named residual, not a false PROVEN — applied: this report's residual list
 - Pax (PO sim): local-only ship (no commit per task instruction); no version bump — applied: leave tree uncommitted for PO review
 

@@ -1,6 +1,6 @@
 {
   "kind": "studio-interaction-inventory",
-  "note": "Post-React rematch for appointment-details (2026-07-22). Captured on cancelled #8762341 after Quinn terminal CTA prove. Compare to MAKE_BASELINE: readinessPass false→true; invalid 3→0. Edit/Cancel correctly absent on terminal sample (non-terminal Edit/Cancel proved via MCP probe 10/10 on default #1411527).",
+  "note": "Post-React rematch for appointment-details (2026-07-22). Captured on cancelled #8762341 after Quinn terminal CTA prove. Compare to LEGACY_BASELINE: readinessPass false→true; invalid 3→0. Edit/Cancel correctly absent on terminal sample (non-terminal Edit/Cancel proved via MCP probe 10/10 on default #1411527).",
   "generatedAt": "2026-07-22T09:51:18.760Z",
   "projectId": "boots-pharmacy",
   "scope": "current",
@@ -30,7 +30,7 @@
     "viewDetails": 0
   },
   "baselineCompare": {
-    "makeFile": "INTERACTION_INVENTORY_APPOINTMENT_DETAILS_MAKE_BASELINE_2026-07-22.json",
+    "makeFile": "INTERACTION_INVENTORY_APPOINTMENT_DETAILS_LEGACY_BASELINE_2026-07-22.json",
     "makeReadinessPass": false,
     "makeInvalid": 3,
     "reactReadinessPass": true,

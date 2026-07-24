@@ -1,20 +1,20 @@
 {
   "meta": {
-    "purpose": "Make-only interaction inventory baseline BEFORE React migration",
+    "purpose": "Legacy-only interaction inventory baseline BEFORE React migration",
     "screenId": "appointment-details",
     "projectId": "boots-pharmacy",
     "capturedAt": "2026-07-22T09:40:10.655Z",
     "capturedBy": "Quinn (QA)",
     "captureMethod": "Chrome DevTools MCP + __studioMapCurrentInteractions (localhost:5173 live tab)",
     "host": "http://localhost:5173/?project=boots-pharmacy&screen=appointment-details&persona=sarah-jenkins&cjm=off&experience=agentic",
-    "hostState": "Make (no React host for appointment-details)",
+    "hostState": "Legacy (no React host for appointment-details)",
     "helper": "await window.__studioMapCurrentInteractions()",
     "knowledgeUsed": "TEAM_KNOWLEDGE Quinn + INTERACTION_INVENTORY.md + LESSONS overlay/R11/interaction-inventory/false-PROVEN",
     "reactMigrationClaim": false,
     "selectedAppointmentId": "1411527",
-    "selectionPath": "History View Details / deep-link → screen=appointment-details with live Make content",
+    "selectionPath": "History View Details / deep-link → screen=appointment-details with live Legacy content",
     "notes": [
-      "readinessPass=false is EXPECTED on Make: Edit/Cancel lack unique ready-target selectors (data-studio-appointment-edit/cancel not in mapper stableSelector set); most hooks missing-stable-target.",
+      "readinessPass=false is EXPECTED on Legacy: Edit/Cancel lack unique ready-target selectors (data-studio-appointment-edit/cancel not in mapper stableSelector set); most hooks missing-stable-target.",
       "Ghost: History View Details BUTTON[data-studio-appointment-view-details=true] may remain display:none in DOM — not a live Details CTA.",
       "No Ask Site Pilot on this Details appointment (#1411527).",
       "Back/return = breadcrumb Appointment history (inventory semantic-ready).",
@@ -252,7 +252,7 @@
         "Diff totals + named CTAs: Edit / Cancel / Appointment history back / breadcrumbs / Ask Site Pilot if present",
         "Require readinessPass=true for primary Studio hooks (unique data-studio-action or data-studio-target)",
         "Unexplained target loss or missing Edit/Cancel blocks PAGE FINAL PASS",
-        "Do not treat Make readinessPass=false as React FAIL — this file is pre-migration evidence only",
+        "Do not treat Legacy readinessPass=false as React FAIL — this file is pre-migration evidence only",
         "Ghost display:none View Details from History must not be counted as Details CTA"
       ],
       "mustPreserveSelectors": [

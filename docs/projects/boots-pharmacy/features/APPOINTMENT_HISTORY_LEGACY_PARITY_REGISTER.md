@@ -1,14 +1,14 @@
-# Appointment History Make → React parity register
+# Appointment History Legacy → React parity register
 
 **Project:** `boots-pharmacy`  
 **Callsigns:** Bea (BA) owns register truth · Quinn (QA) owns prove · Finn/Uma restore gaps  
 **Updated:** 2026-07-22 (post-mount — React host live; Uma/Final Pass pending)  
 **Overall proof status:** React mount ON · Quinn MCP **8/8 PASS** · PAGE FINAL PASS **NOT-GREEN** (do **not** stamp until Uma PROVEN + FE audit).  
-**Register interpretation:** Make columns = Frame/wire inventory. React columns = mount-wave evidence (2026-07-22). Uma pixel/DS matrix still open — I9 stays **Partial** until Uma signs.  
-**Make source:** Frame child **2** · wire `syncAppointmentHistory` · **`APPOINTMENTS`** in `data/appointments.ts` · playback `history-view-details`  
+**Register interpretation:** Legacy columns = Frame/wire inventory. React columns = mount-wave evidence (2026-07-22). Uma pixel/DS matrix still open — I9 stays **Partial** until Uma signs.  
+**Legacy source:** Frame child **2** · wire `syncAppointmentHistory` · **`APPOINTMENTS`** in `data/appointments.ts` · playback `history-view-details`  
 **Public `screenId`:** `appointment-history` · childIndex **2**  
-**React target:** `src/projects/boots-pharmacy/screens/appointment-history/*` — **live** (`mountAppointmentHistoryScreen`; Make retired)  
-**Refs:** [APPOINTMENT_HISTORY_REACT.md](./APPOINTMENT_HISTORY_REACT.md) · Quinn [../audits/QUINN_APPOINTMENT_HISTORY_PROBE_2026-07-22.md](../audits/QUINN_APPOINTMENT_HISTORY_PROBE_2026-07-22.md) · inventory baseline [../audits/INTERACTION_INVENTORY_APPOINTMENT_HISTORY_MAKE_BASELINE_2026-07-22.md](../audits/INTERACTION_INVENTORY_APPOINTMENT_HISTORY_MAKE_BASELINE_2026-07-22.md) · [PAGE_FINAL_PASS.md](../../../product/PAGE_FINAL_PASS.md)
+**React target:** `src/projects/boots-pharmacy/screens/appointment-history/*` — **live** (`mountAppointmentHistoryScreen`; Legacy retired)  
+**Refs:** [APPOINTMENT_HISTORY_REACT.md](./APPOINTMENT_HISTORY_REACT.md) · Quinn [../audits/QUINN_APPOINTMENT_HISTORY_PROBE_2026-07-22.md](../audits/QUINN_APPOINTMENT_HISTORY_PROBE_2026-07-22.md) · inventory baseline [../audits/INTERACTION_INVENTORY_APPOINTMENT_HISTORY_LEGACY_BASELINE_2026-07-22.md](../audits/INTERACTION_INVENTORY_APPOINTMENT_HISTORY_LEGACY_BASELINE_2026-07-22.md) · [PAGE_FINAL_PASS.md](../../../product/PAGE_FINAL_PASS.md)
 
 **Status legend:** Present · Partial · Missing · Fixed · N/A  
 **Priority:** **P0** = ship-blocking · **P1** = visual-only / under-match OK
@@ -28,13 +28,13 @@
 
 **Forbidden invent:** `data-studio-action="appointment-history-view-details"`.
 
-**Sequence:** History only. View Details → **Make** `appointment-details`. Details React closed until History PAGE FINAL PASS hard-green.
+**Sequence:** History only. View Details → **Legacy** `appointment-details`. Details React closed until History PAGE FINAL PASS hard-green.
 
 ---
 
-## Layout (every Make band)
+## Layout (every Legacy band)
 
-| # | Pri | Make behavior | Make | React status | Evidence |
+| # | Pri | Legacy behavior | Legacy | React status | Evidence |
 |---|-----|---------------|------|--------------|----------|
 | L1 | P0 | **1440 shell** | **Present** | **Present** | `appointment-history` shell |
 | L2 | P0 | **Engine header** | **Present** | **N/A** (engine) | header mount kept |
@@ -61,7 +61,7 @@
 
 ## Loading / empty / updating
 
-| # | Pri | Make behavior | Make | React status | Evidence |
+| # | Pri | Legacy behavior | Legacy | React status | Evidence |
 |---|-----|---------------|------|--------------|----------|
 | LE1 | P0 | Page loader | **N/A** | **N/A** | no invent |
 | LE2 | P0 | Empty list | **N/A** | **N/A** | no invent |
@@ -72,30 +72,30 @@
 
 ## Interactions / DS states
 
-| # | Pri | Make behavior | Make | React status | Evidence |
+| # | Pri | Legacy behavior | Legacy | React status | Evidence |
 |---|-----|---------------|------|--------------|----------|
 | I1 | P0 | **View Details** + hard selector | **Present** | **Present** | Quinn MCP click PASS |
 | I2 | P0 | **Title → Details** | **Present** | **Present** | same selection |
 | I3 | P0 | **Edit** non-terminal | **Present** | **Present** | visual; no invent modal |
 | I4 | P0 | **Cancel** non-terminal | **Present** | **Present** | visual; no invent modal |
 | I5 | P0 | **Terminal CTA rule** | **Present** | **Present** | Completed/Cancelled |
-| I6 | P0 | **Status tones** | **Present** | **Present** | screen CSS (Make tones) |
+| I6 | P0 | **Status tones** | **Present** | **Present** | screen CSS (Legacy tones) |
 | I7 | P0 | **Ask Site Pilot** | **Present** | **Present** | link |
 | I8 | P0 | **Discuss with Site Pilot** | **Present** | **Present** | refund |
 | I9 | P0 | **Typical DS hover/focus** | **Present** | **Present** | Uma PROVEN · Quinn View Details hover |
 | I10 | P0 | **Breadcrumb affordance** | **Present** | **Partial** | visual crumbs |
 | I11 | P1 | **Load more** click | **Partial** | **Present** | visual only |
 | I12 | P1 | **Show All** filter | **Partial** | **Present** | visual only |
-| I13 | P0 | **Details = Make** this wave | **Present** | **Present** | MCP handoff PASS |
+| I13 | P0 | **Details = Legacy** this wave | **Present** | **Present** | MCP handoff PASS |
 
 ---
 
 ## Wire / mount gates
 
-| # | Pri | Behavior | Make | React status | Evidence |
+| # | Pri | Behavior | Legacy | React status | Evidence |
 |---|-----|----------|------|--------------|----------|
 | W1 | P0 | React host child 2 | — | **Present** | `mountAppointmentHistoryScreen` |
-| W2 | P0 | Make retired / parked | — | **Present** | Quinn make-retired PASS |
+| W2 | P0 | Legacy retired / parked | — | **Present** | Quinn legacy-retired PASS |
 | W3 | P0 | URL `screen=appointment-history` | **Present** | **Present** | registry |
 | W4 | P0 | Wire early-return when mounted | **Present** | **Present** | `isAppointmentHistoryReactMounted()` |
 | W5 | P0 | No LEGACY growth | — | **Present** | `appointment-history.css` |
@@ -107,7 +107,7 @@
 
 ## CJM / playback / URL
 
-| # | Pri | Contract | Make / engine | React status | Evidence |
+| # | Pri | Contract | Legacy / engine | React status | Evidence |
 |---|-----|----------|---------------|--------------|----------|
 | C1 | P0 | Traditional `history-view-details` | **Present** | **Partial** | selector preserved; full Play re-prove pending |
 | C2 | P0 | Visible View Details first-match | **Present** | **Present** | 4 visible CTAs |

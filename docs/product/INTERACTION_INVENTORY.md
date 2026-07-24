@@ -52,7 +52,7 @@ JSON so later tooling can diff removed or changed targets.
 - **Coarse Figma / early concept:** map the existing project first to reuse its
   target conventions; map the new page after wiring; resolve invalid contracts
   and explicitly classify visual-only candidates before calling it record-ready.
-- **Make → React migration:** download the legacy page map before retirement;
+- **Legacy → React migration:** download the legacy page map before retirement;
   rerun after the React mount; require `readinessPass=true` and reconcile every
   removed or renamed target. Unexplained target loss blocks PAGE FINAL PASS.
 - **Handoff:** attach the JSON result so future CJMs and connection tooling use

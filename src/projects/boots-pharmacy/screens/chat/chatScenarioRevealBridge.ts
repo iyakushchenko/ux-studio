@@ -3,7 +3,7 @@
  *
  * `useScenarioPlayback` visibleCount is the control point (beat/frame steps).
  * React Chat mounts the full thread for `collectSitePilotChatScenarioFrames`
- * but paints only frames with index < visibleCount — Make-parity step reveal.
+ * but paints only frames with index < visibleCount — Legacy-parity step reveal.
  */
 
 export type ChatScenarioRevealState = {
@@ -94,7 +94,7 @@ export function resolveChatRevealedFrameCount(
 }
 
 /**
- * Make order: thinking bubble → then agent reply.
+ * Legacy order: thinking bubble → then agent reply.
  * Hold reply paint while playback thinking is anchored to that frame,
  * even if engine visibleCount already advanced (race / skipPrelude regress).
  * Null/missing anchor during playback = first agent turn (r0) — still hold.

@@ -1,6 +1,6 @@
 {
   "kind": "studio-interaction-inventory",
-  "note": "Post-React rematch for appointment-history (2026-07-22). Compare to MAKE_BASELINE. readinessPass improved false→true; invalid 8→0; View Details still 4.",
+  "note": "Post-React rematch for appointment-history (2026-07-22). Compare to LEGACY_BASELINE. readinessPass improved false→true; invalid 8→0; View Details still 4.",
   "generatedAt": "2026-07-22T09:10:47.652Z",
   "projectId": "boots-pharmacy",
   "scope": "current",
@@ -22,7 +22,7 @@
     "cancel": "[data-studio-appointment-cancel=\"true\"]"
   },
   "baselineCompare": {
-    "makeFile": "INTERACTION_INVENTORY_APPOINTMENT_HISTORY_MAKE_BASELINE_2026-07-22.json",
+    "makeFile": "INTERACTION_INVENTORY_APPOINTMENT_HISTORY_LEGACY_BASELINE_2026-07-22.json",
     "makeReadinessPass": false,
     "makeInvalid": 8,
     "reactReadinessPass": true,

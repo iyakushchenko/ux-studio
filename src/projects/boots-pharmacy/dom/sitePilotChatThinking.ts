@@ -144,7 +144,7 @@ function showThinkingBubble(
   thinkingMode = mode;
 
   if (isChatReactMounted()) {
-    // Explicit id wins — Make/handoff frames often lack data-studio-chat-frame.
+    // Explicit id wins — Legacy/handoff frames often lack data-studio-chat-frame.
     // First agent reply MUST anchor to r0 or React paints reply with no thinking.
     publishChatThinkingBridge({
       mode,
@@ -308,7 +308,7 @@ export function setSitePilotChatSendThinkingMode(
   thinking: boolean
 ): void {
   // Imperative glyphHost.innerHTML + React SendGlyph/StopGlyph swap = removeChild crash
-  // (agentic Play / composer click). LEGACY Make composer only.
+  // (agentic Play / composer click). LEGACY composer only.
   if (isReactOwnedSendButton(sendBtn)) return;
 
   sendBtn.classList.toggle("proto-agentic-send--stop", thinking);

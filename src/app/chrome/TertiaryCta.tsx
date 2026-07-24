@@ -17,7 +17,7 @@ type TertiaryCtaProps = {
 
 /**
  * Tertiary icon + text CTA — transparent, no hover wash; icon→navy, label→black.
- * Soft variant: mint fill for promo surfaces (Make GP CTA parity).
+ * Soft variant: mint fill for promo surfaces (Legacy GP CTA parity).
  * Styled via `.studio-tertiary-cta` in globals-chrome.css.
  */
 export function TertiaryCta({

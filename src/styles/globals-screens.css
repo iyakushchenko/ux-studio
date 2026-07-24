@@ -376,10 +376,10 @@
   line-height: 28px !important;
 }
 
-/* ── Global text links (Make wire under .studio-viewport) ────────────────────
+/* ── Global text links (Legacy wire under .studio-viewport) ────────────────────
  * Rest: no underline; navy #012169. Hover: underline + #01318f.
  * SAME contract as `.uxds-link` (footer-like) — FE_STANDARDS §2.
- * Covers Make <a> / Figma underline spans / `.proto-link` only.
+ * Covers Legacy <a> / Figma underline spans / `.proto-link` only.
  * Migrated React links use `.uxds-link` (text-link.css) — excluded so kit tokens win.
  */
 .studio-viewport a:not(.uxds-link),
@@ -663,7 +663,7 @@
 .studio-viewport > div > div:nth-child(11) [data-name="Subtotal"] {
   align-items: flex-start !important;
 }
-/* Make-only agentic query — React `.site-pilot-composer__query` owns Motion height. */
+/* Legacy-only agentic query — React `.site-pilot-composer__query` owns Motion height. */
 .studio-viewport > div > div:nth-child(11)
   textarea.proto-agentic-query:not(.site-pilot-composer__query) {
   flex: 1 1 0 !important;
@@ -810,7 +810,7 @@
   [data-name="Subtotal"] {
   align-items: flex-start !important;
 }
-/* Make-only composer textarea — React kit uses `.site-pilot-composer__query`. */
+/* Legacy-only composer textarea — React kit uses `.site-pilot-composer__query`. */
 .proto-site-pilot-composer
   textarea.proto-agentic-query:not(.site-pilot-composer__query) {
   flex: 1 1 0 !important;
@@ -1055,7 +1055,7 @@
 /* ── Screen 4: Deal Details layout ──────────────────────────────────────────── */
 
 /* Card: constrain to 1440px and centre.
-   Exclude React `.pdp__rtb-card` — Make data-name reuse must not style React mounts. */
+   Exclude React `.pdp__rtb-card` — Legacy data-name reuse must not style React mounts. */
 .studio-viewport > div > div:nth-child(8) [data-name="module.pdp.rtb"]:not(.pdp__rtb-card) {
   max-width: 1440px !important;
   width: 100% !important;
@@ -1064,14 +1064,14 @@
 }
 
 /* Inner row: gap equals the outer 48px padding so spacing is uniform.
-   HARD FAIL class if this hits React: Make nest is module>div>div (row), React is
+   HARD FAIL class if this hits React: Legacy nest is module>div>div (row), React is
    module.pdp__rtb-card > .pdp__rtb-row > .pdp__rtb-col — same depth, wrong target
    (forced gap 48 on RTB column + 1:1 on title-block). */
 .studio-viewport > div > div:nth-child(8) [data-name="module.pdp.rtb"]:not(.pdp__rtb-card) > div > div {
   gap: 48px !important;
 }
 
-/* Image wrapper (Frame127): true 50/50, keep 1:1 aspect ratio — Make only */
+/* Image wrapper (Frame127): true 50/50, keep 1:1 aspect ratio — Legacy only */
 .studio-viewport > div > div:nth-child(8) [data-name="module.pdp.rtb"]:not(.pdp__rtb-card) > div > div > :first-child {
   flex: 1 1 0 !important;
   min-width: 0 !important;
@@ -1132,7 +1132,7 @@
   overflow: hidden !important;
 }
 
-/* Decorative Figma PNGs removed from Body10 — keep hide rules as belt for residual Make. */
+/* Decorative Figma PNGs removed from Body10 — keep hide rules as belt for residual Legacy. */
 .studio-viewport > div > div:nth-child(11) > [data-name="body"] [data-name="image 52"],
 .studio-viewport > div > div:nth-child(11)
   > [data-name="body"]

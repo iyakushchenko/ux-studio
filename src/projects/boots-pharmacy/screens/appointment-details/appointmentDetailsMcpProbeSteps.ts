@@ -1,6 +1,6 @@
 /**
  * Appointment Details MCP probe recipe — kept out of studioMcpPageProbe.ts (hygiene).
- * screenId: appointment-details · Make child 1 · React screens/appointment-details/*
+ * screenId: appointment-details · Legacy child 1 · React screens/appointment-details/*
  */
 
 import {
@@ -9,7 +9,7 @@ import {
   getSelectedAppointmentId,
   isTerminalAppointmentStatus,
 } from "@/projects/boots-pharmacy/data/appointments";
-import { isMakeRetiredForScreen } from "../retireMakeUnderPage";
+import { isLegacyRetiredForScreen } from "../retireLegacyUnderPage";
 import { APPOINTMENT_DETAILS_REACT_SCREEN_ID } from "./appointmentDetailsContract";
 
 export type AppointmentDetailsMcpProbeStep = {
@@ -64,7 +64,7 @@ function restoreDetailsViaUrl(): boolean | string {
   return true;
 }
 
-/** Lean mount prove — host, Make retired, selected fields, Edit/Cancel rules, crumb back. */
+/** Lean mount prove — host, Legacy retired, selected fields, Edit/Cancel rules, crumb back. */
 export function appointmentDetailsMcpProbeSteps(): AppointmentDetailsMcpProbeStep[] {
   return [
     {
@@ -76,12 +76,12 @@ export function appointmentDetailsMcpProbeSteps(): AppointmentDetailsMcpProbeSte
         `missing React Details host — expected ${HOST_SEL}`,
     },
     {
-      id: "appointment-details-make-retired",
+      id: "appointment-details-legacy-retired",
       selector: HOST_SEL,
       action: "assert",
       assert: () => {
-        if (!isMakeRetiredForScreen(APPOINTMENT_DETAILS_REACT_SCREEN_ID)) {
-          return "Make leak: expected Make Frame children parked for appointment-details";
+        if (!isLegacyRetiredForScreen(APPOINTMENT_DETAILS_REACT_SCREEN_ID)) {
+          return "Legacy leak: expected Legacy Frame children parked for appointment-details";
         }
         return true;
       },

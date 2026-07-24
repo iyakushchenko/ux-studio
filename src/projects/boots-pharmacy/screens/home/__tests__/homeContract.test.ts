@@ -27,7 +27,7 @@ describe("homeContract", () => {
     expect(HOME_REACT_SCREEN_ID).toBe("site-pilot");
   });
 
-  it("locks Make Body10 heading / chips / default query", () => {
+  it("locks Legacy Body10 heading / chips / default query", () => {
     expect(HOME_HEADING_DEFAULT).toMatch(/what health services/i);
     expect(HOME_HEADING_LOGGED_IN).toMatch(/^Sarah,/);
     expect(resolveHomeHeading(false)).toBe(HOME_HEADING_DEFAULT);

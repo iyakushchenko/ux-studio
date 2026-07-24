@@ -1,7 +1,7 @@
 # X-Suite (Summarizer / Experience Suite) → UX Studio
 
 **Status:** Strategic intent locked (Product Owner, 2026-07-19) · **workflow sharpened 2026-07-21**. Import automation not built yet; agents may run the **manual** analyze → build → REC path when PO shares an export.  
-**Commander note:** Design for this seam early; do **not** block Boots erase-Make / REC·Play·QA polish on a full automated importer. Do **not** port Summarizer’s Figma-plugin architecture into Studio.
+**Commander note:** Design for this seam early; do **not** block Boots erase-Legacy / REC·Play·QA polish on a full automated importer. Do **not** port Summarizer’s Figma-plugin architecture into Studio.
 
 **Audience:** Any agent handed an X-Suite persona/CJM export (or asked to “continue the X-Suite stream”).
 
@@ -32,6 +32,20 @@ It writes into the same UXDS organism — especially collection **`setup`** (`IA
 They share **UXDS** as the design/content spine. They are **not** the same app.
 
 ---
+
+## What the PO actually hands over (confirmed 2026-07-24, not guessed)
+
+Three separate artifacts, not one bundle — verified against a real persona export and X-Suite's own schema source:
+
+| Artifact | Contains | Verified shape |
+|---|---|---|
+| **IA + PD export** (e.g. *"Main Nav & Product Data - English (ia-json-…)"*) | Full site nav tree (mega-menu, footer) + catalog data | `IaNode[]` (id/label/type/note/linkType/children, recursive) + length-10-slot product groups — matches `iaPdAiSchema.ts` in `E:\UX\Summarizer` exactly. See [PROJECT_CONTRACT.md](./PROJECT_CONTRACT.md) § Content/copy layer, `src/projects/contentPack.ts`. |
+| **Persona export** (JSON file, e.g. `larkin_emily-stone_tech-savvy-consumer_….json`) | Identity, empathy map (thinking/seeing/hearing/doing/pains/gains), JTBD, and — the useful part — `happy-path-json`: a short journey (Homepage→PLP→PDP→Cart→Checkout style) in the *same* `IaNode` shape as the IA export. Near-directly mappable to a UXML `JourneyBeat` list (one node → one beat; `type` ≈ UXML `screenId`; `note` ≈ dwell/intent copy). Not yet built. | Confirmed live from a real file, 2026-07-24. |
+| **Concept links (Figma)** | Visual/structural reference per `CONCEPT_INTAKE.md` §5 — what a page should look like | PO-provided, ad hoc per page, not exported JSON |
+
+None of the three alone is enough to scaffold a project — IA+PD has no persona intent, Persona has no full site structure or visual reference, concept links have no structured data. All three together is the actual intake bundle.
+
+**A fourth artifact exists in Summarizer's codebase but has no export function yet (confirmed 2026-07-24):** the full `CustomerJourneyMap` — `src/shared/cjmContract.ts` in `E:\UX\Summarizer`. 6 fixed stages (Awareness→Consideration→Decision→Conversion→Retention→Advocacy), each with `sentiment` (-2..2) and per-stage `goals_expectations` / `touchpoints[]` / `actions[]` / `thoughts_feelings` / `painpoints[]` / `risks[]` / `opportunities[]`, plus optional `funnel_leave`/`funnel_return` (why someone drops off/returns at that stage). Richer than Persona's `happy-path-json` in two specific ways: `painpoints`/`risks`/`opportunities` are close to literal QA acceptance criteria (could seed a starter test plan instead of live-discovering gaps, PP-45→49-style); `funnel_leave`/`funnel_return` map almost directly onto UXML's existing retreat/step-back CJM mechanic. Same limitation as happy-path though: `touchpoints[]` are free-text strings, not even a loose controlled vocabulary. Why that's not fixable by a richer export: [CX_CONVEYOR.md](./CX_CONVEYOR.md) § "The determinism boundary" — this specific gap is judgment territory, permanently. No adapter built — no real export exists to test against yet (same discipline as everything else in this doc: don't ship against unverified shape).
 
 ## PO workflow (HARD) — export → analyze → REC
 
@@ -69,7 +83,7 @@ The Studio project must cover **every screen** the X-Suite CJM references (or an
 
 | Guide | Use for |
 |-------|---------|
-| **UX Studio templates** / existing React screen packages | Structure, mount pattern, host/retire Make, CSS layers |
+| **UX Studio templates** / existing React screen packages | Structure, mount pattern, host/retire Legacy, CSS layers |
 | **UXDS styleguide** (Larkin) | General visual language, tokens, type, spacing |
 | **UXDS / components** | Layout structure, control patterns, composition |
 | **HTML / BEM block naming** | [NAMING.md](./NAMING.md) — `screenId` = folder = URL `?screen=`; BEM block ≈ screenId |
@@ -81,7 +95,7 @@ Contract pack: [PAGE_BUILD_CONTRACT.md](./PAGE_BUILD_CONTRACT.md) · [docs/uxds/
 Robo-cursor, camera, REC, and Play need **stable affordances**:
 
 - `screenId` registered + URL-navigable  
-- Interactive controls: `data-studio-action` / `data-studio-*` (and Make-parity `data-name` only where playback already depends on it)  
+- Interactive controls: `data-studio-action` / `data-studio-*` (and Legacy-parity `data-name` only where playback already depends on it)  
 - Prefer **real** buttons/links — not anonymous layout `div`s as click targets  
 - No new `.proto-*` / `data-proto-*` on new React work  
 
@@ -91,14 +105,14 @@ Refs: [NAMING.md](./NAMING.md) · [INTERACTION_FIDELITY.md](./INTERACTION_FIDELI
 
 Pages must be built from **exact coarse concepts** or **UXDS page prototypes** — not freehand invent.
 
-**Agent must ask the PO** for the reference (Figma node / Make frame / UXDS prototype / existing Studio screen) before coding a new page. Prefer under-match over invent ([VISUAL_FIDELITY.md](./VISUAL_FIDELITY.md)).
+**Agent must ask the PO** for the reference (Figma node / Legacy frame / UXDS prototype / existing Studio screen) before coding a new page. Prefer under-match over invent ([VISUAL_FIDELITY.md](./VISUAL_FIDELITY.md)).
 
 ### 5. Reuse React pages — no drift / near-dupes (HARD)
 
 - Prefer **compose / extend** already-built React screens and shared kits (`src/uxds/`, shared composers, mounts).  
 - Keep structure consistent with the reference project (Boots is the rabbit).  
 - **Forbidden:** parallel near-duplicate components, second button languages, one-off layout CSS that already exists as a kit.  
-- New migrated pages still obey **PAGE FINAL PASS** sequencing when replacing Make ([PAGE_FINAL_PASS.md](./PAGE_FINAL_PASS.md)).
+- New migrated pages still obey **PAGE FINAL PASS** sequencing when replacing Legacy ([PAGE_FINAL_PASS.md](./PAGE_FINAL_PASS.md)).
 
 Intake modes: [CONCEPT_INTAKE.md](./CONCEPT_INTAKE.md) §5 (mode B = from what we have).
 

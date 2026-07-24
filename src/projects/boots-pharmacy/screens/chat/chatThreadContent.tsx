@@ -1,8 +1,8 @@
-/** Scripted Chat thread — Make ComponentAppointmentSummary2 parity (Sarah SE Asia). */
+/** Scripted Chat thread — Legacy ComponentAppointmentSummary2 parity (Sarah SE Asia). */
 
 import React, { type ReactNode } from "react";
 
-/** Bubble CTA — always UXDS ButtonPrimary commerce (Make navy primary). */
+/** Bubble CTA — always UXDS ButtonPrimary commerce (Legacy navy primary). */
 export type ChatAgentCta = {
   label: string;
 };
@@ -39,7 +39,7 @@ export const CHAT_THREAD_FRAMES: readonly ChatThreadFrame[] = [
   {
     id: "r0",
     kind: "reply",
-    helpful: true, // Make `Reply` → `ComponentGseSystemMessage`
+    helpful: true, // Legacy `Reply` → `ComponentGseSystemMessage`
     ctas: [
       { label: "Book Southeast Asia Vaccine Bundle – £245" },
       { label: "Book Yellow Fever Vaccine only – £75" },

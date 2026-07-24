@@ -1,13 +1,13 @@
 # Uma fidelity stamp — Site Pilot Chat
 
-**Surface:** Boots Pharmacy Site Pilot Chat (`screenId: chat`, Frame child **10**, Make `Body9`)  
+**Surface:** Boots Pharmacy Site Pilot Chat (`screenId: chat`, Frame child **10**, Legacy `Body9`)  
 **Date:** 2026-07-20  
 **Owner:** Uma (UI/UX)  
 **Status:** **PROVEN** — React Chat host ON; PAGE FINAL PASS HARD-GREEN  
-**React target:** `screens/chat/*` — **live** (`CHAT_REACT_MOUNT_ENABLED=true`; Make child 10 `data-studio-make-retired=chat`)  
-**Make truth:** `frame/index.tsx` `Body9` · `ComponentAppointmentSummary2` · `query` / `reply` bubbles · `component.co.order.summary` · `component.gse.system.message` (feedback + chips) · `ComponentCoOrderSummary8` (composer) · `globals-chrome.css` child-10 · `globals-screens.css` chat flash  
+**React target:** `screens/chat/*` — **live** (`CHAT_REACT_MOUNT_ENABLED=true`; Legacy child 10 `data-studio-legacy-retired=chat`)  
+**Legacy truth:** `frame/index.tsx` `Body9` · `ComponentAppointmentSummary2` · `query` / `reply` bubbles · `component.co.order.summary` · `component.gse.system.message` (feedback + chips) · `ComponentCoOrderSummary8` (composer) · `globals-chrome.css` child-10 · `globals-screens.css` chat flash  
 **Wire / DOM today:** React `ChatScreen` + shared `SitePilotComposer` · `chatThinkingBridge` · Motion frames via `@/uxds/motion` · playback `sitePilotChat.ts`  
-**Register:** [CHAT_MAKE_PARITY_REGISTER.md](../features/CHAT_MAKE_PARITY_REGISTER.md) · brief [CHAT_REACT.md](../features/CHAT_REACT.md)  
+**Register:** [CHAT_LEGACY_PARITY_REGISTER.md](../features/CHAT_LEGACY_PARITY_REGISTER.md) · brief [CHAT_REACT.md](../features/CHAT_REACT.md)  
 **Shared composer:** `screens/shared/SitePilotComposer.tsx` (Home + Chat)  
 **Checklist:** [../../../product/UMA_FIDELITY_NOTES.md](../../../product/UMA_FIDELITY_NOTES.md) · [MOTION.md](../../../product/MOTION.md) · [VISUAL_FIDELITY.md](../../../product/VISUAL_FIDELITY.md) · [FE_UI_UX_AUDIT.md](../../../product/FE_UI_UX_AUDIT.md) · [PAGE_FINAL_PASS.md](../../../product/PAGE_FINAL_PASS.md)  
 **Final Pass audit:** [FE_AUDIT_CHAT_PAGE_FINAL_PASS_2026-07-20.md](./FE_AUDIT_CHAT_PAGE_FINAL_PASS_2026-07-20.md)
@@ -23,15 +23,15 @@
 | **Overall** | **PROVEN** |
 | **§0a typical DS / pointer matrix** | **PASS** — mic · send · chips · reply CTA · helpful Yes/No hover CSS + Quinn MCP hover |
 | **§0b section vertical rhythm** | **PASS** — MCP: summary gap **40px** · max-width **864px** · column pad-top **64px** · query **438px** / radius **16px** · host `#dbebf5` |
-| **loading / empty / updating** | **PASS (P0)** — thinking = playback-owned dots bubble (`SITE_PILOT_CHAT_PLAYBACK_THINK_MS` 1400); **not** on Sarah send (Make truth). PLAYBACK_DIAG `thinking-start` / `thinking-end` |
+| **loading / empty / updating** | **PASS (P0)** — thinking = playback-owned dots bubble (`SITE_PILOT_CHAT_PLAYBACK_THINK_MS` 1400); **not** on Sarah send (Legacy truth). PLAYBACK_DIAG `thinking-start` / `thinking-end` |
 | **checkbox / radio hover** | **N/A** |
 | **Composer ↔ Home shared kit** | **PASS** — same `SitePilotComposer`; Chat label **“Next dialog options:”** |
 | **Motion** | **PASS** — frames + thinking via `@/uxds/motion` |
-| **Accordion / history** | **N/A on Make chat** |
+| **Accordion / history** | **N/A on Legacy chat** |
 | **PO green-light allowed?** | **Yes** — Final Pass HARD-GREEN |
 | **PAGE FINAL PASS** | **HARD-GREEN** |
 
-**Honest scope (Make `Body9` / summary column):**
+**Honest scope (Legacy `Body9` / summary column):**
 
 - **Present:** navy header · sticky Site Pilot secondary bar · `#dbebf5` body · centered **864px** thread · user query **438px** · agent replies · pill CTAs · helpful feedback · **Next dialog options:** chips · mic + send · disclaimer · Motion frames  
 - **Absent (must not invent):** PLP Advantage · chat mini-footer (h≈0) · FAQ accordion · listing loader  
@@ -39,9 +39,9 @@
 
 ---
 
-## Layout bands — Make `Body9` inventory
+## Layout bands — Legacy `Body9` inventory
 
-| # | Make band / component | Uma stamp | Evidence |
+| # | Legacy band / component | Uma stamp | Evidence |
 |---|------------------------|-----------|----------|
 | **C1** | Shell / column — 1440, **64px** pad | **PASS** | column `padding-top: 64px` |
 | **C2** | Page bg `#dbebf5` | **PASS** | host `rgb(219, 235, 245)` |

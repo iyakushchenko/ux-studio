@@ -1,6 +1,6 @@
 # FE / UI / UX audit result
 
-**Surface / slice:** PLP Vaccinations — PO rage #4 (filter/search Make + wire parity)  
+**Surface / slice:** PLP Vaccinations — PO rage #4 (filter/search Legacy + wire parity)  
 **Date:** 2026-07-19  
 **Auditor:** Uma (UI/UX) + Quinn (QA) + Finn (FE) + Bea (BA) — MCP localhost  
 **Prior tip (distrusted):** `1ca5cba` / prior PROVEN on filter search **INVALID**  
@@ -8,7 +8,7 @@
 **Version:** `0.0.12`
 
 **Checklist:** [../../../product/FE_UI_UX_AUDIT.md](../../../product/FE_UI_UX_AUDIT.md) · [UMA_FIDELITY_NOTES.md](../../../product/UMA_FIDELITY_NOTES.md)  
-**Register:** [../features/PLP_MAKE_PARITY_REGISTER.md](../features/PLP_MAKE_PARITY_REGISTER.md)
+**Register:** [../features/PLP_LEGACY_PARITY_REGISTER.md](../features/PLP_LEGACY_PARITY_REGISTER.md)
 
 ---
 
@@ -30,15 +30,15 @@
 ## Root causes (honest)
 
 1. **Two X icons** — `type="search"` native cancel + custom clear.  
-2. **Search icon LEFT** — prior ship followed static Make DOM order; PO + Availability/Book wire = **RIGHT** (`end`).  
+2. **Search icon LEFT** — prior ship followed static Legacy DOM order; PO + Availability/Book wire = **RIGHT** (`end`).  
 3. **View all / 10-cap / filled reset** — wire `PLP_FILTER_LIST_MAX` + `handlePlpFilterViewAllClick` never ported to React.  
-4. **Option counters** — Make `setFilterRowCount` / facet counts cut from React checkbox rows.  
-5. **Invented separator** — `.plp__filter-section { border-bottom }` not in Make.  
+4. **Option counters** — Legacy `setFilterRowCount` / facet counts cut from React checkbox rows.  
+5. **Invented separator** — `.plp__filter-section { border-bottom }` not in Legacy.  
 6. **Bespoke input** — not UXDS kit with full states.
 
 ---
 
-## Restored from Make / wire scripts
+## Restored from Legacy / wire scripts
 
 | Source | Ported behavior |
 |--------|-----------------|
@@ -46,7 +46,7 @@
 | `handlePlpFilterViewAllClick` / `clearPlpFilterSectionSearch` | Filled **View all** resets field |
 | `setFilterRowCount` / `countJabFacetValue` | Option counters via `countPlpFacetOption` |
 | `locationSearch` / Availability icon-end actions | Magnifier **end** + single clear |
-| Make `component.plp.filter.view-all` | Always-present View all links |
+| Legacy `component.plp.filter.view-all` | Always-present View all links |
 
 ---
 
@@ -81,4 +81,4 @@
 | Item | Status |
 |------|--------|
 | AI Assistant promo strip (L6) | Missing — residual |
-| Catalog depth vs Make (L14) | Partial |
+| Catalog depth vs Legacy (L14) | Partial |

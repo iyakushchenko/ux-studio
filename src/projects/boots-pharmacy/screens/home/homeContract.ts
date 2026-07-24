@@ -5,7 +5,7 @@ import { AGENTIC_HOME_DEMO_QUERY } from "@/projects/boots-pharmacy/playback/site
 export const HOME_CHILD_INDEX = 11;
 
 /**
- * Public URL / registry screen id — Make “Agentic. Site Pilot. Home”.
+ * Public URL / registry screen id — Legacy “Agentic. Site Pilot. Home”.
  * `home` is reserved for a future real Home page; do not reuse here.
  * Package folder may remain `screens/home/` until a cheap rename.
  */
@@ -13,7 +13,7 @@ export const HOME_REACT_SCREEN_ID = "site-pilot";
 
 export const HOME_SCREEN_SELECTOR = `.studio-viewport > div > div:nth-child(${HOME_CHILD_INDEX})`;
 
-/** Make Body10 hero line — personalised when header login is active. */
+/** Legacy Body10 hero line — personalised when header login is active. */
 export const HOME_HEADING_DEFAULT =
   "What health services are you focusing on today?";
 export const HOME_HEADING_LOGGED_IN =
@@ -26,7 +26,7 @@ export function resolveHomeHeading(loggedIn: boolean): string {
 /** Default Agentic query textarea value — shared with playback (Sarah's demo intent). */
 export const HOME_QUERY_DEFAULT = AGENTIC_HOME_DEMO_QUERY;
 
-/** Make Frame352 — suggested-dialog chips (Frame219 Body10, `component.gse.system.message`). */
+/** Legacy Frame352 — suggested-dialog chips (Frame219 Body10, `component.gse.system.message`). */
 export const HOME_CHIP_LABELS = [
   "Vaccine services",
   "Skin health services",

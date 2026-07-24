@@ -2,14 +2,20 @@ import type { ReactNode } from "react";
 import SocialIcons from "@/projects/boots-pharmacy/chrome/SocialIcons";
 import { TertiaryCta } from "@/app/chrome/TertiaryCta";
 import searchIcon from "@/assets/avail/search.svg";
-import {
-  FOOTER_COPYRIGHT_LINES,
-  FOOTER_LINK_COLUMNS,
-  FOOTER_PHARMACY_SERVICES_URL,
-  FOOTER_UTILITY_LINKS,
-  footerLinkLabel,
-  footerLinkScreen,
-} from "@/projects/boots-pharmacy/chrome/footerContent";
+import { FOOTER_PHARMACY_SERVICES_URL } from "@/projects/boots-pharmacy/chrome/footerContent";
+import { BOOTS_PHARMACY_CONTENT_PACK } from "@/projects/boots-pharmacy/contentPack";
+
+const FOOTER_UTILITY_LINKS = BOOTS_PHARMACY_CONTENT_PACK.footer.tree.filter(
+  (node) => node.type === "text"
+);
+const FOOTER_LINK_COLUMNS = BOOTS_PHARMACY_CONTENT_PACK.footer.tree.filter(
+  (node) => node.type === "footer-column"
+);
+const FOOTER_COPYRIGHT_LINES = BOOTS_PHARMACY_CONTENT_PACK.footer.copyrightLines;
+
+function footerLinkSlug(label: string): string {
+  return label.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+}
 
 export type FooterVariant = "full" | "minified";
 export type FooterTone = "pharmacy" | "health";
@@ -55,9 +61,9 @@ function FooterUtilityLinks({ dark }: { dark?: boolean }) {
       className={`proto-footer__utility-links${dark ? " proto-footer__utility-links--dark" : ""}`}
       aria-label="Footer"
     >
-      {FOOTER_UTILITY_LINKS.map((label) => (
-        <button key={label} type="button" className="proto-link">
-          {label}
+      {FOOTER_UTILITY_LINKS.map((node) => (
+        <button key={node.id} type="button" className="proto-link">
+          {node.label}
         </button>
       ))}
     </nav>
@@ -65,31 +71,29 @@ function FooterUtilityLinks({ dark }: { dark?: boolean }) {
 }
 
 function FooterLinkColumns({ onGoToPlp }: FooterNavHandlers) {
-  const onColumnLinkClick = (link: (typeof FOOTER_LINK_COLUMNS)[number]["links"][number]) => {
-    const screen = footerLinkScreen(link);
+  const onColumnLinkClick = (screen: string) => {
     if (screen === "plp") onGoToPlp?.();
   };
 
   return (
     <>
       {FOOTER_LINK_COLUMNS.map((column) => (
-        <div key={column.title} className="proto-footer__link-column">
-          <p className="proto-footer__column-title">{column.title}</p>
+        <div key={column.id} className="proto-footer__link-column">
+          <p className="proto-footer__column-title">{column.label}</p>
           <ul className="proto-footer__column-links">
-            {column.links.map((link) => {
-              const label = footerLinkLabel(link);
-              const screen = footerLinkScreen(link);
+            {column.children.map((link) => {
+              const screen = link.linkType === "page" ? link.note : undefined;
               return (
-                <li key={label}>
+                <li key={link.id}>
                   <button
                     type="button"
                     className="proto-link"
-                    data-studio-action={`footer-link-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
+                    data-studio-action={`footer-link-${footerLinkSlug(link.label)}`}
                     onClick={
-                      screen ? () => onColumnLinkClick(link) : undefined
+                      screen ? () => onColumnLinkClick(screen) : undefined
                     }
                   >
-                    {label}
+                    {link.label}
                   </button>
                 </li>
               );

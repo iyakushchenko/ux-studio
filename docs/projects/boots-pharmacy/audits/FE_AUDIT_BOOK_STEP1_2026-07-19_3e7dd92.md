@@ -89,7 +89,7 @@ Live localhost re-audit of React Book Step 1 at HEAD `3e7dd92` confirms prior fi
 
 | # | Result | Evidence |
 |---|--------|----------|
-| H1 | **PASS** | Proto sticky header + Footer remain; Make child-7 chrome retired as designed. |
+| H1 | **PASS** | Proto sticky header + Footer remain; Legacy child-7 chrome retired as designed. |
 | H2 | **PASS** | No console errors/warnings on audited path after reload → Book Step 1. |
 | H3 | **PASS** | Visual gates measured live — not inferred from unit/build alone. |
 
@@ -99,7 +99,7 @@ Live localhost re-audit of React Book Step 1 at HEAD `3e7dd92` confirms prior fi
 |---|--------|----------|
 | I1 | **PASS** | Regular links → `.uxds-link`; tertiary icon+text → `.studio-tertiary-cta` / Change pill language; filter strong selected `#467672` (not mint). |
 | I2 | **PASS** | Page + Availability both use shared `NearMeCta` (`.proto-near-me-cta`). |
-| I3 | **PASS** | Page CSS owns shell/grid/Make structure; shared CTA/link/chip chrome in kits / globals-chrome. |
+| I3 | **PASS** | Page CSS owns shell/grid/Legacy structure; shared CTA/link/chip chrome in kits / globals-chrome. |
 | I4 | **PASS** | Strong filter + commerce CTA deviations registered in [../../uxds/DEVIATIONS.md](../../../uxds/DEVIATIONS.md) (kit wiring may still land separately; role language matches live). |
 
 ---
@@ -115,10 +115,10 @@ Live localhost re-audit of React Book Step 1 at HEAD `3e7dd92` confirms prior fi
 
 ## Intentional non-blockers (from design delta)
 
-- Breadcrumb delimiter is text `/` (not Make rotated bar).  
-- Learn more uses UXDS Disclosure (closed by default) vs always-visible Make paragraph.  
-- Proto sticky header / Footer vs Make absolute chrome.  
-- Help tel on `.uxds-link` navy (regular text-link family) vs Make teal phone — intentional FE_STANDARDS §2.
+- Breadcrumb delimiter is text `/` (not Legacy rotated bar).  
+- Learn more uses UXDS Disclosure (closed by default) vs always-visible Legacy paragraph.  
+- Proto sticky header / Footer vs Legacy absolute chrome.  
+- Help tel on `.uxds-link` navy (regular text-link family) vs Legacy teal phone — intentional FE_STANDARDS §2.
 
 ---
 

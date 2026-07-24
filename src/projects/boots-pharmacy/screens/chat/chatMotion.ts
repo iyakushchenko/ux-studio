@@ -2,7 +2,7 @@ import { MOTION_EASE_IN_OUT, STUDIO_ENTER_MS } from "@/uxds/motion";
 import { playbackDiagChatBubbleMotion } from "@/app/shell/playbackDiag";
 
 /**
- * Make / sitePilotChat pull-up for progressive bubbles.
+ * Legacy / sitePilotChat pull-up for progressive bubbles.
  * User + agent: shared opacity+y ease (no height 0→auto stepping).
  * Agent thinking exits opacity-only (no y collapse).
  */

@@ -69,7 +69,7 @@ type AdvanceOptions = {
   /**
    * Skip beforeReveal (typing/thinking). Default for browse / no hooks.
    * CJM Step must NOT skip when `beforeReveal` is wired — agent reply
-   * thinking bubble must run before the reply frame paints (Make parity).
+   * thinking bubble must run before the reply frame paints (Legacy parity).
    */
   skipPrelude?: boolean;
 };

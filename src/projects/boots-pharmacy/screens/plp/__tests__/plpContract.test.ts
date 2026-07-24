@@ -77,7 +77,7 @@ describe("plpCatalog filters", () => {
     );
   });
 
-  it("collects and removes active filter chips like Make summary", () => {
+  it("collects and removes active filter chips like Legacy summary", () => {
     const dirty = togglePlpFilterValue(
       DEFAULT_PLP_FILTERS,
       "diseases",
@@ -96,7 +96,7 @@ describe("plpCatalog filters", () => {
     expect(isPlpFiltersDirty(cleared)).toBe(false);
   });
 
-  it("caps filter option lists at Make PLP_FILTER_LIST_MAX with View all expand", () => {
+  it("caps filter option lists at Legacy PLP_FILTER_LIST_MAX with View all expand", () => {
     expect(PLP_FILTER_LIST_MAX).toBe(10);
     expect(PLP_COUNTRY_OPTIONS.length).toBeGreaterThan(PLP_FILTER_LIST_MAX);
     const capped = capPlpFilterOptionList(PLP_COUNTRY_OPTIONS);
@@ -110,7 +110,7 @@ describe("plpCatalog filters", () => {
     ).toBe(filtered.length);
   });
 
-  it("counts filter facet options like Make sidebar counters", () => {
+  it("counts filter facet options like Legacy sidebar counters", () => {
     const chicken = countPlpFacetOption(
       DEFAULT_PLP_FILTERS,
       "diseases",
@@ -125,7 +125,7 @@ describe("plpCatalog filters", () => {
     expect(thai).toBeGreaterThan(0);
   });
 
-  it("narrows By Country list when a region is selected (Make cascade)", () => {
+  it("narrows By Country list when a region is selected (Legacy cascade)", () => {
     const europeCandidates = getPlpCountryCandidates(["Europe"]);
     expect(europeCandidates).toEqual([
       ...PLP_TRAVEL_COUNTRIES_BY_REGION.Europe,
@@ -152,7 +152,7 @@ describe("plpCatalog filters", () => {
     }
   });
 
-  it("clears country selections when region toggles (Make wire)", () => {
+  it("clears country selections when region toggles (Legacy wire)", () => {
     const withCountry = togglePlpFilterValue(
       DEFAULT_PLP_FILTERS,
       "countries",

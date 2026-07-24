@@ -16,7 +16,7 @@ Before anyone expects to record:
 
 1. Pages need the **interactive logic** the scenario requires — where links/CTAs lead, on-page controls that work (e.g. PLP filters with substantial internal logic even when they do not navigate elsewhere).
 2. The agent builds that interactivity **before** treating recording as ready.
-3. PO will rely heavily on **agentic workflow** to enrich pages (new concepts **and** pages already in place, including Boots Make wire when those screens are touched).
+3. PO will rely heavily on **agentic workflow** to enrich pages (new concepts **and** pages already in place, including Boots Legacy wire when those screens are touched).
 
 ```
 Page context (± CJM deck later)
@@ -57,16 +57,16 @@ Until a CJM deck is attached, page context alone is enough to anticipate the hap
 
 ### 2.3 Enrichment applies to existing pages
 
-Same rule when enriching Boots Make wire or any in-place screen: if we touch it for recording or journey work, raise interaction fidelity toward the shared kit — do not pile more permanent one-off imperative scripts.
+Same rule when enriching Boots Legacy wire or any in-place screen: if we touch it for recording or journey work, raise interaction fidelity toward the shared kit — do not pile more permanent one-off imperative scripts.
 
 ### 2.4 React rebuild = behavior parity (locked — PO)
 
-When a Make / concept screen is rebuilt in React, **migrate every interaction that already worked** on the prior page (checkbox/booster toggle, Continue gating, search + near-me openers, Change links, breadcrumbs, etc.).
+When a Legacy / concept screen is rebuilt in React, **migrate every interaction that already worked** on the prior page (checkbox/booster toggle, Continue gating, search + near-me openers, Change links, breadcrumbs, etc.).
 
 - Do **not** ship a static visual shell that drops handlers.
-- Prefer React props + `src/uxds/interactions/` kits; mark React-owned rows (`data-studio-react-owned` / host `[data-studio-react-screen]`) so Make global input mutators do not fight React state.
+- Prefer React props + `src/uxds/interactions/` kits; mark React-owned rows (`data-studio-react-owned` / host `[data-studio-react-screen]`) so Legacy global input mutators do not fight React state.
 - Retire a behavior only when the PO explicitly asks.
-- **Also migrate hover / focus / active** from Make CSS (`:hover`, transitions, underline/fill changes) into kit CSS (`src/uxds/components/`) or co-located screen CSS — flat dead controls fail interaction fidelity even when click handlers work.
+- **Also migrate hover / focus / active** from Legacy CSS (`:hover`, transitions, underline/fill changes) into kit CSS (`src/uxds/components/`) or co-located screen CSS — flat dead controls fail interaction fidelity even when click handlers work.
 
 Visual L&F + this parity rule: [VISUAL_FIDELITY.md](./VISUAL_FIDELITY.md) §1.1. Book Step 1 checklist: [BOOTS_REACT_SCREEN_PILOT.md](../projects/boots-pharmacy/BOOTS_REACT_SCREEN_PILOT.md).
 
@@ -144,7 +144,7 @@ Engine-only bridges (`src/app/`) remain for playback/recording — not for reinv
 |-----------|-------------|
 | **New concepts** | Build anticipated interactivity as part of page intake ([CONCEPT_INTAKE.md](./CONCEPT_INTAKE.md)) |
 | **Enriching in-place pages** | Same fidelity bar before calling recording “ready” |
-| **Boots Make wire** | When touching a screen, prefer shared kit / React path over growing Make-era scripts |
+| **Boots Legacy wire** | When touching a screen, prefer shared kit / React path over growing Legacy-era scripts |
 | **Recording session** | Blocked (product sense) until required controls work — see [../shell/RECORDING.md](../shell/RECORDING.md) |
 
 ---
@@ -172,7 +172,7 @@ Engine-only bridges (`src/app/`) remain for playback/recording — not for reinv
 3. Wire CTAs/links to real Studio destinations or explicit non-interactive treatment.  
 4. Prefer React + UXDS modules over new imperative screen scripts.  
 5. Confirm browse + at least the happy-path controls respond.  
-6. Run **Map current page interactions**; resolve invalid contracts and explicitly classify decorative candidates ([INTERACTION_INVENTORY.md](./INTERACTION_INVENTORY.md)). For Make → React work, compare against the pre-migration inventory and reject unexplained target loss.
+6. Run **Map current page interactions**; resolve invalid contracts and explicitly classify decorative candidates ([INTERACTION_INVENTORY.md](./INTERACTION_INVENTORY.md)). For Legacy → React work, compare against the pre-migration inventory and reject unexplained target loss.
 7. Then record / ask PO to record.
 
 ---

@@ -3,16 +3,16 @@ import { describe, expect, it } from "vitest";
 import { findReserveAppointmentButton } from "@/projects/boots-pharmacy/playback/book";
 
 describe("findReserveAppointmentButton", () => {
-  it("prefers React reserve button over Make retired div", () => {
+  it("prefers React reserve button over Legacy retired div", () => {
     const screen = document.createElement("div");
-    const make = document.createElement("div");
-    make.dataset.studioMakeRetired = "book-step-2";
-    make.style.display = "none";
-    const makeBtn = document.createElement("div");
-    makeBtn.setAttribute("data-name", "component.input.button");
-    makeBtn.textContent = "Reserve Appointment";
-    make.appendChild(makeBtn);
-    screen.appendChild(make);
+    const legacyEl = document.createElement("div");
+    legacyEl.dataset.studioLegacyRetired = "book-step-2";
+    legacyEl.style.display = "none";
+    const legacyBtn = document.createElement("div");
+    legacyBtn.setAttribute("data-name", "component.input.button");
+    legacyBtn.textContent = "Reserve Appointment";
+    legacyEl.appendChild(legacyBtn);
+    screen.appendChild(legacyEl);
 
     const reactBtn = document.createElement("button");
     reactBtn.setAttribute("data-studio-action", "book-step-2-reserve");

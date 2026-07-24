@@ -6,7 +6,7 @@ export const APPOINTMENT_DETAILS_REACT_SCREEN_ID = "appointment-details";
 
 export const APPOINTMENT_DETAILS_SCREEN_SELECTOR = `.studio-viewport > div > div:nth-child(${APPOINTMENT_DETAILS_CHILD_INDEX})`;
 
-/** Left-nav labels — Make `module.ma.navigation` (active = Appointment history). */
+/** Left-nav labels — Legacy `module.ma.navigation` (active = Appointment history). */
 export const APPOINTMENT_DETAILS_NAV_ITEMS = [
   "My Account",
   "My invoices",
@@ -40,7 +40,7 @@ export const APPOINTMENT_DETAILS_VACCINATIONS_ITEM_ID = "vaccinations";
 export const APPOINTMENT_DETAILS_SUMMARY_TITLE = "Appointment Summary";
 export const APPOINTMENT_DETAILS_SUMMARY_DISCOUNT = "Appointment Discount";
 
-/** Card info-row labels — Details Make (≠ History short labels). */
+/** Card info-row labels — Details Legacy (≠ History short labels). */
 export const APPOINTMENT_DETAILS_ROW_LABELS = [
   "Appointment number",
   "Status",
@@ -54,7 +54,7 @@ export const APPOINTMENT_DETAILS_ROW_LABELS = [
   "Total",
 ] as const;
 
-/** Static Make hire chrome — do not invent new billing identity. */
+/** Static Legacy hire chrome — do not invent new billing identity. */
 export const APPOINTMENT_DETAILS_CONTACT_EMAIL = "s.jenkins@example.com";
 export const APPOINTMENT_DETAILS_BILLING_NAME = "Sarah Jenkins";
 export const APPOINTMENT_DETAILS_BILLING_LINES = [

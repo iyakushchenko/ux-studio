@@ -27,7 +27,7 @@ Use after any concept page, shell chrome, kit CSS, or layout/CTA change that aff
 ### Evidence (required for every applicable row)
 
 - A **PASS without evidence is incomplete** and blocks overall PROVEN.
-- Visual/state rows: screenshot path or viewport description **plus** the concept / Make / UXDS reference.
+- Visual/state rows: screenshot path or viewport description **plus** the concept / Legacy / UXDS reference.
 - Behavior/chrome rows: localhost/MCP observation **plus** the selector, helper result, or source gate.
 - N/A rows: explain why the changed surface cannot exercise the check; convenience is not an N/A reason.
 - Evidence may cover several rows when it names each stable row ID and proves each claim.
@@ -81,7 +81,7 @@ Refs: [VISUAL_FIDELITY.md](./VISUAL_FIDELITY.md) · [INTERACTION_FIDELITY.md](./
 | D2 | `:focus-visible` (or equivalent) present on keyboard path | | |
 | D3 | Active / pressed / selected states match control family | | |
 | D4 | Disabled controls look and behave disabled | | |
-| D5 | Every UXDS control used (SearchField, Button, checkbox/radio, link) is checked against the kit + Make for hover, focus, active, and disabled; Quinn MCP-hovers at least one SearchField when present | | |
+| D5 | Every UXDS control used (SearchField, Button, checkbox/radio, link) is checked against the kit + Legacy for hover, focus, active, and disabled; Quinn MCP-hovers at least one SearchField when present | | |
 
 ### E. Behavior parity
 
@@ -89,7 +89,7 @@ Refs: [VISUAL_FIDELITY.md](./VISUAL_FIDELITY.md) §1.1 · [INTERACTION_FIDELITY.
 
 | # | Check | PASS / FAIL / N/A | Evidence |
 |---|--------|-------------------|----------|
-| E1 | Prior Make/concept interactions still work (toggles, gating, search, crumbs, etc.) | | |
+| E1 | Prior Legacy/concept interactions still work (toggles, gating, search, crumbs, etc.) | | |
 | E2 | CTAs/links go to real destinations or honest disabled states | | |
 | E3 | No static shell that only “looks” interactive | | |
 
@@ -115,7 +115,7 @@ Refs: [COMMAND_DOCTRINE.md](./COMMAND_DOCTRINE.md) §6
 | G4 | REC vs play chrome labels/gates match JSX source of truth | | |
 | G5 | **Studio chrome parity when AIR / browse:** while AIR (playback live), REC mode switch + recording controls are disabled/forced off the same way cassette step buttons / CJM switch lock — no REC usable during AIR | | |
 | G6 | **REC ⊗ CJM:** when CJM (journey mode) is ON, REC switch is `disabled` (clear visual disabled) and cannot enter Rec mode; when REC is ON, CJM is off/disabled. Gate: `studioModeXor.ts` + MCP sanity `rec-disabled-when-cjm-on` | | |
-| G7 | **Hybrid mount:** React host present; Make chrome hidden (`data-studio-make-retired`); Make wire gated; AIR hooks preserved (`data-name` / `data-studio-*`) | | |
+| G7 | **Hybrid mount:** React host present; Legacy chrome hidden (`data-studio-legacy-retired`); Legacy wire gated; AIR hooks preserved (`data-name` / `data-studio-*`) | | |
 | G8 | **Short grids left-aligned:** incomplete last rows of slot/chip grids share column 0 with full rows (no `space-between` + narrow pads) | | |
 | G9 | **Step/tab targets:** in-page progress + Studio Book Step N navigate to `PROTO_INDEX_BOOK_STEP*` — never snap to Home/tab1 via beat fallback while browsing (`shouldNavigateBeatTabOnEnter`) | | |
 
@@ -138,7 +138,7 @@ Refs: [DS_STRICTNESS.md](./DS_STRICTNESS.md) · [../uxds/DEVIATIONS.md](../uxds/
 | I3 | Page CSS is layout/structure — not anonymous one-off color/hover forks | | |
 | I4 | Intentional kit breaks are registered in DEVIATIONS.md | | |
 
-### J. Make → React state and real-user proof
+### J. Legacy → React state and real-user proof
 
 Refs: [UMA_FIDELITY_NOTES.md](./UMA_FIDELITY_NOTES.md) §0–§0b · [PARITY_RATCHETS.md](./PARITY_RATCHETS.md) · [../shell/PROOF_ROUTER.md](../shell/PROOF_ROUTER.md)
 
@@ -149,7 +149,7 @@ These rows are mandatory for migrated screens. For other UI work, use N/A only w
 | J1 | Loading, empty, and updating states match the source mechanism and copy; loading is in-band, tiles/content hide as intended, and loader/count copy is not duplicated | | |
 | J2 | Checkbox and radio controls preserve source hover, checked, focus, and disabled states; no invented hover chrome | | |
 | J3 | Section vertical rhythm is browser-measured against the source for the relevant stack (including price → CTA/recipient → body → booster); computed gaps/padding are recorded | | |
-| J4 | The Make-parity register has no unchecked P0 rows, including loading/empty/updating when the source has them | | |
+| J4 | The Legacy-parity register has no unchecked P0 rows, including loading/empty/updating when the source has them | | |
 | J5 | Quinn’s localhost MCP matrix covers the changed hover/click/state paths and records the helper/result or step evidence; chat-only or stale-tip evidence is not accepted | | |
 | J6 | During every MCP page-probe step, the AGENT TESTING overlay remains visible, the target is scrolled into view when needed, and open overlays block click-through (“overlay eyes”) | | |
 

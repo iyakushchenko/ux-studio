@@ -12,7 +12,7 @@ import type {
 import { isUsablePlaybackSelectorChain } from "@/app/recording/recordingCompile";
 import {
   humanizeRecordingLabel,
-  isCoarseMakeModuleName,
+  isCoarseLegacyModuleName,
   isDegradedClickTarget,
   isWeakScrollAnchorName,
 } from "@/app/recording/recordingLabels";
@@ -225,8 +225,8 @@ type PlaybackSelectorRoot = Pick<ParentNode, "querySelector" | "querySelectorAll
  * Prefers outer→inner nested matches (how the chain was built), then
  * most-specific unique fallback.
  *
- * HARD: prefer interactive React targets over Make retired divs with the same
- * `data-name` (Book Step 1 location search = button; Make dump = non-clickable div).
+ * HARD: prefer interactive React targets over Legacy retired divs with the same
+ * `data-name` (Book Step 1 location search = button; Legacy dump = non-clickable div).
  */
 export function resolvePlaybackSelectorChain(
   chain: string[] | undefined,
@@ -254,7 +254,7 @@ export function resolvePlaybackSelectorChain(
     scope = el;
   }
   if (nestedOk && nested) {
-    // Nested Make path can land on a non-button field; upgrade to React twin.
+    // Nested Legacy path can land on a non-button field; upgrade to React twin.
     if (
       !isInteractivePlaybackTarget(nested) &&
       nested.getAttribute?.("data-name") === "component.input.field"
@@ -281,7 +281,7 @@ export function resolvePlaybackSelectorChain(
       continue;
     }
     // Multi-match: accept only when exactly one interactive playable remains
-    // (Make div + React button → button).
+    // (Legacy div + React button → button).
     const best = pickBestPlaybackSelectorMatch(matches);
     if (!best) continue;
     const interactive = Array.from(matches).filter(
@@ -293,7 +293,7 @@ export function resolvePlaybackSelectorChain(
   return null;
 }
 
-const MAKE_RETIRED_SELECTOR = "[data-studio-make-retired]";
+const MAKE_RETIRED_SELECTOR = "[data-studio-legacy-retired]";
 
 function isInteractivePlaybackTarget(el: HTMLElement): boolean {
   const tag = el.tagName;
@@ -337,7 +337,7 @@ function isPlayablePlaybackTarget(el: HTMLElement): boolean {
   return true;
 }
 
-/** Prefer button/input over Make div with the same data-name; skip retired. */
+/** Prefer button/input over Legacy div with the same data-name; skip retired. */
 export function pickBestPlaybackSelectorMatch(
   matches: ArrayLike<HTMLElement> | Iterable<HTMLElement>
 ): HTMLElement | null {
@@ -457,7 +457,7 @@ function scrollAnchorScore(el: HTMLElement, dist: number): number {
   if (el.getAttribute("data-studio-action")) score -= 40;
   if (tag === "article" || el.getAttribute("role") === "article") score -= 30;
   if (isWeakScrollAnchorName(dataName)) score += 400;
-  if (isCoarseMakeModuleName(dataName)) score += 180;
+  if (isCoarseLegacyModuleName(dataName)) score += 180;
   if (
     el.matches?.(
       'input[type="checkbox"], input[type="radio"], [role="checkbox"], [role="radio"]'
@@ -489,7 +489,7 @@ export function resolveScrollAnchorElement(
     if (isRecordingChromeTarget(el)) continue;
     const dataName = el.getAttribute("data-name");
     if (isWeakScrollAnchorName(dataName)) continue;
-    if (isCoarseMakeModuleName(dataName)) continue;
+    if (isCoarseLegacyModuleName(dataName)) continue;
     if (
       el.matches?.(
         'input[type="checkbox"], input[type="radio"], [role="checkbox"], [role="radio"]'
@@ -848,7 +848,7 @@ const RECORDING_CHROME_SELECTOR = [
   ".studio-playback-shield",
 ].join(", ");
 
-/** Prefer CTAs / links / actions — not coarse Make modules. */
+/** Prefer CTAs / links / actions — not coarse Legacy modules. */
 const RECORDING_CLICK_FIDELITY_SELECTOR = [
   "button",
   "a",
@@ -883,7 +883,7 @@ export function isRecordingChromeTarget(el: Element | null): boolean {
  * `module.plp.tiles` containers when the click lands on padding/gap.
  */
 export function refineRecordingClickTarget(el: HTMLElement): HTMLElement {
-  // Make dump often leaves a non-button `component.input.field` div; React Book
+  // Legacy dump often leaves a non-button `component.input.field` div; React Book
   // Step 1 uses a real <button data-name="component.input.field">. Prefer button.
   if (
     el.getAttribute?.("data-name") === "component.input.field" &&
@@ -1008,7 +1008,7 @@ export function shouldCaptureRecordingHumanClick(event: Event): boolean {
   return Boolean(target && !isAlreadySelectedNoopTarget(target));
 }
 
-/** Concise human labels for STEPS / nav — scrub Make-ish attr soup. */
+/** Concise human labels for STEPS / nav — scrub Legacy-ish attr soup. */
 export function describeRecordingClickTarget(el: HTMLElement): string {
   // Prefer action slug first (Book now CTA) over noisy button chrome text.
   const action = el.getAttribute("data-studio-action");
@@ -1032,7 +1032,7 @@ export function describeRecordingClickTarget(el: HTMLElement): string {
   if (aria) return humanizeRecordingLabel(aria) || aria;
 
   // Avoid concatenating every tile in module.plp.tiles.
-  if (!isCoarseMakeModuleName(el.getAttribute("data-name"))) {
+  if (!isCoarseLegacyModuleName(el.getAttribute("data-name"))) {
     const text = (el.textContent ?? "").replace(/\s+/g, " ").trim();
     if (text && text.length <= 40) return text;
     if (text && text.length <= 80) return `${text.slice(0, 37)}…`;

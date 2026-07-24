@@ -2,9 +2,9 @@
  * Shared Appointment/Order item card — Appointment History (list) and
  * Appointment Details reuse this exact component + CSS so the two
  * surfaces cannot drift in look & feel (single source of truth).
- * Densified Make live parity (pad/gap 20/20, CTA 12) — canonical spacing
+ * Densified Legacy live parity (pad/gap 20/20, CTA 12) — canonical spacing
  * for both screens; History previously used stale Figma 32/56 spacing.
- * Status tones (Make wire parity — do not invent alternate palette):
+ * Status tones (Legacy wire parity — do not invent alternate palette):
  *   active #5b8fc9 · completed #4a9b72 · cancelled #d4a03a
  */
 

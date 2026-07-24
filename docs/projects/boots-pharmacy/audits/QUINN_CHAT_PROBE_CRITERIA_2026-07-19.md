@@ -6,7 +6,7 @@
 
 **Updated:** 2026-07-20  
 
-**Screen:** `chat` (Make child 10 retired · scenario `site-pilot-chat`)  
+**Screen:** `chat` (Legacy child 10 retired · scenario `site-pilot-chat`)  
 
 **Refs:** [STUDIO_AUTO_RULES.md](../../../product/STUDIO_AUTO_RULES.md) R11 · [URL.md](../../../shell/URL.md) · `studioMcpPageProbe.ts` · [UMA_FIDELITY_CHAT_2026-07-19.md](./UMA_FIDELITY_CHAT_2026-07-19.md) · [FE_AUDIT_CHAT_PAGE_FINAL_PASS_2026-07-20.md](./FE_AUDIT_CHAT_PAGE_FINAL_PASS_2026-07-20.md)
 
@@ -86,7 +86,7 @@ await window.__studioRunMcpPageProbe?.({ screenId: "chat", reload: false })
 
 | `chat-host` | `<main class="chat" data-studio-react-screen="chat">` |
 
-| `chat-make-retired` | Make retired; 1 live summary |
+| `chat-legacy-retired` | Legacy retired; 1 live summary |
 
 | `chat-site-pilot-bar` | Logo + Contact Support + Rate |
 

@@ -1,18 +1,18 @@
 {
   "meta": {
-    "purpose": "Make-only interaction inventory baseline BEFORE React migration",
+    "purpose": "Legacy-only interaction inventory baseline BEFORE React migration",
     "screenId": "appointment-history",
     "projectId": "boots-pharmacy",
     "capturedAt": "2026-07-22T09:01:21.887Z",
     "capturedBy": "Quinn (QA)",
     "captureMethod": "Chrome DevTools MCP + __studioMapCurrentInteractions (localhost:5173 live tab)",
     "host": "http://localhost:5173/?project=boots-pharmacy&screen=appointment-history&persona=sarah-jenkins&cjm=off&experience=agentic",
-    "hostState": "Make (no React host for appointment-history)",
+    "hostState": "Legacy (no React host for appointment-history)",
     "helper": "await window.__studioMapCurrentInteractions()",
     "knowledgeUsed": "TEAM_KNOWLEDGE Quinn + INTERACTION_INVENTORY.md + PROOF_ROUTER.md",
     "reactMigrationClaim": false,
     "notes": [
-      "readinessPass=false is EXPECTED on Make: duplicate View Details cannot form unique ready-target selectors; most hooks missing-stable-target.",
+      "readinessPass=false is EXPECTED on Legacy: duplicate View Details cannot form unique ready-target selectors; most hooks missing-stable-target.",
       "Inventory mapper stableSelector does not treat data-studio-appointment-view-details as unique (and 4 matches would fail uniqueness).",
       "Post-React: re-run map; require readinessPass=true for primary CTAs; reconcile every removed/renamed target — unexplained loss blocks PAGE FINAL PASS."
     ],
@@ -115,7 +115,7 @@
         "Diff totals + named CTAs: View Details / Edit / Cancel / Ask Site Pilot / Discuss with Site Pilot / Load more / breadcrumbs / appointment title links",
         "Require readinessPass=true for primary Studio hooks (prefer unique data-studio-action or data-studio-target per card, or card-scoped view-details + appointment id)",
         "Unexplained target loss or missing View Details blocks PAGE FINAL PASS",
-        "Do not treat Make readinessPass=false as React FAIL — this file is pre-migration evidence only"
+        "Do not treat Legacy readinessPass=false as React FAIL — this file is pre-migration evidence only"
       ],
       "mustPreserveSelectors": [
         "[data-studio-appointment-view-details=\"true\"]",

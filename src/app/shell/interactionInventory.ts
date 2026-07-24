@@ -118,20 +118,34 @@ type StableSelectorResult = {
   ambiguous: boolean;
 };
 
+/** Count only visible matches — mirrors the production resolver
+ * (`resolvePlaybackSelectorChain` → `isPlayablePlaybackTarget`), which also
+ * queries `document`-wide but filters hidden nodes before picking a target.
+ * Screens stay mounted-but-hidden (Phase E park mode), so raw DOM-wide
+ * counts would false-flag every duplicated hidden mount as ambiguous. */
+function visibleMatchCount(selector: string): number {
+  let count = 0;
+  for (const el of document.querySelectorAll<HTMLElement>(selector)) {
+    if (visible(el)) count += 1;
+    if (count > 1) break;
+  }
+  return count;
+}
+
 function stableSelector(el: HTMLElement): StableSelectorResult {
   let ambiguous = false;
   for (const attr of ["data-studio-action", "data-studio-target", "data-name", "id", "aria-label"] as const) {
     const value = attr === "id" ? el.id : el.getAttribute(attr);
     if (!value) continue;
     const selector = attr === "id" ? `#${cssEscape(value)}` : `[${attr}="${cssEscape(value)}"]`;
-    const count = document.querySelectorAll(selector).length;
+    const count = visibleMatchCount(selector);
     if (count === 1) return { selector, ambiguous: false };
     if (count > 1) ambiguous = true;
   }
   const href = el.getAttribute("href");
   if (el.tagName === "A" && href && href !== "#") {
     const selector = `a[href="${cssEscape(href)}"]`;
-    const count = document.querySelectorAll(selector).length;
+    const count = visibleMatchCount(selector);
     if (count === 1) return { selector, ambiguous: false };
     if (count > 1) ambiguous = true;
   }

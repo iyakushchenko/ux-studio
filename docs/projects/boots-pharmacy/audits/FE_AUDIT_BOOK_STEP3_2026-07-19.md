@@ -20,7 +20,7 @@
 
 ## Summary
 
-Live localhost audit of React Book Step 3 confirms hybrid mount at Frame child **3**: Make chrome retired (`display:none` + `data-studio-make-retired="book-step-3"`), React host `[data-studio-react-screen="book-step-3"]` with progress/card **863px**, shell **1440/64**, body “Appointment reserved!” + order summary, AIR hook `data-studio-open-appointment="true"` on Open Appointments. CTA labels nowrap. MCP sanity **pass** (REC⊗CJM). No LEGACY growth (`book-step-3-confirmation.css` + UXDS primary). Adjacent Step 2 slot-grid left-align + Step 1 browse tab stay re-checked PASS (`66e7fe0`).
+Live localhost audit of React Book Step 3 confirms hybrid mount at Frame child **3**: Legacy chrome retired (`display:none` + `data-studio-legacy-retired="book-step-3"`), React host `[data-studio-react-screen="book-step-3"]` with progress/card **863px**, shell **1440/64**, body “Appointment reserved!” + order summary, AIR hook `data-studio-open-appointment="true"` on Open Appointments. CTA labels nowrap. MCP sanity **pass** (REC⊗CJM). No LEGACY growth (`book-step-3-confirmation.css` + UXDS primary). Adjacent Step 2 slot-grid left-align + Step 1 browse tab stay re-checked PASS (`66e7fe0`).
 
 ---
 
@@ -40,7 +40,7 @@ Live localhost audit of React Book Step 3 confirms hybrid mount at Frame child *
 |---|--------|----------|
 | B1 | **PASS** | Shell max-width **1440px**, pad L/R **64px**; card/progress width **863**, left **507** (shared column). |
 | B2 | **PASS** | Progress + card share 863 edge. |
-| B3 | **PASS** | Make retired nodes `display:none`; Proto header/footer Studio chrome retained. |
+| B3 | **PASS** | Legacy retired nodes `display:none`; Proto header/footer Studio chrome retained. |
 | B4 | **PASS** | Desktop confirmation layout intact. |
 
 ### C. Icon + text CTAs — no wrap
@@ -65,7 +65,7 @@ Live localhost audit of React Book Step 3 confirms hybrid mount at Frame child *
 | # | Result | Evidence |
 |---|--------|----------|
 | E1 | **PASS** | Slot/location/recipient copy bound from wire; pricing rows render. |
-| E2 | **PASS** | Open Appointments keeps `data-studio-open-appointment="true"`; Explore wired; Make handlers gated when React mounted. |
+| E2 | **PASS** | Open Appointments keeps `data-studio-open-appointment="true"`; Explore wired; Legacy handlers gated when React mounted. |
 | E3 | **PASS** | Live buttons — not static chrome. |
 
 ### F. Control hierarchy / no zoo
@@ -83,7 +83,7 @@ Live localhost audit of React Book Step 3 confirms hybrid mount at Frame child *
 | G1–G4 | **PASS** | Browse CJM off; no duplicate STEPS; cassette idle. |
 | G5 | **N/A** | AIR not live during this audit path. |
 | G6 | **PASS** | `__protoRunMcpSanityCheck` pass (REC⊗CJM). |
-| G7 | **PASS** | React host + three Make retired nodes `display:none`; AIR hook present. |
+| G7 | **PASS** | React host + three Legacy retired nodes `display:none`; AIR hook present. |
 | G8 | **PASS** | Re-check Step 2 short time rows `delta:0` (grid `repeat(7,65px)`). |
 | G9 | **PASS** | Agentic + CJM off → Studio “Book Step 1” stays `book-step-1` (beatId may be `agentic-home`; no `goToTab(0)`). |
 
@@ -124,7 +124,7 @@ Going forward: `__studioRunMcpPageProbe({ screenId: "book-step-3" })` for visibl
 
 ## Hard gates touched
 
-- Hybrid mount + Make gate (`isBookStep3ReactMounted`)
+- Hybrid mount + Legacy gate (`isBookStep3ReactMounted`)
 - Agent testing overlay auto on MCP sanity (shell PANEL CSS)
 - Lessons: [../LESSONS_LEARNED.md](../../../product/LESSONS_LEARNED.md)
 

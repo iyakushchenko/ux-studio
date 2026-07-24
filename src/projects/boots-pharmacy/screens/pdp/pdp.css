@@ -1,4 +1,4 @@
-/* PDP — React migration; visual source = Make child 8 + live wire chrome */
+/* PDP — React migration; visual source = Legacy child 8 + live wire chrome */
 
 .studio-react-screen-host[data-studio-react-screen="pdp"] {
   display: flex;
@@ -52,7 +52,7 @@
   border: none;
   background: none;
   padding: 0;
-  /* Make ModuleBreadcrumbs: grey underlined crumbs — not navy/teal link tokens */
+  /* Legacy ModuleBreadcrumbs: grey underlined crumbs — not navy/teal link tokens */
   color: #7a7d87;
   text-decoration: underline;
   text-decoration-thickness: 5%;
@@ -71,7 +71,7 @@
   outline-offset: 2px;
 }
 
-/* Make component.gse.breadcrumbs.delimiter — 16×16, rotate-30 #c3c3c3 bar */
+/* Legacy component.gse.breadcrumbs.delimiter — 16×16, rotate-30 #c3c3c3 bar */
 .pdp__crumb-sep {
   position: relative;
   flex-shrink: 0;
@@ -109,7 +109,7 @@
   flex: 1 1 auto;
 }
 
-/* Make Body6: p-[64px] around RTB card stack */
+/* Legacy Body6: p-[64px] around RTB card stack */
 .pdp__rtb-band {
   position: relative;
   width: 100%;
@@ -182,12 +182,12 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  /* Make ComponentPdpRtb: gap-[32px] between title→price→recipient→blurb→booster→CTA */
+  /* Legacy ComponentPdpRtb: gap-[32px] between title→price→recipient→blurb→booster→CTA */
   gap: 32px;
   background: var(--uxds-surface-neutral);
 }
 
-/* Make Frame128 — title + service id stack; must NOT inherit Make image 1:1 flex */
+/* Legacy Frame128 — title + service id stack; must NOT inherit Legacy image 1:1 flex */
 .pdp__title-block {
   display: flex;
   flex-direction: column;
@@ -488,7 +488,7 @@
 }
 
 .pdp__secondary:hover .pdp__secondary-icon {
-  /* Make chrome secondary hover glyph — navy lift #01318f */
+  /* Legacy chrome secondary hover glyph — navy lift #01318f */
   color: var(--project-brand-cta-navy-hover);
 }
 
@@ -539,7 +539,7 @@
   transition: color 0.18s ease;
 }
 
-/* Make `icon=share` wrapper: `-rotate-180 -scale-x-100` */
+/* Legacy `icon=share` wrapper: `-rotate-180 -scale-x-100` */
 .pdp__share-icon {
   transform: rotate(-180deg) scaleX(-1);
 }
@@ -634,7 +634,7 @@
   color: #2e2e2e;
 }
 
-/* —— L14–L20 below-fold (Make Body7) —— */
+/* —— L14–L20 below-fold (Legacy Body7) —— */
 
 .pdp__below {
   width: 100%;
@@ -797,8 +797,8 @@
 }
 
 /*
- * Make Frame126 download CTAs — same tertiary 32px icon+label for both.
- * Leaflet cyan border + cursor in Make = Figma hover mock (I20), not rest stub.
+ * Legacy Frame126 download CTAs — same tertiary 32px icon+label for both.
+ * Leaflet cyan border + cursor in Legacy = Figma hover mock (I20), not rest stub.
  */
 .pdp__pill {
   display: inline-flex;
@@ -826,7 +826,7 @@
 .pdp__pill-icon {
   display: inline-flex;
   flex-shrink: 0;
-  /* Make download glyphs fill #012169 at rest */
+  /* Legacy download glyphs fill #012169 at rest */
   color: var(--project-brand-cta-navy);
   transition: color 0.18s ease;
 }
@@ -898,7 +898,7 @@
 }
 
 /*
- * PO + Make parity: accordion triggers have no focus ring in Make.
+ * PO + Legacy parity: accordion triggers have no focus ring in Legacy.
  * Keyboard expand still works via button + aria-expanded; hover navy remains.
  */
 .pdp__accordion-header:focus,

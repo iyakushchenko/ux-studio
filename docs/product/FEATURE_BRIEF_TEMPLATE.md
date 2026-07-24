@@ -42,7 +42,7 @@ _Why this exists in one short paragraph. Link concept / audit / NEXT_STEPS item.
 
 ## Mount / FE notes (Finn)
 
-_Paths, screenId, URL params, known Make vs React gates._
+_Paths, screenId, URL params, known Legacy vs React gates._
 
 ## Prove notes (Quinn)
 

@@ -3,24 +3,24 @@ import { describe, expect, it } from "vitest";
 import { collectSitePilotChatScenarioFrames } from "@/projects/boots-pharmacy/dom/sitePilotChatScenario";
 
 describe("collectSitePilotChatScenarioFrames", () => {
-  it("prefers React host summary over Make dump-all under page react attr", () => {
+  it("prefers React host summary over Legacy dump-all under page react attr", () => {
     const page = document.createElement("div");
     page.dataset.studioReactScreen = "chat";
 
-    const makeBody = document.createElement("div");
-    makeBody.dataset.studioMakeRetired = "chat";
-    makeBody.style.display = "none";
-    const makeSummary = document.createElement("div");
-    makeSummary.setAttribute("data-name", "component.appointment.summary");
+    const legacyBody = document.createElement("div");
+    legacyBody.dataset.studioLegacyRetired = "chat";
+    legacyBody.style.display = "none";
+    const legacySummary = document.createElement("div");
+    legacySummary.setAttribute("data-name", "component.appointment.summary");
     for (const name of ["query", "reply", "query", "reply"]) {
       const f = document.createElement("div");
       f.setAttribute("data-name", name);
       // Sparse stamps that used to poison collect → 2-frame collapse.
       if (name === "reply") f.setAttribute("data-studio-chat-frame", "r0");
-      makeSummary.appendChild(f);
+      legacySummary.appendChild(f);
     }
-    makeBody.appendChild(makeSummary);
-    page.appendChild(makeBody);
+    legacyBody.appendChild(legacySummary);
+    page.appendChild(legacyBody);
 
     const host = document.createElement("div");
     host.className = "studio-react-screen-host";
@@ -52,7 +52,7 @@ describe("collectSitePilotChatScenarioFrames", () => {
     page.remove();
   });
 
-  it("does not short-circuit Make dump-all on sparse data-studio-chat-frame stamps", () => {
+  it("does not short-circuit Legacy dump-all on sparse data-studio-chat-frame stamps", () => {
     const page = document.createElement("div");
     const summary = document.createElement("div");
     summary.setAttribute("data-name", "component.appointment.summary");

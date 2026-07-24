@@ -1,4 +1,4 @@
-/* Book Step 1 — React pilot; visual source = Make Body5 + live wire CSS */
+/* Book Step 1 — React pilot; visual source = Legacy Body5 + live wire CSS */
 
 .studio-react-screen-host[data-studio-react-screen="book-step-1"] {
   display: flex;
@@ -45,7 +45,7 @@
   box-sizing: border-box;
 }
 
-/* Make module.breadcrumbs — white, no bottom border */
+/* Legacy module.breadcrumbs — white, no bottom border */
 .book-step-1__crumbs {
   width: 100%;
   background: var(--uxds-surface-neutral);
@@ -63,7 +63,7 @@
   line-height: 12px;
 }
 
-/* Make Home link — #305854 (live token --uxds-text-link-link-dark) */
+/* Legacy Home link — #305854 (live token --uxds-text-link-link-dark) */
 .book-step-1__crumb-link {
   border: none;
   background: none;
@@ -94,7 +94,7 @@
 }
 
 /*
- * Make Body5 page fill:
+ * Legacy Body5 page fill:
  * absolute white base + decorative PNG @ opacity 0.31, object-position bottom.
  */
 .book-step-1__body {
@@ -157,7 +157,7 @@
 
 /* Progress + summary pills → UXDS kits (book-appointment-progress / appointment-summary-pill) */
 
-/* Live Make card width override: 863px (not Figma export 758px) */
+/* Live Legacy card width override: 863px (not Figma export 758px) */
 .book-step-1__card {
   display: flex;
   flex-direction: column;
@@ -181,7 +181,7 @@
   color: var(--uxds-text-text-primary);
 }
 
-/* Make Frame209: wrap search + near-me side-by-side */
+/* Legacy Frame209: wrap search + near-me side-by-side */
 .book-step-1__location {
   display: flex;
   flex-wrap: wrap;
@@ -208,7 +208,7 @@
   color: var(--uxds-text-text-primary);
 }
 
-/* Make Text Field: pill 360, #c3c3c3 border, inset navy ring on hover/focus */
+/* Legacy Text Field: pill 360, #c3c3c3 border, inset navy ring on hover/focus */
 .book-step-1__search {
   display: flex;
   align-items: center;
@@ -261,7 +261,7 @@
   white-space: nowrap;
 }
 
-/* Make Frame102: h-72, pt-24 — aligns NearMeCta beside labeled search field */
+/* Legacy Frame102: h-72, pt-24 — aligns NearMeCta beside labeled search field */
 .book-step-1__near-me {
   display: flex;
   align-items: center;
@@ -273,7 +273,7 @@
 
 /* Shared NearMeCta chrome lives in globals-chrome (.studio-tertiary-cta / .proto-near-me-cta) */
 
-/* Chosen store tile — same treatment as Make .proto-chosen-tile */
+/* Chosen store tile — same treatment as Legacy .proto-chosen-tile */
 .book-step-1__chosen {
   display: flex;
   flex-direction: column;
@@ -331,7 +331,7 @@
 }
 
 /*
- * Live Make child-7 booster (globals-screens):
+ * Live Legacy child-7 booster (globals-screens):
  * unchecked white/#c3c3c3; hover #c6e5e1; checked #afccca + #305854 mark.
  */
 .book-step-1__checkbox-row {

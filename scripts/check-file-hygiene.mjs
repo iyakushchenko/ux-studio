@@ -2,7 +2,7 @@
  * Lean file-hygiene gate (Summarizer-inspired, Studio-sized).
  *
  * - FAIL when a watched source file exceeds MAX_LINES (monster).
- * - Allowlist = known LEGACY / Make dumps / current engine ceilings (ratchet only).
+ * - Allowlist = known LEGACY / Legacy dumps / current engine ceilings (ratchet only).
  * - No fragmentation nanny (avoids micro-file zoo pressure).
  *
  * Run: node scripts/check-file-hygiene.mjs
@@ -25,7 +25,7 @@ const MAX_LINES = 1600;
  * Prefer splitting the file over raising the ceiling.
  */
 const ALLOWLIST = {
-  // LEGACY Make dumps — do not grow; retirement is screen-by-screen.
+  // LEGACY Legacy dumps — do not grow; retirement is screen-by-screen.
   "src/styles/globals-screens.css": 3200,
   "src/styles/globals-chrome.css": 2650, // + carriage OS cursor CSS (large demo I-beam)
   "src/styles/globals-hub.css": 1400,
@@ -37,8 +37,8 @@ const ALLOWLIST = {
   "src/app/shell/studioMcpHelpers.ts": 1460, // + PP-42 traditional retreat smoke: camera-beat + saved-location-skip expectations (2026-07-24)
   "src/app/shell/playbackDiag.ts": 1700, // pre-existing overage (diag report + PLAYBACK_DIAG log surface) — split is a separate engine refactor
   "src/app/scenario/demoCursor.ts": 2250, // + lifecycle visibility guard / steady graphic diagnostics; split is a separate engine refactor
-  "src/projects/boots-pharmacy/wire/BootsPharmacyProjectView.tsx": 4900, // + Appointment Details React mount + Make wire early-return
-  "src/projects/boots-pharmacy/data/plpListing.ts": 2000, // Make PLP DOM; retire with PLP React
+  "src/projects/boots-pharmacy/wire/BootsPharmacyProjectView.tsx": 4900, // + Appointment Details React mount + Legacy wire early-return
+  "src/projects/boots-pharmacy/data/plpListing.ts": 2000, // Legacy PLP DOM; retire with PLP React
 };
 
 const SKIP_DIR = new Set([
@@ -46,7 +46,7 @@ const SKIP_DIR = new Set([
   "dist",
   ".git",
   "components", // shadcn dump under src/app/components/ui — not our product surface
-  "frame", // Make frame dumps
+  "frame", // Legacy frame dumps
   "imports",
   "__tests__",
   "playwright-out",

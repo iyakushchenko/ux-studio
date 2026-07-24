@@ -34,7 +34,7 @@ These were thin in docs. I am deciding them so we do not stall.
 
 A page is **prototype-ready** for early Studio when:
 
-1. React screen under the project (not permanent Make HTML growth).  
+1. React screen under the project (not permanent Legacy HTML growth).  
 2. UXDS structure + project `styleguide/theme.css` applied.  
 3. Registered in Studio (screen id / tab) with stable `data-name` hooks.  
 4. Browse works; at least one journey beat can land on it if it is in a CJM.  
@@ -42,11 +42,11 @@ A page is **prototype-ready** for early Studio when:
 
 Not required for prototype-ready: production a11y audit, every viewport, real backend, pixel-match to messy Figma.
 
-**Do not call prototype-ready “migration DONE.”** A Make→React migration is DONE only under the stricter [NEXT_STEPS.md](./NEXT_STEPS.md) erase-Make definition and [PAGE_FINAL_PASS.md](./PAGE_FINAL_PASS.md): Make retirement/wire gates, no LEGACY growth, honest residual, Uma audit, Quinn localhost proof, and PAGE FINAL PASS hard-green.
+**Do not call prototype-ready “migration DONE.”** A Make→React migration is DONE only under the stricter [NEXT_STEPS.md](./NEXT_STEPS.md) erase-Legacy definition and [PAGE_FINAL_PASS.md](./PAGE_FINAL_PASS.md): Legacy retirement/wire gates, no LEGACY growth, honest residual, Uma audit, Quinn localhost proof, and PAGE FINAL PASS hard-green.
 
 ### 2.2 Viewport bar
 
-- **Default proof:** desktop / large (≈1440) first — matches most Make-feed strips.  
+- **Default proof:** desktop / large (≈1440) first — matches most Legacy-feed strips.  
 - **Add small/medium** only when the hypothesis needs it (e.g. mobile booking).  
 - UXDS `screen & fonts` modes stay available; we do not block on full responsive parity.
 
@@ -69,8 +69,8 @@ Not required for prototype-ready: production a11y audit, every viewport, real ba
 
 ### 2.5 Boots coexistence
 
-- **Screen-by-screen replace** of Make wire — no big-bang freeze.  
-- New work = React path; untouched Make screens keep working until replaced.  
+- **Screen-by-screen replace** of Legacy wire — no big-bang freeze.  
+- New work = React path; untouched Legacy screens keep working until replaced.  
 - Same project id `boots-pharmacy`; styleguide delta created on first React pilot.
 
 ### 2.6 Multi-project
@@ -96,13 +96,13 @@ Not required for prototype-ready: production a11y audit, every viewport, real ba
 | What we do **not** build day one | |
 |--------------------------------|--|
 | A full duplicate of every UXDS component in Figma | Grow only what pages need |
-| A growing Make-style **monster stylesheet per screen** | Prefer kit + co-located CSS ([PAGE_BUILD_CONTRACT.md](./PAGE_BUILD_CONTRACT.md) §8) |
+| A growing Legacy-style **monster stylesheet per screen** | Prefer kit + co-located CSS ([PAGE_BUILD_CONTRACT.md](./PAGE_BUILD_CONTRACT.md) §8) |
 | Summarizer-scale CSS governance megasuite | Later if useful |
 | A separate “Studio design system” with different names | Always map to UXDS |
 
 **How it grows:** First real page creates the token bridge + the few modules that page needs. Next page reuses and adds only gaps. You never maintain a giant unused component library.
 
-**Legacy Make CSS:** `globals-*.css` stays for unmigrated screens/overlays. Monster wire CSS is retired **screen by screen** as React pilots land — not overnight.
+**Legacy CSS:** `globals-*.css` stays for unmigrated screens/overlays. Monster wire CSS is retired **screen by screen** as React pilots land — not overnight.
 
 ### 2.8 Engine vs page sequencing
 

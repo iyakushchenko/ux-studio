@@ -46,7 +46,7 @@ Copy this into a chat message when ready; tick what you can provide.
 - [ ] **Figma file link** to UXDS (or the library file that owns variables + components)
 - [ ] Confirmation the agent can use **Figma MCP** on that file (you logged into Figma in Cursor / plugin authorized)
 - [ ] Pointer to **Variables** collection(s) that matter for web concepts (color, type, space, radius)
-- [ ] One **approved concept screen** in Figma (not Make) to use as the rebuild pilot
+- [ ] One **approved concept screen** in Figma (not Legacy) to use as the rebuild pilot
 
 ### Strongly recommended
 

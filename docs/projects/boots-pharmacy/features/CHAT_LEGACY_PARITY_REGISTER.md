@@ -1,29 +1,29 @@
-# Chat Make → React parity register
+# Chat Legacy → React parity register
 
 **Project:** `boots-pharmacy`  
 **Callsigns:** Bea (BA) owns register truth · Quinn (QA) owns prove · Finn/Uma restore gaps  
 **Updated:** 2026-07-21 (truth label added; detailed table retains 2026-07-19 kickoff baseline)  
 **Overall proof status:** Chat PAGE FINAL PASS **HARD-GREEN** per [NEXT_STEPS.md](../../../product/NEXT_STEPS.md) and [FE_AUDIT_CHAT_PAGE_FINAL_PASS_2026-07-20.md](../audits/FE_AUDIT_CHAT_PAGE_FINAL_PASS_2026-07-20.md).  
 **Register interpretation:** The detailed columns and Missing P0 list preserve the kickoff baseline, including the period when the React mount was off. They are not current status. Use the audit/Final Pass evidence for closure; do not rewrite individual rows without row-level evidence. A newly discovered P0 reopens Final Pass and the board.
-**Make source:** Frame child **10** (`Agentic. Site Pilot. Chat`) — `Frame337` microheader + `Body9` in `frame/index.tsx` (`left-[1535px]` UX frame) · wire `BootsPharmacyProjectView` child-10 effects · `dom/sitePilotChatScenario.ts` · `dom/sitePilotChatThinking.ts` · `playback/sitePilotChat.ts` · orchestra `App.tsx` (`site-pilot-chat`)  
+**Legacy source:** Frame child **10** (`Agentic. Site Pilot. Chat`) — `Frame337` microheader + `Body9` in `frame/index.tsx` (`left-[1535px]` UX frame) · wire `BootsPharmacyProjectView` child-10 effects · `dom/sitePilotChatScenario.ts` · `dom/sitePilotChatThinking.ts` · `playback/sitePilotChat.ts` · orchestra `App.tsx` (`site-pilot-chat`)  
 **Public `screenId`:** `chat` (URL `?screen=chat`; scenario id `site-pilot-chat`)  
-**React target:** `src/projects/boots-pharmacy/screens/chat/*` — **live** (`CHAT_REACT_MOUNT_ENABLED=true`; Make child 10 `data-studio-make-retired`)  
-**Refs:** [CHAT_REACT.md](./CHAT_REACT.md) · [HOME_MAKE_PARITY_REGISTER.md](./HOME_MAKE_PARITY_REGISTER.md) (composer shared kit) · [URL.md](../../../shell/URL.md) · [PAGE_FINAL_PASS.md](../../../product/PAGE_FINAL_PASS.md)
+**React target:** `src/projects/boots-pharmacy/screens/chat/*` — **live** (`CHAT_REACT_MOUNT_ENABLED=true`; Legacy child 10 `data-studio-legacy-retired`)  
+**Refs:** [CHAT_REACT.md](./CHAT_REACT.md) · [HOME_LEGACY_PARITY_REGISTER.md](./HOME_LEGACY_PARITY_REGISTER.md) (composer shared kit) · [URL.md](../../../shell/URL.md) · [PAGE_FINAL_PASS.md](../../../product/PAGE_FINAL_PASS.md)
 
 **Status legend:** Present · Partial · Missing · Fixed · N/A
 
-**Make column:** inventory from Frame `Body9` + `ComponentAppointmentSummary2` + wire/dom/playback (2026-07-19).  
+**Legacy column:** inventory from Frame `Body9` + `ComponentAppointmentSummary2` + wire/dom/playback (2026-07-19).  
 **React column:** historical kickoff baseline, including the mount-off period; retained as migration traceability.
 
-**Bea rule:** Every band before Finn codes — **thinking / send-stop / browse-reveal** = **P0** (Make has them; not a page spinner). No invented bands. **Composer = same component as Site Pilot Home** — not a fork ([HOME_MAKE_PARITY_REGISTER.md](./HOME_MAKE_PARITY_REGISTER.md) L7).
+**Bea rule:** Every band before Finn codes — **thinking / send-stop / browse-reveal** = **P0** (Legacy has them; not a page spinner). No invented bands. **Composer = same component as Site Pilot Home** — not a fork ([HOME_LEGACY_PARITY_REGISTER.md](./HOME_LEGACY_PARITY_REGISTER.md) L7).
 
 **PAGE FINAL PASS:** Chat — **NOT-GREEN** (not in `PAGE_FINAL_PASS.json` `requiredScreens`; do **not** add until honest PROVEN). **PDP HARD-GREEN unchanged.**
 
 ---
 
-## Layout (every Make band)
+## Layout (every Legacy band)
 
-| # | Make behavior | Make | React status | Evidence |
+| # | Legacy behavior | Legacy | React status | Evidence |
 |---|---------------|------|--------------|----------|
 | L1 | **1440 shell** — child-10 frame `w-[1440px]`, UX column | **Present** | **Missing** | `frame/index.tsx` child 10 wrapper |
 | L2 | **Engine header** — `boots-pharmacy.module.header` (shared navy) | **Present** | **N/A** (engine) | GhBsBrandSwitcher8 |
@@ -35,17 +35,17 @@
 | L8 | **Thread host** — `component.appointment.summary` 864px, `gap-[40px]`, centered in `p-[64px]` | **Present** | **Missing** | `ComponentAppointmentSummary2` |
 | L9 | **User bubbles (`query`)** — mint-tint card `bg-[rgba(245,255,254,0.35)]`, 438px, right-aligned column | **Present** | **Partial** | React live — Uma pixel PROVEN still PENDING |
 | L10 | **Agent bubbles (`reply`)** — white `component.co.order.summary` 16px pad + inline CTAs | **Present** | **Partial** | React live — Uma pixel PROVEN still PENDING |
-| L11 | **Per-reply helpful strip** — “Was this reply helpful?” + thumbs Yes/No on **reply** (Make: first `Reply`; React: r0 + latest r3, centered) | **Present** | **Partial** | `ChatScreen` `HelpfulStrip` · Make `ComponentGseSystemMessage` / `Frame342`–`343` |
+| L11 | **Per-reply helpful strip** — “Was this reply helpful?” + thumbs Yes/No on **reply** (Legacy: first `Reply`; React: r0 + latest r3, centered) | **Present** | **Partial** | `ChatScreen` `HelpfulStrip` · Legacy `ComponentGseSystemMessage` / `Frame342`–`343` |
 | L12 | **Conversation feedback (finale band)** — “Was this conversation helpful so far?” — wire **hidden** until scripted | **Present** | **Partial** | React band `hidden` — live |
 | L13 | **Disclaimer** — “SitePilot can make mistakes…” + underlined support link below thread | **Present** | **Partial** | `chat__disclaimer` — live |
-| L14 | **Footer** — absent on Chat Make child 10 | **N/A** | **N/A** | Do not invent |
-| L15 | **Accordion / chat history sidebar** — absent on Chat Make | **N/A** | **N/A** | No `component.gse.accordion` in `Body9` |
+| L14 | **Footer** — absent on Chat Legacy child 10 | **N/A** | **N/A** | Do not invent |
+| L15 | **Accordion / chat history sidebar** — absent on Chat Legacy | **N/A** | **N/A** | No `component.gse.accordion` in `Body9` |
 
 ---
 
-## Loading / empty / updating (P0 when Make has them)
+## Loading / empty / updating (P0 when Legacy has them)
 
-| # | Make behavior | Make | React status | Evidence |
+| # | Legacy behavior | Legacy | React status | Evidence |
 |---|---------------|------|--------------|----------|
 | LE1 | **Playback thinking bubble** — dots before each `reply` frame reveal (~**1400ms** `SITE_PILOT_CHAT_PLAYBACK_THINK_MS`) | **Present** | **Partial** | React bridge + `@/uxds/motion` bubble — live only when mount ON |
 | LE2 | **Thinking fade-out** — exit class ~360ms before reply shows | **Present** | **Partial** | React `AnimatePresence` exit ~360ms via bridge |
@@ -53,13 +53,13 @@
 | LE4 | **Send thinking** — user send → thinking bubble + send becomes **Stop** glyph | **Present** | **Partial** | `SitePilotComposer sendThinking` + bridge |
 | LE5 | **Ambient hint thinking** — frame 1 / after cancel → hint bubble before first reply | **Present** | **Partial** | Bridge publishes hint mode |
 | LE6 | **Page load spinner / empty thread** | **N/A** | **N/A** | Static scripted thread — **forbidden** invent full-page loader |
-| LE7 | **“Updating results…”-style listing overlay** | **N/A** | **N/A** | Not in Make Chat |
+| LE7 | **“Updating results…”-style listing overlay** | **N/A** | **N/A** | Not in Legacy Chat |
 
 ---
 
 ## Interactions / DS states
 
-| # | Make behavior | Make | React status | Evidence |
+| # | Legacy behavior | Legacy | React status | Evidence |
 |---|---------------|------|--------------|----------|
 | I1 | **Fixed composer dock** — in-place bottom; `--proto-chat-composer-h` pad; scroll pin near bottom | **Present** | **Missing** | `setupSitePilotChatComposerDock` |
 | I2 | **Composer card** — white shadow `component.co.order.summary`, 32px pad, same row as Home (mic + send) | **Present** | **Missing** | `ComponentCoOrderSummary8` |
@@ -70,40 +70,40 @@
 | I7 | **Next dialog chips ×3** — NHS / Show available slots for today / Elaborate on previous reply | **Present** | **Missing** | `Frame350` |
 | I8 | **Chip fill textarea** — chip click fills composer (not navigate) | **Present** | **Missing** | wire `onCardClick` |
 | I9 | **Chip “Show available slots for today”** — opens Availability Tool (`dateToday`) | **Present** | **Missing** | wire allowlist |
-| I10 | **Agent inline CTAs** — navy pills via UXDS `ButtonPrimary` + `--commerce` (Make `component.input.button`; Figma `#003fcb` rest forced navy like Make globals) | **Present** | **Partial** | `ChatScreen` `AgentCta` · size-only `.chat__cta` |
+| I10 | **Agent inline CTAs** — navy pills via UXDS `ButtonPrimary` + `--commerce` (Legacy `component.input.button`; Figma `#003fcb` rest forced navy like Legacy globals) | **Present** | **Partial** | `ChatScreen` `AgentCta` · size-only `.chat__cta` |
 | I11 | **Product links** → PDP (UXDS `.uxds-link` rest/hover — not invent always-underline) | **Present** | **Partial** | `chat__link uxds-link` · wire `PRODUCT_LINK_RE` |
 | I12 | **“Go to vaccines catalog”** CTA → PLP | **Present** | **Missing** | wire `goPlp` |
 | I13 | **Availability Checker Tool** underline → overlay | **Present** | **Missing** | wire `AVAIL_BTN_INTENT` |
-| I14 | **Reply helpful Yes/No** (+ thumbs, DS hover) | **Present** | **Partial** | React buttons + Make SVG thumbs — wire no-op |
+| I14 | **Reply helpful Yes/No** (+ thumbs, DS hover) | **Present** | **Partial** | React buttons + Legacy SVG thumbs — wire no-op |
 | I15 | **Conversation helpful** (hidden band) | **Present** | **Missing** | feedback frame hidden |
 | I16 | **CTA hover/press (demo)** — `proto-chat-cta--hover` / `--pressed` during playback | **Present** | **Missing** | `playback/sitePilotChat.ts` |
 | I17 | **Demo cursor** — robo on CTA + send; stripped from DOM | **Present** | **Missing** | `moveDemoCursorTo` · `stripSitePilotChatDemoCursors` |
 | I18 | **Scenario deck interrupt** — click scenario controls cancels send-thinking | **Present** | **Missing** | wire `onScenarioDeckClick` |
 | I19 | **Composer suppressed** when blocking overlays open | **Present** | **Missing** | `setSitePilotChatComposerDockSuppressed` · `App.tsx` |
 | I20 | **Scroll ownership** — chat tab skips default scroll-top; scenario start pins top; else bottom | **Present** | **Missing** | wire + `App.tsx` `proto-chat-scenario-at-start` |
-| I21 | **Mic/send/chip/CTA hover·focus** vs Make/UXDS | **Present** | **Missing** | Uma §0a — no invent colors |
+| I21 | **Mic/send/chip/CTA hover·focus** vs Legacy/UXDS | **Present** | **Missing** | Uma §0a — no invent colors |
 | I22 | **Thread motion** — scenario frame reveal + thinking (not height-thrash CSS) | **Present** | **Missing** | React target: `@/uxds/motion` per [MOTION.md](../../../product/MOTION.md) |
 
 ---
 
 ## Shared kit — Site Pilot composer (Home + Chat)
 
-| # | Contract | Make | React status | Evidence |
+| # | Contract | Legacy | React status | Evidence |
 |---|----------|------|--------------|----------|
-| SK1 | **Single React component** for query row + mic + send + chip row — used by `site-pilot` **and** `chat` | **Present** (Make duplicates markup) | **Partial** | `SitePilotComposer` shared; Chat wired but mount flag OFF |
+| SK1 | **Single React component** for query row + mic + send + chip row — used by `site-pilot` **and** `chat` | **Present** (Legacy duplicates markup) | **Partial** | `SitePilotComposer` shared; Chat wired but mount flag OFF |
 | SK2 | **Home variant** — “Suggested dialog options:” + 3 home chips; `data-studio-action=agentic-home-*` | **Present** | **Present** | Home → `SitePilotComposer surface="home"` |
-| SK3 | **Chat variant** — “Next dialog options:” + 3 chat chips; `data-studio-action=agentic-chat-query` | **Present** | **Partial** | Chat chips in React; Make dock authoritative until flip |
+| SK3 | **Chat variant** — “Next dialog options:” + 3 chat chips; `data-studio-action=agentic-chat-query` | **Present** | **Partial** | Chat chips in React; Legacy dock authoritative until flip |
 
 ---
 
 ## Wire / mount gates
 
-| # | Behavior | Make | React status | Evidence |
+| # | Behavior | Legacy | React status | Evidence |
 |---|----------|------|--------------|----------|
-| W1 | React host child 10 | — | **Present** | `CHAT_REACT_MOUNT_ENABLED=true`; Make `data-studio-make-retired` |
-| W2 | `data-studio-make-retired=chat` | — | **Partial** | Mount path ready; retired attr only when flag true |
+| W1 | React host child 10 | — | **Present** | `CHAT_REACT_MOUNT_ENABLED=true`; Legacy `data-studio-legacy-retired` |
+| W2 | `data-studio-legacy-retired=chat` | — | **Partial** | Mount path ready; retired attr only when flag true |
 | W3 | URL `?project=boots-pharmacy&screen=chat` | **Present** | **Present** | `screens.ts` · `studioUrl.ts` |
-| W4 | Make wire early-return when React mounted | — | **Partial** | `isChatReactMounted()` gates wire + dock; inactive while flag false |
+| W4 | Legacy wire early-return when React mounted | — | **Partial** | `isChatReactMounted()` gates wire + dock; inactive while flag false |
 | W5 | No LEGACY growth for React path | — | **Partial** | `chat.css` + `site-pilot-composer.css` only |
 | W6 | PAGE FINAL PASS stamp | — | **Missing** | Do **not** add `chat` to `requiredScreens` until PROVEN |
 | W7 | Engine header + microheader remain hybrid until React owns full shell | **Present** | **N/A** | Finn scope = body thread + dock |
@@ -112,7 +112,7 @@
 
 ## CJM / playback / URL contracts
 
-| # | Contract | Make / engine | React status | Evidence |
+| # | Contract | Legacy / engine | React status | Evidence |
 |---|----------|---------------|--------------|----------|
 | C1 | **Agentic deep link** — `?project=boots-pharmacy&screen=chat&persona=sarah-jenkins&cjm=on&experience=agentic` | **Present** | **Present** | [URL.md](../../../shell/URL.md) |
 | C2 | **Traditional path** — `experience=traditional` → PLP/PDP/book beats; **no** `site-pilot-chat` beat | **Present** | **Present** | `TRADITIONAL_CJM_JOURNEY` |
@@ -140,7 +140,7 @@
 
 ## Overlays / modals (chat-triggered)
 
-| # | Make behavior | Make | React status | Evidence |
+| # | Legacy behavior | Legacy | React status | Evidence |
 |---|---------------|------|--------------|----------|
 | O1 | **Availability Tool** — from chat CTAs / finale / chip | **Present** | **Partial** | Engine overlay; wire allowlist |
 | O2 | **Login popup** — copy mentions Boots Account | **Present** | **Partial** | Shared engine overlay |
@@ -153,8 +153,8 @@
 | Id | Note |
 |----|------|
 | B1 | **PO override:** Chat kickoff while **Site Pilot (`site-pilot`) NOT Final Pass hard-green** — document only; Arch accepted for register/brief. |
-| B2 | **Mount ON** — Quinn agentic P1–P10 playback smoke green on React host (2026-07-19); Make retired. No Chat PROVEN / Final Pass yet. |
-| B3 | **Scenario frames** — React emits `data-name=query|reply` + `data-studio-chat-frame`; `getChatSummary` prefers React host (Make first-match trap fixed). |
+| B2 | **Mount ON** — Quinn agentic P1–P10 playback smoke green on React host (2026-07-19); Legacy retired. No Chat PROVEN / Final Pass yet. |
+| B3 | **Scenario frames** — React emits `data-name=query|reply` + `data-studio-chat-frame`; `getChatSummary` prefers React host (Legacy first-match trap fixed). |
 | B4 | **Thinking UI** — LEGACY CSS classes today (`proto-chat-thinking-*`); React should use `@/uxds/motion` for bubble enter/exit without inventing new copy/placement. |
 | B5 | **Wire DOM surgery** — textarea replace + dock must early-return when React mounted (mirror Home). |
 | B6 | **No PROVEN** — no `PARITY_PROVEN.json` row for `chat` on this kickoff. |

@@ -1,4 +1,4 @@
-/* Shared Site Pilot composer — Home card + Chat dock (Make-identical row). */
+/* Shared Site Pilot composer — Home card + Chat dock (Legacy-identical row). */
 
 .site-pilot-composer__query-row {
   display: flex;
@@ -37,7 +37,7 @@
   padding: 0;
   margin: 0;
   overflow-x: hidden;
-  /* Defeat Make LEGACY `height: 24px !important` on .proto-agentic-query */
+  /* Defeat Legacy LEGACY `height: 24px !important` on .proto-agentic-query */
   height: 100% !important;
   max-height: none !important;
   field-sizing: fixed;

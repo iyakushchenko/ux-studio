@@ -4,7 +4,7 @@ Visual modules mapped to UXDS `component.*` / `module.*` names. Grow by use — 
 
 | Module | UXDS name | Notes |
 |--------|-----------|-------|
-| `ButtonPrimary` | `component.input.button` | Token-backed primary CTA + Make hover/active lift (`button-primary.css`) |
+| `ButtonPrimary` | `component.input.button` | Token-backed primary CTA + Legacy hover/active lift (`button-primary.css`) |
 | `SearchField` | `component.input.field` | Pill search/text field — label/hint, icon `start`\|`end`, single clear (`search-field.css`) |
 | `PromoMessageStrip` | `component.promo.message.strip` | Soft mint logo + copy + CTA slot (`promo-message-strip.css`); CTA = kit `TertiaryCta` |
 | `BookAppointmentProgress` | `component.book.appointment.progress` | Shared 3-step booking progress (Steps 1–3) |
@@ -14,4 +14,4 @@ Visual modules mapped to UXDS `component.*` / `module.*` names. Grow by use — 
 
 Pair with behavior kits under `../interactions/`. See [docs/uxds/COMPONENTS.md](../../../docs/uxds/COMPONENTS.md).
 
-Kit CSS stays small and co-imported from `src/styles/index.css` — not a per-screen Make monster sheet.
+Kit CSS stays small and co-imported from `src/styles/index.css` — not a per-screen Legacy monster sheet.

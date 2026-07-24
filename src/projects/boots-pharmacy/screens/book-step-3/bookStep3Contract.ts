@@ -3,11 +3,11 @@ export const BOOK_STEP3_CHILD_INDEX = 3;
 export const BOOK_STEP3_REACT_SCREEN_ID = "book-step-3";
 export const BOOK_STEP3_SCREEN_SELECTOR = `.studio-viewport > div > div:nth-child(${BOOK_STEP3_CHILD_INDEX})`;
 
-/** Demo Advantage Card points (Make Frame218 defaults). */
+/** Demo Advantage Card points (Legacy Frame218 defaults). */
 export const BOOK_STEP3_POINTS_RECEIVED = "450";
 export const BOOK_STEP3_POINTS_TO_SPEND = "1890";
 
-/** Static confirmation contact / payment copy (Make Frame69). */
+/** Static confirmation contact / payment copy (Legacy Frame69). */
 export const BOOK_STEP3_ORDER_PLACED =
   "Thursday, 24th June 2026, 14:23:48 CET";
 export const BOOK_STEP3_CUSTOMER_NAME = "Sarah Jenkins";

@@ -1,16 +1,16 @@
 /** @vitest-environment happy-dom */
 /**
  * Contract: traditional `pdp-book-now` must prefer React PDP host and skip
- * Make-retired Book now — same first-match class as Chat/Home (LESSONS).
+ * Legacy-retired Book now — same first-match class as Chat/Home (LESSONS).
  */
 import { describe, expect, it } from "vitest";
 import { findPdpBookNowBtn } from "../traditional";
 
-describe("findPdpBookNowBtn (Make-retired skip)", () => {
-  it("prefers React host over Make-retired first-match Book now", () => {
+describe("findPdpBookNowBtn (Legacy-retired skip)", () => {
+  it("prefers React host over Legacy-retired first-match Book now", () => {
     const root = document.createElement("div");
     root.innerHTML = `
-      <div data-studio-make-retired="pdp" style="display:none">
+      <div data-studio-legacy-retired="pdp" style="display:none">
         <div data-name="component.input.button">Book now - £150</div>
       </div>
       <div class="studio-react-screen-host">
@@ -24,14 +24,14 @@ describe("findPdpBookNowBtn (Make-retired skip)", () => {
     const btn = findPdpBookNowBtn(root);
     expect(btn).not.toBeNull();
     expect(btn?.getAttribute("data-studio-action")).toBe("pdp-book-now");
-    expect(btn?.closest("[data-studio-make-retired]")).toBeNull();
+    expect(btn?.closest("[data-studio-legacy-retired]")).toBeNull();
     expect(btn?.closest(".studio-react-screen-host")).not.toBeNull();
   });
 
-  it("skips Make-retired and returns null when React host absent", () => {
+  it("skips Legacy-retired and returns null when React host absent", () => {
     const root = document.createElement("div");
     root.innerHTML = `
-      <div data-studio-make-retired="pdp">
+      <div data-studio-legacy-retired="pdp">
         <div data-name="component.input.button">Book now - £150</div>
       </div>
     `;

@@ -13,7 +13,7 @@ This is the engine-level map of what must exist before UX Studio is a real produ
 
 Ship the **control room** first: deep-linkable screens, recordable interactions, clean agent chrome, slim CI, multi-project registry, domain-named surfaces. Concept pages (Boots) are the rabbit; they do not define the product ceiling.
 
-**Boots erase-Make program (Director lock):** migration order is **PLP → PDP → Site Pilot (`screenId=site-pilot`) → Chat → History/Details**, then **delete Book Step 1–3 Make children**. PLP, PDP, Site Pilot, and Chat are landed; current state and blockers live only on [NEXT_STEPS.md](./NEXT_STEPS.md). Page DONE = React-mounted **and** Make child retired from view with wire gates; prefer delete when safe, else `data-studio-make-retired` + no LEGACY growth — document honest residual.
+**Boots erase-Legacy program (Director lock):** migration order is **PLP → PDP → Site Pilot (`screenId=site-pilot`) → Chat → History/Details**, then **delete Book Step 1–3 Legacy children**. PLP, PDP, Site Pilot, and Chat are landed; current state and blockers live only on [NEXT_STEPS.md](./NEXT_STEPS.md). Page DONE = React-mounted **and** Legacy child retired from view with wire gates; prefer delete when safe, else `data-studio-legacy-retired` + no LEGACY growth — document honest residual.
 
 ---
 
@@ -23,7 +23,7 @@ Ship the **control room** first: deep-linkable screens, recordable interactions,
 
 | Work | Why | Status |
 |------|-----|--------|
-| **Appointment History + Details** | Next open erase-Make page pair after Chat | **READY** — sequence/proof status on board |
+| **Appointment History + Details** | Next open erase-Legacy page pair after Chat | **READY** — sequence/proof status on board |
 | **Traditional CJM smoothness** | Remove the three recorded camera scroll reversals | **OPEN** — acceptance evidence on board |
 | Versioning habit | notes + consider patch on named demos | Habit — every ship |
 | Post-agent clean slate | Sticky Choose Pharmacy after MCP sitrep/reload rage | **LANDED** |
@@ -34,12 +34,12 @@ Ship the **control room** first: deep-linkable screens, recordable interactions,
 
 | Work | Why |
 |------|-----|
-| **Delete Book 1–3 Make children** | Only after History/Details Final Pass + CJM green |
-| LEGACY retirement by screen | No LEGACY growth; shrink `globals-screens` + Make wire as React pages land |
+| **Delete Book 1–3 Legacy children** | Only after History/Details Final Pass + CJM green |
+| LEGACY retirement by screen | No LEGACY growth; shrink `globals-screens` + Legacy wire as React pages land |
 | Concept `.proto-*` class debt | Boots wire/footer/chat/avail cards still `.proto-*` in LEGACY — retire with page migrate |
 | Engine monster splits | `App.tsx` / `useJourneyPlayback.ts` — extract by domain when next touched |
 | UXDS extract-on-second-use | No speculative catalog |
-| Residual Make-only hex tokens | Only when bridge token exists |
+| Residual Legacy-only hex tokens | Only when bridge token exists |
 
 ### LATER
 
@@ -79,7 +79,7 @@ Shared kits in `src/uxds/interactions/`. Dead CTAs forbidden. Fake data OK.
 | Window APIs | Prefer `__studio*`; keep `__proto*` aliases |
 | Beat JSON | `protoTab` stays until beat-schema migration |
 | Storage / events | `studio-nav:` / `studio-hub:` / `studio-*-sync` with legacy read |
-| Concept LEGACY classes | `.proto-*` in Make dumps OK until screen retirement |
+| Concept LEGACY classes | `.proto-*` in Legacy dumps OK until screen retirement |
 
 ### 5. Multi-project — STRUCTURAL
 
@@ -115,13 +115,13 @@ Local notes + CHANGELOG. Release CI later. Version chip must match `package.json
 
 Documented handshake ([X_SUITE_INTEGRATION.md](./X_SUITE_INTEGRATION.md)). Automated importer later. **Now:** when PO shares an X-Suite persona/CJM export, agent analyzes → builds/reuses project pages (UXDS + Studio templates + `data-studio-*` names) → **RECs a new CJM** in Studio. Do not build a second studio inside Summarizer. Ask PO for coarse concept / UXDS page prototype references before new pages.
 
-### 13. Erase-Make (Boots rabbit) — PROGRAM
+### 13. Erase-Legacy (Boots rabbit) — PROGRAM
 
 | Gate | Rule |
 |------|------|
-| DONE | React mount + Make retired from view + wire gates + no LEGACY growth + honest residual |
-| Retire mode | Delete Make child when safe; else `data-studio-make-retired` |
-| Order | **PLP → PDP → Site Pilot → Chat → History/Details → delete Book 1–3 Make** |
+| DONE | React mount + Legacy retired from view + wire gates + no LEGACY growth + honest residual |
+| Retire mode | Delete Legacy child when safe; else `data-studio-legacy-retired` |
+| Order | **PLP → PDP → Site Pilot → Chat → History/Details → delete Book 1–3 Legacy** |
 | Audit | Strict interface audit under `docs/projects/boots-pharmacy/audits/` before PO |
 
 ---
@@ -141,7 +141,7 @@ Documented handshake ([X_SUITE_INTEGRATION.md](./X_SUITE_INTEGRATION.md)). Autom
 | Subagent “done” | Parent verifies §6–§7 |
 | `proto` identity drift | No new `.proto-*` / `data-proto-*`; hygiene + naming rules |
 | Monster / micro-file extremes | Hygiene ratchet + domain cohesion |
-| Make residual forgotten | Honest residual in brief/audit; delete at sequence end |
+| Legacy residual forgotten | Honest residual in brief/audit; delete at sequence end |
 
 ---
 
@@ -152,7 +152,7 @@ Documented handshake ([X_SUITE_INTEGRATION.md](./X_SUITE_INTEGRATION.md)). Autom
 3. Domain CSS/attrs + hygiene — landed  
 4. Version chip + agent felony gate — landed  
 5. Recording compile→journeys vertical — landed  
-6. **Erase-Make: PLP → PDP → Site Pilot → Chat landed; History/Details next → delete Book Make children**  
+6. **Erase-Legacy: PLP → PDP → Site Pilot → Chat landed; History/Details next → delete Book Legacy children**  
 7. LEGACY shrink by screen + UXDS extract-on-second-use  
 8. Second project rabbit  
 9. Release CI + broader CSS contracts  

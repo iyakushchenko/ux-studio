@@ -29,16 +29,16 @@
 
 | Id | Stamp | Evidence |
 |----|-------|----------|
-| A1–A3 | **PASS** | Uma densify card/info/CTA/title match Make live |
+| A1–A3 | **PASS** | Uma densify card/info/CTA/title match Legacy live |
 | B1–B4 | **PASS** | 1440/64/1312 · nav · summary/buyer bands |
 | C1–C3 | **PASS** | Edit/Cancel icon+text nowrap |
 | D1–D5 | **PASS** | Edit/Cancel under-match (no invent); crumb + Discuss `.uxds-link`; SearchField N/A |
 | E1–E3 | **PASS** | History→Details entry · crumb→React History · terminal CTA hide |
 | F1–F3 | **PASS** | Quiet icon CTAs; no View Details on page |
-| G7 | **PASS** | React host + Make parked |
+| G7 | **PASS** | React host + Legacy parked |
 | G9 | **PASS** | URL `screen=appointment-details` |
 | H1–H3 | **PASS** | densify gated; no LEGACY page CSS |
-| J1 / J4 | **N/A** | Make LE none — honest |
+| J1 / J4 | **N/A** | Legacy LE none — honest |
 | J2–J3 | **PASS** | DS + densify rhythm |
 | J5–J6 | **PASS** | Quinn 10/10 · overlay-arm |
 
@@ -47,7 +47,7 @@
 ## Honest residual
 
 - Vaccinations header-only (no invent accordion body).
-- Buyer/payment static Make chrome (wire unbound).
+- Buyer/payment static Legacy chrome (wire unbound).
 - Hire Shipping omitted (under-match).
 - Account chrome composed from History — extract shared kit residual.
 

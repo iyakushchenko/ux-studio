@@ -43,7 +43,7 @@
 | Step | Result | Detail |
 |------|--------|--------|
 | overlay-arm | **PASS** | BR panel visible |
-| pdp-host | **PASS** | React host + make-retired |
+| pdp-host | **PASS** | React host + legacy-retired |
 | pdp-landmarks | **PASS** | `header` + `main` + BEM `.pdp` |
 | pdp-advantage | **PASS** | Collect 3 points… |
 | pdp-no-loader | **PASS** | no invented spinner / Updating… |

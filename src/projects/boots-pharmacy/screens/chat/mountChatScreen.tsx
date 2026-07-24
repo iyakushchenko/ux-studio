@@ -8,12 +8,12 @@ import {
   CHAT_SCREEN_SELECTOR,
   isChatReactMounted,
 } from "./chatContract";
-import { retireMakeUnderPage } from "../retireMakeUnderPage";
+import { retireLegacyUnderPage } from "../retireLegacyUnderPage";
 
 export { CHAT_REACT_MOUNT_ENABLED, isChatReactMounted };
 
 const HOST_CLASS = "studio-react-screen-host";
-/** Keep Studio chrome mounts; retire every Make Frame child under Chat. */
+/** Keep Studio chrome mounts; retire every Legacy Frame child under Chat. */
 const KEEP_VISIBLE = new Set([HOST_CLASS, "proto-footer-mount", "proto-header-mount"]);
 
 let root: Root | null = null;
@@ -48,12 +48,12 @@ function ensureHost(page: HTMLElement): HTMLElement {
 }
 
 /**
- * Erase-Make Phase E (board #7c tail / substrate replacement): `ProjectPageShell`
- * columns start empty — there is no Frame219-sourced Make content left to
+ * Erase-Legacy Phase E (board #7c tail / substrate replacement): `ProjectPageShell`
+ * columns start empty — there is no Frame219-sourced Legacy content left to
  * park-and-restore. Retire permanently, matching the Book Step 1-3 precedent.
  */
 function hideMakeChrome(page: HTMLElement): void {
-  retireMakeUnderPage(page, CHAT_REACT_SCREEN_ID, {
+  retireLegacyUnderPage(page, CHAT_REACT_SCREEN_ID, {
     keepClassNames: KEEP_VISIBLE,
     permanent: true,
   });
@@ -65,7 +65,7 @@ export function mountChatScreen(props: ChatScreenProps): void {
   if (!page) return;
 
   hideMakeChrome(page);
-  // Retire Make fixed-fade composer dock — React owns `.chat__composer-dock`.
+  // Retire Legacy fixed-fade composer dock — React owns `.chat__composer-dock`.
   page.querySelectorAll(".studio-chat-composer-portal-host").forEach((el) => {
     el.remove();
   });

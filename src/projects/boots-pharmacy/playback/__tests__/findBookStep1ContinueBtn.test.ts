@@ -1,16 +1,16 @@
 /** @vitest-environment happy-dom */
 /**
  * Contract: traditional book-location-pick must prefer React Continue and skip
- * Make-retired ghosts — same first-match class as PDP Book now (LESSONS).
+ * Legacy-retired ghosts — same first-match class as PDP Book now (LESSONS).
  */
 import { describe, expect, it } from "vitest";
 import { findBookStep1ContinueBtn } from "../traditional";
 
-describe("findBookStep1ContinueBtn (Make-retired skip)", () => {
-  it("prefers React host over Make-retired Continue", () => {
+describe("findBookStep1ContinueBtn (Legacy-retired skip)", () => {
+  it("prefers React host over Legacy-retired Continue", () => {
     const root = document.createElement("div");
     root.innerHTML = `
-      <div data-studio-make-retired="book-step-1" style="display:none">
+      <div data-studio-legacy-retired="book-step-1" style="display:none">
         <div data-name="component.input.button">Continue</div>
         <div class="proto-chosen-slot"></div>
       </div>
@@ -27,13 +27,13 @@ describe("findBookStep1ContinueBtn (Make-retired skip)", () => {
     expect(btn?.getAttribute("data-studio-action")).toBe(
       "book-step-1-continue"
     );
-    expect(btn?.closest("[data-studio-make-retired]")).toBeNull();
+    expect(btn?.closest("[data-studio-legacy-retired]")).toBeNull();
   });
 
-  it("skips Make-retired and returns null when React Continue absent", () => {
+  it("skips Legacy-retired and returns null when React Continue absent", () => {
     const root = document.createElement("div");
     root.innerHTML = `
-      <div data-studio-make-retired="book-step-1">
+      <div data-studio-legacy-retired="book-step-1">
         <div data-name="component.input.button">Continue</div>
       </div>
     `;

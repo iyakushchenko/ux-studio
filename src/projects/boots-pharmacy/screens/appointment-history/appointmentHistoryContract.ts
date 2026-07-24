@@ -6,7 +6,7 @@ export const APPOINTMENT_HISTORY_REACT_SCREEN_ID = "appointment-history";
 
 export const APPOINTMENT_HISTORY_SCREEN_SELECTOR = `.studio-viewport > div > div:nth-child(${APPOINTMENT_HISTORY_CHILD_INDEX})`;
 
-/** Left-nav labels — Make `module.ma.navigation` (active = Appointment history). */
+/** Left-nav labels — Legacy `module.ma.navigation` (active = Appointment history). */
 export const APPOINTMENT_HISTORY_NAV_ITEMS = [
   "My Account",
   "My invoices",
@@ -36,7 +36,7 @@ export const APPOINTMENT_HISTORY_LOAD_MORE = "Load more";
 export const APPOINTMENT_HISTORY_PROFILE_HELLO = "Hello";
 export const APPOINTMENT_HISTORY_PROFILE_NAME = "Sarah";
 
-/** Card info-row labels (Make hire/order chrome rewritten by wire). */
+/** Card info-row labels (Legacy hire/order chrome rewritten by wire). */
 export const APPOINTMENT_HISTORY_ROW_LABELS = [
   "Appointment number",
   "Status",

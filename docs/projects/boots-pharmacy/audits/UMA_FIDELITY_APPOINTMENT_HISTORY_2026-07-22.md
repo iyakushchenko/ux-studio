@@ -1,14 +1,14 @@
 # Uma fidelity stamp — Appointment History
 
-**Surface:** Boots Pharmacy Appointment History (`screenId: appointment-history`, Frame child **2**, Make `Body1`)  
+**Surface:** Boots Pharmacy Appointment History (`screenId: appointment-history`, Frame child **2**, Legacy `Body1`)  
 **Date:** 2026-07-22  
 **Owner:** Uma (UI/UX)  
-**Status:** **PROVEN** — Uma FAIL blockers cleared 2026-07-22 (re-measure + Make densify gate)  
+**Status:** **PROVEN** — Uma FAIL blockers cleared 2026-07-22 (re-measure + Legacy densify gate)  
 **React target:** `screens/appointment-history/*` — **live** at `http://localhost:5173/?project=boots-pharmacy&screen=appointment-history`  
-**Make truth:** `frame/index.tsx` `Body1` · `Left` cards `boots-pharmacy.component.ma.acc.overview.recent.order` (`p-[32px]` · `gap-[56px]` · `w-[976px]`) · `Frame80` info (`p-[32px]` · border `#c3c3c3`) · `CTAs` `gap-[32px]` · wire `syncAppointmentHistory` / status tones · `data/appointments.ts` `APPOINTMENTS`  
-**Register:** [APPOINTMENT_HISTORY_MAKE_PARITY_REGISTER.md](../features/APPOINTMENT_HISTORY_MAKE_PARITY_REGISTER.md) · brief [APPOINTMENT_HISTORY_REACT.md](../features/APPOINTMENT_HISTORY_REACT.md)  
+**Legacy truth:** `frame/index.tsx` `Body1` · `Left` cards `boots-pharmacy.component.ma.acc.overview.recent.order` (`p-[32px]` · `gap-[56px]` · `w-[976px]`) · `Frame80` info (`p-[32px]` · border `#c3c3c3`) · `CTAs` `gap-[32px]` · wire `syncAppointmentHistory` / status tones · `data/appointments.ts` `APPOINTMENTS`  
+**Register:** [APPOINTMENT_HISTORY_LEGACY_PARITY_REGISTER.md](../features/APPOINTMENT_HISTORY_LEGACY_PARITY_REGISTER.md) · brief [APPOINTMENT_HISTORY_REACT.md](../features/APPOINTMENT_HISTORY_REACT.md)  
 **Checklist:** [../../../product/UMA_FIDELITY_NOTES.md](../../../product/UMA_FIDELITY_NOTES.md) · [VISUAL_FIDELITY.md](../../../product/VISUAL_FIDELITY.md) · [FE_UI_UX_AUDIT.md](../../../product/FE_UI_UX_AUDIT.md)  
-**Quinn MCP (cited):** [QUINN_APPOINTMENT_HISTORY_PROBE_2026-07-22.md](./QUINN_APPOINTMENT_HISTORY_PROBE_2026-07-22.md) — **8/8 PASS** including View Details hover + click → Make `appointment-details` + restore (re-proved after fidelity fix)
+**Quinn MCP (cited):** [QUINN_APPOINTMENT_HISTORY_PROBE_2026-07-22.md](./QUINN_APPOINTMENT_HISTORY_PROBE_2026-07-22.md) — **8/8 PASS** including View Details hover + click → Legacy `appointment-details` + restore (re-proved after fidelity fix)
 
 **Not claimed:** Appointment Details React migration (now unblocked by History HARD-GREEN)
 
@@ -21,7 +21,7 @@
 | **Overall** | **PROVEN** |
 | **§0a typical DS / pointer matrix** | **PASS** — View Details commerce + Ask/Discuss `.uxds-link`; Edit/Cancel under-match (no invent hover) |
 | **§0b section vertical rhythm** | **N/A** (not PDP/RTB purchase stack) — card internal rhythm audited under L11 |
-| **loading / empty / updating** | **N/A** — Make LE1–LE3 honest N/A; React invents none |
+| **loading / empty / updating** | **N/A** — Legacy LE1–LE3 honest N/A; React invents none |
 | **checkbox / radio hover** | **N/A** |
 | **SearchField matrix** | **N/A** |
 | **PO green-light allowed?** | **Yes** |
@@ -35,9 +35,9 @@ Prior FAIL (Uma History fidelity audit `d42a5ce0-22e6-47e6-9b9a-5f17104292ce`): 
 
 | Fix | Evidence |
 |-----|----------|
-| Screen CSS Make pad/gap/title/info/CTA | `appointment-history.css` |
+| Screen CSS Legacy pad/gap/title/info/CTA | `appointment-history.css` |
 | Removed Cancel invent hover | no `#c96b6b` rule |
-| Make densify `!important` gated off React History | `globals-chrome.css` `:not([data-studio-react-screen])` on child-2 card rules |
+| Legacy densify `!important` gated off React History | `globals-chrome.css` `:not([data-studio-react-screen])` on child-2 card rules |
 | **Re-measure MCP** | card pad **32** · gap **56** · title **25/32** · info pad **32** · border `rgb(195,195,195)` · CTA gap **32** · cancelHoverInvent **false** |
 | Quinn re-prove | **8/8 PASS** after fix |
 
@@ -48,21 +48,21 @@ Prior FAIL (Uma History fidelity audit `d42a5ce0-22e6-47e6-9b9a-5f17104292ce`): 
 - **Host:** Chrome DevTools MCP `list_pages` → selected existing `localhost:5173` Appointment History tab (no `new_page`).
 - **Screenshot:** viewport React History (crumbs · nav · title · 4 cards · View Details / Edit / Cancel · footer).
 - **Measured React card shell (post-fix):** `padding: 32px` · internal `gap: 56px` · list card-to-card `24px` · CTA `gap: 32px` · info `padding: 32px` · info border `1px solid #c3c3c3` (`rgb(195,195,195)`).
-- **Make intent (Frame):** card `p-[32px]` · `gap-[56px]` · list `gap-[24px]` · CTA `gap-[32px]` · Frame80 `p-[32px]` · border `#c3c3c3`.
-- **Densify gate:** Make History `!important` densify in `globals-chrome.css` skipped when child-2 has `data-studio-react-screen` (Details child 1 still densified).
-- **Status tones (computed):** active `#5b8fc9` · completed `#4a9b72` · cancelled `#d4a03a` — match Make wire `proto-appointment-status--*` in `globals-chrome.css`.
+- **Legacy intent (Frame):** card `p-[32px]` · `gap-[56px]` · list `gap-[24px]` · CTA `gap-[32px]` · Frame80 `p-[32px]` · border `#c3c3c3`.
+- **Densify gate:** Legacy History `!important` densify in `globals-chrome.css` skipped when child-2 has `data-studio-react-screen` (Details child 1 still densified).
+- **Status tones (computed):** active `#5b8fc9` · completed `#4a9b72` · cancelled `#d4a03a` — match Legacy wire `proto-appointment-status--*` in `globals-chrome.css`.
 - **CTA visibility D1–D4:** confirmed / confirmed → View+Edit+Cancel; Completed / Cancelled → View only; Cancelled `#8762341` → refund + cancellation reason rows present.
 - **View Details hover (MCP):** rest `#012169` → hover `#01318f` + shadow + `translateY(-1px)` · class `uxds-btn-primary uxds-btn-primary--commerce` · theme commerce tokens.
 - **Ask Site Pilot hover:** rest navy → hover `#01318f` + underline (`.uxds-link`).
 - **Discuss with Site Pilot:** `.uxds-link` present on refund row; same kit hover rules as Ask.
-- **Edit hover:** pointer on control; **no** visual change (Make wire icon-text also has no hover CSS — under-match OK).
-- **Quinn:** probe **8/8** View Details → Make Details handoff + restore ([QUINN_APPOINTMENT_HISTORY_PROBE_2026-07-22.md](./QUINN_APPOINTMENT_HISTORY_PROBE_2026-07-22.md)).
+- **Edit hover:** pointer on control; **no** visual change (Legacy wire icon-text also has no hover CSS — under-match OK).
+- **Quinn:** probe **8/8** View Details → Legacy Details handoff + restore ([QUINN_APPOINTMENT_HISTORY_PROBE_2026-07-22.md](./QUINN_APPOINTMENT_HISTORY_PROBE_2026-07-22.md)).
 
 ---
 
-## Layout bands — Make `Body1` inventory
+## Layout bands — Legacy `Body1` inventory
 
-| # | Make band / component | Uma stamp | Evidence |
+| # | Legacy band / component | Uma stamp | Evidence |
 |---|------------------------|-----------|----------|
 | L1 | 1440 / 64 / 1312 shell | **PASS** | shell max-width 1440 · pad 64 · inner 1312 |
 | L2 | Engine header | **N/A** | engine |
@@ -89,7 +89,7 @@ Prior FAIL (Uma History fidelity audit `d42a5ce0-22e6-47e6-9b9a-5f17104292ce`): 
 
 | # | Stamp | Notes |
 |---|-------|-------|
-| LE1–LE3 | **N/A** | Make has no page/list loader / empty / updating — React invents none |
+| LE1–LE3 | **N/A** | Legacy has no page/list loader / empty / updating — React invents none |
 | Honesty | **PASS** | No blank+“Updating…” / invent spinner |
 
 ---
@@ -99,7 +99,7 @@ Prior FAIL (Uma History fidelity audit `d42a5ce0-22e6-47e6-9b9a-5f17104292ce`): 
 | Control | Status | Evidence |
 |---------|--------|----------|
 | View Details (`ButtonPrimary` commerce) | **PASS** | MCP hover `#012169` → `#01318f` + shadow; Quinn hover step PASS |
-| Edit (icon+text) | **PASS (under-match)** | Rest OK; no hover CSS — matches Make wire (no hover rule) |
+| Edit (icon+text) | **PASS (under-match)** | Rest OK; no hover CSS — matches Legacy wire (no hover rule) |
 | Cancel (icon+text) | **PASS (under-match)** | Rest OK; **no** invent hover (removed `#c96b6b`) |
 | Ask Site Pilot (`.uxds-link`) | **PASS** | MCP hover underline + `#01318f` |
 | Discuss with Site Pilot (`.uxds-link`) | **PASS** | same kit; present on refund row |
@@ -113,7 +113,7 @@ Prior FAIL (Uma History fidelity audit `d42a5ce0-22e6-47e6-9b9a-5f17104292ce`): 
 
 ## Design-delta checklist (VISUAL_FIDELITY §1.2) — post-fix
 
-| Element | Make | React (re-measure) | Status |
+| Element | Legacy | React (re-measure) | Status |
 |---------|------|--------------------|--------|
 | Card padding | `p-[32px]` | **32px** | **match** |
 | Card internal gap | `gap-[56px]` | **56px** | **match** |
@@ -136,9 +136,9 @@ Prior FAIL (Uma History fidelity audit `d42a5ce0-22e6-47e6-9b9a-5f17104292ce`): 
 - Show All / Load more **non-interactive** (register P1 under-match).
 - Account nav item routing not wired (P1 visual).
 - Breadcrumb Home / Account Overview are styled spans (affordance only) — not full navigation.
-- Card max-width fluid in content column vs Make fixed `976px` at full frame — acceptable under 1312 shell when sidebar present.
-- Make densify still applies to **Details** child 1 (Make-only this wave).
-- **Details React** — closed; View Details → **Make** `appointment-details` only.
+- Card max-width fluid in content column vs Legacy fixed `976px` at full frame — acceptable under 1312 shell when sidebar present.
+- Legacy densify still applies to **Details** child 1 (Legacy-only this wave).
+- **Details React** — closed; View Details → **Legacy** `appointment-details` only.
 
 ---
 
@@ -146,7 +146,7 @@ Prior FAIL (Uma History fidelity audit `d42a5ce0-22e6-47e6-9b9a-5f17104292ce`): 
 
 | Line | Stamp |
 |------|-------|
-| `loading states` | **N/A** (honest — Make has none) |
+| `loading states` | **N/A** (honest — Legacy has none) |
 | `checkbox/radio hover` | **N/A** |
 | `typical DS checks` | **PASS** |
 | `fidelity checklist` | **PASS / PROVEN** |
@@ -158,20 +158,20 @@ Prior FAIL (Uma History fidelity audit `d42a5ce0-22e6-47e6-9b9a-5f17104292ce`): 
 
 ```
 Uma (UI/UX): fidelity checklist — PASS / PROVEN (card 32/56; info 32/#c3c3c3; CTA 32; title 25/32; Cancel invent removed; densify gated)
-Uma (UI/UX): loading states — N/A (Make LE1–LE3; no invent)
+Uma (UI/UX): loading states — N/A (Legacy LE1–LE3; no invent)
 Uma (UI/UX): checkbox/radio hover — N/A
 Uma (UI/UX): typical DS checks (state matrix) — PASS
-Uma (UI/UX): Quinn MCP cite — 8/8 PASS View Details → Make details + restore (re-proved after fidelity fix)
+Uma (UI/UX): Quinn MCP cite — 8/8 PASS View Details → Legacy details + restore (re-proved after fidelity fix)
 PAGE FINAL PASS — appointment-history — HARD-GREEN
 ```
 
-**Knowledge used:** TEAM_KNOWLEDGE Uma · UMA_FIDELITY_NOTES §0/§0a · VISUAL_FIDELITY §1.2 · no invent vs Make · Make densify vs React host lesson · Quinn 8/8 probe cite.
+**Knowledge used:** TEAM_KNOWLEDGE Uma · UMA_FIDELITY_NOTES §0/§0a · VISUAL_FIDELITY §1.2 · no invent vs Legacy · Legacy densify vs React host lesson · Quinn 8/8 probe cite.
 
 ---
 
 ## Related
 
-- [APPOINTMENT_HISTORY_MAKE_PARITY_REGISTER.md](../features/APPOINTMENT_HISTORY_MAKE_PARITY_REGISTER.md)  
+- [APPOINTMENT_HISTORY_LEGACY_PARITY_REGISTER.md](../features/APPOINTMENT_HISTORY_LEGACY_PARITY_REGISTER.md)  
 - [APPOINTMENT_HISTORY_REACT.md](../features/APPOINTMENT_HISTORY_REACT.md)  
 - [QUINN_APPOINTMENT_HISTORY_PROBE_2026-07-22.md](./QUINN_APPOINTMENT_HISTORY_PROBE_2026-07-22.md)  
 - [UMA_FIDELITY_NOTES.md](../../../product/UMA_FIDELITY_NOTES.md)

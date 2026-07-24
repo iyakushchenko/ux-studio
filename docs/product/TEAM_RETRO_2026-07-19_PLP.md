@@ -11,7 +11,7 @@ Format per callsign: **Pain** / **Worked** / **Keep** (2–4 bullets each). Dial
 
 ## Opening — Arch (Director)
 
-**Arch:** We closed PLP hard-green after too many rage loops. Themes on the table: inventing UX, missing Make logic, false PROVEN, overlay/URL, DS hover, parallel agents, knowledge use, final-pass gate. Speak for your hat — what hurt, what saved us, what we keep.
+**Arch:** We closed PLP hard-green after too many rage loops. Themes on the table: inventing UX, missing Legacy logic, false PROVEN, overlay/URL, DS hover, parallel agents, knowledge use, final-pass gate. Speak for your hat — what hurt, what saved us, what we keep.
 
 ---
 
@@ -37,19 +37,19 @@ Format per callsign: **Pain** / **Worked** / **Keep** (2–4 bullets each). Dial
 ## Bea (BA)
 
 **Pain**
-- Early register treated loading/empty/updating as copy polish — P0 rows for Make spinner/overlay mechanism were missing or marked Fixed without mechanism notes.
+- Early register treated loading/empty/updating as copy polish — P0 rows for Legacy spinner/overlay mechanism were missing or marked Fixed without mechanism notes.
 - Advantage bar / filter wire logic (View all, counters, 10-cap) were not inventoried as first-class bands before Finn coded.
 - “Residual OK” language hid whole missing components until PO rage.
 
 **Worked**
-- Band-by-band [PLP_MAKE_PARITY_REGISTER.md](../projects/boots-pharmacy/features/PLP_MAKE_PARITY_REGISTER.md) once forced complete — gave Uma/Quinn a shared truth table.
-- Loading / empty / updating as mandatory P0 rows when Make has them — stopped “text-only Updating results…” ships.
+- Band-by-band [PLP_LEGACY_PARITY_REGISTER.md](../projects/boots-pharmacy/features/PLP_LEGACY_PARITY_REGISTER.md) once forced complete — gave Uma/Quinn a shared truth table.
+- Loading / empty / updating as mandatory P0 rows when Legacy has them — stopped “text-only Updating results…” ships.
 - No next-page brief until previous Final Pass hard-green — protects Bea from writing PDP acceptance on a soft PLP.
 
 **Keep**
-- Register **every** Make band **before** Finn codes — including loader mechanism + layout notes, not labels alone.
+- Register **every** Legacy band **before** Finn codes — including loader mechanism + layout notes, not labels alone.
 - Unchecked P0 = Bea FAIL on team check; Quinn cannot PASS with open P0s.
-- Wire scripts / Make behavior (View all, counters, hide-tiles) listed as acceptance, not “nice FE detail.”
+- Wire scripts / Legacy behavior (View all, counters, hide-tiles) listed as acceptance, not “nice FE detail.”
 
 ---
 
@@ -57,16 +57,16 @@ Format per callsign: **Pain** / **Worked** / **Keep** (2–4 bullets each). Dial
 
 **Pain**
 - Rebuilt filter search / hearts / loader from intuition — invented fuchsia empty-heart hover, duplicate loader copy, left-side magnifier, double clear X.
-- LEGACY Make hover selectors (`[aria-hidden]`) painted a box on UXDS search icons — port without kit awareness.
+- LEGACY hover selectors (`[aria-hidden]`) painted a box on UXDS search icons — port without kit awareness.
 - Hybrid/mount and landmark gaps (header+main, BEM=`screenId`) showed up late under Final Pass, not at first mount.
 
 **Worked**
 - UXDS kits + ratchets (`check:parity-ratchets`) turned typical misses into CI FAIL instead of chat regret.
-- Height-locked listing + one spinner label + count-hide-on-load matched Make once we stopped “improving” it.
+- Height-locked listing + one spinner label + count-hide-on-load matched Legacy once we stopped “improving” it.
 - Co-owning `check:page-final-pass` with Uma made structure/naming a build gate, not a docs afterthought.
 
 **Keep**
-- Prefer under-match Make over inventing hover/loader chrome.
+- Prefer under-match Legacy over inventing hover/loader chrome.
 - Modal ship checklist: `STUDIO_MODAL` + `data-studio-modal` + **URL `modal` id in [URL.md](../shell/URL.md)** before any dialog lands.
 - New typical fail class → ask Arch/Ben for a ratchet **same ship**.
 
@@ -75,9 +75,9 @@ Format per callsign: **Pain** / **Worked** / **Keep** (2–4 bullets each). Dial
 ## Uma (UI/UX)
 
 **Pain**
-- Side-by-side Make vs React skipped Nazi-hover on SearchField / checkbox / empty heart — rest-state screenshots looked “fine.”
+- Side-by-side Legacy vs React skipped Nazi-hover on SearchField / checkbox / empty heart — rest-state screenshots looked “fine.”
 - Signed or inherited PROVEN while typical DS state matrix (hover/focus/active/disabled) was incomplete.
-- Invented attention chrome (fuchsia, borders, separators) passed visual skim until PO put Make next to React.
+- Invented attention chrome (fuchsia, borders, separators) passed visual skim until PO put Legacy next to React.
 
 **Worked**
 - Explicit team-check lines: `loading states`, `checkbox/radio hover`, `typical DS checks` — forced the miss classes into the open.
@@ -85,8 +85,8 @@ Format per callsign: **Pain** / **Worked** / **Keep** (2–4 bullets each). Dial
 - Final Pass landmarks + BEM=`screenId` stamp — page structure stopped being optional polish.
 
 **Keep**
-- No invent: if Make doesn’t have it, don’t add it; under-match beats pretty-wrong.
-- Typical DS checks vs **kit + Make** before any screen PROVEN — missing DS hover = FAIL class.
+- No invent: if Legacy doesn’t have it, don’t add it; under-match beats pretty-wrong.
+- Typical DS checks vs **kit + Legacy** before any screen PROVEN — missing DS hover = FAIL class.
 - Co-sign PAGE FINAL PASS checklist with Finn; hard-green before Arch opens the next page.
 
 ---
@@ -132,7 +132,7 @@ Format per callsign: **Pain** / **Worked** / **Keep** (2–4 bullets each). Dial
 ## Pax (PO sim)
 
 **Pain**
-- Rage loops burned PO trust: invent UX, missing Make logic, false PROVEN, flat DS hover — “tests passed” meant nothing.
+- Rage loops burned PO trust: invent UX, missing Legacy logic, false PROVEN, flat DS hover — “tests passed” meant nothing.
 - Board tried to race PDP while PLP still bled fidelity.
 - Knowledge base looked busy but wasn’t changing behavior until Knowledge used became a gate.
 
@@ -142,7 +142,7 @@ Format per callsign: **Pain** / **Worked** / **Keep** (2–4 bullets each). Dial
 - Parallel callsigns + Arch veto — team OS felt like a team, not a lone coder with costumes.
 
 **Keep**
-- Accept bar = Make parity + MCP matrix + Final Pass hard-green — not green Vitest alone.
+- Accept bar = Legacy parity + MCP matrix + Final Pass hard-green — not green Vitest alone.
 - Bump only when Finn/user-visible ships need it; docs/reflex notes = notes+push, no bump.
 - Human PO `+` / `ok` on board only after Arch reports HARD-GREEN honestly.
 
@@ -152,8 +152,8 @@ Format per callsign: **Pain** / **Worked** / **Keep** (2–4 bullets each). Dial
 
 | Theme | Verdict |
 |-------|---------|
-| **Inventing UX** | Forbidden. Under-match Make. Empty-heart fuchsia, invent borders, duplicate loader copy = ship fail. |
-| **Missing Make logic** | Register every band + wire behavior (loader mechanism, View all, counters, count-hide) before Finn codes. |
+| **Inventing UX** | Forbidden. Under-match Legacy. Empty-heart fuchsia, invent borders, duplicate loader copy = ship fail. |
+| **Missing Legacy logic** | Register every band + wire behavior (loader mechanism, View all, counters, count-hide) before Finn codes. |
 | **False PROVEN** | PROVEN without Quinn MCP evidence = invalid. PO dispute → revoke until re-prove. |
 | **Overlay / URL** | Every blocking dialog: guard registry + `data-studio-modal` + URL `modal` id **before** ship. |
 | **DS hover** | Typical DS state matrix mandatory; missing hover = FAIL class; MCP-hover ≥1 SearchField. |
@@ -166,8 +166,8 @@ Format per callsign: **Pain** / **Worked** / **Keep** (2–4 bullets each). Dial
 ## Top keep actions (Arch synthesis — apply on PDP+)
 
 1. **Modal URL registry before any dialog ship** — URL.md + `STUDIO_MODAL` / felonies registry + `data-studio-modal` in the same change.  
-2. **Make register complete (incl. loading mechanism) before Finn codes** — unchecked P0 blocks Quinn PASS.  
-3. **No invent UX** — kit + Make only; under-match; typical DS hover/focus/active/disabled signed by Uma + MCP-proved by Quinn.  
+2. **Legacy register complete (incl. loading mechanism) before Finn codes** — unchecked P0 blocks Quinn PASS.  
+3. **No invent UX** — kit + Legacy only; under-match; typical DS hover/focus/active/disabled signed by Uma + MCP-proved by Quinn.  
 4. **PROVEN requires MCP page-probe evidence** — overlay visible, scroll-into-view, overlay-eyes; Arch rejects chat-only green.  
 5. **HARD-GREEN → micro-retro → next page** — PAGE FINAL PASS gate + Arch Reflex into TEAM_KNOWLEDGE before opening the next migrated screen.
 

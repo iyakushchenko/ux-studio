@@ -23,7 +23,7 @@
 
 ## Out of scope (NEXT)
 
-- Concept LEGACY `.proto-*` in Make wire / footer / chat / avail cards  
+- Concept LEGACY `.proto-*` in Legacy wire / footer / chat / avail cards  
 - Beat field `protoTab`  
 - Engine monster splits (`App.tsx`, `useJourneyPlayback.ts`)
 

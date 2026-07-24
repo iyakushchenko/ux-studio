@@ -1256,18 +1256,18 @@ describe("resolvePlaybackSelectorChain", () => {
     ).toBeNull();
   });
 
-  it("prefers React button over Make div with same data-name (location search)", () => {
+  it("prefers React button over Legacy div with same data-name (location search)", () => {
     document.body.innerHTML = "";
     const chosen = document.createElement("div");
     chosen.setAttribute("data-name", "chosen location");
-    const makeDiv = document.createElement("div");
-    makeDiv.setAttribute("data-name", "component.input.field");
-    makeDiv.textContent = "LocationSearch for City, Postcode…";
+    const legacyDiv = document.createElement("div");
+    legacyDiv.setAttribute("data-name", "component.input.field");
+    legacyDiv.textContent = "LocationSearch for City, Postcode…";
     const reactBtn = document.createElement("button");
     reactBtn.type = "button";
     reactBtn.setAttribute("data-name", "component.input.field");
     reactBtn.textContent = "Search for City, Postcode, Location...";
-    chosen.append(makeDiv, reactBtn);
+    chosen.append(legacyDiv, reactBtn);
     document.body.append(chosen);
 
     const found = resolvePlaybackSelectorChain(

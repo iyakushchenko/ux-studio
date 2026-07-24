@@ -1,5 +1,5 @@
-/* Agentic. Site Pilot. Home — React migration; visual source = Make child 11 (Body10)
- * Atmosphere / mic / send / chip states = Make wire (globals-screens + globals-chrome).
+/* Agentic. Site Pilot. Home — React migration; visual source = Legacy child 11 (Body10)
+ * Atmosphere / mic / send / chip states = Legacy wire (globals-screens + globals-chrome).
  * No invent — under-match beats pretty upgrades.
  */
 
@@ -24,7 +24,7 @@
   min-width: 1200px;
   flex: 1 1 auto;
   min-height: 0;
-  /* Make wire: gradient atmosphere; decorative Figma PNGs hidden (globals-screens) */
+  /* Legacy wire: gradient atmosphere; decorative Figma PNGs hidden (globals-screens) */
   background: linear-gradient(165deg, #c5dde8 0%, #dbebf5 45%, #e8f3f9 100%);
   font-family: "Open Sans", sans-serif;
 }
@@ -42,7 +42,7 @@
   box-sizing: border-box;
 }
 
-/* Make `boots.ai assistant 3` — layered wordmark + mark + outline, 258×54 */
+/* Legacy `boots.ai assistant 3` — layered wordmark + mark + outline, 258×54 */
 .home__logo {
   position: relative;
   width: 258px;
@@ -96,7 +96,7 @@
   text-align: center;
 }
 
-/* Make component.co.order.summary — w640 · p32 · gap32 · r16 · navy lift shadow */
+/* Legacy component.co.order.summary — w640 · p32 · gap32 · r16 · navy lift shadow */
 .home__card {
   display: flex;
   flex-direction: column;

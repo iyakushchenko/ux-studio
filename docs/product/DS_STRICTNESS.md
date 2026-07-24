@@ -11,7 +11,7 @@
 1. **No near-duplicate styles anywhere.** One pattern per role (text link, tertiary icon+text CTA, filter pill active, primary CTA, etc.). Do not invent parallel colors/hover for the “same” control on different screens.
 2. **Proper DS, strict on pages.** Page work uses UXDS components / tokens / kits + the project brand theme only. **No custom one-off CSS** unless absolutely needed.
 3. **Deviations must be registered.** If a page needs something the kit does not cover, add a **named, documented, reusable** DS class/deviation — not an anonymous page hack. Registry: [../uxds/DEVIATIONS.md](../uxds/DEVIATIONS.md).
-4. **Brand theme is optional.** Shared components must look correct on **UXDS baseline** colors when the project theme is off. Theme files only **remap** CSS variables; they must not be the only place raw brand values live for shared chrome.
+4. **Brand theme is optional for a client project, off entirely for UXDS itself.** Shared components must look correct on **UXDS baseline** colors when the project theme is off. Theme files only **remap** CSS variables; they must not be the only place raw brand values live for shared chrome. A page built for the UXDS reference project (not a client brand) gets no theme at all — direct 1:1 UXDS parity is expected instead. See [PROJECT_STYLEGUIDE.md](./PROJECT_STYLEGUIDE.md) § "When theme applies vs when direct UXDS parity is required".
 
 ---
 
@@ -24,8 +24,8 @@ Full map: [CSS_BASE_THEME.md](./CSS_BASE_THEME.md). Import order in `src/styles/
 |-------|------|------|-----------|
 | **BASE** | `src/uxds/**/*.css` | Tokens + shared kits | Project-only hex; engine chrome |
 | **THEME** | `src/projects/<id>/styleguide/theme.css` | Variable remaps under `[data-studio-project]` | Component rules, hover forks, layout |
-| **PANEL** | `src/app/nav/**/*.css` (+ future `src/app/shell/`) | Engine chrome (REC / CJM / cassette) | Boots Make page rules |
-| **LEGACY** | `src/styles/globals*.css` | Quarantined Make monster | **Any NEW React page styles** |
+| **PANEL** | `src/app/nav/**/*.css` (+ future `src/app/shell/`) | Engine chrome (REC / CJM / cassette) | Boots Legacy page rules |
+| **LEGACY** | `src/styles/globals*.css` | Quarantined Legacy monster | **Any NEW React page styles** |
 | **Page CSS** | `src/projects/<id>/screens/**/*.css` | Layout / structure for React screens | Parallel palettes; dumping into LEGACY |
 
 ```
@@ -37,7 +37,7 @@ Shared components / kits + PANEL chrome
         ↓ composed by
 Page screens (structure + layout; no parallel palettes)
         ↓ (unmigrated only)
-LEGACY Make globals — retire screen-by-screen; do not grow for React
+LEGACY globals — retire screen-by-screen; do not grow for React
 ```
 
 ---
@@ -74,7 +74,7 @@ Allowed without a deviation entry:
 
 - Layout (shell 1440/64/1312, flex/grid, sticky mounts)
 - Concept structure that does not redefine a shared control’s color/hover language
-- Temporary Make bridge CSS in LEGACY while a screen is not yet React (retire screen-by-screen — **do not add React page rules to LEGACY**)
+- Temporary Legacy bridge CSS in LEGACY while a screen is not yet React (retire screen-by-screen — **do not add React page rules to LEGACY**)
 - Trivial one-property CSS transitions (hover color/opacity) — **not** UI enter/exit/layout motion
 
 Requires a **registered deviation** ([../uxds/DEVIATIONS.md](../uxds/DEVIATIONS.md)):
@@ -92,7 +92,7 @@ Requires a **registered deviation** ([../uxds/DEVIATIONS.md](../uxds/DEVIATIONS.
 2. Consume `var(--uxds-…)` in shared CSS; put brand hex only in `theme.css` (or UXDS baseline).  
 3. If inventing a class: name it, document it, register if it is a deviation.  
 4. Spot-check with theme off (no `data-studio-project` / theme import) — baselines still work.  
-5. Do not big-bang Make `globals-*.css`; migrate surfaces as they are touched.  
+5. Do not big-bang Legacy `globals-*.css`; migrate surfaces as they are touched.  
 6. **Never grow LEGACY for new React work** — use BASE / THEME / PANEL / page CSS ([CSS_BASE_THEME.md](./CSS_BASE_THEME.md)).
 
 ---

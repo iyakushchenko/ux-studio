@@ -1,20 +1,20 @@
 /**
- * Retire Make Frame chrome when a React screen host mounts.
+ * Retire Legacy Frame chrome when a React screen host mounts.
  *
  * HARD: detach from the document (not only display:none) so querySelector /
- * REC play cannot hit ghost Make nodes with the same data-name as React.
+ * REC play cannot hit ghost Legacy nodes with the same data-name as React.
  * Restore on unmount for tab flip / Strict Mode.
  */
 
-export type RetireMakeOptions = {
+export type RetireLegacyOptions = {
   /** Book-step style — only these `:scope > …` selectors. */
   hideSelectors?: readonly string[];
   /** PLP/PDP/home style — retire all direct children except these classes. */
   keepClassNames?: ReadonlySet<string>;
   /**
-   * Erase-Make DONE screens only: delete Make nodes outright instead of
-   * parking for restore. No `restoreMakeUnderPage` call can bring them back
-   * — use once a screen has no Make fallback path left (board NEXT_STEPS #8).
+   * Erase-Legacy DONE screens only: delete Legacy nodes outright instead of
+   * parking for restore. No `restoreLegacyUnderPage` call can bring them back
+   * — use once a screen has no Legacy fallback path left (board NEXT_STEPS #8).
    */
   permanent?: boolean;
 };
@@ -45,7 +45,7 @@ function shouldKeepChild(
 function collectRetireTargets(
   page: HTMLElement,
   screenId: string,
-  options: RetireMakeOptions
+  options: RetireLegacyOptions
 ): HTMLElement[] {
   const out: HTMLElement[] = [];
   if (options.hideSelectors?.length) {
@@ -66,20 +66,20 @@ function collectRetireTargets(
 }
 
 /**
- * Detach Make nodes under `page` and stamp `data-studio-make-retired`.
+ * Detach Legacy nodes under `page` and stamp `data-studio-legacy-retired`.
  * Idempotent for the same screenId (re-parks any still-attached leftovers).
  *
  * `permanent: true` deletes outright — no park entry, no restore possible.
  */
-export function retireMakeUnderPage(
+export function retireLegacyUnderPage(
   page: HTMLElement,
   screenId: string,
-  options: RetireMakeOptions = {}
+  options: RetireLegacyOptions = {}
 ): void {
   const targets = collectRetireTargets(page, screenId, options);
   if (options.permanent) {
     for (const el of targets) {
-      el.dataset.studioMakeRetired = screenId;
+      el.dataset.studioLegacyRetired = screenId;
       el.remove();
     }
     permanentlyRetiredScreens.add(screenId);
@@ -95,7 +95,7 @@ export function retireMakeUnderPage(
       next: el.nextSibling,
       el,
     });
-    el.dataset.studioMakeRetired = screenId;
+    el.dataset.studioLegacyRetired = screenId;
     el.style.display = "none";
     el.setAttribute("hidden", "");
     el.setAttribute("inert", "");
@@ -105,8 +105,8 @@ export function retireMakeUnderPage(
   page.dataset.studioReactScreen = screenId;
 }
 
-/** Re-attach parked Make nodes (tab leave / unmount). */
-export function restoreMakeUnderPage(
+/** Re-attach parked Legacy nodes (tab leave / unmount). */
+export function restoreLegacyUnderPage(
   page: HTMLElement,
   screenId: string
 ): void {
@@ -132,30 +132,30 @@ export function restoreMakeUnderPage(
     el.style.removeProperty("display");
     el.removeAttribute("hidden");
     el.removeAttribute("inert");
-    delete el.dataset.studioMakeRetired;
+    delete el.dataset.studioLegacyRetired;
   }
   parkingByScreen.delete(screenId);
   delete page.dataset.studioReactScreen;
 }
 
-/** True when Make nodes for this screen are parked (detached) or still stamped in DOM. */
-export function isMakeParkedForScreen(screenId: string): boolean {
+/** True when Legacy nodes for this screen are parked (detached) or still stamped in DOM. */
+export function isLegacyParkedForScreen(screenId: string): boolean {
   if ((parkingByScreen.get(screenId)?.length ?? 0) > 0) return true;
   if (typeof document === "undefined") return false;
   return (
-    document.querySelector(`[data-studio-make-retired="${screenId}"]`) != null
+    document.querySelector(`[data-studio-legacy-retired="${screenId}"]`) != null
   );
 }
 
-/** True when Make is gone for this screen — parked (restorable) or permanently deleted. */
-export function isMakeRetiredForScreen(screenId: string): boolean {
+/** True when Legacy is gone for this screen — parked (restorable) or permanently deleted. */
+export function isLegacyRetiredForScreen(screenId: string): boolean {
   return (
-    permanentlyRetiredScreens.has(screenId) || isMakeParkedForScreen(screenId)
+    permanentlyRetiredScreens.has(screenId) || isLegacyParkedForScreen(screenId)
   );
 }
 
 /** Test helper. */
-export function resetMakeRetireParkingForTests(): void {
+export function resetLegacyRetireParkingForTests(): void {
   parkingByScreen.clear();
   permanentlyRetiredScreens.clear();
 }

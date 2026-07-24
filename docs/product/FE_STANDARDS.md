@@ -36,8 +36,8 @@ Sibling **tertiary icon+text** CTAs on the same surface must share **one** icon 
 
 | Rule | Expectation |
 |------|-------------|
-| **Source of truth** | Availability popup / Make tertiary beside search (`.studio-tertiary-cta--compact` + 16×16 map-pin + nowrap) — **not** a FilterChip restyle and **not** a Change-pencil one-off fork |
-| **Placement** | Right of the search field when the concept shows side-by-side (Make `Frame209` / `.proto-avail-search-row`) |
+| **Source of truth** | Availability popup / Legacy tertiary beside search (`.studio-tertiary-cta--compact` + 16×16 map-pin + nowrap) — **not** a FilterChip restyle and **not** a Change-pencil one-off fork |
+| **Placement** | Right of the search field when the concept shows side-by-side (Legacy `Frame209` / `.proto-avail-search-row`) |
 | **Shared class** | `.proto-near-me-cta` on top of tertiary compact chrome — typography, color, icon, hover stay in sync |
 
 Search-field glyphs inside inputs are a **different** family (field chrome) — do not force them onto the tertiary CTA palette unless the concept ties them together.
@@ -61,14 +61,14 @@ Body + footer-style text links (**Learn more**, **Show on map**, FAQs, help tel,
 | **States** | Rest: **no** underline; hover: **underline**; focus-visible: 2px outline in link color |
 
 Legacy aliases (same rule block — not near-dups): `.proto-avail-link`, `.proto-recipient-picker__link`.  
-Make `.proto-link` / footer links share this **same** underline contract (no underline rest → underline hover). Migrated React surfaces use `.uxds-link` + tokens; do **not** ship a second “always underlined” Learn more.
+Legacy `.proto-link` / footer links share this **same** underline contract (no underline rest → underline hover). Migrated React surfaces use `.uxds-link` + tokens; do **not** ship a second “always underlined” Learn more.
 
 **Guard:** `npm run check:links` (`scripts/check-text-link-contract.mjs`) — fails if Book Step 1 Learn more / `.uxds-link` diverge from the footer-like contract. Wired into `npm test`.
 
 | Family | Do not force into `.uxds-link` |
 |--------|--------------------------------|
 | Tertiary icon+text CTAs | Change location, near-me — §1 |
-| Breadcrumb Home | Teal `--uxds-text-link-link-dark` crumb chrome (Make; own underline language) |
+| Breadcrumb Home | Teal `--uxds-text-link-link-dark` crumb chrome (Legacy; own underline language) |
 
 
 ---
@@ -94,19 +94,19 @@ Same grid as header logo container and `Footer` (`.proto-footer__shell` / `__she
 Concept L&F is mandatory. See [VISUAL_FIDELITY.md](./VISUAL_FIDELITY.md).
 
 - Rebuilds require a **written design-delta checklist** (§1.2) including **background fills**.
-- Prefer Make **computed** styles (live wire CSS) over inventing UXDS-looking backgrounds.
+- Prefer Legacy **computed** styles (live wire CSS) over inventing UXDS-looking backgrounds.
 
 ---
 
 ## 5. Behavior parity
 
-Screen rebuild = visual + behavior. Migrate every Make interaction that already worked. See [VISUAL_FIDELITY.md](./VISUAL_FIDELITY.md) §1.1 and [INTERACTION_FIDELITY.md](./INTERACTION_FIDELITY.md).
+Screen rebuild = visual + behavior. Migrate every Legacy interaction that already worked. See [VISUAL_FIDELITY.md](./VISUAL_FIDELITY.md) §1.1 and [INTERACTION_FIDELITY.md](./INTERACTION_FIDELITY.md).
 
 ---
 
 ## 6. Hover / focus / active
 
-Migrate Make `:hover`, `:focus-visible`, and `:active` (and short transitions) into kit or **co-located screen CSS**. Do not ship flat CTAs/inputs/chips that only paint the resting state.
+Migrate Legacy `:hover`, `:focus-visible`, and `:active` (and short transitions) into kit or **co-located screen CSS**. Do not ship flat CTAs/inputs/chips that only paint the resting state.
 
 ---
 
@@ -140,7 +140,7 @@ Use `nowrap` for short CTAs, chips, crumb current labels, and tertiary pills unl
 | Shared timings in `src/app/nav/studioMotion.ts` for shell | Hand-roll width/opacity JS without the library |
 | Register a DS deviation if a bespoke animation is truly required | Claim “we use framer-motion” without importing it |
 
-**Allowed without deviation:** trivial one-property CSS transitions (e.g. hover `color` / `opacity`); Make-parity ports while a screen is still bridged.
+**Allowed without deviation:** trivial one-property CSS transitions (e.g. hover `color` / `opacity`); Legacy-parity ports while a screen is still bridged.
 
 **Honesty (2026-07-19):** Before this checkpoint, `package.json` listed unused `motion` (no `src/` imports). Touchpoint label resize was custom CSS (`width 0.34s ease`); Playback↔Rec swapped with a hard mount/unmount. Now: direct dependency `framer-motion@12.42.2` is imported and used for panel swap + touchpoint label width. Studio LED blink keyframes in `studioNavPanel.css` remain CSS until migrated (register if expanded).
 
@@ -156,7 +156,7 @@ Use `nowrap` for short CTAs, chips, crumb current labels, and tertiary pills unl
 4. Same CTA string/role → one shared component (near-me → `NearMeCta`).  
 5. Availability secondary filters use `.uxds-filter-chip--strong` (not mint selected).  
 6. Regular text links use `.uxds-link` + link tokens (§2) — footer-like underline (rest off / hover on); `npm run check:links`.  
-7. Hover/focus/active ported from Make.  
+7. Hover/focus/active ported from Legacy.  
 8. Design-delta table written (fills in scope).  
 9. Behavior parity verified.  
 10. No near-duplicate control styles; deviations registered if needed.  

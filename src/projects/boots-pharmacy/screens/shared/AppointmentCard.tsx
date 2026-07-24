@@ -63,7 +63,7 @@ function openDetails(appt: Appointment, onOpenDetails: () => void) {
  * Appointment Details reuse this one component so the two screens can
  * never drift in look & feel. History previously used stale Figma
  * spacing/typography (32/56 pad-gap, 25px link title) while Details had
- * already been densified to Make-live parity (20/20, 20px title) — this
+ * already been densified to Legacy-live parity (20/20, 20px title) — this
  * component standardises both screens on the densified Details spec.
  */
 export function AppointmentCard({
@@ -194,6 +194,7 @@ export function AppointmentCard({
                 className="appointment-card__icon-btn"
                 data-name="component.input.button"
                 data-studio-appointment-edit="true"
+                data-studio-action={`appointment-edit-${appt.id}`}
               >
                 <EditIcon />
                 <span>Edit</span>
@@ -203,6 +204,7 @@ export function AppointmentCard({
                 className="appointment-card__icon-btn appointment-card__icon-btn--cancel"
                 data-name="component.input.button"
                 data-studio-appointment-cancel="true"
+                data-studio-action={`appointment-cancel-${appt.id}`}
               >
                 <CancelIcon />
                 <span>Cancel</span>

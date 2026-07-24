@@ -23,10 +23,10 @@ Boots book flow is the first React+UXDS rabbit: Location (`book-step-1`), Date &
 
 ## Acceptance (Bea → Quinn)
 
-- [x] Steps 1–3 mount via React hosts; Make chrome hidden when mounted
+- [x] Steps 1–3 mount via React hosts; Legacy chrome hidden when mounted
 - [x] URL `?project=boots-pharmacy&screen=book-step-N` restores tab
 - [x] FE audits PROVEN for pilots
-- [ ] Residual Make-only hex / LEGACY shrink (board NEXT)
+- [ ] Residual Legacy-only hex / LEGACY shrink (board NEXT)
 
 ## Chrome / fidelity (Uma)
 

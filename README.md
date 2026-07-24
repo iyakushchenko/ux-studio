@@ -2,6 +2,8 @@
 
 Engine for building clickable UX concepts, journey maps (CJMs), and recorded scenarios — with Cursor as the build partner.
 
+**It does not phase out the UX designer.** It keeps the human exactly where UX expertise is genuinely useful — directing intent as a **CX Director** — and automates the mechanical floor (drafting pages, wiring interactions, catching regressions) so a draft is precise enough to pick up from, not a blank page. See [Vision](docs/product/UX_STUDIO_VISION.md) § "The distinctive claim".
+
 **Canonical folder:** `E:\UX\ux-studio`  
 **Live demo (Boots — first project):** https://iyakushchenko.github.io/ux-studio/
 
@@ -13,7 +15,7 @@ Engine for building clickable UX concepts, journey maps (CJMs), and recorded sce
 | **Projects** | `src/projects/` | Concept packages — target stack: **React + UXDS** |
 | **First project** | `src/projects/boots-pharmacy/` | Boots Health Vaccine CJM (test rabbit) |
 
-Figma Make exports are bootstrap only. Real concept pages are rebuilt from **UXDS** into React projects.
+Figma Legacy exports are bootstrap only. Real concept pages are rebuilt from **UXDS** into React projects.
 
 ### GitHub “Languages” bar vs React
 
@@ -27,7 +29,7 @@ done live in [Developer workflow](docs/product/DEVELOPER_WORKFLOW.md).
 ```bash
 npm install
 npm run dev              # http://localhost:5173/ only (strictPort)
-npm test                 # eleven static gates, then Vitest
+npm test                 # thirteen static gates, then Vitest
 npm run build
 ```
 
@@ -45,7 +47,7 @@ Lean CI smoke: `npm run smoke` (dev server on `:5173`). Actions budget: [docs/pr
 | [Proof router](docs/shell/PROOF_ROUTER.md) | One entry point for page, Play, REC, chrome, and PO-signal proof |
 | [Product Owner brief (A–Z)](docs/product/PRODUCT_OWNER_BRIEF.md) | Non-technical product guidance |
 | [Page build contract](docs/product/PAGE_BUILD_CONTRACT.md) | React + UXDS |
-| [Component library plan](docs/product/COMPONENT_LIBRARY.md) | Migrated pages = real React kits, not Make slop |
+| [Component library plan](docs/product/COMPONENT_LIBRARY.md) | Migrated pages = real React kits, not Legacy slop |
 | [UXDS access](docs/product/UXDS_ACCESS.md) | What to share with the agent |
 | [Vision](docs/product/UX_STUDIO_VISION.md) | North star |
 | [Agent guide](AGENTS.md) | Engineers / agents |

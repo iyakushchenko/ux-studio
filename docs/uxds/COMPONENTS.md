@@ -41,7 +41,7 @@ Variants often encode viewport: `screen=small` / `screen=large`, or boolean prop
 2. Keep the **dot-path name** in code identifiers where practical (`ModuleCartProductListing`).  
 3. Pair visuals with **shared interaction kits** (`src/uxds/interactions/`) for typical patterns — accordion, select, filters, tabs, modals, fields — not per-screen imperative scripts.  
 4. Wire Studio playback hooks (`data-name`, touchpoints) on the React root of the module — not on anonymous wrappers.  
-5. Prefer composing modules over cloning Make HTML.  
+5. Prefer composing modules over cloning Legacy HTML.  
 6. **Reuse first** — when PO asks for a page “from what we already have,” assemble from existing UXDS + internal React modules; extend the shared library instead of copy-paste ([../product/CONCEPT_INTAKE.md](../product/CONCEPT_INTAKE.md) §5 mode B).
 
 ---

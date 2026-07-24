@@ -23,7 +23,7 @@ Choose one route. Large governance and evidence documents are references, not a 
 
 | Audience | 10-minute route | Then use |
 |----------|-----------------|----------|
-| Product Owner / reviewer | [Vision](./product/UX_STUDIO_VISION.md) → [CX Conveyor — honest gap state](./product/CX_CONVEYOR.md) → [current board](./product/NEXT_STEPS.md) | [Product Owner brief](./product/PRODUCT_OWNER_BRIEF.md) for decisions and acceptance |
+| Product Owner / reviewer | [Vision](./product/UX_STUDIO_VISION.md) → [CX Conveyor — honest gap state](./product/CX_CONVEYOR.md) → [current board](./product/NEXT_STEPS.md) | [Product Owner brief](./product/PRODUCT_OWNER_BRIEF.md) for decisions and acceptance · **[Stakeholder readiness checklist](./product/STAKEHOLDER_READINESS.md)** — "can I demo this / is it a real product yet" |
 | Contributor / engineer | [Developer workflow](./product/DEVELOPER_WORKFLOW.md) → [architecture](./product/ARCHITECTURE.md) | The workflow’s task table; [post-change checklist](./product/POST_CHANGE_CHECKLIST.md) before close |
 | Page designer / auditor | [Page build contract](./product/PAGE_BUILD_CONTRACT.md) → [Page create inheritance](./product/PAGE_CREATE_INHERITANCE.md) → [strict audit](./product/FE_UI_UX_AUDIT.md) | [Uma fidelity](./product/UMA_FIDELITY_NOTES.md) and [Page Final Pass](./product/PAGE_FINAL_PASS.md) |
 | QA / proof operator | [Proof router](./shell/PROOF_ROUTER.md) · [UXML commands](./shell/UXML_COMMANDS.md) (`uxml rec` / `play` / `play step` / `play step r`) | Open only the deep contract linked from the selected proof row |

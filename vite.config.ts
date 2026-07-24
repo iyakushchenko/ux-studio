@@ -8,18 +8,6 @@ const pkg = JSON.parse(
   fs.readFileSync(path.resolve(__dirname, 'package.json'), 'utf8')
 )
 
-function figmaAssetResolver() {
-  return {
-    name: 'figma-asset-resolver',
-    resolveId(id) {
-      if (id.startsWith('figma:asset/')) {
-        const filename = id.replace('figma:asset/', '')
-        return path.resolve(__dirname, 'src/assets', filename)
-      }
-    },
-  }
-}
-
 const packageJsonPath = path.resolve(__dirname, 'package.json')
 
 /** When package.json bumps while `npm run dev` is running, restart so define + chip stay honest. */
@@ -58,16 +46,10 @@ export default defineConfig({
   },
   plugins: [
     packageJsonVersionReload(),
-    figmaAssetResolver(),
-    // The React and Tailwind plugins are both required for Make, even if
-    // Tailwind is not being actively used – do not remove them
-    react({
-      babel: {
-        // The generated Figma import exceeds Babel's default 500 KB compact
-        // threshold, triggering a deopt warning. Raising the limit silences it.
-        compact: false,
-      },
-    }),
+    // Tailwind utility classes are used directly across real project/app
+    // files (HubPage, AvailabilityTool, LoginPopup, App.tsx, etc.) — both
+    // plugins are load-bearing, not scaffold-only.
+    react(),
     tailwindcss(),
   ],
   resolve: {

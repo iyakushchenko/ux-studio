@@ -72,7 +72,7 @@
 .uxds-summary-pill__change:hover,
 .uxds-summary-pill__change:active {
   background: transparent;
-  /* Make hover black — no UXDS pure-black token yet */
+  /* Legacy hover black — no UXDS pure-black token yet */
   color: #000000;
 }
 

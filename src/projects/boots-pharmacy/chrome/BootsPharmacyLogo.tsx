@@ -8,7 +8,7 @@ type Props = {
   height?: number;
 };
 
-/** Boots Pharmacy wordmark — inline SVG (Figma Make-safe), Boots primary navy. */
+/** Boots Pharmacy wordmark — inline SVG (Figma Legacy-safe), Boots primary navy. */
 export function BootsPharmacyLogo({ className, height = 34 }: Props) {
   const width = (174.961 / 34.001) * height;
 

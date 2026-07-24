@@ -2,7 +2,8 @@
 
 > _Append a bullet on coherent commits via `npm run notes:append -- --lane="<lane>" --intent="<text>"`. Preview with `npm run notes:preview`. On `npm run release:patch` this section is promoted to `## v<X.Y.Z> - DDMMYY` and a fresh empty `## Current` is re-inserted. Policy: `docs/product/VERSIONING.md`._
 
-- **project:** Boots: extract shared AppointmentCard (screens/shared/) so Appointment History and Appointment Details reuse one card component/CSS -- History adopted Details' densified Make-live spacing/typography instead of stale Figma 32/56 spacing
+## v0.0.109 - 240726
+- **project:** Boots: extract shared AppointmentCard (screens/shared/) so Appointment History and Appointment Details reuse one card component/CSS -- History adopted Details' densified Legacy-live spacing/typography instead of stale Figma 32/56 spacing
 - **shell:** Fix self-test kind-hijack: mcp-sanity from Manual QA no longer force-clears/agent-locks the panel
 - **shell:** Fix Reset not repainting title after a suite-run Finale seal on an active session
 - **shell:** Fix kind-hijack for remaining self-test entry points (mcp-page-probe + shared withMcpTestSession wrapper behind retreat/step-forward/play smokes + robot QA) so Manual/Observe QA sessions keep their own kind through any suite test, not only mcp-sanity
@@ -14,6 +15,12 @@
 - **uxds:** MegaMenuFlyout: cap link groups (5/group, 8 groups), left-align groups when a row has fewer than 3, and stamp stable data-studio-action per link for REC/CJM capture
 - **uxds:** MegaMenuFlyout: add module.mega.menu (node 7650:86158) lightbox scrim for visual separation from the page beneath -- anchored to the flyout's own top edge (never the header/breadcrumb), stacked strictly below the panel, non-interactive
 - **uxds:** MegaMenuFlyout: show/hide now uses framer-motion AnimatePresence (opacity + tiny y) instead of an instant mount/unmount, matching the engine's enter/exit-presence motion policy
+- **project:** PLP I3c: dependent-facet zero-count disable + auto-uncheck matching Legacy setFilterCheckboxItemState wire truth -- incompatible filter combos can no longer be selected via click
+- **engine:** Stage 2 (CX_CONVEYOR): check-page-final-pass now derives required screens from the live screens.ts registry instead of a hand-maintained list -- a newly registered screen is structurally forced through the gate, no separate step to remember
+- **engine:** Stage 1 close-out: npm run smoke now runs the ambiguous-target/uniqueness check against real Chromium layout via __studioMapAllInteractions -- jsdom cannot do real layout, so this rides the existing on-demand Playwright smoke job per CI_ACTIONS_BUDGET.md
+- **chore:** Deleted 49 dead Figma Make/shadcn scaffold files (src/app/components/ui + figma/, zero references anywhere) and trimmed src/styles/theme.css to only its load-bearing Tailwind base-layer typography -- CSS bundle 327.6kB to 254.5kB
+- **chore:** Eradicated Figma Make terminology repo-wide (renamed to legacy/Legacy in identifiers, data attributes, CSS, and ~190 doc/comment mentions), including 10 doc file renames and 2 obsolete Figma-Make-cloud-sync files deleted -- verified with build/165 test files/13 gates/live smoke at each step
+- **docs:** Added STAKEHOLDER_READINESS.md (honest demo-vs-repeatable-product checklist) and documented the refapp bootstrap sequence, design2code/code2design traceability rule, and the three concept-intake scenarios (S1 raw, S2 UXDS link, S3 existing UXML page) in CX_CONVEYOR.md/PAGE_BUILD_CONTRACT.md/CONCEPT_INTAKE.md
 
 ## v0.0.108 - 220726
 - **shell:** All 13 Boots Sarah CJMs live-proven through fail-fast QA; legacy recordings can earn current compatibility proof, camera anomaly tolerance avoids compositor false positives, and suite logs report truthful per-CJM results

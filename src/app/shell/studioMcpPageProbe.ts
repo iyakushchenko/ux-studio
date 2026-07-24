@@ -39,7 +39,7 @@ import {
 } from "@/app/shell/agent-testing/agentTestingOverlay";
 import { logControlPanel } from "@/app/shell/controlPanelLog";
 import { pollSmokePoSignal } from "@/app/shell/smokePoSignalPoll";
-import { isMakeRetiredForScreen } from "@/projects/boots-pharmacy/screens/retireMakeUnderPage";
+import { isLegacyRetiredForScreen } from "@/projects/boots-pharmacy/screens/retireLegacyUnderPage";
 /** Ensure Boots screen recipes are registered before probe resolve. */
 import "@/projects/boots-pharmacy/screens/registerMcpPageProbes";
 import {
@@ -236,7 +236,7 @@ function resolveScreenId(options?: McpPageProbeOptions): string {
 }
 
 function plpProbeSteps(): ProbeStep[] {
-  // Prefer button/React-owned nodes — Make leftovers can still match data-name.
+  // Prefer button/React-owned nodes — Legacy leftovers can still match data-name.
   // Filters before Quick View (QV blocks under-page clicks — overlay eyes).
   return [
     {
@@ -533,8 +533,8 @@ function pdpProbeSteps(): ProbeStep[] {
         if (document.querySelector('[data-studio-react-screen="pdp"]') == null) {
           return "missing React PDP host";
         }
-        if (!isMakeRetiredForScreen("pdp")) {
-          return "Make leak: expected Make Frame children parked for pdp";
+        if (!isLegacyRetiredForScreen("pdp")) {
+          return "Legacy leak: expected Legacy Frame children parked for pdp";
         }
         return true;
       },
@@ -751,7 +751,7 @@ function pdpProbeSteps(): ProbeStep[] {
         if (modalId !== "choose-pharmacy") {
           return `expected &modal=choose-pharmacy, got ${modalId ?? "missing"}`;
         }
-        // Logged-out + no chosen location → Make first screen (Find Pharmacy), not Choose Date
+        // Logged-out + no chosen location → Legacy first screen (Find Pharmacy), not Choose Date
         const loggedIn = window.__studioIsLoggedIn?.() ?? false;
         if (!loggedIn) {
           const step = document
@@ -887,7 +887,7 @@ function pdpProbeSteps(): ProbeStep[] {
           '.pdp[data-studio-react-screen="pdp"] [data-studio-accordion-open="who-is-at-risk"]'
         );
         if (!body || !/weakened immune system/i.test(normalizeText(body))) {
-          return "FAQ open body missing Make copy";
+          return "FAQ open body missing Legacy copy";
         }
         const helpBody = document.querySelector(
           '.pdp[data-studio-react-screen="pdp"] [data-studio-accordion-open="how-can-boots-help"]'
@@ -929,7 +929,7 @@ function pdpProbeSteps(): ProbeStep[] {
           !body ||
           !/private Chickenpox Vaccination Service/i.test(normalizeText(body))
         ) {
-          return "How can Boots help? missing Make RTB service blurb";
+          return "How can Boots help? missing Legacy RTB service blurb";
         }
         if (
           !stylesheetHasRule(".pdp__accordion-header:focus-visible") &&
@@ -958,7 +958,7 @@ function pdpProbeSteps(): ProbeStep[] {
           leaflet.classList.contains("pdp__pill--bordered") ||
           guide.classList.contains("pdp__pill--bordered")
         ) {
-          return "leaflet still has stub bordered class (Make hover mock)";
+          return "leaflet still has stub bordered class (Legacy hover mock)";
         }
         // Product tertiary unify — ignore demo-cursor hover/pressed classes
         // (`proto-chat-cta--hover`) that land on the hovered CTA during assert.

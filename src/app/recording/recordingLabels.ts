@@ -1,6 +1,6 @@
 /**
  * Concise human labels for REC → STEPS / touchpoints / QA.
- * Scrubs Make-ish `data-name` / dotted paths and quoted attr soup.
+ * Scrubs legacy-source-ish `data-name` / dotted paths and quoted attr soup.
  */
 
 const SCREEN_LABELS: Record<string, string> = {
@@ -16,7 +16,7 @@ const SCREEN_LABELS: Record<string, string> = {
   hub: "Onboarding",
 };
 
-const MAKEISH_PATH =
+const LEGACYISH_PATH =
   /^(?:component|module|boots-pharmacy|icon|plp|pdp)\b[\w.\-=\s]*$/i;
 
 /** Strip quoted attribute wrappers: data-name="x" → x */
@@ -56,7 +56,7 @@ function wordsFromSlug(raw: string): string {
     return parts.slice(start).join(" ");
   }
 
-  // Prefer last 1–2 dotted segments for Make paths.
+  // Prefer last 1–2 dotted segments for legacy-source paths.
   const dotted = cleaned.includes(".")
     ? cleaned
         .split(".")
@@ -136,8 +136,8 @@ export function humanizeRecordingLabel(
     return camera ? `Camera — ${label}` : label;
   }
 
-  // Make-ish dotted paths / module containers.
-  if (MAKEISH_PATH.test(s) || s.includes(".")) {
+  // Legacy-source-ish dotted paths / module containers.
+  if (LEGACYISH_PATH.test(s) || s.includes(".")) {
     const words = wordsFromSlug(s);
     const label = titleCasePhrase(words) || "Page";
     return camera ? `Camera — ${label}` : label;
@@ -150,7 +150,7 @@ export function humanizeRecordingLabel(
 }
 
 /** True when a data-name is a coarse layout module (bad click / camera leaf). */
-export function isCoarseMakeModuleName(dataName: string | null | undefined): boolean {
+export function isCoarseLegacyModuleName(dataName: string | null | undefined): boolean {
   if (!dataName) return false;
   const n = dataName.trim().toLowerCase();
   if (n.startsWith("module.")) return true;
@@ -169,7 +169,7 @@ export function isDegradedClickTarget(el: Element | null | undefined): boolean {
   if (node.getAttribute("data-studio-action")) return false;
   if (node.closest?.("[data-studio-action]") === node) return false;
   const dataName = node.getAttribute("data-name");
-  if (isCoarseMakeModuleName(dataName)) return true;
+  if (isCoarseLegacyModuleName(dataName)) return true;
   // Huge listing shell without an action of its own.
   if (
     dataName &&
@@ -181,7 +181,7 @@ export function isDegradedClickTarget(el: Element | null | undefined): boolean {
   return false;
 }
 
-/** Filter / checkbox Make nodes — bad scroll-stop camera anchors. */
+/** Filter / checkbox legacy-source nodes — bad scroll-stop camera anchors. */
 export function isWeakScrollAnchorName(dataName: string | null | undefined): boolean {
   if (!dataName) return false;
   const n = dataName.trim().toLowerCase();

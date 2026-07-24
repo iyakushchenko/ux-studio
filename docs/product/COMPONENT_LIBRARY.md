@@ -8,7 +8,7 @@
 
 ## 1. What “library” means here
 
-Migrated concept pages are built from **real React components**, not Make HTML dumps treated as reusable units.
+Migrated concept pages are built from **real React components**, not Legacy HTML dumps treated as reusable units.
 
 | Layer | Path | Role |
 |-------|------|------|
@@ -24,9 +24,9 @@ Migrated concept pages are built from **real React components**, not Make HTML d
 ## 2. Hard rules for migrated pages
 
 1. **Semantic HTML** — use real `<button>`, `<a>`, `<label>`, `<input>` (etc.) for interactive roles. Decorative wrappers are fine; fake clickable `<div>`/`<span>` for primary actions are not.
-2. **Stable `data-name`** — keep Studio / Make-aligned `data-name` hooks on meaningful nodes so recording, MCP, and audits can target the same surface across rebuilds.
+2. **Stable `data-name`** — keep Studio / Legacy-aligned `data-name` hooks on meaningful nodes so recording, MCP, and audits can target the same surface across rebuilds.
 3. **Reuse across projects** — prefer UXDS kits + theme remaps. Project chrome only when the brand/shell truly differs.
-4. **No Make HTML slop as the reusable unit** — Figma Make / wire HTML is bootstrap or LEGACY quarantine only. Do not extract Make markup into a “shared component” and ship it as the library. Rebuild into React + UXDS.
+4. **No Legacy HTML slop as the reusable unit** — Figma Legacy / wire HTML is bootstrap or LEGACY quarantine only. Do not extract Legacy markup into a “shared component” and ship it as the library. Rebuild into React + UXDS.
 5. **One pattern per role** — [DS_STRICTNESS.md](./DS_STRICTNESS.md). Near-duplicate link/chip/CTA styles are defects.
 
 ---
@@ -55,7 +55,7 @@ Success metric: a second project can theme + reuse kits without copying Boots pa
 - [ ] `data-name` preserved or intentionally remapped (document if remapped)
 - [ ] Shared role → existing UXDS kit or project chrome (no one-off fork)
 - [ ] Colors via `var(--uxds-…)`; layout/hover in BASE kits — project `theme.css` = **brand delta only** ([PROJECT_STYLEGUIDE.md](./PROJECT_STYLEGUIDE.md))
-- [ ] Make wire left in LEGACY or deleted — not re-exported as “library”
+- [ ] Legacy wire left in LEGACY or deleted — not re-exported as “library”
 - [ ] FE audit checklist + blast-radius chrome scan ([FE_UI_UX_AUDIT.md](./FE_UI_UX_AUDIT.md))
 
 ---

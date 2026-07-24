@@ -1,5 +1,5 @@
 /**
- * React ↔ Make thinking bridge.
+ * React ↔ Legacy thinking bridge.
  * When Chat React is mounted, `sitePilotChatThinking` publishes here instead of DOM surgery.
  */
 

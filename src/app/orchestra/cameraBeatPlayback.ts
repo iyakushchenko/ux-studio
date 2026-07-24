@@ -35,7 +35,7 @@ function delay(ms: number): Promise<void> {
  */
 export function isPlaybackCameraTargetUsable(el: HTMLElement | null): boolean {
   if (!el?.isConnected) return false;
-  if (el.closest("[data-studio-make-retired]")) return false;
+  if (el.closest("[data-studio-legacy-retired]")) return false;
   let node: HTMLElement | null = el;
   while (node) {
     try {

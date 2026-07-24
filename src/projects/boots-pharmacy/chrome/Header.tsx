@@ -11,12 +11,18 @@ import {
   HEADER_GUEST_GLYPH,
   HEADER_LOGO_PATH,
   HEADER_LOGO_VIEWBOX,
-  HEADER_NAV_ITEMS,
   HEADER_SEARCH_GLYPH,
   type HeaderAccountMenuAction,
   type HeaderAccountMenuBadgeKey,
   type HeaderIcon,
+  type HeaderNavItemKind,
 } from "@/projects/boots-pharmacy/chrome/headerContent";
+import { BOOTS_PHARMACY_CONTENT_PACK } from "@/projects/boots-pharmacy/contentPack";
+
+const HEADER_NAV_ITEMS = BOOTS_PHARMACY_CONTENT_PACK.nav.primary!.map((node) => ({
+  label: node.label,
+  kind: node.type as HeaderNavItemKind,
+}));
 
 const SHOW_DELAY_MS = 100;
 const HIDE_DELAY_MS = 200;
@@ -274,8 +280,8 @@ function HeaderAccountAuxItem({
 
 /**
  * Hand-authored Boots Pharmacy header — replaces the old `sourceHeader
- * .cloneNode(true)` on live Make DOM (contrast `Footer.tsx` /
- * `footerContent.ts`, already Make-free — same extraction pattern applied
+ * .cloneNode(true)` on live Legacy DOM (contrast `Footer.tsx` /
+ * `footerContent.ts`, already Legacy-free — same extraction pattern applied
  * here). Same visual contract (logo, primary nav row, Search + Login/Sarah
  * aux nav) and the same `data-name` markers (`boots-pharmacy`,
  * `component.mega.menu.item`, `component.header.aux.nav.item`) the existing

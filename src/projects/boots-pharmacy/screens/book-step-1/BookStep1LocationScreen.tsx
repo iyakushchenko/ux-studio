@@ -57,7 +57,7 @@ function EditGlyph() {
   );
 }
 
-/** Make Body5 TextField3 search glyph — navy at rest */
+/** Legacy Body5 TextField3 search glyph — navy at rest */
 function SearchGlyph() {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -73,7 +73,7 @@ function SearchGlyph() {
   );
 }
 
-/** Make Book Step 1 checkmark (`element. gse. checkbox. check mark`) */
+/** Legacy Book Step 1 checkmark (`element. gse. checkbox. check mark`) */
 function CheckboxCheckMark() {
   return (
     <span
@@ -95,8 +95,8 @@ function CheckboxCheckMark() {
 
 /**
  * React + UXDS pilot for Book — Step 1 (Location).
- * Retires Make HTML for this screen only; Studio wiring preserved via data-name.
- * Visual source: Make Frame child 7 / Body5 + live globals-screens overrides.
+ * Retires Legacy HTML for this screen only; Studio wiring preserved via data-name.
+ * Visual source: Legacy Frame child 7 / Body5 + live globals-screens overrides.
  */
 export function BookStep1LocationScreen({
   chosenLocation,
@@ -141,7 +141,7 @@ export function BookStep1LocationScreen({
       </header>
 
       <main className="book-step-1__body">
-        {/* Make Body5: white base + decorative fill image @ opacity 0.31 */}
+        {/* Legacy Body5: white base + decorative fill image @ opacity 0.31 */}
         <div className="book-step-1__body-fill" aria-hidden>
           <div className="book-step-1__body-fill-solid" />
           <img
@@ -259,8 +259,9 @@ export function BookStep1LocationScreen({
                 <span
                   className="book-step-1__checkbox-icon"
                   data-name="icon / input / checkbox"
+                  aria-hidden="true"
                 >
-                  <span className="book-step-1__checkbox-box" data-name="box">
+                  <span className="book-step-1__checkbox-box" data-name="box" aria-hidden="true">
                     {includeBoosterDose ? <CheckboxCheckMark /> : null}
                   </span>
                   <input

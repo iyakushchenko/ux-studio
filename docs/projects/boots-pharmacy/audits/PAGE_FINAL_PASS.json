@@ -2,7 +2,7 @@
   "version": 1,
   "projectId": "boots-pharmacy",
   "updatedAt": "2026-07-22",
-  "note": "Hard gate before NEXT page. npm run check:page-final-pass (via npm test) fails unless each required screen has status=proven, full checklist keys true, stampedAt, and source contracts (main/header, BEM=screenId, data-studio-react-screen, make-retired, kits). Policy: docs/product/PAGE_FINAL_PASS.md. Quinn MCP proves after stamp → mcpFinalPass HARD-GREEN opens next page.",
+  "note": "Hard gate before NEXT page. npm run check:page-final-pass (via npm test) fails unless each required screen has status=proven, full checklist keys true, stampedAt, and source contracts (main/header, BEM=screenId, data-studio-react-screen, legacy-retired, kits). Policy: docs/product/PAGE_FINAL_PASS.md. Quinn MCP proves after stamp → mcpFinalPass HARD-GREEN opens next page.",
   "requiredScreens": [
     "book-step-1",
     "book-step-2",
@@ -21,7 +21,7 @@
       "stampedAt": {
         "sha": "d6c3907",
         "date": "2026-07-19",
-        "note": "Uma+Finn structure/naming final pass — header+main landmarks; BEM book-step-1; data-studio-react-screen + make-retired; ButtonPrimary + search-icon markers. Quinn MCP follow-up."
+        "note": "Uma+Finn structure/naming final pass — header+main landmarks; BEM book-step-1; data-studio-react-screen + legacy-retired; ButtonPrimary + search-icon markers. Quinn MCP follow-up."
       },
       "checklist": {
         "semanticHtml": true,
@@ -29,7 +29,8 @@
         "dataStudioHooks": true,
         "uxdsKits": true,
         "noInventSeparators": true,
-        "dsStates": true
+        "dsStates": true,
+        "interactionInventoryReady": true
       }
     },
     {
@@ -38,7 +39,7 @@
       "stampedAt": {
         "sha": "d6c3907",
         "date": "2026-07-19",
-        "note": "Uma+Finn structure/naming final pass — header+main; BEM book-step-2; ButtonPrimary; Make time-rule hrs retained (not invent filter seps). Quinn MCP follow-up."
+        "note": "Uma+Finn structure/naming final pass — header+main; BEM book-step-2; ButtonPrimary; Legacy time-rule hrs retained (not invent filter seps). Quinn MCP follow-up."
       },
       "checklist": {
         "semanticHtml": true,
@@ -46,7 +47,8 @@
         "dataStudioHooks": true,
         "uxdsKits": true,
         "noInventSeparators": true,
-        "dsStates": true
+        "dsStates": true,
+        "interactionInventoryReady": true
       }
     },
     {
@@ -63,7 +65,8 @@
         "dataStudioHooks": true,
         "uxdsKits": true,
         "noInventSeparators": true,
-        "dsStates": true
+        "dsStates": true,
+        "interactionInventoryReady": true
       }
     },
     {
@@ -83,7 +86,7 @@
           "date": "2026-07-19",
           "version": "0.0.17",
           "auditor": "Quinn (QA)",
-          "note": "MCP __studioRunMcpPageProbe({ screenId:\"plp\", reload:false }) full matrix PASS; overlay-arm + every step overlay visible; plp-below-fold-scroll scroll-into-view; landmarks header+main on host; make-retired. Audit: FE_AUDIT_PLP_PAGE_FINAL_PASS_2026-07-19.md"
+          "note": "MCP __studioRunMcpPageProbe({ screenId:\"plp\", reload:false }) full matrix PASS; overlay-arm + every step overlay visible; plp-below-fold-scroll scroll-into-view; landmarks header+main on host; legacy-retired. Audit: FE_AUDIT_PLP_PAGE_FINAL_PASS_2026-07-19.md"
         },
         "url": "http://localhost:5185/?project=boots-pharmacy&screen=plp",
         "auditPath": "docs/projects/boots-pharmacy/audits/FE_AUDIT_PLP_PAGE_FINAL_PASS_2026-07-19.md",
@@ -119,7 +122,8 @@
         "dataStudioHooks": true,
         "uxdsKits": true,
         "noInventSeparators": true,
-        "dsStates": true
+        "dsStates": true,
+        "interactionInventoryReady": true
       }
     },
     {
@@ -129,7 +133,7 @@
       "stampedAt": {
         "sha": "53da33f",
         "date": "2026-07-19",
-        "note": "Finn structure/naming + UXDS Accordion kit + ButtonPrimary Book now; header crumbs + main RTB/below; BEM pdp; data-studio-react-screen + make-retired; FAQ 6/6 + TertiaryCta soft + muted chevrons. PromoMessageStrip kit + tip-stable cursor retained under HARD-GREEN after Quinn 23/23 re-prove @ f5f004f / v0.0.38; Arch restore tip 53da33f."
+        "note": "Finn structure/naming + UXDS Accordion kit + ButtonPrimary Book now; header crumbs + main RTB/below; BEM pdp; data-studio-react-screen + legacy-retired; FAQ 6/6 + TertiaryCta soft + muted chevrons. PromoMessageStrip kit + tip-stable cursor retained under HARD-GREEN after Quinn 23/23 re-prove @ f5f004f / v0.0.38; Arch restore tip 53da33f."
       },
       "mcpFinalPass": {
         "status": "HARD-GREEN",
@@ -182,7 +186,8 @@
         "dataStudioHooks": true,
         "uxdsKits": true,
         "noInventSeparators": true,
-        "dsStates": true
+        "dsStates": true,
+        "interactionInventoryReady": true
       }
     },
     {
@@ -192,7 +197,7 @@
       "stampedAt": {
         "sha": "963b493",
         "date": "2026-07-20",
-        "note": "Uma+Finn structure + SitePilotComposer DS hover; main landmark; dual class site-pilot home; make-retired; header waived (Make Body10). Quinn MCP 15/15."
+        "note": "Uma+Finn structure + SitePilotComposer DS hover; main landmark; dual class site-pilot home; legacy-retired; header waived (Legacy Body10). Quinn MCP 15/15."
       },
       "mcpFinalPass": {
         "status": "HARD-GREEN",
@@ -209,7 +214,7 @@
         "matrix": [
           { "id": "overlay-arm", "pass": true },
           { "id": "site-pilot-host", "pass": true },
-          { "id": "site-pilot-make-retired", "pass": true },
+          { "id": "site-pilot-legacy-retired", "pass": true },
           { "id": "site-pilot-landmarks", "pass": true },
           { "id": "site-pilot-heading-logged-out", "pass": true },
           { "id": "site-pilot-heading-logged-in", "pass": true },
@@ -237,7 +242,8 @@
         "dataStudioHooks": true,
         "uxdsKits": true,
         "noInventSeparators": true,
-        "dsStates": true
+        "dsStates": true,
+        "interactionInventoryReady": true
       }
     },
     {
@@ -247,7 +253,7 @@
       "stampedAt": {
         "sha": "acffdb6",
         "date": "2026-07-20",
-        "note": "Uma+Finn structure + ButtonPrimary CTAs + SitePilotComposer DS; main landmark; BEM chat; make-retired; header waived (Make Body9). Quinn MCP 20/20."
+        "note": "Uma+Finn structure + ButtonPrimary CTAs + SitePilotComposer DS; main landmark; BEM chat; legacy-retired; header waived (Legacy Body9). Quinn MCP 20/20."
       },
       "mcpFinalPass": {
         "status": "HARD-GREEN",
@@ -264,7 +270,7 @@
         "matrix": [
           { "id": "overlay-arm", "pass": true },
           { "id": "chat-host", "pass": true },
-          { "id": "chat-make-retired", "pass": true },
+          { "id": "chat-legacy-retired", "pass": true },
           { "id": "chat-site-pilot-bar", "pass": true },
           { "id": "chat-landmarks", "pass": true },
           { "id": "chat-composer-dock", "pass": true },
@@ -297,7 +303,8 @@
         "dataStudioHooks": true,
         "uxdsKits": true,
         "noInventSeparators": true,
-        "dsStates": true
+        "dsStates": true,
+        "interactionInventoryReady": true
       }
     },
     {
@@ -307,7 +314,7 @@
       "stampedAt": {
         "sha": "95ccca7",
         "date": "2026-07-22",
-        "note": "Uma+Finn History React + densify gate; header+main; BEM appointment-history; ButtonPrimary View Details; make-retired via retireMakeUnderPage. Quinn MCP 8/8."
+        "note": "Uma+Finn History React + densify gate; header+main; BEM appointment-history; ButtonPrimary View Details; legacy-retired via retireLegacyUnderPage. Quinn MCP 8/8."
       },
       "mcpFinalPass": {
         "status": "HARD-GREEN",
@@ -317,14 +324,14 @@
           "date": "2026-07-22",
           "version": "0.0.108",
           "auditor": "Quinn (QA) MCP + Arch (Director) HARD-GREEN",
-          "note": "Quinn __studioRunMcpPageProbe({ screenId:\"appointment-history\", reload:false }) 8/8 PASS on localhost:5173. Uma PROVEN densify gate. View Details → Make details + restore. Audit: FE_AUDIT_APPOINTMENT_HISTORY_PAGE_FINAL_PASS_2026-07-22.md"
+          "note": "Quinn __studioRunMcpPageProbe({ screenId:\"appointment-history\", reload:false }) 8/8 PASS on localhost:5173. Uma PROVEN densify gate. View Details → Legacy details + restore. Audit: FE_AUDIT_APPOINTMENT_HISTORY_PAGE_FINAL_PASS_2026-07-22.md"
         },
         "url": "http://localhost:5173/?project=boots-pharmacy&screen=appointment-history",
         "auditPath": "docs/projects/boots-pharmacy/audits/FE_AUDIT_APPOINTMENT_HISTORY_PAGE_FINAL_PASS_2026-07-22.md",
         "matrix": [
           { "id": "overlay-arm", "pass": true, "detail": "BR panel visible" },
           { "id": "appointment-history-host", "pass": true },
-          { "id": "appointment-history-make-retired", "pass": true },
+          { "id": "appointment-history-legacy-retired", "pass": true },
           { "id": "appointment-history-view-details-count", "pass": true },
           { "id": "appointment-history-view-details-hover", "pass": true },
           { "id": "appointment-history-view-details-click", "pass": true },
@@ -345,8 +352,10 @@
         "dataStudioHooks": true,
         "uxdsKits": true,
         "noInventSeparators": true,
-        "dsStates": true
-      }
+        "dsStates": true,
+        "interactionInventoryReady": true
+      },
+      "interactionInventoryNote": "Live-checked 2026-07-24 (Quinn): 4 remaining 'invalid' items are all the same control (history-view-details, 1 per appointment row) — intentional per doctrine's 'intentional decorative/retired controls are recorded' allowance, not an oversight. It's a TabScriptId in the playback director type system (journeyBeatDirector.ts / playbackScriptRegistry.ts / builtInJourneys.ts), deliberately shared across rows because the built-in CJM only ever demos one specific row. Per-row uniqueness would need a director-system change, out of scope for PP-49's identity-gap sweep. See CX_CONVEYOR.md log 2026-07-24."
     },
     {
       "screenId": "appointment-details",
@@ -355,7 +364,7 @@
       "stampedAt": {
         "sha": "95ccca7",
         "date": "2026-07-22",
-        "note": "Uma+Finn Details React + densify gate; header+main; BEM appointment-details; Edit/Cancel icon+text (no ButtonPrimary); make-retired via retireMakeUnderPage. Quinn MCP 10/10."
+        "note": "Uma+Finn Details React + densify gate; header+main; BEM appointment-details; Edit/Cancel icon+text (no ButtonPrimary); legacy-retired via retireLegacyUnderPage. Quinn MCP 10/10."
       },
       "mcpFinalPass": {
         "status": "HARD-GREEN",
@@ -372,7 +381,7 @@
         "matrix": [
           { "id": "overlay-arm", "pass": true, "detail": "BR panel visible" },
           { "id": "appointment-details-host", "pass": true },
-          { "id": "appointment-details-make-retired", "pass": true },
+          { "id": "appointment-details-legacy-retired", "pass": true },
           { "id": "appointment-details-url-screen", "pass": true },
           { "id": "appointment-details-selected-card", "pass": true },
           { "id": "appointment-details-edit-cancel-rules", "pass": true },
@@ -395,7 +404,8 @@
         "dataStudioHooks": true,
         "uxdsKits": true,
         "noInventSeparators": true,
-        "dsStates": true
+        "dsStates": true,
+        "interactionInventoryReady": true
       }
     }
   ]

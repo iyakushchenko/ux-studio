@@ -4,10 +4,10 @@ import { SITE_PILOT_CHAT_PLAYBACK_THINK_MS } from "@/projects/boots-pharmacy/dom
 import { CHAT_THREAD_FRAMES } from "@/projects/boots-pharmacy/screens/chat/chatThreadContent";
 
 /**
- * Make / pre-React agentic chat sequence ratchet (tip a2c86ba / 5fdde78^).
+ * Legacy / pre-React agentic chat sequence ratchet (tip a2c86ba / 5fdde78^).
  * useScenarioPlayback beforeReveal frameIndex = 1-based next visibleCount.
  */
-describe("sitePilotChat Make sequence", () => {
+describe("sitePilotChat Legacy sequence", () => {
   it("playlist is q/r alternating (8 content frames)", () => {
     expect(CHAT_THREAD_FRAMES.map((f) => f.id)).toEqual([
       "q0",
@@ -21,7 +21,7 @@ describe("sitePilotChat Make sequence", () => {
     ]);
   });
 
-  it("CTA clicks use Make 1-based keys 5 and 7 (not 0-based 4/6)", () => {
+  it("CTA clicks use Legacy 1-based keys 5 and 7 (not 0-based 4/6)", () => {
     expect(Object.keys(SITE_PILOT_CHAT_CTA_BEFORE_USER_FRAME).map(Number)).toEqual([
       5, 7,
     ]);
@@ -40,7 +40,7 @@ describe("sitePilotChat Make sequence", () => {
     expect(SITE_PILOT_CHAT_CTA_BEFORE_USER_FRAME[6]).toBeUndefined();
   });
 
-  it("playback think hold matches Make ~1400ms", () => {
+  it("playback think hold matches Legacy ~1400ms", () => {
     expect(SITE_PILOT_CHAT_PLAYBACK_THINK_MS).toBe(1400);
   });
 });

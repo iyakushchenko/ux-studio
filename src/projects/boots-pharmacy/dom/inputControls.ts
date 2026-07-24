@@ -25,7 +25,7 @@ export function markBoosterCheckboxRow(row: HTMLElement): void {
   row.dataset.studioBooster = "true";
 }
 
-/** React pilot screens own their own checkbox/radio state — do not Make-mutate them. */
+/** React pilot screens own their own checkbox/radio state — do not Legacy-mutate them. */
 export function isReactOwnedInputRow(row: HTMLElement): boolean {
   return (
     row.dataset.studioReactOwned === "true" ||
@@ -242,7 +242,7 @@ export function handleProtoInputClick(target: HTMLElement): boolean {
   );
   if (!radioRow) return false;
 
-  // React screens own radio state — never Make-mutate them.
+  // React screens own radio state — never Legacy-mutate them.
   if (isReactOwnedInputRow(radioRow)) return false;
 
   ensureRadioRow(radioRow);

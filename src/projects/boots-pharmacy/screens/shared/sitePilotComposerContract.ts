@@ -1,5 +1,5 @@
 /**
- * Shared Site Pilot composer — Home + Chat Make-identical query row / mic / send.
+ * Shared Site Pilot composer — Home + Chat Legacy-identical query row / mic / send.
  * `data-studio-action` ids differ by surface (recording / MCP).
  */
 

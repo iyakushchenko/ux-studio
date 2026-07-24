@@ -23,7 +23,7 @@ import "./pdp.css";
 
 const GP_PROMO_COPY =
   "Book your doctor appointment online. Fast and convenient.";
-/** Download glyph paths from Make `icon=download` (Frame126). */
+/** Download glyph paths from Legacy `icon=download` (Frame126). */
 const DOWNLOAD_GLYPH_BAR =
   "M14 12.2682H0V13.9999H14V12.2682Z";
 const DOWNLOAD_GLYPH_ARROW =

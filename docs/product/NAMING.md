@@ -1,7 +1,7 @@
 # Naming conventions — UX Studio
 
 **Status:** Locked (Tech Director, 2026-07-19)  
-**Scope:** New files + applied engine renames. **No big-bang** rename of every Make dump class.  
+**Scope:** New files + applied engine renames. **No big-bang** rename of every Legacy dump class.  
 **Audience:** Every agent creating or renaming files.  
 **Map:** [ARCHITECTURE.md](./ARCHITECTURE.md) · [HYGIENE.md](./HYGIENE.md)
 
@@ -14,7 +14,7 @@ This product is **UX Studio**, not a prototype nickname.
 | Rule | Detail |
 |------|--------|
 | **No new `proto*` / `Proto*` filenames** | Use domain names (`recording`, `nav`, `studio`, `scenario`, `journey`) or short role names. |
-| **No new `.proto-*` CSS classes** | PANEL/chrome → `.studio-nav-*`, `.studio-*`, `.studio-agent-testing-*`. Concept Make leftovers may remain in LEGACY until that screen retires. |
+| **No new `.proto-*` CSS classes** | PANEL/chrome → `.studio-nav-*`, `.studio-*`, `.studio-agent-testing-*`. Concept Legacy leftovers may remain in LEGACY until that screen retires. |
 | **No new `data-proto-*` attributes** | Use `data-studio-*` (+ `dataset.studio*`). |
 | Prefer window APIs | `window.__studio*`. Keep `__proto*` as **stable aliases**. |
 | Journey beat field | `protoTab` may remain until a beat-schema migration. |

@@ -21,7 +21,7 @@
 │  PROJECT styleguide / theme (delta)     │
 │  src/projects/<id>/styleguide/          │
 │  Brand primary, logos, accents, fonts   │
-│  Concept copy cues from coarse Make     │
+│  Concept copy cues from coarse Legacy     │
 │  CSS variables ONLY under               │
 │  [data-studio-project="<id>"]            │
 │  Small helper — not a second DS         │
@@ -34,6 +34,14 @@
 | **Project delta** | Remap `--uxds-*` brand facts + logos/fonts from coarse concepts | Component rules, hover forks, layout hacks, reinventing buttons |
 
 **HARD:** Page create must inherit BASE kits first — [PAGE_CREATE_INHERITANCE.md](./PAGE_CREATE_INHERITANCE.md). Theme grows only when the concept brings a real brand fact.
+
+### When theme applies vs when direct UXDS parity is required (PO, 2026-07-24)
+
+**Default:** every project page adheres to **its own project theme** (brand delta above BASE) — this is the normal case for a client brand concept (e.g. `boots-pharmacy`).
+
+**Exception:** a page built **for UXDS itself** (the reference project, `label: "UXDS - Larkin"`, `id: "puma"` in the registry — see [PROJECT_CONTRACT.md](./PROJECT_CONTRACT.md)) gets **no brand delta at all**. Theme stays off; the page must match UXDS **exactly** — structure, naming, tokens, variables — with zero remap. The whole point of that project is to be the undiluted UXDS reference, not another brand skin. Do not add a `theme.css` for it, do not set project-brand tokens, do not treat UXDS "defaults" as just another project's palette.
+
+If it's unclear which case applies: is this page proving a **client concept**, or is it proving **UXDS itself**? The former gets a theme; the latter gets 1:1 parity.
 
 ---
 

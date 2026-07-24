@@ -22,7 +22,7 @@
  *  - check:hygiene · check:links · check:version · check:parity-* · check:theme-brand
  *  - check:page-final-pass
  *
- * Concept LEGACY `.proto-*` in globals-*.css / Make wire / UXDS link aliases = OK until screen retire.
+ * Concept LEGACY `.proto-*` in globals-*.css / Legacy wire / UXDS link aliases = OK until screen retire.
  * Policy: docs/product/NAMING.md · COMMAND_DOCTRINE.md · STUDIO_AUTO_RULES.md
  */
 import fs from "node:fs";
@@ -49,7 +49,7 @@ const BOOTS_STUB_ALLOW = new Set([
   "docs/product/BOOTS_REACT_SCREEN_PILOT.md",
 ]);
 
-/** UXDS may keep Make class aliases for one-pattern link contract. */
+/** UXDS may keep Legacy class aliases for one-pattern link contract. */
 const PROTO_CSS_ALLOW = new Set([
   "src/uxds/components/text-link.css",
 ]);
