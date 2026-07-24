@@ -81,6 +81,8 @@ While doing **anything** the PO asks, the agent must **spot issues or forecast t
 
 If a risk is real or likely, **fix or flag it in the same turn** — do not leave it for the PO to discover.
 
+**Locked (PO mandate, 2026-07-24) — IxD is a product-value pillar, not decoration:** Interaction design (loading/pending states, commit confirmations, hover/press feedback, entrance/exit transitions) is one of this product's core business-value pillars, same tier as fidelity or REC correctness — not a nice-to-have polish pass. The PO will call out IxD explicitly where the scenario is non-obvious, but the agent does **not** wait for that instruction on the common cases: any control that optimistically flips state ahead of a real commit (wishlist/save/add-to-cart-shaped actions), any async action with a real wait, any reveal/dismiss — these are well-established UX rule-of-thumb territory. The agent has standing authority to add `@/uxds/motion` / existing `src/uxds/interactions/` primitives proactively for these cases in the same turn as the surrounding work, without a separate ask — reuse an existing primitive (`PendingSpinnerIcon`, `CommitPulseIcon`, accordion/disclosure motion, etc.) before inventing a new one. Missing IxD on a rule-of-thumb case is a forecasting miss, same class as missing hover/focus.
+
 ### Blast-radius self-check (after ANY UI change)
 
 **Locked (PO rage list, 2026-07-19).** After changing any visible UI (page, kit CSS, Studio chrome), the agent must **proactively scan adjacent chrome** before claiming done — Summarizer post-change checklist spirit:

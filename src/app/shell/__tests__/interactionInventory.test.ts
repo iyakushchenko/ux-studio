@@ -44,6 +44,27 @@ describe("interaction inventory", () => {
     expect(result.totals.invalid).toBe(1);
   });
 
+  it("flags a control as invalid when its only identity attribute is shared by >1 element (PP-49 ambiguous-target)", () => {
+    document.body.innerHTML = `<main id="surface">
+      <button data-name="component.input.button">Change vaccine</button>
+      <button data-name="component.input.button">Change location</button>
+    </main>`;
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue(rect());
+    vi.spyOn(window, "getComputedStyle").mockReturnValue({
+      display: "block",
+      visibility: "visible",
+      opacity: "1",
+      cursor: "auto",
+    } as CSSStyleDeclaration);
+    const result = inventorySurface(document.querySelector("main")!, {
+      id: "book-step-2",
+      label: "Book step 2",
+      kind: "screen",
+    });
+    expect(result.totals.invalid).toBe(2);
+    expect(result.items.every((item) => item.issues.includes("ambiguous-target"))).toBe(true);
+  });
+
   it("maps every registered surface including Hub and restores the original surface", async () => {
     document.body.innerHTML = `<main><button data-studio-action="go">Go</button></main>`;
     vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue(rect());

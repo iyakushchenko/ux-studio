@@ -58,6 +58,7 @@ function VaccineTile({
               ? "proto-avail-btn-secondary proto-avail-btn-secondary--sm proto-avail-btn-secondary--chosen"
               : "proto-avail-btn-secondary proto-avail-btn-secondary--sm"
           }
+          data-studio-action={`vaccine-select-${vaccine.id}`}
           onClick={(e) => {
             e.stopPropagation();
             onSelect();

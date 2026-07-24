@@ -1368,12 +1368,21 @@ export function registerStudioMcpHelpers(options: {
 
     await stepBackOnce(["appointment-history"], "details-to-history");
     await stepBackOnce(["confirmation"], "history-to-confirmation");
-    await stepBackOnce(["book-step2-reserve"], "confirmation-to-reserve");
+    await stepBackOnce(["book-step3-camera"], "confirmation-to-camera");
+    await stepBackOnce(["book-step2-reserve"], "camera-to-reserve");
     await stepBackOnce(["book-step2-time"], "reserve-to-time");
     await stepBackOnce(["book-step2-date"], "time-to-date");
     await stepBackOnce(["book-step2"], "date-to-book-step2");
-    await stepBackOnce(["choose-location"], "book-step2-to-choose-location");
-    await stepBackOnce(["traditional-pdp"], "choose-location-to-pdp");
+    // Sarah's account state (logged in + saved location) skips choose-location
+    // during retreat by design (shouldSkipTraditionalAccountBeat) — accept
+    // either landing so the smoke isn't coupled to persona saved-location state.
+    const afterBookStep2 = await stepBackOnce(
+      ["choose-location", "traditional-pdp"],
+      "book-step2-to-choose-location"
+    );
+    if (afterBookStep2?.beatId === "choose-location") {
+      await stepBackOnce(["traditional-pdp"], "choose-location-to-pdp");
+    }
     await stepBackOnce(["traditional-plp"], "pdp-to-plp");
 
     checks.push({

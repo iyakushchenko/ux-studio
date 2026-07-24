@@ -9,7 +9,7 @@ import {
   getSelectedAppointmentId,
   isTerminalAppointmentStatus,
 } from "@/projects/boots-pharmacy/data/appointments";
-import { isMakeParkedForScreen } from "../retireMakeUnderPage";
+import { isMakeRetiredForScreen } from "../retireMakeUnderPage";
 import { APPOINTMENT_DETAILS_REACT_SCREEN_ID } from "./appointmentDetailsContract";
 
 export type AppointmentDetailsMcpProbeStep = {
@@ -80,7 +80,7 @@ export function appointmentDetailsMcpProbeSteps(): AppointmentDetailsMcpProbeSte
       selector: HOST_SEL,
       action: "assert",
       assert: () => {
-        if (!isMakeParkedForScreen(APPOINTMENT_DETAILS_REACT_SCREEN_ID)) {
+        if (!isMakeRetiredForScreen(APPOINTMENT_DETAILS_REACT_SCREEN_ID)) {
           return "Make leak: expected Make Frame children parked for appointment-details";
         }
         return true;

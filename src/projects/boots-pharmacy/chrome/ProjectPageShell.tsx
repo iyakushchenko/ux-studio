@@ -1,11 +1,12 @@
 /**
- * Project page-shell substrate — erase-Make Phase E.
+ * Project page-shell substrate — erase-Make Phase E (complete, 2026-07-23).
  *
- * Replaces `frame/index.tsx`'s `Frame219` (the former Figma export) as the
- * thing rendered directly inside `.studio-viewport`. Frame219 is NOT deleted
- * yet (see docs/product/NEXT_STEPS.md Phase E note) — this component only
- * takes over as the *live* substrate every screen mount / `dynamicCSS` rule /
- * `footerMount` depends on.
+ * Replaced `frame/index.tsx`'s `Frame219` (the former Figma export) as the
+ * thing rendered directly inside `.studio-viewport`. `frame/index.tsx` is
+ * deleted (NEXT_STEPS.md Phase E item 8b, hard-green) — only `frame/`'s
+ * image/SVG asset files remain, still legitimately imported as a shared
+ * asset library. This component is the *live* substrate every screen mount /
+ * `dynamicCSS` rule / `footerMount` depends on.
  *
  * Contract every consumer relies on (`BootsPharmacyProjectView.tsx`
  * `dynamicCSS`, every `screens/*Contract.ts` `SCREEN_SELECTOR`,

@@ -1,11 +1,7 @@
-import { useEffect, useLayoutEffect, useRef, type MouseEvent } from "react";
+import type { MouseEvent } from "react";
 import { CloseIcon } from "@/app/chrome/CloseIcon";
 import { useOverlayDismiss } from "@/app/chrome/useOverlayDismiss";
-import {
-  clonePdpRtbStack,
-  syncQuickViewBoosterState,
-  wireQuickViewRtb,
-} from "@/projects/boots-pharmacy/dom/pdpRtb";
+import { PdpRtbCard } from "@/projects/boots-pharmacy/screens/pdp/PdpRtbCard";
 
 type Props = {
   open: boolean;
@@ -29,71 +25,6 @@ export default function QuickViewPopup({
   onOpenLogin,
 }: Props) {
   const { mounted, scrimClassName, onScrimAnimationEnd } = useOverlayDismiss(open);
-  const mountRef = useRef<HTMLDivElement>(null);
-  const cleanupRef = useRef<(() => void) | null>(null);
-  const onBookNowRef = useRef(onBookNow);
-  const onViewDetailsRef = useRef(onViewDetails);
-  const onToggleBoosterRef = useRef(onToggleBooster);
-  const onOpenLoginRef = useRef(onOpenLogin);
-  const loggedInRef = useRef(loggedIn);
-
-  onBookNowRef.current = onBookNow;
-  onViewDetailsRef.current = onViewDetails;
-  onToggleBoosterRef.current = onToggleBooster;
-  onOpenLoginRef.current = onOpenLogin;
-  loggedInRef.current = loggedIn;
-
-  useLayoutEffect(() => {
-    if (!mounted) {
-      cleanupRef.current?.();
-      cleanupRef.current = null;
-      mountRef.current?.replaceChildren();
-      return;
-    }
-    if (!open) return;
-
-    cleanupRef.current?.();
-    cleanupRef.current = null;
-
-    const mount = mountRef.current;
-    if (!mount) return;
-
-    mount.replaceChildren();
-    const clone = clonePdpRtbStack();
-    if (!clone) return;
-
-    mount.appendChild(clone);
-    syncQuickViewBoosterState(clone, includeBoosterDose);
-    cleanupRef.current = wireQuickViewRtb(clone, {
-      onBookNow: () => onBookNowRef.current(),
-      onViewDetails: () => onViewDetailsRef.current(),
-      onToggleBooster: () => onToggleBoosterRef.current(),
-      onOpenLogin: (tab) => onOpenLoginRef.current(tab),
-      loggedIn: loggedInRef.current,
-    });
-
-    return () => {
-      cleanupRef.current?.();
-      cleanupRef.current = null;
-    };
-  }, [mounted, open, includeBoosterDose]);
-
-  useEffect(() => {
-    if (!open) return;
-    const clone = mountRef.current?.querySelector<HTMLElement>(
-      '[data-studio-quick-view-clone="true"]'
-    );
-    if (!clone) return;
-    syncQuickViewBoosterState(clone, includeBoosterDose);
-
-    const reqText = Array.from(clone.querySelectorAll<HTMLParagraphElement>("p")).find((p) =>
-      p.textContent?.includes("Boots Account will be required")
-    );
-    const loginBlock = reqText?.parentElement;
-    if (loginBlock) {
-      loginBlock.style.display = loggedIn ? "none" : "";
-    }
-  }, [open, includeBoosterDose, loggedIn]);
 
   if (!mounted) return null;
 
@@ -128,10 +59,19 @@ export default function QuickViewPopup({
             <CloseIcon />
           </button>
         </div>
-        <div
-          ref={mountRef}
-          className="proto-avail-body proto-quick-view-body proto-quick-view-popup"
-        />
+        <div className="proto-avail-body proto-quick-view-body proto-quick-view-popup">
+          {open ? (
+            <PdpRtbCard
+              includeBoosterDose={includeBoosterDose}
+              onToggleBooster={onToggleBooster}
+              onBookNow={onBookNow}
+              loggedIn={loggedIn}
+              onOpenLogin={onOpenLogin}
+              secondaryLabel="View Details"
+              onSecondaryAction={onViewDetails}
+            />
+          ) : null}
+        </div>
       </div>
     </div>
   );

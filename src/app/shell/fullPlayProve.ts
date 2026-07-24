@@ -237,25 +237,15 @@ function lookupJourneyCatalog(journeyId: string): JourneyCatalogHit | null {
   }
 }
 
-function inferStartScreenId(startBeatId: string): string {
-  const id = startBeatId.toLowerCase();
-  if (id.includes("site-pilot") || id.includes("home")) return "site-pilot";
-  if (id.includes("chat")) return "chat";
-  if (id.includes("pdp")) return "pdp";
-  if (id.includes("plp") || id.includes("vaccination")) return "plp";
-  if (id.includes("book-step-3") || id.includes("confirmation")) {
-    return "book-step-3";
-  }
-  if (id.includes("book-step-2")) return "book-step-2";
-  if (id.includes("book-step-1") || id.includes("location")) {
-    return "book-step-1";
-  }
-  // Traditional short REC usually starts on PLP.
-  return "plp";
-}
-
-function inferEndScreenId(endBeatId: string): string {
-  const id = endBeatId.toLowerCase();
+/**
+ * Screen-identifying substrings only — no fallback. Returns null for generic
+ * non-screen beat ids (camera/scroll-settle markers etc.) so callers can
+ * distinguish "unresolvable" from a real screen match, instead of silently
+ * inheriting a wrong default (see PP-48: a recorded journey's *last* beat is
+ * routinely a trailing `scroll-stop-camera-N` marker with no screen name).
+ */
+function tryInferScreenId(beatId: string): string | null {
+  const id = beatId.toLowerCase();
   if (id.includes("appointment-details") || id.includes("details")) {
     return "appointment-details";
   }
@@ -265,11 +255,20 @@ function inferEndScreenId(endBeatId: string): string {
   if (id.includes("confirmation") || id.includes("book-step-3")) {
     return "book-step-3";
   }
+  if (id.includes("book-step-2")) return "book-step-2";
+  if (id.includes("book-step-1") || id.includes("location")) {
+    return "book-step-1";
+  }
   if (id.includes("chat")) return "chat";
   if (id.includes("pdp")) return "pdp";
-  if (id.includes("plp")) return "plp";
+  if (id.includes("plp") || id.includes("vaccination")) return "plp";
   if (id.includes("site-pilot") || id.includes("home")) return "site-pilot";
-  return inferStartScreenId(endBeatId);
+  return null;
+}
+
+function inferStartScreenId(startBeatId: string): string {
+  // Traditional short REC usually starts on PLP.
+  return tryInferScreenId(startBeatId) ?? "plp";
 }
 
 function resolveExperience(
@@ -325,7 +324,14 @@ function resolvePreset(options?: FullPlayProveOptions): FullPlayProvePreset {
       startScreenId:
         options?.startScreenId ?? inferStartScreenId(startBeatId),
       endBeatId,
-      endScreenId: options?.endScreenId ?? inferEndScreenId(endBeatId),
+      // Recorded journeys routinely auto-advance past their last *recorded*
+      // beat (e.g. Reserve → Confirmation is an automatic transition REC
+      // never captures as its own beat) — no static beat-name inference can
+      // reliably predict that. Only assert an end screen when the caller
+      // explicitly knows it; empty string is a no-op for
+      // assertPlaybackPlayEndedAtEnd's `if (options.endScreenId && ...)`
+      // guard, so peak-count stays the real correctness signal here.
+      endScreenId: options?.endScreenId ?? "",
       expectedPeak,
       timeoutMs: options?.timeoutMs ?? base.timeoutMs,
       // Recorded journey contracts use their own catalog total, never built-in totals.
@@ -530,7 +536,10 @@ export async function runFullPlayProve(
     );
     if (peakErr) errors.push(peakErr);
     if (!end?.pass) {
-      errors.push(end?.reason ?? "play-end-at-end-failed");
+      // smoke.reason already covers this when the *only* failure is the
+      // end-screen check (same underlying assert) — don't double-report it.
+      const endReason = end?.reason ?? "play-end-at-end-failed";
+      if (!errors.includes(endReason)) errors.push(endReason);
     }
 
     // Verdict MUST land before leave-pause: capturePaused drops kind "info"

@@ -459,10 +459,11 @@ export async function runRecNewCjmProve(
 
   // HARD: first beat must equal screen at ● Start.
   const lastSession = getLastRecordingSession();
-  const beat0 =
+  const mintedBeatIds =
     (
       afterList as Array<{ id: string; beatIds?: string[] }>
-    ).find((j) => j.id === journeyId)?.beatIds?.[0] ?? null;
+    ).find((j) => j.id === journeyId)?.beatIds ?? [];
+  const beat0 = mintedBeatIds[0] ?? null;
   if (lastSession) {
     const startAssert = assertFirstBeatMatchesStartScreen(lastSession, {
       id: journeyId,
@@ -491,9 +492,19 @@ export async function runRecNewCjmProve(
     await delay(settle);
   }
 
+  // Pass the catalog snapshot we already have (captured right after minting,
+  // before the REC-off toggle above) instead of letting resolvePreset() redo
+  // its own lookup later — that second lookup can race the toggle's cleanup
+  // and silently find an empty beatIds. No endScreenId here: a recorded
+  // journey routinely auto-advances past its last *recorded* beat (Reserve →
+  // Confirmation is an automatic transition REC never captures as its own
+  // beat), so no static inference can reliably predict it — peak-count
+  // (already asserted below) is the real correctness signal for rec-*.
   const play = await runFullPlayProve({
     journeyId,
     experience,
+    startBeatId: beat0 ?? undefined,
+    endBeatId: mintedBeatIds[mintedBeatIds.length - 1] ?? undefined,
     timeoutMs: options?.timeoutMs ?? 120_000,
   });
   peak = play.peak;

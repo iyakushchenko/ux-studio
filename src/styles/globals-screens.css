@@ -1202,12 +1202,7 @@
   border-radius: 16px 16px 0 0 !important;
 }
 
-.proto-quick-view-popup [data-name="module.pdp.rtb"] > div > div {
-  gap: 48px !important;
-  padding: 48px !important;
-}
-
-.proto-quick-view-popup [data-name="module.pdp.rtb"] > div > div > :first-child {
+.proto-quick-view-popup [data-name="module.pdp.rtb"] .pdp__media {
   flex: 1 1 0 !important;
   min-width: 0 !important;
   aspect-ratio: 1 / 1 !important;

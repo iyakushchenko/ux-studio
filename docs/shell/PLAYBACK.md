@@ -128,6 +128,26 @@ Transport pin: `setDemoCursorJourneyMode(…, { parkAfterInteraction: cjm && !is
 
 ---
 
+## Manual step-forward chaining (read before writing a QA check against a beat id)
+
+A single **Step forward** click does not always stop on the very next beat. `journeyBeatDirector.ts`'s `shouldChainManualDirectorStepOnAdvance(previousBeat, nextBeat)` decides whether the same click should also run the *following* beat's director script in one gesture — e.g. selecting a book date auto-chains into the time-selection script; Reserve auto-chains into opening the confirmed appointment. When it returns true, `useJourneyPlayback.ts` calls `runChainedManualDirectorBeat` instead of stopping at `nextBeat`.
+
+**Consequence:** a beat with no director script of its own (`isDwellLandingBeat` — pure tab-landing/dwell, e.g. `book-step2`) can be **skipped over as an observable stop** during manual stepping. The engine still passes through it, but nothing outside the engine ever sees `beatId === "book-step2"` between two clicks — it may land directly on `book-step2-date`.
+
+**Do not write a QA/robot check that requires landing on an exact beat id if that beat can be a chain-through hop.** Check membership in the beat's *family* instead (e.g. `isBookStep2FamilyBeatId` / `isBookStep2BeatId`), or assert on the outcome the chain produces rather than the intermediate stop. PP-42 and PP-43 ([PAINPOINTS.md](../product/PAINPOINTS.md)) were both QA checks written before this doc existed, hardcoding an exact beat id that chaining legitimately skipped past.
+
+Current chain pairs (see `shouldChainManualDirectorStepOnAdvance` for the authoritative list — beats must also share `protoTab` except where noted):
+
+| From | To | Notes |
+|------|----|-------|
+| `bookScript: reserve-appointment` | `tabScript: confirmation-open-appointments` | Cross-screen chain (no shared `protoTab` requirement) |
+| `tabScript: confirmation-open-appointments` | `tabScript: history-view-details` | Cross-screen chain |
+| `tabScript: login-sign-in` | `tabScript: book-location-pick` | Cross-screen chain |
+| `bookScript: select-book-date` | `bookScript: select-book-time` | Same `protoTab` |
+| `bookScript: select-book-time` | `bookScript: reserve-appointment` | Same `protoTab` |
+
+---
+
 ## How to change an existing script
 
 1. Find the beat in `personas/<persona>/journeys.ts` — note its `homeScript` / `tabScript` / etc.

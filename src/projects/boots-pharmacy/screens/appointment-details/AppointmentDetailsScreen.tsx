@@ -235,6 +235,7 @@ export function AppointmentDetailsScreen({
               type="button"
               className="appointment-details__crumb-link appointment-details__crumb-btn"
               data-studio-appointment-history-crumb="true"
+              data-studio-action="appointment-details-go-history"
               onClick={onGoHistory}
             >
               {APPOINTMENT_DETAILS_CRUMB_HISTORY}

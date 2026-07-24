@@ -21,6 +21,8 @@
     "check:theme-brand": "node scripts/check-theme-brand.mjs",
     "check:version": "node scripts/check-release-version-changelog-sync.mjs",
     "check:uxds-inventory": "node scripts/check-uxds-inventory.mjs",
+    "check:cjm-coverage": "node scripts/check-cjm-interaction-coverage.mjs",
+    "check:interactive-identity": "node scripts/check-interactive-identity.mjs",
     "notes": "node scripts/release-notes.mjs list",
     "notes:list": "node scripts/release-notes.mjs list",
     "notes:append": "node scripts/release-notes.mjs append",

@@ -1,6 +1,7 @@
 import { describePlaybackElement } from "@/app/shell/playbackInteractionContext";
 import { logQaCheck, logQaCursor } from "@/app/shell/controlPanelQa";
 import { playbackDiagCursor } from "@/app/shell/playbackDiag";
+import { isBookStep2FamilyBeatId } from "@/app/orchestra/journeyBeatDirector";
 import {
   isDemoCursorFadedAtJourneyEnd,
   isDemoCursorJourneyModePinned,
@@ -104,17 +105,6 @@ const MAX_EVENTS = 20;
 const MAX_PATH_SAMPLES = 80;
 /** Post-settle left/top delta above this = on-target drift/re-aim. */
 const ON_TARGET_DRIFT_FAIL_PX = 0.75;
-const BOOK_STEP2_BEATS = new Set([
-  "book-step2",
-  "book-step-2",
-  "book-step2-date",
-  "book-step2-time",
-  "book-step2-reserve",
-  "book-step-2-date",
-  "book-step-2-time",
-  "book-step-2-reserve",
-]);
-
 const TRAVEL_OR_CLICK_ACTIONS = new Set<PlaybackCursorAction>([
   "travel",
   "move",
@@ -137,8 +127,9 @@ let pathSettle: { x: number; y: number } | null = null;
 let maxPostSettleDriftPx = 0;
 let lastPathSampleAt = 0;
 
+/** Delegates to the engine's own beat-family SSoT — do not re-enumerate here. */
 export function isBookStep2BeatId(beatId: string | undefined | null): boolean {
-  return beatId != null && BOOK_STEP2_BEATS.has(beatId);
+  return isBookStep2FamilyBeatId(beatId);
 }
 
 export function isBookStep2DwellBeatId(beatId: string | undefined | null): boolean {

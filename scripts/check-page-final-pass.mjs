@@ -69,6 +69,7 @@ const SCREEN_EXTRA_SOURCES = {
   "appointment-details": [
     "src/projects/boots-pharmacy/screens/shared/AppointmentCard.tsx",
   ],
+  pdp: ["src/projects/boots-pharmacy/screens/pdp/PdpRtbCard.tsx"],
 };
 
 const SCREEN_MOUNTS = {

@@ -1,0 +1,232 @@
+{
+  "version": 1,
+  "exportedAt": "2026-07-24T04:27:39.163Z",
+  "projectId": "boots-pharmacy",
+  "personaId": "sarah-jenkins",
+  "journey": {
+    "id": "rec-trad-mryftr4p-hyke",
+    "label": "Thorough REC v2 — forgot-password, guest→login, date/time/location popup",
+    "beats": [
+      {
+        "id": "plp",
+        "label": "Vaccinations",
+        "kind": "tab-landing",
+        "protoTab": 3
+      },
+      {
+        "id": "plp-book-now",
+        "label": "Book Now",
+        "kind": "tab-landing",
+        "recordedClick": {
+          "selectorChain": ["[data-studio-action=\"plp-book-now\"]"],
+          "element": "Book Now"
+        },
+        "protoTab": 3,
+        "dwellMs": 4000
+      },
+      {
+        "id": "pdp",
+        "label": "Vaccine details",
+        "kind": "tab-landing",
+        "protoTab": 4
+      },
+      {
+        "id": "quick-sign-in",
+        "label": "Quick Sign In",
+        "kind": "tab-landing",
+        "recordedClick": {
+          "selectorChain": [
+            "[data-name=\"module.pdp\"]",
+            "[data-name=\"module.pdp.rtb\"]",
+            "[data-name=\"component.pdp.rtb\"]",
+            "button"
+          ],
+          "element": "Quick Sign In"
+        },
+        "protoTab": 4,
+        "dwellMs": 4000
+      },
+      {
+        "id": "login-forgot-password",
+        "label": "Login Forgot Password",
+        "kind": "tab-landing",
+        "recordedClick": {
+          "selectorChain": ["[data-studio-action=\"login-forgot-password\"]"],
+          "element": "Login Forgot Password",
+          "modalId": "login"
+        },
+        "protoTab": 4,
+        "dwellMs": 4000
+      },
+      {
+        "id": "login-forgot-send",
+        "label": "Login Forgot Send",
+        "kind": "tab-landing",
+        "recordedClick": {
+          "selectorChain": ["[data-studio-action=\"login-forgot-send\"]"],
+          "element": "Login Forgot Send",
+          "modalId": "login"
+        },
+        "protoTab": 4,
+        "dwellMs": 4000
+      },
+      {
+        "id": "login-forgot-back",
+        "label": "Login Forgot Back",
+        "kind": "tab-landing",
+        "recordedClick": {
+          "selectorChain": ["[data-studio-action=\"login-forgot-back\"]"],
+          "element": "Login Forgot Back",
+          "modalId": "login"
+        },
+        "protoTab": 4,
+        "dwellMs": 4000
+      },
+      {
+        "id": "login-sign-in",
+        "label": "Login Sign In",
+        "kind": "tab-landing",
+        "recordedClick": {
+          "selectorChain": ["[data-studio-action=\"login-sign-in\"]"],
+          "element": "Login Sign In",
+          "modalId": "login"
+        },
+        "protoTab": 4,
+        "dwellMs": 4000
+      },
+      {
+        "id": "book-step-2",
+        "label": "Book — date & time",
+        "kind": "tab-landing",
+        "protoTab": 6
+      },
+      {
+        "id": "change-location",
+        "label": "Change Location",
+        "kind": "tab-landing",
+        "recordedClick": {
+          "selectorChain": ["[data-studio-action=\"change-location\"]"],
+          "element": "Change Location"
+        },
+        "protoTab": 6,
+        "dwellMs": 4000
+      },
+      {
+        "id": "see-working-hours",
+        "label": "See working hours",
+        "kind": "tab-landing",
+        "recordedClick": {
+          "selectorChain": [
+            "[data-studio-avail-store=\"covent\"]",
+            "[data-name=\"uxds.interaction.disclosure.trigger\"]"
+          ],
+          "element": "See working hours",
+          "modalId": "choose-pharmacy"
+        },
+        "protoTab": 6,
+        "dwellMs": 4000
+      },
+      {
+        "id": "avail-view-map",
+        "label": "View Map",
+        "kind": "overlay",
+        "recordedClick": {
+          "selectorChain": ["[data-studio-action=\"avail-view-map\"]"],
+          "element": "View Map",
+          "modalId": "choose-pharmacy"
+        },
+        "protoTab": 6,
+        "dwellMs": 4000
+      },
+      {
+        "id": "avail-view-list",
+        "label": "View List",
+        "kind": "overlay",
+        "recordedClick": {
+          "selectorChain": ["[data-studio-action=\"avail-view-list\"]"],
+          "element": "View List",
+          "modalId": "choose-pharmacy"
+        },
+        "protoTab": 6,
+        "dwellMs": 4000
+      },
+      {
+        "id": "close-availability-tool",
+        "label": "Close Availability Tool",
+        "kind": "tab-landing",
+        "recordedClick": {
+          "selectorChain": ["button[aria-label=\"Close\\ Availability\\ Tool\"]"],
+          "element": "Close Availability Tool",
+          "modalId": "choose-pharmacy"
+        },
+        "protoTab": 6,
+        "dwellMs": 4000
+      },
+      {
+        "id": "june-15",
+        "label": "June 15",
+        "kind": "tab-landing",
+        "recordedClick": {
+          "selectorChain": [
+            "[data-name=\"calendar. date. cell\"][data-studio-cal-kind=\"date\"][data-studio-cal-month=\"June\"][data-studio-cal-value=\"15\"]"
+          ],
+          "element": "June 15"
+        },
+        "protoTab": 6,
+        "dwellMs": 4000
+      },
+      {
+        "id": "scroll-stop-camera",
+        "label": "Camera — System Message",
+        "kind": "camera",
+        "protoTab": 6,
+        "camera": {
+          "dwellMs": 2001,
+          "selectorChain": [
+            "[data-name=\"component.appointment.summary\"]",
+            "[data-name=\"component.gse.system.message\"]"
+          ],
+          "anchorSelector": "[data-name=\"component.gse.system.message\"]"
+        }
+      },
+      {
+        "id": "book-step-2-reserve-camera",
+        "label": "Camera — Step 2 Reserve",
+        "kind": "camera",
+        "protoTab": 6,
+        "camera": {
+          "dwellMs": 2004,
+          "selectorChain": [
+            "[data-name=\"calendar. date. cell\"][data-studio-cal-kind=\"time\"][data-studio-cal-value=\"12:15\"]"
+          ],
+          "anchorSelector": "[data-name=\"calendar. date. cell\"][data-studio-cal-kind=\"time\"][data-studio-cal-value=\"12:15\"]"
+        }
+      },
+      {
+        "id": "book-step-2-reserve",
+        "label": "Step 2 Reserve",
+        "kind": "tab-landing",
+        "recordedClick": {
+          "selectorChain": ["[data-studio-action=\"book-step-2-reserve\"]"],
+          "element": "Step 2 Reserve"
+        },
+        "protoTab": 6,
+        "dwellMs": 4000
+      },
+      {
+        "id": "scroll-stop-camera-2",
+        "label": "Camera — icon / accent / ok",
+        "kind": "camera",
+        "protoTab": 7,
+        "camera": {
+          "dwellMs": 2001,
+          "selectorChain": [
+            "[data-name=\"component.appointment.summary\"]",
+            "[data-name=\"icon / accent / ok\"]"
+          ],
+          "anchorSelector": "[data-name=\"icon / accent / ok\"]"
+        }
+      }
+    ]
+  }
+}

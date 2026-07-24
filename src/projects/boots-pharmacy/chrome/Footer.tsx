@@ -84,6 +84,7 @@ function FooterLinkColumns({ onGoToPlp }: FooterNavHandlers) {
                   <button
                     type="button"
                     className="proto-link"
+                    data-studio-action={`footer-link-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
                     onClick={
                       screen ? () => onColumnLinkClick(link) : undefined
                     }

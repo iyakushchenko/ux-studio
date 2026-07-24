@@ -13,6 +13,7 @@ import {
   simulateDemoPointerClick,
   simulateDemoPointerHover,
 } from "@/app/scenario/demoCursor";
+import { waitForContentLoadSettled } from "@/app/scenario/playbackReadiness";
 import {
   getPrototypeScrollRoot,
   isDemoTargetInPrototypeView,
@@ -38,7 +39,7 @@ import {
 } from "@/app/shell/agent-testing/agentTestingOverlay";
 import { logControlPanel } from "@/app/shell/controlPanelLog";
 import { pollSmokePoSignal } from "@/app/shell/smokePoSignalPoll";
-import { isMakeParkedForScreen } from "@/projects/boots-pharmacy/screens/retireMakeUnderPage";
+import { isMakeRetiredForScreen } from "@/projects/boots-pharmacy/screens/retireMakeUnderPage";
 /** Ensure Boots screen recipes are registered before probe resolve. */
 import "@/projects/boots-pharmacy/screens/registerMcpPageProbes";
 import {
@@ -532,7 +533,7 @@ function pdpProbeSteps(): ProbeStep[] {
         if (document.querySelector('[data-studio-react-screen="pdp"]') == null) {
           return "missing React PDP host";
         }
-        if (!isMakeParkedForScreen("pdp")) {
+        if (!isMakeRetiredForScreen("pdp")) {
           return "Make leak: expected Make Frame children parked for pdp";
         }
         return true;
@@ -1157,6 +1158,7 @@ async function runProbeStep(step: ProbeStep): Promise<McpPageProbeStepResult> {
   }
 
   if (step.action === "hover") {
+    await waitForContentLoadSettled();
     await revealDemoTargetForAgent(el);
     let hoverAssert: boolean | string = true;
     const hovered = await simulateDemoPointerHover(el, step.settleMs ?? 400, {
@@ -1187,6 +1189,10 @@ async function runProbeStep(step: ProbeStep): Promise<McpPageProbeStepResult> {
   }
 
   // click (default)
+  // A screen's own content-load interim (e.g. PLP listing reload) is
+  // intentionally uncompressed wall-clock time — a click that starts before
+  // it clears can land mid-reveal and silently lose its effect.
+  await waitForContentLoadSettled();
   await revealDemoTargetForAgent(el);
   // Reveal/scroll can allow React loading transitions to replace the target.
   // Re-resolve from the registered selector so probes never click stale nodes.
@@ -1296,6 +1302,19 @@ export async function runMcpPageProbe(
     }
     logAgentTestingOverlay("PASS  overlay-arm — BR panel visible");
     checks.push({ id: "overlay-arm", pass: true, detail: "BR panel visible" });
+
+    // Wishlist state persists in localStorage across runs/sessions — reset via
+    // the real click path (not a store poke) so pdp-heart-hover always starts
+    // from the same "Add to wishlist" rest state a fresh visitor would see.
+    if (screenId === "pdp") {
+      const wishlisted = document.querySelector<HTMLElement>(
+        '.pdp[data-studio-react-screen="pdp"] button[aria-label="Remove from wishlist"]'
+      );
+      if (wishlisted) {
+        await simulateDemoPointerClick(wishlisted, { scroll: true });
+        await delay(300);
+      }
+    }
 
     await preArmAgentTestingOverlay({
       preArmMs,

@@ -87,6 +87,7 @@ export function AppointmentCard({
         <button
           type="button"
           className="appointment-card__title appointment-card__title--link"
+          data-studio-action={`appointment-open-details-${appt.id}`}
           onClick={() => onOpenDetails && openDetails(appt, onOpenDetails)}
           onKeyDown={(e) => {
             if (e.key !== "Enter" && e.key !== " ") return;
@@ -146,6 +147,7 @@ export function AppointmentCard({
                 <button
                   type="button"
                   className="uxds-link appointment-card__refund-link"
+                  data-studio-action={`appointment-refund-${appt.id}`}
                   onClick={() =>
                     onSitePilotHome(getAppointmentRefundPilotQuery(appt))
                   }

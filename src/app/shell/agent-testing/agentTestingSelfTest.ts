@@ -520,7 +520,7 @@ export async function runQaSelfTestSmoke(): Promise<QaSelfTestSmokeResult> {
       checks.push(
         check(
           "dom-session-origin",
-          /Session:\s*Localhost:\d+\s*-\s*(Active|Checking|Offline)/i.test(
+          /Localhost:\d+\s*·\s*(Active|Checking|Offline)/i.test(
             sessionLine
           ),
           sessionLine.slice(0, 60)

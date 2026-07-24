@@ -163,6 +163,7 @@ export default function LoginPopup({ open, initialTab, onClose, onSignIn }: Prop
                     <button
                       type="button"
                       className="proto-avail-btn-primary proto-login-cta"
+                      data-studio-action="login-forgot-send"
                       onClick={() => setForgotSent(true)}
                     >
                       Send reset link
@@ -173,6 +174,7 @@ export default function LoginPopup({ open, initialTab, onClose, onSignIn }: Prop
                   type="button"
                   className="uxds-link proto-avail-link"
                   style={{ alignSelf: "center", marginTop: 8 }}
+                  data-studio-action="login-forgot-back"
                   onClick={() => switchTab("signin")}
                 >
                   Back to Sign in
@@ -235,7 +237,7 @@ export default function LoginPopup({ open, initialTab, onClose, onSignIn }: Prop
                   <label className="proto-login-label">
                     <span className="proto-login-label-text">
                       <span className="proto-login-required">*</span> Password
-                      <span className="uxds-link proto-avail-link proto-login-forgot" onClick={(e) => { e.preventDefault(); switchTab("forgot"); }}>Forgot Password?</span>
+                      <span className="uxds-link proto-avail-link proto-login-forgot" data-studio-action="login-forgot-password" onClick={(e) => { e.preventDefault(); switchTab("forgot"); }}>Forgot Password?</span>
                     </span>
                     <div className="proto-avail-field proto-avail-field--flex proto-login-input-wrap">
                       <input
@@ -251,6 +253,7 @@ export default function LoginPopup({ open, initialTab, onClose, onSignIn }: Prop
                   <label className="proto-login-remember">
                     <span
                       className={`proto-login-checkbox ${remember ? "proto-login-checkbox--checked" : ""}`}
+                      data-studio-action="login-remember-me"
                       onClick={(e) => { e.preventDefault(); setRemember(!remember); }}
                     >
                       {remember && <CheckMark />}
@@ -314,6 +317,7 @@ export default function LoginPopup({ open, initialTab, onClose, onSignIn }: Prop
               <button
                 type="button"
                 className="proto-avail-btn-primary proto-login-cta"
+                data-studio-action="login-create-account"
                 onClick={() => {
                   setCreateEmail("sarah.jenkins@example.com");
                   setCreatePassword("S@rah_Jnk!ns2024");

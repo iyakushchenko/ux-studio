@@ -142,6 +142,7 @@ export function AppointmentHistoryScreen({
                   <button
                     type="button"
                     className="uxds-link"
+                    data-studio-action="appointment-history-ask-site-pilot"
                     onClick={onAskSitePilot}
                   >
                     {APPOINTMENT_HISTORY_HELP_LINK}

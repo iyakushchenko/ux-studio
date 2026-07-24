@@ -116,6 +116,7 @@ function HeaderNav() {
           key={item.label}
           className="proto-header-sticky__nav-item"
           data-name="component.mega.menu.item"
+          data-studio-action={`header-nav-${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
         >
           <p>{item.label}</p>
           {item.kind !== "link" ? (
@@ -137,7 +138,11 @@ function HeaderNav() {
 
 function HeaderSearchAuxItem() {
   return (
-    <div className="proto-header-sticky__aux-item" data-name="component.header.aux.nav.item">
+    <div
+      className="proto-header-sticky__aux-item"
+      data-name="component.header.aux.nav.item"
+      data-studio-action="header-aux-search"
+    >
       <span className="proto-header-search-icon">
         <HeaderGlyphIcon icon={HEADER_SEARCH_GLYPH} size={16} />
       </span>
@@ -211,6 +216,7 @@ function HeaderAccountAuxItem({
     <div
       className="proto-header-sticky__aux-item proto-header-sticky__account-item"
       data-name="component.header.aux.nav.item"
+      data-studio-action="header-aux-account"
       style={{ position: "relative", cursor: "default" }}
       onMouseEnter={scheduleShow}
       onMouseLeave={scheduleHide}
@@ -233,6 +239,7 @@ function HeaderAccountAuxItem({
               type="button"
               className="proto-header-flyout-item"
               data-action={item.action}
+              data-studio-action={`header-account-${item.action}`}
               onClick={() => handleAction(item.action)}
             >
               <HeaderGlyphIcon icon={item.icon} />

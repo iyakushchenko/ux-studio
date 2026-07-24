@@ -53,6 +53,27 @@ describe("resolveStudioTouchpoint", () => {
       })
     ).toEqual({ label: "Book — confirmed", key: "beat:confirmation" });
   });
+
+  // PP-42: book-step3-camera shares tab child 3 with confirmation. If this
+  // returned "beat:confirmation" too, CJM step-back would self-loop forever
+  // (resolveJourneyRetreatTarget scans playlist by key, landing on itself).
+  it("keeps book-step3-camera's own key even though it shares the confirmation tab", () => {
+    expect(
+      resolveStudioTouchpoint({
+        availabilityOpen: false,
+        vaccinePickerOpen: false,
+        recipientPickerOpen: false,
+        loginPopupOpen: false,
+        quickViewOpen: false,
+        beatId: "book-step3-camera",
+        beatLabel: "Book Step 3 — show page",
+        bookConfirmationScreen: true,
+      })
+    ).toEqual({
+      label: "Book Step 3 — show page",
+      key: "beat:book-step3-camera",
+    });
+  });
 });
 
 describe("buildStudioTouchpointPlaylist", () => {

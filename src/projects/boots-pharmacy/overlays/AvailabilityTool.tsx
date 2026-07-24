@@ -862,6 +862,7 @@ export default function AvailabilityTool({
               <div className="proto-avail-field-wrap proto-avail-field-wrap--stack">
                 <label
                   className="proto-avail-field"
+                  data-studio-action="avail-goto-list-from-field"
                   onClick={() => goList()}
                 >
                   <input
@@ -897,6 +898,7 @@ export default function AvailabilityTool({
             <div className="proto-avail-search-row">
               <label
                 className={`proto-avail-field proto-avail-field--flex${nearMe ? " proto-avail-field--near" : ""}`}
+                data-studio-action="avail-search-field-reset"
                 onClick={(e) => {
                   if (nearMe || step === "map") {
                     e.preventDefault();
@@ -1152,6 +1154,7 @@ export default function AvailabilityTool({
                   <button
                     type="button"
                     className="proto-avail-btn-secondary"
+                    data-studio-action="avail-notify-me"
                     onClick={submitNotify}
                   >
                     Notify Me

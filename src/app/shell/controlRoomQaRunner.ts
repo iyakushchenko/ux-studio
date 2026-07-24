@@ -268,11 +268,22 @@ async function stepToBeatAndAssertNoPopup(
   await clickTransport("jump-to-start");
   await delay(500);
 
+  // Manual step-forward can chain straight through a dwell-only landing beat
+  // (e.g. book-step2 has no script — pdp's tabScript completion auto-chains
+  // into it, per shouldChainManualDirectorStepOnAdvance) — so the bare
+  // beatId itself may never be independently observable between clicks.
+  // Accept any beat in that family; the real assertion is "no stray overlay
+  // once we're inside book step 2", not "stopped on this exact sub-beat".
+  // isBookStep2BeatId is the engine's own beat-family SSoT — this check is
+  // currently only ever called for the book-step2 family, so it delegates
+  // straight to that rather than re-deriving a generic prefix match.
+  const reachedFamily = (id: string | undefined) => isBookStep2BeatId(id);
+
   for (let i = 0; i < maxSteps; i++) {
     const ready = await waitTransportIdle("forward");
     if (!ready) break;
     const before = readState();
-    if (before?.beatId === beatId) {
+    if (reachedFamily(before?.beatId)) {
       const strayPopup = hasVisibleBookStep2Overlay();
       return {
         id: `${beatId}-no-stray-popup`,
@@ -283,7 +294,7 @@ async function stepToBeatAndAssertNoPopup(
     if (!(await clickTransport("step-forward"))) break;
     await delay(600);
     const after = readState();
-    if (after?.beatId === beatId && !isOnAir()) {
+    if (reachedFamily(after?.beatId) && !isOnAir()) {
       const strayPopup = hasVisibleBookStep2Overlay();
       return {
         id: `${beatId}-no-stray-popup`,

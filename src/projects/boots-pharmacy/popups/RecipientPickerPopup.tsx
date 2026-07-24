@@ -121,6 +121,7 @@ export default function RecipientPickerPopup({
           <button
             type="button"
             className="proto-avail-btn-primary"
+            data-studio-action="recipient-picker-confirm"
             onClick={confirm}
           >
             Confirm

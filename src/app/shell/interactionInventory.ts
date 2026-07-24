@@ -108,26 +108,42 @@ function cssEscape(value: string): string {
   return globalThis.CSS?.escape ? CSS.escape(value) : value.replace(/["\\]/g, "\\$&");
 }
 
-function stableSelector(el: HTMLElement): string | null {
+type StableSelectorResult = {
+  selector: string | null;
+  /** A candidate identity attribute existed but matched >1 element on the
+   * page — e.g. three "Change" buttons all sharing one data-name (PP-49).
+   * REC/replay resolve this kind of collision to *some* element, not
+   * necessarily the intended one — silent wrong-target risk, not just
+   * missing coverage. */
+  ambiguous: boolean;
+};
+
+function stableSelector(el: HTMLElement): StableSelectorResult {
+  let ambiguous = false;
   for (const attr of ["data-studio-action", "data-studio-target", "data-name", "id", "aria-label"] as const) {
     const value = attr === "id" ? el.id : el.getAttribute(attr);
     if (!value) continue;
     const selector = attr === "id" ? `#${cssEscape(value)}` : `[${attr}="${cssEscape(value)}"]`;
-    if (document.querySelectorAll(selector).length === 1) return selector;
+    const count = document.querySelectorAll(selector).length;
+    if (count === 1) return { selector, ambiguous: false };
+    if (count > 1) ambiguous = true;
   }
   const href = el.getAttribute("href");
   if (el.tagName === "A" && href && href !== "#") {
     const selector = `a[href="${cssEscape(href)}"]`;
-    if (document.querySelectorAll(selector).length === 1) return selector;
+    const count = document.querySelectorAll(selector).length;
+    if (count === 1) return { selector, ambiguous: false };
+    if (count > 1) ambiguous = true;
   }
-  return null;
+  return { selector: null, ambiguous };
 }
 
 function inventoryItem(el: HTMLElement, ordinal: number): InteractionInventoryItem {
   const tag = el.tagName.toLowerCase();
   const role = el.getAttribute("role");
   const action = el.getAttribute("data-studio-action") || el.getAttribute("data-studio-target");
-  const selector = stableSelector(el);
+  const stable = stableSelector(el);
+  const selector = stable.selector;
   const name = accessibleName(el);
   const native = el.matches(NATIVE_SELECTOR);
   const aria = el.matches(ROLE_SELECTOR);
@@ -141,11 +157,16 @@ function inventoryItem(el: HTMLElement, ordinal: number): InteractionInventoryIt
   const issues: string[] = [];
   if (!name && !disabled) issues.push("missing-accessible-name");
   if (!selector && !disabled) issues.push("missing-stable-target");
+  if (stable.ambiguous && !disabled) issues.push("ambiguous-target");
   if (el.parentElement?.closest(`${NATIVE_SELECTOR},${ROLE_SELECTOR}`)) issues.push("nested-interactive");
   const targetId = action || selector || `${tag}-${ordinal}`;
   let readiness: InteractionReadiness;
   if (disabled) readiness = "disabled";
-  else if (issues.includes("missing-accessible-name") || issues.includes("nested-interactive")) readiness = "invalid";
+  else if (
+    issues.includes("missing-accessible-name") ||
+    issues.includes("nested-interactive") ||
+    issues.includes("ambiguous-target")
+  ) readiness = "invalid";
   else if (selector) readiness = "ready-target";
   else if (native || aria) readiness = "semantic-ready";
   else readiness = "visual-candidate";

@@ -26,6 +26,7 @@ type ParkedNode = {
 };
 
 const parkingByScreen = new Map<string, ParkedNode[]>();
+const permanentlyRetiredScreens = new Set<string>();
 
 function shouldKeepChild(
   el: HTMLElement,
@@ -81,6 +82,7 @@ export function retireMakeUnderPage(
       el.dataset.studioMakeRetired = screenId;
       el.remove();
     }
+    permanentlyRetiredScreens.add(screenId);
     page.dataset.studioReactScreen = screenId;
     return;
   }
@@ -145,7 +147,15 @@ export function isMakeParkedForScreen(screenId: string): boolean {
   );
 }
 
+/** True when Make is gone for this screen — parked (restorable) or permanently deleted. */
+export function isMakeRetiredForScreen(screenId: string): boolean {
+  return (
+    permanentlyRetiredScreens.has(screenId) || isMakeParkedForScreen(screenId)
+  );
+}
+
 /** Test helper. */
 export function resetMakeRetireParkingForTests(): void {
   parkingByScreen.clear();
+  permanentlyRetiredScreens.clear();
 }

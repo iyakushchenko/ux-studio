@@ -3,7 +3,7 @@
  * Used by `npm run test:gates` / `npm test` — same scripts CI runs.
  *
  * Gates (do not remove): docs-links, docs-governance, text-link-contract, hygiene, felonies, parity-ratchets,
- * parity-proven, page-final-pass, theme-brand, version, uxds-inventory.
+ * parity-proven, page-final-pass, theme-brand, version, uxds-inventory, cjm-coverage, interactive-identity.
  */
 import { spawn } from "node:child_process";
 import path from "node:path";
@@ -25,6 +25,8 @@ const GATES = [
   ["check:theme-brand", "scripts/check-theme-brand.mjs"],
   ["check:version", "scripts/check-release-version-changelog-sync.mjs"],
   ["check:uxds-inventory", "scripts/check-uxds-inventory.mjs"],
+  ["check:cjm-coverage", "scripts/check-cjm-interaction-coverage.mjs"],
+  ["check:interactive-identity", "scripts/check-interactive-identity.mjs"],
 ];
 
 function runGate(label, relPath) {

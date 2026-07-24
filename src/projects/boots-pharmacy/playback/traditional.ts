@@ -1,7 +1,9 @@
 import {
   isHeaderLoggedIn,
   isInWishlist,
+  PDP_WISHLIST_ID,
   plpTileWishlistId,
+  resetPdpWishlistForPlayback,
   resetPlpTileBookmarkForPlayback,
 } from "@/projects/boots-pharmacy/chrome/headerMount";
 import type { JourneyRuntime, TabScriptId } from "@/app/orchestra/types";
@@ -203,6 +205,15 @@ export function findPdpBookNowBtn(root: ParentNode): HTMLElement | null {
         (btn.textContent ?? "").replace(/\s+/g, " ").trim()
       );
     }) ?? null
+  );
+}
+
+function findPdpWishlistBtn(root: ParentNode): HTMLElement | null {
+  const scope = root instanceof Element ? root : document;
+  return (
+    scope
+      .querySelector<HTMLElement>(`[data-studio-wishlist-id="${PDP_WISHLIST_ID}"]`)
+      ?.closest<HTMLElement>("button") ?? null
   );
 }
 
@@ -485,6 +496,38 @@ async function runPlpOpenPdp(options?: { skip?: boolean }): Promise<PlaybackScri
   return shouldAbort() ? scriptAborted() : scriptOk();
 }
 
+/**
+ * Scripted PDP "Add to Bookmarks" click — same held-open commit contract as
+ * PLP's tile heart (`addFirstPlpTileBookmark`), so Play journey actually
+ * demonstrates the pending-spinner/commit-pulse IxD instead of skipping the
+ * control entirely.
+ */
+async function clickPdpWishlistHeart(
+  screen: HTMLElement,
+  options?: { skip?: boolean }
+): Promise<boolean> {
+  resetPdpWishlistForPlayback(screen);
+
+  const heartBtn = await waitForVisibleTarget(screen, findPdpWishlistBtn);
+  if (!heartBtn || shouldAbort()) return false;
+
+  if (options?.skip) {
+    heartBtn.click();
+    await waitForWishlistCommit(PDP_WISHLIST_ID);
+    await delay(120);
+    return !shouldAbort();
+  }
+
+  const clicked = await simulateDemoPointerClick(heartBtn, {
+    shouldAbort,
+    scroll: false,
+  });
+  if (!clicked || shouldAbort()) return false;
+  await waitForWishlistCommit(PDP_WISHLIST_ID);
+  await delay(SETTLE_MS);
+  return !shouldAbort();
+}
+
 async function runPdpBookNow(
   runtime: JourneyRuntime,
   options?: { skip?: boolean }
@@ -501,6 +544,8 @@ async function runPdpBookNow(
   if (!screen || shouldAbort()) return false;
 
   await delay(SETTLE_MS);
+
+  if (!(await clickPdpWishlistHeart(screen, options))) return false;
 
   const bookBtn = await waitForVisibleTarget(screen, findPdpBookNowBtn);
   if (!bookBtn || shouldAbort()) return false;
@@ -827,7 +872,8 @@ async function syncTraditionalTabState(
       runtime.closeAvailability();
       runtime.goToTab(protoTabIndexForChild(8), { instant });
       await delay(instant ? 80 : SETTLE_MS);
-      await waitForActiveScreen(8);
+      const screen = await waitForActiveScreen(8);
+      if (screen) resetPdpWishlistForPlayback(screen);
       return scriptOk();
     }
     case "login-sign-in": {

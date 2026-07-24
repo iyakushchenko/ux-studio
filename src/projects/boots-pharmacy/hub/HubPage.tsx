@@ -4,7 +4,7 @@ import {
   HUB_SCREEN_GUIDE,
   type HubSection,
 } from "@/projects/boots-pharmacy/hub/hubContent";
-import { BootsPharmacyLogo } from "@/app/BootsPharmacyLogo";
+import { BootsPharmacyLogo } from "@/projects/boots-pharmacy/chrome/BootsPharmacyLogo";
 import HubChatDiagram from "@/projects/boots-pharmacy/hub/HubChatDiagram";
 import HubExperienceDiagram from "@/projects/boots-pharmacy/hub/HubExperienceDiagram";
 import HubImageLightbox, {

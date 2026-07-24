@@ -3,7 +3,7 @@
  * screenId: site-pilot · Make child 11 · React screens/home/*
  */
 
-import { isMakeParkedForScreen } from "../retireMakeUnderPage";
+import { isMakeRetiredForScreen } from "../retireMakeUnderPage";
 
 export type SitePilotMcpProbeStep = {
   id: string;
@@ -85,7 +85,7 @@ export function sitePilotMcpProbeSteps(): SitePilotMcpProbeStep[] {
       selector: HOST_FALLBACK,
       action: "assert",
       assert: () => {
-        if (!isMakeParkedForScreen("site-pilot")) {
+        if (!isMakeRetiredForScreen("site-pilot")) {
           return "Make leak: expected Make Frame children parked for site-pilot";
         }
         const liveBodies = Array.from(

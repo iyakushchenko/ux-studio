@@ -4,7 +4,7 @@
  */
 
 import { APPOINTMENT_COUNT } from "@/projects/boots-pharmacy/data/appointments";
-import { isMakeParkedForScreen } from "../retireMakeUnderPage";
+import { isMakeRetiredForScreen } from "../retireMakeUnderPage";
 import { APPOINTMENT_HISTORY_REACT_SCREEN_ID } from "./appointmentHistoryContract";
 
 export type AppointmentHistoryMcpProbeStep = {
@@ -66,7 +66,7 @@ export function appointmentHistoryMcpProbeSteps(): AppointmentHistoryMcpProbeSte
       selector: HOST_SEL,
       action: "assert",
       assert: () => {
-        if (!isMakeParkedForScreen(APPOINTMENT_HISTORY_REACT_SCREEN_ID)) {
+        if (!isMakeRetiredForScreen(APPOINTMENT_HISTORY_REACT_SCREEN_ID)) {
           return "Make leak: expected Make Frame children parked for appointment-history";
         }
         return true;

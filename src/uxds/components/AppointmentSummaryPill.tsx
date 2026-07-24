@@ -43,6 +43,7 @@ export function AppointmentSummaryPill({
           type="button"
           className="uxds-summary-pill__change"
           data-name="component.input.button"
+          data-studio-action={`change-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
           onClick={onChange}
         >
           <EditGlyph />

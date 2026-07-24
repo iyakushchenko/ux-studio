@@ -23,7 +23,7 @@ Choose one route. Large governance and evidence documents are references, not a 
 
 | Audience | 10-minute route | Then use |
 |----------|-----------------|----------|
-| Product Owner / reviewer | [Vision](./product/UX_STUDIO_VISION.md) → [current board](./product/NEXT_STEPS.md) | [Product Owner brief](./product/PRODUCT_OWNER_BRIEF.md) for decisions and acceptance |
+| Product Owner / reviewer | [Vision](./product/UX_STUDIO_VISION.md) → [CX Conveyor — honest gap state](./product/CX_CONVEYOR.md) → [current board](./product/NEXT_STEPS.md) | [Product Owner brief](./product/PRODUCT_OWNER_BRIEF.md) for decisions and acceptance |
 | Contributor / engineer | [Developer workflow](./product/DEVELOPER_WORKFLOW.md) → [architecture](./product/ARCHITECTURE.md) | The workflow’s task table; [post-change checklist](./product/POST_CHANGE_CHECKLIST.md) before close |
 | Page designer / auditor | [Page build contract](./product/PAGE_BUILD_CONTRACT.md) → [Page create inheritance](./product/PAGE_CREATE_INHERITANCE.md) → [strict audit](./product/FE_UI_UX_AUDIT.md) | [Uma fidelity](./product/UMA_FIDELITY_NOTES.md) and [Page Final Pass](./product/PAGE_FINAL_PASS.md) |
 | QA / proof operator | [Proof router](./shell/PROOF_ROUTER.md) · [UXML commands](./shell/UXML_COMMANDS.md) (`uxml rec` / `play` / `play step` / `play step r`) | Open only the deep contract linked from the selected proof row |
@@ -49,6 +49,7 @@ Read only the ownership group relevant to the task. Document authority, lifecycl
 
 - [Command doctrine](./product/COMMAND_DOCTRINE.md) · [Team](./product/TEAM.md) · [Team knowledge](./product/TEAM_KNOWLEDGE.md) · [Auto-rules](./product/STUDIO_AUTO_RULES.md)
 - [Current board](./product/NEXT_STEPS.md) · [Painpoints](./product/PAINPOINTS.md) · [Product forecast](./product/PRODUCT_FORECAST.md) · [Product Owner brief](./product/PRODUCT_OWNER_BRIEF.md)
+- **[CX Conveyor](./product/CX_CONVEYOR.md)** — living, honest state of the "user story → built + wired + REC'd CJM" automation gap, staged build order, human-in-the-loop map · **[Codebase audit](./product/CODEBASE_AUDIT_2026-07-24.md)** — project-boundary leak risk (engine vs. Boots not yet separable) · **[Project contract](./product/PROJECT_CONTRACT.md)** — what a project supplies/gets, in plain terms (points at `types.ts`, not a copy of it)
 - [Lessons](./product/LESSONS_LEARNED.md) · [PLP retro](./product/TEAM_RETRO_2026-07-19_PLP.md)
 
 ### Build, design, and acceptance

@@ -163,7 +163,10 @@ export function resolveStudioTouchpoint(
     };
   }
 
-  if (input.bookConfirmationScreen) {
+  // book-step3-camera dwells on the same tab (child 3) as confirmation — must
+  // keep its own key or CJM step-back self-loops (retreat target === current
+  // beat) since resolveJourneyRetreatTarget scans by touchpoint key, not tab.
+  if (input.bookConfirmationScreen && input.beatId !== "book-step3-camera") {
     return {
       label: BOOK_CONFIRMATION_TOUCHPOINT_LABEL,
       key: "beat:confirmation",

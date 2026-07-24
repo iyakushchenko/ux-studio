@@ -556,6 +556,7 @@ export function PlpScreen({
             <button
               type="button"
               className="plp__crumb-link"
+              data-studio-action="plp-crumb-home"
               onClick={onGoHome}
             >
               Home
@@ -857,6 +858,7 @@ export function PlpScreen({
                                 className="plp__filter-chip uxds-link"
                                 data-studio-plp-filter-facet={chip.facet}
                                 data-studio-plp-filter-label={chip.label}
+                                data-studio-action={`plp-filter-remove-${chip.facet}-${chip.label}`.toLowerCase().replace(/[^a-z0-9]+/g, "-")}
                                 onClick={() =>
                                   setFilters(
                                     removePlpActiveFilterChip(

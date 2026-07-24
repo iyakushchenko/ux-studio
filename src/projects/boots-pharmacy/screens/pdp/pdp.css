@@ -566,6 +566,58 @@
   outline-offset: 2px;
 }
 
+/*
+ * Wishlist commit IxD (pending spinner + commit pulse) — parity with PLP's
+ * tile heart. Data-attribute driven (not swapped React children) since
+ * PdpRtbCard (screens/pdp/PdpRtbCard.tsx) renders this same markup both on
+ * the full PDP screen and inside the Quick View popup.
+ */
+.pdp__heart-icon[data-fav-pending="true"] svg {
+  opacity: 0;
+}
+
+.pdp__heart-icon[data-fav-pending="true"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--uxds-border-border-default, #d6d6d6);
+  border-top-color: currentColor;
+  animation: pdp-wishlist-spin 0.85s linear infinite;
+}
+
+@keyframes pdp-wishlist-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.pdp__heart-icon[data-fav-pulse="true"] {
+  animation: pdp-wishlist-pulse 0.32s ease-in-out;
+}
+
+@keyframes pdp-wishlist-pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.32);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pdp__heart-icon[data-fav-pending="true"]::after,
+  .pdp__heart-icon[data-fav-pulse="true"] {
+    animation: none !important;
+  }
+}
+
 .pdp__advantage {
   width: 100%;
   background: var(--uxds-surface-accent-soft);
