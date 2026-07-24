@@ -19,6 +19,13 @@ export type StudioUrlSyncOptions = {
   modeId?: string;
   /** CJM playback switch — synced to `&cjm=on|off`. */
   journeyMode?: boolean;
+  /**
+   * True when the current project + persona has at least one real CJM.
+   * When false, `modeId` is a meaningless/stale slot (e.g. a leftover from
+   * another persona) and must never be reflected into `&experience=` /
+   * `&journey=` — those params are omitted entirely (PO, 2026-07-24).
+   */
+  hasCjms?: boolean;
   /** Blocking lightbox id (e.g. choose-pharmacy) — synced to `&modal=`. */
   modalId?: string;
   screens: ReadonlyArray<ScreenRow>;
@@ -45,6 +52,7 @@ export function useStudioUrlSync(options: StudioUrlSyncOptions): void {
     personaId,
     modeId,
     journeyMode,
+    hasCjms = true,
     modalId,
     screens,
     current,
@@ -99,7 +107,9 @@ export function useStudioUrlSync(options: StudioUrlSyncOptions): void {
         projectId: parsed.projectId ?? projectId,
         screenId,
         personaId: parsed.personaId ?? personaId,
-        modeId: (parsed.modeId ?? modeId) as StudioUrlState["modeId"],
+        modeId: hasCjms
+          ? ((parsed.modeId ?? modeId) as StudioUrlState["modeId"])
+          : undefined,
         cjm: parsed.cjm ?? journeyMode ?? false,
         modalId: parsed.modalId,
       });
@@ -124,7 +134,7 @@ export function useStudioUrlSync(options: StudioUrlSyncOptions): void {
       projectId,
       screenId,
       personaId,
-      modeId: modeId as StudioUrlState["modeId"],
+      modeId: hasCjms ? (modeId as StudioUrlState["modeId"]) : undefined,
       cjm: journeyMode,
       modalId,
     };
@@ -166,7 +176,17 @@ export function useStudioUrlSync(options: StudioUrlSyncOptions): void {
         });
       }
     }
-  }, [projectId, personaId, modeId, journeyMode, modalId, screens, current, hubOpen]);
+  }, [
+    projectId,
+    personaId,
+    modeId,
+    journeyMode,
+    hasCjms,
+    modalId,
+    screens,
+    current,
+    hubOpen,
+  ]);
 
   // Back/forward.
   useEffect(() => {
@@ -196,7 +216,7 @@ export function useStudioUrlSync(options: StudioUrlSyncOptions): void {
           projectId: parsed.projectId ?? projectId,
           screenId,
           personaId: parsed.personaId,
-          modeId: parsed.modeId,
+          modeId: hasCjms ? parsed.modeId : undefined,
           cjm: parsed.cjm ?? false,
           modalId: parsed.modalId,
         });
@@ -211,6 +231,7 @@ export function useStudioUrlSync(options: StudioUrlSyncOptions): void {
     return () => window.removeEventListener("popstate", onPopState);
   }, [
     projectId,
+    hasCjms,
     screens,
     setProjectId,
     setPersonaId,

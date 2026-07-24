@@ -71,9 +71,15 @@ export function orchestraShowControls(options: {
   modeId: OrchestraModeId;
   journeys: JourneyDefinition[];
 }): boolean {
-  const { hubOpen, modeId, journeys } = options;
+  const { hubOpen } = options;
 
-  if (hubOpen) return false;
-
-  return (getJourneyForMode(journeys, modeId)?.beats.length ?? 0) > 0;
+  // Previously required the *current* journey to already have beats, which
+  // hid the persona selector and StudioNavJourneyMenu entirely for any
+  // persona with zero CJMs — even though StudioNavJourneyMenu already has
+  // its own "no CJMs yet, Create CJM" empty state built in. That state can
+  // never render if this gate hides the whole controls block first. Nav
+  // controls now show whenever a project has pages open (not hub),
+  // regardless of whether the current persona has any journeys yet —
+  // global shell behavior, not per-project (PO, 2026-07-24).
+  return !hubOpen;
 }

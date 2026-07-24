@@ -112,18 +112,18 @@ export function useStudio() {
     [persona.journeys, importVersion]
   );
 
+  // CJMs are per project + per persona (PO, 2026-07-24) — derive modes
+  // strictly from this persona's own journeys. ORCHESTRA_MODE_OPTIONS is
+  // only a label lookup for the two built-in slot ids (agentic-cjm /
+  // traditional-cjm) so a persona's own journey in that slot keeps the
+  // standard label; it must never seed a mode that has no backing journey,
+  // or every persona (even one with zero CJMs) would show another
+  // project's built-in "Traditional CJM" / "Agentic CJM" as if selectable.
   const modes: OrchestraModeOption[] = useMemo(() => {
-    const byId = new Map<string, OrchestraModeOption>();
-    for (const mode of ORCHESTRA_MODE_OPTIONS) {
-      byId.set(mode.id, mode);
-    }
-    for (const journeyDef of journeys) {
-      byId.set(journeyDef.id, {
-        id: journeyDef.id,
-        label: journeyDef.label,
-      });
-    }
-    return [...byId.values()];
+    return journeys.map((journeyDef) => {
+      const builtIn = ORCHESTRA_MODE_OPTIONS.find((mode) => mode.id === journeyDef.id);
+      return { id: journeyDef.id, label: builtIn?.label ?? journeyDef.label };
+    });
   }, [journeys]);
 
   const [modeId, setModeIdState] = useState<OrchestraModeId>(() => {

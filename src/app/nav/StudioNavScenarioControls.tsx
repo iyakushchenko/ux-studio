@@ -26,6 +26,8 @@ export type StudioNavScenarioControlsProps = {
   journeyMode?: boolean;
   onJourneyModeChange?: (enabled: boolean) => void;
   journeyModeSwitchDisabled?: boolean;
+  /** No CJMs exist yet for this project + persona — arm disabled with an explanatory tooltip. */
+  noCjmsAvailable?: boolean;
   /** Playback diagnostic is open — red studio diode beside popup. */
   playbackErrorActive?: boolean;
   isPlaying: boolean;
@@ -162,6 +164,7 @@ export function StudioNavScenarioControls({
   journeyMode = false,
   onJourneyModeChange,
   journeyModeSwitchDisabled = false,
+  noCjmsAvailable = false,
   playbackErrorActive = false,
   isPlaying,
   isOnAir = isPlaying,
@@ -235,10 +238,11 @@ export function StudioNavScenarioControls({
     isPlaying,
     journeyMode,
   });
-  const cjmSwitchDisabled = isJourneyModeSwitchDisabled({
-    transportLocked: journeyModeSwitchDisabled,
-    recMode,
-  });
+  const cjmSwitchDisabled =
+    isJourneyModeSwitchDisabled({
+      transportLocked: journeyModeSwitchDisabled,
+      recMode,
+    }) || noCjmsAvailable;
 
   const handlePlaybackRecModeChange = (enabled: boolean) => {
     if (recModeLocked && enabled) {
@@ -548,11 +552,13 @@ export function StudioNavScenarioControls({
                     }}
                     disabled={cjmSwitchDisabled}
                     disabledTitle={
-                      recMode
-                        ? "CJM unavailable while REC is on"
-                        : journeyModeSwitchDisabled
-                          ? "CJM unavailable while AIR / playback is live"
-                          : undefined
+                      noCjmsAvailable
+                        ? "No CJMs yet for this project/persona — create one first"
+                        : recMode
+                          ? "CJM unavailable while REC is on"
+                          : journeyModeSwitchDisabled
+                            ? "CJM unavailable while AIR / playback is live"
+                            : undefined
                     }
                   />
                 </span>

@@ -119,8 +119,15 @@ export function StudioNavJourneyMenu({
 
   // CREATE NEW only while Rec mode is on (live session alone must not gold-lock
   // the picker after the user leaves Rec).
+  // `noRealModes`: when a persona has zero CJMs, CREATE NEW is the only
+  // selectable option and the dropdown already shows it via `value` alone
+  // (no explicit dropdown pick ever happened, so `idleCreateNew` stays
+  // false). Without this, arming REC directly from that default state left
+  // `createNewSelected` false until the user re-picked CREATE NEW from the
+  // dropdown even though it was already showing as selected (PO, 2026-07-24).
+  const noRealModes = modes.length === 0;
   const createNewSelected =
-    recMode && (recordingLive || idleCreateNew);
+    recMode && (recordingLive || idleCreateNew || noRealModes);
   const createNewSelectedRef = useRef(createNewSelected);
   createNewSelectedRef.current = createNewSelected;
 

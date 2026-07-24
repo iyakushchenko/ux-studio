@@ -329,6 +329,7 @@ export default function App() {
     personaId: studioPersonaId,
     modeId: orchestraModeId,
     journeyMode: studioJourneyMode,
+    hasCjms: orchestraModes.length > 0,
     modalId: studioModalId,
     screens: SCREENS,
     current,
@@ -2048,6 +2049,7 @@ export default function App() {
               journeyMode={studioJourneyMode}
               onJourneyModeChange={handleStudioJourneyModeChange}
               journeyModeSwitchDisabled={navTransportLocked}
+              noCjmsAvailable={orchestraModes.length === 0}
               isPlaying={transport.isPlaying}
               isOnAir={transport.isOnAir}
               journeyAtEnd={journeyAtEnd}
