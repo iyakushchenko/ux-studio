@@ -1,4 +1,4 @@
-/* PLP — React migration; visual source = Make child 9 + live wire chrome */
+/* PLP — React migration; visual source = Legacy child 9 + live wire chrome */
 
 .studio-react-screen-host[data-studio-react-screen="plp"] {
   display: flex;
@@ -82,7 +82,7 @@
   color: #3a3a3a;
 }
 
-/* Make module.plp.hero — teal category title band 296px + lift shadow over page fill */
+/* Legacy module.plp.hero — teal category title band 296px + lift shadow over page fill */
 .plp__hero {
   position: relative;
   z-index: 2;
@@ -160,7 +160,7 @@
 }
 
 /*
- * Make ModuleLaptopSpecs page fill:
+ * Legacy ModuleLaptopSpecs page fill:
  * absolute white base + decorative PNG @ opacity 0.41, object-position bottom.
  */
 .plp__body {
@@ -204,7 +204,7 @@
   z-index: 1;
 }
 
-/* Make ModuleLaptopSpecs stack: Advantage banner → filters+listing @ 56px */
+/* Legacy ModuleLaptopSpecs stack: Advantage banner → filters+listing @ 56px */
 .plp__body-stack {
   display: flex;
   flex-direction: column;
@@ -212,7 +212,7 @@
   width: 100%;
 }
 
-/* Make component.gse.system.message — mint Advantage Card promo bar */
+/* Legacy component.gse.system.message — mint Advantage Card promo bar */
 .plp__advantage {
   width: 100%;
   box-sizing: border-box;
@@ -242,7 +242,7 @@
   width: 100%;
 }
 
-/* Make Body8 — white listing card standing out from page fill */
+/* Legacy Body8 — white listing card standing out from page fill */
 .plp__listing {
   flex: 1 1 auto;
   min-width: 0;
@@ -261,7 +261,7 @@
   gap: 8px;
 }
 
-/* No invented horizontal separator between filter accordion bands (Make has none). */
+/* No invented horizontal separator between filter accordion bands (Legacy has none). */
 .plp__filter-section {
   width: 100%;
 }
@@ -326,6 +326,11 @@
   color: #3a3a3a;
 }
 
+.plp__option-row:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .plp__option-row:focus-visible {
   outline: 2px solid var(--uxds-border-border-focus);
   outline-offset: 2px;
@@ -366,10 +371,10 @@
   border-radius: 4px;
 }
 
-/* Make checkbox/radio hover — mint wash on unchecked control (globals-chrome !important) */
-.plp__option-row:hover .plp__checkbox:not(.is-on),
-.plp__option-row:hover .plp__radio:not(.is-on),
-[data-name="component.plp.filter.checkbox.item"]:hover .plp__checkbox:not(.is-on),
+/* Legacy checkbox/radio hover — mint wash on unchecked control (globals-chrome !important) */
+.plp__option-row:hover:not(:disabled) .plp__checkbox:not(.is-on),
+.plp__option-row:hover:not(:disabled) .plp__radio:not(.is-on),
+[data-name="component.plp.filter.checkbox.item"]:hover:not(:disabled) .plp__checkbox:not(.is-on),
 [data-name="component.input.radio"]:hover .plp__radio:not(.is-on) {
   background: #c6e5e1 !important;
   border-color: #c6e5e1 !important;
@@ -510,7 +515,7 @@ body[data-studio-content-loading="plp"]
 }
 
 /*
- * Make parity (plpListing hideAllPlpTiles + globals-screens):
+ * Legacy parity (plpListing hideAllPlpTiles + globals-screens):
  * tiles leave the layout during load so the spinner overlay sits in the
  * ~220px host band — NOT opacity:0 tiles that push the overlay below the fold.
  */
@@ -524,7 +529,7 @@ body[data-studio-content-loading="plp"]
 }
 
 /*
- * Make listing preloader — ported from globals-screens .proto-plp-listing-loader.
+ * Legacy listing preloader — ported from globals-screens .proto-plp-listing-loader.
  * Outer = absolute in-band frosted cover (constrained to .plp__tiles-host).
  * Inner = sticky pin so the spinner follows the visible listing scrollport
  * while the height-locked host is tall — not absolute-centered mid-band
@@ -649,7 +654,7 @@ body[data-studio-content-loading="plp"]
   }
 }
 
-/* Make tile pad 16px — no border (Make Frame167 tiles are borderless white) */
+/* Legacy tile pad 16px — no border (Legacy Frame167 tiles are borderless white) */
 .plp__tile {
   width: 100%;
   padding: 16px;
@@ -777,7 +782,7 @@ body[data-studio-content-loading="plp"]
 }
 
 /*
- * Make PLP “Add to Bookmarks” (tertiary text+icon):
+ * Legacy PLP “Add to Bookmarks” (tertiary text+icon):
  * empty rest #afccca → hover navy link (NOT fuchsia — that was invented).
  * filled/active #c8247e (applyPlpTileHeartVisual); favourited hover deepen.
  */

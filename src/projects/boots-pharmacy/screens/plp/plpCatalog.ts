@@ -101,7 +101,7 @@ function jab(
   };
 }
 
-/** Concept-aligned jab catalog (React-owned; does not scrape Make DOM). */
+/** Concept-aligned jab catalog (React-owned; does not scrape Legacy DOM). */
 export const PLP_JAB_ITEMS: PlpCatalogItem[] = [
   jab({
     id: "chickenpox",
@@ -302,7 +302,7 @@ export function togglePlpFilterValue(
   if (key === "ages") {
     return { ...state, allAges: false, ages: next };
   }
-  // Make wire: region change rebuilds country labels and clears country checks.
+  // Legacy wire: region change rebuilds country labels and clears country checks.
   if (key === "regions") {
     return { ...state, regions: next, countries: [] };
   }
@@ -367,7 +367,7 @@ export function filterPlpCatalog(
   });
 }
 
-/** Make wire `PLP_FILTER_LIST_MAX` — disease/country typeahead cap before View all. */
+/** Legacy wire `PLP_FILTER_LIST_MAX` — disease/country typeahead cap before View all. */
 export const PLP_FILTER_LIST_MAX = 10;
 
 export function filterOptionList(
@@ -380,7 +380,7 @@ export function filterOptionList(
 }
 
 /**
- * Cap filter option rows like Make wire (`slice(0, PLP_FILTER_LIST_MAX)`).
+ * Cap filter option rows like Legacy wire (`slice(0, PLP_FILTER_LIST_MAX)`).
  * When `expanded` (View all) or searching, show the full filtered set.
  */
 export function capPlpFilterOptionList(
@@ -445,7 +445,7 @@ function itemMatchesFacet(
 }
 
 /**
- * Make filter option counters — how many listing results would match if this
+ * Legacy filter option counters — how many listing results would match if this
  * facet value alone were applied (other facets kept; this facet cleared first).
  */
 export function countPlpFacetOption(
@@ -460,8 +460,37 @@ export function countPlpFacetOption(
   return pool.filter((item) => itemMatchesFacet(item, facet, value)).length;
 }
 
+const FACET_KEYS: PlpCountFacet[] = ["ages", "diseases", "regions", "countries"];
+
 /**
- * Make `collectPlpCountryFilterLabels` — candidates from
+ * Legacy wire truth (`setFilterCheckboxItemState` L746–765, PLP_LEGACY_PARITY_REGISTER
+ * I3c): a facet value whose leave-one-out count drops to 0 is dropped from
+ * state (auto-uncheck), not just visually disabled. Caller re-runs this after
+ * every filter change until it reports no change (mirrors Legacy's
+ * "re-apply after clear" double-pass) — bounded, since each pass only removes
+ * values, never adds them.
+ */
+export function dropZeroCountFacetValues(
+  state: PlpFilterState,
+  jabs: PlpCatalogItem[] = PLP_JAB_ITEMS,
+  bundles: PlpCatalogItem[] = PLP_BUNDLE_CATALOG
+): { filters: PlpFilterState; changed: boolean } {
+  let next = state;
+  let changed = false;
+  for (const facet of FACET_KEYS) {
+    const survivors = next[facet].filter(
+      (value) => countPlpFacetOption(next, facet, value, jabs, bundles) > 0
+    );
+    if (survivors.length !== next[facet].length) {
+      next = { ...next, [facet]: survivors };
+      changed = true;
+    }
+  }
+  return { filters: next, changed };
+}
+
+/**
+ * Legacy `collectPlpCountryFilterLabels` — candidates from
  * `getPlpCountryCandidates(regions)`, keep score > 0, sort by availability.
  * Does not slice to `PLP_FILTER_LIST_MAX` (View all / search cap stays in UI).
  */
@@ -499,7 +528,7 @@ export function countPlpTypeOption(
   ).length;
 }
 
-/** Active facet chips shown in Make PLP results summary (removable). */
+/** Active facet chips shown in Legacy PLP results summary (removable). */
 export type PlpActiveFilterChip = {
   facet: "ages" | "diseases" | "regions" | "countries";
   label: string;
@@ -541,7 +570,7 @@ export function removePlpActiveFilterChip(
   };
 }
 
-/** Make wire copy noun for results summary. */
+/** Legacy wire copy noun for results summary. */
 export function plpResultsNoun(
   state: PlpFilterState,
   visible: number
