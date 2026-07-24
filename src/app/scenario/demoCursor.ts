@@ -806,14 +806,15 @@ function snapDemoCursorHotspotToTarget(
 }
 
 /**
- * Cards and modal rows can shift for one or two paint frames after camera
- * movement. Re-aim against the live box before press; never click mid-air.
+ * Cards/modal rows can shift for a paint frame after camera movement —
+ * re-aim before press. PP-50: `delay()` is safe here — `playbackMs()`'s
+ * universal real-time floor stops fast mode compressing below real paint.
  */
 async function settleDemoCursorHotspotOnTarget(
   cursor: HTMLElement,
   target: HTMLElement
 ): Promise<boolean> {
-  for (let attempt = 0; attempt < 3; attempt += 1) {
+  for (let attempt = 0; attempt < 5; attempt += 1) {
     if (isDemoCursorHotspotOnTarget(cursor, target)) return true;
     snapDemoCursorHotspotToTarget(cursor, target);
     await delay(16);
@@ -1908,7 +1909,7 @@ export async function simulateDemoPointerClick(
     return false;
   }
 
-  // Harden: never invent success on listing shells / coarse Make modules.
+  // Harden: never invent success on listing shells / coarse Legacy modules.
   const clickTarget = resolveUsableDemoClickTarget(target);
   if (!clickTarget) {
     const bad = describeCursorTarget(target);

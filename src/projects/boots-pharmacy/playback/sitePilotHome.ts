@@ -6,6 +6,7 @@ import {
   simulateDemoPointerClick,
 } from "@/app/scenario/demoCursor";
 import { playbackReadinessDelay } from "@/app/scenario/playbackReadiness";
+import { delayPacing } from "@/app/shell/playbackTiming";
 import type { HomeScriptId } from "@/app/orchestra/types";
 import {
   playbackDiagTypeInEnd,
@@ -82,8 +83,8 @@ function syncHomeQueryHeight(ta: HTMLTextAreaElement): void {
 }
 
 /**
- * Prefer live React Site Pilot card. Make body stays in DOM under
- * `data-studio-make-retired` (display:none) and would otherwise win
+ * Prefer live React Site Pilot card. Legacy body stays in DOM under
+ * `data-studio-legacy-retired` (display:none) and would otherwise win
  * first-match `querySelector` — LESSONS hybrid first-match trap.
  */
 function getAgenticHomeCard(): HTMLElement | null {
@@ -106,7 +107,7 @@ function getAgenticHomeCard(): HTMLElement | null {
       screen.querySelectorAll<HTMLElement>(
         '[data-name="component.co.order.summary"]'
       )
-    ).find((el) => !el.closest("[data-studio-make-retired]")) ?? null
+    ).find((el) => !el.closest("[data-studio-legacy-retired]")) ?? null
   );
 }
 
@@ -126,7 +127,7 @@ async function waitForHomeTextarea(): Promise<HTMLTextAreaElement | null> {
     const ta = getAgenticHomeCard()?.querySelector<HTMLTextAreaElement>(
       "textarea.proto-agentic-query, textarea.site-pilot-composer__query"
     );
-    if (ta && !ta.closest("[data-studio-make-retired]")) return ta;
+    if (ta && !ta.closest("[data-studio-legacy-retired]")) return ta;
     await playbackReadinessDelay(40);
   }
   return null;
@@ -183,7 +184,7 @@ async function simulateSarahHomeTyping(text: string): Promise<boolean> {
     syncHomeQueryHeight(ta);
     tickTypeInCursorGuard(ta, i + 1);
     playbackDiagTypeInProgress(i + 1);
-    await delay(TYPING_MS_PER_CHAR + Math.random() * TYPING_MS_JITTER);
+    await delayPacing(TYPING_MS_PER_CHAR + Math.random() * TYPING_MS_JITTER);
   }
 
   if (shouldAbort()) {

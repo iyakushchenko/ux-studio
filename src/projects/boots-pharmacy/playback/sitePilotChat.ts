@@ -11,6 +11,7 @@ import {
 import {
   pinScenarioScrollToBottomDuring,
 } from "@/app/scenario/scenarioEngine";
+import { delayPacing } from "@/app/shell/playbackTiming";
 import { scrollCameraToTarget, scrollChatCamera, logChatCameraTracker } from "@/app/scenario/playbackScroll";
 import {
   playbackDiagClick,
@@ -57,10 +58,10 @@ const CTA_PRESS_MS = 380;
 /**
  * Which agent CTA Sarah clicks before each scripted user reply.
  * Keys = `frameIndex` from useScenarioPlayback beforeReveal = **1-based**
- * next visibleCount (NOT 0-based array index). Make truth (pre-React Chat,
+ * next visibleCount (NOT 0-based array index). Legacy truth (pre-React Chat,
  * tip a2c86ba / 5fdde78^): 5 → q2 after r1 CTA; 7 → q3 after r2 CTA.
  */
-/** Exported for ratchet tests — Make 1-based frameIndex keys. */
+/** Exported for ratchet tests — Legacy 1-based frameIndex keys. */
 export const SITE_PILOT_CHAT_CTA_BEFORE_USER_FRAME: Record<number, RegExp> = {
   5: /check availability slot for me/i,
   7: /find available slots for today/i,
@@ -68,7 +69,7 @@ export const SITE_PILOT_CHAT_CTA_BEFORE_USER_FRAME: Record<number, RegExp> = {
 const CTA_BEFORE_USER_FRAME = SITE_PILOT_CHAT_CTA_BEFORE_USER_FRAME;
 
 /*
- * Make / pre-React agentic chat sequence (source of truth):
+ * Legacy / pre-React agentic chat sequence (source of truth):
  * frames 0..7 = q0,r0,q1,r1,q2,r2,q3,r3 (+ finale virtual)
  *  land → q0
  *  step → THINKING (left) → r0
@@ -309,7 +310,7 @@ export async function simulateSarahTypingInComposer(text: string): Promise<void>
       // Composer growth + pin scrolls look like path deviation mid type-in.
       playbackScrollMonitor.noteRetreatSync();
     }
-    await delay(TYPING_MS_PER_CHAR + Math.random() * TYPING_MS_JITTER);
+    await delayPacing(TYPING_MS_PER_CHAR + Math.random() * TYPING_MS_JITTER);
   }
 
   if (preludeAborted) {
@@ -344,7 +345,7 @@ export async function runSitePilotChatBeforeReveal(
       : isSitePilotChatUserQueryFrame(frame)
         ? `q${Math.max(0, Math.floor(zeroIndex / 2))}`
         : "?");
-  // Only annotate React playlist nodes — stamping Make dump-all lets
+  // Only annotate React playlist nodes — stamping Legacy dump-all lets
   // collectSitePilotChatScenarioFrames short-circuit to a 2-frame subset.
   if (
     !frame.getAttribute("data-studio-chat-frame") &&
