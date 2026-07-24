@@ -2,6 +2,11 @@
 
 > _Append a bullet on coherent commits via `npm run notes:append -- --lane="<lane>" --intent="<text>"`. Preview with `npm run notes:preview`. On `npm run release:patch` this section is promoted to `## v<X.Y.Z> - DDMMYY` and a fresh empty `## Current` is re-inserted. Policy: `docs/product/VERSIONING.md`._
 
+- **shell:** Fix QA suite start to hard-reset a stuck/running suite instead of rejecting a new start; suite dropdown descriptors rewritten for consistent scope/stop-behavior wording
+- **shell:** QA overlay: suite dropdown no longer blanks during agent-driven runs, removed duplicate Checks 0/1 element, dump-saved hint logs once per session, added animated running-suite stripe indicator
+- **engine:** Fix fast-mode playback timing: playbackMs() now enforces one universal 48ms floor no call site can undercut (was racing real scroll/paint); added playbackPacingMs() for per-character typing pacing with no real-DOM-settle floor
+- **project:** Fix PDP/PLP wishlist heart pending state being silently skipped under scripted/fast playback; added shared useCommitPendingToggle hook (src/app/interaction) so pending is set synchronously in the commit handler instead of derived from a separate pointerdown flag
+
 ## v0.0.109 - 240726
 - **project:** Boots: extract shared AppointmentCard (screens/shared/) so Appointment History and Appointment Details reuse one card component/CSS -- History adopted Details' densified Legacy-live spacing/typography instead of stale Figma 32/56 spacing
 - **shell:** Fix self-test kind-hijack: mcp-sanity from Manual QA no longer force-clears/agent-locks the panel
