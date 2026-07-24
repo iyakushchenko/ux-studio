@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import productImage from "@/projects/boots-pharmacy/frame/ac6ed7db66adf30dd80e0290b6a431d7de94e7bc.png";
 import {
   isInWishlist,
@@ -8,7 +8,7 @@ import {
   WISHLIST_HEART_OUTLINE_D,
   FILLED_HEART_D,
 } from "@/projects/boots-pharmacy/chrome/headerMount";
-import { playbackMs } from "@/app/shell/playbackTiming";
+import { useCommitPendingToggle } from "@/app/interaction/useCommitPendingToggle";
 import {
   PDP_CHECKBOX_LABEL,
   PDP_PRICE_WITH_BOOSTER,
@@ -48,11 +48,11 @@ function CheckboxCheckMark() {
   );
 }
 
-/** Make `icon=question` path (svgPaths.p116ea480). */
+/** Legacy `icon=question` path (svgPaths.p116ea480). */
 const QUESTION_GLYPH_D =
   "M8 0C3.584 0 0 3.584 0 8C0 12.416 3.584 16 8 16C12.416 16 16 12.416 16 8C16 3.584 12.416 0 8 0ZM8.80313 12.8C8.80313 13.2418 8.44495 13.6 8.00313 13.6C7.5613 13.6 7.20312 13.2418 7.20312 12.8C7.20312 12.3582 7.5613 12 8.00313 12C8.44495 12 8.80313 12.3582 8.80313 12.8ZM9.73288 8.13639L10.4529 7.40039C10.9089 6.94439 11.1969 6.30439 11.1969 5.60039C11.1969 3.83239 9.76488 2.40039 7.99687 2.40039C6.50223 2.40039 5.24772 3.42381 4.89552 4.80847C4.78661 5.23666 5.15505 5.60039 5.59688 5.60039C6.0387 5.60039 6.38083 5.22073 6.59385 4.83364C6.86655 4.33811 7.39419 4.00039 7.99687 4.00039C8.87687 4.00039 9.59688 4.72039 9.59688 5.60039C9.59688 6.04039 9.42088 6.44039 9.12488 6.72839L8.13288 7.73639C7.55688 8.32039 7.19688 9.12039 7.19688 10.0004C7.19688 10.2213 7.37596 10.4004 7.59688 10.4004H7.99688C8.4387 10.4004 8.77972 10.0378 8.86566 9.60439C8.99602 8.947 9.30479 8.57042 9.73288 8.13639Z";
 
-/** Make `icon=share` path (svgPaths.p1dcca380). */
+/** Legacy `icon=share` path (svgPaths.p1dcca380). */
 const SHARE_GLYPH_D =
   "M10.2 5.29223L6.41178 7.18633C6.54862 7.7179 6.54862 8.28239 6.41178 8.81399L10.2 10.7081C11.4132 9.19424 13.6725 9.06595 15.0462 10.4397C16.3179 11.712 16.3179 13.7739 15.0462 15.0457C13.7737 16.3181 11.7118 16.3181 10.4394 15.0457C9.63605 14.2424 9.29589 13.0629 9.58801 11.9285L5.80044 10.0344C4.58725 11.5483 2.32799 11.6766 0.954308 10.3029C-0.318103 9.03112 -0.318103 6.96857 0.954308 5.6968C2.32803 4.3231 4.58726 4.45073 5.80044 5.96524L9.58801 4.07114C9.05905 2.01654 10.6098 0 12.7426 0C14.5414 0 16 1.45858 16 3.25732C16 5.05608 14.5414 6.51463 12.7426 6.51463C11.7222 6.51463 10.8019 6.04423 10.1991 5.29225L10.2 5.29223ZM4.59058 6.6666C3.85437 5.93041 2.65957 5.93041 1.92338 6.6666C1.18717 7.4028 1.18717 8.59758 1.92338 9.33376C2.65959 10.07 3.85439 10.07 4.59058 9.33376C5.32679 8.59757 5.32679 7.40278 4.59058 6.6666Z";
 
@@ -111,7 +111,7 @@ export type PdpRtbCardProps = {
  * booster checkbox, book/secondary CTAs, wishlist heart. Shared by the full
  * PDP screen and the Quick View popup so both render the real thing instead
  * of Quick View cloning PDP's live DOM (that clone approach broke outright
- * once PDP started truly unmounting on navigate-away — Erase-Make Phase E).
+ * once PDP started truly unmounting on navigate-away — Erase-Legacy Phase E).
  */
 export function PdpRtbCard({
   includeBoosterDose,
@@ -123,44 +123,17 @@ export function PdpRtbCard({
   onSecondaryAction,
 }: PdpRtbCardProps) {
   const [recipientTab, setRecipientTab] = useState<RecipientTab>("myself");
-  const [wishlistTick, setWishlistTick] = useState(0);
-
-  const wishlisted = wishlistTick >= 0 && isInWishlist(PDP_WISHLIST_ID);
-  // Click-optimistic only, same pattern as PLP's tile heart.
-  const [optimisticOn, setOptimisticOn] = useState<boolean | null>(null);
-  const heartActive = optimisticOn ?? wishlisted;
-  // Optimistic flip landed but the delayed real commit hasn't (add path
-  // only — remove commits synchronously so this never latches true there).
-  const wishlistCommitPending = heartActive && !wishlisted;
-  // Bumps once per real add-commit (false → true) so the CSS pulse can
-  // replay — never on mount, never on remove.
-  const wasWishlistedRef = useRef(wishlisted);
-  const [commitPulseKey, setCommitPulseKey] = useState(0);
-  const [heartPulsing, setHeartPulsing] = useState(false);
-  const wishlistAddTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null
-  );
-
-  useEffect(() => {
-    setOptimisticOn(null);
-    if (!wasWishlistedRef.current && wishlisted) {
-      setCommitPulseKey((k) => k + 1);
-    }
-    wasWishlistedRef.current = wishlisted;
-  }, [wishlisted]);
-
-  useEffect(() => {
-    if (commitPulseKey === 0) return;
-    setHeartPulsing(true);
-    const t = setTimeout(() => setHeartPulsing(false), 320);
-    return () => clearTimeout(t);
-  }, [commitPulseKey]);
-
-  useEffect(
-    () => () => {
-      if (wishlistAddTimerRef.current) clearTimeout(wishlistAddTimerRef.current);
-    },
-    []
+  const {
+    active: heartActive,
+    pending: wishlistCommitPending,
+    pulsing: heartPulsing,
+    onPointerDown: onWishlistPointerDown,
+    onClick: onWishlistClick,
+  } = useCommitPendingToggle(
+    PDP_WISHLIST_ID,
+    isInWishlist,
+    toggleWishlist,
+    PDP_WISHLIST_ADD_DELAY_MS
   );
 
   const bookPrice = includeBoosterDose
@@ -205,6 +178,7 @@ export function PdpRtbCard({
                 data-toggle-active={
                   recipientTab === "myself" ? "true" : undefined
                 }
+                data-studio-action="pdp-recipient-myself"
                 aria-pressed={recipientTab === "myself"}
                 onClick={() => setRecipientTab("myself")}
               >
@@ -218,6 +192,7 @@ export function PdpRtbCard({
                 data-toggle-active={
                   recipientTab === "someone-else" ? "true" : undefined
                 }
+                data-studio-action="pdp-recipient-someone-else"
                 aria-pressed={recipientTab === "someone-else"}
                 onClick={() => setRecipientTab("someone-else")}
               >
@@ -312,30 +287,8 @@ export function PdpRtbCard({
                       ? "Remove from wishlist"
                       : "Add to wishlist"
                 }
-                onPointerDown={() => setOptimisticOn(!heartActive)}
-                onClick={() => {
-                  const pendingAdd = wishlistAddTimerRef.current;
-                  if (wishlisted || pendingAdd != null) {
-                    if (pendingAdd != null) {
-                      // Still pending — cancel; nothing was ever added.
-                      clearTimeout(pendingAdd);
-                      wishlistAddTimerRef.current = null;
-                      setOptimisticOn(null);
-                      return;
-                    }
-                    toggleWishlist(PDP_WISHLIST_ID);
-                    setWishlistTick((t) => t + 1);
-                    return;
-                  }
-                  // Adding — hold the commit open so the pending
-                  // spinner / commit pulse IxD has time to show
-                  // (engine playbackMs, not a raw ms).
-                  wishlistAddTimerRef.current = setTimeout(() => {
-                    wishlistAddTimerRef.current = null;
-                    toggleWishlist(PDP_WISHLIST_ID);
-                    setWishlistTick((t) => t + 1);
-                  }, playbackMs(PDP_WISHLIST_ADD_DELAY_MS));
-                }}
+                onPointerDown={onWishlistPointerDown}
+                onClick={onWishlistClick}
               >
                 <span
                   className={`pdp__heart-icon${heartActive ? " is-active" : ""}`}

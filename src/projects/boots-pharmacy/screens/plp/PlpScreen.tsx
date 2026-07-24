@@ -12,7 +12,7 @@ import {
   plpTileWishlistId,
   toggleWishlist,
 } from "@/projects/boots-pharmacy/chrome/headerMount";
-import { playbackMs } from "@/app/shell/playbackTiming";
+import { useCommitPendingToggle } from "@/app/interaction/useCommitPendingToggle";
 import { waitStudioContentLoad } from "@/uxds/motion";
 import { ButtonPrimary, SearchField } from "@/uxds/components";
 import {
@@ -36,6 +36,7 @@ import {
   collectPlpCountryFilterLabels,
   countPlpFacetOption,
   countPlpTypeOption,
+  dropZeroCountFacetValues,
   filterOptionList,
   filterPlpCatalog,
   isPlpFiltersDirty,
@@ -86,7 +87,7 @@ function BookmarkGlyph() {
   );
 }
 
-/** Make Reset Filters trash glyph — stroke tertiary (studio-tertiary-cta). */
+/** Legacy Reset Filters trash glyph — stroke tertiary (studio-tertiary-cta). */
 function TrashGlyph() {
   return (
     <svg
@@ -142,6 +143,7 @@ function RadioRow({
       data-name="component.input.radio"
       data-radio-checked={String(checked)}
       data-studio-plp-option-count={String(count)}
+      data-studio-action={`plp-filter-radio-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
       aria-checked={checked}
       role="radio"
       onClick={onSelect}
@@ -164,12 +166,19 @@ function CheckboxRow({
   count: number;
   onToggle: () => void;
 }) {
+  // I3c: zero-count rows are unselectable (Legacy `setFilterCheckboxItemState`
+  // L746–765) — checked+0 is only ever a transient render before the
+  // auto-uncheck effect (PlpScreen) settles it, never a stable state.
+  const disabled = count === 0;
   return (
     <button
       type="button"
       className="plp__option-row"
       data-name="component.plp.filter.checkbox.item"
       data-studio-plp-option-count={String(count)}
+      data-studio-action={`plp-filter-checkbox-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
+      disabled={disabled}
+      aria-disabled={disabled}
       onClick={onToggle}
     >
       <span
@@ -188,7 +197,7 @@ function CheckboxRow({
 }
 
 /**
- * Make PLP filter search — UXDS SearchField, magnifier END (right), one clear.
+ * Legacy PLP filter search — UXDS SearchField, magnifier END (right), one clear.
  * Filled + View all → reset field (wire `handlePlpFilterViewAllClick` / clear).
  */
 function FilterSearch({
@@ -213,14 +222,21 @@ function FilterSearch({
   );
 }
 
-/** Make `component.plp.filter.view-all` — always under disease/country lists. */
-function FilterViewAll({ onActivate }: { onActivate: () => void }) {
+/** Legacy `component.plp.filter.view-all` — always under disease/country lists. */
+function FilterViewAll({
+  section,
+  onActivate,
+}: {
+  section: "disease" | "country";
+  onActivate: () => void;
+}) {
   return (
     <a
       href="#"
       className="plp__view-all uxds-link"
       data-name="component.plp.filter.view-all"
       data-studio-plp-view-all="true"
+      data-studio-action={`plp-filter-view-all-${section}`}
       onClick={(e) => {
         e.preventDefault();
         onActivate();
@@ -234,44 +250,34 @@ function FilterViewAll({ onActivate }: { onActivate: () => void }) {
 function ServiceTile({
   item,
   tileIndex,
-  wishlisted,
   staggerMs,
   reveal,
   probeBelowFold,
-  onToggleWishlist,
   onBookNow,
   onQuickView,
 }: {
   item: PlpCatalogItem;
   tileIndex: number;
-  wishlisted: boolean;
   staggerMs?: number;
   reveal?: boolean;
   /** Last-tile marker for MCP below-fold scroll prove. */
   probeBelowFold?: boolean;
-  onToggleWishlist: () => void;
   onBookNow: () => void;
   onQuickView: () => void;
 }) {
-  // Click-optimistic only. Empty hover = Make tertiary navy (CSS), NOT fuchsia.
-  const [optimisticOn, setOptimisticOn] = useState<boolean | null>(null);
-  const heartActive = optimisticOn ?? wishlisted;
-  // Optimistic flip landed but the delayed real commit hasn't (add path
-  // only — remove commits synchronously so this never latches true there).
-  const wishlistCommitPending = heartActive && !wishlisted;
-  // Bumps once per real add-commit (false → true) so CommitPulseIcon can
-  // replay its pop — never on mount (ref starts equal to current value)
-  // and never on remove (that transition is true → false).
-  const wasWishlistedRef = useRef(wishlisted);
-  const [commitPulseKey, setCommitPulseKey] = useState(0);
-
-  useEffect(() => {
-    setOptimisticOn(null);
-    if (!wasWishlistedRef.current && wishlisted) {
-      setCommitPulseKey((k) => k + 1);
-    }
-    wasWishlistedRef.current = wishlisted;
-  }, [wishlisted]);
+  // Click-optimistic only. Empty hover = Legacy tertiary navy (CSS), NOT fuchsia.
+  const {
+    active: heartActive,
+    pending: wishlistCommitPending,
+    pulseKey: commitPulseKey,
+    onPointerDown: onWishlistPointerDown,
+    onClick: onWishlistClick,
+  } = useCommitPendingToggle(
+    plpTileWishlistId(tileIndex),
+    isInWishlist,
+    toggleWishlist,
+    PLP_WISHLIST_ADD_DELAY_MS
+  );
 
   return (
     <article
@@ -292,6 +298,7 @@ function ServiceTile({
               href="#pdp"
               className="plp__tile-title-link proto-plp-tile-title-link"
               data-name="component.plp.tile.title"
+              data-studio-action={`plp-tile-title-${item.id}`}
               onClick={(e) => {
                 e.preventDefault();
                 onBookNow();
@@ -308,6 +315,7 @@ function ServiceTile({
               className="plp__tertiary"
               data-name="component.input.button"
               data-studio-wishlist-id={plpTileWishlistId(tileIndex)}
+              data-studio-action={`plp-tile-wishlist-${item.id}`}
               data-studio-bookmarked={heartActive ? "true" : "false"}
               aria-pressed={heartActive}
               aria-label={
@@ -317,8 +325,8 @@ function ServiceTile({
                     ? "Remove from Bookmarks"
                     : "Add to Bookmarks"
               }
-              onPointerDown={() => setOptimisticOn(!heartActive)}
-              onClick={onToggleWishlist}
+              onPointerDown={onWishlistPointerDown}
+              onClick={onWishlistClick}
             >
               <span
                 className={`plp__tertiary-icon${heartActive ? " is-active" : ""}`}
@@ -360,6 +368,7 @@ function ServiceTile({
               className="plp__tertiary"
               data-name="component.input.button"
               data-studio-quick-view="true"
+              data-studio-action={`plp-tile-quickview-${item.id}`}
               {...(probeBelowFold
                 ? { "data-studio-probe-below-fold": "true" }
                 : {})}
@@ -401,7 +410,7 @@ function ServiceTile({
 
 /**
  * React + UXDS PLP — Vaccinations listing.
- * Retires Make HTML for Frame child 9; Studio hooks via data-name.
+ * Retires Legacy HTML for Frame child 9; Studio hooks via data-name.
  */
 export function PlpScreen({
   onBookNow,
@@ -410,7 +419,16 @@ export function PlpScreen({
   onFiltersDirtyChange,
 }: PlpScreenProps) {
   const [filters, setFilters] = useState<PlpFilterState>(DEFAULT_PLP_FILTERS);
-  const [wishlistTick, setWishlistTick] = useState(0);
+
+  // I3c (PLP_LEGACY_PARITY_REGISTER.md): a checked facet value whose
+  // leave-one-out count drops to 0 auto-unchecks (Legacy `setFilterCheckboxItemState`
+  // L746–765). Re-runs on every filters change; converges in bounded steps
+  // since each pass only removes values.
+  useEffect(() => {
+    const { filters: next, changed } = dropZeroCountFacetValues(filters);
+    if (changed) setFilters(next);
+  }, [filters]);
+
   const [displayItems, setDisplayItems] = useState(() =>
     filterPlpCatalog(DEFAULT_PLP_FILTERS)
   );
@@ -418,22 +436,11 @@ export function PlpScreen({
   const [loadHostMinHeight, setLoadHostMinHeight] = useState<number | null>(
     null
   );
-  /** View all expand (uncap beyond Make `PLP_FILTER_LIST_MAX`). */
+  /** View all expand (uncap beyond Legacy `PLP_FILTER_LIST_MAX`). */
   const [diseaseExpanded, setDiseaseExpanded] = useState(false);
   const [countryExpanded, setCountryExpanded] = useState(false);
   const syncPassRef = useRef(0);
   const tilesHostRef = useRef<HTMLDivElement | null>(null);
-  /** Wishlist adds held open on `PLP_WISHLIST_ADD_DELAY_MS` before commit. */
-  const wishlistAddTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(
-    new Map()
-  );
-
-  useEffect(() => {
-    return () => {
-      wishlistAddTimersRef.current.forEach((timer) => clearTimeout(timer));
-      wishlistAddTimersRef.current.clear();
-    };
-  }, []);
 
   const dirty = isPlpFiltersDirty(filters);
   const activeChips = collectPlpActiveFilterChips(filters);
@@ -496,7 +503,7 @@ export function PlpScreen({
     PLP_DISEASE_OPTIONS,
     filters.diseaseQuery
   );
-  // Make wire: region selection narrows country candidates (counters kept).
+  // Legacy wire: region selection narrows country candidates (counters kept).
   const countryPool = collectPlpCountryFilterLabels(filters);
   const countryFiltered = filterOptionList(countryPool, filters.countryQuery);
   const diseaseQuerying = filters.diseaseQuery.trim().length > 0;
@@ -590,7 +597,7 @@ export function PlpScreen({
       </section>
 
       <main className="plp__body" data-name="module.laptop.specs">
-        {/* Make ModuleLaptopSpecs: white base + decorative fill @ opacity 0.41 */}
+        {/* Legacy ModuleLaptopSpecs: white base + decorative fill @ opacity 0.41 */}
         <div className="plp__body-fill" aria-hidden>
           <div className="plp__body-fill-solid" />
           <img
@@ -602,7 +609,7 @@ export function PlpScreen({
 
         <div className="plp__shell plp__body-shell">
           <div className="plp__shell-inner plp__body-stack">
-            {/* Make ModuleLaptopSpecs — Advantage Card system message above filters/listing */}
+            {/* Legacy ModuleLaptopSpecs — Advantage Card system message above filters/listing */}
             <div
               className="plp__advantage"
               data-name="component.gse.system.message"
@@ -627,7 +634,7 @@ export function PlpScreen({
                 data-name="plp.filter.accordion"
               >
                 <AccordionItem id="type" className="plp__filter-section">
-                  <AccordionTrigger id="type" className="plp__filter-trigger">
+                  <AccordionTrigger id="type" className="plp__filter-trigger" data-studio-action="plp-filter-accordion-type">
                     <span>By Type</span>
                     <ChevronGlyph />
                   </AccordionTrigger>
@@ -654,7 +661,7 @@ export function PlpScreen({
                 </AccordionItem>
 
                 <AccordionItem id="age" className="plp__filter-section">
-                  <AccordionTrigger id="age" className="plp__filter-trigger">
+                  <AccordionTrigger id="age" className="plp__filter-trigger" data-studio-action="plp-filter-accordion-age">
                     <span>By Age</span>
                     <ChevronGlyph />
                   </AccordionTrigger>
@@ -693,7 +700,7 @@ export function PlpScreen({
                 </AccordionItem>
 
                 <AccordionItem id="disease" className="plp__filter-section">
-                  <AccordionTrigger id="disease" className="plp__filter-trigger">
+                  <AccordionTrigger id="disease" className="plp__filter-trigger" data-studio-action="plp-filter-accordion-disease">
                     <span>By Disease</span>
                     <ChevronGlyph />
                   </AccordionTrigger>
@@ -726,8 +733,9 @@ export function PlpScreen({
                       ))}
                     </div>
                     <FilterViewAll
+                      section="disease"
                       onActivate={() => {
-                        // Filled → reset field (Make wire clear / PO restore).
+                        // Filled → reset field (Legacy wire clear / PO restore).
                         if (diseaseQuerying) {
                           setFilters({ ...filters, diseaseQuery: "" });
                           setDiseaseExpanded(false);
@@ -740,7 +748,7 @@ export function PlpScreen({
                 </AccordionItem>
 
                 <AccordionItem id="region" className="plp__filter-section">
-                  <AccordionTrigger id="region" className="plp__filter-trigger">
+                  <AccordionTrigger id="region" className="plp__filter-trigger" data-studio-action="plp-filter-accordion-region">
                     <span>By Region</span>
                     <ChevronGlyph />
                   </AccordionTrigger>
@@ -765,7 +773,7 @@ export function PlpScreen({
                 </AccordionItem>
 
                 <AccordionItem id="country" className="plp__filter-section">
-                  <AccordionTrigger id="country" className="plp__filter-trigger">
+                  <AccordionTrigger id="country" className="plp__filter-trigger" data-studio-action="plp-filter-accordion-country">
                     <span>By Country</span>
                     <ChevronGlyph />
                   </AccordionTrigger>
@@ -798,6 +806,7 @@ export function PlpScreen({
                       ))}
                     </div>
                     <FilterViewAll
+                      section="country"
                       onActivate={() => {
                         if (countryQuerying) {
                           setFilters({ ...filters, countryQuery: "" });
@@ -826,7 +835,7 @@ export function PlpScreen({
               ) : null}
             </aside>
 
-            {/* Make Body8 listing wrapper — white card + drop-shadow over page fill */}
+            {/* Legacy Body8 listing wrapper — white card + drop-shadow over page fill */}
             <section className="plp__listing" data-name="module.plp.listing">
               <div className="plp__results">
                 <div
@@ -904,7 +913,7 @@ export function PlpScreen({
                   style={tilesHostStyle}
                 >
                   {/*
-                    Make preloader (child 9): hide tiles + in-band spinner overlay.
+                    Legacy preloader (child 9): hide tiles + in-band spinner overlay.
                     ONE “Updating results…” under spinner — never also in count line.
                     Host min-height locked to prior band height (no collapse jump).
                     Sticky inner pin keeps spinner in the visible listing scrollport.
@@ -950,9 +959,6 @@ export function PlpScreen({
                   ) : null}
 
                   {displayItems.map((item, tileIndex) => {
-                    const wishId = plpTileWishlistId(tileIndex);
-                    const wishlisted =
-                      wishlistTick >= 0 && isInWishlist(wishId);
                     const staggerMs = Math.min(tileIndex, 8) * 50;
                     const isLastTile = tileIndex === displayItems.length - 1;
                     return (
@@ -960,39 +966,11 @@ export function PlpScreen({
                         key={item.id}
                         item={item}
                         tileIndex={tileIndex}
-                        wishlisted={wishlisted}
                         staggerMs={
                           listingPhase === "reveal" ? staggerMs : undefined
                         }
                         reveal={listingPhase === "reveal"}
                         probeBelowFold={isLastTile && displayItems.length > 1}
-                        onToggleWishlist={() => {
-                          const timers = wishlistAddTimersRef.current;
-                          const pendingAdd = timers.get(wishId);
-                          if (wishlisted || pendingAdd != null) {
-                            if (pendingAdd != null) {
-                              // Still pending — cancel; nothing was ever added.
-                              clearTimeout(pendingAdd);
-                              timers.delete(wishId);
-                              return;
-                            }
-                            toggleWishlist(wishId);
-                            setWishlistTick((n) => n + 1);
-                            return;
-                          }
-                          // Adding — hold the commit open so the user has
-                          // time to see the optimistic hover/pressed flip
-                          // before it lands in Bookmarks (LESSONS-style
-                          // no-invent: engine playbackMs, not a raw ms).
-                          timers.set(
-                            wishId,
-                            setTimeout(() => {
-                              timers.delete(wishId);
-                              toggleWishlist(wishId);
-                              setWishlistTick((n) => n + 1);
-                            }, playbackMs(PLP_WISHLIST_ADD_DELAY_MS))
-                          );
-                        }}
                         onBookNow={() => onBookNow(item)}
                         onQuickView={() => onQuickView(item)}
                       />
