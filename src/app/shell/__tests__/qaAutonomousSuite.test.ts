@@ -178,6 +178,40 @@ describe("autonomous QA suite", () => {
     });
   });
 
+  it("hard resets a stuck running suite instead of rejecting a new start", async () => {
+    let resolveStale!: (value: { pass: boolean }) => void;
+    window.__studioRunMcpSanityCheck = vi.fn(
+      () => new Promise((resolve) => { resolveStale = resolve; })
+    );
+    const first = window.__studioStartQaSuite?.(["mcp-sanity"], { suiteId: "stale-suite" });
+    expect(first?.accepted).toBe(true);
+    await settle();
+    expect(window.__studioGetQaSuiteStatus?.()).toMatchObject({
+      suiteId: "stale-suite",
+      phase: "running",
+    });
+
+    // Previously this silently rejected ({ accepted: false }) while a suite
+    // was mid-`running`, leaving the stale one as the only source of truth —
+    // a genuine "stuck" run needed a manual page reload to recover from.
+    window.__studioRunQaSelfTestSmoke = vi.fn(async () => ({ ok: true }));
+    const second = window.__studioStartQaSuite?.(["qa-self-test"], { suiteId: "fresh-suite" });
+    expect(second?.accepted).toBe(true);
+    expect(window.__studioGetQaSuiteStatus?.().suiteId).toBe("fresh-suite");
+    await settle();
+    expect(window.__studioGetQaSuiteStatus?.()).toMatchObject({
+      suiteId: "fresh-suite",
+      phase: "passed",
+    });
+
+    // The stale first run finally resolving must not clobber the new run's
+    // already-settled status — its completion handler is a stale-token no-op.
+    resolveStale({ pass: true });
+    await settle();
+    expect(window.__studioGetQaSuiteStatus?.().suiteId).toBe("fresh-suite");
+    expect(window.__studioGetQaSuiteStatus?.().phase).toBe("passed");
+  });
+
   it("keeps Current project core fast and reserves playback for Test all CJMs", () => {
     expect(QA_SUITE_COLLECTION.find((suite) => suite.id === "project-core")?.tests)
       .toContainEqual({ id: "validate-all-cjms" });

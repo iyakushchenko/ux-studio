@@ -23,14 +23,14 @@ export const QA_SUITE_COLLECTION: ReadonlyArray<{
   tests: readonly QaSuiteTest[];
 }> = [
   { id: "tool-health", label: "QA tool health", description: "Verify the QA tool itself works: overlay renders, events capture, and agent connection responds", tests: [{ id: "mcp-sanity" }] },
-  { id: "current-page", label: "Test current page", description: "Run the current project's registered page contract", tests: [{ id: "mcp-page-probe" }] },
-  { id: "current-interactions", label: "Map current page interactions", description: "Inventory and grade every visible interactive candidate without activating it", tests: [{ id: "map-current-interactions" }] },
-  { id: "all-interactions", label: "Map all project interactions", description: "Inventory Hub and every registered project page into one machine-readable report", tests: [{ id: "map-all-interactions" }] },
-  { id: "current-cjm-fast", label: "Fast test current CJM", description: "Compressed functional proof; target, route, modal, counter, and end-state guards stay strict. Motion-frame samples remain diagnostic-only.", tests: [{ id: "play-current-cjm", options: { playbackSpeed: "fast" } }] },
-  { id: "all-cjms-fast", label: "Fast test all CJMs", description: "Compressed functional proof of every project CJM; stops on the first real error. Motion-frame samples remain diagnostic-only.", tests: [{ id: "play-all-cjms", options: { playbackSpeed: "fast" } }] },
-  { id: "current-cjm", label: "Test current CJM", description: "Continuously play and prove the currently selected CJM at demo speed", tests: [{ id: "play-current-cjm" }] },
-  { id: "all-cjms", label: "Test all CJMs", description: "Enumerate and continuously prove every CJM at demo speed", tests: [{ id: "play-all-cjms" }] },
-  { id: "project-core", label: "Current project core", description: "Fast QA health, page contract, interaction map, and structural validation of every project CJM", tests: [{ id: "mcp-sanity" }, { id: "mcp-page-probe" }, { id: "map-all-interactions" }, { id: "validate-all-cjms" }] },
+  { id: "current-page", label: "Test current page", description: "Check the currently open page against its registered structural contract (elements, links, layout) — this page only", tests: [{ id: "mcp-page-probe" }] },
+  { id: "current-interactions", label: "Map current page interactions", description: "Inventory and grade every visible interactive candidate on the currently open page without clicking it", tests: [{ id: "map-current-interactions" }] },
+  { id: "all-interactions", label: "Map all project interactions", description: "Inventory Hub and every registered project page into one machine-readable report, without clicking anything", tests: [{ id: "map-all-interactions" }] },
+  { id: "current-cjm-fast", label: "Fast test current CJM", description: "Play the currently selected CJM at compressed speed; stops on the first real functional error. Same pass/fail checks as demo speed — only pacing changes, motion smoothness is not asserted.", tests: [{ id: "play-current-cjm", options: { playbackSpeed: "fast" } }] },
+  { id: "all-cjms-fast", label: "Fast test all CJMs", description: "Play every project CJM at compressed speed; stops on the first real functional error. Same pass/fail checks as demo speed — only pacing changes, motion smoothness is not asserted.", tests: [{ id: "play-all-cjms", options: { playbackSpeed: "fast" } }] },
+  { id: "current-cjm", label: "Test current CJM", description: "Play the currently selected CJM at demo speed; stops on the first real functional error", tests: [{ id: "play-current-cjm" }] },
+  { id: "all-cjms", label: "Test all CJMs", description: "Play every project CJM in turn at demo speed; stops on the first real functional error", tests: [{ id: "play-all-cjms" }] },
+  { id: "project-core", label: "Current project core", description: "4 checks in sequence: QA tool health, current page contract, full project interaction map, and static structural validation of every CJM (no playback — this does not click through the journeys)", tests: [{ id: "mcp-sanity" }, { id: "mcp-page-probe" }, { id: "map-all-interactions" }, { id: "validate-all-cjms" }] },
 ];
 
 export function getQaSuiteDefinition(id: string) {
@@ -130,10 +130,19 @@ export function startAutonomousQaSuite(
   tests: Array<QaSuiteTestId | QaSuiteTest>,
   options?: { suiteId?: string },
 ) {
-  if (status.phase === "running") return { accepted: false, status };
   if (!Array.isArray(tests) || tests.length < 1 || tests.length > 100) {
     throw new Error("QA suite requires 1–100 tests");
   }
+  // Hard reset any previous run before starting — a new suite call always
+  // wins. Previously a suite mid-`running` silently rejected a new start
+  // (`{ accepted: false }`), so switching suites (e.g. normal → fast) or
+  // retrying after getting the app into a stuck state required a manual
+  // page reload to get a trustworthy run. The `status = {...}` reassignment
+  // below already discards any stale `completed`/`failure` from before this
+  // call, and bumping `runToken` (already done further down) invalidates
+  // any in-flight `runRemaining` from a previous run — its own `token ===
+  // runToken` checks turn it into a no-op instead of letting it clobber
+  // this run's status when it eventually resolves.
   activeTests = tests.map((test) => typeof test === "string" ? { id: test } : test);
   status = {
     suiteId: options?.suiteId?.trim() || `qa-${Date.now().toString(36)}`,
