@@ -117,4 +117,18 @@ describe("QA Touchpoints bar — no stale suite chip after Reset / Free Mode", (
     expect(wrapAfterReset?.hidden).toBe(true);
     expect(wrapAfterReset?.textContent ?? "").not.toContain("QA tool health");
   });
+
+  it("agent-driven suite runs still show which suite is running in the dropdown, disabled not blank (PO, 2026-07-24)", async () => {
+    openAgentTestingLogger({ kind: "agent" });
+    startAutonomousQaSuite([{ id: "mcp-sanity" }], { suiteId: "tool-health" });
+    touchAgentTestingOverlay();
+
+    const select = suiteSelect();
+    expect(select?.disabled).toBe(true);
+    expect(select?.value).toBe("tool-health");
+
+    await settle();
+    touchAgentTestingOverlay();
+    expect(suiteSelect()?.value).toBe("tool-health");
+  });
 });

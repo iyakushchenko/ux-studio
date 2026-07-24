@@ -207,6 +207,8 @@ export type { AgentTestingOverlayResult } from "@/app/shell/agent-testing/agentT
 export type { AgentTestingStepOutcome, LogAgentTestingStepInput } from "@/app/shell/agent-testing/agentTestingTypes";
 
 const ROOT_ID = "agent-testing-overlay";
+/** Seamless loop distance for the -45deg running-stripe CSS (20px cycle ÷ cos45°). */
+const STRIPE_LOOP_PX = 20 * Math.SQRT2;
 const LOG_LIMIT = 80;
 /** Safety: never leave the overlay up longer than this (force clear). */
 const MAX_MS = 3 * 60 * 1000;
@@ -410,6 +412,16 @@ let ensureClearTimer: ReturnType<typeof setTimeout> | null = null;
 let reloadTimer: ReturnType<typeof setTimeout> | null = null;
 let elapsedTimer: ReturnType<typeof setInterval> | null = null;
 let sessionStartedAt = 0;
+/**
+ * Log noise fix: the dump-saved usage hint is static, never-changing text
+ * ("primary: window.__studioConsumePoSignal() · dump: ..."). It used to
+ * repeat verbatim on every single `saveDump()` call — 62 identical copies
+ * in one real test-file run's console output. It's a one-time usage note,
+ * not per-event data; show it once per module lifetime, not once per dump.
+ * Deliberately NOT reset by forceClearAgentTestingOverlay — a fresh session
+ * still doesn't need to be told the same static hint again (PO, 2026-07-24).
+ */
+let dumpHintShown = false;
 let lastStepAt = 0;
 /** Accumulated elapsed while running (excludes paused gaps). */
 let elapsedAccumMs = 0;
@@ -688,17 +700,16 @@ function renderTimeline(): void {
   }
 }
 
-/** Keep the QA console honest about both outer tests and nested CJM/page work. */
+/**
+ * Keep the QA console honest about both outer tests and nested CJM/page
+ * work. Progress is shown once, in the Touchpoints bar title only — a
+ * second "Checks N/total" count used to also render beside the suite
+ * dropdown, duplicating the same number in two places (PO, 2026-07-24).
+ */
 function syncQaSuiteProgress(root: HTMLElement): void {
-  const count = root.querySelector<HTMLElement>(".studio-agent-testing-overlay__suite-progress-count");
   const title = root.querySelector<HTMLElement>(".studio-agent-testing-overlay__timeline-wrap .studio-agent-testing-overlay__bar-title");
   if (isRecordingActive()) {
     const rec = buildRecordingTimeline(getActiveRecordingSession());
-    if (count) {
-      count.hidden = false;
-      count.textContent = `REC · ${rec.stepCount} ${rec.stepCount === 1 ? "step" : "steps"}`;
-      count.title = `${rec.stepCount} recorded journey ${rec.stepCount === 1 ? "step" : "steps"}`;
-    }
     if (title) title.textContent = `REC touchpoints · ${rec.stepCount}`;
     timelineKeys = rec.items;
     renderTimeline();
@@ -712,7 +723,6 @@ function syncQaSuiteProgress(root: HTMLElement): void {
   // here is belt-and-suspenders alongside Reset wiping the suite status
   // itself (both must hold for stale "QA tool health"-style chips to die).
   if (!selectedQaSuiteId || !status.suiteId || status.phase === "idle") {
-    count?.setAttribute("hidden", "");
     if (timelineKeys.length > 0) {
       timelineKeys = [];
       renderTimeline();
@@ -725,11 +735,6 @@ function syncQaSuiteProgress(root: HTMLElement): void {
   const total = Math.max(1, scope?.total ?? status.total);
   const current = Math.min(total, scope?.current ?? (status.phase === "passed" ? total : status.index + 1));
   const label = scope?.label ?? "Tests";
-  if (count) {
-    count.hidden = false;
-    count.textContent = `${label} ${current}/${total}`;
-    count.title = `${current} of ${total} ${label.toLowerCase()} checked`;
-  }
   if (title && scope) title.textContent = `Touchpoints · ${label} ${current}/${total}`;
   if (scope?.items) {
     timelineKeys = scope.items.map((item) => ({ key: item.label, outcome: item.outcome }));
@@ -846,13 +851,11 @@ function saveDump(
       })(),
     });
     pushAgentTestingDump(dump);
-    console.info(
-      "[AGENT_TESTING] dump saved (secondary)",
-      reason,
-      dump.code ?? "",
-      dump.atIso,
-      "— primary: window.__studioConsumePoSignal() · dump: __studioDownloadAgentTestingDump()",
-    );
+    const hint = dumpHintShown
+      ? []
+      : ["— primary: window.__studioConsumePoSignal() · dump: __studioDownloadAgentTestingDump()"];
+    dumpHintShown = true;
+    console.info("[AGENT_TESTING] dump saved (secondary)", reason, dump.code ?? "", dump.atIso, ...hint);
     return dump;
   } catch {
     /* never block overlay */
@@ -1900,12 +1903,11 @@ function syncSessionChrome(): void {
   const suiteSelect = root.querySelector<HTMLSelectElement>(".studio-agent-testing-overlay__suite-select");
   if (suiteSelect) {
     const agentDriven = getSessionKind() === "agent";
+    // Disabled = unskippable, not hidden: agent-driven runs must still show
+    // which suite is running (PO, 2026-07-24) — no more forced blank here.
     suiteSelect.disabled = !actions.suitePickerVisible || agentDriven;
-    if (agentDriven && suiteSelect.value !== "") {
-      suiteSelect.value = "";
-    }
     suiteSelect.setAttribute("aria-hidden", actions.suitePickerVisible ? "false" : "true");
-    if (!agentDriven && suiteSelect.value !== selectedQaSuiteId) {
+    if (suiteSelect.value !== selectedQaSuiteId) {
       suiteSelect.value = selectedQaSuiteId;
     }
   }
@@ -2113,6 +2115,14 @@ function ensureOverlayChrome(root: HTMLElement): void {
     frame.setAttribute("aria-hidden", "true");
     root.insertBefore(frame, root.firstChild);
   }
+  // "Test in progress" stripe — always animating (cheap, GPU transform);
+  // CSS opacity alone gates it to [data-suite-phase="running"], so no JS
+  // state to keep in sync with the suite lifecycle (PO, 2026-07-24).
+  const stripes = root.querySelector<HTMLElement>(".studio-agent-testing-overlay__suite-stripes");
+  if (stripes && !stripes.dataset.animating) {
+    stripes.dataset.animating = "true";
+    animate(stripes, { x: [0, -STRIPE_LOOP_PX] }, { duration: 2.4, ease: "linear", repeat: Infinity });
+  }
   try {
     if (isRecordingActive()) root.dataset.rec = "live";
     else delete root.dataset.rec;
@@ -2122,14 +2132,6 @@ function ensureOverlayChrome(root: HTMLElement): void {
   const panel = root.querySelector(".studio-agent-testing-overlay__panel");
   const header = root.querySelector(".studio-agent-testing-overlay__header");
   if (!panel || !header) return;
-
-  const suitePicker = header.querySelector<HTMLElement>(".studio-agent-testing-overlay__suite-picker");
-  if (suitePicker && !suitePicker.querySelector(".studio-agent-testing-overlay__suite-progress-count")) {
-    const count = document.createElement("span");
-    count.className = "studio-agent-testing-overlay__suite-progress-count";
-    count.hidden = true;
-    suitePicker.appendChild(count);
-  }
 
   let clock = header.querySelector<HTMLElement>(".studio-agent-testing-overlay__clock");
   const elapsed = header.querySelector<HTMLElement>(".studio-agent-testing-overlay__elapsed");
@@ -2891,12 +2893,12 @@ function ensureRoot(): HTMLElement | null {
       <div class="studio-agent-testing-overlay__controls">
         <div class="studio-agent-testing-overlay__toolbar">
           <label class="studio-agent-testing-overlay__suite-picker">
+            <span class="studio-agent-testing-overlay__suite-stripes" aria-hidden="true"></span>
             <span class="sr-only">Select mode</span>
             <select id="studio-qa-suite-select" name="studio-qa-suite" class="studio-agent-testing-overlay__suite-select" aria-label="Select mode">
               <option value="">Free Mode</option>
               ${QA_SUITE_COLLECTION.map((suite) => `<option value="${suite.id}">${suite.label}</option>`).join("")}
             </select>
-            <span class="studio-agent-testing-overlay__suite-progress-count" hidden></span>
           </label>
           <div class="studio-agent-testing-overlay__clock">
             <button type="button" class="studio-agent-testing-overlay__capture-toggle" hidden title="Start capture">CAPTURE</button>

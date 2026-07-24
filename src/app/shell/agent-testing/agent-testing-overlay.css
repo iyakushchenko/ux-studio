@@ -210,16 +210,32 @@ body:has(
   flex: 1 1 auto;
   min-width: 0;
   max-width: none;
+  position: relative;
+  overflow: hidden;
 }
 
-.studio-agent-testing-overlay__suite-progress-count {
-  flex: 0 0 auto;
-  color: #9aa0aa;
-  font-size: 9px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
+/* "Test in progress" indicator — only visible while a suite is running
+   ([data-suite-phase="running"] on the overlay root). Diagonal stripe cycle
+   is 20px (10px band + 10px gap); JS animates by exactly one X-period of
+   this angle (STRIPE_LOOP_PX) for a seamless loop — keep both in sync. */
+.studio-agent-testing-overlay__suite-stripes {
+  position: absolute;
+  inset: -20px -28px;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(255, 255, 255, 0.16) 0px,
+    rgba(255, 255, 255, 0.16) 10px,
+    transparent 10px,
+    transparent 20px
+  );
+  opacity: 0;
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity 0.15s ease;
+}
+
+[data-suite-phase="running"] .studio-agent-testing-overlay__suite-stripes {
+  opacity: 1;
 }
 
 .studio-agent-testing-overlay__suite-select {
@@ -238,6 +254,12 @@ body:has(
   text-overflow: ellipsis;
   white-space: nowrap;
   cursor: pointer;
+}
+
+/* Let the running-stripe show through the dropdown's own background — a
+   solid #202226 would otherwise fully hide it (paints on top in DOM order). */
+[data-suite-phase="running"] .studio-agent-testing-overlay__suite-select {
+  background-color: rgba(32, 34, 38, 0.55);
 }
 
 .studio-agent-testing-overlay__suite-select:hover {
