@@ -24,6 +24,9 @@
 /* ── THEME — optional project remaps (`src/projects/<id>/styleguide/theme.css`) */
 @import '../projects/boots-pharmacy/styleguide/theme.css';
 
+/* ── NewCo — self-contained dry-run page CSS (own `.newco-*` namespace, no shared UXDS tokens) */
+@import '../projects/newco/screens/home/newco-home.css';
+
 /* ── PANEL — engine chrome only (`src/app/nav/`; `src/app/shell/`) ─── */
 @import '../app/nav/studioNavPanel.css';
 @import '../app/nav/studioNavPolish.css';

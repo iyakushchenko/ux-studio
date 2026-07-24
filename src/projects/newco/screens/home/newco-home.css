@@ -1,0 +1,1001 @@
+/**
+ * NewCo — dry-run replica theme.
+ * Colors: primary red is Walgreens' documented brand red (#E31837, a real
+ * public brand hex, near-identical to the Figma file's own #e41f35 accent);
+ * neutrals/grays are the Figma file's own live UXDS tokens (uxds-surface,
+ * uxds-text, uxds-border) pulled via get_variable_defs — not invented.
+ * Font: font-family-Inter token in the source file resolves to "Open Sans",
+ * matching the rest of this engine's default.
+ */
+
+.newco-home {
+  --newco-primary: #e31837;
+  --newco-primary-dark: #b3122b;
+  --newco-primary-hover: #c81530;
+  --newco-ink: #171717;
+  --newco-ink-soft: #2e2e2e;
+  --newco-text: #272727;
+  --newco-text-muted: #7a7d87;
+  --newco-border: #d6d6d6;
+  --newco-border-subtle: #e6e6e6;
+  --newco-surface: #ffffff;
+  --newco-surface-muted: #f5f5f5;
+  --newco-surface-alt: #e1e5e9;
+
+  font-family: "Open Sans", sans-serif;
+  color: var(--newco-text);
+  background: var(--newco-surface);
+  overflow-y: auto;
+  width: 100%;
+  height: 100%;
+}
+
+.newco-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────── */
+
+.newco-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  width: 100%;
+  flex-shrink: 0;
+  background: var(--newco-surface);
+}
+
+.newco-header__bar--top {
+  background: var(--newco-ink);
+  color: var(--newco-surface-alt);
+  font-size: 12px;
+}
+.newco-header__top-row {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+.newco-header__phone {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+.newco-header__eligibility {
+  flex: 1 1 auto;
+  text-align: center;
+}
+.newco-header__eligibility a {
+  color: #fff;
+  font-weight: 700;
+  text-decoration: underline;
+}
+.newco-header__locale {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+  background: transparent;
+  border: none;
+  color: var(--newco-surface-alt);
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.newco-header__locale:hover {
+  color: #fff;
+}
+
+.newco-header__bar--main {
+  border-bottom: 1px solid var(--newco-border-subtle);
+}
+.newco-header__row {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 14px 24px;
+}
+
+.newco-logo {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+.newco-logo img {
+  display: block;
+}
+
+.newco-search {
+  position: relative;
+  flex: 1 1 auto;
+  max-width: 420px;
+}
+.newco-search__input {
+  width: 100%;
+  height: 36px;
+  border: 1px solid var(--newco-border);
+  border-radius: 18px;
+  padding: 0 16px 0 40px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--newco-text);
+}
+.newco-search__input:focus {
+  outline: 2px solid var(--newco-primary);
+  outline-offset: 1px;
+}
+.newco-search__icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--newco-text-muted);
+  pointer-events: none;
+}
+
+.newco-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.newco-account-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 17px;
+  border: none;
+  background: transparent;
+  color: var(--newco-text);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.newco-account-btn:hover {
+  background: var(--newco-surface-muted);
+}
+
+.newco-account {
+  position: relative;
+}
+.newco-account-flyout {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 10px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+  padding: 8px 0;
+  min-width: 220px;
+  z-index: 30;
+}
+.newco-account-flyout::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  right: 26px;
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  transform: rotate(45deg);
+  box-shadow: -2px -2px 4px rgba(0, 0, 0, 0.04);
+}
+.newco-account-flyout__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--newco-text);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.newco-account-flyout__item:hover {
+  background: var(--newco-surface-muted);
+}
+.newco-account-flyout__item svg {
+  width: 18px;
+  height: 18px;
+  color: var(--newco-text-muted);
+  flex: 0 0 auto;
+}
+
+.newco-icon-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--newco-text);
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 700;
+}
+.newco-icon-btn:hover {
+  background: var(--newco-surface-muted);
+}
+.newco-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 3px;
+  border-radius: 8px;
+  background: var(--newco-primary);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+}
+
+.newco-header__bar--nav {
+  background: var(--newco-surface);
+  position: relative;
+}
+.newco-nav {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  padding: 10px 24px;
+}
+.newco-nav__item {
+  position: static;
+}
+.newco-nav__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--newco-text);
+  text-decoration: none;
+}
+.newco-nav__link:hover {
+  color: var(--newco-primary);
+}
+.newco-nav__link[aria-expanded="true"] {
+  color: var(--newco-primary);
+}
+
+/*
+ * Anchored to the nav bar's own bottom edge (top: 100% of the position:
+ * relative `.newco-header__bar--nav`), never the viewport — so it starts
+ * exactly where the mega menu starts and never overlays the sticky header
+ * above it. Same anchoring approach as the shared MegaMenuFlyout kit's
+ * `.uxds-mega-menu-flyout__scrim` (position: absolute, not fixed).
+ */
+.newco-mega-menu-scrim {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(to bottom, rgba(99, 109, 115, 0.66), rgba(99, 109, 115, 0) 40%);
+  z-index: 15;
+  pointer-events: none;
+}
+
+.newco-mega-menu {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  align-items: stretch;
+  background: #fff;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 5px 19.5px rgba(0, 0, 0, 0.05);
+  z-index: 20;
+  overflow: hidden;
+}
+.newco-mega-menu::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: 10px;
+}
+
+.newco-mega-menu__categories {
+  flex: 0 0 auto;
+  background: var(--newco-surface-muted);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 224px;
+}
+.newco-mega-menu__category {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--newco-text);
+  cursor: pointer;
+  text-align: left;
+}
+.newco-mega-menu__category.is-active {
+  color: var(--newco-primary);
+}
+.newco-mega-menu__category--flat {
+  text-decoration: none;
+  justify-content: flex-start;
+}
+.newco-mega-menu__category--flat:hover {
+  color: var(--newco-primary);
+}
+
+.newco-mega-menu__sublinks {
+  flex: 0 0 auto;
+  padding: 32px;
+  width: 224px;
+}
+.newco-mega-menu__sublinks ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.newco-mega-menu__sublinks a {
+  display: block;
+  width: 100%;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--newco-text-muted);
+  text-decoration: none;
+}
+.newco-mega-menu__sublinks a:hover {
+  color: var(--newco-primary);
+}
+
+.newco-mega-menu__promo {
+  flex: 1 1 auto;
+  /* No left margin by default — `.newco-mega-menu__sublinks`'s own left
+     padding already provides that gap when it's present between the
+     category list and this card. */
+  margin: 32px 32px 32px 0;
+  border-radius: 8px;
+  min-height: 184px;
+  background-size: cover;
+  background-position: center center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 24px;
+  overflow: hidden;
+}
+/* Flat menus (e.g. About Us) skip the sublinks column entirely, so the
+   promo card needs its own left margin instead of borrowing sublinks'. */
+.newco-mega-menu__promo--flat {
+  margin-left: 32px;
+}
+.newco-mega-menu__promo-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0) 60%);
+}
+.newco-mega-menu__promo h4 {
+  position: relative;
+  color: #fff;
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+}
+.newco-btn--outline-white {
+  position: relative;
+  background: #fff;
+  color: var(--newco-text);
+  border-color: var(--newco-border);
+}
+.newco-btn--outline-white:hover {
+  background: var(--newco-surface-muted);
+}
+
+/* ── Buttons ────────────────────────────────────────────────────────── */
+
+.newco-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 20px;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.newco-btn--solid {
+  background: var(--newco-primary);
+  color: #fff;
+}
+.newco-btn--solid:hover {
+  background: var(--newco-primary-hover);
+}
+.newco-btn--outline {
+  background: transparent;
+  color: var(--newco-primary);
+  border-color: var(--newco-primary);
+}
+.newco-btn--outline:hover {
+  background: rgba(227, 24, 55, 0.06);
+}
+.newco-btn--solid-inverse {
+  background: #fff;
+  color: var(--newco-ink);
+}
+.newco-btn--solid-inverse:hover {
+  background: var(--newco-surface-muted);
+}
+.newco-btn--outline-inverse {
+  background: transparent;
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.6);
+}
+.newco-btn--outline-inverse:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.newco-text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--newco-primary);
+  font-weight: 600;
+  font-size: 13px;
+  text-decoration: none;
+}
+.newco-text-link:hover {
+  text-decoration: underline;
+}
+
+/* ── Hero ───────────────────────────────────────────────────────────── */
+
+.newco-hero {
+  /* background-image (real logo asset photo + legibility gradient) set inline in NewCoHomeScreen.tsx */
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  width: 100%;
+  color: #fff;
+  padding: 120px 0;
+}
+.newco-hero__title {
+  font-size: 44px;
+  line-height: 1.15;
+  font-weight: 700;
+  margin: 0 0 16px;
+  max-width: 560px;
+}
+.newco-hero__body {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 480px;
+  margin: 0 0 32px;
+}
+.newco-hero__ctas {
+  display: flex;
+  gap: 14px;
+}
+
+/* ── Sections ───────────────────────────────────────────────────────── */
+
+.newco-section {
+  padding: 64px 0;
+}
+.newco-section--muted {
+  background: var(--newco-surface-muted);
+}
+.newco-section__title {
+  font-size: 30px;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+.newco-section__title--center {
+  text-align: center;
+  margin-bottom: 40px;
+}
+.newco-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--newco-primary);
+  margin: 0 0 8px;
+}
+
+.newco-help-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+.newco-help-card {
+  text-align: center;
+  padding: 24px;
+}
+.newco-help-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--newco-surface-muted);
+  color: var(--newco-primary);
+  margin-bottom: 16px;
+}
+.newco-help-card__title {
+  font-size: 17px;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+.newco-help-card__body {
+  font-size: 13px;
+  color: var(--newco-text-muted);
+  margin: 0;
+}
+
+.newco-banner {
+  text-align: center;
+  max-width: 640px;
+}
+.newco-banner__body {
+  color: var(--newco-text-muted);
+  font-size: 14px;
+  margin: 12px 0 24px;
+}
+
+.newco-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+  align-items: center;
+}
+.newco-split--reverse {
+  grid-template-columns: 1fr 1fr;
+}
+.newco-split__body {
+  color: var(--newco-text-muted);
+  font-size: 14px;
+  margin: 12px 0 20px;
+}
+.newco-split__media img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  object-position: center center;
+  border-radius: 8px;
+  display: block;
+}
+
+.newco-check-list {
+  list-style: none;
+  margin: 0 0 24px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.newco-check-list li {
+  font-size: 14px;
+  padding-left: 26px;
+  position: relative;
+}
+.newco-check-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--newco-primary);
+}
+.newco-check-list li::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 8px;
+  width: 6px;
+  height: 3px;
+  border-left: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(-45deg);
+}
+
+.newco-category-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.newco-category-tile {
+  border: 1px solid var(--newco-border-subtle);
+  border-radius: 8px;
+  padding: 20px 12px;
+  text-align: center;
+  cursor: pointer;
+  background: var(--newco-surface);
+}
+.newco-category-tile:hover {
+  border-color: var(--newco-primary);
+}
+.newco-category-tile__icon {
+  display: inline-flex;
+  color: var(--newco-primary);
+  margin-bottom: 8px;
+}
+.newco-category-tile__label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ── Testimonials ───────────────────────────────────────────────────── */
+
+.newco-testimonials {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+.newco-testimonials__nav {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--newco-border);
+  background: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.newco-testimonials__track {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.newco-testimonial-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 24px;
+  margin: 0;
+  font-size: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+}
+.newco-testimonial-card p {
+  margin: 0 0 16px;
+  color: var(--newco-text);
+}
+.newco-testimonial-card footer {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+}
+.newco-testimonial-card__name {
+  font-weight: 700;
+}
+.newco-testimonial-card__detail {
+  color: var(--newco-text-muted);
+}
+.newco-testimonials__dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 24px;
+}
+.newco-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  background: var(--newco-border);
+  cursor: pointer;
+  padding: 0;
+}
+.newco-dot.is-active {
+  background: var(--newco-primary);
+}
+
+.newco-badges__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 32px 24px;
+}
+.newco-badges__icon {
+  color: var(--newco-border);
+}
+
+.newco-partner-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.newco-partner-card {
+  background: #fff;
+  border: 1px solid var(--newco-border-subtle);
+  border-radius: 8px;
+  padding: 20px;
+}
+.newco-partner-card h3 {
+  font-size: 15px;
+  margin: 0 0 8px;
+}
+.newco-partner-card p {
+  font-size: 13px;
+  color: var(--newco-text-muted);
+  margin: 0 0 12px;
+}
+
+.newco-articles__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+.newco-article-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.newco-article-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  object-position: center center;
+  border-radius: 8px;
+  display: block;
+  margin-bottom: 16px;
+}
+.newco-article-card__tag {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--newco-primary);
+  text-transform: uppercase;
+  margin: 0 0 6px;
+}
+.newco-article-card h3 {
+  font-size: 16px;
+  margin: 0 0 6px;
+}
+.newco-article-card__date {
+  font-size: 12px;
+  color: var(--newco-text-muted);
+  margin: 0 0 10px;
+}
+.newco-article-card__excerpt {
+  font-size: 13px;
+  color: var(--newco-text-muted);
+  margin: 0 0 12px;
+}
+
+.newco-cta-banner {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+.newco-cta-banner .newco-section__title {
+  margin: 0;
+}
+
+/* ── Footer ─────────────────────────────────────────────────────────── */
+
+.newco-footer {
+  background: var(--newco-ink);
+  color: rgba(255, 255, 255, 0.75);
+  padding-top: 56px;
+}
+.newco-footer__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+  padding-bottom: 40px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.newco-footer__col h4 {
+  color: #fff;
+  font-size: 13px;
+  margin: 0 0 16px;
+}
+.newco-footer__col ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.newco-footer__col a {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  text-decoration: none;
+}
+.newco-footer__col a:hover {
+  color: #fff;
+}
+/*
+ * Same structural pattern as Boots' footer newsletter/socials/CTA band
+ * (proto-footer__extras / __block-title / __email-row / __cta-row in
+ * globals-chrome.css) — flex-wrap blocks, pill-shaped email row, pill
+ * CTAs — with NewCo's own red brand color instead of Boots navy/teal.
+ * Light band between the dark link columns and the dark copyright bar.
+ */
+.newco-footer__newsletter-band {
+  background: var(--newco-surface-muted);
+  color: var(--newco-text);
+}
+.newco-footer__extras {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  padding: 48px 24px;
+}
+.newco-footer__block {
+  flex: 1 1 220px;
+  min-width: 220px;
+  max-width: 360px;
+}
+.newco-footer__block-title {
+  margin: 0 0 16px;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 28px;
+  color: var(--newco-text);
+}
+.newco-footer__block-copy {
+  margin: 0 0 16px;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--newco-text-muted);
+}
+.newco-footer__email-row {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  min-height: 44px;
+  border-radius: 360px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--newco-border);
+}
+.newco-footer__email-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  padding: 0 16px;
+  font-size: 13px;
+  color: var(--newco-text);
+  background: transparent;
+}
+.newco-footer__email-input::placeholder {
+  color: var(--newco-text-muted);
+}
+.newco-footer__signup-btn {
+  flex-shrink: 0;
+  min-width: 96px;
+  padding: 0 24px;
+  border: none;
+  border-radius: 360px;
+  background: var(--newco-primary);
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.newco-footer__signup-btn:hover {
+  background: var(--newco-primary-hover);
+}
+.newco-social-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.newco-icon-btn--muted {
+  border: 1px solid var(--newco-border);
+  background: #fff;
+  color: var(--newco-text-muted);
+}
+.newco-icon-btn--muted:hover {
+  background: var(--newco-surface);
+  color: var(--newco-primary);
+}
+.newco-footer__cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.newco-footer__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 20px;
+  border-radius: 360px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.18s ease, transform 0.12s ease, color 0.18s ease;
+}
+.newco-footer__cta--outline {
+  background: #fff;
+  color: var(--newco-text);
+  border: 1px solid var(--newco-border);
+}
+.newco-footer__cta--outline:hover {
+  background: var(--newco-surface-muted);
+  color: var(--newco-primary);
+  transform: translateY(-1px);
+}
+.newco-footer__bottom {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 24px;
+  font-size: 12px;
+}
+
+@media (max-width: 900px) {
+  .newco-help-grid,
+  .newco-category-grid,
+  .newco-partner-grid,
+  .newco-article-grid,
+  .newco-footer__grid,
+  .newco-testimonials__track {
+    grid-template-columns: 1fr;
+  }
+  .newco-split {
+    grid-template-columns: 1fr;
+  }
+  .newco-nav {
+    flex-wrap: wrap;
+  }
+}

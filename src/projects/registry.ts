@@ -1,10 +1,12 @@
 import type { PersonaDefinition, ProjectDefinition, ProjectId, PersonaId } from "@/projects/types";
 import { BOOTS_PHARMACY_PROJECT } from "@/projects/boots-pharmacy";
 import { PUMA_PROJECT } from "@/projects/puma";
+import { NEWCO_PROJECT } from "@/projects/newco";
 
 export const STUDIO_PROJECTS: ProjectDefinition[] = [
   BOOTS_PHARMACY_PROJECT,
   PUMA_PROJECT,
+  NEWCO_PROJECT,
 ];
 
 const PROJECT_BY_ID = new Map<ProjectId, ProjectDefinition>(
